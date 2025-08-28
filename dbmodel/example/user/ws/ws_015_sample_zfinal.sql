@@ -41,7 +41,8 @@ WHERE parameter = 'inp_options_debug';
 UPDATE cat_feature_node SET graph_delimiter = '{MINSECTOR}' WHERE id = 'SHUTOFF_VALVE';
 UPDATE cat_feature_node SET graph_delimiter = '{MINSECTOR}' WHERE id = 'CHECK_VALVE';
 UPDATE cat_feature_node SET graph_delimiter = '{PRESSZONE}' WHERE id IN ('PUMP', 'PR_REDUC_VALVE','PR_BREAK_VALVE','PR_SUSTA_VALVE');
-UPDATE cat_feature_node SET graph_delimiter='{SECTOR,DMA}' WHERE id='TANK';
+UPDATE cat_feature_node SET graph_delimiter=NULL WHERE id='PRESSURE_METER';
+UPDATE cat_feature_node SET graph_delimiter='{SECTOR,DMA,PRESSZONE}' WHERE id='TANK';
 
 -- 01/05/2024
 UPDATE config_param_system SET value =
@@ -84,11 +85,6 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
-
--- run graphanalytics for presszone
-SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"PRESSZONE", "exploitation":"1", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"8"}, "aux_params":null}}$$);
-
-SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"PRESSZONE", "exploitation":"2", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"8"}, "aux_params":null}}$$);
 
 
 UPDATE ext_rtc_hydrometer SET is_waterbal = false WHERE  id::integer in (3,4);
@@ -152,3 +148,7 @@ FROM element e
 JOIN cat_element ce ON ce.id::text = e.elementcat_id::text
 LEFT JOIN cat_feature cf ON ce.element_type::text = cf.id::text
 WHERE cf.feature_class='GENELEM';
+
+update plan_psector set active = true;
+
+update element set code = element_id;

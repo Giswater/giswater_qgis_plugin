@@ -136,8 +136,8 @@ BEGIN
 					WHEN 'cm' THEN 2
 					ELSE 1
 				END,
-				group_order,
-				orderby
+				group_order desc,
+				orderby desc
 		) d), '[]'::json) INTO v_final;
 
 	ELSE
@@ -160,7 +160,8 @@ BEGIN
 				CASE
 					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 					ELSE st.addparam->>'pkey'
-				END AS "tableId"
+				END AS "tableId",
+				st.addparam
 			FROM sys_table st
 			JOIN config_typevalue ct ON ct.id = st.context
 			LEFT JOIN (

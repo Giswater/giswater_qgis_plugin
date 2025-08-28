@@ -227,6 +227,19 @@ BEGIN
                        "data":{"message":"3498", "function":"2736", "parameters":{"v_related_id":"'||v_related_id||'"}, "fid":"152", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 		END IF;
 
+		IF v_project_type = 'WS' THEN
+			--remove arc_id reference from inlet_arc if there are man_valve related
+			EXECUTE 'UPDATE man_source SET inlet_arc = array_remove(inlet_arc, '||quote_literal(v_feature_id)||') WHERE '||quote_literal(v_feature_id)||'=ANY(inlet_arc);';
+			EXECUTE 'UPDATE man_tank SET inlet_arc = array_remove(inlet_arc, '||quote_literal(v_feature_id)||') WHERE '||quote_literal(v_feature_id)||'=ANY(inlet_arc);';
+			EXECUTE 'UPDATE man_wtp SET inlet_arc = array_remove(inlet_arc, '||quote_literal(v_feature_id)||') WHERE '||quote_literal(v_feature_id)||'=ANY(inlet_arc);';
+			EXECUTE 'UPDATE man_waterwell SET inlet_arc = array_remove(inlet_arc, '||quote_literal(v_feature_id)||') WHERE '||quote_literal(v_feature_id)||'=ANY(inlet_arc);';
+
+			--set to_arc to null if there are man_valve related
+			EXECUTE 'UPDATE man_valve SET to_arc = NULL WHERE to_arc = '||v_feature_id||';';
+			EXECUTE 'UPDATE man_pump SET to_arc = NULL WHERE to_arc = '||v_feature_id||';';
+			EXECUTE 'UPDATE man_meter SET to_arc = NULL WHERE to_arc = '||v_feature_id||';';
+		END IF;
+
 		--set arc_id to null if there are nodes related
 		EXECUTE 'SELECT string_agg(node_id::text,'','') FROM node WHERE arc_id='||v_feature_id||''
 		INTO v_related_id;

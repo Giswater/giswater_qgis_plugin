@@ -162,7 +162,7 @@ BEGIN
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_current')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 	IF v_level = 1 THEN
@@ -175,8 +175,9 @@ BEGIN
 	 	join plan_psector_x_arc px using (arc_id) 
 	 	LEFT JOIN node n ON n.node_id = a.node_1
 	 	LEFT JOIN node m ON m.node_id = a.node_2 
-	 	WHERE psector_id = '||v_psector||' 
-		AND st_distance(st_startpoint(a.the_geom), st_endpoint(a.the_geom)) != st_distance(n.the_geom, m.the_geom)';
+	 	WHERE psector_id = '||v_psector||'
+		AND st_distance(st_startpoint(a.the_geom), st_endpoint(a.the_geom)) - st_distance(n.the_geom, m.the_geom) 
+		NOT BETWEEN -0.05 AND 0.05';
 
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;

@@ -173,7 +173,12 @@ BEGIN
 	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns
 		WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column AND data_type!=v_datatype) IS NOT NULL THEN
 
-		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
+		IF v_datatype ILIKE '%int4[]%' OR v_datatype ILIKE '%integer[]%'  OR v_datatype ILIKE '%int8[]%' OR v_datatype ILIKE '%bigint[]%'THEN
+			v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING ARRAY['||quote_ident(v_column)||']';
+		ELSE
+			v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
+		END IF;
+		
 		EXECUTE v_querytext;
 
 		-- manage config_form_fields

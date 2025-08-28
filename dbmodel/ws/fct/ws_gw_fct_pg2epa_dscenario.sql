@@ -195,6 +195,12 @@ BEGIN
 		UPDATE temp_t_arc t SET minorloss = d.minorloss FROM inp_dscenario_shortpipe d
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
 
+		-- updating values for frshortpipes
+		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_frshortpipe d
+		WHERE t.arc_id = d.element_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		UPDATE temp_t_arc t SET minorloss = d.minorloss FROM inp_dscenario_frshortpipe d
+		WHERE t.arc_id = d.element_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+
 		-- updating values for pumps
 		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_pump d
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a') AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;

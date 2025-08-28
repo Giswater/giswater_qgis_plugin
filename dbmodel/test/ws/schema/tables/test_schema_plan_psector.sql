@@ -24,7 +24,7 @@ SELECT columns_are(
         'observ', 'rotation', 'scale', 'atlas_id', 'gexpenses', 'vat', 'other', 'active',
         'the_geom', 'enable_all', 'status', 'ext_code', 'text3', 'text4', 'text5', 'text6',
         'num_value', 'workcat_id', 'workcat_id_plan', 'parent_id', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'archived', 'creation_date'
+        'creation_date'
     ],
     'Table plan_psector should have the correct columns'
 );
@@ -65,7 +65,6 @@ SELECT col_type_is('plan_psector', 'created_at', 'timestamp without time zone', 
 SELECT col_type_is('plan_psector', 'created_by', 'character varying(50)', 'Column created_by should be character varying(50)');
 SELECT col_type_is('plan_psector', 'updated_at', 'timestamp without time zone', 'Column updated_at should be timestamp without time zone');
 SELECT col_type_is('plan_psector', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
-SELECT col_type_is('plan_psector', 'archived', 'boolean', 'Column archived should be boolean');
 
 -- Check default values
 SELECT col_has_default('plan_psector', 'psector_id', 'Column psector_id should have a default value');

@@ -21,7 +21,8 @@ SELECT columns_are(
     'macrodqa',
     ARRAY[
         'macrodqa_id', 'code', 'name', 'descript', 'expl_id', 'lock_level', 'active', 'the_geom',
-        'created_at', 'created_by', 'updated_at', 'updated_by'
+        'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam', 'link',
+        'muni_id', 'sector_id', 'stylesheet'
     ],
     'Table macrodqa should have the correct columns'
 );
@@ -46,7 +47,6 @@ SELECT col_type_is('macrodqa', 'updated_by', 'varchar(50)', 'Column updated_by s
 -- Check not null constraints
 SELECT col_not_null('macrodqa', 'macrodqa_id', 'Column macrodqa_id should be NOT NULL');
 SELECT col_not_null('macrodqa', 'name', 'Column name should be NOT NULL');
-SELECT col_not_null('macrodqa', 'expl_id', 'Column expl_id should be NOT NULL');
 
 -- Check default values
 SELECT col_default_is('macrodqa', 'active', 'true', 'Column active should default to true');

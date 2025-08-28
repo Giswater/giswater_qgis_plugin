@@ -188,18 +188,8 @@ BEGIN
             v_config = '{"use":[], "ignore":[], "forceClosed":[]}';
         END IF;
 
-        IF v_zone = 'DMA' THEN
-            v_id = 'dma_id';
-        ELSIF v_zone = 'SECTOR' THEN
-            v_id = 'sector_id';
-        ELSIF v_zone = 'PRESSZONE' THEN
-            v_id = 'presszone_id';
-        ELSIF v_zone = 'DQA' THEN
-            v_id = 'dqa_id';
-        ELSIF v_zone = 'DRAINZONE' THEN
-            v_id = 'drainzone_id';
-        END IF;
-        
+        v_id = lower(v_zone) || '_id';
+
         IF v_netscenario_id IS NULL THEN
             EXECUTE 'UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text;';
             RAISE NOTICE '%', ('UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text;');

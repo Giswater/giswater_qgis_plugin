@@ -15,18 +15,18 @@ SELECT plan(6);
 
 
 INSERT INTO ve_macroomzone (macroomzone_id, code, "name", descript, the_geom, expl_id)
-VALUES(-901, '-901', 'Undefined', NULL, NULL, '{0}');
+VALUES(-901, '-901', 'Undefined', NULL, NULL, '{1}');
 
-SELECT is((SELECT count(*)::integer FROM ve_macroomzone WHERE macroomzone_id = -901), 1, 'INSERT: ve_macroomzone -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM macroomzone WHERE macroomzone_id = -901), 1, 'INSERT: macroomzone -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM ve_macroomzone WHERE code = '-901'), 1, 'INSERT: ve_macroomzone -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM macroomzone WHERE code = '-901'), 1, 'INSERT: macroomzone -901 was inserted');
 
-UPDATE ve_macroomzone SET descript = 'updated descript' WHERE macroomzone_id = -901;
-SELECT is((SELECT descript FROM ve_macroomzone WHERE macroomzone_id = -901), 'updated descript', 'UPDATE: ve_macroomzone -901 was updated');
-SELECT is((SELECT descript FROM macroomzone WHERE macroomzone_id = -901), 'updated descript', 'UPDATE: macroomzone -901 was updated');
+UPDATE ve_macroomzone SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM ve_macroomzone WHERE code = '-901'), 'updated descript', 'UPDATE: ve_macroomzone -901 was updated');
+SELECT is((SELECT descript FROM macroomzone WHERE code = '-901'), 'updated descript', 'UPDATE: macroomzone -901 was updated');
 
-DELETE FROM ve_macroomzone WHERE macroomzone_id = -901;
-SELECT is((SELECT count(*)::integer FROM ve_macroomzone WHERE macroomzone_id = -901), 0, 'DELETE: ve_macroomzone -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM macroomzone WHERE macroomzone_id = -901), 0, 'DELETE: macroomzone -901 was deleted');
+DELETE FROM ve_macroomzone WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_macroomzone WHERE code = '-901'), 0, 'DELETE: ve_macroomzone -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM macroomzone WHERE code = '-901'), 0, 'DELETE: macroomzone -901 was deleted');
 
 
 SELECT * FROM finish();

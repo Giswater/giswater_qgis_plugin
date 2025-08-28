@@ -1,4 +1,4 @@
-3.6.005
+3.6.5
 *************
 - New field sector_id on inp_transects (UD).
 - New view v_edit_inp_transects with trigger.

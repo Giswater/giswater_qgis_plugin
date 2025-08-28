@@ -71,8 +71,8 @@ BEGIN
 
 	ELSIF v_networkmode = 3 THEN -- TRIMED NETWORK
 
-		INSERT INTO temp_t_link (link_id, feature_id, feature_type, state, expl_id, the_geom) 
-		SELECT link_id, feature_id, feature_type, state, expl_id, the_geom from ve_link; 
+		INSERT INTO temp_t_link (link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type) 
+		SELECT link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type from ve_link; 
 
 		
 		-- insertar all connecs
@@ -95,13 +95,13 @@ BEGIN
 	ELSIF v_networkmode = 4 THEN 
 
 		-- update patterns for connecs with associated link
-		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
+		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE connec_id::text = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- update patterns for pattern on connecs over arc
 		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- demand on connecs with associated link
-		UPDATE temp_t_node SET demand=v.demand FROM ve_inp_connec v WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
+		UPDATE temp_t_node SET demand=v.demand FROM ve_inp_connec v WHERE connec_id::text = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- demand on connecs over arc
 		UPDATE temp_t_node SET demand=v.demand FROM ve_inp_connec v WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';

@@ -89,6 +89,9 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Deactivate topology control for connecs and gullies.' ));
 
+	-- disable arc divide temporary
+	UPDATE config_param_user SET value = 'TRUE'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
 	--capture input values
  	v_old_psector_id = ((p_data ->>'data')::json->>'psector_id')::text;
 	v_new_psector_name = ((p_data ->>'data')::json->>'new_psector_name')::text;
@@ -311,6 +314,10 @@ BEGIN
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid=153) row;
+
+	-- enable arc divide temporary
+	UPDATE config_param_user SET value = 'FALSE'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
 
 	-- Control nulls
 	v_result := COALESCE(v_result, '{}');

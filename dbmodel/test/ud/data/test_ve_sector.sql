@@ -14,18 +14,18 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 INSERT INTO ve_sector
-(sector_id, code, "name", descript, macrosector_id, sector_type, the_geom, parent_id, graphconfig, stylesheet)
-VALUES(-901, '-901', 'sector_01', 'sector_project_ud', 1, NULL, NULL, NULL, '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}', NULL);
-SELECT is((SELECT count(*)::integer FROM ve_sector WHERE sector_id = -901), 1, 'INSERT: ve_sector -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM sector WHERE sector_id = -901), 1, 'INSERT: sector -901 was inserted');
+(sector_id, code, "name", descript, macrosector_id, sector_type, the_geom, graphconfig, stylesheet)
+VALUES(-901, '-901', 'sector_01', 'sector_project_ud', 1, NULL, NULL, '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}', NULL);
+SELECT is((SELECT count(*)::integer FROM ve_sector WHERE code = '-901'), 1, 'INSERT: ve_sector -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM sector WHERE code = '-901'), 1, 'INSERT: sector -901 was inserted');
 
-UPDATE ve_sector SET descript = 'updated descript' WHERE sector_id = -901;
-SELECT is((SELECT descript FROM ve_sector WHERE sector_id = -901), 'updated descript', 'UPDATE: ve_sector -901 was updated');
-SELECT is((SELECT descript FROM sector WHERE sector_id = -901), 'updated descript', 'UPDATE: sector -901 was updated');
+UPDATE ve_sector SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM ve_sector WHERE code = '-901'), 'updated descript', 'UPDATE: ve_sector -901 was updated');
+SELECT is((SELECT descript FROM sector WHERE code = '-901'), 'updated descript', 'UPDATE: sector -901 was updated');
 
-DELETE FROM ve_sector WHERE sector_id = -901;
-SELECT is((SELECT count(*)::integer FROM ve_sector WHERE sector_id = -901), 0, 'DELETE: ve_sector -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM sector WHERE sector_id = -901), 0, 'DELETE: sector -901 was deleted');
+DELETE FROM ve_sector WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM ve_sector WHERE code = '-901'), 0, 'DELETE: ve_sector -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM sector WHERE code = '-901'), 0, 'DELETE: sector -901 was deleted');
 
 
 SELECT * FROM finish();

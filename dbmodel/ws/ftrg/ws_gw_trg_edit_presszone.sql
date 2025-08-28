@@ -15,6 +15,7 @@ DECLARE
 
 	v_view_name TEXT; -- EDIT | UI
 	v_mapzone_id INTEGER;
+	v_presszone_id INTEGER;
 
 BEGIN
 
@@ -53,47 +54,42 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
+		SELECT max(presszone_id::integer)+1 INTO v_presszone_id FROM presszone WHERE presszone_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_presszone_id::text;
+		END IF;
+
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
+
 		IF v_view_name = 'EDIT' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
 					NEW.expl_id := (SELECT array_agg(expl_id) FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				END IF;
 			END IF;
-		ELSIF v_view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, code, name, expl_id, graphconfig, head, stylesheet, descript, avg_press, presszone_type, link, muni_id, sector_id, lock_level)
-		VALUES (NEW.presszone_id, NEW.presszone_id, NEW.name, NEW.expl_id, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.descript,
-		NEW.avg_press, NEW.presszone_type, NEW.link, NEW.muni_id, NEW.sector_id, NEW.lock_level);
+		INSERT INTO presszone (presszone_id, code, name, descript, active, presszone_type, expl_id, sector_id, muni_id, avg_press, head, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+		VALUES (v_presszone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.presszone_type, NEW.expl_id, NEW.sector_id, NEW.muni_id, NEW.avg_press, 
+		NEW.head, NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
 
-		IF v_view_name = 'UI' THEN
-			UPDATE presszone SET active = NEW.active WHERE presszone_id = NEW.presszone_id;
-		ELSIF v_view_name = 'EDIT' THEN
-			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = NEW.presszone_id;
+		IF v_view_name = 'EDIT' THEN
+			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = OLD.presszone_id;
 		END IF;
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		IF v_view_name = 'UI' THEN
-			IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-				PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'presszone', 'mapzoneId', OLD.presszone_id)));
-			END IF;
-		END IF;
-
 		UPDATE presszone
-		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, graphconfig=NEW.graphconfig::json,
-		head = NEW.head, stylesheet=NEW.stylesheet::json, descript=NEW.descript, updated_at=now(), updated_by = current_user,
-		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, link = NEW.link, muni_id = NEW.muni_id, sector_id = NEW.sector_id, lock_level=NEW.lock_level
+		SET presszone_id=NEW.presszone_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, presszone_type=NEW.presszone_type, expl_id=NEW.expl_id, 
+		muni_id = NEW.muni_id, sector_id = NEW.sector_id, avg_press=NEW.avg_press, head = NEW.head, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json,
+		link = NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, updated_at=now(), updated_by = current_user
 		WHERE presszone_id=OLD.presszone_id;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE presszone SET active = NEW.active WHERE presszone_id = OLD.presszone_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = OLD.presszone_id;
 		END IF;
 

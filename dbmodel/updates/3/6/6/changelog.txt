@@ -1,4 +1,4 @@
-3.6.006
+3.6.6
 *************
 - Minor bug fix
 - New function to merge psectors (gw_fct_psector_merge)

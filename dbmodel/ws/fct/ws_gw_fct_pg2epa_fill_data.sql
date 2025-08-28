@@ -27,6 +27,7 @@ v_forcereservoirsoninlets boolean;
 v_forcetanksoninlets boolean;
 v_count integer;
 v_querytext text;
+v_exporthybriddma boolean;
 
 BEGIN
 
@@ -41,6 +42,7 @@ BEGIN
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
 	v_forcereservoirsoninlets := (SELECT value::json->>'forceReservoirsOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 	v_forcetanksoninlets := (SELECT value::json->>'forceTanksOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+	v_exporthybriddma := (SELECT value::boolean FROM config_param_system WHERE parameter = 'epa_export_hybrid_dma');
 
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -69,12 +71,6 @@ BEGIN
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
-	
-	IF v_networkmode = 1 THEN
-		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
-	ELSIF v_networkmode = 5 THEN
-		v_querytext = v_querytext || ' JOIN dma ON dma.dma_id = n.dma_id WHERE dma.dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_selecteddma'' AND cur_user = current_user)';
-	END IF;
 
 	EXECUTE v_querytext;
 
@@ -154,7 +150,7 @@ BEGIN
 		ve_arc.expl_id, ve_arc.dma_id, presszone_id, dqa_id, minsector_id,
 		(case when ve_arc.builtdate is not null then (now()::date-ve_arc.builtdate)/30 else 0 end)
 		FROM selector_sector, ve_arc
-			LEFT JOIN value_state_type ON id=state_type
+			LEFT JOIN value_state_type ON id=ve_arc.state_type
 			LEFT JOIN cat_arc ON ve_arc.arccat_id = cat_arc.id
 			LEFT JOIN cat_material ON cat_arc.matcat_id = cat_material.id
 			LEFT JOIN inp_pipe ON ve_arc.arc_id = inp_pipe.arc_id
@@ -175,7 +171,11 @@ BEGIN
 			AND st_length(ve_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode = 1 THEN
-		v_querytext = v_querytext || ' AND dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
+		IF v_exporthybriddma THEN
+			v_querytext = v_querytext || ' AND dma.dma_type IN (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND (idval = ''TRANSMISSION'' OR idval = ''HYBRID''))';
+		ELSE
+			v_querytext = v_querytext || ' AND dma.dma_type = (SELECT id FROM edit_typevalue WHERE typevalue = ''dma_type'' AND idval = ''TRANSMISSION'')';
+		END IF;
 	END IF;
 
 	IF v_networkmode = 5 THEN
@@ -190,24 +190,24 @@ BEGIN
 		EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
 			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
 			SELECT concat(''CO'',connec_id), connec_id as node_1, 
-			CASE 	WHEN exit_type = ''ARC'' THEN concat(''VN'',vnode_id)
-				WHEN exit_type IN (''NODE'', ''CONNEC'') THEN exit_id::text 
-				ELSE pjoint_id end AS node_2, 
-			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
+			CASE 	WHEN t.exit_type = ''ARC'' THEN concat(''VN'',t.link_id)
+				WHEN t.exit_type IN (''NODE'', ''CONNEC'') THEN t.exit_id::text 
+				ELSE pjoint_id::text end AS node_2, 
+			''LINK'', conneccat_id, ''PIPE'', t.sector_id, t.state, t.state_type, t.annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
-			(CASE WHEN l.custom_length IS NOT NULL THEN l.custom_length ELSE st_length(l.the_geom) END), 
+			(CASE WHEN t.custom_length IS NOT NULL THEN t.custom_length ELSE st_length(t.the_geom) END), 
 			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from ve_arc (dint)...
-			l.the_geom,
+			t.the_geom,
 			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
-			FROM selector_sector, temp_t_link l 
-			JOIN connec c ON connec_id = feature_id
-			JOIN value_state_type ON value_state_type.id = state_type
+			FROM selector_sector, ve_link t
+			JOIN connec c ON connec_id = t.feature_id
+			JOIN value_state_type ON value_state_type.id = c.state_type
 			JOIN cat_connec ON cat_connec.id = conneccat_id
 			JOIN inp_connec USING (connec_id)
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_connec.matcat_id
-				WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
-				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
+				WHERE (now()::date - (CASE WHEN c.builtdate IS NULL THEN ''1900-01-01''::date ELSE c.builtdate END))/365 >= cat_mat_roughness.init_age
+				AND (now()::date - (CASE WHEN c.builtdate IS NULL THEN ''1900-01-01''::date ELSE c.builtdate END))/365 <= cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 				AND epa_type = ''JUNCTION''
 				AND c.sector_id > 0 AND c.state > 0

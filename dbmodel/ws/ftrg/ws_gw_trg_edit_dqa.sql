@@ -15,7 +15,7 @@ DECLARE
 
 	v_view_name TEXT; -- EDIT | UI
 	v_mapzone_id INTEGER;
-
+	v_dqa_id INTEGER;
 
 BEGIN
 
@@ -54,6 +54,15 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
+		SELECT max(dqa_id::integer)+1 INTO v_dqa_id FROM dqa WHERE dqa_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_dqa_id::text;
+		END IF;
+
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
+
 		IF v_view_name = 'EDIT' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
@@ -63,32 +72,20 @@ BEGIN
 
 			v_mapzone_id = NEW.macrodqa_id;
 		ELSIF v_view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
-
 			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa;
 		END IF;
 
-		INSERT INTO dqa (dqa_id, code, name, expl_id, macrodqa_id, descript, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id, lock_level)
-		VALUES (NEW.dqa_id, NEW.dqa_id, NEW.name, NEW.expl_id, v_mapzone_id, NEW.descript, NEW.pattern_id, NEW.dqa_type,
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.muni_id, NEW.sector_id, NEW.lock_level);
+		INSERT INTO dqa (dqa_id, code, name, descript, active, dqa_type, macrodqa_id, expl_id, sector_id, muni_id, avg_press, pattern_id, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+		VALUES (v_dqa_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.dqa_type, NEW.macrodqa_id, NEW.expl_id, NEW.sector_id, NEW.muni_id, NEW.avg_press, NEW.pattern_id,
+		NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
 
-		IF v_view_name = 'UI' THEN
-			UPDATE dqa SET active = NEW.active WHERE dqa_id = NEW.dqa_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE dqa SET the_geom = NEW.the_geom WHERE dqa_id = NEW.dqa_id;
 		END IF;
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-
-		IF v_view_name = 'UI' THEN
-			IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-				PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'dqa', 'mapzoneId', OLD.dqa_id)));
-			END IF;
-		END IF;
 
 		IF v_view_name = 'EDIT' THEN
 			v_mapzone_id = NEW.macrodqa_id;
@@ -97,14 +94,12 @@ BEGIN
 		END IF;
 
 		UPDATE dqa
-		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=v_mapzone_id, descript=NEW.descript,
-		pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json,
-		stylesheet = NEW.stylesheet::json, updated_at=now(), updated_by = current_user, muni_id = NEW.muni_id, sector_id = NEW.sector_id, lock_level=NEW.lock_level
+		SET dqa_id=NEW.dqa_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, dqa_type=NEW.dqa_type, macrodqa_id=v_mapzone_id, expl_id=NEW.expl_id,
+		sector_id=NEW.sector_id, muni_id=NEW.muni_id, avg_press=NEW.avg_press, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json,
+		stylesheet=NEW.stylesheet::json, link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, updated_at=now(), updated_by = current_user
 		WHERE dqa_id=OLD.dqa_id;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE dqa SET active = NEW.active WHERE dqa_id = OLD.dqa_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE dqa SET the_geom = NEW.the_geom WHERE dqa_id = OLD.dqa_id;
 		END IF;
 

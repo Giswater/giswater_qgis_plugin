@@ -1291,6 +1291,7 @@ UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_gully WHERE
 UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_arc WHERE arc_id IS NOT NULL', vdefault=NULL WHERE listname='v_ui_element_x_arc' AND device=3;
 
 -- 11/02/2025
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL) ON CONFLICT DO NOTHING;
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_data_4', 'lyt_data_4', 'layoutData4', '{"createAddfield":"TRUE"}'::json);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'check_project', 'tab_data', 'versions_check', 'lyt_data_1', 1, NULL, 'check', 'Versions', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);

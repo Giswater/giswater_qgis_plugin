@@ -14,10 +14,10 @@ RETURNS json AS
 $BODY$
 /* FLUID TYPES
 * 0: NOT INFORMED
-* 1: RAINWATER
-* 2: DILUTED
-* 3: FECAL
-* 4: UNITARY
+* 1: STORMWATER
+* 2: DILUTE COMBINED
+* 3: SEWAGE
+* 4: COMBINED
 
 
 * EXAMPLE:
@@ -88,7 +88,7 @@ DECLARE
 	-- dialog variables
 	v_process_name text;
 	v_expl_id text;
-	v_expl_id_array text;
+	v_expl_id_array text[];
     v_parameters json;
 	v_usepsector boolean;
 	v_commitchanges boolean;
@@ -109,6 +109,8 @@ DECLARE
 	v_result_polygon json;
 
 	v_response JSON;
+
+	v_count integer;
 
 BEGIN
 
@@ -131,25 +133,9 @@ BEGIN
 		v_commitchanges := FALSE;
 	END IF;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_info := COALESCE(v_result, '{}');
-	v_result_info := concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-
-	-- MANAGE EXPL ARR
-    -- For user selected exploitations
-    IF v_expl_id = '-901' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-		FROM selector_expl;
-    -- For all exploitations
-    ELSIF v_expl_id = '-902' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-        FROM exploitation
-		WHERE active;
-    -- For a specific exploitation/s
-    ELSE
-		v_expl_id_array = string_to_array(v_expl_id, ',');
-    END IF;
+    -- Get exploitation ID array
+    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
 
 	-- Delete temporary tables
 	-- =======================
@@ -172,26 +158,27 @@ BEGIN
 	-- Start Building Log Message
 	-- =======================
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3424", "fid":"'||v_fid||'", "is_process":true, "is_header":"true"}}$$)';
+                       "data":{"function":"3424", "fid":"'||v_fid||'", "is_process":true, "is_header":"true", "tempTable":"temp_"}}$$)';
 
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update fluid type values: ', upper(v_commitchanges::text)));
 
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008"}}$$)';
+                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008", "tempTable":"temp_"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009", "tempTable":"temp_"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
+                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009", "tempTable":"temp_"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"0", "is_process":true, "is_header":"true", "label_id":"3012", "separator_id":"2010"}}$$)';
+                       "data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"0", "is_process":true, "is_header":"true", "label_id":"3012", "separator_id":"2010", "tempTable":"temp_"}}$$)';
 
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || v_expl_id_array || '", "mapzone_name":"'|| v_process_name ||'"}}';
+	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_process_name ||'"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -354,6 +341,66 @@ BEGIN
                        "data":{"message":"4210", "function":"3424", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
 
 	END IF;
+
+
+	-- Fluid type equal to zero
+	v_count = 0;
+	SELECT count(DISTINCT arc_id) INTO v_count FROM v_temp_arc WHERE fluid_type = 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+	SELECT count(DISTINCT node_id) INTO v_count FROM v_temp_node WHERE fluid_type = 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+	SELECT count(DISTINCT connec_id) INTO v_count FROM v_temp_connec WHERE fluid_type = 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+	SELECT count(DISTINCT gully_id) INTO v_count FROM v_temp_gully WHERE fluid_type = 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+
+	-- Fluid type different to zero
+	SELECT count(DISTINCT arc_id) INTO v_count FROM v_temp_arc WHERE fluid_type > 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+	SELECT count(DISTINCT node_id) INTO v_count FROM v_temp_node WHERE fluid_type > 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+	SELECT count(DISTINCT connec_id) INTO v_count FROM v_temp_connec WHERE fluid_type > 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+	SELECT count(DISTINCT gully_id) INTO v_count FROM v_temp_gully WHERE fluid_type > 0;
+	IF v_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true, "tempTable":"temp_"}}$$)';
+	END IF;
+
+	-- insert spacer for warning and info
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  0, '');
+
+
+
+	-- Get Info for the audit
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) ORDER BY criticity DESC, id ASC) row;
+	v_result := COALESCE(v_result, '{}');
+	v_result_info := concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control NULL values
 	v_result_info := COALESCE(v_result_info, '{}');

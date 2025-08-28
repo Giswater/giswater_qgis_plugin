@@ -22,7 +22,8 @@ SELECT columns_are(
     ARRAY[
         'omzone_id', 'code', 'name', 'descript', 'omzone_type', 'expl_id', 'macroomzone_id',
         'minc', 'maxc', 'effc', 'link', 'graphconfig', 'stylesheet', 'lock_level',
-        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by',
+        'addparam', 'muni_id', 'sector_id'
     ],
     'Table omzone should have the correct columns'
 );
@@ -36,7 +37,7 @@ SELECT col_type_is('omzone', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('omzone', 'name', 'varchar(30)', 'Column name should be varchar(30)');
 SELECT col_type_is('omzone', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('omzone', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
-SELECT col_type_is('omzone', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('omzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('omzone', 'macroomzone_id', 'integer', 'Column macroomzone_id should be integer');
 SELECT col_type_is('omzone', 'minc', 'double precision', 'Column minc should be double precision');
 SELECT col_type_is('omzone', 'maxc', 'double precision', 'Column maxc should be double precision');
@@ -54,7 +55,6 @@ SELECT col_type_is('omzone', 'updated_by', 'varchar(50)', 'Column updated_by sho
 
 -- Check foreign keys
 SELECT has_fk('omzone', 'Table omzone should have foreign keys');
-SELECT fk_ok('omzone', 'expl_id', 'exploitation', 'expl_id', 'FK omzone_expl_id_fkey should exist');
 SELECT fk_ok('omzone', 'macroomzone_id', 'macroomzone', 'macroomzone_id', 'FK omzone_macroomzone_id_fkey should exist');
 
 -- Check triggers

@@ -339,13 +339,13 @@ BEGIN
 				VALUES ('||quote_literal(NEW.id)||','||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';
 			ELSIF lower(NEW.feature_type)='connec' THEN
 				EXECUTE 'INSERT INTO cat_feature_connec (id)
-				VALUES ('||quote_literal(NEW.id)||',);';
+				VALUES ('||quote_literal(NEW.id)||');';
 			ELSIF lower(NEW.feature_type)='link' THEN
 				EXECUTE 'INSERT INTO cat_feature_link (id)
 				VALUES ('||quote_literal(NEW.id)||');';
 			ELSIF lower(NEW.feature_type)='gully' THEN
 				EXECUTE 'INSERT INTO cat_feature_gully (id)
-				VALUES ('||quote_literal(NEW.id)||',);';
+				VALUES ('||quote_literal(NEW.id)||');';
 			ELSIF lower(NEW.feature_type)='element' THEN
 				EXECUTE 'INSERT INTO cat_feature_element (id, epa_default)
 				VALUES ('||quote_literal(NEW.id)||','||quote_literal(v_feature.epa_default)||')';

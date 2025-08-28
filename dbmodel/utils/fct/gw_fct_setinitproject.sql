@@ -67,7 +67,7 @@ BEGIN
 	-- get user parameters
 	SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
 
-	-- profilactic null control
+-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
@@ -112,11 +112,16 @@ BEGIN
 	-- Force exploitation selector in case of null values
 	IF v_qgis_init_guide_map AND (v_isaudit IS NULL OR v_isaudit = 'false') THEN
 		DELETE FROM selector_expl WHERE cur_user = current_user;
+		DELETE FROM selector_sector WHERE cur_user = current_user;
+		DELETE FROM selector_muni WHERE cur_user = current_user;
 
 		-- looking for additional schema
 		IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
 			EXECUTE 'SET search_path = '||v_addschema||', public';
 			DELETE FROM selector_expl WHERE cur_user = current_user;
+			DELETE FROM selector_sector WHERE cur_user = current_user;
+			DELETE FROM selector_muni WHERE cur_user = current_user;
+
 			SET search_path = 'SCHEMA_NAME', public;
 		END IF;
 	ELSE
@@ -179,18 +184,16 @@ BEGIN
 	-- Disable psector mode
 	INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('plan_psector_current', NULL, current_user)
 	ON CONFLICT("parameter", cur_user) DO NOTHING;
-
 	UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-
-
-    --    Control null
+	
+    -- Control null
 	v_message := COALESCE(v_message, '{}');
 	v_return := COALESCE(v_return,'{}');
 
 	--  Return
     RETURN ('{"status":"Accepted", "message":{"level":1, "text":"'|| v_message ||'"}, "version":"'||v_version||'"'||'}')::json;
 
-	--  Exception handling
+	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;

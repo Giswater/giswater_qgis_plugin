@@ -30,15 +30,14 @@ DECLARE
     v_project_type TEXT;
 
     -- parameters
-    v_expl_id_array TEXT;
+    v_expl_id_array text[];
     v_mapzone_name TEXT;
 
     -- extra variables
     v_graph_delimiter TEXT;
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
-    v_querytext TEXT;
-
+    v_query_text TEXT;
 BEGIN
 
 	-- Search path
@@ -48,8 +47,8 @@ BEGIN
     SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get variables from input JSON
-    v_expl_id_array = (SELECT (p_data::json->>'data')::json->>'expl_id_array');
-    v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
+    v_expl_id_array = string_to_array(p_data->'data'->>'expl_id_array', ',');
+    v_mapzone_name = p_data->'data'->>'mapzone_name';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -74,7 +73,9 @@ BEGIN
         v_graph_delimiter := v_mapzone_name;
     END IF;
 
-    v_querytext = '
+
+
+    v_query_text = '
     WITH connectedcomponents AS (
         SELECT * FROM pgr_connectedcomponents($q$
             SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
@@ -88,7 +89,7 @@ BEGIN
             SELECT 1
             FROM v_temp_node vtn
             WHERE c.node = vtn.node_id
-            AND vtn.expl_id::text = ANY (''' || v_expl_id_array || ''')
+            AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
             --AND vtn.node_id = -- node_1 from arc_id selected in mincut algorithm.
         )
         GROUP BY c.component
@@ -103,31 +104,31 @@ BEGIN
     );
     ';
 
-    EXECUTE v_querytext;
+    EXECUTE v_query_text;
 
     IF lower(v_mapzone_name) = 'fluidtype' THEN
-        v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, fluid_type)
+        v_query_text = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, fluid_type)
 	         SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, a.fluid_type
 	         FROM v_temp_arc a
 	         JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
 	         JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
 
-	    EXECUTE v_querytext;
+	    EXECUTE v_query_text;
     ELSE
         -- Dynamic column name for old_mapzone_id: %I_id -> dma_id, presszone_id, etc.
         -- node because we need to inform old mapzone_id for this nodes that is_operative is false.
-        v_querytext = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+        v_query_text = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
             SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
             FROM v_temp_arc a
             JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
             JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
-        EXECUTE v_querytext;
+        EXECUTE v_query_text;
 
         IF v_mapzone_name <> 'MINCUT' THEN
-            v_querytext = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
-            EXECUTE v_querytext;
-            v_querytext = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
-            EXECUTE v_querytext;
+            v_query_text = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
+            EXECUTE v_query_text;
+            v_query_text = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
+            EXECUTE v_query_text;
         END IF;
 
         IF v_project_type = 'WS' THEN

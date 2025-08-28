@@ -28,14 +28,16 @@ v_tstamp timestamp;
 v_geometry_type text;
 v_the_geom jsonb;
 v_geometry text;
+v_schema_parent text;
 
 BEGIN
 	-- search path
 	SET search_path = "audit", public;
 	v_schemaname = 'audit';
 
+	v_schema_parent := (p_data->'schema'->>'parent_schema');
 	-- Get api version
-    SELECT value INTO v_version FROM PARENT_SCHEMA.config_param_system WHERE parameter = 'admin_version';
+	EXECUTE format('SELECT value FROM %I.config_param_system WHERE parameter = ''admin_version''', v_schema_parent) INTO v_version;
 
 	v_log_id = ((p_data ->>'form')::json->>'logId');
 	v_date = ((p_data ->>'form')::json->>'date');
@@ -53,12 +55,14 @@ BEGIN
 		FROM log
 		WHERE feature_id = v_feature_id
        	AND table_name = v_table_name
+		AND "schema" = v_schema_parent
 		ORDER BY tstamp DESC LIMIT 1;
 
 		SELECT newdata INTO v_olddata
 		FROM log
         WHERE feature_id = v_feature_id
 		AND table_name = v_table_name
+		AND "schema" = v_schema_parent
         AND tstamp::date <= v_date
 		AND tstamp < v_tstamp
         ORDER BY tstamp DESC LIMIT 1;
@@ -71,7 +75,7 @@ BEGIN
                  WHERE %I = %L 
                  AND date <= %L 
                  ORDER BY date DESC LIMIT 1) t',
-                'PARENT_SCHEMA_' || v_table_name,
+                v_schema_parent||'_' || v_table_name,
                 v_idname,
                 v_feature_id,
                 v_date

@@ -15,8 +15,14 @@ $BODY$
 
 /*
 
--- MODE 1: individual
-SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{}, "feature":{"id":["3470"]}, "data":{"filterFields":{}, "pageInfo":{}, "enddate":"2024-09-05", "action_mode": 2}}$$);
+-- MODE 1: individual - operative
+SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{}, 
+"feature":{"id":["3470"]}, "data":{"arccat_id":"FD-150", "enddate":"2024-09-05", "action_mode": 2}}$$);
+
+-- MODE 1: individual - plan
+SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{}, 
+"feature":{"id":["1044"]}, "data":{"plan_mode":true, "arccat_id":"FD150", "psectorId":1, "action_mode": 1, "state_type":null,  "workcatId":null}}$$);
+
 
 -- MODE 2: massive usign pure SQL
 SELECT SCHEMA_NAME.gw_fct_setarcfusion(concat('
@@ -85,7 +91,6 @@ v_schemaname text;
 v_arccat_id text;
 v_epatype text;
 
-
 BEGIN
 
 	-- Search path
@@ -105,7 +110,6 @@ BEGIN
 	v_action_mode = ((p_data ->>'data')::json->>'action_mode')::integer;
 	v_arccat_id = ((p_data ->>'data')::json->>'arccat_id')::text;
 	v_arc_type = ((p_data ->>'data')::json->>'arc_type')::text;
-
 
 	-- Get state_type from default value if this isn't on input json
 	IF v_state_type IS NULL THEN

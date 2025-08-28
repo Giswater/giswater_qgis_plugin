@@ -306,6 +306,28 @@ BEGIN
 					v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'';
 
+					IF v_project_type = 'WS' THEN
+
+						--check if final nodes maybe graph delimiters
+						EXECUTE 'SELECT CASE WHEN (''NONE'' = ANY(graph_delimiter) OR ''MINSECTOR'' = ANY(graph_delimiter)) THEN NULL ELSE graph_delimiter END AS graph, node_1 FROM ve_arc a
+						JOIN ve_node n1 ON n1.node_id=node_1
+						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id
+						WHERE a.arc_id='||v_arc_id||''
+						INTO v_node1_graph, v_node_1;
+
+						EXECUTE 'SELECT CASE WHEN (''NONE'' = ANY(graph_delimiter) OR ''MINSECTOR'' = ANY(graph_delimiter)) THEN NULL ELSE graph_delimiter END AS graph,node_2 FROM ve_arc a
+						JOIN ve_node n2 ON n2.node_id=node_2
+						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id
+						WHERE a.arc_id='||v_arc_id||''
+						INTO v_node2_graph, v_node_2;
+
+						EXECUTE 'SELECT CASE WHEN (''NONE'' = ANY(graph_delimiter) OR ''MINSECTOR'' = ANY(graph_delimiter)) THEN NULL ELSE graph_delimiter END AS graph FROM ve_node
+						JOIN cat_feature_node cf2 ON node_type = cf2.id
+						WHERE node_id='||v_node_id||';'
+						INTO v_new_node_graph;
+
+					END IF;
+
 
 					-- In function of states and user's variables proceed.....
 					IF v_state_node=1 THEN
@@ -412,13 +434,8 @@ BEGIN
 						END IF;
 
 						-- connec
-						FOR v_connec_id IN
-						SELECT connec_id FROM connec c JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND
-						c.state = 1
-						LOOP
-							v_array_connec:= array_append(v_array_connec, v_connec_id::text);
-						END LOOP;
-
+						SELECT array_agg(connec_id) INTO v_array_connec FROM connec c WHERE arc_id=v_arc_id AND c.state = 1;
+			
 						SELECT count(connec_id) INTO v_count_connec FROM ve_connec WHERE arc_id=v_arc_id AND state > 0;
 
 						UPDATE plan_psector_x_connec SET link_id=NULL WHERE arc_id=v_arc_id;
@@ -427,12 +444,9 @@ BEGIN
 						-- gully
 						IF v_project_type='UD' THEN
 
-							FOR v_gully_id IN SELECT gully_id FROM gully g JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND
-							g.state = 1
-							LOOP
-								v_array_gully:= array_append(v_array_gully, v_gully_id);
-							END LOOP;
-
+							SELECT array_agg(gully_id) INTO v_array_gully FROM gully g JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND
+							g.state = 1;
+							
 							SELECT count(gully_id) INTO v_count_gully FROM ve_gully WHERE arc_id=v_arc_id AND state > 0;
 
 							UPDATE plan_psector_x_gully SET link_id=NULL WHERE arc_id=v_arc_id;
@@ -568,13 +582,14 @@ BEGIN
 						END LOOP;
 
 						-- reconnect connecs without link but with arc_id
-						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC'
+						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1
 						AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 						LOOP
-							SELECT a.arc_id INTO v_arc_closest FROM connec c, ve_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
-							AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1;
-							UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_connec.connec_id;
-							v_arc_closest = null;
+							SELECT a.arc_id INTO v_arc_closest FROM connec c, v_edit_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
+							AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) ORDER BY st_distance(a.the_geom, c.the_geom) ASC LIMIT 1;
+							
+							UPDATE connec SET arc_id = v_arc_closest WHERE connec_id = rec_connec.connec_id;
+						
 						END LOOP;
 
 						-- reconnec operative gully without link but with arc_id
@@ -1086,13 +1101,8 @@ BEGIN
 						UPDATE arc SET y1=null, custom_y1=null WHERE arc_id = rec_aux2.arc_id;
 						update config_param_system set value = true WHERE parameter='edit_state_topocontrol' ;
 					END IF;
-
-					---- place where work with automatize toarc
-
-					----
-
-					---- end of the place
-
+					
+					
 				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -1109,6 +1119,7 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
+
 
 	-- get results
 	-- info

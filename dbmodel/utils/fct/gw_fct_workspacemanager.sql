@@ -205,16 +205,16 @@ BEGIN
 
 	IF v_action = 'DELETE' THEN
 		--check if someone uses a workspace at the moment, if not, remove it
-		IF v_workspace_id::text IN (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user != current_user) THEN
+		IF v_workspace_id::text IN (SELECT value FROM config_param_user WHERE parameter='utils_workspace_current' AND cur_user != current_user) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3186", "function":"3078","parameters":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSIF v_iseditable IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3200", "function":"3078","parameters":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSE
-			IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user) = v_workspace_id::text THEN
+			IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_current' AND cur_user = current_user) = v_workspace_id::text THEN
 				--remove workspace from config_param_user
-				DELETE FROM config_param_user WHERE parameter = 'utils_workspace_vdefault' AND cur_user = current_user;
+				DELETE FROM config_param_user WHERE parameter = 'utils_workspace_current' AND cur_user = current_user;
 			END IF;
 			DELETE FROM cat_workspace WHERE id=v_workspace_id;
 			v_return_msg = 'Workspace successfully deleted';
@@ -227,7 +227,7 @@ BEGIN
 		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config, v_workspace_private) RETURNING id INTO v_workspace_id;
 
 		INSERT INTO config_param_user (parameter,value, cur_user)
-		VALUES ('utils_workspace_vdefault',v_workspace_id, current_user)
+		VALUES ('utils_workspace_current',v_workspace_id, current_user)
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
 
 		v_return_msg = 'Workspace successfully created';
@@ -249,9 +249,9 @@ BEGIN
 	ELSIF v_action = 'CURRENT' THEN
 
 		--save workspace in config_param_user
-		DELETE FROM config_param_user WHERE parameter = 'utils_workspace_vdefault' AND cur_user = current_user;
+		DELETE FROM config_param_user WHERE parameter = 'utils_workspace_current' AND cur_user = current_user;
 		INSERT INTO config_param_user (parameter,value, cur_user)
-		VALUES ('utils_workspace_vdefault', v_workspace_id, current_user);
+		VALUES ('utils_workspace_current', v_workspace_id, current_user);
 
 		--capture config of selected workspace
 		SELECT config INTO v_workspace_config FROM cat_workspace WHERE id=v_workspace_id;
@@ -282,7 +282,7 @@ BEGIN
 
 		SELECT id INTO v_workspace_id FROM cat_workspace WHERE config::text = v_check_config::text LIMIT 1;
 
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_current', v_workspace_id, current_user)
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_workspace_id;
 
 	END IF;
@@ -446,7 +446,7 @@ BEGIN
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- get uservalues
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_current')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 	SELECT row_to_json (a) INTO v_geometry

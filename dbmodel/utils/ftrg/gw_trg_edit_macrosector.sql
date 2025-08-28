@@ -12,9 +12,8 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_macrosector()
 $BODY$
 
 DECLARE
-
 	v_view_name TEXT; -- EDIT | UI
-
+	v_macrosector_id INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -33,18 +32,20 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 
-		IF v_view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
+		SELECT max(macrosector_id::integer)+1 INTO v_macrosector_id FROM macrosector WHERE macrosector_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_macrosector_id::text;
 		END IF;
 
-		INSERT INTO macrosector (macrosector_id, code, name, descript, lock_level)
-		VALUES (NEW.macrosector_id, NEW.macrosector_id, NEW.name, NEW.descript, NEW.lock_level);
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE macrosector SET active = NEW.active WHERE macrosector_id = NEW.macrosector_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		INSERT INTO macrosector (macrosector_id, code, name, descript, active, expl_id, muni_id, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+		VALUES (v_macrosector_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.expl_id, NEW.muni_id, 
+		NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
+
+		IF v_view_name = 'EDIT' THEN
 			UPDATE macrosector SET the_geom = NEW.the_geom WHERE macrosector_id = NEW.macrosector_id;
 		END IF;
 
@@ -52,13 +53,13 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE macrosector
-		SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript, lock_level=NEW.lock_level
+		SET macrosector_id=NEW.macrosector_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, expl_id=NEW.expl_id, 
+		muni_id=NEW.muni_id, stylesheet=NEW.stylesheet::json, link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, 
+		updated_at=now(), updated_by = current_user
 		WHERE macrosector_id=NEW.macrosector_id;
 
 
-		IF v_view_name = 'UI' THEN
-			UPDATE macrosector SET active = NEW.active WHERE macrosector_id = OLD.macrosector_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE macrosector SET the_geom = NEW.the_geom WHERE macrosector_id = OLD.macrosector_id;
 		END IF;
 

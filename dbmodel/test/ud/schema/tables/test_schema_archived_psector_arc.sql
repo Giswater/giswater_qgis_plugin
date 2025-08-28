@@ -32,7 +32,7 @@ SELECT columns_are(
         'updated_at','updated_by','created_by','district_id','workcat_id_plan','asset_id','pavcat_id','drainzone_id',
         'nodetype_1','node_sys_top_elev_1','node_sys_elev_1','nodetype_2','node_sys_top_elev_2','node_sys_elev_2','parent_id','adate','adescript','visitability',
         'label_quadrant','minsector_id','brand_id','model_id','serial_number','dwfzone_id','initoverflowpath','omunit_id','registration_date',
-        'meandering','conserv_state','om_state','last_visitdate','negative_offset','expl_visibility'
+        'meandering','conserv_state','om_state','last_visitdate','negative_offset','expl_visibility', 'psector_descript'
     ],
     'Table archived_psector_arc should have the correct columns'
 );

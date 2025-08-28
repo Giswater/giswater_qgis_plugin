@@ -1,4 +1,4 @@
-3.6.020
+3.6.20
 *************
 - Bug fix on manage multiple addfields when insert feature
 - Minor bug fix for non-superusers on go2epa

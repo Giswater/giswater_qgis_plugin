@@ -19,7 +19,6 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeo
 fid: 124
 */
 
-
 DECLARE
 
 rec_arc record;
@@ -352,6 +351,9 @@ BEGIN
 
 	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
 	UPDATE temp_t_arc SET diameter = dint FROM cat_node c WHERE arccat_id = c.id AND c.id IS NOT NULL AND diameter IS NULL;
+	
+	-- delete values to do not intersect with the log process
+	delete from t_anl_node WHERE fid = 124;
 
 	RETURN 0;
 

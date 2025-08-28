@@ -15,7 +15,7 @@ DECLARE
 rec record;
 arc_id_aux varchar;
 node_id_aux varchar;
-edit_arc_division_dsbl_aux boolean;
+v_arcdivision_disable boolean;
 v_project_type varchar;
 v_isarcdivide boolean;
 v_node_proximity double precision;
@@ -36,16 +36,16 @@ BEGIN
 		WHERE NEW.nodecat_id=cat_node.id;
 	END IF;
 
-	IF v_isarcdivide IS NULL THEN
-		SELECT value::boolean INTO edit_arc_division_dsbl_aux FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
-	ELSIF v_isarcdivide IS TRUE THEN
-		edit_arc_division_dsbl_aux = FALSE;
-	ELSIF v_isarcdivide IS FALSE THEN
-		edit_arc_division_dsbl_aux = TRUE;
+	SELECT value::boolean INTO v_arcdivision_disable FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
+	IF v_isarcdivide IS TRUE AND v_arcdivision_disable is not true THEN
+		v_arcdivision_disable = FALSE;
+	ELSE
+		v_arcdivision_disable = TRUE;
 	END IF;
 
 	--  Only enabled on insert
-	IF TG_OP = 'INSERT' AND edit_arc_division_dsbl_aux IS NOT TRUE THEN
+	IF TG_OP = 'INSERT' AND v_arcdivision_disable IS NOT TRUE THEN
 
 		SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
 
@@ -62,19 +62,14 @@ BEGIN
 
 			IF arc_id_aux IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_setarcdivide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
-
 			ELSE
-
 				perform gw_fct_arc_repair(concat('
 				{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":', v_srid, '}, "form":{},
 				"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["',arc_id,'"]},
 				"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{},
 				"aux_params":null}}')::json) from arc a where st_dwithin(a.the_geom, new.the_geom, v_node_proximity);
-
 			END IF;
-
 		END IF;
-
    	END IF;
 
 RETURN NEW;

@@ -99,6 +99,9 @@ BEGIN
 		v_querytext = '';
 	end if;
 
+	-- disable arc divide temporary
+	UPDATE config_param_user SET value = 'TRUE'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
 
 	select state into v_state from value_state_type where id=v_state_type;
 
@@ -206,6 +209,10 @@ EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2118", "fid":"116", "cr
 		INSERT INTO selector_audit (fid,cur_user) VALUES (116, current_user);
 	END IF;
 
+	-- enable arc divide temporary
+	UPDATE config_param_user SET value = 'FALSE'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
+  	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_point := COALESCE(v_result_point, '{}');

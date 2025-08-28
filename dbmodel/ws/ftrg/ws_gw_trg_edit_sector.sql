@@ -12,10 +12,9 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_sector()
 $BODY$
 
 DECLARE
-
 	v_view_name TEXT; -- EDIT | UI
 	v_mapzone_id INTEGER;
-
+	v_sector_id INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -48,6 +47,10 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
+		IF NEW.active IS NULL THEN
+				NEW.active = TRUE;
+		END IF;
+
 		IF v_view_name = 'EDIT' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
@@ -59,24 +62,23 @@ BEGIN
 			IF NEW.macrosector_id IS NULL THEN NEW.macrosector_id = 0; END IF;
 			v_mapzone_id = NEW.macrosector_id;
 		ELSIF v_view_name = 'UI' THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
-
 			SELECT macrosector_id INTO v_mapzone_id FROM macrosector WHERE name = NEW.macrosector;
 		END IF;
 
-		INSERT INTO sector (sector_id, code, name, descript, macrosector_id, sector_type, graphconfig, stylesheet, parent_id, pattern_id, avg_press, link, muni_id, expl_id, lock_level)
-		VALUES (NEW.sector_id, NEW.sector_id, NEW.name, NEW.descript, v_mapzone_id, NEW.sector_type,
-		NEW.graphconfig::json, NEW.stylesheet::json, NEW.parent_id, NEW.pattern_id, NEW.avg_press, NEW.link, NEW.muni_id, NEW.expl_id, NEW.lock_level);
+		SELECT max(sector_id::integer)+1 INTO v_sector_id FROM sector WHERE sector_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_sector_id::text;
+		END IF;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE sector SET active = NEW.active WHERE sector_id = NEW.sector_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		INSERT INTO sector (sector_id, code, name, descript, active, macrosector_id, sector_type, expl_id, muni_id, avg_press, pattern_id, graphconfig, stylesheet, lock_level, link, addparam)
+		VALUES (v_sector_id, NEW.code, NEW.name, NEW.descript, NEW.active, v_mapzone_id, NEW.sector_type, NEW.expl_id, NEW.muni_id,
+		NEW.avg_press, NEW.pattern_id, NEW.graphconfig::json, NEW.stylesheet::json, NEW.lock_level, NEW.link, NEW.addparam::json);
+
+		IF v_view_name = 'EDIT' THEN
 			UPDATE sector SET the_geom = NEW.the_geom WHERE sector_id = NEW.sector_id;
 		END IF;
 
-		INSERT INTO selector_sector VALUES (NEW.sector_id, current_user);
+		INSERT INTO selector_sector VALUES (v_sector_id, current_user);
 
 		RETURN NEW;
 
@@ -85,22 +87,17 @@ BEGIN
 		IF v_view_name = 'EDIT' THEN
 			v_mapzone_id = NEW.macrosector_id;
 		ELSIF v_view_name = 'UI' THEN
-			IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-				PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'sector', 'mapzoneId', OLD.sector_id)));
-			END IF;
-
 			SELECT macrosector_id INTO v_mapzone_id FROM macrosector WHERE name = NEW.macrosector;
 		END IF;
 
 		UPDATE sector
-		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=v_mapzone_id, sector_type=NEW.sector_type,
-		graphconfig=NEW.graphconfig::json, stylesheet = NEW.stylesheet::json, parent_id = NEW.parent_id, pattern_id = NEW.pattern_id,
-		updated_at=now(), updated_by = current_user, avg_press = NEW.avg_press, link = NEW.link, muni_id = NEW.muni_id, expl_id = NEW.expl_id, lock_level=NEW.lock_level
+		SET sector_id=NEW.sector_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, macrosector_id=v_mapzone_id, sector_type=NEW.sector_type,
+		expl_id=NEW.expl_id, muni_id=NEW.muni_id, avg_press=NEW.avg_press, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json,
+		stylesheet = NEW.stylesheet::json, lock_level=NEW.lock_level, link = NEW.link, addparam=NEW.addparam::json,
+		updated_at=now(), updated_by = current_user
 		WHERE sector_id=OLD.sector_id;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE sector SET active = NEW.active WHERE sector_id = OLD.sector_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE sector SET the_geom = NEW.the_geom WHERE sector_id = OLD.sector_id;
 		END IF;
 

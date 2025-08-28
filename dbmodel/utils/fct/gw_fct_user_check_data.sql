@@ -90,20 +90,6 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM t_audit_check_data WHERE fid=251 AND cur_user=current_user;
 
-	-- Starting process
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2998", "fid":"251", "criticity":"4", "tempTable":"t_", "is_process":true, "is_header":"true"}}$$)';
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2998", "fid":"251", "criticity":"3", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3004", "separator_id":"2022"}}$$)';
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2998", "fid":"251", "criticity":"2", "tempTable":"t_", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2007"}}$$)';
-
 	-- save state & expl selector
 	IF v_selection_mode !='userSelectors' THEN
 		DELETE FROM temp_table WHERE fid=251 AND cur_user=current_user;
@@ -171,8 +157,10 @@ BEGIN
 
 		IF v_groupby IS NULL THEN
 			IF v_isaudit IS TRUE THEN
-				INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
-				VALUES (rec.fid,  v_count::integer, v_criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
+				INSERT INTO audit.audit_fid_log (fid, type, fprocess_name, fcount, criticity, source)
+				SELECT rec.fid, s.fprocess_type, s.fprocess_name, v_count::integer, v_criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
+				FROM sys_fprocess s
+				WHERE s.isaudit IS TRUE AND rec.fid=s.fid;
 			END IF;
 			INSERT INTO t_audit_check_data(fid, result_id, criticity, error_message,  fcount)
 			SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name, ': ',v_count), v_count::integer
@@ -182,8 +170,10 @@ BEGIN
 			FOREACH rec_result IN ARRAY(json_result) LOOP
 
 				IF v_isaudit IS TRUE  THEN
-					INSERT INTO audit_fid_log (fid, fcount, criticity, groupby, source)
-					VALUES (rec.fid,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'), jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
+					INSERT INTO audit_fid_log (fid, type, fprocess_name, fcount, criticity, groupby, source)
+					SELECT rec.fid, s.fprocess_type, s.fprocess_name,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'), jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
+					FROM sys_fprocess s
+					WHERE s.isaudit IS TRUE AND rec.fid=s.fid;
 				END IF;
 
 				INSERT INTO t_audit_check_data(fid, result_id, criticity, error_message, fcount)
@@ -211,12 +201,11 @@ BEGIN
 
 	--copy errors results from project check
 	IF v_log_project = 'Project' AND v_isaudit IS TRUE THEN
-
-		INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
-		SELECT result_id::integer, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
+		INSERT INTO audit.audit_fid_log (fid, type, fprocess_name, fcount, criticity, source)
+		SELECT result_id::integer, f.fprocess_type, f.fprocess_name, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
 		FROM t_audit_check_data a
 		JOIN sys_fprocess f ON f.fid=result_id::integer
-		WHERE a.fid=101 AND cur_user = current_user
+		WHERE a.fid=604 AND cur_user = current_user
 		AND ((criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%'))
 		OR (criticity IN (0) AND (error_message ILIKE 'DATA%')))
 		AND f.isaudit IS TRUE;
@@ -247,14 +236,6 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM t_audit_check_data WHERE cur_user="current_user"() AND fid=251 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 4, '');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 3, '');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 2, '');
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 1, '');
-
-	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":251, "project_type":"'||v_project_type||'", "action":"DROP", "group":"USERCHECK"}}}$$)';
-
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');

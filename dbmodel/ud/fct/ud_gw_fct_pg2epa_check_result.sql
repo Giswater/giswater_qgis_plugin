@@ -144,7 +144,7 @@ BEGIN
 	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 
 	v_exportmodeval = (SELECT idval FROM config_param_user, inp_typevalue WHERE id = value AND typevalue = 'inp_options_networkmode' and cur_user = current_user and parameter = 'inp_options_networkmode');
-	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
+	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_current' AND c.cur_user=current_user;
 
 	v_dscenarioused = (SELECT count(dscenario_id) FROM selector_inp_dscenario WHERE cur_user = current_user);
 	v_psectorused = (SELECT count(psector_id) FROM selector_psector WHERE cur_user = current_user);
@@ -434,8 +434,8 @@ BEGIN
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
 		FOR object_rec IN SELECT
-		json_array_elements_text('["junction", "conduit", "raingage", "frorifice", "frweir", "froutlet", "froutlet", "storage",  "outfall",  "treatment", "lid_usage" ]'::json) as tabname,
-		json_array_elements_text('["node_id" , "arc_id",  "rg_id",    "nodarc_id",      "nodarc_id",   "nodarc_id",     "nodarc_id",     "node_id",  "node_id",  "node_id",   "subc_id, lidco_id"]'::json) as colname,
+		json_array_elements_text('["junction", "conduit", "raingage", "frorifice", "frweir", "froutlet", "froutlet", "storage",  "outfall",  "treatment", "lids" ]'::json) as tabname,
+		json_array_elements_text('["node_id" , "arc_id",  "rg_id",    "element_id",      "element_id",   "element_id",     "element_id",     "node_id",  "node_id",  "node_id",   "subc_id, lidco_id"]'::json) as colname,
  		json_array_elements_text('["anl_node" ,"anl_arc", "",        "anl_nodarc",     "anl_nodarc",  "anl_nodarc",    "anl_nodarc",    "anl_node", "anl_node", "anl_node",  "anl_polygon"]'::json) as tablename
 		LOOP
 

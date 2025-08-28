@@ -20,9 +20,9 @@ SELECT has_table('drainzone'::name, 'Table drainzone should exist');
 SELECT columns_are(
     'drainzone',
     ARRAY[
-        'drainzone_id', 'code', 'name', 'drainzone_type', 'descript', 'expl_id', 'muni_id', 'sector_id', 'link', 
+        'drainzone_id', 'code', 'name', 'drainzone_type', 'descript', 'expl_id', 'muni_id', 'sector_id', 'link',
         'graphconfig', 'stylesheet', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at',
-        'updated_by'
+        'updated_by', 'addparam'
     ],
     'Table drainzone should have the correct columns'
 );

@@ -21,7 +21,7 @@ SELECT columns_are(
     'sector',
     ARRAY[
         'sector_id', 'code', 'name', 'descript', 'sector_type', 'macrosector_id', 'expl_id', 'muni_id', 'parent_id', 'graphconfig',
-        'stylesheet', 'link', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'stylesheet', 'link', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam'
     ],
     'Table sector should have the correct columns'
 );

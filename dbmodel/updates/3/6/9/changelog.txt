@@ -1,4 +1,4 @@
-3.6.009
+3.6.9
 *************
 - Minor bug fix for ud & ws projects.
 - Minor fix spelling.

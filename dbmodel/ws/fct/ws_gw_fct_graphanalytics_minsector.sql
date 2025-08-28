@@ -26,7 +26,7 @@ DECLARE
 
     -- dialog
     v_expl_id TEXT;
-    v_expl_id_array TEXT;
+    v_expl_id_array TEXT[];
     v_usepsector BOOLEAN;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
@@ -93,20 +93,8 @@ BEGIN
 		v_commitchanges := FALSE;
 	END IF;
 
-	-- MANAGE EXPL ARR
-    -- For user selected exploitations
-    IF v_expl_id = '-901' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-		FROM selector_expl;
-    -- For all exploitations
-    ELSIF v_expl_id = '-902' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-        FROM exploitation
-		WHERE active;
-    -- For a specific exploitation/s
-    ELSE
-		v_expl_id_array = string_to_array(v_expl_id, ',');
-    END IF;
+    -- Get exploitation ID array
+    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
 
 	-- Get user variable for disabling lock level
     SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
@@ -163,7 +151,7 @@ BEGIN
 
     -- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || v_expl_id_array || '", "mapzone_name":"MINSECTOR"}}';
+	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"MINSECTOR"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -587,9 +575,6 @@ BEGIN
         EXECUTE v_query_text;
 
         v_visible_layer ='"ve_minsector", "ve_minsector_mincut"';
-
-        -- Message
-        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4022", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';
 
     END IF;
 

@@ -20,14 +20,14 @@ SELECT has_table('dwfzone'::name, 'Table dwfzone should exist');
 SELECT columns_are(
     'dwfzone',
     ARRAY[
-        'dwfzone_id', 'code', 'name', 'dwfzone_type', 'expl_id', 'muni_id', 'sector_id', 'descript', 'link', 'graphconfig', 
-        'stylesheet', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'drainzone_id'
+        'dwfzone_id', 'code', 'name', 'dwfzone_type', 'expl_id', 'muni_id', 'sector_id', 'descript', 'link', 'graphconfig',
+        'stylesheet', 'lock_level', 'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'drainzone_id', 'addparam'
     ],
     'Table dwfzone should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('dwfzone', 'dwfzone_id', 'Column dwfzone_id should be primary key'); 
+SELECT col_is_pk('dwfzone', 'dwfzone_id', 'Column dwfzone_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('dwfzone', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');

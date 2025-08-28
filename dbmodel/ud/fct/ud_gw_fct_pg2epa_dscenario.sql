@@ -170,7 +170,7 @@ BEGIN
 
 		-- update flwreg orifice
 		WITH src AS (
-    		SELECT en.node_id AS nodarc_id,
+    		SELECT d.element_id::text AS arc_id,
 			d.orifice_type,
 			d.offsetval,
 			d.cd,
@@ -189,7 +189,7 @@ BEGIN
 		SET ori_type  = src.orifice_type, offsetval = src.offsetval, cd = src.cd, orate = src.orate, flap = src.flap, shape = src.shape, geom1 = src.geom1, geom2 = src.geom2,
 		geom3 = src.geom3, geom4 = src.geom4
 		FROM src
-		WHERE t.arc_id = src.nodarc_id
+		WHERE t.arc_id = src.arc_id
   		AND (
 			(src.orifice_type IS NOT NULL AND t.ori_type  IS DISTINCT FROM src.orifice_type) OR 
 			(src.offsetval IS NOT NULL AND t.offsetval IS DISTINCT FROM src.offsetval) OR
@@ -205,7 +205,7 @@ BEGIN
 
 		-- update flwreg outlet
 		WITH src AS (
-    		SELECT en.node_id AS nodarc_id,
+    		SELECT d.element_id::text AS arc_id,
 			d.outlet_type,
 			d.offsetval,
 			d.curve_id,
@@ -219,7 +219,7 @@ BEGIN
 		UPDATE temp_t_arc_flowregulator AS t
 		SET outlet_type = src.outlet_type, offsetval = src.offsetval, curve_id = src.curve_id, cd1 = src.cd1, cd2 = src.cd2, flap = src.flap
 		FROM src
-		WHERE t.arc_id = src.nodarc_id
+		WHERE t.arc_id = src.arc_id
   		AND (
 			(src.outlet_type IS NOT NULL AND t.outlet_type  IS DISTINCT FROM src.outlet_type) OR 
 			(src.offsetval IS NOT NULL AND t.offsetval IS DISTINCT FROM src.offsetval) OR
@@ -232,7 +232,7 @@ BEGIN
 
 		-- update flwreg pump
 		WITH src AS (
-    		SELECT en.node_id AS nodarc_id,
+    		SELECT d.element_id::text AS arc_id,
 			d.curve_id,
 			d.status,
 			d.startup,
@@ -244,7 +244,7 @@ BEGIN
 		UPDATE temp_t_arc_flowregulator AS t
 		SET curve_id = src.curve_id, status = src.status, startup = src.startup, shutoff = src.shutoff
 		FROM src
-		WHERE t.arc_id = src.nodarc_id
+		WHERE t.arc_id = src.arc_id
   		AND (
 			(src.curve_id IS NOT NULL AND t.curve_id IS DISTINCT FROM src.curve_id) OR 
 			(src.status IS NOT NULL AND t.status IS DISTINCT FROM src.status) OR
@@ -255,7 +255,7 @@ BEGIN
 
 		-- update flwreg weir
 		WITH src AS (
-    		SELECT en.node_id AS nodarc_id,
+    		SELECT d.element_id::text AS arc_id,
 			d.weir_type,
 			d.offsetval,
 			d.cd,
@@ -277,7 +277,7 @@ BEGIN
 		UPDATE temp_t_arc_flowregulator AS t
 		SET weir_type = src.weir_type, offsetval = src.offsetval, cd = src.cd, ec = src.ec, cd2 = src.cd2, flap = src.flap, geom1 = src.geom1, geom2 = src.geom2, geom3 = src.geom3, geom4 = src.geom4, surcharge = src.surcharge, road_width = src.road_width, road_surf = src.road_surf, coef_curve = src.coef_curve
 		FROM src
-		WHERE t.arc_id = src.nodarc_id
+		WHERE t.arc_id = src.arc_id
   		AND (
 			(src.weir_type IS NOT NULL AND t.weir_type IS DISTINCT FROM src.weir_type) OR 
 			(src.offsetval IS NOT NULL AND t.offsetval IS DISTINCT FROM src.offsetval) OR

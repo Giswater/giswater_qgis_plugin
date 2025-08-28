@@ -78,7 +78,10 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
 
+	-- disable arc divide temporary
+	UPDATE config_param_user SET value = 'TRUE'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
 
+	
     -- insert connec2network variable for user in case it doesn't exist
     INSERT INTO config_param_user VALUES('edit_connec_automatic_link', 'false', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
     IF v_project_type='UD' THEN
@@ -94,8 +97,6 @@ BEGIN
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3778", "function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "is_process":true}}$$)';
-
-
 
 	--capture input values
  	v_old_psector_ids = ((((p_data ->>'data')::json)->>'parameters')::json->>'psector_ids')::text;
@@ -337,6 +338,10 @@ BEGIN
 	    END IF;
 
 	END IF;
+	
+	-- enable arc divide
+	UPDATE config_param_user SET value = 'false'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
 
 	--activate the functions an set back the values of parameters
 	UPDATE config_param_user SET value=v_connecautolink WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;

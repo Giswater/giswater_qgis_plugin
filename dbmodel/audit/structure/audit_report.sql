@@ -8,35 +8,12 @@ or (at your option) any later version.
 
 SET search_path = PARENT_SCHEMA, public, pg_catalog;
 
-
-INSERT INTO config_report
-(id, alias, query_text, addparam, filterparam, sys_role, descript, active, device)
-VALUES(902, 'DB Activity', 'SELECT date, user_name, count, action  FROM audit.v_log_ws',
-'{"orderBy":"1", "orderType": "DESC", "filterSign":"> now() - INTERVAL", "vDefault":"60 days"}'::json,
-'[{"columnname":"date", "label":"Fecha:", "widgettype":"combo","datatype":"text","layoutorder":1,
-"dvquerytext":"Select id, idval FROM om_typevalue WHERE typevalue = ''custom_report_update_db'' ORDER BY addparam->>''orderby''", "filterSign":"> now() - INTERVAL"}]'::json,
-'role_plan', NULL, true, '{4}') ON CONFLICT (id) DO NOTHING;
-
-
-CREATE OR REPLACE VIEW audit.v_log_ws AS
+CREATE OR REPLACE VIEW audit.v_log AS
 SELECT user_name,  count (*) , action, date FROM
-(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log
-where schema = 'ws')a
-group by user_name, date, action
+(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date, schema from audit.log)a
+group by user_name, date, action, schema
 ORDER BY date desc;
 
-GRANT ALL ON TABLE audit.v_log_ws TO role_master;
+GRANT ALL ON TABLE audit.v_log TO role_plan;
 
-
-CREATE OR REPLACE VIEW audit.v_log_ud AS
-SELECT user_name,  count (*) , action, date FROM
-(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log
-where schema = 'ud')a
-group by user_name, date, action
-ORDER BY date desc;
-
-GRANT ALL ON TABLE audit.v_log_ud TO role_master;
-
-
-
-
+INSERT INTO audit.sys_version (id, giswater, project_type, postgres, postgis, "date", "language", epsg) VALUES(2, '4.0.001', 'AUDIT', 'PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit', '3.4 USE_GEOS=1 USE_PROJ=1 USE_STATS=1', '2025-04-16 10:48:31.383', 'en_US', 25831) ON CONFLICT (id) DO NOTHING;

@@ -168,7 +168,7 @@ BEGIN
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
 			 AND ',v_device,' = ANY(device)
-			 AND 3426 <> id -- 3426 is the id of the function gw_fct_cm_integrate_production, TODO: Remove this where and add a if to check if the cm schema is created.
+			 AND (COALESCE(source,'''') <> ''cm'' OR EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = ''cm''))
 		) a');
 
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);

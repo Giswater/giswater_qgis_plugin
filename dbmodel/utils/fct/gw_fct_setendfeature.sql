@@ -88,11 +88,14 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3068", "fid":"518", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                       "data":{"function":"3068", "fid":"518", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2007"}}$$)';
+
  	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3068", "fid":"518", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2014"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3068", "fid":"518", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2007"}}$$)';
+                       "data":{"function":"3068", "fid":"518", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2007"}}$$)';
 
 
 	FOR v_feature_element IN SELECT json_array_elements(v_feature)
@@ -104,11 +107,28 @@ BEGIN
 			FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
     		loop
 				v_count_feature = v_count_feature + 1;
+
 				--remove links related to arc
 				EXECUTE 'DELETE FROM link
 				WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.state = 1 AND c.arc_id = '|| quote_literal(v_feature_id_value)||')';
 
 				EXECUTE 'UPDATE connec SET arc_id = NULL WHERE state = 1 AND arc_id = '|| quote_literal(v_feature_id_value)||';';
+
+				--check if arc is involved into psector because of some link
+				EXECUTE 'SELECT count(connec.connec_id)  FROM connec JOIN plan_psector_x_connec p USING (arc_id) JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE'
+				INTO v_num_feature;
+
+				IF v_num_feature > 0 THEN
+
+					EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
+					FROM plan_psector_x_connec p JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE'
+					INTO v_psector_list, v_psector_id;
+
+					IF v_psector_id IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3142", "function":"3068","parameters":{"psector_list":"'||v_psector_list||'"}}}$$);' INTO v_audit_result;
+					END IF;
+				END IF;
 
 				IF v_projecttype = 'UD' THEN
 					--remove links related to arc
@@ -156,15 +176,17 @@ BEGIN
 			FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
     		loop
 	    		v_count_feature = v_count_feature + 1;
+			
 				--check if node is involved into psector because of arc
-				EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(v_feature_id_value)||' OR node_2='|| quote_literal(v_feature_id_value)||') AND arc.state = 2'
+				EXECUTE 'SELECT count(arc.arc_id)  FROM arc JOIN plan_psector_x_arc USING (arc_id) JOIN plan_psector USING (psector_id)
+				WHERE (node_1='|| quote_literal(v_feature_id_value)||' OR node_2='|| quote_literal(v_feature_id_value)||') AND arc.state = 2 AND active IS TRUE'
 				INTO v_num_feature;
 
 				IF v_num_feature > 0 THEN
 
 					EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
 					FROM plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN
-					(SELECT arc.arc_id FROM arc WHERE (node_1='||quote_literal(v_feature_id_value)||' OR node_2='|| quote_literal(v_feature_id_value)||') AND arc.state = 2)'
+					(SELECT arc.arc_id FROM arc WHERE (node_1='||quote_literal(v_feature_id_value)||' OR node_2='|| quote_literal(v_feature_id_value)||') AND active IS TRUE AND arc.state = 2)'
 					INTO v_psector_list, v_psector_id;
 
 					IF v_psector_id IS NOT NULL THEN
@@ -185,6 +207,7 @@ BEGIN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"1072", "function":"3068","parameters":{"node_id":"'||v_feature_id_value||'"}}}$$);' INTO v_audit_result;
+
 				END IF;
 
 				-- specific log when a node is related to more than 1 node/arc/connec/gully
@@ -291,8 +314,6 @@ BEGIN
 			SELECT count(*) INTO v_count FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
 			WHERE value::integer IN (SELECT link_id FROM link WHERE state=2);
 
-			--RAISE EXCEPTION 'v_sql %', v_sql;
-
 			IF v_count > 0 THEN
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -361,15 +382,10 @@ BEGIN
 						RAISE EXCEPTION 'a';
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 		"data":{"message":"4328", "function":"3068", "parameters":{}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)' INTO v_audit_result;
-
 					else
-
 						EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(v_feature_id_value)||';';
-
 					END IF;
-
 				END IF;
-
 			END LOOP;
 		END IF;
 	END LOOP;

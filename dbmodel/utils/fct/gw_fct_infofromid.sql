@@ -162,6 +162,7 @@ v_noderecord1 record;
 v_order_id integer;
 v_flwreg_type text;
 v_arc_searchnodes double precision;
+v_talblenameorigin text;
 
 
 BEGIN
@@ -187,6 +188,7 @@ BEGIN
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_talblenameorigin := v_tablename;
 
 	-- control of nulls
 	IF v_addschema = 'NULL' THEN v_addschema = null; END IF;
@@ -525,9 +527,13 @@ BEGIN
 
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
-
-		v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable);
-
+		
+		IF v_talblenameorigin = 've_man_frelem' THEN 
+			v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_talblenameorigin);
+		ELSE
+			v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable);
+		END IF;
+		
 		i = 1;
 		v_querytext := v_querytext || ' WHERE ';
 		FOREACH idname IN ARRAY v_idname_array loop
@@ -763,11 +769,10 @@ BEGIN
 			-- getting id from URN
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
-			ELSIF v_id IS NULL AND v_tablename in  ('v_ui_dma', 'v_ui_dqa', 'v_ui_sector', 'v_ui_drainzone', 'v_ui_supplyzone', 'v_ui_macrodma', 'v_ui_macrosector', 'v_ui_dwfzone', 'v_ui_omzone', 'v_ui_macroomzone') THEN
-				v_zone = replace(v_tablename,'v_ui_','');
-				v_id = (SELECT nextval(concat('SCHEMA_NAME.',v_zone,'_',v_zone,'_id_seq')));
-			ELSIF v_id IS NULL AND v_tablename = 'v_ui_presszone' THEN
-				 select max(presszone_id::integer)+1 INTO v_id from presszone where presszone_id::text ~ '^[0-9]+$';
+			ELSIF v_id IS NULL AND v_tablename in  ('ve_dma', 've_dqa', 've_sector', 've_drainzone', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_dwfzone', 've_omzone', 've_macroomzone', 've_presszone') THEN
+				v_zone = replace(v_tablename,'ve_','');
+				v_querystring = format('SELECT max(%I_id::integer)+1 FROM %I WHERE %I_id::text ~ ''^[0-9]+$''', v_zone, v_zone, v_zone);
+				EXECUTE v_querystring INTO v_id;
             ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
                 -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.
                 -- Get node id from initial clicked point

@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'supplyzone_id', 'code', 'name', 'descript', 'supplyzone_type', 'muni_id', 'expl_id', 'graphconfig',
         'stylesheet', 'parent_id', 'pattern_id', 'avg_press', 'link', 'lock_level', 'active', 'the_geom',
-        'created_at', 'created_by', 'updated_at', 'updated_by'
+        'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam', 'sector_id'
     ],
     'Table supplyzone should have the correct columns'
 );

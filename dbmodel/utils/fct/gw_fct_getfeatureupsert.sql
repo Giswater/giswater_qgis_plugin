@@ -175,6 +175,8 @@ v_featureclass text;
 v_tablefeature text;
 v_toarc	integer;
 
+v_arc_count integer;
+
 
 BEGIN
 
@@ -246,6 +248,17 @@ BEGIN
 	SELECT tablename INTO v_visit_tablename FROM config_visit_class WHERE formname=v_table_id;
 	IF v_visit_tablename IS NOT NULL THEN v_tablename = v_visit_tablename; v_formname = v_table_id;	END IF;
 
+	-- manage with the dynamic state by using the variable of utils_transaction_mode
+	INSERT INTO config_param_user VALUES ('utils_transaction_mode', v_tg_op, current_user) ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_tg_op; 
+
+
+	-- force state vdefault in function of psector mode)
+	IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
+		UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
+	ELSE
+		UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';
+	END IF;
+
 	--  get feature propierties
 	---------------------------
 	v_active_feature = concat('SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE
@@ -307,6 +320,12 @@ BEGIN
 		-- urn_id assingment
 		IF v_id IS NULL THEN
 			v_id = (SELECT nextval('urn_id_seq'));
+		END IF;
+	
+		IF v_tablename = 've_drainzone' THEN
+			v_drainzone_id :=v_id;
+		ELSIF v_tablename = 've_dwfzone' THEN
+			v_dwfzone_id := v_id;
 		END IF;
 
 		IF v_catfeature.code_autofill IS TRUE THEN
@@ -515,6 +534,13 @@ BEGIN
 				SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3694", "function":"2560","parameters":null, "is_process":true}}$$);
 			END IF;
+			IF v_project_type = 'WS' THEN
+				SELECT count(arc_id) INTO v_arc_count FROM ve_arc WHERE node_1 = v_node_id OR node_2 = v_node_id;
+				IF v_arc_count > 2 THEN
+					SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4342", "function":"2560","parameters":null, "is_process":true}}$$);
+				END IF;
+			END IF;
 							
 			-- get to_arc
 			SELECT sys_type INTO v_featureclass FROM ve_node WHERE node_id = v_node_id;
@@ -668,13 +694,6 @@ BEGIN
 		-- static pressure
 		IF v_project_type = 'WS' AND v_presszone_id IS NOT NULL THEN
 			v_staticpressure = (SELECT head from presszone WHERE presszone_id = v_presszone_id) - v_elevation;
-		END IF;
-	
-		-- force state vdefault in function of psector mode
-		IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' and value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
-				UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
-			else
-				UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';			
 		END IF;
 	
 	ELSIF v_tg_op ='UPDATE' OR v_tg_op ='SELECT' then
@@ -1167,6 +1186,9 @@ BEGIN
 		END LOOP;
 	END IF;
 
+	-- setting the user variable on normal mode in order to make able all states
+	UPDATE config_param_user SET value = 'SELECT' WHERE parameter = 'utils_transaction_mode' AND cur_user = current_user;
+	
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
 	  	v_status = TRUE;

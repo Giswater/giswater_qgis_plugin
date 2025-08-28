@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'dma_id', 'code', 'name', 'descript', 'dma_type', 'muni_id', 'expl_id', 'sector_id', 'macrodma_id',
         'minc', 'maxc', 'effc', 'pattern_id', 'link', 'graphconfig', 'stylesheet', 'avg_press', 'lock_level',
-        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam'
     ],
     'Table dma should have the correct columns'
 );

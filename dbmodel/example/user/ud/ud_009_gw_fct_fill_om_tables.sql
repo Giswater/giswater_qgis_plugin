@@ -37,8 +37,8 @@ BEGIN
 	DELETE FROM om_visit_cat CASCADE;
 
 	--Insert Catalog of visit
-	INSERT INTO om_visit_cat (id, name, startdate, enddate)
-	VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)));
+	INSERT INTO om_visit_cat (id, name, startdate, enddate, alias)
+	VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)), 'Test');
 
 	--ARCS
 	FOR rec_arc IN SELECT * FROM arc WHERE state=1

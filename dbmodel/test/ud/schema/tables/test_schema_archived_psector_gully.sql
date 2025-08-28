@@ -33,8 +33,8 @@ SELECT columns_are(
         'updated_by', 'created_by', 'district_id', 'workcat_id_plan', 'asset_id',
         'connec_y2', 'gullycat2_id', 'epa_type', 'groove_height', 'groove_length',
         'units_placement', 'drainzone_id', 'adate', 'adescript', 'siphon_type', 'odorflap',
-        'placement_type', 'access_type', 'label_quadrant', 'minsector_id', 'dwfzone_id', 'datasource', 'omunit_id', 'lock_level', 'length',
-        'width', 'expl_visibility'
+        'placement_type', 'access_type', 'label_quadrant', 'minsector_id', 'dwfzone_id',
+        'datasource', 'omunit_id', 'lock_level', 'length', 'width', 'expl_visibility', 'psector_descript'
     ],
     'Table archived_psector_gully should have the correct columns'
 );
@@ -139,6 +139,7 @@ SELECT col_type_is('archived_psector_gully', 'lock_level', 'integer', 'Column lo
 SELECT col_type_is('archived_psector_gully', 'length', 'numeric(12,3)', 'Column length should be numeric(12,3)');
 SELECT col_type_is('archived_psector_gully', 'width', 'numeric(12,3)', 'Column width should be numeric(12,3)');
 SELECT col_type_is('archived_psector_gully', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
+SELECT col_type_is('archived_psector_gully', 'psector_descript', 'text', 'Column psector_descript should be text');
 
 -- Check default values
 SELECT col_has_default('archived_psector_gully', 'id', 'Column id should have default value');

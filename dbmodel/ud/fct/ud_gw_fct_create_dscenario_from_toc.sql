@@ -210,11 +210,9 @@ BEGIN
 				EXECUTE v_querytext;
 				GET DIAGNOSTICS v_count = row_count;
 			END IF;
-
+			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3704", "function":"3118", "parameters":{"v_count":"'||v_count||'", "v_targettable":"'||v_targettable||'"}, "fid":"'||v_fid||'", "v_result_id":"'||v_result_id||'", "criticity":"1", "is_process":true}}$$)';
-
-
+                       "data":{"message":"3704", "function":"3118", "parameters":{"v_count":"'||v_count||'", "v_targettable":"'||v_targettable||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 			-- set selector
 			DELETE FROM selector_inp_dscenario WHERE cur_user = current_user;

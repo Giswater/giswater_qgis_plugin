@@ -176,12 +176,13 @@ BEGIN
 
 					IF v_project_type = 'WS' THEN
 
-						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, presszone_id,
-						dma_id, dqa_id, minsector_id, fluid_type) SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id,
-						presszone_id, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, presszone_id, 
+						linkcat_id, state_type, dma_id, dqa_id, minsector_id, fluid_type) 
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id,	presszone_id, 
+						linkcat_id, state_type, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					ELSE
-						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
-						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id,fluid_type
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, state_type)
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, state_type
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					END IF;
 

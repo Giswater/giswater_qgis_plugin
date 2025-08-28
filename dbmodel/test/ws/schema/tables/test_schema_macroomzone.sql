@@ -21,7 +21,8 @@ SELECT columns_are(
     'macroomzone',
     ARRAY[
         'macroomzone_id', 'code', 'name', 'descript', 'expl_id', 'lock_level',
-        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'addparam', 'link',
+        'muni_id', 'sector_id', 'stylesheet'
     ],
     'Table macroomzone should have the correct columns'
 );

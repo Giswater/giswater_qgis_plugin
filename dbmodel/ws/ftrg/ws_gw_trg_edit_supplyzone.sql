@@ -13,10 +13,8 @@ CREATE OR REPLACE FUNCTION gw_trg_edit_supplyzone()
 $BODY$
 
 DECLARE
-
 	v_view_name TEXT; -- EDIT | UI
-	v_mapzone_id INTEGER;
-
+	v_supplyzone_id INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -45,44 +43,34 @@ BEGIN
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
+		SELECT max(supplyzone_id::integer)+1 INTO v_supplyzone_id FROM supplyzone WHERE supplyzone_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_supplyzone_id::text;
+		END IF;
+
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
+
+		INSERT INTO supplyzone (supplyzone_id, code, name, descript, active, supplyzone_type, expl_id, sector_id, muni_id, avg_press, pattern_id, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+		VALUES (v_supplyzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.supplyzone_type, NEW.expl_id, NEW.sector_id, NEW.muni_id, NEW.avg_press, 
+		NEW.pattern_id, NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
 
 		IF v_view_name = 'EDIT' THEN
-			v_mapzone_id = NEW.macrosector_id;
-		ELSIF v_view_name = 'UI' THEN
-			SELECT macrosector_id INTO v_mapzone_id FROM macrosector WHERE name = NEW.macrosector;
-		END IF;
-
-		INSERT INTO supplyzone (supplyzone_id, code, name, descript, macrosector_id, supplyzone_type, graphconfig, stylesheet, parent_id, pattern_id, avg_press, link, muni_id, expl_id, lock_level)
-		VALUES (NEW.supplyzone_id, NEW.supplyzone_id, NEW.name, NEW.descript, v_mapzone_id, NEW.supplyzone_type,
-		NEW.graphconfig::json, NEW.stylesheet::json, NEW.parent_id, NEW.pattern_id, NEW.avg_press, NEW.link, NEW.muni_id, NEW.expl_id, NEW.lock_level);
-
-		IF v_view_name = 'UI' THEN
-			UPDATE supplyzone SET active = NEW.active WHERE supplyzone_id = NEW.supplyzone_id;
-		ELSIF v_view_name = 'EDIT' THEN
 			UPDATE supplyzone SET the_geom = NEW.the_geom WHERE supplyzone_id = NEW.supplyzone_id;
 		END IF;
-
-		INSERT INTO selector_supplyzone VALUES (NEW.supplyzone_id, current_user);
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		IF v_view_name = 'EDIT' THEN
-			v_mapzone_id = NEW.macrosector_id;
-		ELSIF v_view_name = 'UI' THEN
-			SELECT macrosector_id INTO v_mapzone_id FROM macrosector WHERE name = NEW.macrosector;
-		END IF;
-
 		UPDATE supplyzone
-		SET supplyzone_id=NEW.supplyzone_id, name=NEW.name, descript=NEW.descript, supplyzone_type = NEW.supplyzone_type, macrosector_id=v_mapzone_id,
-		graphconfig=NEW.graphconfig::json, stylesheet = NEW.stylesheet::json, parent_id = NEW.parent_id, pattern_id = NEW.pattern_id,
-		updated_at=now(), updated_by = current_user, avg_press = NEW.avg_press, link = NEW.link, muni_id = NEW.muni_id, expl_id = NEW.expl_id, lock_level=NEW.lock_level
+		SET supplyzone_id=NEW.supplyzone_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, supplyzone_type = NEW.supplyzone_type, expl_id=NEW.expl_id,
+		sector_id=NEW.sector_id, muni_id=NEW.muni_id, avg_press=NEW.avg_press, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json,
+		stylesheet=NEW.stylesheet::json, link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, updated_at=now(), updated_by = current_user
 		WHERE supplyzone_id=OLD.supplyzone_id;
 
-		IF v_view_name = 'UI' THEN
-			UPDATE supplyzone SET active = NEW.active WHERE supplyzone_id = OLD.supplyzone_id;
-		ELSIF v_view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE supplyzone SET the_geom = NEW.the_geom WHERE supplyzone_id = OLD.supplyzone_id;
 		END IF;
 

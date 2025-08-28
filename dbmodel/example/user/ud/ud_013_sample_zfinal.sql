@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 
+ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 
 INSERT INTO selector_sector SELECT sector_id, current_user from sector where sector_id > 0 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 DELETE FROM selector_psector;
@@ -155,13 +156,11 @@ UPDATE config_param_system SET isenabled = false where parameter = ' basic_selec
 
 INSERT INTO element  (element_id, code, elementcat_id, epa_type, state, state_type, num_elements, rotation, verified, publish, inventory, expl_id, feature_type, top_elev, muni_id, sector_id, the_geom) VALUES
 ('100020', 'E100020', 'WEIR-01','FRWEIR', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)'),
-('100021', 'E100021', 'ORIFICE-01','FRORIFICE', 1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
-('100022', 'E100022', 'PUMP-01','FRPUMP', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
+('100021', 'E100021', 'ORIFICE-01','FRORIFICE', 1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)');
 
 INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length) VALUES
 ('100020','18828','18969',0.5),
-('100021','237','100014',0.5),
-('100022','18828','18966',1);
+('100021','237','100014',0.5);
 
 INSERT INTO man_genelem (element_id)
 SELECT e.element_id
@@ -176,8 +175,8 @@ INSERT INTO inp_frweir (element_id, weir_type, offsetval, cd, flap, geom1,geom2,
 INSERT INTO inp_frorifice (element_id, orifice_type, offsetval, cd, orate, flap, shape, geom1,geom2, geom3, geom4) VALUES
 ('100021', 'SIDE',16.35,1.5000, 0.0000,'NO','RECT_CLOSED',2.0000,1.0000,0.0000,0.0000);
 
-INSERT INTO inp_frpump (element_id, curve_id, status, startup, shutoff) VALUES ('100022', 'PUMP-02', 'ON', 2, 0.4);
-
 INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 
 update plan_psector set active=true;
+
+ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;

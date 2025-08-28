@@ -100,6 +100,7 @@ BEGIN
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
 		-- create temp tables
+		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"WS", "action":"DROP", "group":"EPAMAIN"}}}');
 		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"WS", "action":"CREATE", "group":"EPAMAIN"}}}');
 
 		-- getting selectors
@@ -193,8 +194,8 @@ BEGIN
 		RAISE NOTICE '4.3 - Call gw_fct_pg2epa_doublenod2arc';
 		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
 
-		RAISE NOTICE '4.4 - Call gw_fct_pg2epa_pump_additional function';
-		PERFORM gw_fct_pg2epa_pump_additional(v_result);
+		RAISE NOTICE '4.4 - Call gw_fct_pg2epa_flwreg2arc function';
+		PERFORM gw_fct_pg2epa_flwreg2arc(v_result);
 
 		RAISE NOTICE '4.5 - manage varcs';
 		PERFORM gw_fct_pg2epa_manage_varc(v_result);
@@ -255,10 +256,10 @@ BEGIN
 		UPDATE temp_t_arc SET diameter = dint FROM (
 		SELECT node_2 as n2, diameter dint FROM temp_t_arc UNION SELECT node_2, diameter FROM temp_t_arc
 		)t WHERE t.dint IS NOT NULL AND t.n2 = node_2 AND diameter IS NULL;
-		
+
 		-- update roughness for shortpipes and valves using neighbourg
 		update temp_arc t set roughness = rough from (
-		select a.arc_id, (avg(a1.roughness))::numeric(12,3) as rough, 
+		select a.arc_id, (avg(a1.roughness))::numeric(12,3) as rough,
 		a.epa_type from temp_arc a
 		left join temp_arc a1 on (a1.node_1 = a.node_1 or a1.node_2= a.node_1 or a1.node_1 = a.node_2 or a1.node_2= a.node_2)
 		where a.epa_type in ('SHORTPIPE', 'VALVE') and a.arc_id != a1.arc_id group by 1,3
@@ -299,8 +300,8 @@ BEGIN
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
 			from inp_pattern_value p
 			WHERE
-			pattern_id IN (SELECT distinct (pattern_id) FROM temp_t_demand WHERE pattern_id IS NOT NULL 
-						   UNION 
+			pattern_id IN (SELECT distinct (pattern_id) FROM temp_t_demand WHERE pattern_id IS NOT NULL
+						   UNION
 						   SELECT distinct (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL)
 			order by pattern_id, id;
 
@@ -333,7 +334,7 @@ BEGIN
 		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
 
 		-- create return
-		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
+		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"fid":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);

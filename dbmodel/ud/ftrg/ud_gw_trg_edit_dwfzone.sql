@@ -11,14 +11,14 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dwfzone()  RETURNS trigger 
 $BODY$
 
 DECLARE
-view_name TEXT;
-
+	v_view_name TEXT;
+	v_dwfzone_id INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- Arg will be or 'edit' or 'ui'
-	view_name = TG_ARGV[0];
+	v_view_name = TG_ARGV[0];
 
 	IF TG_OP = 'INSERT' THEN
 
@@ -27,7 +27,7 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
-		IF view_name = 'EDIT'THEN
+		IF v_view_name = 'EDIT'THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
 					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -35,46 +35,35 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- active
-		IF view_name = 'UI'THEN
-			IF NEW.active IS NULL THEN
-				NEW.active = TRUE;
-			END IF;
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
 		END IF;
 
-		INSERT INTO dwfzone (dwfzone_id, code, name, expl_id, sector_id, muni_id, descript, link, graphconfig, stylesheet, dwfzone_type, lock_level, drainzone_id)
-		VALUES (NEW.dwfzone_id, NEW.dwfzone_id, NEW.name, NEW.expl_id, NEW.sector_id, NEW.muni_id, NEW.descript,
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.dwfzone_type, NEW.lock_level, NEW.drainzone_id);
+		SELECT max(dwfzone_id::integer)+1 INTO v_dwfzone_id FROM dwfzone WHERE dwfzone_id::text ~ '^[0-9]+$';
+		IF NEW.code IS NULL THEN
+			NEW.code := v_dwfzone_id::text;
+		END IF;
 
-		IF view_name = 'UI' THEN
-			UPDATE dwfzone SET active = NEW.active WHERE dwfzone_id = NEW.dwfzone_id;
+		INSERT INTO dwfzone (dwfzone_id, code, name, descript, active, dwfzone_type, drainzone_id, expl_id, sector_id, muni_id, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
+		VALUES (v_dwfzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.dwfzone_type, NEW.drainzone_id, NEW.expl_id, NEW.sector_id, NEW.muni_id,
+		NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
 
-		ELSIF view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE dwfzone SET the_geom = NEW.the_geom WHERE dwfzone_id = NEW.dwfzone_id;
-
 		END IF;
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		IF NEW.active IS FALSE AND OLD.active IS TRUE THEN
-			PERFORM gw_fct_check_linked_mapzones(json_build_object('parameters', json_build_object('mapzoneName', 'dwfzone', 'mapzoneId', OLD.dwfzone_id)));
-		END IF;
-
 		UPDATE dwfzone
-		SET dwfzone_id=NEW.dwfzone_id, name=NEW.name, expl_id=NEW.expl_id,
-		sector_id=NEW.sector_id, muni_id=NEW.muni_id, descript=NEW.descript,
-		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, updated_at=now(),
-		updated_by = current_user, dwfzone_type=NEW.dwfzone_type, lock_level=NEW.lock_level, drainzone_id=NEW.drainzone_id
+		SET dwfzone_id=NEW.dwfzone_id, code=NEW.code, name=NEW.name, descript=NEW.descript, active=NEW.active, dwfzone_type=NEW.dwfzone_type, drainzone_id=NEW.drainzone_id, 
+		expl_id=NEW.expl_id, sector_id=NEW.sector_id, muni_id=NEW.muni_id, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json,
+		link=NEW.link, lock_level=NEW.lock_level, addparam=NEW.addparam::json, updated_at=now(), updated_by = current_user
 		WHERE dwfzone_id=OLD.dwfzone_id;
 
-		IF view_name = 'UI' THEN
-			UPDATE dwfzone SET active = NEW.active WHERE dwfzone_id = OLD.dwfzone_id;
-
-		ELSIF view_name = 'EDIT' THEN
+		IF v_view_name = 'EDIT' THEN
 			UPDATE dwfzone SET the_geom = NEW.the_geom WHERE dwfzone_id = OLD.dwfzone_id;
-
 		END IF;
 
 		RETURN NEW;
@@ -84,8 +73,8 @@ BEGIN
 		DELETE FROM dwfzone WHERE dwfzone_id = OLD.dwfzone_id;
 		RETURN NULL;
 	END IF;
-END;
 
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

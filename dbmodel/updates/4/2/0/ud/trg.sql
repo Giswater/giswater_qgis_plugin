@@ -115,8 +115,8 @@ CREATE TRIGGER gw_trg_v_ui_macroomzone INSTEAD OF DELETE OR UPDATE
 ON v_ui_macroomzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macroomzone('UI');
 
 -- Expl_id
-DROP TRIGGER gw_trg_fk_array_id_table ON exploitation;
-DROP TRIGGER gw_trg_fk_array_id_table_update ON exploitation;
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table ON exploitation;
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON exploitation;
 CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON exploitation
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id', '{"dma":"expl_id", "macroomzone":"expl_id", "dwfzone":"expl_id", "drainzone":"expl_id", "sector":"expl_id", "ext_municipality":"expl_id"}');
 
@@ -127,22 +127,47 @@ CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE ON dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_id', 'exploitation', 'expl_id');
 -- The others are already created
 
--- Muni_id
-DROP TRIGGER gw_trg_fk_array_id_table ON ext_municipality;
-DROP TRIGGER gw_trg_fk_array_id_table_update ON ext_municipality;
-CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON ext_municipality
-FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id", "dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
 
-CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON ext_municipality
-FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id", "dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
 
-CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON dma
-FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+	IF v_utils IS true THEN
+        -- Muni_id
+        DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table ON utils.municipality;
+        DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON utils.municipality;
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id", "dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id", "dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON dma
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
+    ELSE
+        -- Muni_id
+        DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table ON ext_municipality;
+        DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON ext_municipality;
+        CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id", "dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id', '{"dma":"muni_id", "dwfzone":"muni_id", "drainzone":"muni_id", "exploitation":"muni_id", "sector":"muni_id"}');
+
+        CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE ON dma
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+    END IF;
+
+
+END $$;
+
 -- The others are already created
 
 -- Sector_id
-DROP TRIGGER gw_trg_fk_array_id_table ON sector;
-DROP TRIGGER gw_trg_fk_array_id_table_update ON sector;
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table ON sector;
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON sector;
 CREATE TRIGGER gw_trg_fk_array_id_table BEFORE DELETE ON sector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id', '{"dma":"sector_id", "dwfzone":"sector_id", "drainzone":"sector_id", "exploitation":"sector_id", "ext_municipality":"sector_id"}');
 

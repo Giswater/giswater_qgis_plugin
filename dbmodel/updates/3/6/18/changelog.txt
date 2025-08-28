@@ -1,4 +1,4 @@
-3.6.018
+3.6.18
 *************
 - Add dqa_style on v_edit_* tables
 - Add psector_type widget on psector dialog

@@ -1,4 +1,4 @@
-3.6.023
+3.6.23
 *************
 - Calculate avg_press grouped in exploitation only when a INP becomes corporate
 - Add status "RUN FAILED" for INP results

@@ -180,7 +180,6 @@ BEGIN
 		END IF;
 	END IF;
 
-
 	-- compare parameters in message with parameters recieved
 	IF rec_cat_error.error_message IS NOT NULL THEN
 		IF (select (select array(SELECT key FROM json_each_text(v_parameters) order by key)) =
@@ -195,7 +194,7 @@ BEGIN
 			END LOOP;
 		ELSE
 			-- return error parameters aren't the same
-			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
+			--RAISE EXCEPTION '%', upper(rec_cat_error.error_message);
 		END IF;
 	END IF;
 
@@ -218,9 +217,6 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
-
-
-
 
 	-- There are three types of messages: 'UI', 'AUDIT', and 'DEBUG' (see edit_typevalue table).
 	-- UI: Show message on UI
@@ -343,12 +339,9 @@ BEGIN
 
         EXECUTE v_querytext;
 
-
     ELSIF rec_cat_error.message_type = 'DEBUG' THEN
 
 	END IF;
-
-
 
 	SELECT jsonb_build_object
 	('level', v_level,

@@ -1,4 +1,4 @@
-3.6.004
+3.6.4
 *************
 - New tables: plan_netscenario, plan_netscenario_dma, plan_netscenario_presszone, plan_netscenario_arc, plan_netscenario_node, plan_netscenario_connec for storing data related to mapzone netscenario.
 - New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for netscenario.

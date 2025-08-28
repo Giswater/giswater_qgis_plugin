@@ -45,13 +45,31 @@ INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
 
 UPDATE cat_feature SET active = false WHERE id = 'VCONNEC';
 
-INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'WJOIN', 'PVC', '16', '32', 32.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC32-PN16-IND', 'WJOIN', 'PVC', '16', '32', 32.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', 'WJOIN', 'PVC', '16', '50', 50.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC63-PN16-FOU', 'FOUNTAIN', 'PVC', '16', '63', 63.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC25-PN16-TAP', 'TAP', 'PVC', '16', '25', 25.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO cat_connec VALUES ('PVC50-PN16-GRE', 'GREENTAP', 'PVC', '16', '50', 50.00000, NULL, 'PVC connec ', NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
+VALUES ('PVC25-PN16', 'PIPELINK', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
+VALUES ('PVC32-PN16', 'PIPELINK', 'PVC', '16', '32', 32.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
+VALUES ('PVC50-PN16', 'PIPELINK', 'PVC', '16', '50', 50.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
+VALUES ('PVC63-PN16', 'PIPELINK', 'PVC', '16', '63', 63.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('FACADE-CABINET', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('METER-PIT', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('INDOOR', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('METER-BANK', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('TEMPORARY', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('IRRIGATION', 'TAP', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('DRINKING-FOUNTAIN', 'FOUNTAIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('ORNAMENTAL-FOUNTAIN', 'GREENTAP', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
 
 INSERT INTO cat_dscenario VALUES (1, 'Hydrants_50%', NULL, NULL, 'DEMAND', true, NULL, NULL);
 
@@ -68,6 +86,7 @@ INSERT INTO cat_element (id,element_type,active) VALUES ('MANHOLE-01','EMANHOLE'
 INSERT INTO cat_element (id,element_type,active) VALUES ('HYDRANT_PLATE-01','EHYDRANT_PLATE',true);
 INSERT INTO cat_element (id,element_type,active) VALUES ('RREGISTER-01','EREGISTER',true);
 INSERT INTO cat_element (id,element_type,active) VALUES ('STEP-01','ESTEP',true);
+INSERT INTO cat_element (id,element_type,active) VALUES ('EMETER-01','EMETER',true);
 
 
 UPDATE cat_feature SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE'
@@ -184,9 +203,11 @@ INSERT INTO man_type_location VALUES (3, 'St. Location', 'CONNEC', NULL, NULL, t
 INSERT INTO man_type_location VALUES (4, 'St. Location', 'ELEMENT', NULL, NULL, true);
 
 
-INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
-SELECT id, 'PIPELINK' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
-FROM cat_connec ON CONFLICT DO NOTHING;
-
 INSERT INTO cat_link (id, link_type, descript) VALUES('VIRTUAL', 'VLINK', 'Virtual link')
 ON CONFLICT (id) DO UPDATE SET link_type='VLINK', descript='Virtual link';
+
+UPDATE cat_feature SET feature_class='VCONNEC' WHERE id='VCONNEC';
+
+UPDATE cat_feature_element SET epa_default='FRPUMP' WHERE id = 'EPUMP';
+UPDATE cat_feature_element SET epa_default='FRVALVE' WHERE id = 'EVALVE';
+UPDATE cat_feature_element SET epa_default='FRSHORTPIPE' WHERE id = 'EMETER';

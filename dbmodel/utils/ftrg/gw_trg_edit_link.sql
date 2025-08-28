@@ -81,6 +81,8 @@ v_check_arcdnom_status boolean;
 v_check_arcdnom integer;
 v_sql varchar;
 
+v_linkcat_id text;
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -670,14 +672,10 @@ BEGIN
 				IF v_customfeature IS NOT NULL THEN
 					NEW.linkcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat('feat_',v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 				ELSE
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSE
-						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
-					END IF;
+					v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					NEW.linkcat_id = v_linkcat_id;
 				END IF;
 			END IF;
-
 
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
 			fluid_type, omzone_id, dqa_id, presszone_id, minsector_id, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate,
@@ -690,19 +688,8 @@ BEGIN
 
 		ELSIF  v_projectype = 'UD' THEN
 			IF NEW.linkcat_id IS NULL THEN
-				IF NEW.feature_type ='CONNEC' THEN
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSE
-						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
-					END IF;
-				ELSEIF NEW.feature_type ='GULLY' THEN
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSE
-						NEW.linkcat_id = (SELECT _connec_arccat_id FROM gully WHERE gully_id = NEW.feature_id);
-					END IF;
-				END IF;
+				v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.linkcat_id = v_linkcat_id;
 			END IF;
 
 			IF NEW.top_elev1 IS NULL THEN
@@ -852,8 +839,6 @@ BEGIN
 				UPDATE connec SET arc_id = v_arc_id, dma_id = v_dma, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
 				omzone_id = v_omzone WHERE connec_id = NEW.feature_id;
 
-				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE feature_id = NEW.feature_id AND link.state > 0;
-
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
 				omzone_id = v_omzone, fluid_type=v_fluidtype::integer WHERE  gully_id = NEW.feature_id;
@@ -869,7 +854,6 @@ BEGIN
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
-				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE feature_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;

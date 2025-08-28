@@ -50,15 +50,15 @@ xp1 float;
 yp1 float;
 xp2 float;
 yp2 float;
-
 old_node_id text;
 old_to_arc text;
 epa_type_aux text;
-
 v_version record;
 v_count integer = 1;
-
 old_node_2 varchar;
+max_flwreg_length numeric;
+arc_geom_old_node integer = -1;
+arc_geom_old_to_arc2 integer = -1;
 
 
 BEGIN
@@ -96,14 +96,22 @@ BEGIN
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a
-		ORDER BY flw_type, element_id, to_arc
+		ORDER BY flw_type, node_id, to_arc, element_id
 
 	LOOP
 		-- Getting data from node
 		SELECT * INTO rec_node FROM temp_t_node WHERE node_id = rec_flowreg.node_id::text;
 
+		SELECT max(flwreg_length) INTO max_flwreg_length FROM man_frelem WHERE node_id=rec_flowreg.node_id AND to_arc=rec_flowreg.to_arc;
+		
+		IF arc_geom_old_node != rec_flowreg.node_id OR arc_geom_old_to_arc2 != rec_flowreg.to_arc THEN
+			SELECT the_geom INTO v_geom FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc::text;
+		END IF;	
 		-- Getting data from arc
-		SELECT arc_id, node_1, node_2, the_geom INTO v_arc, v_node_1, v_node_2, v_geom FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc::text;
+		SELECT arc_id, node_1, node_2 INTO v_arc, v_node_1, v_node_2 FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc::text;
+
+		arc_geom_old_node = rec_flowreg.node_id;
+		arc_geom_old_to_arc2 = rec_flowreg.to_arc;
 		IF v_arc IS NULL THEN
 
 		ELSE
@@ -115,10 +123,11 @@ BEGIN
 			ELSE
 				-- Create the extrem nodes of the new nodarc
 				v_nodarc_node_1_geom := ST_StartPoint(v_geom);
-				v_nodarc_node_2_geom := ST_LineInterpolatePoint(v_geom, (rec_flowreg.flwreg_length / ST_Length(v_geom)));
+				v_nodarc_node_2_geom := ST_LineInterpolatePoint(v_geom, (max_flwreg_length / ST_Length(v_geom)));
 
 				-- Correct old arc geometry
-				v_arc_reduced_geom := ST_LineSubstring(v_geom, (rec_flowreg.flwreg_length / ST_Length(v_geom)),1);
+				v_arc_reduced_geom := ST_LineSubstring(v_geom, (max_flwreg_length / ST_Length(v_geom)),1);
+				UPDATE temp_t_arc SET the_geom = v_arc_reduced_geom WHERE arc_id = v_arc;
 
 				IF ST_GeometryType(v_arc_reduced_geom) != 'ST_LineString' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -159,23 +168,22 @@ BEGIN
 
 
 				IF old_node_id= rec_flowreg.node_id::text AND old_to_arc =rec_flowreg.to_arc::text THEN
-
 					v_counter:=v_counter+1;
 
 					-- Right or left hand
 					odd_var = v_counter %2;
 
 					IF (odd_var)=0 then
-						angle=(ST_Azimuth(ST_startpoint(nodarc_rec.the_geom), ST_endpoint(nodarc_rec.the_geom)))+1.57;
+						angle=(ST_Azimuth(ST_startpoint(rec_new_arc.the_geom), ST_endpoint(rec_new_arc.the_geom)))+1.57;
 					ELSE
-						angle=(ST_Azimuth(ST_startpoint(nodarc_rec.the_geom), ST_endpoint(nodarc_rec.the_geom)))-1.57;
+						angle=(ST_Azimuth(ST_startpoint(rec_new_arc.the_geom), ST_endpoint(rec_new_arc.the_geom)))-1.57;
 					END IF;
 
 					-- Geometry construction from pattern arc
 					-- intermediate variables
-					n1_geom = ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.4);
-					n2_geom = ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.6);
-					dist = (ST_Distance(ST_transform(ST_startpoint(nodarc_rec.the_geom),v_version.epsg), ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.3)));
+					n1_geom = ST_LineInterpolatePoint(rec_new_arc.the_geom, 0.4);
+					n2_geom = ST_LineInterpolatePoint(rec_new_arc.the_geom, 0.6);
+					dist = (ST_Distance(ST_transform(ST_startpoint(rec_new_arc.the_geom),v_version.epsg), ST_LineInterpolatePoint(rec_new_arc.the_geom, 0.3)));
 
 					--create point1
 					yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.1*(v_counter)::float;
@@ -188,8 +196,8 @@ BEGIN
 					p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),v_version.epsg);
 
 					--create the modified geom
-					rec_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(nodarc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(nodarc_rec.the_geom)]);
-					UPDATE temp_t_arc SET arccat_id='SECONDARY', the_geom=rec_new_arc.the_geom WHERE arc_id = rec_new_arc.arc_id;
+					rec_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(rec_new_arc.the_geom), p1_geom, p2_geom, ST_endpoint(rec_new_arc.the_geom)]);
+					UPDATE temp_t_arc SET arccat_id='SECONDARY', the_geom=rec_new_arc.the_geom WHERE arc_id = rec_flowreg.element_id::text;
 				ELSE
 					-- Inserting new node into node table
 					rec_node.epa_type := 'JUNCTION';
