@@ -9,6 +9,7 @@ import os
 import json
 import webbrowser
 from functools import partial
+import re
 
 
 try:
@@ -1553,7 +1554,7 @@ class GwNonVisual:
         """ Insert table values into ve_inp_pattern_values """
 
         # Insert inp_pattern_value
-        values = self._read_tbl_values(tbl_pattern_value)
+        values = self._tbl_values_to_float(tbl_pattern_value)
 
         is_empty = True
         for row in values:
@@ -1571,13 +1572,14 @@ class GwNonVisual:
             if row == (['null'] * tbl_pattern_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO ve_inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, " \
-                  f"factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, " \
-                  f"factor_15, factor_16, factor_17, factor_18) " \
-                  f"VALUES ({pattern_id}, "
-            for x in row:
-                sql += f"{x}, "
-            sql = sql.rstrip(', ') + ")"
+            sql_columns = []
+            sql_values = []
+            for i, x in enumerate(row):
+                sql_columns.append(f"factor_{i+1}")
+                sql_values.append(x)
+            sql = f"""INSERT INTO ve_inp_pattern_value (pattern_id, {','.join(sql_columns)}) 
+                        VALUES ({pattern_id}, {','.join(map(str, sql_values))});"""
+            print(sql)
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern value."
@@ -1593,34 +1595,7 @@ class GwNonVisual:
         # Clear plot
         plot_widget.axes.cla()
 
-        # Read row values
-        values = self._read_tbl_values(table)
-        temp_list = []  # String list with all table values
-        for v in values:
-            temp_list.append(v)
-
-        # Clean nulls of the end of the list
-        clean_list = []
-        for i, item in enumerate(temp_list):
-            last_idx = -1
-            for j, value in enumerate(item):
-                if value != 'null':
-                    last_idx = j
-            clean_list.append(item[:last_idx + 1])
-
-        # Convert list items to float
-        float_list = []
-        for lst in clean_list:
-            temp_lst = []
-            if len(lst) < 2:
-                continue
-            for item in lst:
-                try:
-                    value = float(item)
-                except (ValueError, TypeError):
-                    value = 0
-                temp_lst.append(value)
-            float_list.append(temp_lst)
+        float_list = self._tbl_values_to_float(table)
 
         # Create lists for pandas DataFrame
         x_offset = 0
@@ -1632,7 +1607,10 @@ class GwNonVisual:
             df_list.extend(lst)
 
             plot_widget.axes.bar(range(0, len(df_list)), df_list, width=1, align='edge', color='lightcoral', edgecolor='indianred')
-            plot_widget.axes.set_xticks(range(0, len(df_list)))
+            if len(df_list) > 10:
+                plot_widget.axes.set_xticks(range(0, len(df_list), 2))
+            else:
+                plot_widget.axes.set_xticks(range(0, len(df_list)))
             x_offset += len(lst)
 
         # Draw plot
@@ -1946,7 +1924,10 @@ class GwNonVisual:
             df_list.extend(lst)
 
             plot_widget.axes.bar(range(0, len(df_list)), df_list, width=1, align='edge', color='lightcoral', edgecolor='indianred')
-            plot_widget.axes.set_xticks(range(0, len(df_list)))
+            if len(df_list) > 10:
+                plot_widget.axes.set_xticks(range(0, len(df_list), 2))
+            else:
+                plot_widget.axes.set_xticks(range(0, len(df_list)))
             x_offset += len(lst)
 
         # Draw plot
@@ -2999,6 +2980,39 @@ class GwNonVisual:
                     if item.data(0) not in (None, ''):
                         return
             table.setRowCount(table.rowCount() - 1)
+
+    def _tbl_values_to_float(self, table: QTableWidget):
+        """ Convert table values to float """
+
+        # Read row values
+        values = self._read_tbl_values(table)
+        temp_list = []  # String list with all table values
+        for v in values:
+            temp_list.append(v)
+
+        # Clean nulls of the end of the list
+        clean_list = []
+        for i, item in enumerate(temp_list):
+            last_idx = -1
+            for j, value in enumerate(item):
+                if value not in ('null', None, '', 'None'):
+                    last_idx = j
+            clean_list.append(item[:last_idx + 1])
+
+        # Convert list items to float
+        float_list = []
+        for lst in clean_list:
+            temp_lst = []
+            if len(lst) < 2:
+                continue
+            for item in lst:
+                try:
+                    value = float(item)
+                except (ValueError, TypeError):
+                    value = 0
+                temp_lst.append(value)
+            float_list.append(temp_lst)    
+        return float_list
 
     def _read_tbl_values(self, table, clear_nulls=False):
 
