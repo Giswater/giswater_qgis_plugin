@@ -91,7 +91,7 @@ class GwGo2EpaButton(GwAction):
         self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
         if lib_vars.session_vars['dialog_docker']:
-            tools_qt.manage_translation('go2epa', self.dlg_go2epa)
+            tools_qt._translate_form('go2epa', self.dlg_go2epa)
             tools_gw.docker_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_close.clicked.disconnect()
             self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))

@@ -91,7 +91,7 @@ class GwLoadProject(QObject):
 
         # Manage locale and corresponding 'i18n' file
         lib_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', lib_vars.plugin_dir)
-        tools_qt.manage_translation(lib_vars.plugin_name)
+        tools_qt._add_translator(lib_vars.plugin_name)
 
 
         # Check if schema exists

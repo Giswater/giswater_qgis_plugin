@@ -124,7 +124,7 @@ class GwSearch:
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
-            tools_qt.manage_translation('search', self.dlg_search)
+            tools_qt._translate_form('search', self.dlg_search)
             self._init_dialog()
 
 
