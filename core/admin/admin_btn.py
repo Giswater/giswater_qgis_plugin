@@ -717,10 +717,17 @@ class GwAdminButton:
         # Process each version folder in order
         for major, minor, patch, folder_path in version_folders:
             current_folder_version = f"{major}.{minor}.{patch}"
-            if current_folder_version <= str(self.plugin_version):
-                status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
-                if tools_os.set_boolean(status, False) is False:
-                    return False
+            if new_project:
+                if current_folder_version <= str(self.plugin_version):
+                    status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
+                    if tools_os.set_boolean(status, False) is False:
+                        return False
+            else:
+                if current_folder_version > str(self.project_version) and current_folder_version <= str(self.plugin_version):
+                    status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
+                    if tools_os.set_boolean(status, False) is False:
+                        return False
+
 
         return True
 
@@ -1700,14 +1707,34 @@ class GwAdminButton:
             tools_qgis.show_message(msg)
             return
 
-        folders = sorted(os.listdir(self.folder_updates))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
-            for sub_folder in sub_folders:
-                if str(sub_folder) > str(self.project_version).replace('.', ''):
-                    folder_aux = os.path.join(self.folder_updates, folder, sub_folder)
-                    if self._process_folder(folder_aux):
-                        self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
+        # Collect all version folders and sort them
+        version_folders = []
+
+        # Walk through the updates directory to find all version folders
+        # EX: 3/6/1, 4/2/0 -> 3.6.1, 4.2.0
+        for root, _, _ in os.walk(self.folder_updates):
+            rel_path = os.path.relpath(root, self.folder_updates)
+            if rel_path == '.':
+                continue
+
+            parts = rel_path.split(os.sep)
+            if len(parts) == 3:
+                try:
+                    major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
+                    version_folders.append((major, minor, patch, root))
+                except ValueError:
+                    continue
+
+        # Sort by version number (major.minor.patch)
+        version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
+
+        # Process each version folder in order
+        for major, minor, patch, folder_path in version_folders:
+            current_folder_version = f"{major}.{minor}.{patch}"
+            if current_folder_version > str(self.project_version):
+                folder_aux = os.path.join(self.folder_updates, str(major), str(minor), str(patch))
+                if self._process_folder(folder_aux):
+                    self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
 
         return True
 
