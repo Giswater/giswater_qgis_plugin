@@ -1654,6 +1654,7 @@ def set_style_mapzones(schema_name: str | None = None) -> bool:
         lyr.triggerRepaint()
     return True
 
+
 def manage_feature_cat():
     """ Manage records from table 'cat_feature' """
 
