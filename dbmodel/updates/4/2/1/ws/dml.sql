@@ -22,9 +22,9 @@ DECLARE
   rec record;
   v_view text;
 BEGIN
-  FOR rec IN (SELECT * FROM _element_type WHERE id NOT IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET'))
+  FOR rec IN (SELECT * FROM cat_feature_element WHERE id NOT IN ('EPUMP', 'EORIFICE', 'EWEIR', 'EOUTLET', 'EVALVE', 'EMETER'))
   LOOP
-    v_view := concat('ve_element_e', lower(REPLACE(REC.id, ' ', '_')));
+    v_view := concat('ve_element_', lower(REPLACE(REC.id, ' ', '_')));
 
     INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,stylesheet,widgetcontrols,hidden)
         VALUES (v_view,'form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector ID:','Sector ID',false,false,true,false,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false,'{"label":"color:blue; font-weight:bold;"}'::json,'{"setMultiline": false, "labelPosition": "top"}'::json,false);
