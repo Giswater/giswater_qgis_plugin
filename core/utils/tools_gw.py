@@ -861,18 +861,18 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if extent is not None:
         layer.setExtent(extent)
-    
+
     if properties is not None:
         for prop, value in properties.items():
             if prop == 'hiddenForm' and value == 'true':
                 cfg = layer.editFormConfig()
                 cfg.setSuppress(QgsEditFormConfig.SuppressOn)
                 layer.setEditFormConfig(cfg)
-                
+
     # Apply mapzone styling if this is a mapzone layer
     mapzone_tables = ['presszone', 'dma', 'sector', 'dqa', 'minsector', 've_presszone', 've_dma', 've_sector', 've_dqa', 've_minsector']
     if any(mapzone_table in tablename_og.lower() for mapzone_table in mapzone_tables):
-        set_style_mapzones()
+        set_style_mapzones(schema_name)
 
     if create_project is False:
         global_vars.iface.mapCanvas().refresh()
@@ -1571,12 +1571,16 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
         tools_qt.set_widget_text(dialog, btn_accept, msg)
 
 
-def set_style_mapzones():
+def set_style_mapzones(schema_name: str | None = None) -> bool:
     """ Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function """
 
     extras = '"mapzones":""'
     body = create_body(extras=extras)
-    json_return = execute_procedure('gw_fct_getstylemapzones', body)
+
+    if schema_name is None:
+        schema_name = lib_vars.schema_name
+
+    json_return = execute_procedure('gw_fct_getstylemapzones', body, schema_name=schema_name)
     if not json_return or json_return['status'] == 'Failed':
         return False
 
@@ -1648,7 +1652,7 @@ def set_style_mapzones():
 
         # repaint layer
         lyr.triggerRepaint()
-
+    return True
 
 def manage_feature_cat():
     """ Manage records from table 'cat_feature' """
@@ -3458,7 +3462,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
 
-def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, 
+def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                    tool_type="rectangle"):
     """ Set canvas map tool to an instance of selection tool based on tool_type """
     try:
@@ -3525,8 +3529,8 @@ def update_default_action(dialog, action):
     dialog.btn_snapping.setDefaultAction(action)
 
 
-def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT, 
-                      callback: Callable[[], bool] | None = None, callback_kwargs: dict[str, Any] | None = None, 
+def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT,
+                      callback: Callable[[], bool] | None = None, callback_kwargs: dict[str, Any] | None = None,
                       callback_later: Callable = None, callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
     """Create snapping button with menu (split button behavior)"""
 
@@ -3591,7 +3595,7 @@ def get_expected_table_name(class_object, table_object, selection_mode):
         expected_table_name = f"tbl_{table_object}_{class_object.rel_feature_type}"
     else:
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
-    
+
     return expected_table_name
 
 
@@ -3624,17 +3628,17 @@ def highlight_features_in_table(class_object, dialog, expected_table_name):
     # Check if table is valid
     if not widget_table or not widget_table.model() or not feature_type:
         return
-    
+
     model = widget_table.model()
     if not model or model.rowCount() == 0:
         remove_selection(layers=class_object.rel_layers)
         return
-    
+
     id_column_name = f"{feature_type}_id"
     id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
     if id_column_index == -1:
         return
-    
+
     ids_to_select = [str(model.index(row, id_column_index).data()) for row in range(model.rowCount())]
 
     if not ids_to_select:
@@ -3644,13 +3648,13 @@ def highlight_features_in_table(class_object, dialog, expected_table_name):
     expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
     tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
 
-    # Activate rubberband function 
+    # Activate rubberband function
     tools_qgis.highlight_features_selected_in_table(class_object, dialog, expected_table_name, feature_type)
 
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
-    
+
     if selection_mode != GwSelectionMode.EXPRESSION:
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -3708,7 +3712,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Prevent UI interference while updating the table
     table_widget.blockSignals(True)
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
-    
+
     if selection_mode == GwSelectionMode.PSECTOR:
         _insert_feature_psector(dialog, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
         remove_selection()
@@ -4532,7 +4536,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     # Update model of the widget with selected expr_filter
     _perform_delete_and_refresh_view(class_object, dialog, table_object, feature_type, selection_mode, list_id,
                                      expr_filter, lazy_widget, lazy_init_function, extra_field, selected_list, widget)
-    
+
     # Select features with previous filter
     # Build a list of feature id's and select them
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
