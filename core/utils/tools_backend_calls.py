@@ -552,11 +552,11 @@ def get_graph_config(**kwargs):
         return
 
     has_conflicts = json_result['body']['data'].get('hasConflicts')
-    if not has_conflicts:
+    if has_conflicts is None or has_conflicts:
         return
 
     netscenario_id = json_result['body']['data'].get('netscenarioId')
-    context = "NETSCENARIO" if netscenario_id else "OPERATIVE"
+    context = "NETSCENARIO" if netscenario_id is not None and netscenario_id != '-1' else "OPERATIVE"
     mapzone_type = json_result['body']['data'].get('graphClass')
     if not mapzone_type:
         msg = "Function {0} error: missing key {1}"
