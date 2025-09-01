@@ -2172,7 +2172,7 @@ class GwInfo(QObject):
 
     def _set_auto_update_hyperlink(self, field, dialog, widget, new_feature=None):
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):
             widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
