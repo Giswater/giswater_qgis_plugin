@@ -19,19 +19,16 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 		
 		-- expl_id		
-		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
-			RETURN NULL;				
-		END IF;
 		IF NEW.the_geom IS NOT NULL THEN
 			IF NEW.expl_id IS NULL THEN
-				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				NEW.expl_id := (SELECT expl_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 50)  ORDER BY ST_Distance(NEW.the_geom, ve_arc.the_geom) ASC LIMIT 1);
 			END IF;
 		END IF;
 
-		NEW.node_id=nextval('SCHEMA_NAME.urn_id_seq'::regclass);
+		NEW.node_id=nextval('ws421.urn_id_seq'::regclass);
 
 		INSERT INTO anl_node (node_id, nodecat_id, expl_id, the_geom, fid)
-		VALUES (NEW.node_id, NEW.nodecat_id, NEW.expl_id, NEW.the_geom, 468);
+		VALUES (NEW.node_id, 'PROPOSED HYDRANT', NEW.expl_id, NEW.the_geom, 468);
 
 		RETURN NEW;
 		
