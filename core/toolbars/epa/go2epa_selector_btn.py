@@ -79,7 +79,8 @@ def accept(**kwargs):
     tools_qgis.set_cursor_wait()
     try:
         _load_result_layers()
-        _load_compare_layers()
+        if form.get('tab_result_result_name_compare') and form.get('tab_result_result_name_compare') != '':
+            _load_compare_layers()
     except Exception:
         pass
     tools_qgis.restore_cursor()
