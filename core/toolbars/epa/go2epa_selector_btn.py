@@ -159,11 +159,16 @@ def _load_compare_layers():
     sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filtre}' AND alias IS NOT NULL"
     rows = tools_db.get_rows(sql)
     if rows:
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
-                pk = "id"
-                if global_vars.project_type == 'ws' and 'hourly' not in tablename:
+                for field in json_result['body']['data']['fields']:
+                    if field['tableName'] == tablename:
+                        pk = field['tableId']
+                        break
+                if global_vars.project_type == 'ws' and 'hourly' not in tablename and not pk:
                     pk = f"{tablename.split('_')[-1]}_id"
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
 
