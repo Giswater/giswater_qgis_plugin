@@ -12,4 +12,5 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 VALUES('help_domain', 'https://docs.giswater.org/', 'Base domain for documentation web.', 'Custom variable for documentation', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'boolean', 'check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)
 ON CONFLICT DO NOTHING;
 
+-- 01/09/2025
 UPDATE config_form_fields SET widgetfunction = replace(widgetfunction::text, 'v_edit_', 've_')::json WHERE widgetfunction::TEXT ILIKE '%v_edit_%';
