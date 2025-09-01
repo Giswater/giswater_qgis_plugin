@@ -182,6 +182,9 @@ class GwSearch:
 
     def refresh_tab(self, tab_name=None):
 
+        if self.dlg_search is None:
+            return
+
         if tab_name:
             form = f'"singleTab":"{tab_name}"'
         else:
