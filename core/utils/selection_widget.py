@@ -13,7 +13,7 @@ from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, QHBoxLayout, QPushButton
 
 import tools_gw
-from ...libs import tools_qt, tools_qgis, lib_vars # tools_db,
+from ...libs import tools_qt, tools_qgis, lib_vars  # tools_db,
 # from .select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
 from .selection_mode import GwSelectionMode
 
