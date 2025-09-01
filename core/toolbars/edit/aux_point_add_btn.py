@@ -15,7 +15,7 @@ from qgis.gui import QgsVertexMarker, QgsRubberBand
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxPointUi
 from ...utils import tools_gw
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
 
 
 class GwAuxPointAddButton(GwMaptool):
@@ -202,7 +202,7 @@ class GwAuxPointAddButton(GwMaptool):
             self.dlg_create_point.rb_left.setChecked(True)
         elif tools_gw.get_config_parser('btn_auxpoint', "rb_right", "user", "session") in ("True", True):
             self.dlg_create_point.rb_right.setChecked(True)
-        
+
         tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
         self.dialog_created = True
         self.dlg_create_point.dist_x.setFocus()
@@ -276,7 +276,7 @@ class GwAuxPointAddButton(GwMaptool):
         self.dist_y = self.dlg_create_point.dist_y.text()
         if not self.dist_y:
             self.dist_y = 0
-        
+
         if self.layer_points:
             self.layer_points.startEditing()
             self.delete_prev = tools_qt.is_checked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
@@ -313,7 +313,7 @@ class GwAuxPointAddButton(GwMaptool):
     def _add_aux_point(self, event):
 
         if event.button() == Qt.LeftButton:
-            
+
             # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
@@ -369,8 +369,11 @@ class GwAuxPointAddButton(GwMaptool):
                 tools_gw.close_dialog(self.dlg_create_point)
                 self.dialog_created = False
 
-        if self.layer_points:
-            self.layer_points.commitChanges()
+        try:
+            if self.layer_points:
+                self.layer_points.commitChanges()
+        except RuntimeError:
+            tools_log.log_error("Error committing changes to layer points")
 
     def _reset_rubberbands(self):
 
