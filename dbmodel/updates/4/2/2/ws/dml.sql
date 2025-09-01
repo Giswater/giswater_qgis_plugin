@@ -12,3 +12,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO sys_table (id,descript,sys_role,alias, context) VALUES ('ve_inp_frshortpipe','ve_inp_frshortpipe','role_edit','Inp flwreg shortpipe', '{"levels": ["EPA", "HYDRAULICS"]}');
 UPDATE sys_table SET descript='ve_inp_frpump', context = '{"levels": ["EPA", "HYDRAULICS"]}', alias = 'Inp flwreg pump' WHERE id='ve_inp_frpump';
 UPDATE sys_table SET descript='ve_inp_frvalve', context = '{"levels": ["EPA", "HYDRAULICS"]}', alias = 'Inp flwreg valve' WHERE id='ve_inp_frvalve';
+
+UPDATE config_form_fields SET dv_isnullvalue = true WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
+UPDATE config_form_fields SET dv_isnullvalue = true WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='status' AND tabname='tab_epa';

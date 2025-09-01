@@ -138,6 +138,7 @@ BEGIN
 					FROM ve_inp_frshortpipe
 					WHERE temp_t_node.node_id=concat(ve_inp_frshortpipe.node_id, '_n2a_2') AND ve_inp_frshortpipe.node_id = flwreg_rec.node_id;
 				END IF;
+				v_addparam = NULL;
 			END IF;
 
 	 		-- Inserting into temp_t_arc
