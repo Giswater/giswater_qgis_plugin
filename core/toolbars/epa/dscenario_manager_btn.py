@@ -923,10 +923,6 @@ class GwDscenarioManagerButton(GwAction):
         frelem_name = None
         if obj_name.startswith('tab_elements_tbl_frelem_dsc_'):
             frelem_name = obj_name.replace('tab_elements_tbl_frelem_dsc_', '')
-        elif obj_name.startswith('tab_elements_frelem_dsc_'):
-            frelem_name = obj_name.replace('tab_elements_frelem_dsc_', '')
-        elif obj_name.startswith('tbl_frelem_dsc_'):
-            frelem_name = obj_name.replace('tbl_frelem_dsc_', '')
 
         if frelem_name:
             tablename = f'inp_dscenario_fr{frelem_name}'
