@@ -1595,7 +1595,6 @@ class GwPsector:
 
         self.dlg_psector_mng.btn_cancel.clicked.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
-        self.dlg_psector_mng.btn_restore.clicked.connect(partial(self.set_toggle_archive, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
@@ -1642,10 +1641,6 @@ class GwPsector:
         action_toggle_active = QAction("Toggle active", qtableview)
         action_toggle_active.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
         menu.addAction(action_toggle_active)
-
-        action_toggle_archive = QAction("Toggle archive", qtableview)
-        action_toggle_archive.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_restore"))
-        menu.addAction(action_toggle_archive)
 
         action_merge = QAction("Merge", qtableview)
         action_merge.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_merge"))
@@ -1724,38 +1719,6 @@ class GwPsector:
             tools_qgis.force_refresh_map_canvas()
             tools_gw.refresh_selectors()
 
-    def set_toggle_archive(self, dialog, qtbl_psm):
-
-        sql = ""
-        selected_list = qtbl_psm.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            msg = "Any record selected"
-            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
-            return
-        cur_psector = tools_gw.get_config_value('plan_psector_current')
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            psector_id = qtbl_psm.model().record(row).value("psector_id")
-            archived = qtbl_psm.model().record(row).value("archived")
-            if cur_psector and cur_psector[0] is not None and psector_id == int(cur_psector[0]):
-                msg = "The archive state of the current psector cannot be changed. Current psector: {0}"
-                msg_params = (cur_psector[0],)
-                tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng, msg_params=msg_params)
-                return
-            if archived is True:
-                sql += f"UPDATE plan_psector SET archived = False WHERE psector_id = {psector_id};"
-                msg = f"Psector {psector_id} unarchived"
-                tools_qgis.show_info(msg, dialog=self.dlg_psector_mng)
-            else:
-                sql += f"UPDATE plan_psector SET archived = True, active = False WHERE psector_id = {psector_id};"
-                msg = f"Psector {psector_id} archived"
-                tools_qgis.show_info(msg, dialog=self.dlg_psector_mng)
-
-        tools_db.execute_sql(sql)
-
-        # Refresh table with both filters
-        self._filter_table(dialog, dialog.tbl_psm, dialog.txt_name, dialog.chk_active, dialog.chk_archived, 'v_ui_plan_psector')
-
     def update_current_psector(self, dialog, qtbl, scenario_type, col_id_name):
         """ Sets the selected psector as current if it is active """
         # Get selected rows in the table
@@ -1824,15 +1787,13 @@ class GwPsector:
 
         expr = ""
 
-        # Handle active filter
-        if not active_checked:
-            expr += " active is true"
-
-        # Handle archive filter
-        if not archive_checked:
-            if expr != "":
-                expr += " AND "
-            expr += " archived is not true"
+        # Handle archived and active filter
+        if not archive_checked and not active_checked:
+            expr += " archived is false and active is true"
+        elif archive_checked and not active_checked:
+            expr += " archived is true or active is true"
+        elif active_checked and not archive_checked:
+            expr += " (archived is false and active is false) or active is true"
 
         if result_select != 'null':
             if expr != "":
