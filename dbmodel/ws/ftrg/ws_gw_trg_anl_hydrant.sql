@@ -25,7 +25,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		NEW.node_id=nextval('ws421.urn_id_seq'::regclass);
+		NEW.node_id=nextval('SCHEMA_NAME.urn_id_seq'::regclass);
 
 		INSERT INTO anl_node (node_id, nodecat_id, expl_id, the_geom, fid)
 		VALUES (NEW.node_id, 'PROPOSED HYDRANT', NEW.expl_id, NEW.the_geom, 468);
