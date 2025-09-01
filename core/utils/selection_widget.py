@@ -17,6 +17,7 @@ from ...libs import tools_qt, tools_qgis, lib_vars  # tools_db,
 # from .select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
 from .selection_mode import GwSelectionMode
 
+
 class GwSelectionWidget(QWidget):
     """
     A widget that provides selection tools and functionality for GIS features.

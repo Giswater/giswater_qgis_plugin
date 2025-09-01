@@ -1574,7 +1574,7 @@ class GwNonVisual:
             sql_columns = []
             sql_values = []
             for i, x in enumerate(row):
-                sql_columns.append(f"factor_{i+1}")
+                sql_columns.append(f"factor_{i + 1}")
                 sql_values.append(x)
             sql = f"""INSERT INTO ve_inp_pattern_value (pattern_id, {','.join(sql_columns)}) 
                         VALUES ({pattern_id}, {','.join(map(str, sql_values))});"""
