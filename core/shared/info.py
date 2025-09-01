@@ -2842,26 +2842,11 @@ class GwInfo(QObject):
         row = index.row()
         first_col_value = index.sibling(row, 0).data()
         dscenario_manager_btn.selected_dscenario_id = int(first_col_value)
-        # Pass a refresh callback so Info tables reload when generic form closes
-        try:
-            def _refresh_dscenario_table():
-                try:
-                    tbl = tableview
-                    dlg = self.dlg_cf
-                    complet_result = self.complet_result
-                    feature_id = complet_result['body']['feature']['id']
-                    id_name = complet_result['body']['feature']['idName']
-                    view = tbl.property('linkedobject')
-                    if not view:
-                        return
-                    complet_list = get_list(view, id_name, feature_id)
-                    fill_tbl(complet_list, tbl, self, view, dlg)
-                    tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=self.schema_name)
-                except Exception:
-                    pass
-            dscenario_manager_btn.manage_update(dlg_cf, tableview, on_close=_refresh_dscenario_table)
-        except Exception:
-            dscenario_manager_btn.manage_update(dlg_cf, tableview)
+        dscenario_manager_btn.manage_update(
+            dlg_cf,
+            tableview,
+            on_close=partial(_reload_table, dialog=dlg_cf, complet_result=self.complet_result)
+        )
 
     def force_enable_clear_button(self, widget):
         # Always ensure nulls are allowed
