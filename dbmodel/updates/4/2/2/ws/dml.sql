@@ -1036,3 +1036,5 @@ UPDATE sys_style
   <layerGeometryType>0</layerGeometryType>
 </qgis>'
 	WHERE layername='v_rpt_node' AND styleconfig_id=101;
+
+UPDATE sys_table SET addparam = '{"pkey":"id"}' WHERE id = 'v_rpt_arc' OR id = 'v_rpt_node';
