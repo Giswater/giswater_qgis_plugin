@@ -6,15 +6,15 @@ or (at your option) any later version.
 """
 import os
 from functools import partial
-from typing import Literal, Dict, Optional, Any, Callable
+from typing import Any, Callable  # Literal, Dict, Optional,
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, QHBoxLayout, QPushButton
 
 import tools_gw
-from ...libs import tools_qt, tools_db, tools_qgis, lib_vars
-from .select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
+from ...libs import tools_qt, tools_qgis, lib_vars # tools_db,
+# from .select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
 from .selection_mode import GwSelectionMode
 
 class GwSelectionWidget(QWidget):
@@ -36,7 +36,7 @@ class GwSelectionWidget(QWidget):
             highlight_variables: Tuple containing (class_object, dialog, table_object, selection_mode, method, callback_values)
         """
         super().__init__(parent)
-        
+
         # Create layout
         self.layout = QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -112,16 +112,16 @@ class GwSelectionWidget(QWidget):
         btn_select_all.setToolTip("Select all features in the table")
         btn_select_all.clicked.connect(partial(self.select_all_features, class_object, dialog, expected_table_name))
         self.layout.addWidget(btn_select_all)
-        
+
         # Clear Selection button
         btn_clear = QPushButton("Clear", self)
         btn_clear.setToolTip("Clear current selection")
         btn_clear.clicked.connect(partial(self.clear_selection, class_object, dialog, expected_table_name))
         self.layout.addWidget(btn_clear)
-        
+
         # Add separator
         self.add_separator()
-        
+
         return btn_select_all, btn_clear
 
     # region utility functions
@@ -263,8 +263,8 @@ class GwSelectionWidget(QWidget):
             self.highlight_features_selected_in_table(class_object, dialog, expected_table_name)
         elif method == "psector":
             self.highlight_features_psector_in_table(class_object, dialog, expected_table_name)
-    
-    def highlight_in_tab_changed(self, class_object: Any, dialog: QDialog, expected_table_name: str, 
+
+    def highlight_in_tab_changed(self, class_object: Any, dialog: QDialog, expected_table_name: str,
                                  parent_tab: QTabWidget, method: str):
         """
         Handle tab change events for highlighting features.
@@ -294,7 +294,7 @@ class GwSelectionWidget(QWidget):
         class_object, dialog, expected_table_name = callback_values()
         self.highlight_features_method(class_object, dialog, expected_table_name, method)
 
-    def init_highlight_features_methods(self, class_object: Any, dialog: QDialog, table_object: str, 
+    def init_highlight_features_methods(self, class_object: Any, dialog: QDialog, table_object: str,
                                             selection_mode: GwSelectionMode, method: str = "selected",
                                             callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
         """
@@ -317,14 +317,14 @@ class GwSelectionWidget(QWidget):
         if parent_tab_table:
             parent_tab_table.currentChanged.connect(partial(self.highlight_in_table_changed, method, callback_values))
         if parent_tab:
-            parent_tab.currentChanged.connect(partial(self.highlight_in_tab_changed, class_object, dialog, 
+            parent_tab.currentChanged.connect(partial(self.highlight_in_tab_changed, class_object, dialog,
                                                       expected_table_name, parent_tab, method))
 
     # endregion activate highlight methods
 
     # region highlight features in table
 
-    def highlight_features_selected_in_table(self, class_object: Any, dialog: QDialog, expected_table_name: str, 
+    def highlight_features_selected_in_table(self, class_object: Any, dialog: QDialog, expected_table_name: str,
                                              connected_signal: bool = False):
         """
         Highlight features selected in table.
@@ -367,11 +367,11 @@ class GwSelectionWidget(QWidget):
         # Select features on map
         expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
         tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
-        
+
         if not connected_signal:
-            model.selectionChanged.connect(partial(tools_qgis.highlight_features_selected_in_table, 
+            model.selectionChanged.connect(partial(tools_qgis.highlight_features_selected_in_table,
                                                    class_object, dialog, expected_table_name, connected_signal=True))
-        
+
     def highlight_features_psector_in_table(self, class_object: Any, dialog: QDialog, expected_table_name: str):
         """
         Highlight features psector in table.
@@ -442,16 +442,16 @@ class GwSelectionWidget(QWidget):
         widget_table = tools_qt.get_widget(dialog, expected_table_name)
         if not widget_table or not widget_table.model():
             return
-            
+
         selection_model = widget_table.selectionModel()
         if not selection_model:
             return
-            
+
         # Select all rows
         for row in range(widget_table.model().rowCount()):
             index = widget_table.model().index(row, 0)
             selection_model.select(index, selection_model.Select | selection_model.Rows)
-            
+
         # Highlight the selected features
         self.highlight_features_in_table(class_object, dialog, expected_table_name)
 
@@ -467,10 +467,10 @@ class GwSelectionWidget(QWidget):
         widget_table = tools_qt.get_widget(dialog, expected_table_name)
         if not widget_table or not widget_table.selectionModel():
             return
-            
+
         # Clear selection
         widget_table.selectionModel().clearSelection()
-        
+
         # Remove selection from map
         tools_gw.remove_selection(layers=class_object.rel_layers)
         tools_qgis.refresh_map_canvas()
@@ -493,7 +493,7 @@ class GwSelectionWidget(QWidget):
         btn_invert = QPushButton("Invert Selection", self)
         btn_invert.setToolTip("Invert the current selection in the table")
         self.layout.addWidget(btn_invert)
-        
+
         # Connect button click to invert selection logic
         btn_invert.clicked.connect(partial(self.invert_table_selection, class_object, dialog, expected_table_name))
 
@@ -509,32 +509,32 @@ class GwSelectionWidget(QWidget):
         widget_table = tools_qt.get_widget(dialog, expected_table_name)
         if not widget_table or not widget_table.model():
             return
-            
+
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
-        
+
         if not selection_model:
             return
-            
+
         # Get all row indices
         all_rows = set(range(model.rowCount()))
         selected_rows = set()
-        
+
         # Get currently selected rows
         for index in selection_model.selectedRows():
             selected_rows.add(index.row())
-            
+
         # Calculate rows to select (invert selection)
         rows_to_select = all_rows - selected_rows
-        
+
         # Clear current selection
         selection_model.clearSelection()
-        
+
         # Select the inverted rows
         for row in rows_to_select:
             index = model.index(row, 0)
             selection_model.select(index, selection_model.Select | selection_model.Rows)
-            
+
         # Highlight the newly selected features
         self.highlight_features_selected_in_table(class_object, dialog, expected_table_name)
 

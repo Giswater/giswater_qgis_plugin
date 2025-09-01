@@ -9,7 +9,6 @@ import os
 import json
 import webbrowser
 from functools import partial
-import re
 
 
 try:
@@ -3011,7 +3010,7 @@ class GwNonVisual:
                 except (ValueError, TypeError):
                     value = 0
                 temp_lst.append(value)
-            float_list.append(temp_lst)    
+            float_list.append(temp_lst)
         return float_list
 
     def _read_tbl_values(self, table, clear_nulls=False):
@@ -3027,7 +3026,7 @@ class GwNonVisual:
                 if clear_nulls and value is None:
                     continue
                 values[y].append(value)
-        
+
         # Filter out trailing empty rows
         while values and all(v is None for v in values[-1]):
             values.pop()
