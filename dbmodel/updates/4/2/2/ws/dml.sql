@@ -15,3 +15,4 @@ UPDATE sys_table SET descript='ve_inp_frvalve', context = '{"levels": ["EPA", "H
 
 UPDATE config_form_fields SET dv_isnullvalue = true WHERE formname='ve_epa_frvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
 UPDATE config_form_fields SET dv_isnullvalue = true WHERE formname='ve_epa_frshortpipe' AND formtype='form_feature' AND columnname='status' AND tabname='tab_epa';
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('inp_frshortpipe', 'inp_frshortpipe', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
