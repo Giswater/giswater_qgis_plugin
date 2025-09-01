@@ -141,8 +141,6 @@ def _load_result_layers():
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
                 pk = "id"
-                if global_vars.project_type == 'ws' and (tablename == 'v_rpt_node' or tablename == 'v_rpt_arc'):
-                    pk = f"{tablename.split('_')[-1]}_id"
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
 
 
@@ -169,8 +167,6 @@ def _load_compare_layers():
                     if field['tableName'] == tablename:
                         pk = field['tableId']
                         break
-                if global_vars.project_type == 'ws' and 'hourly' not in tablename and not pk:
-                    pk = f"{tablename.split('_')[-1]}_id"
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
 
 # end region
