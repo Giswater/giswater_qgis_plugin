@@ -3553,7 +3553,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
     activation_function()
 
     # Show dialog
-    if show_expression_dialog(class_object.rel_feature_type, dialog, table_object) in (QDialog.Accepted, QDialog.Rejected):
+    if show_expression_dialog(class_object.feature_type, dialog, table_object) in (QDialog.Accepted, QDialog.Rejected):
         # Execute deactivation function
         deactivation_function()
 
