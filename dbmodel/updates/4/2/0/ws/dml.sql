@@ -312,9 +312,22 @@ ALTER TABLE config_form_fields ENABLE TRIGGER ALL;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_meter_metertype', '0', 'UNKNOWN', NULL, NULL)
 ON CONFLICT (typevalue, id) DO NOTHING;
 
+INSERT INTO edit_typevalue (typevalue, id, idval, descript)
+SELECT DISTINCT 'man_meter_metertype', ROW_NUMBER() OVER(), meter_type, NULL FROM man_meter ORDER BY 2 ASC LIMIT 3 ON CONFLICT DO NOTHING;
+
+INSERT INTO cat_brand (id)
+SELECT DISTINCT brand_id FROM node WHERE brand_id IS NOT NULL ON CONFLICT DO NOTHING;
+
+INSERT INTO cat_brand_model (catbrand_id, id)
+SELECT DISTINCT brand_id, model_id FROM node WHERE model_id IS NOT NULL ON CONFLICT DO NOTHING;
+
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
 VALUES('edit_typevalue', 'man_meter_metertype', 'man_meter', 'meter_type', NULL, true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_param_system SET 
+value='{"sys_table_id":"ve_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"conneccat_id","orderby":"3","search_type":"connec"}' 
+WHERE "parameter"='basic_search_network_connec';
 
 DELETE FROM config_toolbox WHERE id=2712;
 

@@ -16,5 +16,5 @@ ALTER TABLE doc_x_node ADD CONSTRAINT doc_x_node_doc_id_fkey FOREIGN KEY (doc_id
 ALTER TABLE doc_x_arc ADD CONSTRAINT doc_x_arc_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc(id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE doc_x_connec ADD CONSTRAINT doc_x_connec_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-DROP RULE insert_plan_psector_x_arc ON arc;
-DROP RULE insert_plan_psector_x_node ON node;
+DROP RULE IF EXISTS insert_plan_psector_x_arc ON arc;
+DROP RULE IF EXISTS insert_plan_psector_x_node ON node;
