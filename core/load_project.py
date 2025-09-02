@@ -429,7 +429,6 @@ class GwLoadProject(QObject):
                             self.buttons[index_action] = button
                         successful = True
                     attempt = attempt + 1
-        global_vars.gw_buttons = self.buttons
         # Disable buttons which are project type exclusive
         project_exclude = None
         successful = False
@@ -767,22 +766,22 @@ class GwLoadProject(QObject):
     def _enable_all_buttons(self, enable=True):
         """ Utility to enable/disable all buttons """
 
-        for index in global_vars.gw_buttons.keys():
+        for index in self.buttons.keys():
             self._enable_button(index, enable)
 
     def _enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
 
         key = str(button_id).zfill(2)
-        if key in global_vars.gw_buttons:
-            global_vars.gw_buttons[key].action.setEnabled(enable)
+        if key in self.buttons:
+            self.buttons[key].action.setEnabled(enable)
 
     def _hide_button(self, button_id, hide=True):
         """ Enable/disable selected action """
 
         key = str(button_id).zfill(2)
-        if key in global_vars.gw_buttons:
-            global_vars.gw_buttons[key].action.setVisible(not hide)
+        if key in self.buttons:
+            self.buttons[key].action.setVisible(not hide)
 
     def _enable_toolbar(self, toolbar_id, enable=True):
         """ Enable/Disable toolbar. Normally because user has no permission """

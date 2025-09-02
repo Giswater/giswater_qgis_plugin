@@ -4886,7 +4886,7 @@ def manage_current_psector_docker(psector_name=None):
 def set_psector_mode_enabled(enable: bool):
     """ Set psector mode enabled """
 
-    buttons = global_vars.gw_buttons
+    buttons = global_vars.load_project.buttons
     # Change button icons
     for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
         if key in (None, 'None'):
