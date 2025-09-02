@@ -715,15 +715,18 @@ class GwAdminButton:
         version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
 
         # Process each version folder in order
+        project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
+        plugin_tuple = tuple(int(x) for x in str(self.plugin_version).split('.'))
+        
         for major, minor, patch, folder_path in version_folders:
-            current_folder_version = f"{major}.{minor}.{patch}"
+            current_tuple = (major, minor, patch)
             if new_project:
-                if current_folder_version <= str(self.plugin_version):
+                if current_tuple <= plugin_tuple:
                     status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
                     if tools_os.set_boolean(status, False) is False:
                         return False
             else:
-                if current_folder_version > str(self.project_version) and current_folder_version <= str(self.plugin_version):
+                if current_tuple > project_tuple and current_tuple <= plugin_tuple:
                     status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
                     if tools_os.set_boolean(status, False) is False:
                         return False
@@ -1728,9 +1731,11 @@ class GwAdminButton:
         version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
 
         # Process each version folder in order
+        project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
+        
         for major, minor, patch, folder_path in version_folders:
-            current_folder_version = f"{major}.{minor}.{patch}"
-            if current_folder_version > str(self.project_version):
+            current_tuple = (major, minor, patch)
+            if current_tuple > project_tuple:
                 folder_aux = os.path.join(self.folder_updates, str(major), str(minor), str(patch))
                 if self._process_folder(folder_aux):
                     self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
