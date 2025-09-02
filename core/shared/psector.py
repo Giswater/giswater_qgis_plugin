@@ -1296,7 +1296,7 @@ class GwPsector:
                         _filter = self.dict_to_update[main_key][sub_key]
                     else:
                         sql += f"UPDATE ve_plan_psector_x_other SET {sub_key} = '{self.dict_to_update[main_key][sub_key]}' " \
-                               f"WHERE psector_id = {tools_qt.get_text(self.dlg_plan_psector, self.psector_id)} AND price_id = '{_filter}';\n"
+                               f"WHERE psector_id = {self.psector_id} AND price_id = '{_filter}';\n"
             tools_db.execute_sql(sql)
 
     def _manage_widgets(self, dialog, lbl, widget, count, pos):
@@ -1478,7 +1478,7 @@ class GwPsector:
         tools_db.execute_sql(sql)
 
         # self._refresh_tables_relations()
-        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
+        filter_ = "psector_id = '" + str(self.psector_id) + "'"
         self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
                         set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
 
@@ -2406,7 +2406,7 @@ class GwPsector:
 
             tools_db.execute_sql(sql)
 
-        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
+        filter_ = "psector_id = '" + str(self.psector_id) + "'"
         self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
                         set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
 
@@ -2580,7 +2580,7 @@ class GwPsector:
                 self.node_id = snapped_feat.attribute('node_id')
                 self.node_state = snapped_feat.attribute('state')
 
-                selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+                selected_psector = self.psector_id
 
                 # Execute setarcfusion
                 workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
@@ -2711,7 +2711,7 @@ class GwPsector:
         tab_idx = dialog.tab_feature.currentIndex()
         feature_type = dialog.tab_feature.tabText(tab_idx).lower()
         qtbl_feature = dialog.findChild(QTableView, f"tbl_psector_x_{feature_type}")
-        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+        selected_psector = self.psector_id
         list_tables = {'arc': self.tablename_psector_x_arc, 'node': self.tablename_psector_x_node,
                        'connec': self.tablename_psector_x_connec, 'gully': self.tablename_psector_x_gully}
 

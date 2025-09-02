@@ -5617,6 +5617,10 @@ def _insert_feature_psector(dialog, feature_type, ids=None):
         sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
+        if feature_type in ('connec', 'gully'):
+            sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id, state) "
+            sql += f"VALUES('{ids[i]}', '{value}', 1) ON CONFLICT DO NOTHING;"
+            tools_db.execute_sql(sql)
         load_tableview_psector(dialog, feature_type)
 
 
