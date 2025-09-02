@@ -142,7 +142,6 @@ class GwProjectCheckTask(GwTask):
         
         extras = f'"version":"{plugin_version}"'
         extras += ', "fid":101'
-        extras += ', "isAudit":"true"'
         extras += f', "initProject":{init_project}'
         extras += f', "addSchema":"{add_schema}"'
         extras += f', "mainSchema":"{main_schema}"'
