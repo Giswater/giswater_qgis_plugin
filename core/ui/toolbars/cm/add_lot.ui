@@ -74,13 +74,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_snapping">
+             <widget class="QToolButton" name="btn_snapping">
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../../../../../../../../../../../../.designer/icons/137.png</normaloff>../../../../../../../../../../../../../.designer/icons/137.png</iconset>
+              <property name="popupMode">
+               <enum>QToolButton::MenuButtonPopup</enum>
               </property>
              </widget>
             </item>
