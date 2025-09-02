@@ -136,8 +136,13 @@ BEGIN
 				END IF;
 			END IF;
 		ELSIF v_formname = 'epaoptions' THEN
-			EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
-			USING  v_value, v_widget;
+			IF result IS NOT NULL THEN
+				EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
+				USING  v_value, v_widget;
+			ELSE
+				EXECUTE 'INSERT INTO '|| quote_ident(v_table) ||' (parameter, value, cur_user) VALUES ($1, $2, current_user)'
+				USING  v_widget, v_value;
+			END IF;
 		END IF;
 	END IF;
    END LOOP;

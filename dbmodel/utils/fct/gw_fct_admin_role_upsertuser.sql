@@ -153,6 +153,8 @@ BEGIN
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_expl (expl_id, cur_user) 
 				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.config_user_x_expl 
 				WHERE username= '''||v_user_id||''' ON CONFLICT (expl_id,cur_user) DO NOTHING';
+
+				
 	
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (207, null, 1, concat('INFO: User ',v_user_id,' inserted into expl and state selectors of schema ',rec_schema,'.'));
@@ -165,6 +167,10 @@ BEGIN
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_expl (expl_id, cur_user) 
 				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.exploitation 
 				ON CONFLICT (expl_id,cur_user) DO NOTHING';
+
+				EXECUTE 'INSERT INTO '||rec_schema||'.selector_sector (sector_id, cur_user) 
+				SELECT sector_id, '''||v_user_id||''' FROM '||rec_schema||'.sector 
+				ON CONFLICT (sector_id,cur_user) DO NOTHING';
 	
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (207, null, 1, concat('INFO: User ',v_user_id,' inserted into expl and state selectors of schema ',rec_schema,'.'));
