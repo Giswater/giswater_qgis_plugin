@@ -51,6 +51,8 @@ giswater_settings = None                # Instance of class QSettings. QGIS sett
 exec_procedure_max_retries = None       # Maximum number of execution retries of a PostgreSQL function
 load_project_menu = None
 load_project = None                     # Instance of class GwLoadProject. Contains all toolbar buttons and project configuration
+psignals_widgets = []                   # A list of all the psector status bar widgets
+gw_buttons = {}                         # A dictionary containing all the Giswater buttons
 # endregion
 
 

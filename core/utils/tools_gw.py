@@ -31,7 +31,8 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup, \
+    QToolBar
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -4239,7 +4240,7 @@ def add_icon(widget, icon, folder="dialogs"):
         return False
 
 
-def get_icon(icon, folder="dialogs"):
+def get_icon(icon, folder="dialogs", log_info=True):
     # Get icons folder
     icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
@@ -4247,8 +4248,9 @@ def get_icon(icon, folder="dialogs"):
     if os.path.exists(icon_path):
         return QIcon(icon_path)
     else:
-        msg = "File not found"
-        tools_log.log_info(msg, parameter=icon_path)
+        if log_info:
+            msg = "File not found"
+            tools_log.log_info(msg, parameter=icon_path)
         return None
 
 
@@ -4879,6 +4881,37 @@ def manage_current_psector_docker(psector_name=None):
     if not dock_widget.isVisible():
         dock_widget.show()
         dock_widget.raise_()
+
+
+def set_psector_mode_enabled(enable: bool):
+    """ Set psector mode enabled """
+
+    buttons = global_vars.gw_buttons
+    # Change button icons
+    for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
+        if key in (None, 'None'):
+            continue
+        toolbar = button.toolbar
+        toolbar_id = toolbar.property('gw_name')
+        icon_path = f"{key}p" if enable else f"{key}"
+        icon = get_icon(icon_path, f"toolbars{os.sep}{toolbar_id}", log_info=False)
+        if icon:
+            button.action.setIcon(icon)
+
+
+def get_gw_toolbars():
+    """ Get Giswater toolbars"""
+
+    # Get all QToolBar from qgis iface
+    widget_list = global_vars.iface.mainWindow().findChildren(QToolBar)
+    gw_toolbars = []
+
+    # Get list with Giswater QToolBars
+    for w in widget_list:
+        if w.property('gw_name'):
+            gw_toolbars.append(w)
+
+    return gw_toolbars
 
 
 def create_sqlite_conn(file_name):

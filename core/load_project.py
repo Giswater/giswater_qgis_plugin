@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QPushButton, QComboBox
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -127,6 +127,9 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
+        # Create Psector status bar
+        self._create_psector_status_bar()
+
         # Manage "btn_updateall" from attribute table
         self._manage_attribute_table()
 
@@ -192,14 +195,7 @@ class GwLoadProject(QObject):
     # region private functions
 
     def _save_toolbars_position(self):
-        # Get all QToolBar from qgis iface
-        widget_list = self.iface.mainWindow().findChildren(QToolBar)
-        own_toolbars = []
-
-        # Get list with own QToolBars
-        for w in widget_list:
-            if w.property('gw_name'):
-                own_toolbars.append(w)
+        own_toolbars = tools_gw.get_gw_toolbars()
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
@@ -433,7 +429,7 @@ class GwLoadProject(QObject):
                             self.buttons[index_action] = button
                         successful = True
                     attempt = attempt + 1
-
+        global_vars.gw_buttons = self.buttons
         # Disable buttons which are project type exclusive
         project_exclude = None
         successful = False
@@ -548,6 +544,38 @@ class GwLoadProject(QObject):
             plugin_toolbar.list_actions = list_actions
             self.plugin_toolbars[toolbar_id] = plugin_toolbar
             self._enable_toolbar(toolbar_id)
+
+    def _create_psector_status_bar(self):
+        """ Create Psector status bar """
+        statusbar = self.iface.mainWindow().statusBar()
+
+        self.playpause_button = QPushButton()
+        tools_gw.add_icon(self.playpause_button, "73", f"toolbars{os.sep}status")
+        self.playpause_button.setProperty('psector_active', False)
+        self.playpause_button.clicked.connect(partial(self._toggle_psector_playpause, self.playpause_button))
+        statusbar.addWidget(self.playpause_button)
+
+        self.cmb_psector = QComboBox()
+        sql = "SELECT psector_id as id, name as idval FROM plan_psector WHERE active = true ORDER BY id ASC"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            for row in rows:
+                self.cmb_psector.addItem(row['idval'], row['id'])
+        statusbar.addWidget(self.cmb_psector)
+
+        global_vars.psignals_widgets = [self.playpause_button, self.cmb_psector]
+
+    def _toggle_psector_playpause(self, button):
+        """ Manage psector play/pause """
+        active = button.property('psector_active')
+        if active:
+            button.setProperty('psector_active', False)
+            tools_gw.add_icon(button, "73", f"toolbars{os.sep}status")
+        else:
+            button.setProperty('psector_active', True)
+            tools_gw.add_icon(button, "74", f"toolbars{os.sep}status")
+
+        tools_gw.set_psector_mode_enabled(not active)
 
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
@@ -739,22 +767,22 @@ class GwLoadProject(QObject):
     def _enable_all_buttons(self, enable=True):
         """ Utility to enable/disable all buttons """
 
-        for index in self.buttons.keys():
+        for index in global_vars.gw_buttons.keys():
             self._enable_button(index, enable)
 
     def _enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
 
         key = str(button_id).zfill(2)
-        if key in self.buttons:
-            self.buttons[key].action.setEnabled(enable)
+        if key in global_vars.gw_buttons:
+            global_vars.gw_buttons[key].action.setEnabled(enable)
 
     def _hide_button(self, button_id, hide=True):
         """ Enable/disable selected action """
 
         key = str(button_id).zfill(2)
-        if key in self.buttons:
-            self.buttons[key].action.setVisible(not hide)
+        if key in global_vars.gw_buttons:
+            global_vars.gw_buttons[key].action.setVisible(not hide)
 
     def _enable_toolbar(self, toolbar_id, enable=True):
         """ Enable/Disable toolbar. Normally because user has no permission """

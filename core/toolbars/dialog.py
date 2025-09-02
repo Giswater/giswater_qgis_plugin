@@ -40,10 +40,11 @@ class GwAction:
         self.action.setCheckable(False)
         self.action.triggered.connect(self.clicked_event)
 
-        if toolbar is None:
+        self.toolbar = toolbar
+        if self.toolbar is None:
             return
 
-        toolbar.addAction(self.action)
+        self.toolbar.addAction(self.action)
 
     def clicked_event(self):
 

@@ -62,7 +62,8 @@ class GwMaptool(QgsMapTool):
         self.reset()
         self.force_active_layer = True
 
-        if toolbar is None:
+        self.toolbar = toolbar
+        if self.toolbar is None:
             return
 
         self.action = None
@@ -78,7 +79,7 @@ class GwMaptool(QgsMapTool):
         self.action.setObjectName(action_name)
         self.action.setCheckable(True)
         self.action.triggered.connect(self.clicked_event)
-        toolbar.addAction(self.action)
+        self.toolbar.addAction(self.action)
         self.setAction(self.action)
 
     def clicked_event(self):
