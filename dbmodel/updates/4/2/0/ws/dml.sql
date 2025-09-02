@@ -2647,3 +2647,11 @@ UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "le
 UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=9, alias='Link catalog' WHERE id='cat_link';
 UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=10, alias='Element catalog' WHERE id='cat_element';
 UPDATE sys_table SET project_template='{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, context='{"levels": ["INVENTORY", "CATALOGS"]}', orderby=11, alias='Material catalog' WHERE id='cat_material';
+
+
+INSERT INTO sys_label (id, idval, label_type) 
+VALUES(3013, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user. For example:
+
+SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;
+
+Only the errors with anl_table next to the number can be checked this way. Using Giswater Toolbox it''s also posible to check these errors.', 'header');
