@@ -98,7 +98,7 @@ class GwSchemaI18NUpdate:
         msg = "Succesfully connected to {0}"
         msg_params = (host_org,)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
-        sql = "SELECT id, idval FROM i18n.cat_language"
+        sql = "SELECT id, idval FROM i18n.cat_language WHERE id != 'All'"
         rows = self._get_rows(sql, self.cursor_i18n)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "session", False)
@@ -242,7 +242,7 @@ class GwSchemaI18NUpdate:
         lang_columns = []
 
         if 'dbconfig_form_fields' in table:
-            columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            columns = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
                             f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
             if 'feat' in table:
@@ -318,6 +318,10 @@ class GwSchemaI18NUpdate:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
                             f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            
+        elif 'dblabel' in table:
+            columns = ["source", "project_type", "context", "vl_en_us"]
+            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}"]
 
         elif 'dbconfig_engine' in table:
             columns = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
@@ -395,11 +399,11 @@ class GwSchemaI18NUpdate:
                             if row['feature_type'] == feature_type:
                                 formname = row['feature_type'].lower()
                                 sql_text = (f'UPDATE {self.schema}.{row["context"]} SET label = {texts[0]}, tooltip = {texts[1]} '
-                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row["formtype"]}\' AND columnname = \'{row["source"]}\' ')
+                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row["formtype"]}\' AND tabname = \'{row["tabname"]}\' AND columnname = \'{row["source"]}\' ')
                                 break
                     else:
                         sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
-                                f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND columnname = '{row['source']}';\n")
+                                f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND tabname = '{row['tabname']}' AND columnname = '{row['source']}';\n")
 
                 elif 'dbparam_user' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]} "
@@ -452,6 +456,10 @@ class GwSchemaI18NUpdate:
                 elif 'dbtable' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
+                    
+                elif 'dblabel' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
+                                f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbconfig_engine' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]}, placeholder = {texts[2]} "
@@ -481,7 +489,7 @@ class GwSchemaI18NUpdate:
             # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
-                key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"])
+                key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"], row["tabname"])
             else:
                 key = (row["source"], row["context"], row["text"])
             updates.setdefault(key, []).append(row)
@@ -558,10 +566,10 @@ class GwSchemaI18NUpdate:
 
             if context == "config_form_fields":
                 values_str = ",\n    ".join([
-                    f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
+                    f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', '{txt}')"
                     for source, row, txt, col in data
                 ])
-                sql_text = (f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                sql_text = (f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
                 print(sql_text)
             else:
                 values_str = ",\n    ".join([
@@ -862,7 +870,7 @@ class GwSchemaI18NUpdate:
             "ws": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
                  #"dbtables": ["dbtable"]
@@ -870,7 +878,7 @@ class GwSchemaI18NUpdate:
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
             },

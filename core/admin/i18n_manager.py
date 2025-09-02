@@ -34,7 +34,7 @@ class GwSchemaI18NManager:
         self.primary_keys_no_project_type_org = []
         self.values_en_us = []
         self.conflict_project_type = []
-        self.schema_i18n = "i18n_proves_1"
+        self.schema_i18n = "i18n"
         self.delete_old_keys = False
 
     def init_dialog(self):
@@ -329,7 +329,7 @@ class GwSchemaI18NManager:
                 msg_params = (table_i18n,)
                 tools_qt.show_info_box(msg, msg_params=msg_params)
                 return f"The table ({table_org}) does not exists\n"
-            elif "json" in table_i18n:
+            if "json" in table_i18n:
                 query += self._json_update(table_i18n, table_org)
             elif "dbconfig_form_fields_feat" in table_i18n:
                 query += self._dbconfig_form_fields_feat_update(table_i18n)
@@ -413,6 +413,10 @@ class GwSchemaI18NManager:
         elif 'dbconfig_typevalue' in table_i18n:
             columns_i18n = ["formname", "source", "tt_en_us"]
             columns_org = ["typevalue", "id", "idval"]
+
+        elif 'dblabel' in table_i18n:
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "vl_en_us"]
+            columns_org = ["id", "idval"]
 
         elif 'dbmessage' in table_i18n:
             columns_i18n = ["CAST(source AS INTEGER) AS source", "CAST(log_level AS INTEGER) AS log_level",
@@ -564,7 +568,7 @@ class GwSchemaI18NManager:
         """ Update the table with the json format """
 
         if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
-            self.conflict_project_type = ["source_code", "context", "formname", "formtype", "source", "hint", "text", "lb_en_us"]
+            self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "text", "lb_en_us"]
         elif table_i18n.split('.')[1] == "dbjson":
             self.conflict_project_type = ["source_code", "context", "hint", "text", "source", "lb_en_us"]
 
@@ -605,9 +609,9 @@ class GwSchemaI18NManager:
                         # Get safe text and Construct the query
                         safe_text = text.replace("'", "''")
                         if "config_form_fields" in table_i18n:
-                            query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, formname, formtype, source, hint, text, lb_en_us)
-                            VALUES ('giswater', '{self.project_type}', '{table_org}', '{row['formname']}', '{row['formtype']}', '{row['columnname']}', '{key}_{i}', '{safe_row_column}', '{safe_text}')
-                            ON CONFLICT (source_code, project_type, context, formname, formtype, source, hint, text)
+                            query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, formname, formtype, tabname, source, hint, text, lb_en_us)
+                            VALUES ('giswater', '{self.project_type}', '{table_org}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', '{row['columnname']}', '{key}_{i}', '{safe_row_column}', '{safe_text}')
+                            ON CONFLICT (source_code, project_type, context, formname, formtype, tabname, source, hint, text)
                             DO UPDATE SET lb_en_us = '{safe_text}'; """
                         else:
                             query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, hint, text, source, lb_en_us)
@@ -623,6 +627,10 @@ class GwSchemaI18NManager:
 
     def _dbconfig_form_fields_feat_update(self, table_i18n):
         """ Update the table with the config_form_fields_feat format. Use an sql type program to do it """
+
+        self.conflict_project_type = ["feature_type", "source_code", "context", "formtype", "tabname", "source", "lb_en_us", "tt_en_us"]
+        self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
+        self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
 
         schema = table_i18n.split('.')[0]
         table_org = f"{schema}.dbconfig_form_fields"
@@ -670,7 +678,7 @@ class GwSchemaI18NManager:
                 FROM {table_org}
                 WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 've_flwreg')
             ) AS unioned
-            ON CONFLICT (feature_type, source_code, project_type, context, formtype, source)
+            ON CONFLICT (feature_type, source_code, project_type, context, formtype, tabname, source)
             DO NOTHING;
 
             delete from {table_org}  where formtype = 'form_feature' and (formname like 've_arc%' or formname in ('ve_arc'));
@@ -1385,6 +1393,7 @@ class GwSchemaI18NManager:
     def detect_table_func(self, table, cursor):
         """ Detect if the table exists """
 
+        sql = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';"
         cursor.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
         result = cursor.fetchone()
         existing_table = result[0] > 0  # Check if count is greater than 0
@@ -1409,7 +1418,7 @@ class GwSchemaI18NManager:
             tables_org = ["sys_fprocess_cm"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
-        elif "dbconfig_form_fields_json" in table_i18n:
+        elif "dbconfig_form_fields_json" in table_i18n or "dbconfig_form_fields_feat" in table_i18n:
             tables_org = ["config_form_fields"]
         elif "dbconfig_engine" in table_i18n:
             tables_org = ["config_engine", "config_engine_def"]
@@ -1585,18 +1594,18 @@ class GwSchemaI18NManager:
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields"],
+                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields"],
+                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
@@ -1736,5 +1745,4 @@ class GwSchemaI18NManager:
         message = "Date of creation"
         message = "Date of last update"
         message = "In schema"
-
         message = "In schema"
