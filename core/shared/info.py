@@ -628,6 +628,23 @@ class GwInfo(QObject):
             lib_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
             lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
+            
+            # For new features created after a previous feature (docker dialog stays open), enable edit mode
+            is_new_feature = new_feature is not None
+            if is_new_feature and self.layer:
+                # Check if the layer has any features (indicating previous inserts)
+                feature_count = self.layer.featureCount()
+                # If there are features and this is a new feature, enable edit mode
+                if feature_count > 0:
+                    can_edit = tools_os.set_boolean(tools_db.check_role_user('role_edit'))
+                    if can_edit:
+                        if not self.layer.isEditable():
+                            self.layer.startEditing()
+                        self.action_edit.setChecked(True)
+            
+            # Hide Accept button in Docker mode - use Apply instead
+            if btn_accept:
+                btn_accept.hide()
 
         else:
             dlg_cf.dlg_closed.connect(self._roll_back)
