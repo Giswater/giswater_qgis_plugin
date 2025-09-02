@@ -28,7 +28,7 @@ SELECT is(
         }
     }$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_graphanalytics_minsector with All explotations and no commitChanges returns status "Accepted"'
+    'Check if gw_fct_graphanalytics_minsector with All exploitations and no commitChanges returns status "Accepted"'
 );
 
 SELECT ok(
@@ -43,7 +43,7 @@ SELECT ok(
             }
         }
     }$$)::JSON->'body'->'data'->'polygon' IS NOT NULL),
-    'Check if gw_fct_graphanalytics_minsector with All explotations and no commitChanges returns a valid polygon'
+    'Check if gw_fct_graphanalytics_minsector with All exploitations and no commitChanges returns a valid polygon'
 );
 
 SELECT is(
@@ -59,7 +59,7 @@ SELECT is(
         }
     }$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_graphanalytics_minsector with All explotations and commitChanges true returns status "Accepted"'
+    'Check if gw_fct_graphanalytics_minsector with All exploitations and commitChanges true returns status "Accepted"'
 );
 
 SELECT is(
@@ -75,7 +75,7 @@ SELECT is(
         }
     }$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_graphanalytics_minsector with All explotations and usePlanPsector true returns status "Accepted"'
+    'Check if gw_fct_graphanalytics_minsector with All exploitations and usePlanPsector true returns status "Accepted"'
 );
 
 SELECT is(
@@ -91,7 +91,7 @@ SELECT is(
         }
     }$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_graphanalytics_minsector with All explotations and usePlanPsector true returns status "Accepted"'
+    'Check if gw_fct_graphanalytics_minsector with All exploitations and usePlanPsector true returns status "Accepted"'
 );
 
 SELECT is(

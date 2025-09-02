@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(12);
 
--- Subtest 1: Testing macroexplotation operations
+-- Subtest 1: Testing macroexploitation operations
 INSERT INTO macroexploitation (macroexpl_id, code, "name", descript, lock_level, active) VALUES(-999, '-999', 'Test', 'Test macroexploitation', NULL, true);
 SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = -999), 1, 'INSERT: macroexploitation "2" was inserted');
 
