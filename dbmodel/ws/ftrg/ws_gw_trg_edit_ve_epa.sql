@@ -110,6 +110,10 @@ BEGIN
 		ELSIF v_epatype = 'frshortpipe' THEN
 			UPDATE inp_frshortpipe SET minorloss=NEW.minorloss, status=NEW.status, bulk_coeff=NEW.bulk_coeff, wall_coeff=NEW.wall_coeff,
 			custom_dint=NEW.custom_dint WHERE element_id=NEW.element_id;
+		
+		ELSIF v_epatype = 'virtualpump' THEN
+			UPDATE inp_virtualpump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, status=NEW.status,
+			effic_curve_id=NEW.effic_curve_id, energy_price=NEW.energy_price, energy_pattern_id=NEW.energy_pattern_id, pump_type=NEW.pump_type WHERE arc_id=OLD.arc_id;
 		END IF;
 
 		RETURN NEW;

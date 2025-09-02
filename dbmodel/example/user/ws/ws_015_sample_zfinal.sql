@@ -152,3 +152,5 @@ WHERE cf.feature_class='GENELEM';
 update plan_psector set active = true;
 
 update element set code = element_id;
+
+UPDATE config_form_fields SET "label"='Price pattern:',tooltip='Price pattern' WHERE formname='ve_epa_virtualpump' AND formtype='form_feature' AND columnname='energy_pattern_id' AND tabname='tab_epa';
