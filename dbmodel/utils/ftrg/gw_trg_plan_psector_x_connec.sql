@@ -30,6 +30,12 @@ BEGIN
 		"data":{"message":"3234", "function":"2936","parameters":null}}$$);';
 	END IF;
 
+	IF NEW.state IS NULL AND v_stateaux = 1 THEN
+		NEW.state = 0;
+	ELSIF NEW.state IS NULL AND v_stateaux=2 THEN
+		NEW.state=1;
+	END IF;
+
 	IF NEW.state = 1 AND v_stateaux = 1 THEN
 		NEW.doable=false;
 		-- looking for arc_id state=2 closest
@@ -42,7 +48,6 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3182", "function":"2936","parameters":null}}$$);';
 		END IF;
-		NEW.state = 1;
 		NEW.doable=true;
 	END IF;
 
