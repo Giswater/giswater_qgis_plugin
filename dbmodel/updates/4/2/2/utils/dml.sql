@@ -36,13 +36,12 @@ UPDATE config_typevalue SET addparam='{"orderBy":999}' WHERE typevalue='sys_tabl
 
 -- 03/09/2025
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
-VALUES('layout_name_typevalue', 'lyt_connect_link_4', 'lyt_connect_link_4', 'lytConnectLink4', '{"lytOrientation": "horizontal"}'::json)
+VALUES('layout_name_typevalue', 'lyt_connect_link_4', 'lyt_connect_link_4', 'lytConnectLink4', '{"lytOrientation": "horizontal"}'::json);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-VALUES('generic', 'link_to_connec', 'tab_none', 'arc_id', 'lyt_connect_link_4', 1, 'text', 'text', 'Connect to arc:', 'Arc Id', NULL, false, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0)
+VALUES('generic', 'link_to_connec', 'tab_none', 'arc_id', 'lyt_connect_link_4', 1, 'text', 'text', 'Connect to arc:', 'Arc Id', NULL, false, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
 VALUES('generic', 'link_to_connec', 'tab_none', 'btn_set_to_arc', 'lyt_connect_link_4', 2, NULL, 'button', NULL, 'Set to arc', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "155"
-}'::json, NULL, NULL, NULL, false, 0)
-ON CONFLICT (formname, formtype, tabname, columnname) DO UPDATE SET layoutname = 'lyt_connect_link_4', layoutorder = 2, stylesheet = '{"icon": "155"}'::json, widgetcontrols = NULL, widgetfunction = NULL;
+}'::json, NULL, NULL, NULL, false, 0);
