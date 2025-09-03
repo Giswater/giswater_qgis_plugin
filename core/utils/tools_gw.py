@@ -4882,21 +4882,51 @@ def manage_current_psector_docker(psector_name=None):
         dock_widget.raise_()
 
 
-def set_psector_mode_enabled(enable: bool):
+def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None):
     """ Set psector mode enabled """
 
-    if global_vars.load_project is None:
+    # Manage play/pause button
+    btn_psector_playpause = global_vars.psignals_widgets[0]
+    if enable is None and btn_psector_playpause is not None:
+        active = btn_psector_playpause.property('psector_active')
+        enable = not active
+
+    # Manage psector combo box
+    cmb_changed = psector_id is not None
+    cmb_psector_id = global_vars.psignals_widgets[1]
+    if psector_id is None and cmb_psector_id is not None:
+        psector_id = tools_qt.get_combo_value(None, cmb_psector_id)
+
+    # If cmb changed and psector mode is disabled
+    if cmb_changed and enable:
         return
-    buttons = global_vars.load_project.buttons
-    # Change button icons
-    for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
-        if key in (None, 'None'):
-            continue
-        toolbar_id = button.gw_name
-        icon_path = f"{key}p" if enable else f"{key}"
-        icon = get_icon(icon_path, f"toolbars{os.sep}{toolbar_id}", log_info=False)
-        if icon:
-            button.action.setIcon(icon)
+
+    if psector_id is None:
+        return
+
+    # If cmb changed and psector mode is enabled, don't change the buttons
+    if not (cmb_changed and not enable):
+        btn_psector_playpause.setProperty('psector_active', enable)
+        add_icon(btn_psector_playpause, "74" if enable else "73", f"toolbars{os.sep}status")
+
+        # Change 'edit' buttons icons
+        if enable is not None and global_vars.load_project is not None:
+            buttons = global_vars.load_project.buttons
+            for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
+                if key in (None, 'None'):
+                    continue
+                toolbar_id = button.gw_name
+                icon_path = f"{key}p" if enable else f"{key}"
+                icon = get_icon(icon_path, f"toolbars{os.sep}{toolbar_id}", log_info=False)
+                if icon:
+                    button.action.setIcon(icon)
+
+    # Prepare the JSON body for gw_fct_set_toggle_current
+    extras = f'"type": "psector", "id": "{psector_id}"'
+    body = create_body(extras=extras)
+
+    # Execute the stored procedure
+    result = execute_procedure("gw_fct_set_toggle_current", body)
 
 
 def create_sqlite_conn(file_name):
