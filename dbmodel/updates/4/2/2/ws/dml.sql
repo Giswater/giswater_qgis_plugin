@@ -1038,3 +1038,7 @@ UPDATE sys_style
 	WHERE layername='v_rpt_node' AND styleconfig_id=101;
 
 UPDATE sys_table SET addparam = '{"pkey":"id"}' WHERE id = 'v_rpt_arc' OR id = 'v_rpt_node';
+
+INSERT INTO sys_table (id,descript,sys_role,context,orderby,alias,"source")
+VALUES ('ve_minsector_mincut','Shows editable information about mincut misectors','role_edit','{"levels": ["OM", "ANALYTICS"]}',3,'Mincut minsector','core');
+UPDATE sys_table SET context='{"levels": ["OM", "ANALYTICS"]}', orderby =2 WHERE id='ve_minsector';
