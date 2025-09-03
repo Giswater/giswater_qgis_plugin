@@ -28,8 +28,8 @@ class GwSelectionWidget(QWidget):
     It also manages highlighting of selected features on the map based on table selections.
     """
 
-    def __init__(self, selection_mode: GwSelectionMode, general_variables: dict, menu_variables: dict = None, 
-                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None, 
+    def __init__(self, selection_mode: GwSelectionMode, general_variables: dict, menu_variables: dict = None,
+                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None,
                  zoom_to_selection: bool = False, selection_on_top: bool = False):
         """
         Initialize the selection widget.
@@ -68,7 +68,7 @@ class GwSelectionWidget(QWidget):
             self.init_zoom_to_selection(**general_variables)
 
         if selection_on_top:
-            self.init_selection_on_top(**general_variables)    
+            self.init_selection_on_top(**general_variables)
 
     # region utility functions
 
@@ -138,7 +138,7 @@ class GwSelectionWidget(QWidget):
         # Disconnect any existing connections to avoid duplicates
         try:
             self.btn_snapping.clicked.disconnect()
-        except:
+        except Exception:
             pass
         tools_gw.selection_init(class_object, dialog, table_object, self.selection_mode, tool_type)
 
@@ -163,7 +163,7 @@ class GwSelectionWidget(QWidget):
             if callback_later:
                 callback_later()
 
-        # Action group to keep exclusivity  
+        # Action group to keep exclusivity
         tools = {"rectangle": "137.png", "polygon": "180.svg", "freehand": "182.svg", "circle": "181.svg", "point": "181.svg"}
 
         # Create btn_snapping as menu or button widget
@@ -196,7 +196,7 @@ class GwSelectionWidget(QWidget):
             self.btn_snapping = QPushButton(self)
             tools_gw.add_icon(self.btn_snapping, tools[tool_type].split(".")[0])
             self.btn_snapping.setToolTip(tool_type)
-            self.btn_snapping.clicked.connect(partial(tools_gw.selection_init, class_object, dialog, table_object, 
+            self.btn_snapping.clicked.connect(partial(tools_gw.selection_init, class_object, dialog, table_object,
                                                       self.selection_mode, tool_type))
 
         # Add btn_snapping to layout and create actions
@@ -468,7 +468,7 @@ class GwSelectionWidget(QWidget):
         self.btn_expression.clicked.connect(partial(self.expression_selection, class_object, dialog, table_object,
                                                   callback, callback_later))
         self.lyt_selection.addWidget(self.btn_expression)
-        
+
     def expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
                              callback: Callable[[], bool] | None = None, callback_later: Callable = None):
         """

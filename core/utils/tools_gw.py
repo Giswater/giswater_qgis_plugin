@@ -4926,7 +4926,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
     body = create_body(extras=extras)
 
     # Execute the stored procedure
-    result = execute_procedure("gw_fct_set_toggle_current", body)
+    execute_procedure("gw_fct_set_toggle_current", body)
 
 
 def create_sqlite_conn(file_name):
