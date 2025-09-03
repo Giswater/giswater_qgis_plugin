@@ -31,3 +31,5 @@ INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'link_id', 9, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'insert_tstamp', 10, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'insert_user', 11, false, NULL, NULL, NULL);
+
+UPDATE config_typevalue SET addparam='{"orderBy":999}' WHERE typevalue='sys_table_context' AND id='{"levels": ["HIDDEN"]}';
