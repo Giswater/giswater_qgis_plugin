@@ -414,7 +414,7 @@ BEGIN
 
 							IF v_link.the_geom IS NULL THEN
 								-- create link geom
-								v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), SRID_VALUE);
+								v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), ST_SRID(v_connect.the_geom));
 
 
 								IF v_isforcedarcs THEN
