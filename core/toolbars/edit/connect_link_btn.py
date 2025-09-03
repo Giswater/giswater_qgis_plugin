@@ -666,7 +666,6 @@ def accept(**kwargs):
 
     # Get arc layer
     layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
-    selected_arc = None
 
     # Get selected arcs from the class variable or field
     selected_arcs = []
@@ -689,9 +688,6 @@ def accept(**kwargs):
                 selected_arc_feature = layer_arc.selectedFeatures()[0]  # Use the first selected arc
                 selected_arcs = [str(selected_arc_feature.attribute("arc_id"))]
     
-    # Convert to single arc for compatibility (use first arc)
-    selected_arc = selected_arcs[0] if selected_arcs else None
-
     # Initialize an empty list
     this.ids = []
     model = this.tbl_ids.model()
