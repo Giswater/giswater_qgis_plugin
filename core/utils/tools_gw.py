@@ -4886,14 +4886,15 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
     """ Set psector mode enabled """
 
     # Manage play/pause button
-    btn_psector_playpause = global_vars.psignals_widgets[0]
+    psignals_widgets = global_vars.psignals['widgets']
+    btn_psector_playpause = psignals_widgets[0]
     if enable is None and btn_psector_playpause is not None:
         active = btn_psector_playpause.property('psector_active')
         enable = not active
 
     # Manage psector combo box
     cmb_changed = psector_id is not None
-    cmb_psector_id = global_vars.psignals_widgets[1]
+    cmb_psector_id = psignals_widgets[1]
     if psector_id is None and cmb_psector_id is not None:
         psector_id = tools_qt.get_combo_value(None, cmb_psector_id)
 
@@ -4906,8 +4907,12 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
 
     # If cmb changed and psector mode is enabled, don't change the buttons
     if not (cmb_changed and not enable):
+        # Update play/pause button
         btn_psector_playpause.setProperty('psector_active', enable)
         add_icon(btn_psector_playpause, "74" if enable else "73", f"toolbars{os.sep}status")
+        # Update psector status information
+        global_vars.psignals['psector_active'] = enable
+        global_vars.psignals['psector_id'] = psector_id
 
         # Change 'edit' buttons icons
         if enable is not None and global_vars.load_project is not None:

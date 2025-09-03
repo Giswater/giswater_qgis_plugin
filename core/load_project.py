@@ -570,7 +570,7 @@ class GwLoadProject(QObject):
         self.cmb_psector.currentIndexChanged.connect(self._manage_psector_change)
         statusbar.addWidget(self.cmb_psector)
 
-        global_vars.psignals_widgets = [self.playpause_button, self.cmb_psector]
+        global_vars.psignals['widgets'] = [self.playpause_button, self.cmb_psector]
 
     def _playpause_btn_clicked(self):
         """ Manage psector play/pause """

@@ -393,10 +393,10 @@ class Giswater(QObject):
         """ Unset PSIGNALS (when plugin is disabled or reloaded) """
 
         statusbar = self.iface.mainWindow().statusBar()
-        for widget in global_vars.psignals_widgets:
+        for widget in global_vars.psignals['widgets']:
             statusbar.removeWidget(widget)
             widget.deleteLater()
-        global_vars.psignals_widgets.clear()
+        global_vars.psignals['widgets'].clear()
 
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
