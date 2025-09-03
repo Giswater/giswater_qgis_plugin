@@ -104,6 +104,7 @@ class GwGisFileCreate:
 
         # Hide hidden group
         tools_gw.hide_group_from_toc('HIDDEN')
+        root.findGroup('HIDDEN').setItemVisibilityChecked(False)
         
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
