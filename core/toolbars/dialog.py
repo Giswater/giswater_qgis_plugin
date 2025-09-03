@@ -24,6 +24,7 @@ class GwAction:
         self.settings = global_vars.giswater_settings
         self.plugin_dir = lib_vars.plugin_dir
         self.project_type = global_vars.project_type
+        self.gw_name = toolbar.property('gw_name')
 
         icon = None
         if os.path.exists(icon_path):
@@ -40,11 +41,10 @@ class GwAction:
         self.action.setCheckable(False)
         self.action.triggered.connect(self.clicked_event)
 
-        self.toolbar = toolbar
-        if self.toolbar is None:
+        if toolbar is None:
             return
 
-        self.toolbar.addAction(self.action)
+        toolbar.addAction(self.action)
 
     def clicked_event(self):
 

@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QPushButton, QComboBox
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -127,9 +127,6 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
-        # Create Psector status bar
-        self._create_psector_status_bar()
-
         # Manage "btn_updateall" from attribute table
         self._manage_attribute_table()
 
@@ -138,6 +135,9 @@ class GwLoadProject(QObject):
 
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
+
+        # Create Psector status bar
+        self._create_psector_status_bar()
 
         # Check parameter 'force_tab_expl'
         force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
@@ -195,7 +195,14 @@ class GwLoadProject(QObject):
     # region private functions
 
     def _save_toolbars_position(self):
-        own_toolbars = tools_gw.get_gw_toolbars()
+        # Get all QToolBar from qgis iface
+        widget_list = self.iface.mainWindow().findChildren(QToolBar)
+        own_toolbars = []
+
+        # Get list with own QToolBars
+        for w in widget_list:
+            if w.property('gw_name'):
+                own_toolbars.append(w)
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
@@ -429,6 +436,7 @@ class GwLoadProject(QObject):
                             self.buttons[index_action] = button
                         successful = True
                     attempt = attempt + 1
+
         # Disable buttons which are project type exclusive
         project_exclude = None
         successful = False
@@ -575,6 +583,7 @@ class GwLoadProject(QObject):
             tools_gw.add_icon(button, "74", f"toolbars{os.sep}status")
 
         tools_gw.set_psector_mode_enabled(not active)
+
 
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """

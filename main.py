@@ -132,13 +132,6 @@ class Giswater(QObject):
             tools_log.log_info(msg, parameter=str(e), msg_params=msg_params)
 
         try:
-            # Remove PSIGNALS
-            self._unset_psignals()
-        except Exception as e:
-            msg_params = ("self._unset_psignals()",)
-            tools_log.log_info(msg, parameter=str(e), msg_params=msg_params)
-
-        try:
             # Remove file handler when reloading
             if hide_gw_button:
                 lib_vars.logger.close_logger()
@@ -163,6 +156,13 @@ class Giswater(QObject):
                         self.iface.removeToolBarIcon(button.action)
         except Exception as e:
             msg_params = ("self.iface.removePluginMenu(self.plugin_name, button.action)",)
+            tools_log.log_info(msg, parameter=str(e), msg_params=msg_params)
+
+        try:
+            # Remove PSIGNALS
+            self._unset_psignals()
+        except Exception as e:
+            msg_params = ("self._unset_psignals()",)
             tools_log.log_info(msg, parameter=str(e), msg_params=msg_params)
 
         try:
@@ -396,7 +396,7 @@ class Giswater(QObject):
         for widget in global_vars.psignals_widgets:
             statusbar.removeWidget(widget)
             widget.deleteLater()
-        global_vars.psignals_widgets = []
+        global_vars.psignals_widgets.clear()
 
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """

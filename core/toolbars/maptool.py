@@ -29,6 +29,7 @@ class GwMaptool(QgsMapTool):
         self.settings = global_vars.giswater_settings
         self.plugin_dir = lib_vars.plugin_dir
         self.project_type = global_vars.project_type
+        self.gw_name = toolbar.property('gw_name')
         self.show_help = tools_gw.get_config_parser('system', 'show_help', "project", "giswater")
         self.layer_arc = None
         self.layer_connec = None
@@ -62,8 +63,7 @@ class GwMaptool(QgsMapTool):
         self.reset()
         self.force_active_layer = True
 
-        self.toolbar = toolbar
-        if self.toolbar is None:
+        if toolbar is None:
             return
 
         self.action = None
@@ -79,7 +79,7 @@ class GwMaptool(QgsMapTool):
         self.action.setObjectName(action_name)
         self.action.setCheckable(True)
         self.action.triggered.connect(self.clicked_event)
-        self.toolbar.addAction(self.action)
+        toolbar.addAction(self.action)
         self.setAction(self.action)
 
     def clicked_event(self):
