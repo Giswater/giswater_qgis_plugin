@@ -316,7 +316,6 @@ class GwSelectionWidget(QWidget):
 
         ids_to_select = [str(model.index(row.row(), id_column_index).data()) for row in model.selectedRows()]
 
-
         if not ids_to_select:
             tools_gw.remove_selection(layers=class_object.rel_layers)
             return
@@ -355,7 +354,6 @@ class GwSelectionWidget(QWidget):
         """
         # Get main variables
         widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
-        
 
         # Validate table and model
         if not widget_table or not widget_table.model() or not feature_type:
@@ -488,7 +486,6 @@ class GwSelectionWidget(QWidget):
         tools_gw.select_with_expression_dialog(class_object, dialog, table_object, self.selection_mode)
         if callback_later:
             callback_later()
-
 
     # endregion expression selection
 
