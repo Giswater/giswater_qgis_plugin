@@ -4045,7 +4045,8 @@ def save_tbl_changes(table_name, info, dialog, pk):
     if status:
         tools_gw.close_dialog(dialog)
     else:
-        tools_qgis.show_warning('There are some error in the records with id: ', parameter=list_rows, dialog=dialog)
+        msg = 'There are some error in the records with id'
+        tools_qgis.show_warning(msg, parameter=list_rows, dialog=dialog)
 
 
 def save_widgets_changes(table_name, info, dialog, pk):
@@ -4075,7 +4076,8 @@ def save_widgets_changes(table_name, info, dialog, pk):
     if status:
         tools_gw.close_dialog(dialog)
     else:
-        tools_qgis.show_warning('There are some error in the records with id: ', parameter=id_, dialog=dialog)
+        msg = 'There are some error in the records with id'
+        tools_qgis.show_warning(msg, parameter=id_, dialog=dialog)
 
 
 def _manage_accept_btn(info, tablename):
