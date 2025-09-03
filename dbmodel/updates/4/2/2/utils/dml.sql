@@ -22,12 +22,12 @@ UPDATE config_form_tableview SET visible=true WHERE objectname='plan_psector_x_n
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'id', 0, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'connec_id', 1, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'arc_id', 2, true, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'psector_id', 3, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'psector_id', 3, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'state', 4, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'doable', 5, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'descript', 6, true, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', '_link_geom_', 7, true, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', '_userdefined_geom_', 8, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', '_link_geom_', 7, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', '_userdefined_geom_', 8, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'link_id', 9, true, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'insert_tstamp', 10, true, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'insert_user', 11, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'insert_tstamp', 10, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_connec', 'insert_user', 11, false, NULL, NULL, NULL);
