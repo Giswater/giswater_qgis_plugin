@@ -584,7 +584,6 @@ class GwLoadProject(QObject):
 
         tools_gw.set_psector_mode_enabled(not active)
 
-
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
 
