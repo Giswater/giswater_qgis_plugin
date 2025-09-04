@@ -52,3 +52,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "functionName": "filter_expression_arc",
   "module": "connect_link_btn"
 }'::json, NULL, false, 0);
+
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3512, 'gw_fct_plan_recover_archived', 'utils', 'function', 'json', 'json', NULL, 'role_plan', NULL, 'core', NULL);

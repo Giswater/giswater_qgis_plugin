@@ -7,3 +7,5 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
