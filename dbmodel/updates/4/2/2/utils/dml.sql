@@ -45,3 +45,10 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('generic', 'link_to_connec', 'tab_none', 'btn_set_to_arc', 'lyt_connect_link_4', 2, NULL, 'button', NULL, 'Set to arc', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "155"
 }'::json, NULL, NULL, NULL, false, 0);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'link_to_connec', 'tab_none', 'btn_expr_arc', 'lyt_connect_link_4', 3, NULL, 'button', NULL, 'Select by Expression - Set closest point', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
+  "icon": "178"
+}'::json, NULL, '{
+  "functionName": "filter_expression_arc",
+  "module": "connect_link_btn"
+}'::json, NULL, false, 0);
