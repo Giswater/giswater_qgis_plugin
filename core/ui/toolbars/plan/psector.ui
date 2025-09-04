@@ -263,31 +263,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btn_select_arc">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="btn_arc_fusion">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -476,8 +451,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>744</width>
-            <height>308</height>
+            <width>98</width>
+            <height>68</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -1231,7 +1206,6 @@
   <tabstop>btn_delete</tabstop>
   <tabstop>btn_snapping</tabstop>
   <tabstop>btn_toggle</tabstop>
-  <tabstop>btn_select_arc</tabstop>
   <tabstop>btn_arc_fusion</tabstop>
   <tabstop>btn_set_to_arc</tabstop>
   <tabstop>tab_feature</tabstop>

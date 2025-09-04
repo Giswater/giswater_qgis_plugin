@@ -33,6 +33,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.cat_table = None
         self.feature_edit_type = None
         self.feature_type_cat = None
+        self.feature_cat_id = None
         self.feature_id = None
         self.actions = actions
         if not self.actions:
@@ -135,6 +136,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.cat_table = f'cat_{self.feature_type}'
             self.feature_edit_type = f'{self.feature_type}_type'
             self.feature_type_cat = f'{self.feature_type}_type'
+            self.feature_cat_id = f'{self.feature_type}cat_id'
             self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
             self._init_replace_feature_form(snapped_feat)
 
@@ -243,7 +245,7 @@ class GwFeatureReplaceButton(GwMaptool):
                            f"ORDER BY id")
                 if sql:
                     rows = tools_db.get_rows(sql)
-                    tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
+                    tools_qt.fill_combo_values(self.dlg_replace.new_featurecat_id, rows)
 
         keep_epa_values = tools_gw.get_config_parser('btn_feature_replace', 'keep_epa_values', "user", "session")
         tools_qt.set_checked(self.dlg_replace, 'keep_epa_values', tools_os.set_boolean(keep_epa_values))
@@ -269,8 +271,16 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
         tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 
+        # Get current featurecat_id
+        current_featurecat_id = feature.attribute(self.feature_cat_id)
+        tools_qt.set_widget_text(self.dlg_replace, self.dlg_replace.current_featurecat_id, current_featurecat_id)
+
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_replace)
+
+        # Hide unused widgets for plan
+        if global_vars.psignals and global_vars.psignals['psector_active']:
+            self._manage_plan_widgets()
 
         # Set buttons signals
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
@@ -290,7 +300,7 @@ class GwFeatureReplaceButton(GwMaptool):
             return
 
         self.catalog = GwCatalog()
-        self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', feature_type, child_type)
+        self.catalog.open_catalog(self.dlg_replace, 'new_featurecat_id', feature_type, child_type)
 
     def _update_date(self):
 
@@ -391,7 +401,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
-        featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
+        new_featurecat_id = tools_qt.get_text(dialog, dialog.new_featurecat_id)
         keep_epa_values = tools_qt.is_checked(self.dlg_replace, 'keep_epa_values')
         keep_asset_id = tools_qt.is_checked(self.dlg_replace, 'chk_keep_asset_id')
         tools_gw.set_config_parser('btn_feature_replace', 'keep_epa_values', str(tools_os.set_boolean(keep_epa_values)), "user", "session")
@@ -403,7 +413,7 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qgis.show_warning(msg, parameter="'New feature type'", dialog=dialog)
             return
 
-        if featurecat_id in (None, 'null'):
+        if new_featurecat_id in (None, 'null'):
             msg = "Mandatory field is missing. Please, set a value for field"
             tools_qgis.show_warning(msg, parameter="'Catalog id'", dialog=dialog)
             return
@@ -414,22 +424,30 @@ class GwFeatureReplaceButton(GwMaptool):
         title = "Replace feature"
         answer = tools_qt.show_question(msg, title)
         if answer:
-            # Get function input parameters
-            feature = f'"type":"{self.feature_type}"'
-            extras = f'"old_feature_id":"{self.feature_id}"'
-            extras += f', "feature_type_new":"{feature_type_new}"'
-            extras += f', "featurecat_id":"{featurecat_id}"'
-            if self.workcat_id_end_aux not in (None, 'null', ''):
-                extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
-            extras += f', "enddate":"{self.enddate_aux}"'
-            extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
-            extras += f', "keep_epa_values":"{tools_qt.is_checked(dialog, "keep_epa_values")}"'
-            extras += f', "keep_asset_id":"{tools_qt.is_checked(dialog, "chk_keep_asset_id")}"'
-            body = tools_gw.create_body(feature=feature, extras=extras)
+            # Check if psector is active
+            if global_vars.psignals and global_vars.psignals['psector_active']:
+                feature = f'"featureType":"ARC", "ids":["{self.feature_id}"]'
+                extras = f'"catalog":"{new_featurecat_id}"'
+                body = tools_gw.create_body(feature=feature, extras=extras)
+                complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
+            else:
+                # Get function input parameters
+                feature = f'"type":"{self.feature_type}"'
+                extras = f'"old_feature_id":"{self.feature_id}"'
+                extras += f', "feature_type_new":"{feature_type_new}"'
+                extras += f', "featurecat_id":"{new_featurecat_id}"'
+                if self.workcat_id_end_aux not in (None, 'null', ''):
+                    extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
+                extras += f', "enddate":"{self.enddate_aux}"'
+                extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
+                extras += f', "keep_epa_values":"{tools_qt.is_checked(dialog, "keep_epa_values")}"'
+                extras += f', "keep_asset_id":"{tools_qt.is_checked(dialog, "chk_keep_asset_id")}"'
+                body = tools_gw.create_body(feature=feature, extras=extras)
 
-            # Execute SQL function and show result to the user
-            complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body)
-            if not complet_result:
+                # Execute SQL function and show result to the user
+                complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body)
+
+            if not complet_result or complet_result['status'] == "Failed":
                 msg = "Error replacing feature"
                 tools_qgis.show_warning(msg)
                 # Check in init config file if user wants to keep map tool active or not
@@ -437,12 +455,11 @@ class GwFeatureReplaceButton(GwMaptool):
                 tools_gw.close_dialog(dialog)
                 return
 
-            msg = "Feature replaced successfully"
-            tools_qgis.show_info(msg)
-
-            # Fill tab 'Info log'
+            # Fill tab 'Info log' and show message
             if complet_result and complet_result['status'] == "Accepted":
                 tools_gw.fill_tab_log(self.dlg_replace, complet_result['body']['data'])
+                msg = "Feature replaced successfully"
+                tools_qgis.show_info(msg)
 
             # Refresh canvas
             self.refresh_map_canvas()
@@ -456,7 +473,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.manage_active_maptool()
 
     def _edit_change_elem_type_get_value(self, index):
-        """ Just select item to 'real' combo 'featurecat_id' (that is hidden) """
+        """ Just select item to 'real' combo 'new_featurecat_id' (that is hidden) """
 
         if index == -1:
             return
@@ -471,7 +488,7 @@ class GwFeatureReplaceButton(GwMaptool):
         sql = ""
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
-            tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
+            tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.new_featurecat_id, True)
             sql = (f"SELECT DISTINCT(id), id as idval "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)"
@@ -485,7 +502,21 @@ class GwFeatureReplaceButton(GwMaptool):
                    f"ORDER BY id")
 
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
-        tools_qt.set_autocompleter(self.dlg_replace.featurecat_id)
+        tools_qt.fill_combo_values(self.dlg_replace.new_featurecat_id, rows)
+        tools_qt.set_autocompleter(self.dlg_replace.new_featurecat_id)
+
+    def _manage_plan_widgets(self):
+        # Hide unused widgets for plan
+        self.dlg_replace.grb_end_parameters.setVisible(False)
+        self.dlg_replace.lbl_feature_type.setVisible(False)
+        self.dlg_replace.feature_type.setVisible(False)
+        self.dlg_replace.lbl_new_feature_type.setVisible(False)
+        self.dlg_replace.feature_type_new.setVisible(False)
+        self.dlg_replace.lbl_keep_elements.setVisible(False)
+        self.dlg_replace.keep_elements.setVisible(False)
+        self.dlg_replace.lbl_keep_epa_values.setVisible(False)
+        self.dlg_replace.keep_epa_values.setVisible(False)
+        self.dlg_replace.lbl_keep_asset_id.setVisible(False)
+        self.dlg_replace.chk_keep_asset_id.setVisible(False)
 
     # endregion

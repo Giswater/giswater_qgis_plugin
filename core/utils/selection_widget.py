@@ -9,7 +9,7 @@ from functools import partial
 from typing import Any, Callable  # Literal, Dict, Optional,
 
 from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
-from qgis.core import QgsExpression, QgsMapLayer, QgsFeatureRequest
+from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, QHBoxLayout, QPushButton
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtCore import QItemSelectionModel
@@ -19,7 +19,6 @@ from ...libs import tools_qt, tools_qgis, lib_vars  # tools_db,
 # from .select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
 from .selection_mode import GwSelectionMode
 from ... import global_vars
-from ...global_vars import GwFeatureTypes
 
 
 class GwSelectionWidget(QWidget):
@@ -31,8 +30,8 @@ class GwSelectionWidget(QWidget):
     It also manages highlighting of selected features on the map based on table selections.
     """
 
-    def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None, 
-                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None, 
+    def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None,
+                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None,
                  zoom_to_selection: bool = False, selection_on_top: bool = False):
         """
         Initialize the selection widget.
@@ -309,10 +308,10 @@ class GwSelectionWidget(QWidget):
             return
 
         selection_model = widget_table.selectionModel()
-        if not model or model.selectedRows() == 0:
+        if not selection_model or selection_model.selectedRows() == 0:
             tools_gw.remove_selection(layers=class_object.rel_layers)
             return
-        
+
         data_model = widget_table.model()
         if not data_model:
             return
@@ -340,7 +339,7 @@ class GwSelectionWidget(QWidget):
             selection_model.selectionChanged.connect(partial(self.highlight_features_selected_in_table,
                                                    class_object, dialog, table_object, True))
 
-    def highlight_features_psector_in_table(self, class_object: Any, dialog: QDialog, table_object: str, 
+    def highlight_features_psector_in_table(self, class_object: Any, dialog: QDialog, table_object: str,
                                             disconnect: bool = True, connect: bool = True):
         """
         Highlight features psector in table by drawing lines.
@@ -361,14 +360,14 @@ class GwSelectionWidget(QWidget):
         selection_model = widget_table.selectionModel()
         if not selection_model or selection_model.selectedRows() == 0:
             return
-        
+
         data_model = widget_table.model()
         if not data_model:
             return
-        
+
         id_column_name = f"{feature_type}_id"
-        id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
-        state_column_index = tools_qt.get_col_index_by_col_name(widget_table, "state")
+        id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)  # noqa: F841
+        state_column_index = tools_qt.get_col_index_by_col_name(widget_table, "state")  # noqa: F841
 
     def highlight_features_in_table(self, class_object: Any, dialog: QDialog, table_object: str):
         """
@@ -592,13 +591,13 @@ class GwSelectionWidget(QWidget):
         btn_selection_on_top.setToolTip("Show selection on top")
         btn_selection_on_top.setCheckable(True)
         self.lyt_selection.addWidget(btn_selection_on_top, 0)
-        
+
         # Store original model and button state
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
         if widget_table and widget_table.model():
             widget_table.setProperty('original_model', widget_table.model())
             widget_table.setProperty('selection_on_top', False)
-            
+
         # Connect signals
         btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object))
 
@@ -612,7 +611,7 @@ class GwSelectionWidget(QWidget):
 
         checked = widget_table.property('selection_on_top')
         selected_ids = self.get_selected_ids(widget_table)
-        
+
         if not checked or widget_table.property('previous_selected_ids') != selected_ids:
             # Store current model if not already stored
             if not widget_table.property('original_model'):
@@ -636,7 +635,7 @@ class GwSelectionWidget(QWidget):
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
         selected_ids = []
-        
+
         if selection_model and selection_model.hasSelection():
             for index in selection_model.selectedRows():
                 selected_ids.append(str(model.data(model.index(index.row(), 0))))
@@ -646,10 +645,10 @@ class GwSelectionWidget(QWidget):
         """Restore selection based on IDs"""
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
-        
+
         if not model or not selection_model:
             return
-            
+
         for row in range(model.rowCount()):
             row_id = str(model.data(model.index(row, 0)))
             if row_id in selected_ids:
@@ -699,7 +698,7 @@ class GwSelectionWidget(QWidget):
 
         # Set the new model
         widget_table.setModel(temp_model)
-        
+
         # Restore selection
         self.restore_selection(widget_table, selected_ids)
 

@@ -572,15 +572,6 @@ class GwPsectorRepairUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "replace_arc"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwReplaceArc(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "netscenario_manager"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 

@@ -25,7 +25,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 from .document import GwDocument, global_vars
 from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwReplaceArc, GwPsectorRepairUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPsectorRepairUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
@@ -137,7 +137,6 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "116")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "168")
         tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "155")
         tools_gw.add_icon(self.dlg_plan_psector.btn_toggle, "101")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
@@ -276,8 +275,6 @@ class GwPsector:
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR))
-        self.dlg_plan_psector.btn_select_arc.clicked.connect(
-            partial(self._replace_arc))
         self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
             partial(self._arc_fusion))
         self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
@@ -291,12 +288,12 @@ class GwPsector:
 
         self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector"}
         general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
-        menu_variables = { "used_tools": ["rectangle", "polygon", "freehand"]}
+        menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"]}
         highlight_variables = {"callback_values": self.callback_values}
         invert_selection = True
         zoom_to_selection = True
         selection_on_top = True
-        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, invert_selection=True, zoom_to_selection=True, selection_on_top=True)
+        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, highlight_variables=highlight_variables, invert_selection=invert_selection, zoom_to_selection=zoom_to_selection, selection_on_top=selection_on_top)
         self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
 
         # Create corner buttons
@@ -2428,133 +2425,6 @@ class GwPsector:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.set_model_signals(self)
 
-    def _replace_arc(self):
-
-        if hasattr(self, 'emit_point') and self.emit_point is not None:
-            tools_gw.disconnect_signal('psector', 'replace_arc_ep_canvasClicked_open_arc_replace_form')
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper_manager = GwSnapManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
-        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
-
-        # Vertex marker
-        self.vertex_marker = self.snapper_manager.vertex_marker
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Set signals
-        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
-                                'replace_arc_xyCoordinates_mouse_move_arc')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, self._open_arc_replace_form, 'psector',
-                                'replace_arc_ep_canvasClicked_open_arc_replace_form')
-
-    def _open_arc_replace_form(self, point):
-
-        self.dlg_replace_arc = GwReplaceArc(self)
-        tools_gw.load_settings(self.dlg_replace_arc)
-
-        event_point = self.snapper_manager.get_event_point(point=point)
-        self.arc_id = None
-
-        # Snap point
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-
-        if result.isValid():
-            # Check feature
-            layer = self.snapper_manager.get_snapped_layer(result)
-            if layer == self.layer_arc:
-                # Get the point
-                snapped_feat = self.snapper_manager.get_snapped_feature(result)
-                self.arc_id = snapped_feat.attribute('arc_id')
-                self.arc_cat_id = snapped_feat.attribute('arccat_id')
-
-                # Set highlight
-                feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
-                try:
-                    geometry = feature.geometry()
-                    self.rubber_band_point.setToGeometry(geometry, None)
-                    self.rubber_band_point.setColor(QColor(255, 0, 0, 100))
-                    self.rubber_band_point.setWidth(5)
-                    self.rubber_band_point.show()
-                except AttributeError:
-                    pass
-
-        if self.arc_id is None:
-            return
-
-        # Populate combo arccat
-        sql = "SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE "
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_replace_arc.cmb_newarccat, rows)
-
-        vdefault = tools_gw.get_config_parser('dlg_replace_arc', 'cmb_newarccat', "user", "session")
-        if vdefault:
-            tools_qt.set_combo_value(self.dlg_replace_arc.cmb_newarccat, vdefault, 0, add_new=False)
-
-        # Set text current arccat
-        self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)
-
-        # Disconnect Snapping
-        tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
-        tools_gw.disconnect_signal('psector')
-
-        # Disable tab log
-        tools_gw.disable_tab_log(self.dlg_replace_arc)
-
-        # Triggers
-        self.dlg_replace_arc.btn_accept.clicked.connect(partial(self._set_plan_replace_feature))
-        self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
-        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_point))
-        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_line))
-        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_op))
-        self.dlg_replace_arc.rejected.connect(self._reset_snapping)
-
-        # Open form
-        tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
-
-    def _set_plan_replace_feature(self):
-
-        cmb_value = tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)
-        new_arc_cat = f'"{cmb_value}"'
-
-        tools_gw.set_config_parser('dlg_replace_arc', 'cmb_newarccat', f"{cmb_value}", "user", "session")
-
-        feature = f'"featureType":"ARC", "ids":["{self.arc_id}"]'
-        extras = f'"catalog":{new_arc_cat}'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
-
-        # Force a map refresh
-        tools_qgis.force_refresh_map_canvas()
-        # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
-        self._refresh_tables_relations()
-
-        log = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_disable_showlog", 'user', 'init')
-        showlog = not tools_os.set_boolean(log, False)
-
-        msg = json_result['message']['text']
-        if msg is not None and showlog:
-            tools_qt.show_info_box(msg)
-
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], force_tab=showlog)
-
-        if not change_tab:
-            self.dlg_replace_arc.close()
-            tools_gw.reset_rubberband(self.rubber_band_point)
-            tools_gw.reset_rubberband(self.rubber_band_line)
-            tools_gw.reset_rubberband(self.rubber_band_op)
-            self.iface.actionPan().trigger()
-
-        # Activate again if variable is True
-        keep_active = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_keep_active", 'user', 'init')
-        if tools_os.set_boolean(keep_active, False):
-            if not change_tab:
-                self.dlg_plan_psector.btn_select_arc.click()
-                return
-            self.dlg_replace_arc.finished.connect(self.dlg_plan_psector.btn_select_arc.click)
-
     def _arc_fusion(self):
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
@@ -2622,7 +2492,6 @@ class GwPsector:
             table_name = None
 
         # Disable all by default
-        self.dlg_plan_psector.btn_select_arc.setEnabled(False)
         self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
         self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
@@ -2631,10 +2500,6 @@ class GwPsector:
             # If the tableview's model is stored, it means that the selected rows are shown on top, therefore the button should be checked
             active = bool(self.relations_og_models.get(table_name))
             self.show_on_top_button.setChecked(active)
-
-        if tab_idx == 0:
-            # Enable btn select_arc
-            self.dlg_plan_psector.btn_select_arc.setEnabled(True)
 
         if tab_idx == 1:
             # Enable btn arc_fusion
