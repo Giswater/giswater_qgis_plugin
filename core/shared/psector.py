@@ -61,9 +61,6 @@ class GwPsector:
         self.qtbl_connec = None
         self.qtbl_gully = None
 
-        self.relations_og_models = {}
-        self.show_on_top_button = None
-
         self.previous_map_tool = self.canvas.mapTool()
 
         self.project_type = tools_gw.get_project_type()
@@ -295,24 +292,6 @@ class GwPsector:
         selection_on_top = True
         selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, highlight_variables=highlight_variables, invert_selection=invert_selection, zoom_to_selection=zoom_to_selection, selection_on_top=selection_on_top)
         self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
-
-        # Create corner buttons
-        self.corner_widget = QWidget()
-        layout = QHBoxLayout(self.corner_widget)
-        layout.setContentsMargins(0, 1, 0, 0)
-
-        self.show_on_top_button = QPushButton()
-        self.show_on_top_button.setCheckable(True)
-        tools_gw.add_icon(self.show_on_top_button, '175')
-        self.show_on_top_button.clicked.connect(partial(self._show_selection_on_top, self.show_on_top_button))
-        layout.addWidget(self.show_on_top_button)
-
-        self.zoom_to_selection_button = QPushButton()
-        tools_gw.add_icon(self.zoom_to_selection_button, '176')
-        self.zoom_to_selection_button.clicked.connect(partial(self._zoom_to_selection))
-        layout.addWidget(self.zoom_to_selection_button)
-
-        self.dlg_plan_psector.tab_feature.setCornerWidget(self.corner_widget)
 
         self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
@@ -2495,12 +2474,6 @@ class GwPsector:
         self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
         self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
-        # Set "show on top" button not checked
-        if self.show_on_top_button is not None:
-            # If the tableview's model is stored, it means that the selected rows are shown on top, therefore the button should be checked
-            active = bool(self.relations_og_models.get(table_name))
-            self.show_on_top_button.setChecked(active)
-
         if tab_idx == 1:
             # Enable btn arc_fusion
             self.dlg_plan_psector.btn_arc_fusion.setEnabled(True)
@@ -2734,128 +2707,8 @@ class GwPsector:
             print(f"Error in _manage_selection_changed: {e}")
             pass
 
-    def _show_selection_on_top(self, button: QPushButton):
-        """
-        Show the selected features on top of the tableview
-        """
-
-        cur_idx = self.dlg_plan_psector.tab_feature.currentIndex()
-        tableviews = [self.qtbl_arc, self.qtbl_node, self.qtbl_connec, self.qtbl_gully]
-        tableview = tableviews[cur_idx]
-        if not tableview:
-            return
-
-        model = tableview.model()
-        selection_model = tableview.selectionModel()
-        selected_rows = selection_model.selectedRows()
-
-        # Store the IDs of the selected rows
-        selected_ids = [f"{model.data(model.index(index.row(), 0))}" for index in selected_rows]
-
-        if button.isChecked():
-            if not selected_rows:
-                button.blockSignals(True)
-                button.setChecked(False)
-                button.blockSignals(False)
-                return
-
-            # If the original model is stored, don't do anything (already on top)
-            if tableview.objectName() in self.relations_og_models:
-                return
-
-            # Disconnect the selection changed signal
-            self._manage_selection_changed_signals(GwFeatureTypes.from_index(cur_idx), connect=False)
-
-            self.relations_og_models[tableview.objectName()] = tableview.model()
-            # Create a temporary in-memory model
-            temp_model = QStandardItemModel()
-            temp_model.setHorizontalHeaderLabels(
-                [model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())]
-            )
-
-            # Add selected rows to the temporary model
-            selected_data = []
-            for index in selected_rows:
-                row_data = []
-                for column in range(model.columnCount()):
-                    row_data.append(QStandardItem(str(model.data(model.index(index.row(), column)))))
-                selected_data.append(row_data)
-
-            # Add selected data to the temporary model
-            for row_data in selected_data:
-                temp_model.appendRow(row_data)
-
-            # Add remaining rows to the temporary model
-            for row in range(model.rowCount()):
-                if any(row == index.row() for index in selected_rows):
-                    continue
-                row_data = []
-                for column in range(model.columnCount()):
-                    row_data.append(QStandardItem(str(model.data(model.index(row, column)))))
-                temp_model.appendRow(row_data)
-
-            # Set the temporary model to the tableview
-            tableview.setModel(temp_model)
-            # Reapply the selection based on IDs
-            new_selection_model = tableview.selectionModel()
-            for row in range(temp_model.rowCount()):
-                _id = temp_model.data(temp_model.index(row, 0))
-                if f"{_id}" in selected_ids:
-                    new_index = tableview.model().index(row, 0)
-                    new_selection_model.select(new_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
-        else:
-            # Disconnect the selection changed signal
-            self._manage_selection_changed_signals(GwFeatureTypes.from_index(cur_idx), connect=False)
-
-            # Restore the original model
-            original_model = self.relations_og_models.pop(tableview.objectName(), None)
-            if original_model:
-                tableview.setModel(original_model)
-            # Reapply the selection based on IDs
-            new_selection_model = tableview.selectionModel()
-            for row in range(original_model.rowCount()):
-                _id = original_model.data(original_model.index(row, 0))
-                if f"{_id}" in selected_ids:
-                    new_index = tableview.model().index(row, 0)
-                    new_selection_model.select(new_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
-
-        # Connect the selection changed signal
-        self._manage_selection_changed_signals(GwFeatureTypes.from_index(cur_idx))
-
-        # Set the focus on the tableview
-        tableview.setFocus()
-
     def callback_values(self):
         return self, self.dlg_plan_psector, "psector"
-
-    def _zoom_to_selection(self):
-        """
-        Zoom to the selected features in the tableview
-        """
-        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
-        tableview_map = {
-            0: (self.qtbl_arc, "ve_arc", "arc_id"),
-            1: (self.qtbl_node, "ve_node", "node_id"),
-            2: (self.qtbl_connec, "ve_connec", "connec_id"),
-            3: (self.qtbl_gully, "ve_gully", "gully_id"),
-        }
-        tableview, tablename, idname = tableview_map.get(tab_idx, (None, None, None))
-        if (tableview, tablename, idname) == (None, None, None):
-            return
-
-        selection_model = tableview.selectionModel()
-        selected_rows = selection_model.selectedRows()
-        model = tableview.model()
-        feature_ids = []
-        for index in selected_rows:
-            feature_id = None
-            if isinstance(model, QSqlTableModel):
-                feature_id = model.record(index.row()).value(idname)
-            elif isinstance(model, QStandardItemModel):
-                feature_id = model.data(model.index(index.row(), tools_qt.get_col_index_by_col_name(tableview, idname)))
-            if feature_id not in (None, ''):
-                feature_ids.append(feature_id)
-        tools_gw.zoom_to_feature_by_id(tablename, idname, feature_ids)
 
     def _manage_psector_editability(self, psector_id):
         """ Manage psector form editability based on psector_editable variable """
