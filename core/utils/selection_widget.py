@@ -8,15 +8,18 @@ import os
 from functools import partial
 from typing import Any, Callable  # Literal, Dict, Optional,
 
-from qgis.PyQt.QtGui import QIcon, QStandardItem
-from qgis.core import QgsExpression
+from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
+from qgis.core import QgsExpression, QgsMapLayer, QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, QHBoxLayout, QPushButton
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QItemSelectionModel
 
 from . import tools_gw
 from ...libs import tools_qt, tools_qgis, lib_vars  # tools_db,
 # from .select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
 from .selection_mode import GwSelectionMode
+from ... import global_vars
+from ...global_vars import GwFeatureTypes
 
 
 class GwSelectionWidget(QWidget):
@@ -28,8 +31,8 @@ class GwSelectionWidget(QWidget):
     It also manages highlighting of selected features on the map based on table selections.
     """
 
-    def __init__(self, selection_mode: GwSelectionMode, general_variables: dict, menu_variables: dict = None,
-                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None,
+    def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None, 
+                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None, 
                  zoom_to_selection: bool = False, selection_on_top: bool = False):
         """
         Initialize the selection widget.
@@ -42,7 +45,8 @@ class GwSelectionWidget(QWidget):
         """
         super().__init__()
 
-        self.selection_mode = selection_mode
+        self.selection_mode = self_varibles.get("selection_mode", GwSelectionMode.DEFAULT)
+        self.method = self_varibles.get("method", "selected")
 
         # Create layout
         self.lyt_selection = QHBoxLayout(self)
@@ -206,7 +210,7 @@ class GwSelectionWidget(QWidget):
 
     # region activate highlight methods
 
-    def highlight_features_method(self, class_object: Any, dialog: QDialog, table_object: str, method: str):
+    def highlight_features_method(self, class_object: Any, dialog: QDialog, table_object: str):
         """
         Route to appropriate highlight method based on method string.
         
@@ -214,13 +218,12 @@ class GwSelectionWidget(QWidget):
             class_object: The class object
             dialog: The dialog
             table_object: The table name
-            method: The method to use ("all", "selected", "psector")
         """
-        if method == "all":
+        if self.method == "all":
             self.highlight_features_in_table(class_object, dialog, table_object)
-        elif method == "selected":
+        elif self.method == "selected":
             self.highlight_features_selected_in_table(class_object, dialog, table_object)
-        elif method == "psector":
+        elif self.method == "psector":
             self.highlight_features_psector_in_table(class_object, dialog, table_object)
 
     def highlight_in_tab_changed(self, class_object: Any, dialog: QDialog, table_object: str,
@@ -294,7 +297,9 @@ class GwSelectionWidget(QWidget):
         """
         # Refresh map canvas and reset rubberband
         tools_qgis.refresh_map_canvas()
-        tools_gw.reset_rubberband(class_object.rubber_band)
+        all_rubberbands = global_vars.active_rubberbands
+        for rubberband in all_rubberbands:
+            tools_gw.reset_rubberband(rubberband)
 
         # Get main variables
         widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
@@ -303,9 +308,13 @@ class GwSelectionWidget(QWidget):
         if not widget_table or not widget_table.selectionModel() or not feature_type:
             return
 
-        model = widget_table.selectionModel()
+        selection_model = widget_table.selectionModel()
         if not model or model.selectedRows() == 0:
             tools_gw.remove_selection(layers=class_object.rel_layers)
+            return
+        
+        data_model = widget_table.model()
+        if not data_model:
             return
 
         # Get feature IDs from table
@@ -314,7 +323,10 @@ class GwSelectionWidget(QWidget):
         if id_column_index == -1:
             return
 
-        ids_to_select = [str(model.index(row.row(), id_column_index).data()) for row in model.selectedRows()]
+        ids_to_select = []
+        for row in selection_model.selectedRows():
+            id_value = data_model.data(data_model.index(row.row(), id_column_index))
+            ids_to_select.append(id_value)
 
         if not ids_to_select:
             tools_gw.remove_selection(layers=class_object.rel_layers)
@@ -325,12 +337,13 @@ class GwSelectionWidget(QWidget):
         tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
 
         if not connected_signal:
-            model.selectionChanged.connect(partial(tools_qgis.highlight_features_selected_in_table,
-                                                   class_object, dialog, table_object, connected_signal=True))
+            selection_model.selectionChanged.connect(partial(self.highlight_features_selected_in_table,
+                                                   class_object, dialog, table_object, True))
 
-    def highlight_features_psector_in_table(self, class_object: Any, dialog: QDialog, table_object: str):
+    def highlight_features_psector_in_table(self, class_object: Any, dialog: QDialog, table_object: str, 
+                                            disconnect: bool = True, connect: bool = True):
         """
-        Highlight features psector in table.
+        Highlight features psector in table by drawing lines.
         
         Args:
             class_object: The class object
@@ -339,9 +352,23 @@ class GwSelectionWidget(QWidget):
         """
         # Refresh map canvas and reset rubberband
         tools_qgis.refresh_map_canvas()
-        tools_gw.reset_rubberband(class_object.rubber_band)
+        all_rubberbands = global_vars.active_rubberbands
+        for rubberband in all_rubberbands:
+            tools_gw.reset_rubberband(rubberband)
 
         widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
+
+        selection_model = widget_table.selectionModel()
+        if not selection_model or selection_model.selectedRows() == 0:
+            return
+        
+        data_model = widget_table.model()
+        if not data_model:
+            return
+        
+        id_column_name = f"{feature_type}_id"
+        id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
+        state_column_index = tools_qt.get_col_index_by_col_name(widget_table, "state")
 
     def highlight_features_in_table(self, class_object: Any, dialog: QDialog, table_object: str):
         """
@@ -416,14 +443,14 @@ class GwSelectionWidget(QWidget):
         if not widget_table or not widget_table.model():
             return
 
-        model = widget_table.model()
+        data_model = widget_table.model()
         selection_model = widget_table.selectionModel()
 
-        if not selection_model:
+        if not selection_model or not data_model:
             return
 
         # Get all row indices
-        all_rows = set(range(model.rowCount()))
+        all_rows = set(range(data_model.rowCount()))
         selected_rows = set()
 
         # Get currently selected rows
@@ -438,11 +465,11 @@ class GwSelectionWidget(QWidget):
 
         # Select the inverted rows
         for row in rows_to_select:
-            index = model.index(row, 0)
+            index = data_model.index(row, 0)
             selection_model.select(index, selection_model.Select | selection_model.Rows)
 
         # Highlight the newly selected features
-        self.highlight_features_selected_in_table(class_object, dialog, table_object)
+        self.highlight_features_method(class_object, dialog, table_object)
 
     # endregion invert selection
 
@@ -544,7 +571,7 @@ class GwSelectionWidget(QWidget):
             return
 
         # Use the generic zoom function to match psector's behavior
-        tools_gw.zoom_to_feature_by_id(f"ve_{feature_type}", id_col_name, feature_ids, dialog=dialog)
+        tools_gw.zoom_to_feature_by_id(f"ve_{feature_type}", id_col_name, feature_ids)
 
     # endregion zoom to selection
 
@@ -559,21 +586,80 @@ class GwSelectionWidget(QWidget):
             dialog: The dialog
             table_object: The table name
         """
+        # Create button
         btn_selection_on_top = QPushButton(self)
         tools_gw.add_icon(btn_selection_on_top, "175")
         btn_selection_on_top.setToolTip("Show selection on top")
+        btn_selection_on_top.setCheckable(True)
         self.lyt_selection.addWidget(btn_selection_on_top, 0)
-        btn_selection_on_top.clicked.connect(partial(self.show_selection_on_top, class_object, dialog, table_object))
+        
+        # Store original model and button state
+        widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
+        if widget_table and widget_table.model():
+            widget_table.setProperty('original_model', widget_table.model())
+            widget_table.setProperty('selection_on_top', False)
+            
+        # Connect signals
+        btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object))
 
-    def show_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str):
+    def toggle_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str):
         """
-        Moves the selected rows in a QTableView to the top
-        Args:
-            class_object: The class object
-            dialog: The dialog
-            table_object: The table name
+        Toggle between showing selection on top or restoring original order
         """
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
+        if not widget_table or not widget_table.model() or not widget_table.selectionModel():
+            return
+
+        checked = widget_table.property('selection_on_top')
+        selected_ids = self.get_selected_ids(widget_table)
+        
+        if not checked or widget_table.property('previous_selected_ids') != selected_ids:
+            # Store current model if not already stored
+            if not widget_table.property('original_model'):
+                widget_table.setProperty('original_model', widget_table.model())
+            if widget_table.selectionModel():
+                widget_table.setProperty('previous_selected_ids', selected_ids)
+            self.show_selection_on_top(widget_table)
+            widget_table.setProperty('selection_on_top', True)
+        else:
+            # Restore original model
+            original_model = widget_table.property('original_model')
+            if original_model:
+                # Restore model
+                widget_table.setModel(original_model)
+                # Restore selection
+                self.restore_selection(widget_table, selected_ids)
+                widget_table.setProperty('selection_on_top', False)
+
+    def get_selected_ids(self, widget_table):
+        """Get IDs of selected rows"""
+        model = widget_table.model()
+        selection_model = widget_table.selectionModel()
+        selected_ids = []
+        
+        if selection_model and selection_model.hasSelection():
+            for index in selection_model.selectedRows():
+                selected_ids.append(str(model.data(model.index(index.row(), 0))))
+        return selected_ids
+
+    def restore_selection(self, widget_table, selected_ids):
+        """Restore selection based on IDs"""
+        model = widget_table.model()
+        selection_model = widget_table.selectionModel()
+        
+        if not model or not selection_model:
+            return
+            
+        for row in range(model.rowCount()):
+            row_id = str(model.data(model.index(row, 0)))
+            if row_id in selected_ids:
+                index = model.index(row, 0)
+                selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+
+    def show_selection_on_top(self, widget_table):
+        """
+        Moves the selected rows in a QTableView to the top
+        """
         if not widget_table or not widget_table.model() or not widget_table.selectionModel():
             return
 
@@ -582,25 +668,39 @@ class GwSelectionWidget(QWidget):
         if not selection_model or not selection_model.hasSelection():
             return
 
-        selected_rows = [index.row() for index in selection_model.selectedRows()]
-        selected_rows.sort()
+        # Remember selected IDs
+        selected_ids = self.get_selected_ids(widget_table)
 
-        # Extract items from selected rows
-        rows_data = []
+        # Create a new model
+        temp_model = QStandardItemModel()
+        temp_model.setHorizontalHeaderLabels([model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())])
+
+        # First add selected rows
+        selected_rows = sorted([index.row() for index in selection_model.selectedRows()])
         for row in selected_rows:
-            row_items = [model.item(row, col) for col in range(model.columnCount())]
-            rows_data.append([QStandardItem(item.text()) if item else QStandardItem() for item in row_items])
+            row_data = []
+            for col in range(model.columnCount()):
+                data_value = model.data(model.index(row, col))
+                text = "" if data_value is None else str(data_value)
+                item = QStandardItem(text)
+                row_data.append(item)
+            temp_model.appendRow(row_data)
 
-        # Remove selected rows from the bottom up to avoid index shifting issues
-        for row in reversed(selected_rows):
-            model.removeRow(row)
+        # Then add non-selected rows
+        for row in range(model.rowCount()):
+            if row not in selected_rows:
+                row_data = []
+                for col in range(model.columnCount()):
+                    data_value = model.data(model.index(row, col))
+                    text = "" if data_value is None else str(data_value)
+                    item = QStandardItem(text)
+                    row_data.append(item)
+                temp_model.appendRow(row_data)
 
-        # Insert rows at the top
-        for i, row_data in enumerate(rows_data):
-            model.insertRow(i, row_data)
-
-        # Restore selection on the moved rows
-        for i in range(len(rows_data)):
-            widget_table.selectRow(i)
+        # Set the new model
+        widget_table.setModel(temp_model)
+        
+        # Restore selection
+        self.restore_selection(widget_table, selected_ids)
 
     # endregion selection on top

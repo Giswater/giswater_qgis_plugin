@@ -31,6 +31,7 @@ from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_o
 from ..utils.snap_manager import GwSnapManager
 from ...global_vars import GwFeatureTypes
 from ..utils.selection_mode import GwSelectionMode
+from ..utils.selection_widget import GwSelectionWidget
 
 
 class GwPsector:
@@ -287,6 +288,16 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._manage_tab_feature_buttons))
         viewname = 've_plan_psector_x_other'
+
+        self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector"}
+        general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
+        menu_variables = { "used_tools": ["rectangle", "polygon", "freehand"]}
+        highlight_variables = {"callback_values": self.callback_values}
+        invert_selection = True
+        zoom_to_selection = True
+        selection_on_top = True
+        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, invert_selection=True, zoom_to_selection=True, selection_on_top=True)
+        self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
 
         # Create corner buttons
         self.corner_widget = QWidget()
@@ -2948,6 +2959,9 @@ class GwPsector:
 
         # Set the focus on the tableview
         tableview.setFocus()
+
+    def callback_values(self):
+        return self, self.dlg_plan_psector, "psector"
 
     def _zoom_to_selection(self):
         """
