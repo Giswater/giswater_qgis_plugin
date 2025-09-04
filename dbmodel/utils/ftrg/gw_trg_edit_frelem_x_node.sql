@@ -80,7 +80,7 @@ BEGIN
 		END IF;
 
 		DELETE FROM element WHERE element_id = OLD.element_id;
-		RETURN NULL;
+		RETURN OLD;
 	END IF;
 
 END;
