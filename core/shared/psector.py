@@ -15,10 +15,10 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
-from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QStandardItem, QPixmap
+from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu, QHBoxLayout
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
@@ -2464,11 +2464,6 @@ class GwPsector:
 
     def _manage_tab_feature_buttons(self):
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
-        tablename_map = {0: self.qtbl_arc, 1: self.qtbl_node, 2: self.qtbl_connec, 3: self.qtbl_gully}
-        try:
-            table_name = tablename_map.get(tab_idx).objectName()
-        except AttributeError:
-            table_name = None
 
         # Disable all by default
         self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
