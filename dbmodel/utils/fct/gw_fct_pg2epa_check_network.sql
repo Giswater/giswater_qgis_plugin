@@ -186,7 +186,7 @@ BEGIN
 	-- remove dry demands
 	IF v_removedemands THEN
 		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(a.addparam::json, 'removedDemand'::text, true::boolean)
-		FROM temp_t_pgr_go2epa_node a WHERE a.node_id = n.node_id;
+		FROM temp_t_pgr_go2epa_node a WHERE a.node_id = n.node_id AND a.dma_id = 0;
 		GET DIAGNOSTICS v_count = row_count;
 
 		IF v_count > 0 THEN
