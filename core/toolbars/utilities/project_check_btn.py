@@ -200,14 +200,14 @@ class GwProjectCheckButton(GwAction):
     def _save_dlg_values(self):
         """ Save dialog values """
 
-        versions_check = self.versions_check.isChecked()
-        qgisproj_check = self.qgisproj_check.isChecked()
-        verified_exceptions = self.verified_exceptions.isChecked()
-        om_check = self.om_check.isChecked()
-        graph_check = self.graph_check.isChecked()
-        epa_check = self.epa_check.isChecked()
-        plan_check = self.plan_check.isChecked()
-        admin_check = self.admin_check.isChecked()
+        versions_check = self.versions_check.isChecked() if self.versions_check else False
+        qgisproj_check = self.qgisproj_check.isChecked() if self.qgisproj_check else False
+        verified_exceptions = self.verified_exceptions.isChecked() if self.verified_exceptions else False
+        om_check = self.om_check.isChecked() if self.om_check else False
+        graph_check = self.graph_check.isChecked() if self.graph_check else False
+        epa_check = self.epa_check.isChecked() if self.epa_check else False
+        plan_check = self.plan_check.isChecked() if self.plan_check else False
+        admin_check = self.admin_check.isChecked() if self.admin_check else False
 
         tools_gw.set_config_parser('admin_checkproject', 'versions_check', versions_check)
         tools_gw.set_config_parser('admin_checkproject', 'qgisproj_check', qgisproj_check)
