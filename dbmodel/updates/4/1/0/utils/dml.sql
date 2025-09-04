@@ -656,7 +656,7 @@ VALUES(3326, 'Some values on %array_column% don''t exist in %id_table% . %id_col
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3328, 'Cannot delete register because it has reference on other tables', null, 2, true, 'utils', 'core', 'UI');
 
-UPDATE sys_function SET function_alias = 'MAPZONES CONFIGURATION' WHERE function_name = 'gw_fct_setfeaturesreplace';
+UPDATE sys_function SET function_alias = 'REPLACE FEATURE' WHERE function_name = 'gw_fct_setfeaturesreplace';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3332, 'New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.', null, 0, true, 'utils', 'core', 'AUDIT');
@@ -714,7 +714,7 @@ VALUES(3364, 'New node is a delimiter of a mapzone that needs to be configured.'
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3366, 'Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.', null, 0, true, 'utils', 'core', 'AUDIT');
 
-UPDATE sys_function SET function_alias = 'MAPZONES CONFIGURATION' WHERE function_name = 'gw_fct_setarcdivide';
+UPDATE sys_function SET function_alias = 'ARC DIVIDE' WHERE function_name = 'gw_fct_setarcdivide';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(3368, 'Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.', null, 0, true, 'utils', 'core', 'AUDIT');
