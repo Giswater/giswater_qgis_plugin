@@ -120,6 +120,9 @@ class GwConnectLinkButton(GwMaptool):
         
         # Setup "Set to arc" button dropdown menu immediately (same as psector)
         self._setup_set_to_arc_button()
+        
+        # Ensure arc field is read-only (database config may not work)
+        self._make_arc_field_readonly()
 
     def _setup_set_to_arc_button(self):
         """ Setup set to arc button with dropdown menu (same as psector) """
@@ -145,14 +148,25 @@ class GwConnectLinkButton(GwMaptool):
         # Set initial button state
         self._update_set_to_arc_button_state()
 
+    def _make_arc_field_readonly(self):
+        """ Make arc field read-only (fallback if database config doesn't work) """
+        txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
+        if txt_arc_id and hasattr(txt_arc_id, 'setReadOnly'):
+            txt_arc_id.setReadOnly(True)
+
     def _update_set_to_arc_button_state(self):
         """ Update "Set to arc" button enabled state based on connec table content """
         btn_set_to_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_set_to_arc")
+        btn_expr_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_expr_arc")
         
-        if btn_set_to_arc and hasattr(self, 'tbl_ids') and self.tbl_ids:
+        if hasattr(self, 'tbl_ids') and self.tbl_ids:
             model = self.tbl_ids.model()
             has_connecs = model and model.rowCount() > 0
-            btn_set_to_arc.setEnabled(has_connecs)
+            
+            if btn_set_to_arc:
+                btn_set_to_arc.setEnabled(has_connecs)
+            if btn_expr_arc:
+                btn_expr_arc.setEnabled(has_connecs)
 
     def _cleanup_and_close(self):
         """ Cleanup all visual elements when dialog is closed (same pattern as psector) """
@@ -399,6 +413,54 @@ class GwConnectLinkButton(GwMaptool):
         self.fill_tbl_ids(layer)
         self.iface.actionPan().trigger()
 
+    def _selection_end_arc(self):
+        """ Process selected arc features """
+        layer = self.iface.activeLayer()
+        if not layer:
+            return
+
+        selected_features = layer.selectedFeatures()
+        if not selected_features:
+            return
+
+        # Extract arc IDs from selected features
+        selected_arc_ids = [str(feature.attribute('arc_id')) for feature in selected_features]
+
+        # Update arc line edit field directly (same as mapzone forceClosed)
+        txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
+        if txt_arc_id and hasattr(txt_arc_id, 'setText'):
+            arc_text = ', '.join(selected_arc_ids)
+            txt_arc_id.setText(arc_text)
+
+        # Clean up
+        self.iface.actionPan().trigger()
+
+    def _highlight_all_selected_arcs(self):
+        """ Highlight all selected arcs in red """
+        # Always reset existing rubber band first
+        tools_gw.reset_rubberband(self.rubber_band_line)
+        
+        # If no arcs selected, just clear and return
+        if not hasattr(self, 'selected_arcs') or not self.selected_arcs:
+            return
+        
+        # Get arc layer and highlight all selected arcs
+        layer = tools_qgis.get_layer_by_tablename('ve_arc')
+        if layer:
+            for arc_id in self.selected_arcs:
+                feature = tools_qt.get_feature_by_id(layer, arc_id, 'arc_id')
+                if feature:
+                    try:
+                        geometry = feature.geometry()
+                        self.rubber_band_line.addGeometry(geometry, None)
+                    except AttributeError:
+                        pass
+        
+        # Set styling and show
+        self.rubber_band_line.setColor(QColor(255, 0, 0, 100))
+        self.rubber_band_line.setWidth(5)
+        self.rubber_band_line.show()
+
     def _save_dlg_values(self):
         """ Save dialog values """
 
@@ -428,6 +490,11 @@ class GwConnectLinkButton(GwMaptool):
         
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
+        
+        # Show instruction message for multiple selection mode
+        if idx == 0:  # "Set closest point (multiple)"
+            message = "Click on arcs to select them. Use Alt+click to unselect selected arcs."
+            tools_qgis.show_info(message, title='Connect to network')
         
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'connect_link',
@@ -499,20 +566,38 @@ class GwConnectLinkButton(GwMaptool):
             # Clear any previous user click point to ensure closest point behavior
             self.user_click_point = None
             
-            # Add to selected arcs list (avoid duplicates)
-            if self.arc_id not in self.selected_arcs:
+            # Check for Alt+click to unselect
+            alt_pressed = QApplication.keyboardModifiers() & Qt.AltModifier
+            
+            if alt_pressed:
+                # Alt+click only works on already selected arcs
+                if self.arc_id in self.selected_arcs:
+                    # Alt+click on selected arc - remove it
+                    self.selected_arcs.remove(self.arc_id)
+                    action = "removed"
+                else:
+                    # Alt+click on unselected arc - do nothing
+                    return
+            elif self.arc_id not in self.selected_arcs:
+                # Normal click on unselected arc - add it
                 self.selected_arcs.append(self.arc_id)
+                action = "added"
+            else:
+                # Normal click on already selected arc - do nothing
+                return
                 
             # Update display with all selected arcs
             txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
             if txt_arc_id and hasattr(txt_arc_id, 'setText'):
-                # Show all selected arcs, comma-separated
-                arc_text = ', '.join(map(str, self.selected_arcs))
-                txt_arc_id.setText(arc_text)
+                if self.selected_arcs:
+                    arc_text = ', '.join(map(str, self.selected_arcs))
+                    txt_arc_id.setText(arc_text)
+                else:
+                    txt_arc_id.setText('')
+            
+            # Highlight all selected arcs
+            self._highlight_all_selected_arcs()
                 
-            # Continue selection mode - don't disconnect yet
-            message = f"Arc {self.arc_id} added. Total: {len(self.selected_arcs)} arcs. Click more arcs or press Accept."
-            tools_qgis.show_info(message, title='Connect to network')
             return  # Stay in selection mode
             
         elif idx == 1:  # "Set user click (single)"
@@ -748,7 +833,7 @@ def close(**kwargs):
 
 
 def filter_expression(**kwargs):
-    """Select features by expression for mapzone config"""
+    """Select features by expression for connec table"""
 
     # Get class
     this = kwargs['class']
@@ -773,3 +858,37 @@ def filter_expression(**kwargs):
         this._selection_init,
         this._selection_end
     )
+
+
+def filter_expression_arc(**kwargs):
+    """Select arc features by expression for arc field"""
+
+    # Get class
+    this = kwargs['class']
+
+    # Get arc layer
+    layer_name = 've_arc'
+    layer = tools_qgis.get_layer_by_tablename(layer_name)
+    if not layer:
+        return
+
+    # Set active layer
+    this.iface.setActiveLayer(layer)
+    tools_qgis.set_layer_visible(layer)
+
+    # Temporarily change feature_type to 'arc' for correct dialog title and layer
+    original_feature_type = this.feature_type
+    this.feature_type = 'arc'
+
+    # Show expression dialog for arc field
+    tools_gw.select_with_expression_dialog_custom(
+        this,
+        this.dlg_connect_link,
+        None,  # No table object needed for arc field
+        layer_name,
+        this._selection_init,
+        this._selection_end_arc
+    )
+    
+    # Restore original feature_type
+    this.feature_type = original_feature_type
