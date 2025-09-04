@@ -52,6 +52,14 @@ BEGIN
 		
 		RETURN NEW;
 
+		 IF NEW.status = 8 THEN
+	   
+	   		EXECUTE '
+			SELECT gw_fct_plan_recover_archived($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"parameters":{"psectorId":"'||NEW.psector_id||'"}}}$$);
+			';
+	   
+	   	END IF;
+
 	END IF;
 			
 END;
