@@ -283,7 +283,7 @@ BEGIN
 	road_surf, coef_curve, surcharge
 	FROM ve_inp_weir
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = ve_inp_weir.weir_type::text
-	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
+	WHERE inp_typevalue.typevalue::text = 'inp_typevalue_weir';
 
 	-- filling empty values
 	UPDATE temp_t_node SET y0=0 where y0 IS NULL;
