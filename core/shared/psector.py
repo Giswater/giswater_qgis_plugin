@@ -36,6 +36,9 @@ from ..utils.selection_widget import GwSelectionWidget
 
 class GwPsector:
 
+    OPERATIVE_COLOR = QColor(255, 144, 2, 125)
+    OBSOLETE_COLOR = QColor(140, 197, 229, 200)
+
     def __init__(self):
         """ Class to control 'New Psector' of toolbar 'master' """
 
@@ -2606,19 +2609,29 @@ class GwPsector:
 
         self.feature_geoms[feature_type] = json_result['body']['data']
 
-    def _highlight_features_by_id(self, qtable, feature_type, field_id, rubber_band, width, selected, deselected):
+    def _highlight_features_by_id(self, qtable, feature_type, field_id, rubber_band, width, state_value=1):
+        """
+        Highlight features by id based on their state
+        
+        Args:
+            state_value: 1 = operative (orange), 0 = obsolete (light blue)
+        """
 
-        tools_gw.reset_rubberband(self.rubber_band_op)
-        geoms = self.feature_geoms.get(feature_type)
-        if not geoms:
-            return
+        rubber_band.reset()
+
+        # Define colors based on state
+        color = self.OPERATIVE_COLOR if state_value == 1 else self.OBSOLETE_COLOR
 
         ids = []
-        for idx, index in enumerate(qtable.selectionModel().selectedRows()):
+        for _, index in enumerate(qtable.selectionModel().selectedRows()):
             row = index.row()
+
+            # Filter by state
             column_index = tools_qt.get_col_index_by_col_name(qtable, "state")
-            if index.sibling(row, column_index).data() != 0:
+            if index.sibling(row, column_index).data() != state_value:
                 continue
+
+            # Get the feature ID
             column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
             _id = index.sibling(row, column_index).data()
             ids.append(str(_id))
@@ -2626,12 +2639,19 @@ class GwPsector:
         if not ids:
             return
 
-        for _id in ids:
-            if _id not in geoms:
-                continue
-            geom = geoms[_id]['st_astext']
-            color = QColor(0, 90, 255, 125)
-            tools_qgis.draw_polyline(geom, rubber_band, color, width)
+        # Get geometries from database
+        ids_str = "','".join(ids)
+        sql = f"SELECT {field_id}, ST_AsText(the_geom) as geom FROM {feature_type} WHERE {field_id} IN ('{ids_str}')"
+        rows = tools_db.get_rows(sql)
+
+        if not rows:
+            return
+
+        # Draw all selected features with the appropriate color
+        for row in rows:
+            _id, geom_text = row
+            if geom_text:
+                tools_qgis.draw_polyline(geom_text, rubber_band, color, width, reset_rb=False)
 
     def _open_toolbox_function(self, function, signal=None, connect=None):
         """ Execute currently selected function from combobox """
@@ -2731,10 +2751,10 @@ class GwPsector:
         Manage the selection changed signals for the tableview based on the feature type
         """
         tableview_map = {
-            GwFeatureTypes.ARC: (self.qtbl_arc, "ve_arc", "arc_id", "arc", "arc_id", self.rubber_band_line, 5),
-            GwFeatureTypes.NODE: (self.qtbl_node, "ve_node", "node_id", "node", "node_id", self.rubber_band_point, 10),
-            GwFeatureTypes.CONNEC: (self.qtbl_connec, "ve_connec", "connec_id", "connec", "connec_id", self.rubber_band_point, 10),
-            GwFeatureTypes.GULLY: (self.qtbl_gully, "ve_gully", "gully_id", "gully", "gully_id", self.rubber_band_point, 10),
+            GwFeatureTypes.ARC: (self.qtbl_arc, "ve_arc", "arc_id", "arc", "arc_id", self.rubber_band_line, 10),
+            GwFeatureTypes.NODE: (self.qtbl_node, "ve_node", "node_id", "node", "node_id", self.rubber_band_point, 5),
+            GwFeatureTypes.CONNEC: (self.qtbl_connec, "ve_connec", "connec_id", "connec", "connec_id", self.rubber_band_point, 5),
+            GwFeatureTypes.GULLY: (self.qtbl_gully, "ve_gully", "gully_id", "gully", "gully_id", self.rubber_band_point, 5),
         }
         tableview, tablename, feat_id, tablename_op, feat_id_op, rb, width = tableview_map.get(feature_type, (None, None, None, None, None, None, None))
         if tableview is None:
@@ -2749,13 +2769,14 @@ class GwPsector:
         if not connect:
             return
 
-        # Highlight features by id
+        # Highlight operative features (state = 1)
         tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
-            tools_qgis.highlight_features_by_id, tableview, tablename, feat_id, rb, width
+            self._highlight_features_by_id, tableview, tablename, feat_id, rb, width, state_value=1
         ), 'psector', f"highlight_features_by_id_{tablename}")
-        # Higlight features by id (obsolete features)
+
+        # Highlight obsolete features (state = 0)
         tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
-            self._highlight_features_by_id, tableview, tablename_op, feat_id_op, self.rubber_band_op, 5
+            self._highlight_features_by_id, tableview, tablename_op, feat_id_op, self.rubber_band_op, width, state_value=0
         ), 'psector', f"highlight_features_by_id_{tablename_op}_op")
 
         # Manage connec/gully special cases
@@ -2773,14 +2794,13 @@ def close_dlg(**kwargs):
     """ Close dialog and disconnect snapping """
     class_obj = kwargs["class"]
     try:
-        if not class_obj.dlg_plan_psector.isVisible():
-            # Only check topology if psector is active and has an id
-            active = tools_qt.get_widget_value(class_obj.dlg_plan_psector, "tab_general_active")
-            if active:
-                psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
-                psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
-                class_obj.check_topology_psector(psector_id, psector_name)
-            return
+        # Only check topology if psector is active and has an id
+        active = tools_qt.get_widget_value(class_obj.dlg_plan_psector, "tab_general_active")
+        if active:
+            psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
+            psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
+            class_obj.check_topology_psector(psector_id, psector_name)
+
         tools_gw.reset_rubberband(class_obj.rubber_band_point)
         tools_gw.reset_rubberband(class_obj.rubber_band_line)
         tools_gw.reset_rubberband(class_obj.rubber_band_op)

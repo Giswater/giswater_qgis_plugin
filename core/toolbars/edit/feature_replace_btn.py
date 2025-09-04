@@ -278,9 +278,8 @@ class GwFeatureReplaceButton(GwMaptool):
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_replace)
 
-        # Hide unused widgets for plan
-        if global_vars.psignals and global_vars.psignals['psector_active']:
-            self._manage_plan_widgets()
+        # Manage plan widgets
+        self._manage_plan_widgets()
 
         # Set buttons signals
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
@@ -404,6 +403,7 @@ class GwFeatureReplaceButton(GwMaptool):
         new_featurecat_id = tools_qt.get_text(dialog, dialog.new_featurecat_id)
         keep_epa_values = tools_qt.is_checked(self.dlg_replace, 'keep_epa_values')
         keep_asset_id = tools_qt.is_checked(self.dlg_replace, 'chk_keep_asset_id')
+        description = tools_qt.get_text(self.dlg_replace, 'description')
         tools_gw.set_config_parser('btn_feature_replace', 'keep_epa_values', str(tools_os.set_boolean(keep_epa_values)), "user", "session")
         tools_gw.set_config_parser('btn_feature_replace', 'chk_keep_asset_id', str(tools_os.set_boolean(keep_asset_id)), "user", "session")
 
@@ -428,6 +428,7 @@ class GwFeatureReplaceButton(GwMaptool):
             if global_vars.psignals and global_vars.psignals['psector_active']:
                 feature = f'"featureType":"ARC", "ids":["{self.feature_id}"]'
                 extras = f'"catalog":"{new_featurecat_id}"'
+                extras += f', "description":"{description}"'
                 body = tools_gw.create_body(feature=feature, extras=extras)
                 complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
             else:
@@ -506,17 +507,21 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_qt.set_autocompleter(self.dlg_replace.new_featurecat_id)
 
     def _manage_plan_widgets(self):
-        # Hide unused widgets for plan
-        self.dlg_replace.grb_end_parameters.setVisible(False)
-        self.dlg_replace.lbl_feature_type.setVisible(False)
-        self.dlg_replace.feature_type.setVisible(False)
-        self.dlg_replace.lbl_new_feature_type.setVisible(False)
-        self.dlg_replace.feature_type_new.setVisible(False)
-        self.dlg_replace.lbl_keep_elements.setVisible(False)
-        self.dlg_replace.keep_elements.setVisible(False)
-        self.dlg_replace.lbl_keep_epa_values.setVisible(False)
-        self.dlg_replace.keep_epa_values.setVisible(False)
-        self.dlg_replace.lbl_keep_asset_id.setVisible(False)
-        self.dlg_replace.chk_keep_asset_id.setVisible(False)
+        if global_vars.psignals and global_vars.psignals['psector_active']:
+            # Hide unused widgets for plan
+            self.dlg_replace.grb_end_parameters.setVisible(False)
+            self.dlg_replace.lbl_feature_type.setVisible(False)
+            self.dlg_replace.feature_type.setVisible(False)
+            self.dlg_replace.lbl_new_feature_type.setVisible(False)
+            self.dlg_replace.feature_type_new.setVisible(False)
+            self.dlg_replace.lbl_keep_elements.setVisible(False)
+            self.dlg_replace.keep_elements.setVisible(False)
+            self.dlg_replace.lbl_keep_epa_values.setVisible(False)
+            self.dlg_replace.keep_epa_values.setVisible(False)
+            self.dlg_replace.lbl_keep_asset_id.setVisible(False)
+            self.dlg_replace.chk_keep_asset_id.setVisible(False)
+        else:
+            self.dlg_replace.lbl_description.setVisible(False)
+            self.dlg_replace.description.setVisible(False)
 
     # endregion

@@ -315,6 +315,9 @@
            </property>
           </widget>
          </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_selection"/>
+         </item>
         </layout>
        </item>
        <item>
@@ -451,8 +454,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>68</height>
+            <width>744</width>
+            <height>308</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">

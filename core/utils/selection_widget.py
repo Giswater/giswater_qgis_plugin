@@ -226,7 +226,7 @@ class GwSelectionWidget(QWidget):
             self.highlight_features_psector_in_table(class_object, dialog, table_object)
 
     def highlight_in_tab_changed(self, class_object: Any, dialog: QDialog, table_object: str,
-                                 parent_tab: QTabWidget, method: str):
+                                 parent_tab: QTabWidget):
         """
         Handle tab change events for highlighting features.
         
@@ -235,29 +235,32 @@ class GwSelectionWidget(QWidget):
             dialog: The dialog
             table_object: The table name
             parent_tab: The parent tab widget
-            method: The highlight method to use
         """
         widget = parent_tab.widget(parent_tab.currentIndex())
         if widget.objectName() in ("tab_relations", "tab_features"):
-            self.highlight_features_method(class_object, dialog, table_object, method)
+            self.highlight_features_method(class_object, dialog, table_object)
         else:
             tools_qgis.refresh_map_canvas()
-            tools_gw.reset_rubberband(class_object.rubber_band)
+            if self.method == "psector":
+                tools_gw.reset_rubberband(class_object.rubber_band_op)
+                tools_gw.reset_rubberband(class_object.rubber_band_line)
+                tools_gw.reset_rubberband(class_object.rubber_band_rectangle)
+                tools_gw.reset_rubberband(class_object.rubber_band_point)
+            else:
+                tools_gw.reset_rubberband(class_object.rubber_band)
 
-    def highlight_in_table_changed(self, method: str, callback_values: Callable[[], tuple]):
+    def highlight_in_table_changed(self, callback_values: Callable[[], tuple]):
         """
         Handle table change events for highlighting features.
         
         Args:
-            method: The highlight method to use
             callback_values: Callback function that returns (class_object, dialog, table_object)
         """
         class_object, dialog, table_object = callback_values()
-        self.highlight_features_method(class_object, dialog, table_object, method)
+        self.highlight_features_method(class_object, dialog, table_object)
 
     def init_highlight_features_methods(self, class_object: Any, dialog: QDialog, table_object: str,
-                                            callback_values: Callable[[], tuple],
-                                            method: str = "selected"):
+                                            callback_values: Callable[[], tuple]):
         """
         Initialize highlight features methods with tab change event handlers.
         
@@ -265,7 +268,6 @@ class GwSelectionWidget(QWidget):
             class_object: The class object
             dialog: The dialog
             table_object: The table object name
-            method: The highlight method
             callback_values: Optional callback function
         """
         # Setup tab change event handlers
@@ -274,10 +276,10 @@ class GwSelectionWidget(QWidget):
         parent_tab = self.find_parent_tab(parent_tab_table)
 
         if parent_tab_table:
-            parent_tab_table.currentChanged.connect(partial(self.highlight_in_table_changed, method, callback_values))
+            parent_tab_table.currentChanged.connect(partial(self.highlight_in_table_changed, callback_values))
         if parent_tab:
             parent_tab.currentChanged.connect(partial(self.highlight_in_tab_changed, class_object, dialog,
-                                                      table_object, parent_tab, method))
+                                                      table_object, parent_tab))
 
     # endregion activate highlight methods
 
