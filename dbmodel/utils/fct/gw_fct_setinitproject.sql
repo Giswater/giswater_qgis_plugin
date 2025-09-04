@@ -112,7 +112,7 @@ BEGIN
 	END IF;
 
 	-- Force exploitation selector
-	IF v_qgis_init_guide_map AND (v_isaudit IS NULL OR v_isaudit = 'false') OR v_sectorisexplismuni THEN -- v_sectorisexplismuni IS used ALSO here NOT ONLY IN selectors
+	IF (v_isaudit IS DISTINCT FROM TRUE) AND (v_qgis_init_guide_map OR v_sectorisexplismuni) THEN -- v_sectorisexplismuni IS used ALSO here NOT ONLY IN selectors
 		DELETE FROM selector_expl WHERE cur_user = current_user;
 		DELETE FROM selector_sector WHERE cur_user = current_user;
 		DELETE FROM selector_muni WHERE cur_user = current_user;
