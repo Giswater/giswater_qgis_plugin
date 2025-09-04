@@ -124,7 +124,7 @@ UPDATE cat_arc SET geom2 = 0 WHERE id = 'EG150';
 
 UPDATE inp_junction SET ysur=999 WHERE node_id= '302';
 
-UPDATE cat_arc SET id = 'PP030', geom1 = 0.25 WHERE id = 'PP020';
+UPDATE cat_arc SET id = 'PP030', geom1 = 0.25, geom2 = 100 WHERE id = 'PP020';
 
 UPDATE inp_dwf SET value = value*6*random();
 
