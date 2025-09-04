@@ -15,13 +15,13 @@ SELECT plan(3);
 
 INSERT INTO ve_anl_hydrant (nodecat_id, expl_id, the_geom)
 VALUES('-901', 0, null);
-SELECT is((SELECT count(*)::integer FROM ve_anl_hydrant WHERE nodecat_id = '-901'), 1, 'INSERT: ve_anl_hydrant -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM ve_anl_hydrant WHERE nodecat_id = 'PROPOSED HYDRANT'), 1, 'INSERT: ve_anl_hydrant -901 was inserted');
 
-UPDATE ve_anl_hydrant SET expl_id = 1 WHERE nodecat_id = '-901';
-SELECT is((SELECT expl_id FROM ve_anl_hydrant WHERE nodecat_id = '-901'), 1, 'UPDATE: ve_anl_hydrant -901 was updated');
+UPDATE ve_anl_hydrant SET expl_id = 1 WHERE nodecat_id = 'PROPOSED HYDRANT';
+SELECT is((SELECT expl_id FROM ve_anl_hydrant WHERE nodecat_id = 'PROPOSED HYDRANT'), 1, 'UPDATE: ve_anl_hydrant -901 was updated');
 
-DELETE FROM ve_anl_hydrant WHERE nodecat_id = '-901';
-SELECT is((SELECT count(*)::integer FROM ve_anl_hydrant WHERE nodecat_id = '-901'), 0, 'DELETE: ve_anl_hydrant -901 was deleted');
+DELETE FROM ve_anl_hydrant WHERE nodecat_id = 'PROPOSED HYDRANT';
+SELECT is((SELECT count(*)::integer FROM ve_anl_hydrant WHERE nodecat_id = 'PROPOSED HYDRANT'), 0, 'DELETE: ve_anl_hydrant -901 was deleted');
 
 
 SELECT * FROM finish();

@@ -1760,5 +1760,5 @@ UPDATE sys_style
 '
 	WHERE layername='ve_minsector' AND styleconfig_id=101;
 
-UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values on pump_type column.' WHERE fid=600;
-UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values at least on mandatory column curve_id.' WHERE fid=601;
+UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values on pump_type column.', query_text='SELECT * FROM inp_virtualpump WHERE pump_type IS NULL' WHERE fid=600;
+UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values at least on mandatory column curve_id.', query_text='SELECT * FROM inp_virtualpump WHERE curve_id IS NULL' WHERE fid=601;
