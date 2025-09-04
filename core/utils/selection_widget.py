@@ -424,7 +424,7 @@ class GwSelectionWidget(QWidget):
         """
         # Create invert selection button
         btn_invert = QPushButton(self)
-        tools_gw.add_icon(btn_invert, "137")
+        tools_gw.add_icon(btn_invert, "183")
         btn_invert.setToolTip("Invert the current selection in the table")
         btn_invert.clicked.connect(partial(self.invert_table_selection, class_object, dialog, table_object))
         self.lyt_selection.addWidget(btn_invert)
