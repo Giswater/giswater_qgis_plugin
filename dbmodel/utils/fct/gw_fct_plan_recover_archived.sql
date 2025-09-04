@@ -39,7 +39,7 @@ v_message JSON;
 BEGIN 
 	
 	-- input params
-	v_psector_id := (p_data->'data'->'parameters'->>'psectorId')::integer;
+	v_psector_id := (p_data->'data'->>'psectorId')::integer;
 
 	SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version LIMIT 1;
 	SELECT json_build_object('level', 1, 'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
@@ -51,7 +51,7 @@ BEGIN
 	
 		EXECUTE '
 		INSERT INTO plan_psector_x_'||rec_feature||' ('||rec_feature||'_id, psector_id, state, doable, descript, addparam)
-		SELECT '||rec_feature||'_id::INT, psector_id, state, doable, descript, 
+		SELECT '||rec_feature||'_id::INT, psector_id, psector_state, doable, descript, 
 		to_jsonb(t) - ''id'' - ''psector_id'' - ''state'' - ''doable'' - ''descript''
 		FROM archived_psector_'||rec_feature||' t
 		WHERE psector_id = '||v_psector_id||'
