@@ -2827,7 +2827,7 @@ class GwNonVisual:
 
         img = f"ud_lid_{row[0]}"
         tools_qt.add_image(self.dialog, 'lbl_section_image',
-                           f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
+                           f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}.png")
 
     def _accept_lids(self, dialog, is_new, lidco_id):
         """ Manage accept button (insert & update) """
