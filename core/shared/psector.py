@@ -1585,6 +1585,7 @@ class GwPsector:
 
         self.dlg_psector_mng.btn_cancel.clicked.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
+        self.dlg_psector_mng.btn_restore.clicked.connect(partial(self.restore_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
@@ -1708,6 +1709,28 @@ class GwPsector:
         if selector_updated:
             tools_qgis.force_refresh_map_canvas()
             tools_gw.refresh_selectors()
+
+    def restore_psector(self, dialog, qtbl_psm):
+        """ Recover the selected archived psector """
+
+        selected_list = qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            msg = "Any record selected"
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+        row = selected_list[0].row()
+        psector_id = qtbl_psm.model().record(row).value("psector_id")
+        archived = qtbl_psm.model().record(row).value("archived")
+        if archived is False:
+            msg = "Psector is not archived"
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
+        extras = f'"psectorId": "{psector_id}"'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_plan_recover_archived', body)
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+            return
 
     def update_current_psector(self, dialog, qtbl, scenario_type, col_id_name):
         """ Sets the selected psector as current if it is active """
