@@ -475,14 +475,9 @@ BEGIN
 
 		-- expl
 		DELETE FROM selector_expl WHERE cur_user = current_user;
-		IF v_sectorisexplismuni THEN			
-			INSERT INTO selector_expl SELECT expl_id, current_user FROM ud.selector_expl WHERE cur_user = current_user AND expl_id 
-			IN (SELECT expl_id FROM exploitation WHERE active);
-		ELSE	
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (expl_id, cur_user) DO NOTHING;
-		END IF;
+		INSERT INTO selector_expl
+		SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+		ON CONFLICT (expl_id, cur_user) DO NOTHING;
 		
 		-- macrosector
 		DELETE FROM selector_macrosector WHERE cur_user = current_user;
