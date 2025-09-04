@@ -27,3 +27,6 @@ INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_gully', 'link_id', 9, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_gully', 'insert_tstamp', 10, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector_x_gully', 'insert_user', 11, false, NULL, NULL, NULL);
+
+
+UPDATE sys_table SET context = '{"levels": ["EPA", "HYDROLOGY"]}' WHERE id = 've_raingage';
