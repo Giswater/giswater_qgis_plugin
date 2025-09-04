@@ -1759,3 +1759,6 @@ UPDATE sys_style
 </qgis>
 '
 	WHERE layername='ve_minsector' AND styleconfig_id=101;
+
+UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values on pump_type column.' WHERE fid=600;
+UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values at least on mandatory column curve_id.' WHERE fid=601;
