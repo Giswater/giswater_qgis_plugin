@@ -581,7 +581,6 @@ class GwConnectLinkButton(GwMaptool):
             elif self.arc_id not in self.selected_arcs:
                 # Normal click on unselected arc - add it
                 self.selected_arcs.append(self.arc_id)
-                action = "added"
             else:
                 # Normal click on already selected arc - do nothing
                 return
