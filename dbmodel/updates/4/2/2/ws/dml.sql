@@ -1764,3 +1764,6 @@ UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values on
 UPDATE sys_fprocess SET active=true,except_msg='virtualpumps with null values at least on mandatory column curve_id.', query_text='SELECT * FROM inp_virtualpump WHERE curve_id IS NULL' WHERE fid=601;
 
 UPDATE config_form_fields SET columnname='dint' WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='cat_dint' AND tabname='tab_epa';
+
+-- 05/09/2025
+UPDATE sys_table SET project_template='{"template": [1],"visibility": false,"levels_to_read": 2}'::jsonb WHERE id='ve_dqa';
