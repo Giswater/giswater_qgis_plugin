@@ -102,6 +102,7 @@ v_orderby_query text;
 v_orderby_check boolean;
 v_project_type text;
 v_tabnetworksignal integer = 0;
+v_querystylesheet TEXT;
 
 BEGIN
 
@@ -311,13 +312,23 @@ BEGIN
 			v_table = concat(v_addschema,'.',v_table);
 			v_selector = concat(v_addschema,'.',v_selector);
 		END IF;
+		
+		IF v_selector = 'selector_psector' THEN
+		
+			v_querystylesheet = 'case when EXISTS(SELECT psector_id FROM plan_psector e WHERE active and e.psector_id = s.psector_id) is not true then ''color: lightgray; font-style: italic;'' end as stylesheet';
+		
+		ELSE
+		
+			v_querystylesheet = 'NULL as stylesheet';
+		
+		END IF;
 
 		-- final query
 		v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 				select *, row_number() OVER (',v_orderby_query,') as orderby from (
 				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", 
-				EXISTS(SELECT ', v_selector_id, ' FROM ', v_selector, ' e WHERE e.', v_selector_id, ' = s.', v_table_id, ' and cur_user=current_user) as "value" 
+				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", ', v_querystylesheet, ',
+				EXISTS (SELECT ', v_selector_id, ' FROM ', v_selector, ' e WHERE e.', v_selector_id, ' = s.', v_table_id, ' and cur_user=current_user) as "value"
 				FROM ', v_table ,' s WHERE TRUE ', v_fullfilter, ' ) a)b');
 
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
