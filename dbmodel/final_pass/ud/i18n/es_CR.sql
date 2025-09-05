@@ -1347,6 +1347,7 @@ FROM (
     ('min_flow', 'v_rpt_comp_pumping_sum', 'form_feature', 'tab_none', 'Flujo mínimo:', 'Flujo mínimo - min_flow '),
     ('old_y2', 've_review_audit_arc', 'form_feature', 'tab_none', 'Antiguo y2:', 'viejo_y2'),
     ('id', 'v_rpt_rainfall_dep', 'form_feature', 'tab_none', 'ID:', 'ID'),
+    ('feature_type', 'generic', 'form_featuretype_change', 'tab_none', 'Tipo actual:', 'Tipo de característica actual'),
     ('geom1', 'upsert_catalog_arc', 'form_catalog', 'tab_none', 'Geometría 1:', 'Geometría 1'),
     ('result_id', 'v_rpt_high_cont_errors', 'form_feature', 'tab_none', 'Id de resultado:', 'Identificador del resultado - result_id '),
     ('shape', 'upsert_catalog_connec', 'form_catalog', 'tab_none', 'Forma:', 'Forma'),
@@ -1360,7 +1361,6 @@ FROM (
     ('flwreg_id', 'inp_flwreg_weir', 'form_feature', 'tab_none', 'Flwreg id:', 'flwreg_id'),
     ('subc_id', 'v_rpt_comp_subcatchwashoff_sum', 'form_feature', 'tab_none', 'ID de subcuenca:', 'ID de subcuenca'),
     ('sub_crit', 'v_rpt_comp_flowclass_sum', 'form_feature', 'tab_none', 'Subcrítica:', 'Subcrítica'),
-    ('feature_type', 'generic', 'form_featuretype_change', 'tab_none', 'Tipo actual:', 'Tipo de característica actual'),
     ('cd2', 'inp_dscenario_froutlet', 'form_feature', 'tab_none', 'Cd2:', 'Coeficiente de descarga 2'),
     ('coef_curve', 'inp_flwreg_weir', 'form_feature', 'tab_none', 'Coeficiente de curva:', 'Coeficiente de la curva'),
     ('sh', 'inp_dscenario_storage', 'form_feature', 'tab_none', 'Sh:', 'sh'),
@@ -3708,6 +3708,7 @@ FROM (
     ('hspacer_document_1', 'connec', 'form_feature', 'tab_documents', NULL, NULL),
     ('text', 'generic', 'nvo_controls', 'tab_none', NULL, NULL),
     ('chk_node', 'generic', 'snapshot_view', 'tab_none', 'Nodos:', 'Nodos'),
+    ('featurecat_id', 'generic', 'form_featuretype_change', 'tab_none', 'Catálogo:', 'ID de catálogo'),
     ('text6', 've_plan_psector', 'form_feature', 'tab_none', 'Texto 6:', 'Texto 6'),
     ('svg', 'cat_element', 'form_feature', 'tab_none', 'Svg:', 'svg - Pictograma de simbología.'),
     ('percent', 'plan_arc_x_pavement', 'form_feature', 'tab_none', 'Porcentaje:', 'Porcentaje de cobertura del pavimento en arco.'),
@@ -3715,7 +3716,6 @@ FROM (
     ('factor_8', 'inp_pattern_value', 'form_feature', 'tab_none', 'Factor 8:', 'Valor del patrón (uno o varios multiplicadores).'),
     ('log', 've_inp_curve', 'form_feature', 'tab_none', 'Registro:', 'Registro'),
     ('btn_doc_delete', 'connec', 'form_feature', 'tab_documents', NULL, 'Borrar documento'),
-    ('featurecat_id', 'generic', 'form_featuretype_change', 'tab_none', 'Catálogo:', 'ID de catálogo'),
     ('descript', 'cat_arc', 'form_feature', 'tab_none', 'Descripción:', 'descript - Campo para almacenar información adicional sobre la característica.'),
     ('tbl_elements', 'connec', 'form_feature', 'tab_elements', NULL, NULL),
     ('id', 've_cat_feature_connec', 'form_feature', 'tab_none', 'ID:', 'ID'),
@@ -8060,8 +8060,8 @@ UPDATE config_report AS t
 SET filterparam = v.text::json
 FROM (
 	VALUES
-	(105, '[{"columnname": "Exploitation", "label": "Operación:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Node type", "label": "Tipo de nodo:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id", "isNullValue": "true"}]'),
-    (100, '[{"columnname": "Exploitation", "label": "Operación:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Arc Catalog", "label": "Catálogo Arc:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id", "isNullValue": "true"}]'),
+	(100, '[{"columnname": "Exploitation", "label": "Operación:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Arc Catalog", "label": "Catálogo Arc:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id", "isNullValue": "true"}]'),
+    (105, '[{"columnname": "Exploitation", "label": "Operación:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Node type", "label": "Tipo de nodo:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id", "isNullValue": "true"}]'),
     (101, '[{"columnname": "expl_id", "label": "Operación:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL", "isNullValue": "true"}]')
 ) AS v(id, text)
 WHERE t.id = v.id;

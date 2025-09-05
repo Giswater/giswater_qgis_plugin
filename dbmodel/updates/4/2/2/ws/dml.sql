@@ -770,13 +770,15 @@ UPDATE config_toolbox SET inputparams='[
     "layoutorder": 1,
     "comboIds": [
       "PRESSZONE",
-      "SECTOR",
-      "DMA"
+      "DQA",
+      "DMA",
+      "SECTOR"
     ],
     "comboNames": [
       "PRESSZONE",
-      "SECTOR",
-      "DMA"
+      "DQA",
+      "DMA",
+      "SECTOR"
     ],
     "selectedId": null
   },
