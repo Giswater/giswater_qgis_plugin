@@ -7,3 +7,23 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON ve_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node ON ve_node;
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_connec ON ve_connec;
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully ON ve_gully;
+CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON ve_link;
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
