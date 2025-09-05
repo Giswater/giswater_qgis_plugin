@@ -303,7 +303,7 @@ AS WITH
       pp.arc_id,
 		  pp.state AS p_state
 		FROM plan_psector_x_arc pp
-		JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
+    WHERE (EXISTS (SELECT 1 FROM sel_ps s WHERE s.psector_id = pp.psector_id))
 		ORDER BY pp.arc_id, pp.state
 	),
   arc_selector AS (
@@ -700,7 +700,7 @@ AS WITH
       pp.node_id,
       pp.state AS p_state
     FROM plan_psector_x_node pp
-    JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
+    WHERE (EXISTS (SELECT 1 FROM sel_ps s WHERE s.psector_id = pp.psector_id))
     ORDER BY pp.node_id, pp.state
   ), 
   node_selector AS (
@@ -1145,7 +1145,7 @@ AS WITH
     pp.arc_id,
     pp.link_id
   FROM plan_psector_x_connec pp
-  JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
+  WHERE (EXISTS (SELECT 1 FROM sel_ps s WHERE s.psector_id = pp.psector_id))
   ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
   ), 
   connec_selector AS (
@@ -1632,7 +1632,7 @@ AS WITH
       pp.psector_id,
       pp.link_id
     FROM plan_psector_x_connec pp
-    JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
+    WHERE (EXISTS (SELECT 1 FROM sel_ps s WHERE s.psector_id = pp.psector_id))
     ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
   ),
   link_selector AS (
