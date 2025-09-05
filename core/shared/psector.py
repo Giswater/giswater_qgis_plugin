@@ -2394,21 +2394,6 @@ class GwPsector:
         if self.qtbl_connec.selectionModel() is None:
             return
 
-    def _mouse_move_arc(self, point):
-
-        if not self.layer_arc:
-            return
-
-        # Set active layer
-        self.iface.setActiveLayer(self.layer_arc)
-
-        # Get clicked point and add marker
-        self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(point=point)
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            self.snapper_manager.add_marker(result, self.vertex_marker)
-
     def _mouse_move_node(self, point):
 
         if not self.layer_node:
