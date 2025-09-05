@@ -56,3 +56,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
 VALUES(3512, 'gw_fct_plan_recover_archived', 'utils', 'function', 'json', 'json', NULL, 'role_plan', NULL, 'core', NULL);
+
+UPDATE config_form_fields SET iseditable = false where formname ilike 've_node_%' and columnname = 'state';
+UPDATE config_form_fields SET iseditable = false where formname ilike 've_arc_%' and columnname = 'state';
+UPDATE config_form_fields SET iseditable = false where formname ilike 've_connec_%' and columnname = 'state';
+UPDATE config_form_fields SET iseditable = false where formname ilike 've_link_%' and columnname = 'state';
+UPDATE config_form_fields SET iseditable = false where formname ilike 've_gully_%' and columnname = 'state';
