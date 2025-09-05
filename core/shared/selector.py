@@ -262,9 +262,14 @@ class GwSelector:
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
                     widget.setLayoutDirection(Qt.LeftToRight)
 
+                    style = ""
+                    if field.get('stylesheet') is not None:
+                        style += field.get('stylesheet')
                     # Set background color every other item (if enabled)
                     if color_rows and order % 2 == 0:
-                        widget.setStyleSheet("background-color: #E9E7E3")
+                        style += "background-color: #E9E7E3"
+                    if style:
+                        widget.setStyleSheet(style)
 
                     # Add widget to layout
                     field['layoutname'] = gridlayout.objectName()
