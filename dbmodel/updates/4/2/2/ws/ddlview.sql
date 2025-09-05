@@ -175,3 +175,37 @@ AS WITH sel_expl AS (
   WHERE (EXISTS ( SELECT 1
            FROM sel_expl
           WHERE sel_expl.expl_id = ANY (m.expl_id)));
+
+
+CREATE OR REPLACE VIEW v_rpt_arc_stats
+AS SELECT r.arc_id,
+    r.result_id,
+    rpt_cat_result.flow_units,
+    rpt_cat_result.quality_units,
+    r.arc_type,
+    r.sector_id,
+    r.arccat_id,
+    r.flow_max,
+    r.flow_min,
+    r.flow_avg,
+    r.vel_max,
+    r.vel_min,
+    r.vel_avg,
+    r.headloss_max,
+    r.headloss_min,
+    r.setting_max,
+    r.setting_min,
+    r.reaction_max,
+    r.reaction_min,
+    r.ffactor_max,
+    r.ffactor_min,
+    r.length,
+    r.tot_headloss_max,
+    r.tot_headloss_min,
+    arc.diameter,
+    r.the_geom
+   FROM rpt_arc_stats r
+     JOIN selector_rpt_main s ON s.result_id::text = r.result_id::text
+     JOIN rpt_inp_arc arc ON arc.result_id::text = s.result_id::text AND arc.arc_id = r.arc_id 
+     JOIN rpt_cat_result ON rpt_cat_result.result_id::text = s.result_id::text
+  WHERE s.cur_user = CURRENT_USER;
