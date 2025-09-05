@@ -33,6 +33,8 @@ UPDATE sys_table SET context = '{"levels": ["EPA", "HYDROLOGY"]}' WHERE id = 've
 
 UPDATE sys_param_user SET id='inp_options_hydrology_current' WHERE id='inp_options_hydrology_scenario';
 
+UPDATE config_toolbox SET inputparams = replace(inputparams::text, '''ALL VISIBLE SECTORS''', '''ALL VISIBLE SECTORS''')::json WHERE id = '3102' or id = '3100';
+
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND  typevalue = ''inp_typevalue_orifice'''
 WHERE formname='ve_epa_frorifice' AND formtype='form_feature' AND columnname='orifice_type' AND tabname='tab_epa';
 
