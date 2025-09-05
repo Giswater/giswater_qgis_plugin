@@ -574,7 +574,6 @@ class GwConnectLinkButton(GwMaptool):
                 if self.arc_id in self.selected_arcs:
                     # Alt+click on selected arc - remove it
                     self.selected_arcs.remove(self.arc_id)
-                    action = "removed"
                 else:
                     # Alt+click on unselected arc - do nothing
                     return
