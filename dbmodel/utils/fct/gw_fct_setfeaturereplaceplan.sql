@@ -24,6 +24,7 @@ v_feature text;
 v_id integer;
 v_catalog text;
 v_arc integer;
+v_description text;
 
 rec record;
 
@@ -55,6 +56,7 @@ BEGIN
 	v_feature = (p_data->>'feature')::json->>'featureType';
 	v_feature_text = (p_data->>'feature')::json->>'ids';
 	v_catalog = (p_data->>'data')::json->>'catalog';
+	v_description = (p_data->>'data')::json->>'description';
 
 	-- select config values
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -96,8 +98,8 @@ BEGIN
 				-- downgrade existing arc on this psector
 				UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
-				INSERT INTO plan_psector_x_arc (arc_id, state, psector_id)
-				VALUES (rec.arc_id, 0, v_currentpsector);
+				INSERT INTO plan_psector_x_arc (arc_id, state, psector_id, description)
+				VALUES (rec.arc_id, 0, v_currentpsector, v_description);
 
 				UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
