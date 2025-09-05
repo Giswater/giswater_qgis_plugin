@@ -882,3 +882,6 @@ UPDATE config_toolbox SET inputparams='[
     "value": null
   }
 ]'::json WHERE id=2768;
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue=''mincut_state'' AND id<>''4'''
+WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='state';
