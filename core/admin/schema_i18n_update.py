@@ -856,7 +856,7 @@ class GwSchemaI18NUpdate:
 
             # Reload values in special cases
             modified = modified.replace(': "a"', ': ""')
-            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL'")
+            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL")
 
             return json.loads(modified)
         except json.JSONDecodeError as e:
