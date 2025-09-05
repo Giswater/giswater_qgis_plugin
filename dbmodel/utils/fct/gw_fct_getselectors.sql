@@ -316,12 +316,9 @@ BEGIN
 		v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 				select *, row_number() OVER (',v_orderby_query,') as orderby from (
 				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-				FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-				v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-				FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
-				 v_fullfilter ,') a)b');
+				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", 
+				EXISTS(SELECT ', v_selector_id, ' FROM ', v_selector, ' e WHERE e.', v_selector_id, ' = s.', v_table_id, ' and cur_user=current_user) as "value" 
+				FROM ', v_table ,' s WHERE TRUE ', v_fullfilter, ' ) a)b');
 
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
 						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
