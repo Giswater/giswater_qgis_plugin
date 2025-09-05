@@ -153,6 +153,9 @@ class GwLoadProject(QObject):
         # Set indexing strategy for snapping so that it uses less memory if possible
         self.iface.mapCanvas().snappingUtils().setIndexingStrategy(QgsSnappingUtils.IndexHybrid)
 
+        # Set default project snapping settings
+        tools_qgis.set_project_snapping_settings()
+
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, lib_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
