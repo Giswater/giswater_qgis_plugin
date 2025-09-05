@@ -30,3 +30,5 @@ INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector
 
 
 UPDATE sys_table SET context = '{"levels": ["EPA", "HYDROLOGY"]}' WHERE id = 've_raingage';
+
+UPDATE sys_param_user SET id='inp_options_hydrology_current' WHERE id='inp_options_hydrology_scenario';
