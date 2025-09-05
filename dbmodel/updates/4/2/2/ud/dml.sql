@@ -32,3 +32,9 @@ INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector
 UPDATE sys_table SET context = '{"levels": ["EPA", "HYDROLOGY"]}' WHERE id = 've_raingage';
 
 UPDATE sys_param_user SET id='inp_options_hydrology_current' WHERE id='inp_options_hydrology_scenario';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND  typevalue = ''inp_typevalue_orifice'''
+WHERE formname='ve_epa_frorifice' AND formtype='form_feature' AND columnname='orifice_type' AND tabname='tab_epa';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND  typevalue = ''inp_typevalue_weir'''
+WHERE formname='ve_epa_frweir' AND formtype='form_feature' AND columnname='weir_type' AND tabname='tab_epa';
