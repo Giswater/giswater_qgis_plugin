@@ -1165,7 +1165,7 @@ AS WITH
       cp.connec_id,
       cp.arc_id,
       cp.link_id,
-      p_state
+      cp.p_state
     FROM connec_psector cp
     WHERE (EXISTS (SELECT 1 FROM sel_state s WHERE s.state_id = cp.p_state))
   ), 
