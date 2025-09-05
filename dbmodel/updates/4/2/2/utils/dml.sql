@@ -62,3 +62,5 @@ UPDATE config_form_fields SET iseditable = false where formname ilike 've_arc_%'
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_connec_%' and columnname = 'state';
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_link_%' and columnname = 'state';
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_gully_%' and columnname = 'state';
+
+INSERT INTO config_style (id, idval, descript, sys_role, addparam, is_templayer, active) VALUES(110, 'GwPlan', NULL, NULL, NULL, false, true);
