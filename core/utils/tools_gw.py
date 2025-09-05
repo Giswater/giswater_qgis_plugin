@@ -3839,7 +3839,6 @@ def get_model_index(model, row, field_name):
 def set_model_signals(class_object):
 
     class_object.rubber_band_point.reset()
-    class_object.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
     filter_ = "psector_id = '" + str(class_object.psector_id) + "'"
     class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,

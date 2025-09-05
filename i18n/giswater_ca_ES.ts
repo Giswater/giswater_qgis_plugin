@@ -4635,7 +4635,8 @@
 		</message>
 		<message>
 			<source>No results found. Please check values set on selector of state and exploitation</source>
-			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+
 </translation>
 		</message>
 		<message>
@@ -5703,8 +5704,10 @@
 			<translation>Task aborted: {0}.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>El procediment eliminarà elements de xaraxa en la base de dades a menys que sigui un node que no divideix l'arc. \ N Assegureu-vos que els elements de la xarxa no tinguin un valor de recuperació vertader.\ NPer altra banda, ha de saber que la traçabilitat emmagatzemarà informació precedent.</translation>
 		</message>
@@ -19440,14 +19443,6 @@
 		<message>
 			<source>tooltip_vat_label</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_set_to_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_set_to_arc</source>
-			<translation>Establir arc_id (només ARC exit_type)</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
