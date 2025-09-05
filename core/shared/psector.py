@@ -2322,7 +2322,6 @@ class GwPsector:
                 all_checked = False
         return all_checked
 
-
     def _arc_fusion(self):
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
@@ -2395,7 +2394,6 @@ class GwPsector:
         if self.qtbl_connec.selectionModel() is None:
             return
 
-
     def _mouse_move_arc(self, point):
 
         if not self.layer_arc:
@@ -2444,7 +2442,6 @@ class GwPsector:
             action.triggered.connect(partial(self._toggle_feature_psector, dialog, idx))
 
         dialog.btn_toggle.setMenu(toggle_menu)
-
 
     def _toggle_feature_psector(self, dialog, idx):
         """ Delete features_id to table plan_@feature_type_x_psector"""
