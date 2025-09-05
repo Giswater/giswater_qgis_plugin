@@ -26,9 +26,9 @@ FROM (
     ('edit_connec_category_vdefault', 'Categoria de connec:', 'Valor predeterminat del tipus de categoria per a la connexió'),
     ('inp_report_nodes', 'Timestep detailed nodes:I-(max.40):', 'Value of node, which gives a list of nodes whose results are to be reported'),
     ('feat_register_vdefault', 'Default catalog for register:', 'Value default catalog for register cat_feature'),
+    ('edit_connec_automatic_link', 'Rotació automàtica:', 'Si és vertader, l''etiqueta del connec i el símbol del vnode serà rotat utilitzant l''angle del link. Necessites tenir el símbol de l''etiqueta configurat amb "CASE WHEN label = 5 THEN ''   '' || "connec_id" ELSE "connec_id" || ''   '' END", label_x as quadrant and label_rotation as rotation.'),
     ('utils_debug_mode', 'Debug mode:', 'Variable to configure the debug mode of user'),
     ('inp_options_networkmode', 'Network geometry generator:', 'Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs'),
-    ('edit_connec_automatic_link', 'Rotació automàtica:', 'Si és vertader, l''etiqueta del connec i el símbol del vnode serà rotat utilitzant l''angle del link. Necessites tenir el símbol de l''etiqueta configurat amb "CASE WHEN label = 5 THEN ''   '' || "connec_id" ELSE "connec_id" || ''   '' END", label_x as quadrant and label_rotation as rotation.'),
     ('feat_servconnection_vdefault', 'Default catalog for servconnection:', 'Value default catalog for servconnection cat_feature'),
     ('inp_options_rule_step', 'Pas de la norma:', 'Control del pas de norma'),
     ('edit_insert_elevation_from_dem', 'Insertar elevació des de DEM:', 'Si és cert, l''elevació s''inserirà automàticament des del ràster DEM'),
@@ -213,7 +213,7 @@ FROM (
     ('inp_options_wet_step', 'Període humit:', 'Valor del període humit, que és la durada del període de temps que s''utilitza per calcular l''escorrentia de les subconques durant els períodes de pluja o quan l''aigua de l''estany encara roman a la superfície'),
     ('inp_report_controls', 'Controls:', 'Valor dels controls, que especifica si s''han d''enumerar o no totes les accions de control realitzades durant una simulació'),
     ('feat_frweir_vdefault', 'Default catalog for frweir:', 'Value default catalog for frweir cat_feature'),
-    ('edit_link_update_connecrotation', 'Rotació automàtica:', 'Si és vertader, l''etiqueta del connec i el símbol del vnode serà rotat utilitzant l''angle del link. '),
+    ('edit_link_update_connecrotation', 'Rotació automàtica:', 'If true, connec''s label and vnode symbol will be rotated using the angle of link'),
     ('inp_options_end_date', 'End date:', 'Value of end date, which is the date when the simulation is to end'),
     ('feat_netinit_vdefault', 'Catàleg per defecte per a netint:', 'Catàleg de valors per defecte per a netint cat_feature'),
     ('edit_node_ymax_vdefault', 'Ymax predeterminats per nodes:', 'Default value of ymax for nodes'),
@@ -6711,12 +6711,11 @@ FROM (
     ('v_plan_psector_arc', 'Plan psector arc', 'View to show arcs related to psectors. Useful to show arcs which will be obsolete in psectors'),
     ('man_arc_pump_pipe', NULL, NULL),
     ('v_ui_cat_dscenario', NULL, 'Table to show dscenario un qgis ui'),
-    ('v_rpt_arc', NULL, 'v_rpt_arc'),
+    ('v_rpt_node', 'Node values', 'v_rpt_node'),
     ('ve_node_netgully', 'Netgully', 'Custom editable view for NETGULLY'),
     ('ve_elem_froutlet', 'Froutlet', 'Custom editable view for FROUTLET'),
     ('vu_arc', NULL, 'Unfiltered view with no state and no sector'),
     ('v_arc', NULL, 'Shows the arc data.'),
-    ('v_rpt_node', NULL, 'v_rpt_node'),
     ('ve_inp_controls', 'Controls', 'View to edit control values, filteder by sector_id'),
     ('inp_timeseries_value', NULL, 'Table relative to timeseries values. This table could be edited trough giswater control panel: Giswater / Data / Timeseries'),
     ('man_node_rect_manhole', NULL, NULL),
@@ -6735,6 +6734,7 @@ FROM (
     ('ve_cat_dwf_scenario', 'Dwf scenario catalog', 'Table to manage scenario for dwf'),
     ('v_node', NULL, 'Shows the node data.'),
     ('vi_controls', NULL, 'Used to export to EPANET information about controls that modify links based on a single condition.'),
+    ('v_rpt_arc', 'Arc values', 'v_rpt_arc'),
     ('v_state_samplepoint', NULL, 'View that filter samplepoints for state'),
     ('v_plan_psector_connec', 'Plan psector connec', 'View to show connecs related to psectors. Useful to show connecs which will be obsolete in psectors'),
     ('element', NULL, 'Contains the elements'),
@@ -8047,12 +8047,12 @@ SET name = v.name
 FROM (
     VALUES
     (100, 'OBSOLETE-FICTICIUS'),
+    (2, 'OPERATIVE'),
     (1, 'OBSOLETE'),
-    (5, 'PROVISIONAL'),
     (3, 'PLANIFIED'),
-    (99, 'FICTICIUS'),
+    (5, 'PROVISIONAL'),
     (4, 'RECONSTRUCT'),
-    (2, 'OPERATIVE')
+    (99, 'FICTICIUS')
 ) AS v(id, name)
 WHERE t.id = v.id;
 

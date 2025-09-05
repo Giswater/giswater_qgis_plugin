@@ -26,9 +26,9 @@ FROM (
     ('edit_connec_category_vdefault', 'コネックのカテゴリー：', 'コネクションのカテゴリータイプのデフォルト値'),
     ('inp_report_nodes', 'Timestep detailed nodes:I-(max.40):', 'Value of node, which gives a list of nodes whose results are to be reported'),
     ('feat_register_vdefault', 'Default catalog for register:', 'Value default catalog for register cat_feature'),
+    ('edit_connec_automatic_link', 'コネクションラベルとVノードの自動ローテーション：', 'trueの場合、connecのラベルとノードシンボルはリンクの角度で回転します。ラベルのシンボルを ''CASE WHEN label_x = 5 THEN '' '' || ''connec_id'' || '' END ''で設定する必要があります。 ELSE ''connec_id'' || '' '' END''、label_xは象限、label_rotationは回転です。'),
     ('utils_debug_mode', 'Debug mode:', 'Variable to configure the debug mode of user'),
     ('inp_options_networkmode', 'Network geometry generator:', 'Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs'),
-    ('edit_connec_automatic_link', 'コネクションラベルとVノードの自動ローテーション：', 'trueの場合、connecのラベルとノードシンボルはリンクの角度で回転します。ラベルのシンボルを ''CASE WHEN label_x = 5 THEN '' '' || ''connec_id'' || '' END ''で設定する必要があります。 ELSE ''connec_id'' || '' '' END''、label_xは象限、label_rotationは回転です。'),
     ('feat_servconnection_vdefault', 'Default catalog for servconnection:', 'Value default catalog for servconnection cat_feature'),
     ('inp_options_rule_step', 'ルールのステップ：', 'ルール・ステップ・コントロール'),
     ('edit_insert_elevation_from_dem', 'DEMから標高を挿入する：', 'trueの場合、標高はDEMラスターから自動的に挿入されます。'),
@@ -6711,12 +6711,11 @@ FROM (
     ('v_plan_psector_arc', 'Plan psector arc', 'View to show arcs related to psectors. Useful to show arcs which will be obsolete in psectors'),
     ('man_arc_pump_pipe', NULL, NULL),
     ('v_ui_cat_dscenario', NULL, 'Table to show dscenario un qgis ui'),
-    ('v_rpt_arc', NULL, 'v_rpt_arc'),
+    ('v_rpt_node', 'Node values', 'v_rpt_node'),
     ('ve_node_netgully', 'Netgully', 'Custom editable view for NETGULLY'),
     ('ve_elem_froutlet', 'Froutlet', 'Custom editable view for FROUTLET'),
     ('vu_arc', NULL, 'Unfiltered view with no state and no sector'),
     ('v_arc', NULL, 'Shows the arc data.'),
-    ('v_rpt_node', NULL, 'v_rpt_node'),
     ('ve_inp_controls', 'Controls', 'View to edit control values, filteder by sector_id'),
     ('inp_timeseries_value', NULL, 'Table relative to timeseries values. This table could be edited trough giswater control panel: Giswater / Data / Timeseries'),
     ('man_node_rect_manhole', NULL, NULL),
@@ -6735,6 +6734,7 @@ FROM (
     ('ve_cat_dwf_scenario', 'Dwf scenario catalog', 'Table to manage scenario for dwf'),
     ('v_node', NULL, 'Shows the node data.'),
     ('vi_controls', NULL, 'Used to export to EPANET information about controls that modify links based on a single condition.'),
+    ('v_rpt_arc', 'Arc values', 'v_rpt_arc'),
     ('v_state_samplepoint', NULL, 'View that filter samplepoints for state'),
     ('v_plan_psector_connec', 'Plan psector connec', 'View to show connecs related to psectors. Useful to show connecs which will be obsolete in psectors'),
     ('element', NULL, 'Contains the elements'),
@@ -8047,12 +8047,12 @@ SET name = v.name
 FROM (
     VALUES
     (100, 'OBSOLETE-FICTICIUS'),
+    (2, 'OPERATIVE'),
     (1, 'OBSOLETE'),
-    (5, 'PROVISIONAL'),
     (3, 'PLANIFIED'),
-    (99, 'FICTICIUS'),
+    (5, 'PROVISIONAL'),
     (4, 'RECONSTRUCT'),
-    (2, 'OPERATIVE')
+    (99, 'FICTICIUS')
 ) AS v(id, name)
 WHERE t.id = v.id;
 
