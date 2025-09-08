@@ -176,7 +176,6 @@ BEGIN
         FROM temp_pgr_drivingdistance d
         JOIN temp_pgr_arc a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
         WHERE a.graph_delimiter ='SECTOR'
-        AND d.edge <> -1
         AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);
 
         -- the water source
@@ -185,7 +184,6 @@ BEGIN
         FROM temp_pgr_drivingdistance d
         JOIN temp_pgr_arc a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
         WHERE a.graph_delimiter ='SECTOR'
-        AND d.edge <> -1
         AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);
 
         -- border valves that have on the other side a checkvalve
@@ -194,7 +192,6 @@ BEGIN
         FROM temp_pgr_drivingdistance d
         JOIN temp_pgr_arc a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
         WHERE a.graph_delimiter ='MINSECTOR'
-        AND d.edge <> -1
         AND a.cost <> a.reverse_cost;
 
         -- close the valves (not the border checkvalves) for the zones with water and without checkvalves
@@ -289,7 +286,6 @@ BEGIN
             FROM temp_pgr_drivingdistance d
             JOIN temp_pgr_arc a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
             WHERE a.graph_delimiter ='SECTOR'
-            AND d.edge <> -1
             AND (d.node = a.pgr_node_1 AND a.cost = 0 OR d.node = a.pgr_node_2 AND a.reverse_cost = 0);
 
             -- close the valves that have on the other side a water source
