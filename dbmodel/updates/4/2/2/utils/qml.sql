@@ -12,9 +12,9 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active)
 <qgis version="3.40.7-Bratislava" styleCategories="Symbology">
  <renderer-v2 forceraster="0" type="RuleRenderer" symbollevels="0" referencescale="-1" enableorderby="0">
   <rules key="{27c5bcf5-31ab-4680-a34f-7d1469258a0b}">
-   <rule key="{d7963222-1f79-4e3c-81c2-99095fc5484b}" symbol="0" label="Archived" filter="status in (5,6,7)"/>
    <rule key="{acd8b33b-d1cb-4560-9912-677a5b67bb73}" symbol="1" label="Active" filter="active is true"/>
    <rule key="{1a5745ef-3db0-447b-916c-16f80c5fad2f}" symbol="2" label="Inactive" filter="active is not true"/>
+   <rule key="{d7963222-1f79-4e3c-81c2-99095fc5484b}" symbol="0" label="Archived" filter="status in (5,6,7)"/>
   </rules>
   <symbols>
    <symbol frame_rate="10" type="fill" clip_to_extent="1" is_animated="0" force_rhr="0" name="0" alpha="1">
@@ -166,9 +166,9 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
 <qgis version="3.40.7-Bratislava" styleCategories="Symbology">
  <renderer-v2 forceraster="0" type="RuleRenderer" symbollevels="0" referencescale="-1" enableorderby="0">
   <rules key="{27c5bcf5-31ab-4680-a34f-7d1469258a0b}">
-   <rule key="{d7963222-1f79-4e3c-81c2-99095fc5484b}" symbol="0" label="Archived" filter="status in (5,6,7)"/>
    <rule key="{acd8b33b-d1cb-4560-9912-677a5b67bb73}" symbol="1" label="Active" filter="active is true"/>
    <rule key="{1a5745ef-3db0-447b-916c-16f80c5fad2f}" symbol="2" label="Inactive" filter="active is not true"/>
+   <rule key="{d7963222-1f79-4e3c-81c2-99095fc5484b}" symbol="0" label="Archived" filter="status in (5,6,7)"/>
   </rules>
   <symbols>
    <symbol frame_rate="10" type="fill" clip_to_extent="1" is_animated="0" force_rhr="0" name="0" alpha="1">
