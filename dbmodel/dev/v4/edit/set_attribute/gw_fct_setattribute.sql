@@ -39,6 +39,8 @@ v_count integer;
 -- return
 v_message JSON;
 v_version TEXT;
+v_Result JSON;
+v_Result_info JSON;
 
 
 v_sql TEXT;
@@ -94,10 +96,20 @@ BEGIN
     "data":{"message":"4350", "function":"3514", "fid":"670", "cur_user":"current_user", "is_process":false, "parameters":{"v_count":'||v_count||'}}}$$)'; 
 
    
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"'||v_version||'"'||
-		 ',"body":{"form":{}'||
-		 ',"data":{ "info":{}}}'||
-	'}')::json, 3514, null, null, null);
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=670 AND tstamp = now() order by id) row;
+
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+
+
+	--  Return
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+               ',"body":{"form":{}'||
+  		     ',"data":{ "info":'||v_result_info||'}}'||
+  	    '}')::json, 3514, null, null, null);
 
     
 
