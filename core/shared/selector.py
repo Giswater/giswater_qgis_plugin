@@ -303,6 +303,18 @@ class GwSelector:
         if tab:
             main_tab.setCurrentWidget(tab)
 
+        # Refresh psector mode
+        current_psector = None
+        for user_value in json_result['body']['data']['userValues']:
+            if user_value['parameter'] == 'plan_psector_current':
+                current_psector = user_value['value']
+                break
+        if current_psector is not None:
+            tools_gw.set_psector_mode_enabled(enable=True, psector_id=current_psector, do_call_fct=False, force_change=True)
+        else:
+            tools_gw.set_psector_mode_enabled(enable=False, do_call_fct=False, force_change=True)
+
+
     # region private functions
 
     def _show_help(self, dialog, selection_modes):
