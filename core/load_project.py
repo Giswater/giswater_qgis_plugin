@@ -160,32 +160,26 @@ class GwLoadProject(QObject):
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, lib_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
-        # Only get the x.y.zzz, not x.y.zzz.n
+
+        # Compare major.minor versions
         try:
             plugin_version_l = str(plugin_version).split('.')
-            if len(plugin_version_l) >= 4:
-                plugin_version = f'{plugin_version_l[0]}'
-                for i in range(1, 3):
-                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
-        except Exception:
-            pass
-        try:
             project_version_l = str(project_version).split('.')
-            if len(project_version_l) >= 4:
-                project_version = f'{project_version_l[0]}'
-                for i in range(1, 3):
-                    project_version = f"{project_version}.{project_version_l[i]}"
+            plugin_major_minor = f'{plugin_version_l[0]}.{plugin_version_l[1]}'
+            project_major_minor = f'{project_version_l[0]}.{project_version_l[1]}'
+
+            if plugin_major_minor == project_major_minor:
+                msg = "Project read finished"
+                tools_log.log_info(msg)
+            else:
+                msg = ("Project read finished with different versions on plugin metadata ({0}) and "
+                      "PostgreSQL sys_version table ({1}).")
+                msg_params = (plugin_version, project_version,)
+                tools_log.log_warning(msg, msg_params=msg_params)
+                tools_qgis.show_warning(msg, msg_params=msg_params)
         except Exception:
-            pass
-        if project_version == plugin_version:
             msg = "Project read finished"
             tools_log.log_info(msg)
-        else:
-            msg = ("Project read finished with different versions on plugin metadata ({0}) and "
-                    "PostgreSQL sys_version table ({1}).")
-            msg_params = (plugin_version, project_version,)
-            tools_log.log_warning(msg, msg_params=msg_params)
-            tools_qgis.show_warning(msg, msg_params=msg_params)
 
         # Reset dialogs position
         tools_gw.reset_position_dialog()
