@@ -179,4 +179,6 @@ INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 
 update plan_psector set active=true;
 
+UPDATE cat_arc SET geom2 = NULL WHERE id = 'PP030';
+
 ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
