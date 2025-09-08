@@ -652,14 +652,20 @@ BEGIN
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
 				
+	ELSIF v_tabname IN ('tab_psector') THEN
+		SELECT row_to_json (a)
+		INTO v_geometry
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM plan_psector WHERE psector_id IN (select psector_id FROM selector_psector WHERE cur_user = current_user))b) a;
+	
+	ELSIF v_tabname IN ('tab_hydro_state', 'tab_network_state', 'tab_dscenario') THEN
+		v_geometry = NULL;
+
 	ELSIF (v_count > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
-		
-	ELSIF v_tabname IN ('tab_hydro_state', 'tab_network_state', 'tab_dscenario') THEN
-		v_geometry = NULL;
 
 	END IF;
 
