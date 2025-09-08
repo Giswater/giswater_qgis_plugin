@@ -1034,6 +1034,7 @@ class GwPsector:
                             f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
                     tools_db.execute_sql(sql)
                     self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
+                    tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id[0], do_call_fct=False, force_change=True)
 
         sql = ("UPDATE config_param_user "
                 "SET value = False "
