@@ -295,6 +295,7 @@ BEGIN
             -- close the valves that have on the other side a water source
             UPDATE temp_pgr_arc a SET proposed = TRUE
             WHERE a.graph_delimiter = 'MINSECTOR'
+            AND a.mapzone_id = 1
             AND closed = FALSE and to_arc IS NULL
             AND (a.pgr_node_1 = ANY (v_valve_water) OR a.pgr_node_2 = ANY (v_valve_water));
 
