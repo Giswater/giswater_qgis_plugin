@@ -23,7 +23,7 @@ UPDATE sys_style SET layername='v_rpt_arc_stats' WHERE layername='v_rpt_arc' AND
 UPDATE sys_style SET layername='v_rpt_node_stats' WHERE layername='v_rpt_node' AND styleconfig_id=101;
 
 INSERT INTO sys_table (id,descript,sys_role,context,orderby,alias,"source")
-VALUES ('ve_minsector_mincut','Shows editable information about mincut misectors','role_edit','{"levels": ["OM", "ANALYTICS"]}',3,'Mincut minsector','core');
+VALUES ('ve_minsector_mincut','Shows editable information about mincut misectors','role_edit','{"levels": ["OM", "ANALYTICS"]}',3,'Minsector mincut','core');
 UPDATE sys_table SET context='{"levels": ["OM", "ANALYTICS"]}', orderby =2 WHERE id='ve_minsector';
 
 UPDATE sys_table SET context='{"levels": ["EPA", "RESULTS"]}' WHERE id='v_rpt_arc_stats' OR id='v_rpt_node_stats';
