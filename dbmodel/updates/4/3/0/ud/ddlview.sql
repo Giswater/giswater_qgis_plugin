@@ -1965,7 +1965,7 @@ AS WITH
 			date_trunc('second'::text, l.updated_at) AS updated_at,
 			l.updated_by,
 			l.the_geom,
-			psector_link.p_state
+			link_psector.p_state
 		FROM link_selector
 		JOIN link l USING (link_id)
 		JOIN exploitation ON l.expl_id = exploitation.expl_id
@@ -1977,7 +1977,7 @@ AS WITH
 		LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 		LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN inp_network_mode ON true
-		LEFT JOIN psector_link ON psector_link.link_id = link.link_id
+		LEFT JOIN link_psector ON link_psector.link_id = l.link_id
 	)
 SELECT link_id,
 	code,
