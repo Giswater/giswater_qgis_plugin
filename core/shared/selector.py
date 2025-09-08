@@ -314,7 +314,6 @@ class GwSelector:
         else:
             tools_gw.set_psector_mode_enabled(enable=False, do_call_fct=False, force_change=True)
 
-
     # region private functions
 
     def _show_help(self, dialog, selection_modes):
