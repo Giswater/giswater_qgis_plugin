@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import re
+import json
 import psycopg2
 import psycopg2.extras
 from functools import partial
@@ -568,9 +569,13 @@ class GwSchemaI18NManager:
         """ Update the table with the json format """
 
         if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
-            self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "text", "lb_en_us"]
+            self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "lb_en_us"]
+            pk_column_org =["formname", "formtype", "tabname", "columnname"]
+            pk_column_i18n = ["formname", "formtype", "tabname", "source"]
         elif table_i18n.split('.')[1] == "dbjson":
-            self.conflict_project_type = ["source_code", "context", "hint", "text", "source", "lb_en_us"]
+            self.conflict_project_type = ["source_code", "context", "hint", "source", "lb_en_us"]
+            pk_column_org = ["id"]
+            pk_column_i18n = ["source"]
 
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
         self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
@@ -585,19 +590,19 @@ class GwSchemaI18NManager:
             column = 'widgetcontrols'
 
         # Get the rows from the original table
-        query = f"SELECT * FROM {self.schema_org}.{table_org}"
-        rows = self._get_rows(query, self.cursor_org)
+        query = f"SELECT {", ".join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org}"
+        rows_org = self._get_rows(query, self.cursor_org)
 
         # Set the query message
         query = ""
-        for row in rows:
+        for row in rows_org:
+            hints_used = set()
+            hints_i18n = self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n)
             #Get safe row values and avoid SQL injection
-            safe_row_column = str(row[column]).replace("'", "''")
             if row[column] not in [None, "", "None"]:
-                # Get the data to update
                 datas = self.extract_and_update_strings(row[column])
 
-                # Loop through the data to update
+                # Loop through the data to insert
                 for i, data in enumerate(datas):
                     for key, text in data.items():
                         # Handle string or list of strings
@@ -608,19 +613,74 @@ class GwSchemaI18NManager:
 
                         # Get safe text and Construct the query
                         safe_text = text.replace("'", "''")
+                        row_to_insert = {}
                         if "config_form_fields" in table_i18n:
-                            query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, formname, formtype, tabname, source, hint, text, lb_en_us)
-                            VALUES ('giswater', '{self.project_type}', '{table_org}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', '{row['columnname']}', '{key}_{i}', '{safe_row_column}', '{safe_text}')
-                            ON CONFLICT (source_code, project_type, context, formname, formtype, tabname, source, hint, text)
-                            DO UPDATE SET lb_en_us = '{safe_text}'; """
+                            row_to_insert = {
+                                "source_code": "'giswater'",
+                                "project_type": f"'{self.project_type}'",
+                                "context": f"'{table_org}'",
+                                "formname": f"'{row['formname']}'",
+                                "formtype": f"'{row['formtype']}'",
+                                "tabname": f"'{row['tabname']}'",
+                                "source": f"'{row['columnname']}'",
+                                "hint": f"'{key}_{i}'",
+                                "text": f"'{json.dumps(row[column]).replace("'", "''")}'::jsonb",
+                                "lb_en_us": f"'{safe_text}'"
+                            }
                         else:
-                            query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, hint, text, source, lb_en_us)
-                            VALUES ('giswater', '{self.project_type}', '{table_org}', '{key}_{i}', '{safe_row_column}', '{row['id']}', '{safe_text}')
-                            ON CONFLICT (source_code, project_type, context, hint, text, source)
-                            DO UPDATE SET lb_en_us = '{safe_text}'; """
+                            row_to_insert = {
+                                "source_code": "'giswater'",
+                                "project_type": f"'{self.project_type}'",
+                                "context": f"'{table_org}'",
+                                "hint": f"'{key}_{i}'",
+                                "text": f"'{json.dumps(row[column]).replace("'", "''")}'::jsonb",
+                                "source": f"'{row['id']}'",
+                                "lb_en_us": f"'{safe_text}'"
+                            }
+                        
+                        columns = list(row_to_insert.keys())
+                        values = list(row_to_insert.values())
+                        conflict_keys = [key for key in columns if key not in ('text', 'lb_en_us')]
+                        
+                        query += f"""INSERT INTO {table_i18n} ({', '.join(columns)}) VALUES ({', '.join(values)})
+                            ON CONFLICT ({', '.join(conflict_keys)})
+                            DO UPDATE SET
+                                text = EXCLUDED.text,
+                                lb_en_us = EXCLUDED.lb_en_us;\n
+                        """
+                        hints_used.add(f"'{key}_{i}'")
+                
+                # Convert hints_used to a set and hints_i18n (query results) to a set of hint values
+                hints_to_delete = hints_i18n - hints_used
+                if hints_to_delete:
+                    query += self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete)
 
-                        query += query_row
         return query
+
+    def get_hints(self, table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete=None):
+        """ Delete the rows that already exist in the table """
+        where_conditions = ["source_code = 'giswater'", f"project_type = '{self.project_type}'", f"context = '{table_i18n.split('.')[1]}'"]
+        for i, pk in enumerate(pk_column_org):
+            if row.get(pk) is None:
+                where_conditions.append(f"{pk} IS NULL")
+            else:
+                where_conditions.append(f"{pk_column_i18n[i]} = '{str(row[pk]).replace("'", "''")}'")
+
+        if hints_to_delete:
+            # Make sure hints are properly quoted for SQL
+            quoted_hints = [f"'{hint}'" for hint in hints_to_delete]
+            where_conditions.append(f"hint IN ({','.join(quoted_hints)})")
+            where_clause = " AND ".join(where_conditions)
+            query_delete = f"""DELETE FROM {table_i18n} WHERE {where_clause};"""
+            return query_delete
+        
+        where_clause = " AND ".join(where_conditions)
+        query = f"""SELECT hint FROM {table_i18n} WHERE {where_clause};"""
+
+        self.cursor_i18n.execute(query)
+        hints_i18n = self.cursor_i18n.fetchall()
+        hints_i18n_set = set([row[0] for row in hints_i18n])
+        return hints_i18n_set
 
     # endregion
     # region Config_form_fields_feat
@@ -851,8 +911,13 @@ class GwSchemaI18NManager:
                 if val is None:
                     row_values.append("NULL")
                 else:
-                    escaped_val = str(val).replace("'", "''")
-                    row_values.append(f"'{escaped_val}'")
+                    if col == 'text':
+                        # Handle JSON data properly
+                        json_str = json.dumps(val).replace("'", "''")
+                        row_values.append(f"'{json_str}'::jsonb")
+                    else:
+                        escaped_val = str(val).replace("'", "''")
+                        row_values.append(f"'{escaped_val}'")
             values_sql.append(f"({', '.join(row_values)})")
 
         values_block = ',\n'.join(values_sql)
@@ -1596,7 +1661,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields_json"],
+                "dbtables": ["dbjson"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1605,7 +1670,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields_json"],
+                "dbtables": ["dbjson"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
