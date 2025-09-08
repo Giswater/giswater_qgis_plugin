@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from ...shared.document import global_vars
 from qgis.PyQt.QtCore import Qt, QDate
 
 from ..maptool import GwMaptool
@@ -59,7 +60,10 @@ class GwArcFusionButton(GwMaptool):
 
         state_type = tools_qt.get_combo_value(self.dlg_fusion, "cmb_statetype")
         action_mode = self.dlg_fusion.cmb_nodeaction.currentIndex()
+        if global_vars.psignals['psector_active']:
+            action_mode = 1
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
+        catalog = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.cmb_new_cat)
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
         feature_id = f'"id":["{self.node_id}"]'
@@ -75,6 +79,8 @@ class GwArcFusionButton(GwMaptool):
                     extras += f', "state_type": {state_type}'
                 else:
                     extras += ', "state_type": null'
+        if catalog not in (None, 'null', ''):
+            extras += f', "arccat_id":"{catalog}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
@@ -162,7 +168,16 @@ class GwArcFusionButton(GwMaptool):
             sql = f"SELECT psector_id FROM v_plan_psector_node WHERE node_id = '{self.node_id}'"
             row = tools_db.get_row(sql)
             if row:
-                self.psector_id = row[0]
+                node_psector_id = row[0]
+                if global_vars.psignals['psector_active']:
+                    current_psector_id = global_vars.psignals['psector_id']
+                    if node_psector_id != current_psector_id:
+                        msg = f"The selected node is planified in another psector.\nNode psector: {0}\nCurrent psector: {1}"
+                        title = "Arc fusion"
+                        msg_params = (node_psector_id, current_psector_id,)
+                        tools_qt.show_info_box(msg, title=title, msg_params=msg_params)
+                        return
+                self.psector_id = node_psector_id
             self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
             self.dlg_fusion.cmb_nodeaction.setEnabled(False)
             tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
@@ -171,6 +186,10 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.enddate.setEnabled(False)
             self.dlg_fusion.workcat_id_end.setEnabled(False)
             self.dlg_fusion.cmb_statetype.setEnabled(False)
+
+        # Build catalog widgets
+        if not self._build_catalog_widgets():
+            return
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_fusion)
@@ -182,6 +201,28 @@ class GwArcFusionButton(GwMaptool):
         self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
         tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
+
+    def _build_catalog_widgets(self):
+        """ Build catalog widgets """
+
+        # Get arc catalogs
+        sql = "SELECT id, id as idval FROM cat_arc"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_fusion.cmb_new_cat, rows)
+        tools_qt.set_autocompleter(self.dlg_fusion.cmb_new_cat)
+
+        # Get linked arcs to the selected node
+        sql = f"SELECT arc_id, arccat_id FROM arc WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}"
+        rows = tools_db.get_rows(sql)
+        if rows and len(rows) != 2:
+            msg = "The selected node should have two valid linked arcs."
+            title = "Arc fusion"
+            tools_qt.show_info_box(msg, title=title)
+            return False
+        elif rows:
+            tools_qt.set_widget_text(self.dlg_fusion, "txt_arc1cat", rows[0][1])
+            tools_qt.set_widget_text(self.dlg_fusion, "txt_arc2cat", rows[1][1])
+        return True
 
     def _manage_nodeaction(self, index):
 

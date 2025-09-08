@@ -28,7 +28,6 @@ from ..shared.psector_duplicate import GwPsectorDuplicate
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPsectorRepairUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
-from ..utils.snap_manager import GwSnapManager
 from ...global_vars import GwFeatureTypes
 from ..utils.selection_mode import GwSelectionMode
 from ..utils.selection_widget import GwSelectionWidget
@@ -134,7 +133,6 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "116")
         tools_gw.add_icon(self.dlg_plan_psector.btn_toggle, "101")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
@@ -230,9 +228,6 @@ class GwPsector:
             # Load existing psector data and populate form
             self.load_psector(self.dlg_plan_psector, psector_id, list_coord=None, form_opened=True)
 
-        if self.dlg_plan_psector.tab_feature.currentIndex() != 1:
-            self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
-
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
         self.all_states = rows
@@ -270,8 +265,6 @@ class GwPsector:
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR))
-        self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
-            partial(self._arc_fusion))
         self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
@@ -2322,92 +2315,8 @@ class GwPsector:
                 all_checked = False
         return all_checked
 
-    def _arc_fusion(self):
-
-        if hasattr(self, 'emit_point') and self.emit_point is not None:
-            tools_gw.disconnect_signal('psector', 'replace_arc_ep_canvasClicked_open_arc_replace_form')
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper_manager = GwSnapManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
-        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
-
-        # Vertex marker
-        self.vertex_marker = self.snapper_manager.vertex_marker
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Set signals
-        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node, 'psector',
-                                'arc_fusion_xyCoordinates_mouse_move_node')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, self._perform_arc_fusion, 'psector',
-                                'arc_fusion_ep_canvasClicked_open_arc_fusion_form')
-
-    def _perform_arc_fusion(self, point):
-
-        # Snap point
-        event_point = self.snapper_manager.get_event_point(point=point)
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            # Check feature
-            layer = self.snapper_manager.get_snapped_layer(result)
-            if layer == self.layer_node:
-                # Get the point
-                snapped_feat = self.snapper_manager.get_snapped_feature(result)
-                self.node_id = snapped_feat.attribute('node_id')
-                self.node_state = snapped_feat.attribute('state')
-
-                selected_psector = self.psector_id
-
-                # Execute setarcfusion
-                workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
-                feature_id = f'"id":["{self.node_id}"]'
-                extras = '"enddate":null'
-                if workcat_id not in (None, 'null', ''):
-                    extras += f', "workcatId":"{workcat_id}"'
-                extras += f', "psectorId": "{selected_psector}"'
-                extras += ', "action_mode": 1'
-                extras += ', "state_type": null'
-                body = tools_gw.create_body(feature=feature_id, extras=extras)
-                # Execute SQL function and show result to the user
-                result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
-                if not result or result['status'] == 'Failed':
-                    return
-
-                # Force a map refresh
-                tools_qgis.force_refresh_map_canvas()
-                # Refresh tables
-                self._refresh_tables_relations()
-
     def _manage_tab_feature_buttons(self):
-        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
-
-        # Disable all by default
-        self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
-
-        if tab_idx == 1:
-            # Enable btn arc_fusion
-            self.dlg_plan_psector.btn_arc_fusion.setEnabled(True)
-
-        # Tabs connec/gully
-        if self.qtbl_connec.selectionModel() is None:
-            return
-
-    def _mouse_move_node(self, point):
-
-        if not self.layer_node:
-            return
-
-        # Set active layer
-        self.iface.setActiveLayer(self.layer_node)
-
-        # Get clicked point and add marker
-        self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(point=point)
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            self.snapper_manager.add_marker(result, self.vertex_marker)
+        return
 
     def _reset_snapping(self):
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
@@ -2657,10 +2566,6 @@ class GwPsector:
 
         # Manage connec/gully special cases
         if feature_type in (GwFeatureTypes.CONNEC, GwFeatureTypes.GULLY):
-            tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
-                self._manage_tab_feature_buttons
-            ), 'psector', f"manage_tab_feature_buttons_{tablename}")
-
             tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
 
     # endregion
