@@ -443,7 +443,7 @@ SELECT
 	meandering
 FROM arc_selected;
 
-CREATE OR REPLACE VIEW ud_github.ve_node
+CREATE OR REPLACE VIEW ve_node
 AS WITH
 	sel_state AS (
     SELECT selector_state.state_id
@@ -475,7 +475,7 @@ AS WITH
 			edit_typevalue.typevalue,
 			edit_typevalue.id,
 			edit_typevalue.idval
-		FROM ud_github.edit_typevalue
+		FROM edit_typevalue
 		WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
 	), 
 	sector_table AS (
@@ -484,7 +484,7 @@ AS WITH
 			sector.macrosector_id,
 			sector.stylesheet,
 			t.id::character varying(16) AS sector_type
-		FROM ud_github.sector
+		FROM sector
 		LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
 	), 
 	omzone_table AS (
@@ -493,7 +493,7 @@ AS WITH
 			omzone.macroomzone_id,
 			omzone.stylesheet,
 			t.id::character varying(16) AS omzone_type
-		FROM ud_github.omzone
+		FROM omzone
 		LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
 	), 
 	drainzone_table AS (
@@ -501,7 +501,7 @@ AS WITH
 			drainzone.drainzone_id,
 			drainzone.stylesheet,
 			t.id::character varying(16) AS drainzone_type
-		FROM ud_github.drainzone
+		FROM drainzone
 		LEFT JOIN typevalue t ON t.id::text = drainzone.drainzone_type::text AND t.typevalue::text = 'drainzone_type'::text
 	), 
 	dwfzone_table AS (
@@ -510,7 +510,7 @@ AS WITH
 			dwfzone.stylesheet,
 			t.id::character varying(16) AS dwfzone_type,
 			dwfzone.drainzone_id
-		FROM ud_github.dwfzone
+		FROM dwfzone
 		LEFT JOIN typevalue t ON t.id::text = dwfzone.dwfzone_type::text AND t.typevalue::text = 'dwfzone_type'::text
 	), 
 	node_psector AS (
@@ -672,17 +672,17 @@ AS WITH
 			node.updated_by,
 			node.the_geom
 			FROM node_selector
-				JOIN ud_github.node USING (node_id)
-				JOIN ud_github.cat_node ON node.nodecat_id::text = cat_node.id::text
-				JOIN ud_github.cat_feature ON cat_feature.id::text = node.node_type::text
-				JOIN ud_github.exploitation ON node.expl_id = exploitation.expl_id
-				JOIN ud_github.ext_municipality mu ON node.muni_id = mu.muni_id
-				JOIN ud_github.value_state_type vst ON vst.id = node.state_type
+				JOIN node USING (node_id)
+				JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+				JOIN cat_feature ON cat_feature.id::text = node.node_type::text
+				JOIN exploitation ON node.expl_id = exploitation.expl_id
+				JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+				JOIN value_state_type vst ON vst.id = node.state_type
 				JOIN sector_table ON sector_table.sector_id = node.sector_id
 				LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
 				LEFT JOIN drainzone_table ON node.omzone_id = drainzone_table.drainzone_id
 				LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
-				LEFT JOIN ud_github.node_add ON node_add.node_id = node.node_id
+				LEFT JOIN node_add ON node_add.node_id = node.node_id
 	), node_base AS (
 		SELECT node_selected.node_id,
 			node_selected.code,
