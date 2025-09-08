@@ -3455,7 +3455,7 @@ def manage_layer_manager(json_result, sql=None):
                     else:
                         group = "GW Layers"
                     style_id = lyr[layer_name]['style_id']
-                    add_layer_database(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                    add_layer_database(layer_name, the_geom, field_id, group=group, style_id=style_id, alias=lyr.get(layer_name).get('alias'))
                 tools_qgis.set_layer_visible(layer)
 
         # force reload dataProvider in order to reindex.
