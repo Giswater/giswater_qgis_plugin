@@ -864,7 +864,7 @@ class GwLoadProject(QObject):
         )
         try:
             config_rows = tools_db.get_rows(sql)
-        except Exception as e:
+        except Exception:
             # The table might not exist in older versions
             return
             
