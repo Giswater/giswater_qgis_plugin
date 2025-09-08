@@ -156,6 +156,15 @@ CREATE TABLE config_form_tabs (
 	CONSTRAINT config_form_tabs_pkey PRIMARY KEY (formname, tabname)
 );
 
+CREATE TABLE cm_form_config (
+    id serial PRIMARY KEY,
+    campaign_ids integer[] NOT NULL,
+    layer_name varchar(255) NOT NULL,
+    field_name varchar(255) NOT NULL,
+    field_order integer,
+    is_hidden boolean DEFAULT false
+);
+
 CREATE TABLE config_param_system (
 	"parameter" varchar(50) NOT NULL,
 	value text NULL,
