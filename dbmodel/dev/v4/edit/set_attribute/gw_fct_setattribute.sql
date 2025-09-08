@@ -65,7 +65,7 @@ BEGIN
 		v_message := (SELECT json_build_object('level', 1, 'text', error_message) FROM sys_message WHERE id = 4352);
 	
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
- 		"data":{"message":"4352", "function":"3514", "fid":"888", "is_process":true}}$$)';
+ 		"data":{"message":"4352", "function":"3514", "fid":"670", "cur_user":"current_user", "is_process":false}}$$)';
 
 	
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"'||v_version||'"'||
@@ -91,7 +91,7 @@ BEGIN
 
 	-- return
 	execute 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"4350", "function":"3514", "fid":"888", "cur_user":"current_user", "parameters":{"v_count":'||v_count||'}}}$$)'; 
+    "data":{"message":"4350", "function":"3514", "fid":"670", "cur_user":"current_user", "is_process":false, "parameters":{"v_count":'||v_count||'}}}$$)'; 
 
    
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"'||v_version||'"'||
