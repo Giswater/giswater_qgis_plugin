@@ -885,3 +885,6 @@ UPDATE config_toolbox SET inputparams='[
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue=''mincut_state'' AND id<>''4'''
 WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='state';
+
+-- 08/09/2025
+UPDATE config_param_system SET value = REPLACE(value, '"MINSECTOR":{"mode":"Random", "column":"name"}', '"MINSECTOR":{"mode":"Random", "column":"minsector_id"}') WHERE parameter='utils_graphanalytics_style';
