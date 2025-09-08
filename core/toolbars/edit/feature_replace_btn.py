@@ -245,10 +245,14 @@ class GwFeatureReplaceButton(GwMaptool):
         else:
             valid_states = [0, 2]
         if feature.attribute('state') in valid_states:
-            state = 'OBSOLETE' if feature.attribute('state') == 0 else 'PLANIFIED'
-            msg = "Current feature has state '{0}'. Therefore it is not replaceable"
-            msg_params = (state,)
-            tools_qt.show_info_box(msg, "Info", msg_params=msg_params)
+            msg_params = None
+            if feature.attribute('state') == 0:
+                msg = "Current feature has state '{0}'. Therefore it is not replaceable"
+                state = 'OBSOLETE'
+                msg_params = (state,)
+            elif feature.attribute('state') == 2:
+                msg = "Current feature is planified. You should activate plan mode to work with it."
+            tools_qt.show_info_box(msg, "Info", msg_params=msg_params if msg_params is not None else None)
             return
 
         if self.project_type == 'ud':
