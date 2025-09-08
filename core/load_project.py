@@ -8,7 +8,8 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils
+from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils, QgsVectorLayer, QgsEditFormConfig, QgsAttributeEditorContainer, \
+                    QgsAttributeEditorField, QgsEditorWidgetSetup
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton
 
@@ -194,6 +195,9 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
+
+        # Apply campaign form configuration
+        self._apply_campaign_form_config()
 
     # region private functions
 
@@ -834,5 +838,93 @@ class GwLoadProject(QObject):
                         break
             except IndexError:
                 pass
+
+    # region Campaign form config
+    
+    def _apply_campaign_form_config(self):
+        """
+        Applies custom form configurations from the cm_form_config table to project layers.
+        """
+        
+        if not tools_db.check_schema('cm'):
+            return
+
+        sql = "SELECT campaign_id FROM cm.selector_campaign WHERE cur_user = current_user LIMIT 1"
+        rows = tools_db.get_rows(sql)
+        campaign_id = rows[0][0] if rows else None
+        
+        if not campaign_id:
+            return
+
+        sql = (
+            "SELECT layer_name, field_name, field_order, is_hidden "
+            "FROM cm.cm_form_config "
+            f"WHERE {campaign_id} = ANY(campaign_ids) "
+            "ORDER BY layer_name, field_order"
+        )
+        try:
+            config_rows = tools_db.get_rows(sql)
+        except Exception as e:
+            # The table might not exist in older versions
+            return
+            
+        if not config_rows:
+            return
+
+        # Group configuration by layer
+        configs_by_layer = {}
+        for layer_name, field_name, field_order, is_hidden in config_rows:
+            configs_by_layer.setdefault(layer_name, []).append(
+                {"field": field_name, "hidden": bool(is_hidden)}
+            )
+
+        for layer_name, cfg_fields in configs_by_layer.items():
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+            if layer and isinstance(layer, QgsVectorLayer):
+                self._configure_layer_form(layer, cfg_fields)
+
+    def _configure_layer_form(self, layer, cfg_fields):
+        """
+        Applies a given form configuration to a single QgsVectorLayer.
+        """
+        
+        # Build order list: configured first, then the rest
+        configured_map = {f["field"]: f for f in cfg_fields}
+        configured_order = [f["field"] for f in cfg_fields]
+        all_fields = [f.name() for f in layer.fields()]
+        final_order = configured_order + [f for f in all_fields if f not in configured_map]
+
+        # Put form in Drag&Drop mode and clear previous layout
+        form_cfg = layer.editFormConfig()
+        form_cfg.setLayout(QgsEditFormConfig.TabLayout)
+        form_cfg.clearTabs()
+
+        # Main container
+        main_tab = QgsAttributeEditorContainer(form_cfg.invisibleRootContainer())
+        main_tab.setName("General")
+
+        for fname in final_order:
+            idx = layer.fields().indexOf(fname)
+            if idx < 0:
+                continue
+
+            # Hidden
+            hidden = fname in configured_map and configured_map[fname]["hidden"]
+            if hidden:
+                # Mark widget as Hidden and don't add it to the container
+                layer.setEditorWidgetSetup(idx, QgsEditorWidgetSetup("Hidden", {}))
+                continue
+            else:
+                # Ensure it's not left Hidden from a previous run
+                current = layer.editorWidgetSetup(idx)
+                if current.type() == "Hidden":
+                    layer.setEditorWidgetSetup(idx, QgsEditorWidgetSetup("", {}))
+
+            # Add visible field to the container in the desired order
+            main_tab.addChildElement(QgsAttributeEditorField(fname, idx, main_tab))
+
+        # Register container and apply
+        form_cfg.addTab(main_tab)
+        layer.setEditFormConfig(form_cfg)
 
     # endregion
