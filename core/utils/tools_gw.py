@@ -883,7 +883,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                 layer.setEditFormConfig(cfg)
 
     # Apply mapzone styling if this is a mapzone layer
-    mapzone_tables = ['presszone', 'dma', 'sector', 'dqa', 'minsector', 've_presszone', 've_dma', 've_sector', 've_dqa', 've_minsector']
+    mapzone_tables = ['presszone', 'dma', 'sector', 'dqa', 'minsector', 've_presszone', 've_dma', 've_sector', 've_dqa', 've_minsector', 've_minsector_mincut']
     if any(mapzone_table in tablename_og.lower() for mapzone_table in mapzone_tables):
         set_style_mapzones(schema_name)
 
