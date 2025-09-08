@@ -590,7 +590,7 @@ class GwSchemaI18NManager:
             column = 'widgetcontrols'
 
         # Get the rows from the original table
-        query = f"SELECT {", ".join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org}"
+        query = f"SELECT {', '.join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org}"
         rows_org = self._get_rows(query, self.cursor_org)
 
         # Set the query message
@@ -614,7 +614,9 @@ class GwSchemaI18NManager:
                         # Get safe text and Construct the query
                         safe_text = text.replace("'", "''")
                         row_to_insert = {}
+                        text_json = json.dumps(row[column]).replace("'", "''")
                         if "config_form_fields" in table_i18n:
+                            # Avoid nested f-string with both single and double quotes
                             row_to_insert = {
                                 "source_code": "'giswater'",
                                 "project_type": f"'{self.project_type}'",
@@ -624,16 +626,17 @@ class GwSchemaI18NManager:
                                 "tabname": f"'{row['tabname']}'",
                                 "source": f"'{row['columnname']}'",
                                 "hint": f"'{key}_{i}'",
-                                "text": f"'{json.dumps(row[column]).replace("'", "''")}'::jsonb",
+                                "text": f"'{text_json}'::jsonb",
                                 "lb_en_us": f"'{safe_text}'"
                             }
                         else:
+
                             row_to_insert = {
                                 "source_code": "'giswater'",
                                 "project_type": f"'{self.project_type}'",
                                 "context": f"'{table_org}'",
                                 "hint": f"'{key}_{i}'",
-                                "text": f"'{json.dumps(row[column]).replace("'", "''")}'::jsonb",
+                                "text": f"'{text_json}'::jsonb",
                                 "source": f"'{row['id']}'",
                                 "lb_en_us": f"'{safe_text}'"
                             }
@@ -664,7 +667,9 @@ class GwSchemaI18NManager:
             if row.get(pk) is None:
                 where_conditions.append(f"{pk} IS NULL")
             else:
-                where_conditions.append(f"{pk_column_i18n[i]} = '{str(row[pk]).replace("'", "''")}'")
+                # Avoid nested f-string with both single and double quotes
+                escaped_value = str(row[pk]).replace("'", "''")
+                where_conditions.append(f"{pk_column_i18n[i]} = '{escaped_value}'")
 
         if hints_to_delete:
             # Make sure hints are properly quoted for SQL
