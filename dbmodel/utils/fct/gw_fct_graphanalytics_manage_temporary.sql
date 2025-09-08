@@ -151,8 +151,8 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut_valve (LIKE SCHEMA_NAME.minsector_mincut_valve INCLUDING ALL);
 
                 -- used for MASSIVE MINCUT
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_mincut (LIKE temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_mincut (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
             IF v_fct_name = 'DMA' AND v_netscenario IS NOT NULL THEN
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN pattern_id varchar(16);

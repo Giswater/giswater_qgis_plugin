@@ -582,6 +582,9 @@ BEGIN
     IF v_execute_massive_mincut THEN
         -- PREPARE tables for Massive Mincut
 
+        -- TODO: instead of using temp_pgr_arc and temp_pgr_node, we need to
+        -- make insert in the tables temp_pgr_arc_mincut and temp_pgr_node_mincut
+
         --ARCS - keep only the new arcs
         DELETE FROM temp_pgr_arc WHERE graph_delimiter = 'NONE';
 
@@ -644,7 +647,9 @@ BEGIN
             UPDATE temp_pgr_node SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_arc SET proposed = FALSE WHERE proposed;
 
-            v_data := '{"data":{"pgrDistance":'||v_pgr_distance||', "pgrRootVids":['||array_to_string(v_pgr_root_vids, ',')||'], "ignoreCheckValvesMincut":'||v_ignore_check_valves||'}}';
+            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":%s, "mode":"MASSIVE"}}',
+            v_pgr_distance, array_to_string(v_pgr_root_vids, ','), v_ignore_check_valves);
+
             RAISE NOTICE 'v_data: %', v_data;
             v_response := gw_fct_mincut_core(v_data);
 
