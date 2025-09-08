@@ -37,7 +37,9 @@ class GwFeatureReplaceButton(GwMaptool):
         self.feature_id = None
         self.actions = actions
         if not self.actions:
-            self.actions = [['ARC', tools_qt.tr('ARC')], ['NODE', tools_qt.tr('NODE')], ['CONNEC', tools_qt.tr('CONNEC')]]
+            self.actions = [['ARC', tools_qt.tr('ARC'), ['operative', 'plan']], ['NODE', tools_qt.tr('NODE'), ['operative']], ['CONNEC', tools_qt.tr('CONNEC'), ['operative']]]
+        if global_vars.project_type in ('UD', 'ud'):
+            self.actions.append(['GULLY', tools_qt.tr('GULLY'), ['operative']])
         self.list_tables = list_tables
         if not self.list_tables:
             self.list_tables = ['ve_arc', 've_node', 've_connec', 've_gully']
@@ -53,6 +55,9 @@ class GwFeatureReplaceButton(GwMaptool):
         if toolbar is not None:
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
+
+        # Connect menu aboutToShow signal to update menu
+        self.menu.aboutToShow.connect(self._fill_action_menu)
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
@@ -155,10 +160,11 @@ class GwFeatureReplaceButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        if global_vars.project_type in ('UD', 'ud'):
-            self.actions.append(['GULLY', tools_qt.tr('GULLY')])
+        current_mode = 'plan' if global_vars.psignals and global_vars.psignals['psector_active'] else 'operative'
 
-        for action_id, action_name in self.actions:
+        for action_id, action_name, action_modes in self.actions:
+            if current_mode not in action_modes:
+                continue
             obj_action = QAction(f"{action_name}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(super().clicked_event))
@@ -227,7 +233,18 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
         # Avoid to replace obsolete or planified features
-        if feature.attribute('state') in (0, 2):
+        valid_states = [0]
+        if global_vars.psignals['psector_active'] and feature.attribute('state') == 2:
+            node_psector_id = self._get_feature_psector_id(self.feature_id, self.feature_type)
+            if node_psector_id is not None and node_psector_id != global_vars.psignals['psector_id']:
+                msg = "The selected feature is planified in another psector.\nFeature psector: {0}\nCurrent psector: {1}"
+                title = "Feature replace"
+                msg_params = (node_psector_id, global_vars.psignals['psector_id'],)
+                tools_qt.show_info_box(msg, title=title, msg_params=msg_params)
+                return
+        else:
+            valid_states = [0, 2]
+        if feature.attribute('state') in valid_states:
             state = 'OBSOLETE' if feature.attribute('state') == 0 else 'PLANIFIED'
             msg = "Current feature has state '{0}'. Therefore it is not replaceable"
             msg_params = (state,)
@@ -523,5 +540,24 @@ class GwFeatureReplaceButton(GwMaptool):
         else:
             self.dlg_replace.lbl_description.setVisible(False)
             self.dlg_replace.description.setVisible(False)
+
+    def _get_feature_psector_id(self, feature_id, feature_type):
+        """ Get psector_id from a feature """
+
+        table_name = f"plan_psector_x_{feature_type}"
+        sql = f"""
+            SELECT psector_id 
+            FROM {table_name} 
+            WHERE {feature_type}_id = '{feature_id}' 
+            AND state = 1  -- operative feature
+            AND psector_id IN (
+                SELECT psector_id 
+                FROM selector_psector 
+                WHERE cur_user = current_user
+            )
+        """
+
+        row = tools_db.get_row(sql)
+        return row[0] if row else None
 
     # endregion
