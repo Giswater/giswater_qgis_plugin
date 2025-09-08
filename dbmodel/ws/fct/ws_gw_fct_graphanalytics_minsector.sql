@@ -582,31 +582,14 @@ BEGIN
     IF v_execute_massive_mincut THEN
         -- PREPARE tables for Massive Mincut
 
-        -- TODO: instead of using temp_pgr_arc and temp_pgr_node, we need to
-        -- make insert in the tables temp_pgr_arc_mincut and temp_pgr_node_mincut
-
         --ARCS - keep only the new arcs
-        -- DELETE FROM temp_pgr_arc WHERE graph_delimiter = 'NONE';
+        
+        -- arcs that connect nodes with graph_delimiter = 'SECTOR'
         INSERT INTO temp_pgr_arc_mincut 
         SELECT * FROM temp_pgr_arc
-        WHERE graph_delimiter <> 'NONE';
+        WHERE graph_delimiter = 'SECTOR';
 
-        -- ARCS-VALVE (MINSECTOR)
-        -- delete the valves that are not minsector borders
-        DELETE FROM temp_pgr_arc_mincut
-        WHERE graph_delimiter = 'MINSECTOR'
-        AND NOT EXISTS (
-            SELECT 1 FROM temp_pgr_minsector_graph g
-            WHERE g.node_id = COALESCE (a.node_1 , a.node_2)
-        );
-
-        -- change pgr_node_1 and pgr_node_2 for their minsector value
-        UPDATE temp_pgr_arc_mincut a
-        SET pgr_node_1 = g.minsector_1, pgr_node_2 = g.minsector_2
-        FROM temp_pgr_minsector_graph g
-        WHERE g.node_id = COALESCE (a.node_1 , a.node_2);
-
-        -- ARCS-SECTOR
+        -- change pgr_node_1 and pgr_node_2 for their minsector value and if not exists (nodes SECTORS) for their original node_id
         UPDATE temp_pgr_arc_mincut a
         SET pgr_node_1 = COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
         FROM temp_pgr_node n
@@ -621,21 +604,33 @@ BEGIN
         AND n.graph_delimiter = 'SECTOR'
         AND n.pgr_node_id = a.pgr_node_2;
 
-        -- NODES - keep only the nodes-SECTOR that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
-        -- DELETE FROM temp_pgr_node tpn
-        -- WHERE graph_delimiter <> 'SECTOR' OR mapzone_id > 0;
-        INSERT INTO temp_pgr_node_mincut (pgr_node_id, node_id, old_node_id, mapzone_id, old_mapzone_id, fluid_type, modif, graph_delimiter)
-        SELECT node_id, node_id, old_node_id, mapzone_id, old_mapzone_id, fluid_type, modif, graph_delimiter 
-        FROM temp_pgr_node
-        WHERE graph_delimiter = 'SECTOR' OR mapzone_id <= 0;
+        -- ARCS-VALVE (MINSECTOR)
+        -- only the valves that are minsector borders
+        INSERT INTO temp_pgr_arc_mincut 
+        SELECT * FROM temp_pgr_arc
+        WHERE graph_delimiter = 'MINSECTOR'
+        AND EXISTS (
+            SELECT 1 FROM temp_pgr_minsector_graph g
+            WHERE g.node_id = COALESCE (a.node_1 , a.node_2)
+        );
 
-        -- update mapzone_id with the node_id
-        --UPDATE temp_pgr_node_mincut SET pgr_node_id = node_id;
+        -- change pgr_node_1 and pgr_node_2 for their minsector value
+        UPDATE temp_pgr_arc_mincut a
+        SET pgr_node_1 = g.minsector_1, pgr_node_2 = g.minsector_2
+        FROM temp_pgr_minsector_graph g
+        WHERE g.node_id = COALESCE (a.node_1 , a.node_2);
 
+        -- NODES
         -- insert the MINSECTORS as nodes
         INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
         SELECT minsector_id, 0, 'MINSECTOR'
         FROM temp_pgr_minsector m;
+    
+    -- insert the SECTORS nodes that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
+        INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
+        SELECT n.node_id, 0, 'SECTOR'
+        FROM temp_pgr_node n
+        WHERE n.graph_delimiter = 'SECTOR' AND n.node_id is not NULL;
 
         -- FINISH preparing
 
