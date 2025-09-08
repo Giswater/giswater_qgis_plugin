@@ -4,6 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3514, 'gw_fct_setattribute', 'utils', 'function', 'json', 'json', 'Updates the attributes chosen for the selected arcs. 
+
+WARNING: It only takes into account the selected features (Selected features only).', 'role_edit', NULL, 'core', NULL);
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4350, '%v_count% rows updated.', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
