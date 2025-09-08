@@ -1,0 +1,4 @@
+4.3.0
+*************
+- Add help_domain parameter to config_param_system for custom documentation domain
+- feature: revamped psectors strategy for better manageability, enhanced topology, and improved ve_* views
