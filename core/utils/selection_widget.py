@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 import os
 from functools import partial
-from typing import Any, Callable  # Literal, Dict, Optional,
+from typing import Any, Callable, Union  # Literal, Dict, Optional,
 
 from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
 from qgis.core import QgsExpression
@@ -146,7 +146,7 @@ class GwSelectionWidget(QWidget):
         tools_gw.selection_init(class_object, dialog, table_object, self.selection_mode, tool_type)
 
     def init_selection_btn(self, class_object: Any, dialog: QDialog, table_object: str, used_tools: list[str],
-                        callback: Callable[[], bool] | None = None, callback_later: Callable = None):
+                        callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
         """
         Create snapping button with menu (split button behavior).
         
@@ -477,7 +477,7 @@ class GwSelectionWidget(QWidget):
     # region expression selection
 
     def init_expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
-                                   callback: Callable[[], bool] | None = None, callback_later: Callable = None):
+                                   callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
         """
         Initialize expression selection functionality.
         
@@ -498,7 +498,7 @@ class GwSelectionWidget(QWidget):
         self.lyt_selection.addWidget(self.btn_expression)
 
     def expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
-                             callback: Callable[[], bool] | None = None, callback_later: Callable = None):
+                             callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
         """
         Select features by expression.
         

@@ -13,7 +13,7 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal, Dict, Optional, Any, Callable
+from typing import Literal, Dict, Optional, Any, Callable, Union
 import webbrowser
 import xml.etree.ElementTree as ET
 from sip import isdeleted
@@ -1584,7 +1584,7 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
         tools_qt.set_widget_text(dialog, btn_accept, msg)
 
 
-def set_style_mapzones(schema_name: str | None = None) -> bool:
+def set_style_mapzones(schema_name: Union[str, None] = None) -> bool:
     """ Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function """
 
     extras = '"mapzones":""'
@@ -3584,8 +3584,8 @@ def update_default_action(dialog, action):
 
 
 def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT,
-                      callback: Callable[[], bool] | None = None, callback_kwargs: dict[str, Any] | None = None,
-                      callback_later: Callable = None, callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
+                      callback: Union[Callable[[], bool], None] = None, callback_kwargs: Union[dict[str, Any], None] = None,
+                      callback_later: Callable = None, callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
     """Create snapping button with menu (split button behavior)"""
 
     def handle_action(tool_type):
@@ -3653,7 +3653,7 @@ def get_expected_table_name(class_object, table_object, selection_mode):
     return expected_table_name
 
 
-def highlight_in_table_changed(callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
+def highlight_in_table_changed(callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
     class_object, dialog, expected_table_name = callback_values()
     highlight_features_in_table(class_object, dialog, expected_table_name)
 
