@@ -137,10 +137,16 @@ def _load_result_layers():
     sql = f"SELECT id, alias FROM sys_table WHERE {filtre} AND alias IS NOT NULL"
     rows = tools_db.get_rows(sql)
     if rows:
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
                 pk = "id"
+                for field in json_result['body']['data']['fields']:
+                    if field['tableName'] == tablename:
+                        pk = field['tableId']
+                        break
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
 
 
@@ -163,6 +169,7 @@ def _load_compare_layers():
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
+                pk = "id"
                 for field in json_result['body']['data']['fields']:
                     if field['tableName'] == tablename:
                         pk = field['tableId']
