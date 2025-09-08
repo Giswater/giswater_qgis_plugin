@@ -4882,7 +4882,16 @@ def manage_current_psector_docker(psector_name=None):
 
 
 def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None, do_call_fct: bool = True, force_change: bool = False):
-    """ Set psector mode enabled """
+    """
+    Set psector mode enabled/disabled and update UI elements accordingly.
+
+    Args:
+        enable (Optional[bool]): If True, enables psector mode. If False, disables it.
+            If None, toggles current state.
+        psector_id (Optional[int]): ID of psector to set. If None, uses psector from cmb_psector_id.
+        do_call_fct (bool): If True, calls gw_fct_set_toggle_current procedure. Should be False if it was already called.
+        force_change (bool): If True, forces UI update. Useful when called from another function.
+    """
 
     # Manage play/pause button
     psignals_widgets = global_vars.psignals['widgets']
