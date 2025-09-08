@@ -100,6 +100,7 @@ class GwProjectCheckButton(GwAction):
 
         # Set listeners
         self.dialog.btn_accept.clicked.connect(self._on_accept_clicked)
+        self.dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dialog))
         self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
         # Open the dialog

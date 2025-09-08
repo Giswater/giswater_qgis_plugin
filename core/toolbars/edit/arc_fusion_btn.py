@@ -122,10 +122,10 @@ class GwArcFusionButton(GwMaptool):
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
         if snapped_feat:
+
             self.node_id = snapped_feat.attribute('node_id')
             self.node_state = snapped_feat.attribute('state')
             self.psector_id = None
-
             # If the node has state 0 (obsolete) don't open arc fusion dlg
             if self.node_state is not None and self.node_state == 0:
                 msg = "The node is obsolete, this tool doesn't work with obsolete nodes."
@@ -163,24 +163,34 @@ class GwArcFusionButton(GwMaptool):
         current_date = QDate.currentDate()
         tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
+        valid_states = [0]
         # If the node has state 2 (planified) only allow remove node
-        if self.node_state is not None and self.node_state == 2:
-            sql = f"SELECT psector_id FROM v_plan_psector_node WHERE node_id = '{self.node_id}'"
-            row = tools_db.get_row(sql)
-            if row:
-                node_psector_id = row[0]
-                if global_vars.psignals['psector_active']:
-                    current_psector_id = global_vars.psignals['psector_id']
-                    if node_psector_id != current_psector_id:
-                        msg = f"The selected node is planified in another psector.\nNode psector: {0}\nCurrent psector: {1}"
-                        title = "Arc fusion"
-                        msg_params = (node_psector_id, current_psector_id,)
-                        tools_qt.show_info_box(msg, title=title, msg_params=msg_params)
-                        return
-                self.psector_id = node_psector_id
+        if self.node_state is not None and self.node_state == 2 and global_vars.psignals['psector_active']:
+            node_psector_id = self._get_feature_psector_id(self.node_id, 'node')
+            current_psector_id = global_vars.psignals['psector_id']
+            if node_psector_id != current_psector_id:
+                msg = f"The selected node is planified in another psector.\nNode psector: {0}\nCurrent psector: {1}"
+                title = "Arc fusion"
+                msg_params = (node_psector_id, current_psector_id,)
+                tools_qt.show_info_box(msg, title=title, msg_params=msg_params)
+                return
+            self.psector_id = node_psector_id
             self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
             self.dlg_fusion.cmb_nodeaction.setEnabled(False)
             tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
+        else:
+            valid_states = [0, 2]
+        if self.node_state in valid_states:
+            msg_params = None
+            if self.node_state == 0:
+                msg = "Current feature has state '{0}'. Therefore it is not fusionable"
+                state = 'OBSOLETE'
+                msg_params = (state,)
+            elif self.node_state == 2:
+                msg = "Current feature is planified. You should activate plan mode to work with it."
+            tools_qt.show_info_box(msg, "Info", msg_params=msg_params if msg_params is not None else None)
+            return
+
         # Disable some widgets
         if self.dlg_fusion.cmb_nodeaction.currentIndex() != 1:
             self.dlg_fusion.enddate.setEnabled(False)
@@ -190,6 +200,9 @@ class GwArcFusionButton(GwMaptool):
         # Build catalog widgets
         if not self._build_catalog_widgets():
             return
+
+        # Manage plan widgets
+        self._manage_plan_widgets()
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_fusion)
@@ -212,14 +225,14 @@ class GwArcFusionButton(GwMaptool):
         tools_qt.set_autocompleter(self.dlg_fusion.cmb_new_cat)
 
         # Get linked arcs to the selected node
-        sql = f"SELECT arc_id, arccat_id FROM arc WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}"
+        sql = f"SELECT arc_id, arccat_id FROM ve_arc WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}"
         rows = tools_db.get_rows(sql)
-        if rows and len(rows) != 2:
-            msg = "The selected node should have two valid linked arcs."
+        if not rows or len(rows) != 2:
+            msg = "The selected node should have exactly two linked arcs."
             title = "Arc fusion"
             tools_qt.show_info_box(msg, title=title)
             return False
-        elif rows:
+        else:
             tools_qt.set_widget_text(self.dlg_fusion, "txt_arc1cat", rows[0][1])
             tools_qt.set_widget_text(self.dlg_fusion, "txt_arc2cat", rows[1][1])
         return True
@@ -235,6 +248,19 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.workcat_id_end.setEnabled(False)
             self.dlg_fusion.cmb_statetype.setEnabled(False)
 
+    def _manage_plan_widgets(self):
+        """ Manage plan widgets """
+
+        if global_vars.psignals and global_vars.psignals['psector_active']:
+            self.dlg_fusion.lbl_nodeaction.setVisible(False)
+            self.dlg_fusion.cmb_nodeaction.setVisible(False)
+            self.dlg_fusion.lbl_enddate.setVisible(False)
+            self.dlg_fusion.enddate.setVisible(False)
+            self.dlg_fusion.lbl_workcat_id_end.setVisible(False)
+            self.dlg_fusion.workcat_id_end.setVisible(False)
+            self.dlg_fusion.lbl_statetype.setVisible(False)
+            self.dlg_fusion.cmb_statetype.setVisible(False)
+
     def _save_dlg_values(self):
 
         # Save combo 'Node action'
@@ -246,5 +272,24 @@ class GwArcFusionButton(GwMaptool):
         state_type = tools_qt.get_text(self.dlg_fusion, "cmb_statetype")
         if state_type:
             tools_gw.set_config_parser("btn_arc_fusion", "cmb_statetype", state_type)
+
+    def _get_feature_psector_id(self, feature_id, feature_type):
+        """ Get psector_id from a feature """
+
+        table_name = f"plan_psector_x_{feature_type}"
+        sql = f"""
+            SELECT psector_id 
+            FROM {table_name} 
+            WHERE {feature_type}_id = '{feature_id}' 
+            AND state = 1  -- operative feature
+            AND psector_id IN (
+                SELECT psector_id 
+                FROM selector_psector 
+                WHERE cur_user = current_user
+            )
+        """
+
+        row = tools_db.get_row(sql)
+        return row[0] if row else None
 
     # endregion
