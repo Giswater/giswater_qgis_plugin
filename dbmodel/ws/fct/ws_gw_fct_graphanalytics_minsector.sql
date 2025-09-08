@@ -670,6 +670,8 @@ BEGIN
 
     END IF;
 
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4354", "function":"2706", "fid":"'||v_fid||'", "is_process":true, "tempTable":"temp_"}}$$)';
+
     -- Info
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (
@@ -688,6 +690,8 @@ BEGIN
 
 	-- Restore original disable lock level
     UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
+
+    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4354", "function":"2706", "fid":"'||v_fid||'", "is_process":true, "tempTable":"temp_"}}$$)';
 
     -- Return
     RETURN gw_fct_json_create_return(

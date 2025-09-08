@@ -889,3 +889,6 @@ WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='state
 -- 08/09/2025
 UPDATE config_param_system SET value = REPLACE(value, '"MINSECTOR":{"mode":"Random", "column":"name"}', '"MINSECTOR":{"mode":"Random", "column":"minsector_id"}') WHERE parameter='utils_graphanalytics_style';
 UPDATE config_param_system SET value = (value::jsonb || '{"MINSECTOR_MINCUT":{"mode":"Random", "column":"minsector_id"}}'::jsonb)::TEXT WHERE "parameter" = 'utils_graphanalytics_style';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4354, 'Minsector dynamic analysis done successfully', null, 0, true, 'ws', 'core', 'AUDIT');
