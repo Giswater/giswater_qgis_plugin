@@ -603,7 +603,7 @@ BEGIN
 
 		EXECUTE 'SET search_path = '||v_schemaname||', public';
 								
-		IF v_sectorisexplismuni IS FALSE THEN
+		IF v_sectorisexplismuni IS NOT TRUE THEN
 
 			-- macroexpl
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
@@ -634,6 +634,15 @@ BEGIN
 			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN 
 		    (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 		END IF;
+	END IF;
+
+	-- change current psector if selector_expl changes
+	v_expl = (SELECT expl_id FROM plan_psector JOIN
+            (SELECT value FROM config_param_user where parameter ='plan_psector_current' and cur_user = current_user) a ON value::integer = psector_id
+            WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+
+	IF v_expl IS NULL THEN
+		UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = CURRENT_USER();
 	END IF;
 
 	-- cross reference schema for state 
