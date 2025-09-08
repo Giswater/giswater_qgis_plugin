@@ -154,3 +154,7 @@ update plan_psector set active = true;
 update element set code = element_id;
 
 UPDATE config_form_fields SET "label"='Price pattern:',tooltip='Price pattern' WHERE formname='ve_epa_virtualpump' AND formtype='form_feature' AND columnname='energy_pattern_id' AND tabname='tab_epa';
+
+-- 08/09/2025
+UPDATE config_form_fields SET hidden=true WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='setting_max' AND tabname='tab_epa';
+UPDATE config_form_fields SET hidden=true WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='setting_min' AND tabname='tab_epa';
