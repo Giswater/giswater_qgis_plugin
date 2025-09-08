@@ -289,7 +289,8 @@ AS WITH
 			date_trunc('second'::text, arc.updated_at) AS updated_at,
 			arc.updated_by,
 			arc.the_geom,
-			arc.meandering
+			arc.meandering,
+			arc_psector.p_state
 			FROM arc_selector
 				JOIN arc USING (arc_id)
 				JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
@@ -302,6 +303,7 @@ AS WITH
 				LEFT JOIN drainzone_table ON arc.omzone_id = drainzone_table.drainzone_id
 				LEFT JOIN dwfzone_table ON arc.dwfzone_id = dwfzone_table.dwfzone_id
 				LEFT JOIN arc_add ON arc_add.arc_id = arc.arc_id
+				LEFT JOIN arc_psector ON arc_psector.arc_id = arc.arc_id
 	)
 SELECT
 	arc_id,
@@ -440,7 +442,8 @@ SELECT
 	updated_at,
 	updated_by,
 	the_geom,
-	meandering
+	meandering,
+	p_state
 FROM arc_selected;
 
 CREATE OR REPLACE VIEW ve_node
@@ -670,7 +673,8 @@ AS WITH
 			node.created_by,
 			date_trunc('second'::text, node.updated_at) AS updated_at,
 			node.updated_by,
-			node.the_geom
+			node.the_geom,
+			node_psector.p_state
 			FROM node_selector
 				JOIN node USING (node_id)
 				JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
@@ -683,6 +687,7 @@ AS WITH
 				LEFT JOIN drainzone_table ON node.omzone_id = drainzone_table.drainzone_id
 				LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
 				LEFT JOIN node_add ON node_add.node_id = node.node_id
+				LEFT JOIN node_psector ON node_psector.node_id = node.node_id
 	), node_base AS (
 		SELECT node_selected.node_id,
 			node_selected.code,
@@ -804,7 +809,8 @@ AS WITH
 			node_selected.created_by,
 			node_selected.updated_at,
 			node_selected.updated_by,
-			node_selected.the_geom
+			node_selected.the_geom,
+			node_selected.p_state
 			FROM node_selected
 	)
 SELECT
@@ -922,7 +928,8 @@ SELECT
 	created_by,
 	updated_at,
 	updated_by,
-	the_geom
+	the_geom,
+	p_state
 FROM node_base;
 
 CREATE OR REPLACE VIEW ve_connec
@@ -1200,7 +1207,8 @@ AS WITH
 			date_trunc('second'::text, connec.updated_at) AS updated_at,
 			connec.updated_by,
 			connec.the_geom,
-			connec.diagonal
+			connec.diagonal,
+			connec_psector.p_state
 		FROM connec_selector
 		JOIN connec USING (connec_id)
 		JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
@@ -1213,6 +1221,7 @@ AS WITH
 		LEFT JOIN drainzone_table ON connec.omzone_id = drainzone_table.drainzone_id
 		LEFT JOIN dwfzone_table ON connec.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN link_planned USING (link_id)
+		LEFT JOIN connec_psector ON connec_psector.connec_id = connec.connec_id
 	)
 SELECT 
 	connec_id,
@@ -1321,7 +1330,8 @@ SELECT
 	updated_at,
 	updated_by,
 	the_geom,
-	diagonal
+	diagonal,
+	p_state
 FROM connec_selected;
 
 CREATE OR REPLACE VIEW ve_gully
@@ -1630,7 +1640,8 @@ AS WITH
 			gully.created_by,
 			date_trunc('second'::text, gully.updated_at) AS updated_at,
 			gully.updated_by,
-			gully.the_geom
+			gully.the_geom,
+			gully_psector.p_state
 		FROM gully_selector
 		JOIN gully USING (gully_id)
 		JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
@@ -1645,6 +1656,7 @@ AS WITH
 		LEFT JOIN dwfzone_table ON gully.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN link_planned ON gully.gully_id = link_planned.feature_id
 		LEFT JOIN inp_network_mode ON true
+		LEFT JOIN gully_psector ON gully_psector.gully_id = gully.gully_id
 	)
 SELECT 
 	gully_id,
@@ -1758,7 +1770,8 @@ SELECT
 	created_by,
 	updated_at,
 	updated_by,
-	the_geom
+	the_geom,
+	p_state
 FROM gully_selected;
 
 CREATE OR REPLACE VIEW ve_link
@@ -1951,7 +1964,8 @@ AS WITH
 			l.created_by,
 			date_trunc('second'::text, l.updated_at) AS updated_at,
 			l.updated_by,
-			l.the_geom
+			l.the_geom,
+			psector_link.p_state
 		FROM link_selector
 		JOIN link l USING (link_id)
 		JOIN exploitation ON l.expl_id = exploitation.expl_id
@@ -1963,6 +1977,7 @@ AS WITH
 		LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 		LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN inp_network_mode ON true
+		LEFT JOIN psector_link ON psector_link.link_id = link.link_id
 	)
 SELECT link_id,
 	code,
@@ -2031,5 +2046,6 @@ SELECT link_id,
 	created_by,
 	updated_at,
 	updated_by,
-	the_geom
+	the_geom,
+	p_state
 FROM link_selected;

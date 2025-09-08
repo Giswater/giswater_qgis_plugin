@@ -461,7 +461,8 @@ AS WITH
       arc.created_by,
       date_trunc('second'::text, arc.updated_at) AS updated_at,
       arc.updated_by,
-      arc.the_geom
+      arc.the_geom,
+      arc_psector.p_state
     FROM arc_selector
     JOIN arc ON arc.arc_id = arc_selector.arc_id
     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
@@ -476,6 +477,7 @@ AS WITH
     LEFT JOIN omzone_table ON omzone_table.omzone_id = arc.omzone_id
     LEFT JOIN arc_add ON arc_add.arc_id = arc.arc_id
     LEFT JOIN value_state_type vst ON vst.id = arc.state_type
+    LEFT JOIN arc_psector on arc_psector.arc_id = arc.arc_id
   )
 SELECT 
   arc_id,
@@ -503,7 +505,6 @@ SELECT
   epa_type,
   state,
   state_type,
-  --p_state,
   parent_id,
   expl_id,
   macroexpl_id,
@@ -605,7 +606,8 @@ SELECT
   created_by,
   updated_at,
   updated_by,
-  the_geom
+  the_geom,
+  p_state
 FROM arc_selected;
 
 CREATE OR REPLACE VIEW ve_node
@@ -860,7 +862,8 @@ AS WITH
       node.created_by,
       date_trunc('second'::text, node.updated_at) AS updated_at,
       node.updated_by,
-      node.the_geom
+      node.the_geom,
+      node_psector.p_state
     FROM node_selector
     JOIN node ON node.node_id = node_selector.node_id
     JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
@@ -876,6 +879,7 @@ AS WITH
     LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
     LEFT JOIN node_add ON node_add.node_id = node.node_id
     LEFT JOIN man_valve m ON m.node_id = node.node_id
+    LEFT JOIN node_psector ON node_psector.node_id = node.node_id
   )
 SELECT 
   node_id,
@@ -895,7 +899,6 @@ SELECT
   epa_type,
   state,
   state_type,
---p_state,
   arc_id,
   parent_id,
   expl_id,
@@ -1004,7 +1007,8 @@ SELECT
   created_by,
   updated_at,
   updated_by,
-  the_geom
+  the_geom,
+  p_state
 FROM node_selected n;
 
 CREATE OR REPLACE VIEW ve_connec
@@ -1376,7 +1380,8 @@ AS WITH
       connec.created_by,
       date_trunc('second'::text, connec.updated_at) AS updated_at,
       connec.updated_by,
-      connec.the_geom
+      connec.the_geom,
+      connec_psector.p_state
     FROM connec_selector
     JOIN connec ON connec.connec_id = connec_selector.connec_id
     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
@@ -1394,6 +1399,7 @@ AS WITH
     LEFT JOIN connec_add ON connec_add.connec_id = connec.connec_id
     LEFT JOIN value_state_type vst ON vst.id = connec.state_type
     LEFT JOIN inp_network_mode ON true
+    LEFT JOIN connec_psector ON connec_psector.connec_id = connec.connec_id
   )
 SELECT 
   connec_id,
@@ -1529,7 +1535,8 @@ SELECT
   created_by,
   updated_at,
   updated_by,
-  the_geom
+  the_geom,
+  p_state
 FROM connec_selected c;
 
 CREATE OR REPLACE VIEW ve_link
@@ -1733,7 +1740,8 @@ AS WITH
       l_1.created_by,
       l_1.updated_at,
       l_1.updated_by,
-      l_1.the_geom
+      l_1.the_geom,
+      link_psector.p_state
     FROM link_selector
     JOIN link l_1 ON l_1.link_id = link_selector.link_id
     LEFT JOIN connec c ON c.connec_id = l_1.feature_id
@@ -1747,6 +1755,7 @@ AS WITH
     LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l_1.supplyzone_id
     LEFT JOIN omzone_table ON omzone_table.omzone_id = l_1.omzone_id
     LEFT JOIN inp_network_mode ON true
+    LEFT JOIN link_psector ON link_psector.p_state = l_1.link_id
   )
 SELECT 
   link_id,
@@ -1819,6 +1828,7 @@ SELECT
   created_by,
   updated_at,
   updated_by,
-  the_geom
+  the_geom,
+  p_state
 FROM link_selected l;
 
