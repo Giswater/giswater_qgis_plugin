@@ -19,7 +19,7 @@ try:
     import wntr
     from wntr.network import WaterNetworkModel, Link, LinkStatus
     from wntr.sim import EpanetSimulator
-    from wntr.metrics.hydraulics import average_expected_demand
+    from wntr.metrics.hydraulic import average_expected_demand
 except ImportError:
     wntr = None
     WaterNetworkModel = None

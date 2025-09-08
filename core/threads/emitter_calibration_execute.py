@@ -18,11 +18,11 @@ from ...libs import tools_log
 
 try:
     import wntr
-    from wntr.network import WaterNetworkModel
+    from wntr.network import write_inpfile
     from wntr.sim import EpanetSimulator
 except ImportError:
     wntr = None
-    WaterNetworkModel = None
+    write_inpfile = None
     EpanetSimulator = None
 
 
@@ -493,7 +493,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 network_junctions["0"].append(v["node_id"])
 
     def _export_network(self):
-        WaterNetworkModel.write_inpfile(
+        write_inpfile(
             self.network, Path(self.output_folder) / f"{self.file_name}.inp"
         )
 

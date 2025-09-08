@@ -20,7 +20,7 @@ from ..utils import tools_gw
 try:
     import wntr
     from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
-    from wntr.network import WaterNetworkModel, LinkStatus
+    from wntr.network import write_inpfile, LinkStatus, WaterNetworkModel
     from wntr.sim import EpanetSimulator
 except ImportError:
     wntr = None
@@ -28,6 +28,7 @@ except ImportError:
     to_si = None
     FlowUnits = None
     HydParam = None
+    write_inpfile = None
     WaterNetworkModel = None
     LinkStatus = None
     EpanetSimulator = None
@@ -69,7 +70,7 @@ class GwStaticCalibration(GwTask):
 
             self.status.emit({"message": "Saving output files...", "step": "last"})
             inp_file = f"{self.output_folder}/{self.file_name}.inp"
-            WaterNetworkModel.write_inpfile(static_calibration.calibrated_network, inp_file)
+            write_inpfile(static_calibration.calibrated_network, inp_file)
             csv_file = f"{self.output_folder}/{self.file_name}.csv"
             report = static_calibration.report()
             static_calibration.write_csv_report(csv_file, report_obj=report)

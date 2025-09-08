@@ -21,11 +21,12 @@ from ...resources.epatools.utils import anl_quantized_demands
 
 try:
     import wntr
-    from wntr.network import WaterNetworkModel
+    from wntr.network import write_inpfile, WaterNetworkModel
     from wntr.sim import EpanetSimulator
     from wntr.metrics import expected_demand
 except ImportError:
     wntr = None
+    write_inpfile = None
     WaterNetworkModel = None
     EpanetSimulator = None
 
@@ -71,7 +72,7 @@ class GwQuantizedDemands(GwTask):
                 self.ended.emit("Task canceled.")
                 return False
             self.status.emit("Saving INP file...")
-            WaterNetworkModel.write_inpfile(model.quantized_network, inppath)
+            write_inpfile(model.quantized_network, inppath)
             msg += f"\n\nINP file created on:\n{inppath}"
 
             csvpath = Path(self.output_folder) / f"{self.file_name}.csv"
