@@ -69,9 +69,10 @@ BEGIN
 					''geom_field'', '''||v_geom_field||''',
 					''pkey_field'', '''||v_pkey_field||''',
 					''style_id'', style, 
-					''group_layer'', group_layer
+					''group_layer'', group_layer,
+					''alias'', alias
 					) AS feature
-					FROM (SELECT style, group_layer from sys_table 
+					FROM (SELECT style, group_layer, alias from sys_table 
 						LEFT JOIN config_table USING (id)
 						WHERE id = '''||v_rec||'''
 					) row) a;'
