@@ -200,6 +200,7 @@ BEGIN
         -- close the valves (not the border checkvalves) for the zones with water and without checkvalves
         UPDATE temp_pgr_arc a SET proposed = TRUE
         WHERE a.graph_delimiter = 'MINSECTOR'
+        AND a.mapzone_id = 1
         AND closed = FALSE and to_arc IS NULL
         AND (a.pgr_node_1 = ANY (v_valve_water) OR a.pgr_node_2 = ANY (v_valve_water))
         AND a.pgr_node_1 <> ALL (v_valve_chk) AND a.pgr_node_2 <> ALL (v_valve_chk);
