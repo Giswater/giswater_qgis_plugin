@@ -64,3 +64,8 @@ UPDATE config_form_fields SET iseditable = false where formname ilike 've_link_%
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_gully_%' and columnname = 'state';
 
 INSERT INTO config_style (id, idval, descript, sys_role, addparam, is_templayer, active) VALUES(110, 'GwPlan', NULL, NULL, NULL, false, true);
+
+-- 08/09/2025
+UPDATE config_form_fields
+	SET iseditable=false
+	WHERE formname='generic' AND formtype='check_project' AND columnname='txt_infolog' AND tabname='tab_log';
