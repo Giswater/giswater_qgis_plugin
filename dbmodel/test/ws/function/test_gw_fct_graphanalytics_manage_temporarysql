@@ -234,13 +234,13 @@ SELECT ok(
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_node_minsector' AND table_type = 'LOCAL TEMPORARY';),
-    'Check if temp_pgr_node_minsector table exists after CREATE'
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_node_mincut' AND table_type = 'LOCAL TEMPORARY';),
+    'Check if temp_pgr_node_mincut table exists after CREATE'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc_minsector' AND table_type = 'LOCAL TEMPORARY';),
-    'Check if temp_pgr_arc_minsector table exists after CREATE'
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc_mincut' AND table_type = 'LOCAL TEMPORARY';),
+    'Check if temp_pgr_arc_mincut table exists after CREATE'
 );
 
 -- Check if extra temporary views exist after CREATE
@@ -282,13 +282,13 @@ SELECT ok(
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_node_minsector' AND table_type = 'LOCAL TEMPORARY';),
-    'Check if temp_pgr_node_minsector table does not exist after DROP'
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_node_mincut' AND table_type = 'LOCAL TEMPORARY';),
+    'Check if temp_pgr_node_mincut table does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc_minsector' AND table_type = 'LOCAL TEMPORARY';),
-    'Check if temp_pgr_arc_minsector table does not exist after DROP'
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc_mincut' AND table_type = 'LOCAL TEMPORARY';),
+    'Check if temp_pgr_arc_mincut table does not exist after DROP'
 );
 
 -- Check if extra temporary views exist after DROP

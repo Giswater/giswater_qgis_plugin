@@ -937,8 +937,8 @@ BEGIN
 
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
-        DROP TABLE IF EXISTS temp_pgr_node_minsector;
-        DROP TABLE IF EXISTS temp_pgr_arc_minsector;
+        DROP TABLE IF EXISTS temp_pgr_node_mincut;
+        DROP TABLE IF EXISTS temp_pgr_arc_mincut;
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_audit_check_data;
