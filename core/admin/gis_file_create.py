@@ -124,6 +124,9 @@ class GwGisFileCreate:
             if isinstance(group, QgsLayerTreeGroup):
                 group.setExpanded(False)
 
+        # Set default project snapping settings
+        tools_qgis.set_project_snapping_settings()
+
         # Set camera position on ve_node
         global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))
 
