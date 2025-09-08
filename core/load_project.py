@@ -563,26 +563,17 @@ class GwLoadProject(QObject):
         tools_gw.add_icon(self.playpause_button, "73", f"toolbars{os.sep}status")
         self.playpause_button.setProperty('psector_active', False)
         self.playpause_button.clicked.connect(self._playpause_btn_clicked)
-        statusbar.addWidget(self.playpause_button)
+        statusbar.insertPermanentWidget(0, self.playpause_button)
 
         self.cmb_psector = QComboBox()
-        sql = "SELECT psector_id as id, name as idval FROM plan_psector WHERE active = true ORDER BY id ASC"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(self.cmb_psector, rows)
-        self.cmb_psector.currentIndexChanged.connect(self._manage_psector_change)
-        statusbar.addWidget(self.cmb_psector)
+        tools_gw.fill_cmb_psector_id(self.cmb_psector)
+        statusbar.insertPermanentWidget(1, self.cmb_psector)
 
         global_vars.psignals['widgets'] = [self.playpause_button, self.cmb_psector]
 
     def _playpause_btn_clicked(self):
         """ Manage psector play/pause """
         tools_gw.set_psector_mode_enabled()
-
-    def _manage_psector_change(self, index):
-        """ Manage psector change """
-        psector_id = tools_qt.get_combo_value(None, self.cmb_psector)
-        tools_gw.set_psector_mode_enabled(psector_id=psector_id)
 
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """

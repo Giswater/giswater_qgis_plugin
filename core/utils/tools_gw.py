@@ -4881,7 +4881,7 @@ def manage_current_psector_docker(psector_name=None):
         dock_widget.raise_()
 
 
-def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None):
+def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None, do_call_fct: bool = True, force_change: bool = False):
     """ Set psector mode enabled """
 
     # Manage play/pause button
@@ -4898,39 +4898,75 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         psector_id = tools_qt.get_combo_value(None, cmb_psector_id)
 
     # If cmb changed and psector mode is disabled
-    if cmb_changed and enable:
+    if not force_change and cmb_changed and enable:
         return
 
-    if psector_id is None:
+    if not force_change and psector_id is None:
         return
 
     # If cmb changed and psector mode is enabled, don't change the buttons
-    if not (cmb_changed and not enable):
-        # Update play/pause button
-        btn_psector_playpause.setProperty('psector_active', enable)
-        add_icon(btn_psector_playpause, "74" if enable else "73", f"toolbars{os.sep}status")
-        # Update psector status information
-        global_vars.psignals['psector_active'] = enable
+    if force_change or not (cmb_changed and not enable):
+        _change_plan_mode_buttons(enable=enable, psector_id=psector_id, update_cmb_psector_id=force_change)
+
+    if do_call_fct:
+        # Prepare the JSON body for gw_fct_set_toggle_current
+        extras = f'"type": "psector", "id": "{psector_id}"'
+        body = create_body(extras=extras)
+
+        # Execute the stored procedure
+        execute_procedure("gw_fct_set_toggle_current", body)
+
+
+def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False):
+    """ Change plan mode buttons """
+
+    psignals_widgets = global_vars.psignals['widgets']
+    btn_psector_playpause = psignals_widgets[0]
+    cmb_psector_id = psignals_widgets[1]
+
+    # Update play/pause button
+    btn_psector_playpause.setProperty('psector_active', enable)
+    add_icon(btn_psector_playpause, "74" if enable else "73", f"toolbars{os.sep}status")
+    # Update psector status information
+    global_vars.psignals['psector_active'] = enable
+
+    # Change 'edit' buttons icons
+    if enable is not None and global_vars.load_project is not None:
+        buttons = global_vars.load_project.buttons
+        for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
+            if key in (None, 'None'):
+                continue
+            toolbar_id = button.gw_name
+            icon_path = f"{key}p" if enable else f"{key}"
+            icon = get_icon(icon_path, f"toolbars{os.sep}{toolbar_id}", log_info=False)
+            if icon:
+                button.action.setIcon(icon)
+
+    # Update cmb_psector_id if needed
+    if update_cmb_psector_id and cmb_psector_id is not None:
+        fill_cmb_psector_id(cmb_psector_id, psector_id)
         global_vars.psignals['psector_id'] = psector_id
 
-        # Change 'edit' buttons icons
-        if enable is not None and global_vars.load_project is not None:
-            buttons = global_vars.load_project.buttons
-            for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
-                if key in (None, 'None'):
-                    continue
-                toolbar_id = button.gw_name
-                icon_path = f"{key}p" if enable else f"{key}"
-                icon = get_icon(icon_path, f"toolbars{os.sep}{toolbar_id}", log_info=False)
-                if icon:
-                    button.action.setIcon(icon)
 
-    # Prepare the JSON body for gw_fct_set_toggle_current
-    extras = f'"type": "psector", "id": "{psector_id}"'
-    body = create_body(extras=extras)
+def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
+    """ Fill cmb_psector_id """
+    sql = "SELECT psector_id as id, name as idval FROM plan_psector WHERE active = true ORDER BY id ASC"
+    rows = tools_db.get_rows(sql)
+    if not rows:
+        return
+    disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
+    tools_qt.fill_combo_values(cmb_psector_id, rows)
+    if psector_id is not None:
+        tools_qt.set_combo_value(cmb_psector_id, psector_id, 0)
+    connect_signal(cmb_psector_id.currentIndexChanged, partial(manage_psector_change, cmb_psector_id),
+                   "psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change"
+    )
 
-    # Execute the stored procedure
-    execute_procedure("gw_fct_set_toggle_current", body)
+
+def manage_psector_change(cmb_psector, index):
+    """ Manage psector change """
+    psector_id = tools_qt.get_combo_value(None, cmb_psector)
+    set_psector_mode_enabled(psector_id=psector_id)
 
 
 def create_sqlite_conn(file_name):

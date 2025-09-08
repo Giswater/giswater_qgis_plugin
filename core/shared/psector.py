@@ -2202,16 +2202,19 @@ class GwPsector:
             # Retrieve the psector ID for use in the extras configuration
             psector_id = result["body"]["data"]["psector_id"]
 
+            enabled = bool(cur_psector and cur_psector[0] is not None)
+
             if self.psector_with_current is None and lib_vars.plugin_dir:
                 self.icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}"
                 self.psector_with_current = QPixmap(f"{self.icon_folder}140.png")
                 self.psector_without_current = QPixmap(f"{self.icon_folder}138.png")
             if self.psector_with_current:
-                if cur_psector and cur_psector[0] is not None:
+                if enabled:
                     dialog.lbl_status_current.setPixmap(self.psector_with_current)
                 else:
                     dialog.lbl_status_current.setPixmap(self.psector_without_current)
             tools_gw.manage_current_psector_docker(name_value)
+            tools_gw.set_psector_mode_enabled(enable=enabled, psector_id=psector_id, do_call_fct=False, force_change=True)
         except KeyError:
             msg = "Error: '{0}' or '{1}' field is missing in the result."
             msg_params = ("name", "psector_id",)
