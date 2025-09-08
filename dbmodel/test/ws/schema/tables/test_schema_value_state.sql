@@ -20,7 +20,7 @@ SELECT has_table('value_state'::name, 'Table value_state should exist');
 SELECT columns_are(
     'value_state',
     ARRAY[
-        'id', 'name', 'observ'
+        'id', 'name', 'observ', 'active'
     ],
     'Table value_state should have the correct columns'
 );
