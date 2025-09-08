@@ -313,4 +313,4 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
  <featureBlendMode>0</featureBlendMode>
  <layerGeometryType>2</layerGeometryType>
 </qgis>
-' WHERE styleconfig_id=101;
+' WHERE styleconfig_id=110;
