@@ -60,7 +60,8 @@ class GwArcFusionButton(GwMaptool):
 
         state_type = tools_qt.get_combo_value(self.dlg_fusion, "cmb_statetype")
         action_mode = self.dlg_fusion.cmb_nodeaction.currentIndex()
-        if global_vars.psignals['psector_active']:
+        plan_mode = global_vars.psignals['psector_active']
+        if plan_mode:
             action_mode = 1
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         catalog = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.cmb_new_cat)
@@ -72,6 +73,7 @@ class GwArcFusionButton(GwMaptool):
             extras += f', "workcatId":"{workcat_id_end}"'
         if self.psector_id:
             extras += f', "psectorId": "{self.psector_id}"'
+        extras += f', "plan_mode": {str(plan_mode).lower()}'
         if action_mode is not None:
             extras += f', "action_mode": {action_mode}'
             if action_mode == 1 and state_type is not None:
@@ -165,20 +167,29 @@ class GwArcFusionButton(GwMaptool):
 
         valid_states = [0]
         # If the node has state 2 (planified) only allow remove node
-        if self.node_state is not None and self.node_state == 2 and global_vars.psignals['psector_active']:
-            node_psector_id = self._get_feature_psector_id(self.node_id, 'node')
-            current_psector_id = global_vars.psignals['psector_id']
-            if node_psector_id != current_psector_id:
-                msg = f"The selected node is planified in another psector.\nNode psector: {0}\nCurrent psector: {1}"
-                title = "Arc fusion"
-                msg_params = (node_psector_id, current_psector_id,)
-                tools_qt.show_info_box(msg, title=title, msg_params=msg_params)
-                return
-            self.psector_id = node_psector_id
-            self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
-            self.dlg_fusion.cmb_nodeaction.setEnabled(False)
-            tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
+        if global_vars.psignals['psector_active']:
+            self.psector_id = global_vars.psignals['psector_id']
+            if self.node_state is not None and self.node_state == 2:
+                node_psector_id = int(self._get_feature_psector_id(self.node_id, 'node'))
+                current_psector_id = int(global_vars.psignals['psector_id'])
+                node_psector_name = None
+                current_psector_name = None
+                row = tools_db.get_row(f"SELECT name FROM v_plan_psector WHERE psector_id = {node_psector_id}")
+                if row:
+                    node_psector_name = row[0]
+                row = tools_db.get_row(f"SELECT name FROM v_plan_psector WHERE psector_id = {current_psector_id}")
+                if row:
+                    current_psector_name = row[0]
+                if node_psector_id != current_psector_id:
+                    msg = "The selected node is planified in another psector.\nNode psector: {0}\nCurrent psector: {1}"
+                    msg_params = (node_psector_name, current_psector_name,)
+                    tools_qt.show_info_box(msg, title="Info", msg_params=msg_params)
+                    return
+                self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
+                self.dlg_fusion.cmb_nodeaction.setEnabled(False)
+                tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
         else:
+            self.psector_id = None
             valid_states = [0, 2]
         if self.node_state in valid_states:
             msg_params = None
@@ -229,8 +240,7 @@ class GwArcFusionButton(GwMaptool):
         rows = tools_db.get_rows(sql)
         if not rows or len(rows) != 2:
             msg = "The selected node should have exactly two linked arcs."
-            title = "Arc fusion"
-            tools_qt.show_info_box(msg, title=title)
+            tools_qt.show_info_box(msg, title="Info")
             return False
         else:
             tools_qt.set_widget_text(self.dlg_fusion, "txt_arc1cat", rows[0][1])
