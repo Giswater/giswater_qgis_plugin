@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import sys
 
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QMainWindow, QShortcut, QSizePolicy, QStackedLayout, QWidget
@@ -27,7 +28,10 @@ class GwMainWindow(QMainWindow):
 
     def __init__(self, class_obj, subtag=None, parent=None):
 
-        super().__init__(iface.mainWindow())
+        if sys.platform == 'Darwin':
+            super().__init__()
+        else:
+            super().__init__(iface.mainWindow())
         self.setupUi(self)
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly
