@@ -428,7 +428,7 @@ BEGIN
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 
 		-- update psector status to EXECUTED (Traceability) or CANCELED (Traceability)
-		ELSIF (OLD.status != NEW.status) AND (NEW.status = 6 OR NEW.status = 7) THEN
+		ELSIF (OLD.status != NEW.status) AND (NEW.status = 5 OR NEW.status = 6 OR NEW.status = 7) THEN
 
 			-- get psector geometry
 			v_psector_geom = (SELECT the_geom FROM plan_psector WHERE psector_id=NEW.psector_id);
@@ -461,7 +461,7 @@ BEGIN
 					c.n_inhabitants, c.supplyzone_id, c.datasource, c.lock_level, c.block_code, c.n_hydrometer
 				FROM plan_psector_x_connec pc
 				JOIN connec c USING (connec_id)
-				JOIN link l USING (link_id)
+				LEFT JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
 
