@@ -340,7 +340,6 @@ class GwSchemaI18NManager:
         # Determine the return message acording to the query message
         if query == '':
             text_return = f'{table_i18n.split(".")[1]}: 1- No update needed. '
-
         else:
             try:
                 self.cursor_i18n.execute(query)
@@ -568,6 +567,8 @@ class GwSchemaI18NManager:
     def _json_update(self, table_i18n, table_org):
         """ Update the table with the json format """
 
+        print('aaaaaaaaaa')
+
         if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
             self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "lb_en_us"]
             pk_column_org =["formname", "formtype", "tabname", "columnname"]
@@ -577,8 +578,12 @@ class GwSchemaI18NManager:
             pk_column_org = ["id"]
             pk_column_i18n = ["source"]
 
+        print('bbbbbbbbbb')
+
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
         self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
+
+        print('ccccccccccc')
 
         # Set the column to update in the table_org (filterparam, inputparams, widgetcontrols)
         column = ""
@@ -589,75 +594,112 @@ class GwSchemaI18NManager:
         elif table_org == 'config_form_fields':
             column = 'widgetcontrols'
 
-        # Get the rows from the original table
-        query = f"SELECT {', '.join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org}"
+        self.translatable_keys = ['label', 'tooltip', 'placeholder', 'text', 'comboNames', 'vdefault_value']
+        
+        # Build conditions to check if key is not found within the column text
+        where_conditions = []
+        for key in self.translatable_keys:
+            where_conditions.append(f"""{column}::text ILIKE '%{key}":%'""")
+        where_clause = " OR ".join(where_conditions) if where_conditions else "TRUE"
+
+        query = f"""SELECT {', '.join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org} WHERE {where_clause}"""
+        print(query)
         rows_org = self._get_rows(query, self.cursor_org)
 
-        # Set the query message
-        query = ""
+        # Prepare batch insert
+        all_values = []
+        all_hints_used = []
+        
         for row in rows_org:
-            hints_used = set()
-            hints_i18n = self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n)
-            #Get safe row values and avoid SQL injection
-            if row[column] not in [None, "", "None"]:
-                datas = self.extract_and_update_strings(row[column])
-
-                # Loop through the data to insert
-                for i, data in enumerate(datas):
-                    for key, text in data.items():
-                        # Handle string or list of strings
-                        if isinstance(text, list):
-                            text = ", ".join(text)
-                        elif not isinstance(text, str):
-                            continue
-
-                        # Get safe text and Construct the query
-                        safe_text = text.replace("'", "''")
-                        row_to_insert = {}
-                        text_json = json.dumps(row[column]).replace("'", "''")
-                        if "config_form_fields" in table_i18n:
-                            # Avoid nested f-string with both single and double quotes
-                            row_to_insert = {
-                                "source_code": "'giswater'",
-                                "project_type": f"'{self.project_type}'",
-                                "context": f"'{table_org}'",
-                                "formname": f"'{row['formname']}'",
-                                "formtype": f"'{row['formtype']}'",
-                                "tabname": f"'{row['tabname']}'",
-                                "source": f"'{row['columnname']}'",
-                                "hint": f"'{key}_{i}'",
-                                "text": f"'{text_json}'::jsonb",
-                                "lb_en_us": f"'{safe_text}'"
-                            }
-                        else:
-
-                            row_to_insert = {
-                                "source_code": "'giswater'",
-                                "project_type": f"'{self.project_type}'",
-                                "context": f"'{table_org}'",
-                                "hint": f"'{key}_{i}'",
-                                "text": f"'{text_json}'::jsonb",
-                                "source": f"'{row['id']}'",
-                                "lb_en_us": f"'{safe_text}'"
-                            }
-                        
-                        columns = list(row_to_insert.keys())
-                        values = list(row_to_insert.values())
-                        conflict_keys = [key for key in columns if key not in ('text', 'lb_en_us')]
-                        
-                        query += f"""INSERT INTO {table_i18n} ({', '.join(columns)}) VALUES ({', '.join(values)})
-                            ON CONFLICT ({', '.join(conflict_keys)})
-                            DO UPDATE SET
-                                text = EXCLUDED.text,
-                                lb_en_us = EXCLUDED.lb_en_us;\n
-                        """
-                        hints_used.add(f"'{key}_{i}'")
+            if row[column] in [None, "", "None"]:
+                continue
                 
-                # Convert hints_used to a set and hints_i18n (query results) to a set of hint values
-                hints_to_delete = hints_i18n - hints_used
-                if hints_to_delete:
-                    query += self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete)
+            # Cache the JSON dump
+            text_json = json.dumps(row[column]).replace("'", "''")
+            
+            # Get all translatable strings at once
+            datas = self.extract_and_update_strings(row[column])
+            hints_used = set()
+            
+            # Process all strings in this row
+            for i, data in enumerate(datas):
+                for key, text in data.items():
+                    if isinstance(text, list):
+                        text = ", ".join(text)
+                    elif not isinstance(text, str):
+                        continue
+                    
+                    safe_text = text.replace("'", "''")
+                    hint = f"{key}_{i}"
+                    hints_used.add(f"'{hint}'")
+                    
+                    # Prepare values tuple
+                    if "config_form_fields" in table_i18n:
+                        values = (
+                            'giswater',
+                            self.project_type,
+                            table_org,
+                            row['formname'],
+                            row['formtype'],
+                            row['tabname'],
+                            row['columnname'],
+                            hint,
+                            text_json,
+                            safe_text
+                        )
+                    else:
+                        values = (
+                            'giswater',
+                            self.project_type,
+                            table_org,
+                            hint,
+                            text_json,
+                            row['id'],
+                            safe_text
+                        )
+                    all_values.append(values)
+            
+            # Store hints for later deletion
+            hints_i18n = self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n)
+            hints_to_delete = hints_i18n - hints_used
+            if hints_to_delete:
+                all_hints_used.append((row, hints_to_delete))
+        
+        # Generate single batch insert query
+        if "config_form_fields" in table_i18n:
+            columns = ['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'hint', 'text', 'lb_en_us']
+            conflict_keys = ['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'hint']
+        else:
+            columns = ['source_code', 'project_type', 'context', 'hint', 'text', 'source', 'lb_en_us']
+            conflict_keys = ['source_code', 'project_type', 'context', 'hint', 'source']
+        
+        # Build the VALUES part with proper type casting
+        values_parts = []
+        for values in all_values:
+            value_list = []
+            for i, val in enumerate(values):
+                if columns[i] == 'text':
+                    value_list.append(f"'{val}'::jsonb")
+                else:
+                    value_list.append(f"'{val}'")
+            values_parts.append(f"({', '.join(value_list)})")
+            
+        
+        # Construct final query
+        query = f"""
+            INSERT INTO {table_i18n} ({', '.join(columns)})
+            VALUES {', '.join(values_parts)}
+            ON CONFLICT ({', '.join(conflict_keys)})
+            DO UPDATE SET
+                text = EXCLUDED.text,
+                lb_en_us = EXCLUDED.lb_en_us;
+        """
+        
+        # Add deletion queries for unused hints
+        for row, hints_to_delete in all_hints_used:
+            query += self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete)
 
+        print(query)
         return query
 
     def get_hints(self, table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete=None):
@@ -1549,14 +1591,13 @@ class GwSchemaI18NManager:
 
     def extract_and_update_strings(self, data):
         """Recursively extract and return list of dictionaries with translatable keys."""
-        translatable_keys = ['label', 'tooltip', 'placeholder', 'text', 'comboNames', 'vdefault_value']
         results = []
 
         def recurse(item):
             if isinstance(item, dict):
                 entry = {}
                 for key, value in item.items():
-                    if key in translatable_keys:
+                    if key in self.translatable_keys:
                         if key == 'comboNames' and isinstance(value, list):
                             entry[key] = value
                         elif isinstance(value, str):
@@ -1666,7 +1707,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbjson"],
+                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1675,7 +1716,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbjson"],
+                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
