@@ -40,3 +40,6 @@ WHERE formname='ve_epa_frorifice' AND formtype='form_feature' AND columnname='or
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND  typevalue = ''inp_typevalue_weir'''
 WHERE formname='ve_epa_frweir' AND formtype='form_feature' AND columnname='weir_type' AND tabname='tab_epa';
+
+-- 09/09/2025
+UPDATE sys_param_user SET id='inp_options_dwfscenario_current' WHERE id='inp_options_dwfscenario';
