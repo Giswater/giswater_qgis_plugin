@@ -1001,7 +1001,7 @@ class GwInfo(QObject):
         """ Open help file with selected @project_type and @feature_type """
 
         # Get locale of QGIS application
-        locale = tools_qgis.get_locale()
+        locale = tools_qgis.get_locale_schema()
         project_type = tools_gw.get_project_type()
         png_folder = os.path.join(lib_vars.plugin_dir, f'resources{os.sep}png')
 
