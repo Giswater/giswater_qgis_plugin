@@ -158,6 +158,10 @@ BEGIN
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN pattern_id varchar(16);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_om_waterbalance_dma_graph (LIKE SCHEMA_NAME.om_waterbalance_dma_graph INCLUDING ALL);
             END IF;
+        ELSE 
+            IF v_fct_name = 'DWFZONE'
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN  drainzone_id int4;
+            END IF;
         END IF;
 
 
@@ -861,66 +865,67 @@ BEGIN
         END IF;
 
         -- For specific functions
-        IF v_fct_name = 'MINSECTOR' THEN
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_minsector_mincut AS
-            WITH minsector_mapzones AS (
-                SELECT
-                    t.mincut_minsector_id AS minsector_id,
-                    array_agg(DISTINCT t.dma_id) AS dma_id,
-                    array_agg(DISTINCT t.dqa_id) AS dqa_id,
-                    array_agg(DISTINCT t.presszone_id) AS presszone_id,
-                    array_agg(DISTINCT t.expl_id) AS expl_id,
-                    array_agg(DISTINCT t.sector_id) AS sector_id,
-                    array_agg(DISTINCT t.muni_id) AS muni_id,
-                    array_agg(DISTINCT t.supplyzone_id) AS supplyzone_id,
-                    ST_Union(t.the_geom) AS the_geom
-                FROM (
+        IF v_project_type = 'WS' THEN
+            IF v_fct_name = 'MINSECTOR' THEN
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_minsector_mincut AS
+                WITH minsector_mapzones AS (
                     SELECT
-                        m.minsector_id,
-                        mm.minsector_id AS mincut_minsector_id,
-                        unnest(m.dma_id) AS dma_id,
-                        unnest(m.dqa_id) AS dqa_id,
-                        unnest(m.presszone_id) AS presszone_id,
-                        unnest(m.expl_id) AS expl_id,
-                        unnest(m.sector_id) AS sector_id,
-                        unnest(m.muni_id) AS muni_id,
-                        unnest(m.supplyzone_id) AS supplyzone_id,
-                        m.the_geom
-                    FROM temp_pgr_minsector m
-                    JOIN temp_pgr_minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
-                ) t
-                GROUP BY t.mincut_minsector_id
-            ),
-            minsector_sums AS (
+                        t.mincut_minsector_id AS minsector_id,
+                        array_agg(DISTINCT t.dma_id) AS dma_id,
+                        array_agg(DISTINCT t.dqa_id) AS dqa_id,
+                        array_agg(DISTINCT t.presszone_id) AS presszone_id,
+                        array_agg(DISTINCT t.expl_id) AS expl_id,
+                        array_agg(DISTINCT t.sector_id) AS sector_id,
+                        array_agg(DISTINCT t.muni_id) AS muni_id,
+                        array_agg(DISTINCT t.supplyzone_id) AS supplyzone_id,
+                        ST_Union(t.the_geom) AS the_geom
+                    FROM (
+                        SELECT
+                            m.minsector_id,
+                            mm.minsector_id AS mincut_minsector_id,
+                            unnest(m.dma_id) AS dma_id,
+                            unnest(m.dqa_id) AS dqa_id,
+                            unnest(m.presszone_id) AS presszone_id,
+                            unnest(m.expl_id) AS expl_id,
+                            unnest(m.sector_id) AS sector_id,
+                            unnest(m.muni_id) AS muni_id,
+                            unnest(m.supplyzone_id) AS supplyzone_id,
+                            m.the_geom
+                        FROM temp_pgr_minsector m
+                        JOIN temp_pgr_minsector_mincut mm ON mm.mincut_minsector_id = m.minsector_id
+                    ) t
+                    GROUP BY t.mincut_minsector_id
+                ),
+                minsector_sums AS (
+                    SELECT
+                        mm.minsector_id,
+                        SUM(m.num_border) AS num_border,
+                        SUM(m.num_connec) AS num_connec,
+                        SUM(m.num_hydro) AS num_hydro,
+                        SUM(m.length) AS length
+                    FROM temp_pgr_minsector_mincut mm
+                    JOIN temp_pgr_minsector m ON m.minsector_id = mm.mincut_minsector_id
+                    GROUP BY mm.minsector_id
+                )
                 SELECT
-                    mm.minsector_id,
-                    SUM(m.num_border) AS num_border,
-                    SUM(m.num_connec) AS num_connec,
-                    SUM(m.num_hydro) AS num_hydro,
-                    SUM(m.length) AS length
-                FROM temp_pgr_minsector_mincut mm
-                JOIN temp_pgr_minsector m ON m.minsector_id = mm.mincut_minsector_id
-                GROUP BY mm.minsector_id
-            )
-            SELECT
-                m.minsector_id,
-                m.dma_id,
-                m.dqa_id,
-                m.presszone_id,
-                m.expl_id,
-                m.sector_id,
-                m.muni_id,
-                m.supplyzone_id,
-                s.num_border,
-                s.num_connec,
-                s.num_hydro,
-                s.length,
-                m.the_geom
-            FROM minsector_mapzones m
-            JOIN minsector_sums s ON s.minsector_id = m.minsector_id;
-        END IF;
+                    m.minsector_id,
+                    m.dma_id,
+                    m.dqa_id,
+                    m.presszone_id,
+                    m.expl_id,
+                    m.sector_id,
+                    m.muni_id,
+                    m.supplyzone_id,
+                    s.num_border,
+                    s.num_connec,
+                    s.num_hydro,
+                    s.length,
+                    m.the_geom
+                FROM minsector_mapzones m
+                JOIN minsector_sums s ON s.minsector_id = m.minsector_id;
+            END IF;
 
-
+        END IF; 
 
         v_return_message = 'The temporary tables/views have been created successfully';
     ELSIF v_action = 'DROP' THEN
