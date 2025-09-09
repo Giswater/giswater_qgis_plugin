@@ -1822,3 +1822,43 @@ SELECT
   p_state
 FROM link_selected l;
 
+
+
+DROP VIEW IF EXISTS ve_epa_valve;
+CREATE OR REPLACE VIEW ve_epa_valve
+AS SELECT inp_valve.node_id,
+    inp_valve.valve_type,
+    cat_node.dint,
+    inp_valve.custom_dint,
+    inp_valve.setting,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    v.to_arc,
+        CASE
+            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+            ELSE NULL::character varying(12)
+        END AS status,
+    inp_valve.add_settings,
+    inp_valve.init_quality,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min
+   FROM node
+     JOIN inp_valve USING (node_id)
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_valve.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_valve.node_id;

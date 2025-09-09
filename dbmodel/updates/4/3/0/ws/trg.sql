@@ -23,3 +23,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 DROP TRIGGER IF EXISTS gw_trg_edit_link ON ve_link;
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_valve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('valve');
