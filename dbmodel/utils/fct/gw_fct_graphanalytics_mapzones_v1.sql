@@ -561,6 +561,50 @@ BEGIN
 		UPDATE temp_pgr_node n SET mapzone_id = 0
 		FROM boundary AS s
 		WHERE n.node_id = s.node_id AND n.graph_delimiter = 'MINSECTOR';
+	ELSE
+		IF v_mapzone_name = 'DWFZONE' THEN
+			UPDATE temp_pgr_mapzone m SET min_node = agg.min_node
+			FROM (
+				SELECT c.component, MIN(n.node_id) AS min_node
+				FROM temp_pgr_connectedcomponents c
+				JOIN temp_pgr_node n on n.pgr_node_id = c.node
+				GROUP BY c.component
+			) AS agg
+			WHERE m.component = agg.component;
+
+			TRUNCATE temp_pgr_connectedcomponents;
+
+			v_query_text := '
+				WITH 
+					nodes AS (
+						SELECT n.pgr_node_id, m.min_node 
+						FROM temp_pgr_node n
+						JOIN temp_pgr_mapzone m ON m.component = n.mapzone_id
+					),
+					components AS (
+						SELECT min_node AS source, min_node AS target
+						FROM temp_pgr_mapzone m
+						UNION 
+						SELECT n1.min_node AS source, n2.min_node AS target
+						FROM temp_pgr_arc a
+						JOIN nodes n1 on a.pgr_node_1 = n1.pgr_node_id
+						JOIN nodes n2 on a.pgr_node_2 = n2.pgr_node_id
+						WHERE a.graph_delimiter = ''INITOVERFLOWPATH''
+					)
+				SELECT ROW_NUMBER () OVER (ORDER BY source, target) AS id,
+					source,
+					target,
+					1 AS cost
+				FROM components
+			';
+			INSERT INTO temp_pgr_connectedcomponents (seq,component, node)
+			SELECT seq,component, node
+			FROM pgr_connectedComponents(v_query_text);
+
+			UPDATE temp_pgr_mapzone m set drainzone_id = c.component
+			FROM temp_pgr_connectedcomponents c 
+			WHERE m.min_node = c.node;
+		END IF;	
 	END IF;
 
 	IF v_update_map_zone > 0 THEN
