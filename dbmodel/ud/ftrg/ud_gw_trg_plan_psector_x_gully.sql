@@ -19,6 +19,7 @@ DECLARE
 v_stateaux smallint;
 v_explaux smallint;
 v_psector_expl smallint;
+v_link_id integer;
 
 BEGIN 
 
