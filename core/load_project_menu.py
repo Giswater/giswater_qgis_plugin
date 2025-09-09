@@ -41,13 +41,13 @@ class GwMenuLoad(QObject):
 
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
-        config_icon = QIcon(icon_path)   
+        config_icon = QIcon(icon_path)
 
         # region Actions
         actions_menu = QMenu(tools_qt.tr("Actions"), self.iface.mainWindow().menuBar())
         actions_menu.setIcon(config_icon)
         self.main_menu.addMenu(actions_menu)
-        
+
         if project_loaded:
             # Action 'Get help'
             action_help = actions_menu.addAction(tools_qt.tr("Get help"))
@@ -72,16 +72,6 @@ class GwMenuLoad(QObject):
                     f"{action_reset_plugin_shortcut}", "user", "init", prefix=False)
             action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
             action_reset_plugin.triggered.connect(self._reset_plugin)
-
-            # Action 'Show current selectors'
-            action_open_selections = actions_menu.addAction(tools_qt.tr("Show current psector"))
-            action_open_selections_shortcut = tools_gw.get_config_parser("actions_shortcuts",
-                "shortcut_open_curselectors", "user", "init", prefix=False)
-            if not action_open_selections_shortcut:
-                tools_gw.set_config_parser("actions_shortcuts", "shortcut_open_curselectors",
-                    f"{action_open_selections_shortcut}", "user", "init", prefix=False)
-            action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
-            action_open_selections.triggered.connect(self._open_current_psector)
 
         # Action 'Toggle Log DB'
         action_set_log_sql = actions_menu.addAction(tools_qt.tr("Toggle Log DB"))
@@ -269,11 +259,6 @@ class GwMenuLoad(QObject):
             tools_gw.set_config_parser("log", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(msg)
-
-    def _open_current_psector(self):
-
-        if lib_vars.session_vars['current_psector']:
-            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_psector'])
 
     def _reset_plugin(self):
         """ Called in reset plugin action """

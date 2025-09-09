@@ -2208,7 +2208,6 @@ class GwPsector:
                     dialog.lbl_status_current.setPixmap(self.psector_with_current)
                 else:
                     dialog.lbl_status_current.setPixmap(self.psector_without_current)
-            tools_gw.manage_current_psector_docker(name_value)
             tools_gw.set_psector_mode_enabled(enable=enabled, psector_id=psector_id, do_call_fct=False, force_change=True)
         except KeyError:
             msg = "Error: '{0}' or '{1}' field is missing in the result."

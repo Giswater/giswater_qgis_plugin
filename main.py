@@ -443,12 +443,6 @@ class Giswater(QObject):
         if docker_info:
             self.iface.removeDockWidget(docker_info)
 
-        # Remove 'current_psector' docker
-        if lib_vars.session_vars.get('current_psector'):
-            self.iface.removeDockWidget(lib_vars.session_vars['current_psector'])
-            lib_vars.session_vars['current_psector'].deleteLater()
-            lib_vars.session_vars['current_psector'] = None
-
         # Manage 'dialog_docker' from lib_vars.session_vars and remove it if exists
         tools_gw.close_docker()
 

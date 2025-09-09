@@ -29,9 +29,9 @@ from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, Q
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QDialog, QActionGroup
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QActionGroup
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -4839,61 +4839,6 @@ def open_dlg_help():
         webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
     finally:
         return True
-
-
-def manage_current_psector_docker(psector_name=None):
-    """
-    Manage labels for the current_psector docker
-    """
-    if not isinstance(psector_name, (str, type(None))):
-        return
-
-    # Configuration
-    title = "Current psector"
-    icon_size = 12
-    if psector_name is None:
-        psector_name = ""
-
-    # Determine icon path based on psector_name
-    icon_filename = "140.png" if psector_name else "138.png"
-    icon_path = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}{icon_filename}"
-
-    # Get or create dock widget
-    dock_widget = lib_vars.session_vars['current_psector']
-    if dock_widget is None:
-        dock_widget = QDockWidget()
-        dock_widget.setWindowTitle(title)
-        lib_vars.session_vars['current_psector'] = dock_widget
-        global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, dock_widget)
-
-    # Update dock widget content and title
-    dock_widget.setWindowTitle(title)
-
-    # Create content widget with horizontal layout
-    content_widget = QWidget()
-    layout = QHBoxLayout()
-    content_widget.setLayout(layout)
-
-    # Add icon if file exists
-    if os.path.exists(icon_path):
-        icon_label = QLabel()
-        pixmap = QPixmap(icon_path).scaled(icon_size, icon_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not pixmap.isNull():
-            icon_label.setPixmap(pixmap)
-        layout.addWidget(icon_label)
-
-    # Add text label
-    text_label = QLabel(psector_name)
-    layout.addWidget(text_label)
-    layout.addStretch()
-
-    # Set widget and show
-    dock_widget.setWidget(content_widget)
-
-    # Show dock widget if not already visible
-    if not dock_widget.isVisible():
-        dock_widget.show()
-        dock_widget.raise_()
 
 
 def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None, do_call_fct: bool = True, force_change: bool = False):
