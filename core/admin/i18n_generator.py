@@ -704,12 +704,13 @@ class GwI18NGenerator:
         for row in rows:
             if row['project_type'] not in self.path_dic[file_type]["project_type"]:
                 continue
+            text = json.dumps(row["text"]).replace("'", "''")
             # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
-                key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"], row["tabname"])
+                key = (row["source"], row["context"], text, row["formname"], row["formtype"], row["tabname"])
             else:
-                key = (row["source"], row["context"], row["text"])
+                key = (row["source"], row["context"], text)
             updates.setdefault(key, []).append(row)
 
         for key, related_rows in updates.items():
@@ -728,11 +729,7 @@ class GwI18NGenerator:
                 tools_log.log_error(msg, msg_params=msg_params)
                 continue
 
-            # Parse JSON safely
-            json_data = self.safe_parse(source, original_text)
-            if json_data is None:
-                return f'{context} - Error parsing JSON source (Log_info)'
-
+            text_json = json.loads(original_text.replace("''", "'"))
             # Translate fields
             for row in related_rows:
                 key_hint = row["hint"].rsplit('_', 1)[0]
@@ -743,31 +740,10 @@ class GwI18NGenerator:
                     default_text
                 )
 
-                if ", " in default_text and key_hint == "comboNames":
-                    default_list = default_text.split(", ")
-                    translated_list = translated.split(", ")
-                    for item in json_data:
-                        if isinstance(item, dict) and key_hint in item:
-                            if set(default_list).intersection(item["comboNames"]):
-                                item["comboNames"] = [
-                                    t if d in default_list else d
-                                    for d, t in zip(default_list, translated_list)
-                                ]
-                else:
-                    if isinstance(json_data, dict):
-                        for key_name, value in json_data.items():
-                            if key_name == key_hint and value == default_text:
-                                json_data[key_name] = translated
-                    elif isinstance(json_data, list):
-                        for item in json_data:
-                            if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
-                                item[key_hint] = translated
-                    else:
-                        msg = "Unexpected json_data structure!"
-                        tools_log.log_error(msg)
+                text_json = self.replace_transaltions(text_json, default_text, key_hint, translated)
 
             # Encode new JSON safely
-            new_text = json.dumps(json_data, ensure_ascii=False).replace("'", "''")
+            new_text = json.dumps(text_json, ensure_ascii=False).replace("'", "''")
 
             # Save the result grouped by context and column
             if context not in values_by_context:
@@ -892,66 +868,32 @@ class GwI18NGenerator:
 
         return status
 
-    def safe_parse(self, source, text):
-        try:
-            # Try JSON first (safer if it's valid JSON)
-            # First handle empty values 
-
-            modified = text.replace("False", "false").replace("True", "true").replace("None", "null")
-            
-            #Save values in special cases
-            modified = modified.replace(": ''", ': "a"').replace(":''", ': "a"').replace(':""', ': "a"')
-            modified = modified.replace("','. ", "',a'. ").replace("'T','TANK'", "a'T',a'TANK'a")
-            modified = modified.replace("-999,'ALL", "-999,a'ALL")
-            
-            # Adapt " in keys and values
-            modified = modified.replace("': '", '": "').replace("':'", '": "').replace("' :'", '": "').replace("' : '", '": "')
-            modified = modified.replace("': \"", '": "').replace("':\"", '": "').replace("' :\"", '": "').replace("' : \"", '": "')
-            modified = modified.replace("\": '", '": "').replace("\":'", '": "').replace("\" :\"", '": "').replace("\" : \"", '": "')
-            
-            modified = modified.replace("', '", '", "').replace("','", '", "').replace("' ,'", '", "').replace("' , '", '", "')
-            modified = modified.replace("', \"", '", "').replace("',\"", '", "').replace("' ,\"", '", "').replace("' , \"", '", "')
-            modified = modified.replace("\", '", '", "').replace("\",'", '", "').replace("\" ,'", '", "').replace("\" , '", '", "')
-
-            #{ cases
-            modified = modified.replace("{'", '{"').replace("'}", '"}')
-            modified = modified.replace("': {", '": {').replace("':{", '": {').replace("' :{", '": {').replace("' : {", '": {')
-            
-            #Null cases
-            modified = modified.replace("': null", '": null').replace("':null", '": null').replace("' :null", '": null').replace("' : null", '": null')
-            modified = modified.replace("null, '", 'null, "').replace("null,'", 'null, "').replace("null ,'", 'null, "').replace("null , '", 'null, "')
-            
-            #False cases
-            modified = modified.replace("': false", '": false').replace("':false", '": false').replace("' :false", '": false').replace("' : false", '": false')
-            modified = modified.replace("false, '", 'false, "').replace("false,'", 'false, "').replace("false ,'", 'false, "').replace("false , '", 'false, "')
-            
-            #True cases
-            modified = modified.replace("': true", '": true').replace("':true", '": true').replace("' :true", '": true').replace("' : true", '": true')
-            modified = modified.replace("true, '", 'true, "').replace("true,'", 'true, "').replace("true ,'", 'true, "').replace("true , '", 'true, "')
-            
-            #Number cases
-            modified = re.sub(r'(\d+)(\]?)\s*,\s*\'', r'\1\2, "', modified)  # number], ' or number, '
-            modified = re.sub(r'\':\s*(\[?)(\d+)', r'": \1\2', modified)     # ': [number or ': number
-            
-            #Combo cases
-            modified = modified.replace("': ['", '": ["').replace("':'[", '": ["').replace("' :['", '": ["').replace("' : ''[", '": ["')
-            modified = modified.replace("'], '", '"], "').replace("'],'", '"], "').replace("'] ,'", '"], "').replace("'] , ''", '"], "')
-            
-            modified = modified.replace("']}", '"]}')
-            
-            # Replace remaining single quotes with double quotes for JSON compatibility
-            modified = modified.replace("''", "'")
-
-            # Reload values in special cases
-            modified = modified.replace(': "a"', ': ""')
-            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL")
-
-            return json.loads(modified.replace("None", "null"))
-        except json.JSONDecodeError as e:
-            msg = "Error parsing JSON source: {0} - e1: {1} -- {2}"
-            msg_params = (source, e, modified)
-            tools_log.log_error(msg, msg_params=msg_params)
-            return None
+    def replace_transaltions(self, json_data, default_text, key_hint, translated):
+        if ", " in default_text and key_hint == "comboNames":
+            default_list = default_text.split(", ")
+            translated_list = translated.split(", ")
+            for item in json_data:
+                if isinstance(item, dict) and key_hint in item:
+                    if set(default_list).intersection(item["comboNames"]):
+                        item["comboNames"] = [
+                            t if d in default_list else d
+                            for d, t in zip(default_list, translated_list)
+                        ]
+        elif isinstance(json_data, dict):
+            for key_name, value in json_data.items():
+                if key_name == key_hint and value == default_text:
+                    json_data[key_name] = translated
+        elif isinstance(json_data, list): 
+            if json_data is None:
+                json_data = []
+            else:
+                for i, item in enumerate(json_data):
+                    json_data[i] = self.replace_transaltions(item, default_text, key_hint, translated)
+        else:
+            msg = "Unexpected json_data structure!"
+            tools_log.log_error(msg)
+        
+        return json_data
 
     def _commit(self):
         """ Commit current database transaction """
