@@ -27,7 +27,7 @@ class GwDialog(QDialog):
     def __init__(self, class_obj, subtag=None, parent=None):
 
         # If parent is not null the dialog is integrated into parent
-        if sys.platform == 'Darwin':
+        if sys.platform == 'darwin':
             super().__init__()
         else:
             super().__init__(iface.mainWindow())

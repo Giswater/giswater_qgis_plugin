@@ -28,7 +28,7 @@ class GwMainWindow(QMainWindow):
 
     def __init__(self, class_obj, subtag=None, parent=None):
 
-        if sys.platform == 'Darwin':
+        if sys.platform == 'darwin':
             super().__init__()
         else:
             super().__init__(iface.mainWindow())
