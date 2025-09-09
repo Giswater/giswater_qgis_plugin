@@ -46,28 +46,9 @@ BEGIN
 	SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version LIMIT 1;
 	SELECT json_build_object('level', 1, 'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
 
-/* TO DO
-	-- if a recovered arc with psector_status_status=0 has connecs, recover the connecs with psector_status=0
-	v_sql = '
-	SELECT arc_id::INT fROM archived_psector_arc WHERE psector_state=0 AND arc_id::int IN (SELECT arc_id FROM connec)
-	';
-
-	EXECUTE 'SELECT EXISTS ('||v_sql||')' INTO v_exists;
-
-
-	IF v_exists THEN
-				
-		EXECUTE '
-		INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, link_id)
-		SELECT feature_id, exit_id, '||v_psector_id||', 0, link_id 
-		FROM link WHERE exit_id IN ('||v_sql||')
-		';
-	
-	END IF;
-	*/
 
 	-- recover data
-	FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 -- arc/node/connec/gully
+	FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 ORDER BY 1 DESC -- arc/node/connec/gully
 	LOOP
 	
 		EXECUTE '

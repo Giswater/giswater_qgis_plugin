@@ -651,6 +651,13 @@ BEGIN
 			-- reset plan_psector_force_delete
 			UPDATE config_param_user SET value=v_plan_psector_force_delete WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;
 
+		
+		ELSIF OLD.status IN (5,6,7) AND NEW.status IN (1,2) THEN -- change the status of the psector in order to restore it
+		
+			EXECUTE '
+			SELECT gw_fct_plan_recover_archived($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"psectorId":"'||NEW.psector_id||'"}}}$$)
+			';
+	
 		END IF;
 
         RETURN NEW;
