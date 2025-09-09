@@ -1140,8 +1140,8 @@ BEGIN
 					END LOOP;
 
 				ELSE
-					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, the_geom, created_at, created_by, graphconfig)
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], m.the_geom, now(), current_user,
+					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
+					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
 							json_build_object(
