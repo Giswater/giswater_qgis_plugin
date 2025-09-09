@@ -3734,7 +3734,6 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
 
     # Handle cases where the table is empty
     table_ids = []
-
     if model:
         table_ids = [
             str(get_model_index(model, row, field_id)) for row in range(model.rowCount())
@@ -3757,37 +3756,49 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
             if layer.selectedFeatureCount() > 0:
                 for feature in layer.selectedFeatures():
                     selected_id = str(feature.attribute(field_id))
-                    if selected_id and selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                    if selected_id:
                         selected_ids.append(selected_id)
-                        class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+                        if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                            class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
     # Ensure selections are added even if the table was initially empty
     if not table_ids and selected_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = selected_ids
     # Prevent UI interference while updating the table
     table_widget.blockSignals(True)
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
+    
+    ids_to_insert = []
+    for id in class_object.rel_list_ids[class_object.rel_feature_type]:
+        if id not in table_ids:
+            ids_to_insert.append(id)
+    
+    do_insert = False
+    if ids_to_insert:
+        msg = "Do you want to insert the selected features? {0}"
+        msg_params = (", ".join(ids_to_insert), )
+        do_insert = tools_qt.show_question(msg, msg_params=msg_params)
 
-    if selection_mode == GwSelectionMode.PSECTOR:
-        _insert_feature_psector(dialog, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+    if selection_mode == GwSelectionMode.PSECTOR and do_insert:
+        _insert_feature_psector(dialog, class_object.rel_feature_type, ids=ids_to_insert)
         remove_selection()
         load_tableview_psector(dialog, class_object.rel_feature_type)
         set_model_signals(class_object)
-    elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
-        _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+    elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) and do_insert:
+        _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=ids_to_insert)
         load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
-    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
-        _insert_feature_lot(dialog, class_object.rel_feature_type, class_object.lot_id, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT) and do_insert:
+        _insert_feature_lot(dialog, class_object.rel_feature_type, class_object.lot_id, ids=ids_to_insert)
         load_tableview_lot(dialog, class_object.rel_feature_type, class_object.lot_id, class_object.rel_layers)
-    elif selection_mode == GwSelectionMode.ELEMENT:
-        _insert_feature_elements(dialog, class_object.feature_id, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+    elif selection_mode == GwSelectionMode.ELEMENT and do_insert:
+        _insert_feature_elements(dialog, class_object.feature_id, class_object.rel_feature_type, ids=ids_to_insert)
         load_tableview_element(dialog, class_object.feature_id, class_object.rel_feature_type)
-    elif selection_mode == GwSelectionMode.FEATURE_END:
+    elif selection_mode == GwSelectionMode.FEATURE_END and do_insert:
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-    elif selection_mode == GwSelectionMode.VISIT:
-        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
+    elif selection_mode == GwSelectionMode.VISIT and do_insert:
+        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=ids_to_insert)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
-    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC and do_insert:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
@@ -3795,30 +3806,33 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
+    enable_feature_type(dialog, widget_table=table_object, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+
     table_widget.blockSignals(False)
 
     # Ensure selection of rows in the table based on the selected feature IDs from the map
+    model = table_widget.model()
+    selection_model = table_widget.selectionModel()
     if model and selection_model and selected_ids:
         selection_model.clearSelection()
-        selection_flags = QItemSelectionModel.Select | QItemSelectionModel.Rows | QItemSelectionModel.Current
-
+        
         for row in range(model.rowCount()):
             model_index = get_model_index(model, row, field_id)
             row_value = str(model_index)
             if row_value in selected_ids:
-                selection_model.select(model_index, selection_flags)
-                table_widget.setCurrentIndex(model_index)
-                table_widget.scrollTo(model_index, QAbstractItemView.PositionAtCenter)
-                table_widget.selectionModel().setCurrentIndex(model_index,
-                                                              QItemSelectionModel.Select | QItemSelectionModel.Rows)
+                column_index = model.fieldIndex(field_id)
+                index = model.index(row, column_index)
+                selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
-    # Ensure proper table refresh
-    table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-    table_widget.viewport().update()
-    table_widget.repaint()
 
-    enable_feature_type(dialog, widget_table=table_object, ids=class_object.rel_list_ids[class_object.rel_feature_type])
-
+def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
+    """Select IDs in table"""
+    widget_table, feature_type = class_object.get_expected_table(class_object, dialog, table_object)
+    if not widget_table or not widget_table.model() or not feature_type:
+        return
+    
+    expr_filter = QgsExpression(f"{feature_type}_id IN ({','.join(f'{i}' for i in ids_to_select)})")
+    tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
 
 def get_model_index(model, row, field_name):
     if hasattr(model, 'fieldIndex'):
