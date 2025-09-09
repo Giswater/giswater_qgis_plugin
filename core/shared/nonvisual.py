@@ -420,6 +420,7 @@ class GwNonVisual:
             # Commit & refresh table
             tools_db.dao.commit()
             self._reload_manager_table()
+            self._populate_filter_combos()
 
     def _print_object(self):
 
@@ -1160,6 +1161,9 @@ class GwNonVisual:
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
+        # Flag to control post actions (commit + UI refresh)
+        post_actions = False
+
         if is_new:
             # Check that there are no empty fields
             if not curve_id or curve_id == 'null':
@@ -1182,10 +1186,8 @@ class GwNonVisual:
             if not result:
                 return
 
-            # Commit
-            tools_db.dao.commit()
-            # Reload manager table
-            self._reload_manager_table()
+            post_actions = True
+
         elif curve_id is not None:
             # Update curve fields
             table_name = 've_inp_curve'
@@ -1211,11 +1213,14 @@ class GwNonVisual:
             result = self._insert_curve_values(dialog, tbl_curve_value, curve_id)
             if not result:
                 return
+            
+            post_actions = True
 
-            # Commit
+        # Commit and refresh UI once per operation
+        if post_actions:
             tools_db.dao.commit()
-            # Reload manager table
             self._reload_manager_table()
+            self._populate_filter_combos()
 
         # Call configure_layers_from_table_name dynamically for curve tables
         tools_gw.configure_layers_from_table_name("curve")
