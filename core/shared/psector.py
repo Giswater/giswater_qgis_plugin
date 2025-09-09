@@ -1037,7 +1037,6 @@ class GwPsector:
                 "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
         if from_tab_change is False:
-            #tools_gw.refresh_selectors()
             self.dlg_plan_psector.accept()
 
     def check_topology_psector(self, psector_id=None, psector_name=None):
