@@ -102,9 +102,6 @@ class GwConnectLinkButton(GwMaptool):
         if linkcat_id_value not in (None, 'None', ''):
             tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_linkcat", linkcat_id_value)
 
-        # Set combo ids editable
-        self.txt_id.setEditable(True)
-
         # Add headers to table
         tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header': f'{self.feature_type}_id'}])
 
