@@ -18,7 +18,7 @@ FROM (
     ('feat_eiot_sensor_vdefault', 'Default catalog for eiot sensor:', 'Value default catalog for eiot_sensor cat_feature'),
     ('qgis_info_docker', 'Force use docker for info:', 'Force use docker for info'),
     ('inp_options_ignore_rainfall', 'Ignore rainfall:', 'Value of ignore rainfall, which is set to YES if all rainfall data and runoff calculations should be ignored'),
-    ('inp_options_min_surfarea', 'Min surfarce area:', 'Value of minimum surfarea, which is a minimum surface area used at nodes when computing changes in water depth under dynamic wave routing'),
+    ('inp_options_min_surfarea', 'Min surface area:', 'Value of minimum surfarea, which is a minimum surface area used at nodes when computing changes in water depth under dynamic wave routing'),
     ('inp_options_epaversion', 'EPA version:', 'EPA version'),
     ('edit_addfield_p28_vdefault', 'Filter param 1:', 'Default value of addfield filter_param_1 for FILTER'),
     ('inp_options_advancedsettings', 'Additional settings for go2epa:', 'Additional settings for go2epa'),
