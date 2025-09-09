@@ -588,11 +588,11 @@ class GwSelectionWidget(QWidget):
             table_object: The table name
         """
         # Create button
-        btn_selection_on_top = QPushButton(self)
-        tools_gw.add_icon(btn_selection_on_top, "175")
-        btn_selection_on_top.setToolTip("Show selection on top")
-        btn_selection_on_top.setCheckable(True)
-        self.lyt_selection.addWidget(btn_selection_on_top, 0)
+        self.btn_selection_on_top = QPushButton(self)  # Store as instance variable
+        tools_gw.add_icon(self.btn_selection_on_top, "175")
+        self.btn_selection_on_top.setToolTip("Show selection on top")
+        self.btn_selection_on_top.setCheckable(True)
+        self.lyt_selection.addWidget(self.btn_selection_on_top, 0)
 
         # Store original model and button state
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
@@ -601,7 +601,7 @@ class GwSelectionWidget(QWidget):
             widget_table.setProperty('selection_on_top', False)
 
         # Connect signals
-        btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object))
+        self.btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object))
 
     def toggle_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str):
         """
@@ -622,15 +622,52 @@ class GwSelectionWidget(QWidget):
                 widget_table.setProperty('previous_selected_ids', selected_ids)
             self.show_selection_on_top(widget_table)
             widget_table.setProperty('selection_on_top', True)
+            self.btn_selection_on_top.setChecked(True)  # Update button state
         else:
-            # Restore original model
+            # Get the current and original models
+            current_model = widget_table.model()
             original_model = widget_table.property('original_model')
-            if original_model:
-                # Restore model
+            if original_model and current_model:
+                # Get the feature type and find ID column
+                _, feature_type = self.get_expected_table(class_object, dialog, table_object)
+                if not feature_type:
+                    return
+                    
+                # Create a mapping of IDs to their current data
+                current_data = {}
+                id_column_name = f"{feature_type}_id"
+                id_col = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
+                if id_col == -1:
+                    return
+                    
+                for row in range(current_model.rowCount()):
+                    row_id = str(current_model.data(current_model.index(row, id_col)))
+                    row_data = {}
+                    for col in range(current_model.columnCount()):
+                        source_index = current_model.index(row, col)
+                        item = QStandardItem()
+                        row_data[col] = self.copy_item_data(current_model, source_index, item)
+                    current_data[row_id] = row_data
+                
+                # Update original model with current data
+                for row in range(original_model.rowCount()):
+                    row_id = str(original_model.data(original_model.index(row, id_col)))
+                    if row_id in current_data:
+                        for col in range(original_model.columnCount()):
+                            target_index = original_model.index(row, col)
+                            current_item = current_data[row_id][col]
+                            # Copy all roles from current item to original model
+                            for role in range(Qt.UserRole + 100):  # Copy all possible roles
+                                data = current_item.data(role)
+                                if data is not None:
+                                    original_model.setData(target_index, data, role)
+                
+                # Restore model with updated data
                 widget_table.setModel(original_model)
                 # Restore selection
                 self.restore_selection(widget_table, selected_ids)
                 widget_table.setProperty('selection_on_top', False)
+                self.btn_selection_on_top.setChecked(False)  # Update button state
 
     def get_selected_ids(self, widget_table):
         """Get IDs of selected rows"""
@@ -659,7 +696,7 @@ class GwSelectionWidget(QWidget):
 
     def show_selection_on_top(self, widget_table):
         """
-        Moves the selected rows in a QTableView to the top
+        Moves the selected rows in a QTableView to the top while preserving all data roles and delegates
         """
         if not widget_table or not widget_table.model() or not widget_table.selectionModel():
             return
@@ -676,15 +713,22 @@ class GwSelectionWidget(QWidget):
         temp_model = QStandardItemModel()
         temp_model.setHorizontalHeaderLabels([model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())])
 
+        # Copy all item delegates from the original model
+        for col in range(model.columnCount()):
+            delegate = widget_table.itemDelegateForColumn(col)
+            if delegate:
+                widget_table.setItemDelegateForColumn(col, None)  # Remove from old model
+                temp_model.setItemDelegateForColumn(col, delegate)  # Set on new model
+
         # First add selected rows
         selected_rows = sorted([index.row() for index in selection_model.selectedRows()])
         for row in selected_rows:
             row_data = []
             for col in range(model.columnCount()):
-                data_value = model.data(model.index(row, col))
-                text = "" if data_value is None else str(data_value)
-                item = QStandardItem(text)
-                row_data.append(item)
+                source_index = model.index(row, col)
+                item = QStandardItem()
+                target_item = self.copy_item_data(model, source_index, item)
+                row_data.append(target_item)
             temp_model.appendRow(row_data)
 
         # Then add non-selected rows
@@ -692,10 +736,10 @@ class GwSelectionWidget(QWidget):
             if row not in selected_rows:
                 row_data = []
                 for col in range(model.columnCount()):
-                    data_value = model.data(model.index(row, col))
-                    text = "" if data_value is None else str(data_value)
-                    item = QStandardItem(text)
-                    row_data.append(item)
+                    source_index = model.index(row, col)
+                    item = QStandardItem()
+                    target_item = self.copy_item_data(model, source_index, item)
+                    row_data.append(target_item)
                 temp_model.appendRow(row_data)
 
         # Set the new model
@@ -703,5 +747,28 @@ class GwSelectionWidget(QWidget):
 
         # Restore selection
         self.restore_selection(widget_table, selected_ids)
+
+    def copy_item_data(self, model, source_index, target_item):
+            # List of common Qt roles to preserve
+            roles = [
+                Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole, Qt.ToolTipRole,
+                Qt.StatusTipRole, Qt.WhatsThisRole, Qt.FontRole, Qt.TextAlignmentRole,
+                Qt.BackgroundRole, Qt.ForegroundRole, Qt.CheckStateRole, Qt.InitialSortOrderRole,
+                Qt.UserRole
+            ]
+            
+            # Copy data for all roles
+            for role in roles:
+                data = model.data(source_index, role)
+                if data is not None:
+                    target_item.setData(data, role)
+            
+            # Copy any custom user roles (above Qt.UserRole)
+            for role in range(Qt.UserRole + 1, Qt.UserRole + 100):
+                data = model.data(source_index, role)
+                if data is not None:
+                    target_item.setData(data, role)
+            
+            return target_item
 
     # endregion selection on top
