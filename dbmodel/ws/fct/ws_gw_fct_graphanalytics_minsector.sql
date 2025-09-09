@@ -607,7 +607,7 @@ BEGIN
         -- ARCS-VALVE (MINSECTOR)
         -- only the valves that are minsector borders
         INSERT INTO temp_pgr_arc_mincut 
-        SELECT * FROM temp_pgr_arc
+        SELECT * FROM temp_pgr_arc a
         WHERE graph_delimiter = 'MINSECTOR'
         AND EXISTS (
             SELECT 1 FROM temp_pgr_minsector_graph g
@@ -626,7 +626,7 @@ BEGIN
         SELECT minsector_id, 0, 'MINSECTOR'
         FROM temp_pgr_minsector m;
     
-    -- insert the SECTORS nodes that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
+        -- insert the SECTORS nodes that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
         INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
         SELECT n.node_id, 0, 'SECTOR'
         FROM temp_pgr_node n
@@ -648,7 +648,7 @@ BEGIN
             UPDATE temp_pgr_node_mincut SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_arc_mincut SET proposed = FALSE WHERE proposed;
 
-            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":%s, "mode":"MASSIVE"}}',
+            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s", "mode":"MASSIVE"}}',
             v_pgr_distance, array_to_string(v_pgr_root_vids, ','), v_ignore_check_valves);
 
             RAISE NOTICE 'v_data: %', v_data;
