@@ -124,7 +124,7 @@ BEGIN
             WHERE node_id=OLD.node_id AND order_id=OLD.order_id;
 
         ELSIF v_node_table = 'inp_valve' THEN
-            UPDATE inp_valve SET valve_type=NEW.valve_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
+            UPDATE inp_valve SET valve_type=NEW.valve_type, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss,  custom_dint=NEW.custom_dint, add_settings = NEW.add_settings,
             init_quality=NEW.init_quality
             WHERE node_id=OLD.node_id;
