@@ -1038,7 +1038,7 @@ class GwPsector:
         tools_db.execute_sql(sql)
         if from_tab_change is False:
             tools_gw.refresh_selectors()
-            self.dlg_plan_psector.accept()
+            tools_gw.close_dialog(self.dlg_plan_psector)
 
     def check_topology_psector(self, psector_id=None, psector_name=None):
 
