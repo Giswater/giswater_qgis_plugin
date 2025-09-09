@@ -4920,7 +4920,7 @@ def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, c
 
 def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
     """ Fill cmb_psector_id """
-    sql = "SELECT psector_id as id, name as idval FROM plan_psector WHERE active = true ORDER BY id ASC"
+    sql = "SELECT psector_id as id, name as idval FROM v_ui_plan_psector WHERE archived = false ORDER BY id ASC"
     rows = tools_db.get_rows(sql)
     if not rows:
         return
