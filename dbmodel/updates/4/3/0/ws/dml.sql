@@ -896,3 +896,13 @@ VALUES(4354, 'Minsector dynamic analysis done successfully', null, 0, true, 'ws'
 UPDATE sys_table
 SET addparam='{"pkey": "netscenario_id, presszone_id"}'::json
 WHERE id='plan_netscenario_presszone';
+
+-- 09/09/2025
+UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false}, {"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false}, {"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false}, {"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false}, {"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false},
+{"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false},
+{"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false}, {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
+{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]'::json WHERE formname='ve_node' AND tabname='tab_epa';
