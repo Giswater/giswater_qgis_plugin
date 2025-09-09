@@ -572,7 +572,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#10;when cat_geom1 is not null then&#10;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -605,7 +605,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#10;when cat_geom1 is not null then&#10;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -648,7 +648,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
                   <Option name="properties" type="Map">
                     <Option name="size" type="Map">
                       <Option value="true" name="active" type="bool"/>
-                      <Option value="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 1000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 1000 THEN 0&#xd;&#xa;END" name="expression" type="QString"/>
+                      <Option value="CASE &#10;WHEN  @map_scale  &lt;= 1000 THEN 2.0 &#10;WHEN @map_scale  > 1000 THEN 0&#10;END" name="expression" type="QString"/>
                       <Option value="3" name="type" type="int"/>
                     </Option>
                   </Option>
@@ -703,7 +703,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#10;when cat_geom1 is not null then&#10;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -752,7 +752,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
                 </Option>
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.1 + 0.415 * ln((cat_geom1*cat_geom2) + 0.10)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.1 + 0.415 * ln((3.14*cat_geom1*cat_geom1/4) + 0.10)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.1 + 0.415 * ln((cat_geom1*cat_geom2) + 0.10)&#10;when cat_geom1 is not null then&#10;0.1 + 0.415 * ln((3.14*cat_geom1*cat_geom1/4) + 0.10)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -785,7 +785,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#10;when cat_geom1 is not null then&#10;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -828,7 +828,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
                   <Option name="properties" type="Map">
                     <Option name="size" type="Map">
                       <Option value="true" name="active" type="bool"/>
-                      <Option value="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 1500 THEN 3.0 &#xd;&#xa;WHEN @map_scale  > 1500 THEN 0&#xd;&#xa;END" name="expression" type="QString"/>
+                      <Option value="CASE &#10;WHEN  @map_scale  &lt;= 1500 THEN 3.0 &#10;WHEN @map_scale  > 1500 THEN 0&#10;END" name="expression" type="QString"/>
                       <Option value="3" name="type" type="int"/>
                     </Option>
                   </Option>
@@ -883,7 +883,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#10;when cat_geom1 is not null then&#10;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -916,7 +916,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#xd;&#xa;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#xd;&#xa;when cat_geom1 is not null then&#xd;&#xa;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#xd;&#xa;else 0.35 end" name="expression" type="QString"/>
+                  <Option value="case when cat_geom2 > 1 and  cat_geom2 < 10 then&#10;0.378 + 0.715 * ln((cat_geom1*cat_geom2) + 0.720)&#10;when cat_geom1 is not null then&#10;0.378 + 0.715 * ln((3.14*cat_geom1*cat_geom1/4) + 0.720)&#10;else 0.35 end" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -959,7 +959,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
                   <Option name="properties" type="Map">
                     <Option name="size" type="Map">
                       <Option value="true" name="active" type="bool"/>
-                      <Option value="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 1000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 1000 THEN 0&#xd;&#xa;END" name="expression" type="QString"/>
+                      <Option value="CASE &#10;WHEN  @map_scale  &lt;= 1000 THEN 2.0 &#10;WHEN @map_scale  > 1000 THEN 0&#10;END" name="expression" type="QString"/>
                       <Option value="3" name="type" type="int"/>
                     </Option>
                   </Option>
@@ -1016,7 +1016,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 5000 THEN 0.55&#xd;&#xa;WHEN @map_scale  > 5000 THEN  &quot;conduit_cat_geom1&quot; * 0.4&#xd;&#xa;END" name="expression" type="QString"/>
+                  <Option value="CASE &#10;WHEN  @map_scale  &lt;= 5000 THEN 0.55&#10;WHEN @map_scale  > 5000 THEN  &quot;conduit_cat_geom1&quot; * 0.4&#10;END" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -1049,7 +1049,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
               <Option name="properties" type="Map">
                 <Option name="outlineWidth" type="Map">
                   <Option value="true" name="active" type="bool"/>
-                  <Option value="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 5000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 5000 THEN 0&#xd;&#xa;END" name="expression" type="QString"/>
+                  <Option value="CASE &#10;WHEN  @map_scale  &lt;= 5000 THEN 2.0 &#10;WHEN @map_scale  > 5000 THEN 0&#10;END" name="expression" type="QString"/>
                   <Option value="3" name="type" type="int"/>
                 </Option>
               </Option>
@@ -1092,7 +1092,7 @@ SET styletype='qml', stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
                   <Option name="properties" type="Map">
                     <Option name="size" type="Map">
                       <Option value="true" name="active" type="bool"/>
-                      <Option value="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 1000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 1000 THEN 0&#xd;&#xa;END" name="expression" type="QString"/>
+                      <Option value="CASE &#10;WHEN  @map_scale  &lt;= 1000 THEN 2.0 &#10;WHEN @map_scale  > 1000 THEN 0&#10;END" name="expression" type="QString"/>
                       <Option value="3" name="type" type="int"/>
                     </Option>
                   </Option>
