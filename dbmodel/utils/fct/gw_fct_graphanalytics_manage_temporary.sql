@@ -159,8 +159,8 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_om_waterbalance_dma_graph (LIKE SCHEMA_NAME.om_waterbalance_dma_graph INCLUDING ALL);
             END IF;
         ELSE 
-            IF v_fct_name = 'DWFZONE'
-                ALTER TABLE temp_pgr_mapzone ADD COLUMN  drainzone_id int4;
+            IF v_fct_name = 'DWFZONE' THEN
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN  drainzone_id int4 DEFAULT 0;
             END IF;
         END IF;
 
