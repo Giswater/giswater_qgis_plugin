@@ -846,14 +846,9 @@ class GwPsector:
     def check_tab_position(self):
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
-        cur_psector = tools_gw.get_config_value('plan_psector_current')
-        if cur_psector and cur_psector[0] is not None:
-            cur_psector = int(cur_psector[0])
-        else:
-            cur_psector = None
-
-        if psector_id in (None, "null") or psector_id == cur_psector:
-            self.insert_or_update_new_psector(close_dlg=False)
+        
+        if not self.update:
+            self.insert_or_update_new_psector(from_tab_change=True)
 
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
@@ -925,7 +920,7 @@ class GwPsector:
             return False
         return True
 
-    def insert_or_update_new_psector(self, close_dlg=False):
+    def insert_or_update_new_psector(self, from_tab_change=False):
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name", return_string_null=False)
         if psector_name == "":
@@ -1033,6 +1028,7 @@ class GwPsector:
                         sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                             f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
                     tools_db.execute_sql(sql)
+                    self.update = True
                     self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
                     tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id[0], do_call_fct=False, force_change=True)
 
@@ -1040,11 +1036,9 @@ class GwPsector:
                 "SET value = False "
                 "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
-
-        # Refresh selectors UI if it is open and and the form will close
-        if close_dlg:
-            tools_gw.close_dialog(self.dlg_plan_psector)
-            tools_gw.refresh_selectors()
+        if from_tab_change is False:
+            #tools_gw.refresh_selectors()
+            self.dlg_plan_psector.accept()
 
     def check_topology_psector(self, psector_id=None, psector_name=None):
 
@@ -2644,4 +2638,4 @@ def accept(**kwargs):
     """ Accept button action """
 
     class_obj = kwargs["class"]
-    class_obj.insert_or_update_new_psector(True)
+    class_obj.insert_or_update_new_psector()
