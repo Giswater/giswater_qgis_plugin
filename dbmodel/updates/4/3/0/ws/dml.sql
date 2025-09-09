@@ -892,3 +892,7 @@ UPDATE config_param_system SET value = (value::jsonb || '{"MINSECTOR_MINCUT":{"m
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4354, 'Minsector dynamic analysis done successfully', null, 0, true, 'ws', 'core', 'AUDIT');
+
+UPDATE sys_table
+SET addparam='{"pkey": "netscenario_id, presszone_id"}'::json
+WHERE id='plan_netscenario_presszone';
