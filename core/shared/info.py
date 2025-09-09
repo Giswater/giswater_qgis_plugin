@@ -628,7 +628,7 @@ class GwInfo(QObject):
             lib_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
             lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
-            
+
             # For new features created after a previous feature (docker dialog stays open), enable edit mode
             is_new_feature = new_feature is not None
             if is_new_feature and self.layer:
@@ -641,7 +641,7 @@ class GwInfo(QObject):
                         if not self.layer.isEditable():
                             self.layer.startEditing()
                         self.action_edit.setChecked(True)
-            
+
             # Hide Accept button in Docker mode - use Apply instead
             if btn_accept:
                 btn_accept.hide()
@@ -1015,27 +1015,35 @@ class GwInfo(QObject):
         return result
 
     def _open_help(self, feature_type):
-        """ Open PDF file with selected @project_type and @feature_type """
+        """ Open help file with selected @project_type and @feature_type """
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
-
         project_type = tools_gw.get_project_type()
-        # Get PDF file
-        pdf_folder = os.path.join(lib_vars.plugin_dir, f'resources{os.sep}png')
-        pdf_path = os.path.join(pdf_folder, f"{project_type}_{feature_type}_{locale}.png")
+        png_folder = os.path.join(lib_vars.plugin_dir, f'resources{os.sep}png')
 
-        # Open PDF if exists. If not open Spanish version
-        if os.path.exists(pdf_path):
-            os.system(pdf_path)
-        else:
-            locale = "es_ES"
-            pdf_path = os.path.join(pdf_folder, f"{project_type}_{feature_type}_{locale}.png")
-            if os.path.exists(pdf_path):
-                os.system(pdf_path)
-            else:
-                message = "No help file found"
-                tools_qgis.show_warning(message, parameter=pdf_path)
+        # Try with current locale
+        png_path = os.path.join(png_folder, f"{project_type}_{feature_type}_{locale}.png")
+        if os.path.exists(png_path):
+            os.system(png_path)
+            return
+
+        # If locale starts with 'es', try with es_ES
+        if locale.startswith('es'):
+            png_path = os.path.join(png_folder, f"{project_type}_{feature_type}_es_ES.png")
+            if os.path.exists(png_path):
+                os.system(png_path)
+                return
+
+        # Try with en_US as fallback
+        png_path = os.path.join(png_folder, f"{project_type}_{feature_type}_en_US.png")
+        if os.path.exists(png_path):
+            os.system(png_path)
+            return
+
+        # If no help file found, show warning
+        message = "No help file found"
+        tools_qgis.show_warning(message, parameter=png_path)
 
     def _block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
 
