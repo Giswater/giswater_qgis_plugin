@@ -79,7 +79,7 @@ AS WITH
 		LEFT JOIN typevalue t ON t.id::text = dwfzone.dwfzone_type::text AND t.typevalue::text = 'dwfzone_type'::text
 	),
 	arc_psector AS (
-		SELECT DISTINCT ON (pp.arc_id)
+		SELECT DISTINCT ON (pp.arc_id, pp.state)
       pp.arc_id,
 		  pp.state AS p_state
 		FROM plan_psector_x_arc pp
@@ -185,7 +185,6 @@ AS WITH
 			arc.epa_type,
 			arc.state,
 			arc.state_type,
-			--arc_selector.p_state,
 			arc.parent_id,
 			arc.expl_id,
 			e.macroexpl_id,
@@ -290,7 +289,7 @@ AS WITH
 			arc.updated_by,
 			arc.the_geom,
 			arc.meandering,
-			arc_psector.p_state
+			arc_selector.p_state
 			FROM arc_selector
 				JOIN arc USING (arc_id)
 				JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
@@ -303,7 +302,6 @@ AS WITH
 				LEFT JOIN drainzone_table ON arc.omzone_id = drainzone_table.drainzone_id
 				LEFT JOIN dwfzone_table ON arc.dwfzone_id = dwfzone_table.dwfzone_id
 				LEFT JOIN arc_add ON arc_add.arc_id = arc.arc_id
-				LEFT JOIN arc_psector ON arc_psector.arc_id = arc.arc_id
 	)
 SELECT
 	arc_id,
@@ -341,7 +339,6 @@ SELECT
 	epa_type,
 	state,
 	state_type,
-	--p_state,
 	parent_id,
 	expl_id,
 	macroexpl_id,
@@ -517,7 +514,7 @@ AS WITH
 		LEFT JOIN typevalue t ON t.id::text = dwfzone.dwfzone_type::text AND t.typevalue::text = 'dwfzone_type'::text
 	), 
 	node_psector AS (
-    SELECT DISTINCT ON (pp.node_id) 
+    SELECT DISTINCT ON (pp.node_id, pp.state) 
       pp.node_id,
       pp.state AS p_state
     FROM plan_psector_x_node pp
@@ -575,7 +572,6 @@ AS WITH
 			node.epa_type,
 			node.state,
 			node.state_type,
-			--node_selector.p_state,
 			node.arc_id,
 			node.parent_id,
 			node.expl_id,
@@ -674,7 +670,7 @@ AS WITH
 			date_trunc('second'::text, node.updated_at) AS updated_at,
 			node.updated_by,
 			node.the_geom,
-			node_psector.p_state
+			node_selector.p_state
 			FROM node_selector
 				JOIN node USING (node_id)
 				JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
@@ -687,7 +683,6 @@ AS WITH
 				LEFT JOIN drainzone_table ON node.omzone_id = drainzone_table.drainzone_id
 				LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
 				LEFT JOIN node_add ON node_add.node_id = node.node_id
-				LEFT JOIN node_psector ON node_psector.node_id = node.node_id
 	), node_base AS (
 		SELECT node_selected.node_id,
 			node_selected.code,
@@ -833,7 +828,6 @@ SELECT
 	epa_type,
 	state,
 	state_type,
-	--p_state,
 	arc_id,
 	parent_id,
 	expl_id,
@@ -1032,7 +1026,7 @@ AS WITH
 		WHERE l.state = 2
 	), 
 	connec_psector AS (
-    SELECT DISTINCT ON (pp.connec_id) 
+    SELECT DISTINCT ON (pp.connec_id, pp.state) 
     pp.connec_id,
     pp.state AS p_state,
     pp.psector_id,
@@ -1080,7 +1074,6 @@ AS WITH
 			connec.connec_length,
 			connec.state,
 			connec.state_type,
-			--connec_selector.p_state,
 			connec_selector.arc_id,
 			connec.expl_id,
 			exploitation.macroexpl_id,
@@ -1208,7 +1201,7 @@ AS WITH
 			connec.updated_by,
 			connec.the_geom,
 			connec.diagonal,
-			connec_psector.p_state
+			connec_selector.p_state
 		FROM connec_selector
 		JOIN connec USING (connec_id)
 		JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
@@ -1221,7 +1214,6 @@ AS WITH
 		LEFT JOIN drainzone_table ON connec.omzone_id = drainzone_table.drainzone_id
 		LEFT JOIN dwfzone_table ON connec.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN link_planned USING (link_id)
-		LEFT JOIN connec_psector ON connec_psector.connec_id = connec.connec_id
 	)
 SELECT 
 	connec_id,
@@ -1239,7 +1231,6 @@ SELECT
 	connec_length,
 	state,
 	state_type,
-	--p_state,
 	arc_id,
 	expl_id,
 	macroexpl_id,
@@ -1439,7 +1430,7 @@ AS WITH
 		WHERE l.state = 2
 	), 
 	gully_psector AS (
-    SELECT DISTINCT ON (pp.gully_id) 
+    SELECT DISTINCT ON (pp.gully_id, pp.state) 
     pp.gully_id,
     pp.state AS p_state,
     pp.psector_id,
@@ -1518,7 +1509,6 @@ AS WITH
 			gully.epa_type,
 			gully.state,
 			gully.state_type,
-			--gully_selector.p_state,
 			gully.expl_id,
 			exploitation.macroexpl_id,
 			gully.muni_id,
@@ -1641,7 +1631,7 @@ AS WITH
 			date_trunc('second'::text, gully.updated_at) AS updated_at,
 			gully.updated_by,
 			gully.the_geom,
-			gully_psector.p_state
+			gully_selector.p_state
 		FROM gully_selector
 		JOIN gully USING (gully_id)
 		JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
@@ -1656,7 +1646,6 @@ AS WITH
 		LEFT JOIN dwfzone_table ON gully.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN link_planned ON gully.gully_id = link_planned.feature_id
 		LEFT JOIN inp_network_mode ON true
-		LEFT JOIN gully_psector ON gully_psector.gully_id = gully.gully_id
 	)
 SELECT 
 	gully_id,
@@ -1690,7 +1679,6 @@ SELECT
 	epa_type,
 	state,
 	state_type,
-	--p_state,
 	expl_id,
 	macroexpl_id,
 	muni_id,
@@ -1850,7 +1838,7 @@ AS WITH
 		WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
 	), 
 	link_psector AS (
-    (SELECT DISTINCT ON (pp.connec_id) 
+    (SELECT DISTINCT ON (pp.connec_id, pp.state) 
       'CONNEC'::text AS feature_type,
       pp.connec_id AS feature_id,
       pp.state AS p_state,
@@ -1861,7 +1849,7 @@ AS WITH
     ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
 		)
 		UNION ALL
-		(SELECT DISTINCT ON (pp.gully_id) 
+		(SELECT DISTINCT ON (pp.gully_id, pp.state) 
       'GULLY'::text AS feature_type,
       pp.gully_id AS feature_id,
       pp.state AS p_state,
@@ -1915,7 +1903,6 @@ AS WITH
 			l.linkcat_id,
 			l.state,
 			l.state_type,
-			--link_selector.p_state,
 			l.expl_id,
 			exploitation.macroexpl_id,
 			l.muni_id,
@@ -1965,7 +1952,7 @@ AS WITH
 			date_trunc('second'::text, l.updated_at) AS updated_at,
 			l.updated_by,
 			l.the_geom,
-			link_psector.p_state
+			link_selector.p_state
 		FROM link_selector
 		JOIN link l USING (link_id)
 		JOIN exploitation ON l.expl_id = exploitation.expl_id
@@ -1977,7 +1964,6 @@ AS WITH
 		LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 		LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
 		LEFT JOIN inp_network_mode ON true
-		LEFT JOIN link_psector ON link_psector.link_id = l.link_id
 	)
 SELECT link_id,
 	code,
@@ -1997,7 +1983,6 @@ SELECT link_id,
 	linkcat_id,
 	state,
 	state_type,
-	--p_state,
 	expl_id,
 	macroexpl_id,
 	muni_id,

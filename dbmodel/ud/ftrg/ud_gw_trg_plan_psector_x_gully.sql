@@ -59,6 +59,14 @@ BEGIN
 		NEW.doable =  TRUE;
 	END IF;
 
+	SELECT link_id INTO v_link_id FROM ve_link WHERE feature_id = NEW.gully_id LIMIT 1;
+
+	IF TG_OP = 'INSERT' THEN
+		IF v_link_id IS NOT NULL THEN
+			NEW.link_id = v_link_id;
+		END IF;
+	END IF;
+
 	RETURN NEW;
 
 END;  
