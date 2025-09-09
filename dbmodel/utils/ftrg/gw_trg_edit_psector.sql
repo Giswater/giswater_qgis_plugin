@@ -222,7 +222,7 @@ BEGIN
 					a.function_type, a.category_type, a.fluid_type, a.location_type, a.workcat_id, a.workcat_id_end, a.builtdate, a.enddate, a.ownercat_id, a.muni_id,
 					a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id, a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom,
 					a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.uncertain, a.expl_id, a.num_value, a.feature_type, a.created_at, a.updated_at, a.updated_by, a.created_by,
-					a.district_id, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.SCHEMA_NAME_id, a.nodetype_1, a.node_sys_top_elev_1, a.node_sys_elev_1, a.nodetype_2, a.node_sys_top_elev_2,
+					a.district_id, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.node_sys_top_elev_1, a.node_sys_elev_1, a.nodetype_2, a.node_sys_top_elev_2,
 					a.node_sys_elev_2, a.parent_id, a.expl_visibility, a.adate, a.adescript, a.visitability, a.label_quadrant, a.minsector_id, a.brand_id, a.model_id, a.serial_number,
 					a.dwfzone_id, a.initoverflowpath, a.omunit_id, a.registration_date, a.meandering, a.conserv_state, a.om_state, a.last_visitdate, a.negative_offset
 				FROM plan_psector_x_arc pa
