@@ -4930,7 +4930,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
 
     # If cmb changed and psector mode is enabled, don't change the buttons
     if force_change or not (cmb_changed and not enable):
-        _change_plan_mode_buttons(enable=enable, psector_id=psector_id, update_cmb_psector_id=force_change)
+        _change_plan_mode_buttons(enable=enable, psector_id=psector_id, update_cmb_psector_id=force_change, cmb_changed=cmb_changed)
 
     if do_call_fct:
         # Prepare the JSON body for gw_fct_set_toggle_current
@@ -4939,9 +4939,10 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
 
         # Execute the stored procedure
         execute_procedure("gw_fct_set_toggle_current", body)
+        global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
 
 
-def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False):
+def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
     """ Change plan mode buttons """
 
     psignals_widgets = global_vars.psignals['widgets']
@@ -4969,7 +4970,7 @@ def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False):
     # Update cmb_psector_id if needed
     if update_cmb_psector_id and cmb_psector_id is not None:
         fill_cmb_psector_id(cmb_psector_id, psector_id)
-        global_vars.psignals['psector_id'] = psector_id
+        global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
 
 
 def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
