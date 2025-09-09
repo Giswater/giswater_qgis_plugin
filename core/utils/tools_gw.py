@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QDialog, QActionGroup
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -3766,12 +3766,12 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Prevent UI interference while updating the table
     table_widget.blockSignals(True)
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
-    
+
     ids_to_insert = []
     for id in class_object.rel_list_ids[class_object.rel_feature_type]:
         if id not in table_ids:
             ids_to_insert.append(id)
-    
+
     do_insert = False
     if ids_to_insert:
         msg = "Do you want to insert the selected features? {0}"
@@ -3815,7 +3815,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     selection_model = table_widget.selectionModel()
     if model and selection_model and selected_ids:
         selection_model.clearSelection()
-        
+
         for row in range(model.rowCount()):
             model_index = get_model_index(model, row, field_id)
             row_value = str(model_index)
@@ -3830,9 +3830,10 @@ def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
     widget_table, feature_type = class_object.get_expected_table(class_object, dialog, table_object)
     if not widget_table or not widget_table.model() or not feature_type:
         return
-    
+
     expr_filter = QgsExpression(f"{feature_type}_id IN ({','.join(f'{i}' for i in ids_to_select)})")
     tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
+
 
 def get_model_index(model, row, field_name):
     if hasattr(model, 'fieldIndex'):

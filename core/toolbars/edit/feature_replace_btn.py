@@ -233,17 +233,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
         # Avoid to replace obsolete or planified features
-        valid_states = [0]
-        if global_vars.psignals['psector_active'] and feature.attribute('state') == 2:
-            node_psector_id = self._get_feature_psector_id(self.feature_id, self.feature_type)
-            if node_psector_id is not None and node_psector_id != global_vars.psignals['psector_id']:
-                msg = "The selected feature is planified in another psector.\nFeature psector: {0}\nCurrent psector: {1}"
-                title = "Feature replace"
-                msg_params = (node_psector_id, global_vars.psignals['psector_id'],)
-                tools_qt.show_info_box(msg, title=title, msg_params=msg_params)
-                return
-        else:
-            valid_states = [0, 2]
+        valid_states = [0, 2]
         if feature.attribute('state') in valid_states:
             msg_params = None
             if feature.attribute('state') == 0:
@@ -251,7 +241,7 @@ class GwFeatureReplaceButton(GwMaptool):
                 state = 'OBSOLETE'
                 msg_params = (state,)
             elif feature.attribute('state') == 2:
-                msg = "Current feature is planified. You should activate plan mode to work with it."
+                msg = "Planified features cannot be replaced"
             tools_qt.show_info_box(msg, "Info", msg_params=msg_params if msg_params is not None else None)
             return
 
@@ -544,24 +534,5 @@ class GwFeatureReplaceButton(GwMaptool):
         else:
             self.dlg_replace.lbl_description.setVisible(False)
             self.dlg_replace.description.setVisible(False)
-
-    def _get_feature_psector_id(self, feature_id, feature_type):
-        """ Get psector_id from a feature """
-
-        table_name = f"plan_psector_x_{feature_type}"
-        sql = f"""
-            SELECT psector_id 
-            FROM {table_name} 
-            WHERE {feature_type}_id = '{feature_id}' 
-            AND state = 1  -- operative feature
-            AND psector_id IN (
-                SELECT psector_id 
-                FROM selector_psector 
-                WHERE cur_user = current_user
-            )
-        """
-
-        row = tools_db.get_row(sql)
-        return row[0] if row else None
 
     # endregion
