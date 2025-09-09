@@ -906,3 +906,6 @@ UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit", "actionTool
 {"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false},
 {"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false}, {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
 {"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]'::json WHERE formname='ve_node' AND tabname='tab_epa';
+
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';

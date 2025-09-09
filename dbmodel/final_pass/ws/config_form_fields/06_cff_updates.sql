@@ -943,3 +943,6 @@ UPDATE config_form_fields SET placeholder=NULL WHERE formname IN('ve_dma', 've_d
 -- f87b2fc
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue=''mincut_state'' AND id<>''4'''
 WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='state';
+
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
