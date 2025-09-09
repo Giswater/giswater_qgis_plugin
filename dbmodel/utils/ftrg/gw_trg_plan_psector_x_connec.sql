@@ -16,6 +16,7 @@ DECLARE
 v_stateaux smallint;
 v_explaux smallint;
 v_psector_expl smallint;
+v_link_id integer;
 
 BEGIN
 
@@ -54,6 +55,14 @@ BEGIN
 	-- profilactic control of doable
 	IF NEW.doable IS NULL THEN
 		NEW.doable =  TRUE;
+	END IF;
+
+	SELECT link_id INTO v_link_id FROM ve_link WHERE feature_id = NEW.connec_id LIMIT 1;
+
+	IF TG_OP = 'INSERT' THEN
+		IF v_link_id IS NOT NULL THEN
+			NEW.link_id = v_link_id;
+		END IF;
 	END IF;
 
 	RETURN NEW;

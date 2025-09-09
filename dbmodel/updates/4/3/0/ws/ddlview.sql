@@ -299,7 +299,7 @@ AS WITH
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
   ),
   arc_psector AS (
-		SELECT DISTINCT ON (pp.arc_id)
+		SELECT DISTINCT ON (pp.arc_id, pp.state)
       pp.arc_id,
 		  pp.state AS p_state
 		FROM plan_psector_x_arc pp
@@ -350,7 +350,6 @@ AS WITH
       arc.epa_type,
       arc.state,
       arc.state_type,
-      --arc_selector.p_state,
       arc.parent_id,
       arc.expl_id,
       exploitation.macroexpl_id,
@@ -462,7 +461,7 @@ AS WITH
       date_trunc('second'::text, arc.updated_at) AS updated_at,
       arc.updated_by,
       arc.the_geom,
-      arc_psector.p_state
+      arc_selector.p_state
     FROM arc_selector
     JOIN arc ON arc.arc_id = arc_selector.arc_id
     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
@@ -477,7 +476,6 @@ AS WITH
     LEFT JOIN omzone_table ON omzone_table.omzone_id = arc.omzone_id
     LEFT JOIN arc_add ON arc_add.arc_id = arc.arc_id
     LEFT JOIN value_state_type vst ON vst.id = arc.state_type
-    LEFT JOIN arc_psector on arc_psector.arc_id = arc.arc_id
   )
 SELECT 
   arc_id,
@@ -698,7 +696,7 @@ AS WITH
     LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
   ), 
   node_psector AS (
-    SELECT DISTINCT ON (pp.node_id) 
+    SELECT DISTINCT ON (pp.node_id, pp.state) 
       pp.node_id,
       pp.state AS p_state
     FROM plan_psector_x_node pp
@@ -744,7 +742,6 @@ AS WITH
       node.epa_type,
       node.state,
       node.state_type,
-      --node_selector.p_state,
       node.arc_id,
       node.parent_id,
       node.expl_id,
@@ -863,7 +860,7 @@ AS WITH
       date_trunc('second'::text, node.updated_at) AS updated_at,
       node.updated_by,
       node.the_geom,
-      node_psector.p_state
+      node_selector.p_state
     FROM node_selector
     JOIN node ON node.node_id = node_selector.node_id
     JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
@@ -879,7 +876,6 @@ AS WITH
     LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
     LEFT JOIN node_add ON node_add.node_id = node.node_id
     LEFT JOIN man_valve m ON m.node_id = node.node_id
-    LEFT JOIN node_psector ON node_psector.node_id = node.node_id
   )
 SELECT 
   node_id,
@@ -1142,7 +1138,7 @@ AS WITH
     WHERE l.state = 2
   ), 
   connec_psector AS (
-    SELECT DISTINCT ON (pp.connec_id) 
+    SELECT DISTINCT ON (pp.connec_id, pp.state) 
     pp.connec_id,
     pp.state AS p_state,
     pp.psector_id,
@@ -1192,7 +1188,6 @@ AS WITH
       connec.epa_type,
       connec.state,
       connec.state_type,
-      --connec_selector.connec_id,
       connec_selector.arc_id,
       connec.expl_id,
       exploitation.macroexpl_id,
@@ -1381,7 +1376,7 @@ AS WITH
       date_trunc('second'::text, connec.updated_at) AS updated_at,
       connec.updated_by,
       connec.the_geom,
-      connec_psector.p_state
+      connec_selector.p_state
     FROM connec_selector
     JOIN connec ON connec.connec_id = connec_selector.connec_id
     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
@@ -1399,7 +1394,6 @@ AS WITH
     LEFT JOIN connec_add ON connec_add.connec_id = connec.connec_id
     LEFT JOIN value_state_type vst ON vst.id = connec.state_type
     LEFT JOIN inp_network_mode ON true
-    LEFT JOIN connec_psector ON connec_psector.connec_id = connec.connec_id
   )
 SELECT 
   connec_id,
@@ -1419,7 +1413,6 @@ SELECT
   epa_type,
   state,
   state_type,
-  --p_state
   arc_id,
   expl_id,
   macroexpl_id,
@@ -1632,7 +1625,7 @@ AS WITH
     WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
   ),
   link_psector AS (
-    SELECT DISTINCT ON (pp.connec_id) 
+    SELECT DISTINCT ON (pp.connec_id, pp.state) 
       'CONNEC'::text AS feature_type,
       pp.connec_id AS feature_id,
       pp.state AS p_state,
@@ -1685,7 +1678,6 @@ AS WITH
       l_1.linkcat_id,
       l_1.state,
       l_1.state_type,
-      --link_selector.p_state,
       l_1.expl_id,
       exploitation.macroexpl_id,
       l_1.muni_id,
@@ -1741,7 +1733,7 @@ AS WITH
       l_1.updated_at,
       l_1.updated_by,
       l_1.the_geom,
-      link_psector.p_state
+      link_selector.p_state
     FROM link_selector
     JOIN link l_1 ON l_1.link_id = link_selector.link_id
     LEFT JOIN connec c ON c.connec_id = l_1.feature_id
@@ -1755,7 +1747,6 @@ AS WITH
     LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l_1.supplyzone_id
     LEFT JOIN omzone_table ON omzone_table.omzone_id = l_1.omzone_id
     LEFT JOIN inp_network_mode ON true
-    LEFT JOIN link_psector ON link_psector.p_state = l_1.link_id
   )
 SELECT 
   link_id,
@@ -1776,7 +1767,6 @@ SELECT
   linkcat_id,
   state,
   state_type,
-  --p_state,
   expl_id,
   macroexpl_id,
   muni_id,
