@@ -69,3 +69,5 @@ INSERT INTO config_style (id, idval, descript, sys_role, addparam, is_templayer,
 UPDATE config_form_fields
 	SET iseditable=false
 	WHERE formname='generic' AND formtype='check_project' AND columnname='txt_infolog' AND tabname='tab_log';
+
+UPDATE value_state SET active = true;

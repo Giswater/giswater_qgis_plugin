@@ -642,7 +642,7 @@ BEGIN
             WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
 	IF v_expl IS NULL THEN
-		UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = CURRENT_USER();
+		UPDATE config_param_user SET value = NULL WHERE parameter = 'plan_psector_current' AND cur_user = CURRENT_USER;
 	END IF;
 
 	-- cross reference schema for state 
