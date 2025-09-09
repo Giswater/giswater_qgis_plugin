@@ -444,7 +444,7 @@ BEGIN
         END IF;
 
 		-- if the new arc is equal to an existing arc
-      	IF TG_OP = 'INSERT' AND (SELECT EXISTS (SELECT 1 FROM arc WHERE ST_Equals(the_geom, NEW.the_geom))) IS TRUE THEN
+      	IF TG_OP = 'INSERT' AND (SELECT EXISTS (SELECT 1 FROM arc WHERE ST_Equals(the_geom, NEW.the_geom) AND arc.state = 1 AND NEW.state=1)) IS TRUE THEN
       
 			IF v_dsbl_error IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
