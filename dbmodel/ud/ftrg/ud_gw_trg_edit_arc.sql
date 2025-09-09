@@ -456,7 +456,7 @@ BEGIN
 
 		IF v_man_table='man_conduit' THEN
 
-			INSERT INTO man_conduit VALUES (NEW.arc_id, NEW.bottom_mat, NEW.conduit_code);
+			INSERT INTO man_conduit (arc_id, bottom_mat, conduit_code) VALUES (NEW.arc_id, NEW.bottom_mat, NEW.conduit_code);
 
 		ELSIF v_man_table='man_siphon' THEN
 
