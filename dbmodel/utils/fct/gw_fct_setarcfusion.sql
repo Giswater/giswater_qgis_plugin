@@ -16,11 +16,11 @@ $BODY$
 /*
 
 -- MODE 1: individual - operative
-SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{}, 
+SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{},
 "feature":{"id":["3470"]}, "data":{"arccat_id":"FD-150", "enddate":"2024-09-05", "action_mode": 2}}$$);
 
 -- MODE 1: individual - plan
-SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{}, 
+SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{},
 "feature":{"id":["1044"]}, "data":{"plan_mode":true, "arccat_id":"FD150", "psectorId":1, "action_mode": 1, "state_type":null,  "workcatId":null}}$$);
 
 
@@ -40,8 +40,8 @@ v_point_array2 geometry[];
 v_count integer;
 v_exists_node_id integer;
 v_new_record SCHEMA_NAME.arc;
-v_record1 SCHEMA_NAME.arc;
-v_record2 SCHEMA_NAME.arc;
+v_record1 SCHEMA_NAME.ve_arc;
+v_record2 SCHEMA_NAME.ve_arc;
 v_arc_geom geometry;
 v_project_type text;
 rec_param record;
@@ -77,6 +77,7 @@ v_man_table text;
 v_epa_table text;
 v_state_type integer;
 v_action_mode integer;
+v_plan_mode boolean;
 
 rec_addfields record;
 v_sql text;
@@ -90,6 +91,9 @@ v_result_id text= 'arc fusion';
 v_schemaname text;
 v_arccat_id text;
 v_epatype text;
+
+v_arc1_psector integer;
+v_arc2_psector integer;
 
 BEGIN
 
@@ -110,6 +114,7 @@ BEGIN
 	v_action_mode = ((p_data ->>'data')::json->>'action_mode')::integer;
 	v_arccat_id = ((p_data ->>'data')::json->>'arccat_id')::text;
 	v_arc_type = ((p_data ->>'data')::json->>'arc_type')::text;
+	v_plan_mode = ((p_data ->>'data')::json->>'plan_mode')::boolean;
 
 	-- Get state_type from default value if this isn't on input json
 	IF v_state_type IS NULL THEN
@@ -123,6 +128,7 @@ BEGIN
 	END IF;
 
 	v_action_mode = COALESCE(v_action_mode, 1);
+	v_plan_mode = COALESCE(v_plan_mode, false);
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=214 AND cur_user=current_user;
@@ -146,8 +152,33 @@ BEGIN
 		IF v_count = 2 THEN
 
 			-- Get both arc features
-			SELECT * INTO v_record1 FROM arc WHERE (node_2 = v_node_id) AND state > 0 ORDER BY arc_id DESC LIMIT 1;
-			SELECT * INTO v_record2 FROM arc where (node_1 = v_node_id) AND state > 0 ORDER BY arc_id ASC LIMIT 1;
+			SELECT * INTO v_record1 FROM ve_arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id DESC LIMIT 1;
+			SELECT * INTO v_record2 FROM ve_arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id ASC LIMIT 1;
+
+			-- Check psector compatibility based on mode
+			IF v_plan_mode = true THEN
+				-- Plan mode: validate psector compatibility
+				-- For planned arcs (state = 2), they must belong to the current psector
+				IF v_record1.state = 2 THEN
+					SELECT psector_id INTO v_arc1_psector FROM plan_psector_x_arc WHERE arc_id = v_record1.arc_id AND state = 1 LIMIT 1;
+					IF v_arc1_psector != v_psector_id OR v_arc1_psector IS NULL THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4350", "function":"2112", "is_process":true}}$$)';
+					END IF;
+				END IF;
+
+				IF v_record2.state = 2 THEN
+					SELECT psector_id INTO v_arc2_psector FROM plan_psector_x_arc WHERE arc_id = v_record2.arc_id AND state = 1 LIMIT 1;
+					IF v_arc2_psector != v_psector_id OR v_arc2_psector IS NULL THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4350", "function":"2112", "is_process":true}}$$)';
+					END IF;
+				END IF;
+
+			ELSE
+				-- Operative mode: deny operation if any arc is planned
+				IF v_record1.state = 2 OR v_record2.state = 2 THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4352", "function":"2112", "is_process":true}}$$)';
+				END IF;
+			END IF;
 
 			-- get states
 			SELECT state INTO v_state_node FROM node WHERE node_id = v_node_id;

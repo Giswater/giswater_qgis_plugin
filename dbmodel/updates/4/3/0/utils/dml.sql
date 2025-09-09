@@ -35,13 +35,13 @@ INSERT INTO config_form_tableview VALUES ('plan toolbar', 'utils', 'plan_psector
 UPDATE config_typevalue SET addparam='{"orderBy":999}' WHERE typevalue='sys_table_context' AND id='{"levels": ["HIDDEN"]}';
 
 -- 03/09/2025
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
 VALUES('layout_name_typevalue', 'lyt_connect_link_4', 'lyt_connect_link_4', 'lytConnectLink4', '{"lytOrientation": "horizontal"}'::json);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('generic', 'link_to_connec', 'tab_none', 'arc_id', 'lyt_connect_link_4', 1, 'text', 'text', 'Connect to arc:', 'Arc Id', NULL, false, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('generic', 'link_to_connec', 'tab_none', 'btn_set_to_arc', 'lyt_connect_link_4', 2, NULL, 'button', NULL, 'Set to arc', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{
   "icon": "155"
 }'::json, NULL, NULL, NULL, false, 0);
@@ -54,7 +54,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 }'::json, NULL, false, 0);
 
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3512, 'gw_fct_plan_recover_archived', 'utils', 'function', 'json', 'json', NULL, 'role_plan', NULL, 'core', NULL);
 
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_node_%' and columnname = 'state';
@@ -70,4 +70,9 @@ UPDATE config_form_fields
 	SET iseditable=false
 	WHERE formname='generic' AND formtype='check_project' AND columnname='txt_infolog' AND tabname='tab_log';
 
+-- 09/09/2025
 UPDATE value_state SET active = true;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (4350, 'Planned arcs belong to a different psector than the current one', 'One or more planned arcs are associated with a different psector', 2, true, 'utils', 'core', 'UI'),
+(4352, 'Fusion is not allowed in operative mode when there are planned arcs', 'To continue, switch to plan mode or remove the planned arcs from the psector', 2, true, 'utils', 'core', 'UI');
