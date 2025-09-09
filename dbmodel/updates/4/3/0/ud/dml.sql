@@ -238,3 +238,5 @@ UPDATE config_toolbox
   }
 ]'::json
 	WHERE id=3292;
+
+UPDATE sys_table SET context='{"levels": ["EPA", "DSCENARIO"]}', alias = 'Lid Dscenario' WHERE id='ve_inp_dscenario_lids';
