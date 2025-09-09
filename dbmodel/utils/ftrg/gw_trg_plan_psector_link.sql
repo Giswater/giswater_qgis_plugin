@@ -26,7 +26,6 @@ v_featuretype text;
 v_arc record;
 v_feature text;
 v_id integer;
-v_link record;
 
 BEGIN
 
@@ -39,7 +38,6 @@ BEGIN
 
 	-- setting variables
 	v_id = NEW.id;
-	SELECT * INTO v_link FROM link LIMIT 1;
 
 	-- getting variables in function of table
 	IF v_table_name = 'connec' THEN
