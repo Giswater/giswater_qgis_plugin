@@ -74,5 +74,5 @@ UPDATE config_form_fields
 UPDATE value_state SET active = true;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4350, 'Planned arcs belong to a different psector than the current one', 'One or more planned arcs are associated with a different psector', 2, true, 'utils', 'core', 'UI'),
+VALUES (4350, 'Planified arcs belong to a different psector than the current one', 'One or more planned arcs are associated with a different psector', 2, true, 'utils', 'core', 'UI'),
 (4352, 'Fusion is not allowed in operative mode when there are planned arcs', 'To continue, switch to plan mode or remove the planned arcs from the psector', 2, true, 'utils', 'core', 'UI');
