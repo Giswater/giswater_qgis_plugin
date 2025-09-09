@@ -43,7 +43,6 @@ v_name text;
 v_descript text;
 v_parent_id integer;
 v_dscenario_type text;
-v_active boolean;
 v_expl_id integer;
 v_scenarioid integer;
 
@@ -60,7 +59,6 @@ BEGIN
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
 	v_parent_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'parent';
 	v_dscenario_type :=  ((p_data ->>'data')::json->>'parameters')::json->>'type';
-	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
 
 	-- Reset values
@@ -83,7 +81,7 @@ BEGIN
                        "data":{"message":"3668", "function":"3134", "parameters":{"v_dscenario_type":"'||v_dscenario_type||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3670", "function":"3134", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3670", "function":"3134", "parameters":{"v_active":"true"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
@@ -101,7 +99,7 @@ BEGIN
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
 	INSERT INTO cat_dscenario (name, descript, parent_id, dscenario_type, active, expl_id,log)
-	VALUES (v_name, v_descript, v_parent_id, v_dscenario_type, v_active, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
+	VALUES (v_name, v_descript, v_parent_id, v_dscenario_type, true, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid;
 

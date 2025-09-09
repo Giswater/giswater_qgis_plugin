@@ -41,7 +41,6 @@ v_startdate date;
 v_enddate date;
 v_observ text;
 v_expl_id integer;
-v_active boolean;
 v_scenarioid text;
 v_aux_params json;
 v_inp_dwf text;
@@ -63,7 +62,6 @@ BEGIN
 	v_enddate :=  ((p_data ->>'data')::json->>'parameters')::json->>'enddate';
 	v_observ :=  ((p_data ->>'data')::json->>'parameters')::json->>'observ';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
-	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_aux_params := ((p_data ->>'data')::json->>'aux_params')::json;
 
 	-- Reset values
@@ -87,7 +85,7 @@ BEGIN
 	PERFORM setval('SCHEMA_NAME.cat_dwf_id_seq'::regclass,(SELECT max(id) FROM cat_dwf) ,true);
 
 	INSERT INTO cat_dwf (idval, startdate, enddate, observ, active, expl_id,log)
-	VALUES (v_idval, v_startdate, v_enddate, v_observ, v_active, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
+	VALUES (v_idval, v_startdate, v_enddate, v_observ, true, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (idval) DO NOTHING
 	RETURNING id INTO v_scenarioid;
 
@@ -106,7 +104,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 							"data":{"message":"3888", "function":"3134", "parameters":{"v_observ":"'||quote_nullable(v_observ)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3890", "function":"3134", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+							"data":{"message":"3890", "function":"3134", "parameters":{"v_active":"true"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 							"data":{"message":"3892", "function":"3134", "parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));

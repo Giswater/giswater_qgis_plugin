@@ -39,7 +39,6 @@ v_name text;
 v_descript text;
 v_parent_id integer;
 v_dscenario_type text;
-v_active boolean;
 v_expl_id integer;
 v_scenarioid integer;
 v_aux_params json;
@@ -63,7 +62,6 @@ BEGIN
 	v_infiltration :=  ((p_data ->>'data')::json->>'parameters')::json->>'infiltration';
 	v_text :=  ((p_data ->>'data')::json->>'parameters')::json->>'text';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
-	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_aux_params :=  ((p_data ->>'data')::json->>'aux_params')::json;
 
 
@@ -86,7 +84,7 @@ BEGIN
                        "data":{"message":"3716", "function":"3134", "parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3670", "function":"3134", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3670", "function":"3134", "parameters":{"v_active":"true"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
@@ -104,7 +102,7 @@ BEGIN
 	PERFORM setval('SCHEMA_NAME.cat_hydrology_hydrology_id_seq'::regclass,(SELECT max(hydrology_id) FROM cat_hydrology) ,true);
 
 	INSERT INTO cat_hydrology (name, infiltration, text, expl_id, active, log)
-	VALUES (v_name, v_infiltration, v_text, v_expl_id, v_active, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
+	VALUES (v_name, v_infiltration, v_text, v_expl_id, true, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (name) DO NOTHING
 	RETURNING hydrology_id INTO v_scenarioid;
 

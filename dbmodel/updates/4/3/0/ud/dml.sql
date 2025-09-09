@@ -43,3 +43,198 @@ WHERE formname='ve_epa_frweir' AND formtype='form_feature' AND columnname='weir_
 
 -- 09/09/2025
 UPDATE sys_param_user SET id='inp_options_dwfscenario_current' WHERE id='inp_options_dwfscenario';
+
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Name: (*)",
+    "value": null,
+    "tooltip": "Name for dscenario (mandatory)",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "name",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 1,
+    "placeholder": ""
+  },
+  {
+    "label": "Descript:",
+    "value": null,
+    "tooltip": "Descript for dscenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "descript",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 2,
+    "placeholder": ""
+  },
+  {
+    "label": "Parent:",
+    "value": null,
+    "tooltip": "Parent for dscenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "parent",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 3,
+    "placeholder": ""
+  },
+  {
+    "label": "Type:",
+    "value": null,
+    "tooltip": "Dscenario type",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "type",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_dscenario''",
+    "isMandatory": true,
+    "layoutorder": 4
+  },
+  {
+    "label": "Exploitation:",
+    "value": null,
+    "tooltip": "Dscenario type",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "expl",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation",
+    "isMandatory": true,
+    "layoutorder": 6
+  }
+]'::json
+	WHERE id=3134;
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Name: (*)",
+    "value": null,
+    "tooltip": "Name for hydrology scenario (mandatory)",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "name",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 1,
+    "placeholder": ""
+  },
+  {
+    "label": "Infiltration:",
+    "value": null,
+    "tooltip": "Infiltration",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "infiltration",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, idval FROM inp_typevalue WHERE typevalue =''inp_value_options_in''",
+    "isMandatory": true,
+    "layoutorder": 2
+  },
+  {
+    "label": "Text:",
+    "value": null,
+    "tooltip": "Text of hydrology scenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "text",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 3,
+    "placeholder": ""
+  },
+  {
+    "label": "Exploitation:",
+    "value": null,
+    "tooltip": "hydrology scenario type",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "expl",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation",
+    "isMandatory": true,
+    "layoutorder": 4
+  }
+]'::json
+	WHERE id=3290;
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Name: (*)",
+    "value": null,
+    "tooltip": "Name for dwf scenario (mandatory)",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "idval",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 1,
+    "placeholder": ""
+  },
+  {
+    "label": "Startdate:",
+    "value": null,
+    "tooltip": "Start date for dwf scenario",
+    "datatype": "date",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "startdate",
+    "widgettype": "datetime",
+    "isMandatory": false,
+    "layoutorder": 2,
+    "placeholder": ""
+  },
+  {
+    "label": "Enddate:",
+    "value": null,
+    "tooltip": "End date",
+    "datatype": "date",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "enddate",
+    "widgettype": "datetime",
+    "isMandatory": false,
+    "layoutorder": 3,
+    "placeholder": "End date for dwf scenario"
+  },
+  {
+    "label": "Observ:",
+    "value": null,
+    "tooltip": "Observations of dwf scenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "observ",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 4,
+    "placeholder": ""
+  },
+  {
+    "label": "Exploitation:",
+    "value": null,
+    "tooltip": "dwf scenario type",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "expl",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation",
+    "isMandatory": true,
+    "layoutorder": 5
+  }
+]'::json
+	WHERE id=3292;
