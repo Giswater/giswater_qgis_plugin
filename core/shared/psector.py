@@ -258,9 +258,9 @@ class GwPsector:
             button.clicked.connect(partial(self._reset_snapping))
 
         self.dlg_plan_psector.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, True, None, None))
+            partial(self.insert_delete_feature, 'insert', table_object))
         self.dlg_plan_psector.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, None, None, "state"))
+            partial(self.insert_delete_feature, 'delete', table_object))
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
@@ -2564,6 +2564,24 @@ class GwPsector:
         # Manage connec/gully special cases
         if feature_type in (GwFeatureTypes.CONNEC, GwFeatureTypes.GULLY):
             tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
+
+    def insert_delete_feature(self, action: str, table_object: str):
+        """ Manage insert/delete feature """
+
+        if action == 'insert':
+            tools_gw.insert_feature(self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, True, None, None)
+        elif action == 'delete':
+            tools_gw.delete_records(self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, None, None, "state")
+
+        self.reset_relation_tables_signals()
+
+    def reset_relation_tables_signals(self):
+        """ Reset relation tables signals """
+
+        self._manage_selection_changed_signals(GwFeatureTypes.ARC)
+        self._manage_selection_changed_signals(GwFeatureTypes.NODE)
+        self._manage_selection_changed_signals(GwFeatureTypes.CONNEC)
+        self._manage_selection_changed_signals(GwFeatureTypes.GULLY)
 
     # endregion
 
