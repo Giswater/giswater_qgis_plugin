@@ -134,10 +134,14 @@ def delete_object(**kwargs):
     complet_result = kwargs['complet_result']
     qtable_name = func_params['targetwidget']
 
+    check_for_frelem = False
+
     if qtable_name == 'tab_features_tbl_element':
         feature_type = tools_gw.get_signal_change_tab(dialog)
         tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
         qtable_name = f"{qtable_name}_x_{feature_type}"
+    elif qtable_name == 'tab_elements_tbl_elements':
+        check_for_frelem = True
     elif 'featureType' in complet_result['body']['feature']:
         feature_type = complet_result['body']['feature']['featureType']
         tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
@@ -156,6 +160,7 @@ def delete_object(**kwargs):
     list_object_id = ""
     row_index = ""
     list_id = ""
+    frelem_ids = []
     for i in range(0, len(selected_list)):
         index = selected_list[i]
         row = index.row()
@@ -169,9 +174,18 @@ def delete_object(**kwargs):
         list_object_id = list_object_id + str(object_id) + ", "
         row_index += str(row + 1) + ", "
 
+        if check_for_frelem:
+            column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_class')
+            feature_class = index.sibling(row, column_index).data()
+            if feature_class == 'FRELEM':
+                frelem_ids.append(object_id)
+
     list_object_id = list_object_id[:-2]
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
+    if frelem_ids:
+        message += f"\nWARNING: Some of these records are FRELEM ({', '.join(frelem_ids)}). "
+        message += "This will not only remove the relation, but delete them entirely."
     title = "Delete records"
     answer = tools_qt.show_question(message, title, list_object_id)
     if answer:
