@@ -4959,7 +4959,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
     if not force_change and cmb_changed and enable:
         return
 
-    if not force_change and psector_id is None:
+    if not force_change and psector_id in (None, ""):
         return
 
     # If cmb changed and psector mode is enabled, don't change the buttons
