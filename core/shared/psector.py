@@ -132,7 +132,6 @@ class GwPsector:
         # Set icons
         tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_plan_psector.btn_toggle, "101")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
@@ -263,8 +262,6 @@ class GwPsector:
             partial(self.insert_delete_feature, 'delete', table_object))
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
-        self.dlg_plan_psector.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR))
         self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
@@ -276,8 +273,9 @@ class GwPsector:
 
         self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector", "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
-        menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"]}
-        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables)
+        menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"], "callback_later": self.reset_relation_tables_signals}
+        selection_on_top_variables = {"callback_later": self.reset_relation_tables_signals}
+        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, selection_on_top_variables=selection_on_top_variables)
         self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
 
         self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
@@ -834,7 +832,6 @@ class GwPsector:
     def enable_buttons(self, enabled):
         self.dlg_plan_psector.btn_insert.setEnabled(enabled)
         self.dlg_plan_psector.btn_delete.setEnabled(enabled)
-        self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)

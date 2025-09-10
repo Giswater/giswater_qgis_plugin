@@ -33,7 +33,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_general">
       <attribute name="title">
@@ -186,34 +186,6 @@
          </item>
          <item>
           <widget class="QPushButton" name="btn_delete">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btn_snapping">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -1154,7 +1126,6 @@
   <tabstop>feature_id</tabstop>
   <tabstop>btn_insert</tabstop>
   <tabstop>btn_delete</tabstop>
-  <tabstop>btn_snapping</tabstop>
   <tabstop>btn_toggle</tabstop>
   <tabstop>tab_feature</tabstop>
   <tabstop>tbl_psector_x_arc</tabstop>

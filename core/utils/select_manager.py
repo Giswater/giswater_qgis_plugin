@@ -49,6 +49,8 @@ class GwSelectManager(QgsMapTool):
         self._reset_selection()
         self.selected_features = []
 
+        tools_qgis.refresh_map_canvas()
+
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasPressEvent(self, event):
@@ -215,6 +217,8 @@ class GwPolygonSelectManager(QgsMapTool):
         self.points = []
         self.is_drawing = False
 
+        tools_qgis.refresh_map_canvas()
+
     def activate(self):
         """Activate the tool and preselect features."""
         pass
@@ -315,6 +319,8 @@ class GwCircleSelectManager(QgsMapTool):
         self.center_point = None
         self.step = 0  # 0 = waiting for center, 1 = waiting for radius
         self.current_radius = 0
+
+        tools_qgis.refresh_map_canvas()
 
     def activate(self):
         """Activate the tool and preselect features."""
@@ -476,6 +482,8 @@ class GwFreehandSelectManager(QgsMapTool):
         self.points = []
         self.is_drawing = False
         self.min_distance = 5.0  # Minimum distance between points in pixels
+
+        tools_qgis.refresh_map_canvas()
 
     def activate(self):
         """Activate the tool and preselect features."""

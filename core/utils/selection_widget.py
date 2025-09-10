@@ -31,7 +31,7 @@ class GwSelectionWidget(QWidget):
     """
 
     def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None,
-                 highlight_variables: dict = None, expression_selection: dict = None):
+                 highlight_variables: dict = None, expression_selection: dict = None, selection_on_top_variables: dict = None):
         """
         Initialize the selection widget.
         
@@ -69,7 +69,7 @@ class GwSelectionWidget(QWidget):
             self.init_zoom_to_selection(**general_variables)
 
         if self_varibles.get("selection_on_top", False):
-            self.init_selection_on_top(**general_variables)
+            self.init_selection_on_top(**general_variables, **selection_on_top_variables)
 
     # region utility functions
 
@@ -160,9 +160,8 @@ class GwSelectionWidget(QWidget):
             if callback and callback() is False:
                 return
             # Directly call selection_init instead of activate_selection_mode to avoid double activation
+            class_object.callback_later_selection = callback_later
             self.activate_selection_mode(class_object, dialog, table_object, tool_type)
-            if callback_later:
-                callback_later()
 
         # Action group to keep exclusivity
         tools = {"rectangle": "137.png", "polygon": "180.svg", "freehand": "182.svg", "circle": "181.svg", "point": "181.svg"}
@@ -573,7 +572,7 @@ class GwSelectionWidget(QWidget):
 
     # region selection on top
 
-    def init_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str):
+    def init_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str, callback_later: Callable = None):
         """
         Initialize selection on top functionality.
         
@@ -594,6 +593,9 @@ class GwSelectionWidget(QWidget):
         if widget_table and widget_table.model():
             widget_table.setProperty('original_model', widget_table.model())
             widget_table.setProperty('selection_on_top', False)
+
+        if callback_later:
+            class_object.callback_later_selection_on_top = callback_later
 
         # Connect signals
         self.btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object))
@@ -663,6 +665,9 @@ class GwSelectionWidget(QWidget):
                 self.restore_selection(widget_table, selected_ids)
                 widget_table.setProperty('selection_on_top', False)
                 self.btn_selection_on_top.setChecked(False)  # Update button state
+        
+        if class_object.callback_later_selection_on_top:
+            class_object.callback_later_selection_on_top()
 
     def get_selected_ids(self, widget_table):
         """Get IDs of selected rows"""

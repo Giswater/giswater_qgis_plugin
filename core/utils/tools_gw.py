@@ -3825,6 +3825,9 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
                 index = model.index(row, column_index)
                 selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
+    if class_object.callback_later_selection:
+        class_object.callback_later_selection()
+
 
 def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
     """Select IDs in table"""
