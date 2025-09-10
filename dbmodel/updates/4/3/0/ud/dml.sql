@@ -364,3 +364,13 @@ UPDATE inp_typevalue SET idval='FRWEIR',id='FRWEIR' WHERE typevalue='inp_typeval
 UPDATE inp_typevalue SET idval='FRPUMP',id='FRPUMP' WHERE typevalue='inp_typevalue_dscenario' AND id='PUMP';
 UPDATE inp_typevalue SET idval='FRORIFICE',id='FRORIFICE' WHERE typevalue='inp_typevalue_dscenario' AND id='ORIFICE';
 UPDATE inp_typevalue SET idval='FROUTLET',id='FROUTLET' WHERE typevalue='inp_typevalue_dscenario' AND id='OUTLET';
+
+UPDATE config_form_fields
+	SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND  typevalue = ''inp_typevalue_orifice'''
+	WHERE formname='inp_dscenario_frorifice' AND formtype='form_feature' AND columnname='orifice_type' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_yesno'' '
+	WHERE formname='inp_dscenario_frorifice' AND formtype='form_feature' AND columnname='flap' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_orifice'''
+	WHERE formname='inp_dscenario_frorifice' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_none';

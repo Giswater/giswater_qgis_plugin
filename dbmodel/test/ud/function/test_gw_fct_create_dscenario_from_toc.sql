@@ -549,7 +549,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -558,7 +558,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -573,7 +573,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -582,7 +582,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -597,7 +597,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -606,7 +606,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -621,7 +621,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -630,7 +630,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -645,7 +645,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -654,7 +654,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -669,7 +669,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -678,7 +678,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -693,7 +693,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -702,7 +702,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -717,7 +717,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -726,7 +726,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -741,7 +741,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -750,7 +750,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -765,7 +765,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -774,7 +774,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -789,7 +789,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -798,7 +798,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -813,7 +813,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -822,7 +822,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_arc and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1629,7 +1629,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -1638,7 +1638,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1653,7 +1653,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -1662,7 +1662,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1677,7 +1677,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -1686,7 +1686,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1701,7 +1701,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -1710,7 +1710,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1725,7 +1725,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -1734,7 +1734,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1749,7 +1749,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -1758,7 +1758,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1773,7 +1773,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -1782,7 +1782,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1797,7 +1797,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -1806,7 +1806,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1821,7 +1821,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -1830,7 +1830,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1845,7 +1845,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -1854,7 +1854,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1869,7 +1869,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -1878,7 +1878,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -1893,7 +1893,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -1902,7 +1902,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Conduit and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2709,7 +2709,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -2718,7 +2718,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2733,7 +2733,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -2742,7 +2742,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2757,7 +2757,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -2766,7 +2766,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2781,7 +2781,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -2790,7 +2790,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2805,7 +2805,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -2814,7 +2814,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2829,7 +2829,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -2838,7 +2838,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2853,7 +2853,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -2862,7 +2862,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2877,7 +2877,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -2886,7 +2886,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2901,7 +2901,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -2910,7 +2910,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2925,7 +2925,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -2934,7 +2934,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2949,7 +2949,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -2958,7 +2958,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -2973,7 +2973,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -2982,7 +2982,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Orifice and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3789,7 +3789,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -3798,7 +3798,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3813,7 +3813,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -3822,7 +3822,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3837,7 +3837,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -3846,7 +3846,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3861,7 +3861,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -3870,7 +3870,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3885,7 +3885,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -3894,7 +3894,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3909,7 +3909,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -3918,7 +3918,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3933,7 +3933,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -3942,7 +3942,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3957,7 +3957,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -3966,7 +3966,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -3981,7 +3981,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -3990,7 +3990,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4005,7 +4005,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -4014,7 +4014,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4029,7 +4029,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -4038,7 +4038,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4053,7 +4053,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -4062,7 +4062,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outlet and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4869,7 +4869,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -4878,7 +4878,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4893,7 +4893,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -4902,7 +4902,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4917,7 +4917,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -4926,7 +4926,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4941,7 +4941,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -4950,7 +4950,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4965,7 +4965,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -4974,7 +4974,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -4989,7 +4989,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -4998,7 +4998,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5013,7 +5013,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -5022,7 +5022,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5037,7 +5037,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -5046,7 +5046,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5061,7 +5061,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -5070,7 +5070,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5085,7 +5085,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -5094,7 +5094,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5109,7 +5109,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -5118,7 +5118,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5133,7 +5133,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -5142,7 +5142,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Pump and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5949,7 +5949,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -5958,7 +5958,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5973,7 +5973,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -5982,7 +5982,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -5997,7 +5997,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -6006,7 +6006,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6021,7 +6021,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -6030,7 +6030,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6045,7 +6045,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -6054,7 +6054,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6069,7 +6069,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -6078,7 +6078,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6093,7 +6093,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -6102,7 +6102,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6117,7 +6117,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -6126,7 +6126,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6141,7 +6141,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -6150,7 +6150,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6165,7 +6165,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -6174,7 +6174,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6189,7 +6189,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -6198,7 +6198,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -6213,7 +6213,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -6222,7 +6222,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Virtual and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7029,7 +7029,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -7038,7 +7038,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7053,7 +7053,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -7062,7 +7062,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7077,7 +7077,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -7086,7 +7086,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7101,7 +7101,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -7110,7 +7110,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7125,7 +7125,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -7134,7 +7134,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7149,7 +7149,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -7158,7 +7158,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7173,7 +7173,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -7182,7 +7182,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7197,7 +7197,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -7206,7 +7206,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7221,7 +7221,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -7230,7 +7230,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7245,7 +7245,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -7254,7 +7254,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7269,7 +7269,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -7278,7 +7278,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -7293,7 +7293,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -7302,7 +7302,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Weir and featureType > ARC and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8109,7 +8109,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -8118,7 +8118,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8133,7 +8133,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -8142,7 +8142,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8157,7 +8157,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -8166,7 +8166,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8181,7 +8181,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -8190,7 +8190,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8205,7 +8205,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -8214,7 +8214,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8229,7 +8229,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -8238,7 +8238,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8253,7 +8253,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -8262,7 +8262,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8277,7 +8277,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -8286,7 +8286,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8301,7 +8301,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -8310,7 +8310,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8325,7 +8325,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -8334,7 +8334,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8349,7 +8349,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -8358,7 +8358,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -8373,7 +8373,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -8382,7 +8382,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_node and featureType > NODE and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9189,7 +9189,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -9198,7 +9198,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9213,7 +9213,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -9222,7 +9222,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9237,7 +9237,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -9246,7 +9246,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9261,7 +9261,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -9270,7 +9270,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9285,7 +9285,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -9294,7 +9294,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9309,7 +9309,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -9318,7 +9318,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9333,7 +9333,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -9342,7 +9342,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9357,7 +9357,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -9366,7 +9366,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9381,7 +9381,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -9390,7 +9390,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9405,7 +9405,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -9414,7 +9414,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9429,7 +9429,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -9438,7 +9438,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -9453,7 +9453,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -9462,7 +9462,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Junction and featureType > NODE and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10269,7 +10269,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -10278,7 +10278,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10293,7 +10293,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -10302,7 +10302,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10317,7 +10317,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -10326,7 +10326,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10341,7 +10341,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -10350,7 +10350,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10365,7 +10365,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -10374,7 +10374,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10389,7 +10389,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -10398,7 +10398,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10413,7 +10413,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -10422,7 +10422,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10437,7 +10437,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -10446,7 +10446,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10461,7 +10461,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -10470,7 +10470,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10485,7 +10485,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -10494,7 +10494,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10509,7 +10509,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -10518,7 +10518,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -10533,7 +10533,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -10542,7 +10542,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Netgully and featureType > NODE and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11349,7 +11349,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -11358,7 +11358,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11373,7 +11373,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -11382,7 +11382,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11397,7 +11397,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -11406,7 +11406,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11421,7 +11421,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -11430,7 +11430,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11445,7 +11445,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -11454,7 +11454,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11469,7 +11469,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -11478,7 +11478,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11493,7 +11493,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -11502,7 +11502,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11517,7 +11517,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -11526,7 +11526,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11541,7 +11541,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -11550,7 +11550,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11565,7 +11565,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -11574,7 +11574,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11589,7 +11589,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -11598,7 +11598,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -11613,7 +11613,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -11622,7 +11622,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Outfall and featureType > NODE and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12429,7 +12429,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -12438,7 +12438,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12453,7 +12453,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -12462,7 +12462,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12477,7 +12477,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -12486,7 +12486,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12501,7 +12501,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -12510,7 +12510,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12525,7 +12525,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -12534,7 +12534,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12549,7 +12549,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -12558,7 +12558,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12573,7 +12573,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -12582,7 +12582,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12597,7 +12597,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -12606,7 +12606,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12621,7 +12621,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -12630,7 +12630,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12645,7 +12645,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -12654,7 +12654,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12669,7 +12669,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -12678,7 +12678,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -12693,7 +12693,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -12702,7 +12702,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Storage and featureType > NODE and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13509,7 +13509,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -13518,7 +13518,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13533,7 +13533,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -13542,7 +13542,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13557,7 +13557,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -13566,7 +13566,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13581,7 +13581,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -13590,7 +13590,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13605,7 +13605,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -13614,7 +13614,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13629,7 +13629,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -13638,7 +13638,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13653,7 +13653,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -13662,7 +13662,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13677,7 +13677,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -13686,7 +13686,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13701,7 +13701,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -13710,7 +13710,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13725,7 +13725,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -13734,7 +13734,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13749,7 +13749,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -13758,7 +13758,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -13773,7 +13773,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -13782,7 +13782,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Raingage and featureType > RAINGAGE and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14589,7 +14589,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -14598,7 +14598,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > WEIR and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRWEIR and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14613,7 +14613,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -14622,7 +14622,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > WEIR and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRWEIR and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14637,7 +14637,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "WEIR", 
+                "type": "FRWEIR", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -14646,7 +14646,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > WEIR and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRWEIR and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14661,7 +14661,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -14670,7 +14670,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > PUMP and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRPUMP and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14685,7 +14685,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -14694,7 +14694,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > PUMP and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRPUMP and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14709,7 +14709,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "PUMP", 
+                "type": "FRPUMP", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -14718,7 +14718,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > PUMP and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRPUMP and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14733,7 +14733,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -14742,7 +14742,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > ORIFICE and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRORIFICE and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14757,7 +14757,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -14766,7 +14766,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > ORIFICE and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRORIFICE and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14781,7 +14781,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "ORIFICE", 
+                "type": "FRORIFICE", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -14790,7 +14790,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > ORIFICE and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FRORIFICE and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14805,7 +14805,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 0,
                 "descript": "null"
             }, 
@@ -14814,7 +14814,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > OUTLET and exploitation > 0 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FROUTLET and exploitation > 0 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14829,7 +14829,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 1,
                 "descript": "null"
             }, 
@@ -14838,7 +14838,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > OUTLET and exploitation > 1 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FROUTLET and exploitation > 1 returns status "Accepted"'
 );
     
 SELECT is (
@@ -14853,7 +14853,7 @@ SELECT is (
             "selectionMode": "wholeSelection",
             "parameters": {
                 "name": "null",
-                "type": "OUTLET", 
+                "type": "FROUTLET", 
                 "exploitation": 2,
                 "descript": "null"
             }, 
@@ -14862,7 +14862,7 @@ SELECT is (
     }
     $$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > OUTLET and exploitation > 2 returns status "Accepted"'
+    'Check if gw_fct_create_dscenario_from_toc with tablename > ve_Inp_Subcatchment and featureType > SUBCATCHMENT and type > FROUTLET and exploitation > 2 returns status "Accepted"'
 );
     
 SELECT is (
