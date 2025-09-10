@@ -18,6 +18,7 @@ from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, AddCampaignInventoryUi
 from ...shared.selector import GwSelector
+from ...utils.selection_widget import GwSelectionWidget
 
 
 class Campaign:
@@ -601,8 +602,16 @@ class Campaign:
             partial(self._update_feature_completer, self.dialog)
         )
 
+        
+
         # Create menu for btn_snapping
-        tools_gw.menu_btn_snapping(self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
+        tools_gw.menu_btn_snapping(self, self.dialog, "campaign", GwSelectionMode.CAMPAIGN)
+        self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
+        general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
+        used_tools = ["rectangle", "polygon", "freehand", "circle"]
+        menu_variables = {"used_tools":used_tools}
+        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables)
+        self.dialog.lyt_selection.addWidget(selection_widget, 0)
         
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
