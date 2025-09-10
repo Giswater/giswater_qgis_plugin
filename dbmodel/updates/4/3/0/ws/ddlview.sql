@@ -169,7 +169,7 @@ AS WITH sel_expl AS (
     s.num_connec,
     s.num_hydro,
     s.length,
-    m.the_geom::geometry(Polygon, SRID_VALUE) AS the_geom
+    m.the_geom::geometry(MultiPolygon, SRID_VALUE) AS the_geom
    FROM minsector_mapzones m
      JOIN minsector_sums s ON s.minsector_id = m.minsector_id
   WHERE (EXISTS ( SELECT 1
