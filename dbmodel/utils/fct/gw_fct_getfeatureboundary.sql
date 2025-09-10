@@ -44,7 +44,7 @@ BEGIN
 
 	v_type = ((p_data ->>'data')::json->>'type');
 
-	IF v_type = 'time_updated' THEN
+	IF v_type = 'time' THEN
 
 	    v_lastseed = ((p_data ->>'data')::json->>'lastSeed');
 	    v_updatetables = ((p_data ->>'feature')::json->>'update_tables');
@@ -68,22 +68,7 @@ BEGIN
 		    END IF;
 
 			v_querytext := concat(v_querytext, ' UNION');
-
-	    END LOOP;
-
-		v_querytext = left(v_querytext, length(v_querytext) - 6);
-		v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Collect(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))
-		FROM (', v_querytext, ') AS combined_geometries');
-
-	ELSIF v_type = 'time_deleted' THEN
-
-	    v_lastseed = ((p_data ->>'data')::json->>'lastSeed');
-	    v_updatetables = ((p_data ->>'feature')::json->>'update_tables');
-	    v_extra = ((p_data ->>'data')::json->>'extra');
-		v_epsg =	((p_data ->>'client')::json->>'epsg');
-	    v_querytext = '';
-
-	    FOR v_table IN SELECT json_array_elements_text(v_updatetables::json) LOOP
+			v_epsg =	((p_data ->>'client')::json->>'epsg');
 
 			v_querytext := concat(
 		        v_querytext,
@@ -93,6 +78,7 @@ BEGIN
 		        ' AND schema = current_schema()',
 		        ' AND tstamp > ''', v_lastseed, '''::timestamp'
 		    );
+
 		    IF v_extra IS NOT NULL AND jsonb_typeof(v_extra::jsonb) = 'object' THEN
 		        FOR v_key, v_val IN SELECT * FROM json_each_text(v_extra::json) LOOP
 		            v_querytext := concat(
@@ -105,6 +91,8 @@ BEGIN
 		    v_querytext := concat(v_querytext, ' UNION');
 
 	    END LOOP;
+
+		raise notice 'query: %', v_querytext;
 
 		v_querytext = left(v_querytext, length(v_querytext) - 6);
 		v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Collect(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))
