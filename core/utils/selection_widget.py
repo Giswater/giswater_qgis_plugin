@@ -467,9 +467,6 @@ class GwSelectionWidget(QWidget):
             index = data_model.index(row, 0)
             selection_model.select(index, selection_model.Select | selection_model.Rows)
 
-        # Highlight the newly selected features
-        self.highlight_features_method(class_object, dialog, table_object)
-
     # endregion invert selection
 
     # region expression selection

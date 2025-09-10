@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
                                   QHBoxLayout, QLabel, QLineEdit, QTableView,
-                                  QTextEdit, QToolBar, QWidget, QPushButton)
+                                  QTextEdit, QToolBar, QWidget)
 
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
@@ -166,7 +166,7 @@ class AddNewLot:
         self_variables = {"selection_mode": GwSelectionMode.LOT, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_lot, "table_object": "lot"}
         used_tools = ["freehand"]
-        menu_variables = {"used_tools":used_tools, "callback": self._init_snapping_selection}
+        menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection}
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._select_by_expression}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection)

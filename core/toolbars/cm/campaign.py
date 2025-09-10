@@ -240,7 +240,6 @@ class Campaign:
         tools_gw.add_icon(self.dialog.btn_insert, '111')
         tools_gw.add_icon(self.dialog.btn_delete, '112')
         tools_gw.add_icon(self.dialog.btn_snapping, '137')
-        tools_gw.add_icon(self.dialog.btn_expr_select, '178')
 
         self.dialog.rejected.connect(self._on_dialog_rejected)
 
@@ -593,24 +592,14 @@ class Campaign:
         self.dialog.btn_snapping.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
         )
-
-        self.dialog.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dialog, "campaign",
-                    selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),
-        )
-        self.dialog.btn_expr_select.clicked.connect(
-            partial(self._update_feature_completer, self.dialog)
-        )
-
         
-
         # Create menu for btn_snapping
-        tools_gw.menu_btn_snapping(self, self.dialog, "campaign", GwSelectionMode.CAMPAIGN)
         self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
         used_tools = ["rectangle", "polygon", "freehand", "circle"]
-        menu_variables = {"used_tools":used_tools}
-        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables)
+        menu_variables = {"used_tools": used_tools}
+        expression_selection = {"callback_later": self._update_feature_completer}
+        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, expression_selection)
         self.dialog.lyt_selection.addWidget(selection_widget, 0)
         
     def _check_and_disable_class_combos(self):

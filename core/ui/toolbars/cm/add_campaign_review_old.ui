@@ -504,16 +504,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QToolButton" name="btn_snapping">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="popupMode">
-               <enum>QToolButton::MenuButtonPopup</enum>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>
