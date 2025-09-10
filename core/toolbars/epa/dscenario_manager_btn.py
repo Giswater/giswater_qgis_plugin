@@ -814,6 +814,9 @@ class GwDscenarioManagerButton(GwAction):
     def _manage_current_changed(self):
         """ Manages tab changes """
 
+        if not hasattr(self, 'dlg_dscenario') or isdeleted(self.dlg_dscenario):
+            return
+
         # Fill current table
         self._fill_dscenario_table()
 
