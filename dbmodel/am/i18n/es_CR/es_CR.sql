@@ -44,9 +44,9 @@ UPDATE value_status AS t
 SET idval = v.idval
 FROM (
     VALUES
+    ('FINISHED', 'ACABADO'),
     ('ON PLANNING', 'EN PLANIFICACIÓN'),
-    ('CANCELED', 'CANCELADO'),
-    ('FINISHED', 'ACABADO')
+    ('CANCELED', 'CANCELADO')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 
