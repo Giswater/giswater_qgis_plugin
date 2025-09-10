@@ -374,3 +374,6 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_orifice'''
 	WHERE formname='inp_dscenario_frorifice' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_none';
+
+-- 10/09/2025
+UPDATE sys_table SET context=NULL WHERE id='v_plan_psector_gully';

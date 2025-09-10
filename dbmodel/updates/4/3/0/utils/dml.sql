@@ -78,3 +78,10 @@ UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AN
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4350, 'Planified arcs belong to a different psector than the current one', 'One or more planned arcs are associated with a different psector', 2, true, 'utils', 'core', 'UI'),
 (4352, 'Fusion is not allowed in operative mode when there are planned arcs', 'To continue, switch to plan mode or remove the planned arcs from the psector', 2, true, 'utils', 'core', 'UI');
+
+-- 10/09/2025
+UPDATE sys_table SET context=NULL WHERE id='v_plan_current_psector';
+UPDATE sys_table SET context=NULL WHERE id='v_plan_psector_arc';
+UPDATE sys_table SET context=NULL WHERE id='v_plan_psector_connec';
+UPDATE sys_table SET context=NULL WHERE id='v_plan_psector_link';
+UPDATE sys_table SET context=NULL WHERE id='v_plan_psector_node';

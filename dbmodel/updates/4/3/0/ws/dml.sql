@@ -925,3 +925,10 @@ UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_arc';
 UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_node';
 UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_valve';
 UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_initpoint';
+
+INSERT INTO config_typevalue (typevalue,id,addparam) VALUES ('sys_table_context','{"levels": ["OM", "ANALYTICS", "INPUT"]}','{"orderBy":31}'::json);
+INSERT INTO config_typevalue (typevalue,id,addparam) VALUES ('sys_table_context','{"levels": ["OM", "ANALYTICS", "OUTPUT"]}','{"orderBy":32}'::json);
+
+UPDATE sys_table SET alias='Proposed Hydrants', context='{"levels": ["OM", "ANALYTICS", "INPUT"]}' WHERE id='ve_anl_hydrant';
+UPDATE sys_table SET context='{"levels": ["OM", "ANALYTICS", "OUTPUT"]}' WHERE id='ve_minsector';
+UPDATE sys_table SET context='{"levels": ["OM", "ANALYTICS", "OUTPUT"]}' WHERE id='ve_minsector_mincut';
