@@ -65,6 +65,10 @@ class GwArcFusionButton(GwMaptool):
             action_mode = 1
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         catalog = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.cmb_new_cat)
+        if catalog in (None, 'null'):
+            msg = "Mandatory field is missing. Please, set a value for field"
+            tools_qgis.show_warning(msg, parameter="'Catalog id'", dialog=self.dlg_fusion)
+            return
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
         feature_id = f'"id":["{self.node_id}"]'
@@ -85,19 +89,21 @@ class GwArcFusionButton(GwMaptool):
             extras += f', "arccat_id":"{catalog}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
-        result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
-        if not result or result['status'] == 'Failed':
+        complet_result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
+        if not complet_result or complet_result['status'] == "Failed":
+            msg = "Error fusing arcs"
+            tools_qgis.show_warning(msg)
             return
 
         text_result = None
         log = tools_gw.get_config_parser("user_edit_tricks", "arc_fusion_disable_showlog", 'user', 'init')
         if not tools_os.set_boolean(log, False):
-            text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
+            text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, complet_result['body']['data'], True, True, 1)
 
         self._save_dlg_values()
 
         if not text_result:
-            self.dlg_fusion.close()
+            tools_gw.close_dialog(self.dlg_fusion)
 
         self.refresh_map_canvas()
         self.iface.mapCanvas().refresh()

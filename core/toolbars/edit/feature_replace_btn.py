@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
+from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi, GwPsectorUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....libs import tools_qt, tools_log, tools_qgis, tools_db, tools_os
@@ -462,9 +462,6 @@ class GwFeatureReplaceButton(GwMaptool):
             if not complet_result or complet_result['status'] == "Failed":
                 msg = "Error replacing feature"
                 tools_qgis.show_warning(msg)
-                # Check in init config file if user wants to keep map tool active or not
-                self.manage_active_maptool()
-                tools_gw.close_dialog(dialog)
                 return
 
             # Fill tab 'Info log' and show message
@@ -480,6 +477,9 @@ class GwFeatureReplaceButton(GwMaptool):
 
             # Disable ok button at the end of process
             self.dlg_replace.btn_accept.setEnabled(False)
+
+            # Refresh psector's relations tables
+            tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
             # Check in init config file if user wants to keep map tool active or not
             self.manage_active_maptool()

@@ -16,6 +16,7 @@ from ...ui.ui_manager import GwFeatureDeleteUi
 from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt, tools_db
 from .... import global_vars
+from ...shared.psector import GwPsectorUi
 
 
 class GwFeatureDeleteButton(GwAction):
@@ -213,6 +214,9 @@ class GwFeatureDeleteButton(GwAction):
 
         # Set visible button delete another feature
         self.dlg_feature_delete.btn_delete_another.setVisible(True)
+
+        # Refresh psector's relations tables
+        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
         # Close dialog
         if not change_tab:
