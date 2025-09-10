@@ -4855,8 +4855,11 @@ def set_epsg():
     lib_vars.project_epsg = epsg
 
 
-def refresh_selectors(tab_name=None):
-    """ Refreshes the selectors' UI if it's open """
+def refresh_selectors(is_cm: bool = False):
+    """Refreshes the selector docker if it's open.
+
+    If is_cm=True, refresh the specific selector of campaign manager.
+    """
 
     # Get the selector UI if it's open
     windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
@@ -4866,6 +4869,9 @@ def refresh_selectors(tab_name=None):
         try:
             dialog = windows[0]
             selector = dialog.property('GwSelector')
+            if is_cm:
+                selector.open_selector(selector_type='selector_campaign', reload_dlg=dialog)
+            else:
             selector.open_selector(reload_dlg=dialog)
         except Exception:
             pass

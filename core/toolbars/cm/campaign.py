@@ -476,6 +476,12 @@ class Campaign:
             self.is_new_campaign = False
             self._cleanup_map_selection()
 
+            # Ensure selector_campaign docker reflects the new/updated campaign immediately
+            try:
+                tools_gw.refresh_selectors(is_cm=True)
+            except Exception:
+                pass
+
             # Update campaign ID in the dialog
             campaign_id = result.get("body", {}).get("campaign_id")
             self.campaign_id = campaign_id
@@ -1006,6 +1012,7 @@ class Campaign:
         msg = "{0} campaign(s) deleted."
         msg_params = (count,)
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
+        tools_gw.refresh_selectors(is_cm=True)
         self.filter_campaigns()
 
     def open_campaign(self, index: Optional[QModelIndex] = None):

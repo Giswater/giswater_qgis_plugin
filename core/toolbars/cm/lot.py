@@ -684,6 +684,7 @@ class AddNewLot:
             self._cleanup_map_selection()
             if not from_change_tab:
                 self.dlg_lot.accept()
+            tools_gw.refresh_selectors(is_cm=True)
         else:
             msg = "Error saving lot."
             tools_qgis.show_warning(msg)
@@ -1068,6 +1069,7 @@ class AddNewLot:
         msg = "{0} lot(s) deleted."
         msg_params = (deleted,)
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.dlg_lot_man)
+        tools_gw.refresh_selectors(is_cm=True)
         self.filter_lot()
 
     def _on_lot_selection_changed(self, selected, deselected):
