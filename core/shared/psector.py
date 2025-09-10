@@ -57,7 +57,7 @@ class GwPsector:
         self.tablename_psector_x_node = "plan_psector_x_node"
         self.tablename_psector_x_connec = "plan_psector_x_connec"
         self.tablename_psector_x_gully = "plan_psector_x_gully"
-        self.no_editable_fields = ['state', 'psector_id', 'link_id', 'arc_id', 'node_id', 'connec_id', 
+        self.no_editable_fields = ['state', 'psector_id', 'link_id', 'arc_id', 'node_id', 'connec_id',
                                 'gully_id', 'id', '_link_geom_', '_userdefined_geom_', 'insert_user', 'insert_tstamp']
 
         self.qtbl_node = None
@@ -504,17 +504,17 @@ class GwPsector:
     def flags(self, index, model, editable_columns=None, table_specific_editable=None):
 
         column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
-        
+
         # Check if column is specifically allowed to be editable for this table
         if table_specific_editable and column_name in table_specific_editable:
             if isinstance(model, QSqlTableModel):
                 return QSqlTableModel.flags(model, index)
             return QStandardItemModel.flags(model, index)
-        
+
         # If column is in non-editable list, make it non-editable
         if column_name in self.no_editable_fields:
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled
-            
+
         if editable_columns and column_name not in editable_columns:
             flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
             return flags
@@ -1467,13 +1467,13 @@ class GwPsector:
         columns = []
         values = []
         update_clauses = []
-        
+
         for column in range(model.columnCount()):
             column_name = model.headerData(column, Qt.Horizontal, Qt.DisplayRole)
             if column_name:
                 value = record.value(column_name)
                 columns.append(column_name)
-                
+
                 if value in [None, 'None', 'null', 'Null', 'NULL', '']:
                     values.append('NULL')
                     if column_name not in self.no_editable_fields:
@@ -1506,17 +1506,17 @@ class GwPsector:
             columns_str = ', '.join(columns)
             values_str = ', '.join(values)
             update_str = ', '.join(update_clauses) if update_clauses else columns_str
-            
+
             # Determine the primary key or unique constraint
             # Most psector tables use 'id' as primary key
             conflict_column = 'id'
             record_id = record.value('id')
-            
+
             # If no ID, try to use a combination of psector_id and feature_id
             if not record_id:
                 psector_id = record.value('psector_id')
                 feature_id = None
-                
+
                 # Determine feature ID column based on table name
                 if 'arc' in table_name:
                     feature_id = record.value('arc_id')
@@ -1530,7 +1530,7 @@ class GwPsector:
                 elif 'gully' in table_name:
                     feature_id = record.value('gully_id')
                     conflict_column = 'psector_id, gully_id'
-                
+
                 if not (psector_id and feature_id):
                     return  # Cannot proceed without proper identifiers
 
@@ -1545,7 +1545,7 @@ class GwPsector:
                 sql = (f"INSERT INTO {table_name} ({columns_str}) "
                        f"VALUES ({values_str}) "
                        f"ON CONFLICT ({conflict_column}) DO NOTHING")
-            
+
             # Execute the UPSERT
             tools_db.execute_sql(sql)
 
@@ -2184,6 +2184,7 @@ class GwPsector:
                         feature += f', "tableName":"{table_name}", "idName":"{column_id}"'
                         body = tools_gw.create_body(feature=feature)
                         tools_gw.execute_procedure('gw_fct_setdelete', body)
+                        tools_gw.fill_cmb_psector_id(global_vars.psignals['widgets'][1])
 
         elif action == 'price':
             msg = "Are you sure you want to delete these records?"

@@ -5005,8 +5005,6 @@ def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
     """ Fill cmb_psector_id """
     sql = "SELECT psector_id as id, name as idval FROM v_ui_plan_psector WHERE archived = false ORDER BY id ASC"
     rows = tools_db.get_rows(sql)
-    if not rows:
-        return
     disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
     tools_qt.fill_combo_values(cmb_psector_id, rows)
     if psector_id is not None:
