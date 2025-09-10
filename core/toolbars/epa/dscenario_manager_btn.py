@@ -1372,8 +1372,9 @@ class GwDscenarioManagerButton(GwAction):
             if selected_ids:
                 inserted = {f'{feature_type}': []}
                 for f in selected_ids:
-                    sql = f"INSERT INTO ve_{view}"
+                    sql = f"INSERT INTO {view}"
                     if view == 'inp_dscenario_demand':
+                        sql = f"INSERT INTO ve_{view}"
                         sql += " (dscenario_id, feature_id)"
                     sql += f" VALUES ({self.selected_dscenario_id}, '{f}');"
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
