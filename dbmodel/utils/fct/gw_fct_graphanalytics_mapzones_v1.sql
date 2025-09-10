@@ -1294,13 +1294,13 @@ BEGIN
 			)';
 			EXECUTE v_query_text;
 
-			-- for DISCONNECTED & CONFLICT, mapzone_id is 0
+			-- for DISCONNECTED, mapzone_id is 0, for  CONFLICT mapzone_id is -1
 			v_query_text := '
 				WITH mapzones AS (
 					SELECT
 						component,
 						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
-						ELSE 0
+						ELSE -1
 						END AS mapzone_id
 					FROM temp_pgr_mapzone
 					UNION ALL
@@ -1319,7 +1319,7 @@ BEGIN
 					SELECT
 						component,
 						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
-						ELSE 0
+						ELSE -1
 						END AS mapzone_id
 					FROM temp_pgr_mapzone
 					UNION ALL
@@ -1338,7 +1338,7 @@ BEGIN
 					SELECT
 						component,
 						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
-						ELSE 0
+						ELSE -1
 						END AS mapzone_id
 					FROM temp_pgr_mapzone
 					UNION ALL
@@ -1357,7 +1357,7 @@ BEGIN
 					SELECT
 						component,
 						CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
-						ELSE 0
+						ELSE -1
 						END AS mapzone_id
 					FROM temp_pgr_mapzone
 					UNION ALL
@@ -1379,7 +1379,7 @@ BEGIN
 						SELECT
 							component,
 							CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
-							ELSE 0
+							ELSE -1
 							END AS mapzone_id
 						FROM temp_pgr_mapzone
 						UNION ALL
@@ -1398,7 +1398,7 @@ BEGIN
 						SELECT
 							component,
 							CASE WHEN CARDINALITY(mapzone_id) = 1 THEN mapzone_id[1]
-							ELSE 0
+							ELSE -1
 							END AS mapzone_id
 						FROM temp_pgr_mapzone
 						UNION ALL
