@@ -678,6 +678,39 @@ class Campaign:
         completer.setCaseSensitivity(False)
         dlg.feature_id.setCompleter(completer)
 
+    def get_allowed_features_for_campaign(self, feature: str) -> Optional[List[Any]]:
+        """Return list of allowed feature IDs for current campaign and feature tab.
+
+        If campaign type is inventory (3), returns None to indicate no restriction.
+        """
+        id_column = f"{feature}_id"
+
+        # Inventory: no restriction
+        if self.campaign_type == 3:
+            return None
+
+        allowed_types: List[str] = []
+        if self.campaign_type == 1:
+            reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
+            allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
+        elif self.campaign_type == 2:
+            visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
+            allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
+
+        if not allowed_types:
+            return []
+
+        allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+        sql = f"""
+            SELECT p.{id_column}::text AS {id_column}
+            FROM {self.schema_parent}.{feature} p
+            JOIN {self.schema_parent}.cat_{feature} c
+              ON p.{feature}cat_id = c.id
+            WHERE c.{feature}_type IN ({allowed_types_str})
+        """
+        rows = tools_db.get_rows(sql)
+        return [row[id_column] for row in (rows or []) if row.get(id_column)]
+
     def _on_class_changed(self, sender: Optional[QComboBox] = None):
         """Called when the user changes the reviewclass or visitclass combo or when dialog opens"""
         # If sender is not passed, try get it from signal

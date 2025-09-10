@@ -3668,6 +3668,41 @@ def find_parent_tab(widget):
     return None
 
 
+def _filter_ids_by_context(class_object, selection_mode: GwSelectionMode, feature_type: str, candidate_ids: list[str]) -> list[str]:
+    """Filter candidate ids according to the current selection context (LOT/CAMPAIGN).
+
+    Keeps logic centralized and returns a new filtered list of string ids.
+    """
+    ids = [str(i) for i in (candidate_ids or [])]
+
+    # LOT filter: only ids allowed by the campaign linked to the lot
+    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        try:
+            lot_id = getattr(class_object, 'lot_id', None) or getattr(class_object, 'lot_id_value', None)
+        except Exception:
+            lot_id = None
+        if lot_id and hasattr(class_object, 'get_allowed_features_for_lot'):
+            try:
+                allowed = class_object.get_allowed_features_for_lot(int(lot_id), feature_type) or []
+                allowed_set = set(map(str, allowed))
+                return [i for i in ids if i in allowed_set]
+            except Exception:
+                return ids
+
+    # CAMPAIGN filter: allowed ids according to review/visit class restrictions
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) \
+       and hasattr(class_object, 'get_allowed_features_for_campaign'):
+        try:
+            allowed = class_object.get_allowed_features_for_campaign(feature_type)
+            if isinstance(allowed, list):
+                allowed_set = set(map(str, allowed))
+                return [i for i in ids if i in allowed_set]
+        except Exception:
+            return ids
+
+    return ids
+
+
 def highlight_features_in_table(class_object, dialog, expected_table_name):
     """Selects all features on the map that are currently listed in the given table widget."""
 
@@ -3765,6 +3800,17 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Ensure selections are added even if the table was initially empty
     if not table_ids_original and selected_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = selected_ids
+
+    # Filter current buffers and selection once, centrally.
+    feature_type = class_object.rel_feature_type
+    class_object.rel_list_ids[feature_type] = _filter_ids_by_context(
+        class_object, selection_mode, feature_type, class_object.rel_list_ids.get(feature_type, []))
+    selected_ids = _filter_ids_by_context(class_object, selection_mode, feature_type, selected_ids)
+
+    # Reflect filtered selection on the map
+    if selected_ids:
+        expr = QgsExpression(f"{field_id} IN ({','.join(f'{i}' for i in selected_ids)})")
+        tools_qgis.select_features_by_ids(feature_type, expr, class_object.rel_layers)
     
     ids_to_insert = []
     for id in class_object.rel_list_ids[class_object.rel_feature_type]:
@@ -3776,6 +3822,13 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         msg = "Do you want to insert the selected features? {0}"
         msg_params = (", ".join(ids_to_insert), )
         do_insert = tools_qt.show_question(msg, msg_params=msg_params)
+    else:
+        # No new ids to insert: ensure we clear any selection on canvas
+        remove_selection(layers=class_object.rel_layers)
+
+    # If user closes/cancels the confirmation, just clear canvas selection
+    if not do_insert:
+        remove_selection(layers=class_object.rel_layers)
 
     # Prevent UI interference while updating the table
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
