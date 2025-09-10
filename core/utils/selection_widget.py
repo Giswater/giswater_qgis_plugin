@@ -69,7 +69,9 @@ class GwSelectionWidget(QWidget):
             self.init_zoom_to_selection(**general_variables)
 
         if self_varibles.get("selection_on_top", False):
-            self.init_selection_on_top(**general_variables, **selection_on_top_variables)
+            # selection_on_top_variables can be None; ensure we pass a mapping
+            extra_kwargs = selection_on_top_variables or {}
+            self.init_selection_on_top(**general_variables, **extra_kwargs)
 
     # region utility functions
 

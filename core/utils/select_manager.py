@@ -9,7 +9,7 @@ import math
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtCore import Qt
-from qgis.core import QgsPointXY, QgsRectangle, QgsGeometry, QgsWkbTypes
+from qgis.core import QgsPointXY, QgsRectangle, QgsGeometry, QgsWkbTypes, QgsVectorLayer
 from qgis.gui import QgsMapTool
 
 from ..utils import tools_gw
@@ -265,13 +265,11 @@ class GwPolygonSelectManager(QgsMapTool):
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
         
-        # Select features within polygon
+        # Select features within polygon using precise geometry predicate
+        wkt = polygon.asWkt()
+        behavior = QgsVectorLayer.RemoveFromSelection if unselect else QgsVectorLayer.AddToSelection
         for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-            
-            if unselect:
-                layer.selectByRect(polygon.boundingBox(), layer.RemoveFromSelection)
-            else:
-                layer.selectByRect(polygon.boundingBox(), layer.AddToSelection)
+            layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
 
         # Clean up
         self.rubber_band.hide()
@@ -426,13 +424,13 @@ class GwCircleSelectManager(QgsMapTool):
         
         # Select features within circle
         selected_count = 0
+        wkt = circle_geom.asWkt()
+        behavior = QgsVectorLayer.RemoveFromSelection if unselect else QgsVectorLayer.AddToSelection
         for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-
-            # First select by bounding box for efficiency
-            if unselect:
-                layer.selectByRect(circle_geom.boundingBox(), layer.RemoveFromSelection)
-            else:
-                layer.selectByRect(circle_geom.boundingBox(), layer.AddToSelection)
+            before = layer.selectedFeatureCount()
+            layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
+            after = layer.selectedFeatureCount()
+            selected_count += max(0, after - before)
 
         # Show selection result in status bar
         if hasattr(self.iface, 'statusBarIface'):
@@ -568,14 +566,11 @@ class GwFreehandSelectManager(QgsMapTool):
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
         
-        # Select features within polygon
+        # Select features within polygon using precise geometry predicate
+        wkt = polygon.asWkt()
+        behavior = QgsVectorLayer.RemoveFromSelection if unselect else QgsVectorLayer.AddToSelection
         for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-            
-            # First select by bounding box for efficiency
-            if unselect:
-                layer.selectByRect(polygon.boundingBox(), layer.RemoveFromSelection)
-            else:
-                layer.selectByRect(polygon.boundingBox(), layer.AddToSelection)
+            layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
 
         # Clean up
         self.rubber_band.hide()
