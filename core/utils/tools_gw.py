@@ -3811,7 +3811,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     if selected_ids:
         expr = QgsExpression(f"{field_id} IN ({','.join(f'{i}' for i in selected_ids)})")
         tools_qgis.select_features_by_ids(feature_type, expr, class_object.rel_layers)
-    
+
     ids_to_insert = []
     for id in class_object.rel_list_ids[class_object.rel_feature_type]:
         if id not in table_ids_original:
@@ -3834,9 +3834,11 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
     if selection_mode == GwSelectionMode.PSECTOR and do_insert:
         _insert_feature_psector(dialog, class_object.rel_feature_type, ids=ids_to_insert)
-        remove_selection()
         load_tableview_psector(dialog, class_object.rel_feature_type)
         set_model_signals(class_object)
+        remove_selection()
+    elif selection_mode == GwSelectionMode.PSECTOR and not do_insert:
+        remove_selection()
     elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) and do_insert:
         _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=ids_to_insert)
         load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
@@ -3911,31 +3913,39 @@ def get_model_index(model, row, field_name):
 def set_model_signals(class_object):
 
     class_object.rubber_band_point.reset()
+    class_object.rubber_band_op.reset()
+    class_object.rubber_band_line.reset()
+    class_object.rubber_band_rectangle.reset()
 
-    filter_ = "psector_id = '" + str(class_object.psector_id) + "'"
+    if hasattr(class_object, 'psector_id') and class_object.psector_id:
+        psector_id = class_object.psector_id
+    else:
+        psector_id = tools_qt.get_text(class_object.dlg_plan_psector, 'tab_general_psector_id')
+
+    filter_ = "psector_id = '" + str(psector_id) + "'"
     class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
                     set_edit_triggers=QTableView.DoubleClicked, expr=filter_, feature_type="connec", field_id="connec_id")
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "ve_arc", "arc_id", class_object.rubber_band_point, 5
+        class_object._highlight_features_by_id, class_object.qtbl_arc, "ve_arc", "arc_id", class_object.rubber_band_point, 10, state_value=1
     ))
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-        class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 5
+        class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 10, state_value=0
     ))
 
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "ve_node", "node_id", class_object.rubber_band_point, 10
+        class_object._highlight_features_by_id, class_object.qtbl_node, "ve_node", "node_id", class_object.rubber_band_point, 5, state_value=1
     ))
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
-        class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5
+        class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5, state_value=0
     ))
 
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "ve_connec", "connec_id", class_object.rubber_band_point, 10
+        class_object._highlight_features_by_id, class_object.qtbl_connec, "ve_connec", "connec_id", class_object.rubber_band_point, 5, state_value=1
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-        class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5
+        class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5, state_value=0
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
         class_object._manage_tab_feature_buttons
@@ -3943,10 +3953,10 @@ def set_model_signals(class_object):
 
     if class_object.project_type.upper() == 'UD':
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "ve_gully", "gully_id", class_object.rubber_band_point, 10
+            class_object._highlight_features_by_id, class_object.qtbl_gully, "ve_gully", "gully_id", class_object.rubber_band_point, 5, state_value=1
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-            class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5
+            class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5, state_value=0
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._manage_tab_feature_buttons
@@ -4045,6 +4055,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         _insert_feature_psector(dialog, feature_type, ids=selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
+        set_model_signals(class_object)
     elif selection_mode == GwSelectionMode.CAMPAIGN:
         _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
@@ -4731,6 +4742,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
+        set_model_signals(class_object)
     elif selection_mode == GwSelectionMode.CAMPAIGN:
         state = None
         if extra_field is not None and len(selected_list) == 1:

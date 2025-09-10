@@ -596,13 +596,10 @@ class GwSelectionWidget(QWidget):
             widget_table.setProperty('original_model', widget_table.model())
             widget_table.setProperty('selection_on_top', False)
 
-        if callback_later:
-            class_object.callback_later_selection_on_top = callback_later
-
         # Connect signals
-        self.btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object))
+        self.btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object, callback_later))
 
-    def toggle_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str):
+    def toggle_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str, callback_later: Callable = None):
         """
         Toggle between showing selection on top or restoring original order
         """
@@ -631,14 +628,14 @@ class GwSelectionWidget(QWidget):
                 _, feature_type = self.get_expected_table(class_object, dialog, table_object)
                 if not feature_type:
                     return
-                    
+
                 # Create a mapping of IDs to their current data
                 current_data = {}
                 id_column_name = f"{feature_type}_id"
                 id_col = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
                 if id_col == -1:
                     return
-                    
+
                 for row in range(current_model.rowCount()):
                     row_id = str(current_model.data(current_model.index(row, id_col)))
                     row_data = {}
@@ -647,7 +644,7 @@ class GwSelectionWidget(QWidget):
                         item = QStandardItem()
                         row_data[col] = self.copy_item_data(current_model, source_index, item)
                     current_data[row_id] = row_data
-                
+
                 # Update original model with current data
                 for row in range(original_model.rowCount()):
                     row_id = str(original_model.data(original_model.index(row, id_col)))
@@ -660,16 +657,16 @@ class GwSelectionWidget(QWidget):
                                 data = current_item.data(role)
                                 if data is not None:
                                     original_model.setData(target_index, data, role)
-                
+
                 # Restore model with updated data
                 widget_table.setModel(original_model)
                 # Restore selection
                 self.restore_selection(widget_table, selected_ids)
                 widget_table.setProperty('selection_on_top', False)
                 self.btn_selection_on_top.setChecked(False)  # Update button state
-        
-        if class_object.callback_later_selection_on_top:
-            class_object.callback_later_selection_on_top()
+
+        if callback_later:
+            callback_later()
 
     def get_selected_ids(self, widget_table):
         """Get IDs of selected rows"""
@@ -758,19 +755,19 @@ class GwSelectionWidget(QWidget):
                 Qt.BackgroundRole, Qt.ForegroundRole, Qt.CheckStateRole, Qt.InitialSortOrderRole,
                 Qt.UserRole
             ]
-            
+
             # Copy data for all roles
             for role in roles:
                 data = model.data(source_index, role)
                 if data is not None:
                     target_item.setData(data, role)
-            
+
             # Copy any custom user roles (above Qt.UserRole)
             for role in range(Qt.UserRole + 1, Qt.UserRole + 100):
                 data = model.data(source_index, role)
                 if data is not None:
                     target_item.setData(data, role)
-            
+
             return target_item
 
     # endregion selection on top

@@ -257,9 +257,9 @@ class GwPsector:
             button.clicked.connect(partial(self._reset_snapping))
 
         self.dlg_plan_psector.btn_insert.clicked.connect(
-            partial(self.insert_delete_feature, 'insert', table_object))
+            partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, True, None, None))
         self.dlg_plan_psector.btn_delete.clicked.connect(
-            partial(self.insert_delete_feature, 'delete', table_object))
+            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, None, None, "state"))
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
@@ -273,9 +273,10 @@ class GwPsector:
 
         self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector", "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
-        menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"], "callback_later": self.reset_relation_tables_signals}
+        menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"]}
+        highlight_variables = {"callback_values": self.callback_values}
         selection_on_top_variables = {"callback_later": self.reset_relation_tables_signals}
-        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, selection_on_top_variables=selection_on_top_variables)
+        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, highlight_variables=highlight_variables, selection_on_top_variables=selection_on_top_variables)
         self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
 
         self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
@@ -2501,6 +2502,14 @@ class GwPsector:
     def callback_values(self):
         return self, self.dlg_plan_psector, "psector"
 
+    def reset_relation_tables_signals(self):
+        """ Reset relation tables signals """
+
+        self._manage_selection_changed_signals(GwFeatureTypes.ARC)
+        self._manage_selection_changed_signals(GwFeatureTypes.NODE)
+        self._manage_selection_changed_signals(GwFeatureTypes.CONNEC)
+        self._manage_selection_changed_signals(GwFeatureTypes.GULLY)
+
     def _manage_psector_editability(self, psector_id):
         """ Manage psector form editability based on psector_editable variable """
         if hasattr(self, 'psector_editable') and not self.psector_editable and psector_id:
@@ -2558,24 +2567,6 @@ class GwPsector:
         # Manage connec/gully special cases
         if feature_type in (GwFeatureTypes.CONNEC, GwFeatureTypes.GULLY):
             tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
-
-    def insert_delete_feature(self, action: str, table_object: str):
-        """ Manage insert/delete feature """
-
-        if action == 'insert':
-            tools_gw.insert_feature(self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, True, None, None)
-        elif action == 'delete':
-            tools_gw.delete_records(self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, None, None, "state")
-
-        self.reset_relation_tables_signals()
-
-    def reset_relation_tables_signals(self):
-        """ Reset relation tables signals """
-
-        self._manage_selection_changed_signals(GwFeatureTypes.ARC)
-        self._manage_selection_changed_signals(GwFeatureTypes.NODE)
-        self._manage_selection_changed_signals(GwFeatureTypes.CONNEC)
-        self._manage_selection_changed_signals(GwFeatureTypes.GULLY)
 
     # endregion
 
