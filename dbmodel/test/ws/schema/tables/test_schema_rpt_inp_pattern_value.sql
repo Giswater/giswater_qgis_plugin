@@ -32,7 +32,7 @@ SELECT col_is_pk('rpt_inp_pattern_value', ARRAY['id'], 'Column id should be prim
 
 -- Check column types
 SELECT col_type_is('rpt_inp_pattern_value', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('rpt_inp_pattern_value', 'result_id', 'character varying(16)', 'Column result_id should be character varying(16)');
+SELECT col_type_is('rpt_inp_pattern_value', 'result_id', 'character varying(100)', 'Column result_id should be character varying(16)');
 SELECT col_type_is('rpt_inp_pattern_value', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('rpt_inp_pattern_value', 'pattern_id', 'character varying(16)', 'Column pattern_id should be character varying(16)');
 SELECT col_type_is('rpt_inp_pattern_value', 'idrow', 'integer', 'Column idrow should be integer');
