@@ -376,8 +376,7 @@ BEGIN
                     SELECT t.mapzone_id AS minsector_id, ST_Collect(ext_plot.the_geom) AS geom 
                     FROM temp_pgr_arc t 
                     JOIN v_temp_connec vc USING (arc_id)
-                    LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code
-					LEFT JOIN ext_plot ON ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
+                    LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code AND ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
                     WHERE mapzone_id::integer > 0 
                     GROUP BY t.mapzone_id
                 ) c 
