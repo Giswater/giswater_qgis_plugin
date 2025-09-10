@@ -4872,7 +4872,7 @@ def refresh_selectors(is_cm: bool = False):
             if is_cm:
                 selector.open_selector(selector_type='selector_campaign', reload_dlg=dialog)
             else:
-            selector.open_selector(reload_dlg=dialog)
+                selector.open_selector(reload_dlg=dialog)
         except Exception:
             pass
 
