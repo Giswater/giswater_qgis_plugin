@@ -920,3 +920,8 @@ UPDATE config_form_fields SET columnname = 'dint', hidden = true WHERE formname=
 UPDATE config_form_fields SET columnname='matcat_id', hidden = true WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='cat_matcat_id' AND tabname='tab_epa';
 UPDATE config_form_fields SET hidden = true WHERE formname='ve_epa_link' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_epa';
 
+UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_connec';
+UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_arc';
+UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_node';
+UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_valve';
+UPDATE sys_table SET context=NULL WHERE id='v_om_mincut_initpoint';
