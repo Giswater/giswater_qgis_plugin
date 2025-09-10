@@ -17,7 +17,6 @@ from sip import isdeleted
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlRecord
-from qgis.PyQt.QtCore import QAbstractTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer
@@ -1451,7 +1450,6 @@ class GwPsector:
             if str(widget.model().record(row).value('tab_general_psector_id')) != tools_qt.get_text(dialog, 'tab_general_psector_id'):
                 widget.hideRow(i)
 
-    
     def manage_update_model_relations(self, model: QSqlTableModel, row: int, record: QSqlRecord):
         """
         Manage update model relations - INSERT if new, UPDATE if exists
