@@ -2430,6 +2430,7 @@ class GwPsector:
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec)
         if self.project_type.upper() == 'UD':
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully)
+        self.reset_relation_tables_signals()
 
     def _check_layers_visible(self, layer_name, the_geom, field_id):
         """ Check layers visibility and add it if it is not in the toc """
