@@ -909,3 +909,14 @@ UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit", "actionTool
 
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
+
+
+-- 10/09/2025
+UPDATE config_form_fields SET columnname = 'dint', hidden = true WHERE formname='ve_epa_shortpipe' AND formtype='form_feature' AND columnname='cat_dint' AND tabname='tab_epa';
+UPDATE config_form_fields SET hidden = true WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='dint' AND tabname='tab_epa';
+UPDATE config_form_fields SET hidden = true WHERE formname='ve_epa_link' AND formtype='form_feature' AND columnname='dint' AND tabname='tab_epa';
+UPDATE config_form_fields SET columnname = 'dint', hidden = true WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='cat_dint' AND tabname='tab_epa';
+
+UPDATE config_form_fields SET columnname='matcat_id', hidden = true WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='cat_matcat_id' AND tabname='tab_epa';
+UPDATE config_form_fields SET hidden = true WHERE formname='ve_epa_link' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_epa';
+
