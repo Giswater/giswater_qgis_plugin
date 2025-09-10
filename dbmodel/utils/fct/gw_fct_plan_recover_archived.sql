@@ -41,7 +41,7 @@ v_message JSON;
 BEGIN 
 	
 	-- input params
-	v_psector_id := (p_data->'data'->'parameters'->>'psectorId')::integer;
+	v_psector_id := (p_data->'data'->>'psectorId')::integer;
 
 	SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version LIMIT 1;
 	SELECT json_build_object('level', 1, 'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
