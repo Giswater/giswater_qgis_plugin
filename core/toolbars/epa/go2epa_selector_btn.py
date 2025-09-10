@@ -79,7 +79,8 @@ def accept(**kwargs):
     tools_qgis.set_cursor_wait()
     try:
         _load_result_layers()
-        _load_compare_layers()
+        if form.get('tab_result_result_name_compare') and form.get('tab_result_result_name_compare') != '':
+            _load_compare_layers()
     except Exception:
         pass
     tools_qgis.restore_cursor()
@@ -136,12 +137,16 @@ def _load_result_layers():
     sql = f"SELECT id, alias FROM sys_table WHERE {filtre} AND alias IS NOT NULL"
     rows = tools_db.get_rows(sql)
     if rows:
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
                 pk = "id"
-                if global_vars.project_type == 'ws' and (tablename == 'v_rpt_node' or tablename == 'v_rpt_arc'):
-                    pk = f"{tablename.split('_')[-1]}_id"
+                for field in json_result['body']['data']['fields']:
+                    if field['tableName'] == tablename:
+                        pk = field['tableId']
+                        break
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
 
 
@@ -159,12 +164,16 @@ def _load_compare_layers():
     sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filtre}' AND alias IS NOT NULL"
     rows = tools_db.get_rows(sql)
     if rows:
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
                 pk = "id"
-                if global_vars.project_type == 'ws' and 'hourly' not in tablename:
-                    pk = f"{tablename.split('_')[-1]}_id"
+                for field in json_result['body']['data']['fields']:
+                    if field['tableName'] == tablename:
+                        pk = field['tableId']
+                        break
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
 
 # end region

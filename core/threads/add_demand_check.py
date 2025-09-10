@@ -24,12 +24,12 @@ WNTR_IMPORT_ERROR = "Couldn't import WNTR Python package. Please check if the Gi
 try:
     import wntr
     from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
-    from wntr.network import WaterNetworkModel
+    from wntr.network import read_inpfile
     from wntr.sim import EpanetSimulator
-    from wntr.metrics.hydraulics import average_expected_demand
+    from wntr.metrics.hydraulic import average_expected_demand
 except ImportError:
     wntr = None
-    WaterNetworkModel = None
+    read_inpfile = None
     EpanetSimulator = None
     average_expected_demand = None
     # error_traceback = traceback.format_exc()
@@ -213,7 +213,7 @@ class GwAddDemandCheck(GwTask):
             self.cur_step = WNTR_IMPORT_ERROR
             raise ImportError(WNTR_IMPORT_ERROR)
         self.cur_step = "Preparing network model..."
-        wn = WaterNetworkModel.read_inpfile(self.input_file)
+        wn = read_inpfile(self.input_file)
         self.adjusted_demands = average_expected_demand(wn)
 
         # Replace demands with the adjusted demands

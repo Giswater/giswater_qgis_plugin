@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import sys
 
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDialog, QShortcut, QWidget, QSizePolicy, QStackedLayout
@@ -26,7 +27,10 @@ class GwDialog(QDialog):
     def __init__(self, class_obj, subtag=None, parent=None):
 
         # If parent is not null the dialog is integrated into parent
-        super().__init__(iface.mainWindow())
+        if sys.platform == 'darwin':
+            super().__init__()
+        else:
+            super().__init__(iface.mainWindow())
         self.setupUi(self)
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly

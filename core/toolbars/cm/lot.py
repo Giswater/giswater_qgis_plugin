@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
                                   QHBoxLayout, QLabel, QLineEdit, QTableView,
-                                  QTextEdit, QToolBar, QWidget, QPushButton)
+                                  QTextEdit, QToolBar, QWidget)
 
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
@@ -22,6 +22,7 @@ from .... import global_vars
 from ....libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
+from ...utils.selection_widget import GwSelectionWidget
 from ....global_vars import GwFeatureTypes
 
 
@@ -125,25 +126,15 @@ class AddNewLot:
         # Icon buttons
         tools_gw.add_icon(self.dlg_lot.btn_insert, '111')
         tools_gw.add_icon(self.dlg_lot.btn_delete, '112')
-        tools_gw.add_icon(self.dlg_lot.btn_snapping, '137')
-        tools_gw.add_icon(self.dlg_lot.btn_expr_select, '178')
 
         # Create a widget and layout to hold the buttons
         self.corner_widget = QWidget()
         layout = QHBoxLayout(self.corner_widget)
         layout.setContentsMargins(0, 1, 0, 0)
 
-        self.btn_show_on_top_relations = QPushButton()
-        tools_gw.add_icon(self.btn_show_on_top_relations, '175')
-        self.btn_show_on_top_relations.setToolTip("Show selection on top")
-        self.btn_show_on_top_relations.clicked.connect(self._show_selection_on_top_relations)
-        layout.addWidget(self.btn_show_on_top_relations)
+        # self.btn_show_on_top_relations.clicked.connect(self._show_selection_on_top_relations)
 
-        self.btn_zoom_to_selection_relations = QPushButton()
-        tools_gw.add_icon(self.btn_zoom_to_selection_relations, '176')
-        self.btn_zoom_to_selection_relations.setToolTip("Zoom to selection")
-        self.btn_zoom_to_selection_relations.clicked.connect(self._zoom_to_selection_relations)
-        layout.addWidget(self.btn_zoom_to_selection_relations)
+        # self.btn_zoom_to_selection_relations.clicked.connect(self._zoom_to_selection_relations)
 
         self.dlg_lot.tab_feature.setCornerWidget(self.corner_widget)
 
@@ -172,9 +163,15 @@ class AddNewLot:
         # Relation feature buttons
         self.dlg_lot.btn_insert.clicked.connect(self._insert_related_feature)
         self.dlg_lot.btn_delete.clicked.connect(self._delete_related_records)
-        self.dlg_lot.btn_expr_select.clicked.connect(self._select_by_expression)
 
-        tools_gw.menu_btn_snapping(self, self.dlg_lot, "lot", GwSelectionMode.LOT, callback=self._init_snapping_selection)
+        self_variables = {"selection_mode": GwSelectionMode.LOT, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
+        general_variables = {"class_object": self, "dialog": self.dlg_lot, "table_object": "lot"}
+        used_tools = ["rectangle", "polygon", "freehand", "circle"]
+        menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection}
+        highlight_variables = {"callback_values": self.callback_values}
+        expression_selection = {"callback_later": self._select_by_expression}
+        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection)
+        self.dlg_lot.lyt_selection.addWidget(selection_widget, 0)
 
         # Always set multi-row and full row selection for relation tables, both on create and edit
         relation_table_names = [
@@ -196,6 +193,9 @@ class AddNewLot:
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+    def callback_values(self):
+        return (self, self.dlg_lot, "lot")
 
     def _on_campaign_changed(self):
         """
@@ -311,6 +311,9 @@ class AddNewLot:
         if campaign_sector_id is not None:
             self.set_widget_value(sector_combo, campaign_sector_id)
             sector_combo.setEnabled(False)
+
+        # Update relations tab enable/disable based on campaign relations
+        self._check_enable_tab_relations()
 
     def load_lot_dialog(self, lot_id: Optional[int]):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
@@ -522,10 +525,23 @@ class AddNewLot:
 
     def _check_enable_tab_relations(self):
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
-        if not name_widget:
-            return
+        name_ok = bool(name_widget.text().strip()) if name_widget else False
 
-        enable = bool(name_widget.text().strip())
+        campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+        campaign_id = campaign_combo.currentData() if campaign_combo else None
+
+        has_relations = False
+        if campaign_id:
+            features = ["arc", "node", "connec", "link"]
+            if tools_gw.get_project_type() == 'ud':
+                features.append("gully")
+            for feature in features:
+                sql = f"SELECT 1 FROM cm.om_campaign_x_{feature} WHERE campaign_id = {campaign_id} LIMIT 1"
+                if tools_db.get_row(sql):
+                    has_relations = True
+                    break
+
+        enable = name_ok and has_relations
         self.dlg_lot.tab_widget.setTabEnabled(self.dlg_lot.tab_widget.indexOf(self.dlg_lot.RelationsTab), enable)
 
     def _on_tab_change(self, index: int):
@@ -668,6 +684,7 @@ class AddNewLot:
             self._cleanup_map_selection()
             if not from_change_tab:
                 self.dlg_lot.accept()
+            tools_gw.refresh_selectors(is_cm=True)
         else:
             msg = "Error saving lot."
             tools_qgis.show_warning(msg)
@@ -730,8 +747,6 @@ class AddNewLot:
 
     def _select_by_expression(self):
         """Handles the 'select with expression' button click action."""
-        tools_gw.select_with_expression_dialog(self, self.dlg_lot, "lot",
-                                               selection_mode=GwSelectionMode.EXPRESSION_LOT)
         self._update_feature_completer_lot(self.dlg_lot)
 
     def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
@@ -1054,6 +1069,7 @@ class AddNewLot:
         msg = "{0} lot(s) deleted."
         msg_params = (deleted,)
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.dlg_lot_man)
+        tools_gw.refresh_selectors(is_cm=True)
         self.filter_lot()
 
     def _on_lot_selection_changed(self, selected, deselected):

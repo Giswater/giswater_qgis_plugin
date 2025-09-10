@@ -91,7 +91,7 @@ class GwRecursiveEpa(GwTask):
                 for l1o in list1:
                     query = query1.replace("$list1object", l1o)  # Replace `$list1object` for actual `list{i}` object
                     tools_db.execute_sql(query, is_thread=True)  # Execute `query{i}` from `list1` section
-                    if self.stop or global_vars.session_vars['last_error']:
+                    if self.stop or lib_vars.session_vars['last_error']:
                         return False
                     if not queries2 or not lists2:
                         self.run_go2epa(l1o)
@@ -103,7 +103,7 @@ class GwRecursiveEpa(GwTask):
                         for l2o in list2:
                             query = query2.replace("$list2object", l2o)  # Replace `$list2object` for actual `list{i}` object
                             tools_db.execute_sql(query, is_thread=True)  # Execute `query{i}` from `list2` section
-                            if self.stop or global_vars.session_vars['last_error']:
+                            if self.stop or lib_vars.session_vars['last_error']:
                                 return False
                             if not queries3 or not lists3:
                                 self.run_go2epa(l1o, l2o)
@@ -116,7 +116,7 @@ class GwRecursiveEpa(GwTask):
                                     query = query3.replace("$list3object", l3o)  # Replace `$list3object` for actual `list{i}` object
                                     tools_db.execute_sql(query, is_thread=True)  # Execute `query{i}` from `list3` section
                                     self.run_go2epa(l1o, l2o, l3o)
-                                    if self.stop or global_vars.session_vars['last_error']:
+                                    if self.stop or lib_vars.session_vars['last_error']:
                                         return False
 
         except Exception as e:
@@ -213,6 +213,7 @@ class GwRecursiveEpa(GwTask):
         if self.function_failed:
             if self.json_result is None or not self.json_result:
                 msg = "Function failed finished"
+                msg_params = (self.function_name,)
                 tools_log.log_warning(msg, msg_params=msg_params)
             if self.complet_result:
                 if 'status' in self.complet_result:
@@ -236,8 +237,8 @@ class GwRecursiveEpa(GwTask):
             raise self.exception
 
         # If Database exception, show dialog after task has finished
-        if global_vars.session_vars['last_error']:
-            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
+        if lib_vars.session_vars['last_error']:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
 
     def cancel(self):
         self.stop_task()
@@ -607,6 +608,7 @@ class GwRecursiveEpa(GwTask):
         json_rpt = '[' + str(json_rpt[:-2]) + ']'
         self.json_rpt = json_rpt
 
+        self.json_rpt = self.json_rpt.replace("\\", "/")
         self._close_file()
         del full_file
 

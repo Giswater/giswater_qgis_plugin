@@ -8,9 +8,10 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils
+from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils, QgsVectorLayer, QgsEditFormConfig, QgsAttributeEditorContainer, \
+                    QgsAttributeEditorField, QgsEditorWidgetSetup
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -136,6 +137,9 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
+        # Create Psector status bar
+        self._create_psector_status_bar()
+
         # Check parameter 'force_tab_expl'
         force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
         if tools_os.set_boolean(force_tab_expl, False):
@@ -150,35 +154,32 @@ class GwLoadProject(QObject):
         # Set indexing strategy for snapping so that it uses less memory if possible
         self.iface.mapCanvas().snappingUtils().setIndexingStrategy(QgsSnappingUtils.IndexHybrid)
 
+        # Activate snapping
+        tools_qgis.set_project_snapping_settings(enabled=True)
+
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, lib_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
-        # Only get the x.y.zzz, not x.y.zzz.n
+
+        # Compare major.minor versions
         try:
             plugin_version_l = str(plugin_version).split('.')
-            if len(plugin_version_l) >= 4:
-                plugin_version = f'{plugin_version_l[0]}'
-                for i in range(1, 3):
-                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
-        except Exception:
-            pass
-        try:
             project_version_l = str(project_version).split('.')
-            if len(project_version_l) >= 4:
-                project_version = f'{project_version_l[0]}'
-                for i in range(1, 3):
-                    project_version = f"{project_version}.{project_version_l[i]}"
+            plugin_major_minor = f'{plugin_version_l[0]}.{plugin_version_l[1]}'
+            project_major_minor = f'{project_version_l[0]}.{project_version_l[1]}'
+
+            if plugin_major_minor == project_major_minor:
+                msg = "Project read finished"
+                tools_log.log_info(msg)
+            else:
+                msg = ("Project read finished with different versions on plugin metadata ({0}) and "
+                      "PostgreSQL sys_version table ({1}).")
+                msg_params = (plugin_version, project_version,)
+                tools_log.log_warning(msg, msg_params=msg_params)
+                tools_qgis.show_warning(msg, msg_params=msg_params)
         except Exception:
-            pass
-        if project_version == plugin_version:
             msg = "Project read finished"
             tools_log.log_info(msg)
-        else:
-            msg = ("Project read finished with different versions on plugin metadata ({0}) and "
-                    "PostgreSQL sys_version table ({1}).")
-            msg_params = (plugin_version, project_version,)
-            tools_log.log_warning(msg, msg_params=msg_params)
-            tools_qgis.show_warning(msg, msg_params=msg_params)
 
         # Reset dialogs position
         tools_gw.reset_position_dialog()
@@ -188,6 +189,9 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
+
+        # Apply campaign form configuration
+        self._apply_campaign_form_config()
 
     # region private functions
 
@@ -549,6 +553,26 @@ class GwLoadProject(QObject):
             self.plugin_toolbars[toolbar_id] = plugin_toolbar
             self._enable_toolbar(toolbar_id)
 
+    def _create_psector_status_bar(self):
+        """ Create Psector status bar """
+        statusbar = self.iface.mainWindow().statusBar()
+
+        self.playpause_button = QPushButton()
+        tools_gw.add_icon(self.playpause_button, "73", f"toolbars{os.sep}status")
+        self.playpause_button.setProperty('psector_active', False)
+        self.playpause_button.clicked.connect(self._playpause_btn_clicked)
+        statusbar.insertPermanentWidget(0, self.playpause_button)
+
+        self.cmb_psector = QComboBox()
+        tools_gw.fill_cmb_psector_id(self.cmb_psector)
+        statusbar.insertPermanentWidget(1, self.cmb_psector)
+
+        global_vars.psignals['widgets'] = [self.playpause_button, self.cmb_psector]
+
+    def _playpause_btn_clicked(self):
+        """ Manage psector play/pause """
+        tools_gw.set_psector_mode_enabled()
+
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
 
@@ -808,5 +832,93 @@ class GwLoadProject(QObject):
                         break
             except IndexError:
                 pass
+
+    # region Campaign form config
+    
+    def _apply_campaign_form_config(self):
+        """
+        Applies custom form configurations from the cm_form_config table to project layers.
+        """
+        
+        if not tools_db.check_schema('cm'):
+            return
+
+        sql = "SELECT campaign_id FROM cm.selector_campaign WHERE cur_user = current_user LIMIT 1"
+        rows = tools_db.get_rows(sql)
+        campaign_id = rows[0][0] if rows else None
+        
+        if not campaign_id:
+            return
+
+        sql = (
+            "SELECT layer_name, field_name, field_order, is_hidden "
+            "FROM cm.cm_form_config "
+            f"WHERE {campaign_id} = ANY(campaign_ids) "
+            "ORDER BY layer_name, field_order"
+        )
+        try:
+            config_rows = tools_db.get_rows(sql)
+        except Exception:
+            # The table might not exist in older versions
+            return
+            
+        if not config_rows:
+            return
+
+        # Group configuration by layer
+        configs_by_layer = {}
+        for layer_name, field_name, field_order, is_hidden in config_rows:
+            configs_by_layer.setdefault(layer_name, []).append(
+                {"field": field_name, "hidden": bool(is_hidden)}
+            )
+
+        for layer_name, cfg_fields in configs_by_layer.items():
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+            if layer and isinstance(layer, QgsVectorLayer):
+                self._configure_layer_form(layer, cfg_fields)
+
+    def _configure_layer_form(self, layer, cfg_fields):
+        """
+        Applies a given form configuration to a single QgsVectorLayer.
+        """
+        
+        # Build order list: configured first, then the rest
+        configured_map = {f["field"]: f for f in cfg_fields}
+        configured_order = [f["field"] for f in cfg_fields]
+        all_fields = [f.name() for f in layer.fields()]
+        final_order = configured_order + [f for f in all_fields if f not in configured_map]
+
+        # Put form in Drag&Drop mode and clear previous layout
+        form_cfg = layer.editFormConfig()
+        form_cfg.setLayout(QgsEditFormConfig.TabLayout)
+        form_cfg.clearTabs()
+
+        # Main container
+        main_tab = QgsAttributeEditorContainer(form_cfg.invisibleRootContainer())
+        main_tab.setName("General")
+
+        for fname in final_order:
+            idx = layer.fields().indexOf(fname)
+            if idx < 0:
+                continue
+
+            # Hidden
+            hidden = fname in configured_map and configured_map[fname]["hidden"]
+            if hidden:
+                # Mark widget as Hidden and don't add it to the container
+                layer.setEditorWidgetSetup(idx, QgsEditorWidgetSetup("Hidden", {}))
+                continue
+            else:
+                # Ensure it's not left Hidden from a previous run
+                current = layer.editorWidgetSetup(idx)
+                if current.type() == "Hidden":
+                    layer.setEditorWidgetSetup(idx, QgsEditorWidgetSetup("", {}))
+
+            # Add visible field to the container in the desired order
+            main_tab.addChildElement(QgsAttributeEditorField(fname, idx, main_tab))
+
+        # Register container and apply
+        form_cfg.addTab(main_tab)
+        layer.setEditFormConfig(form_cfg)
 
     # endregion

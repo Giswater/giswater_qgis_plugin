@@ -122,7 +122,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_hydrology_manager.btn_toc, "164")
 
         # Manage btn create
-        self._manage_btn_create(self.dlg_hydrology_manager, 've_cat_hydrology')
+        self._manage_btn_create(self.dlg_hydrology_manager, 've_cat_hydrology', scenario_type="hydrology")
 
         # Apply filter validator
         self.filter_name = self.dlg_hydrology_manager.findChild(QLineEdit, 'txt_name')
@@ -134,8 +134,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_hydrology_manager.findChild(QTableView, 'tbl_dscenario')
-        self._fill_manager_table('ve_cat_hydrology')
-        self._set_label_current_dscenario_type(self.dlg_hydrology_manager, scenario_type="hydrology", from_open_dialog=True)
+        self._fill_manager_table('ve_cat_hydrology', dialog=self.dlg_hydrology_manager, scenario_type="hydrology")
 
         # Populate custom context menu
         self.dlg_hydrology_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -144,20 +143,24 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_hydrology_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 've_cat_hydrology', 'Catalogs'))
         self.dlg_hydrology_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                        've_cat_hydrology', None))
+                                                                        've_cat_hydrology', None,
+                                                                        dialog=self.dlg_hydrology_manager,
+                                                                        scenario_type="hydrology"))
         self.dlg_hydrology_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_hydrology_manager, 've_cat_hydrology', 3294))
         self.dlg_hydrology_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3100,
-                                                                       've_cat_hydrology'))
+                                                                       've_cat_hydrology', dialog=self.dlg_hydrology_manager, scenario_type="hydrology"))
         self.dlg_hydrology_manager.btn_update.clicked.connect(partial(self._manage_properties,
                                                 self.dlg_hydrology_manager, 've_cat_hydrology', True))
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_hydrology_manager, 've_cat_hydrology'))
+                                                self.dlg_hydrology_manager, 've_cat_hydrology', scenario_type="hydrology"))
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_hydrology_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
-                                                self.dlg_hydrology_manager, self.tbl_dscenario, 've_cat_hydrology'))
+                                                self.dlg_hydrology_manager, self.tbl_dscenario, 've_cat_hydrology', 'inp_options_hydrology_current', scenario_type="hydrology"))
         self.dlg_hydrology_manager.chk_active.stateChanged.connect(
-            partial(self._fill_manager_table, 've_cat_hydrology'))
+            partial(self._fill_manager_table, 've_cat_hydrology',
+                    dialog=self.dlg_hydrology_manager,
+                    scenario_type="hydrology"))
 
         self.dlg_hydrology_manager.btn_update_dscenario.clicked.connect(
             partial(self.update_current_scenario, self.dlg_hydrology_manager, qtbl=self.tbl_dscenario,
@@ -183,7 +186,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_dwf_manager.btn_toc, "164")
 
         # Manage btn create
-        self._manage_btn_create(self.dlg_dwf_manager, 've_cat_dwf')
+        self._manage_btn_create(self.dlg_dwf_manager, 've_cat_dwf', scenario_type="dwf")
 
         # Apply filter validator
         self.filter_name = self.dlg_dwf_manager.findChild(QLineEdit, 'txt_name')
@@ -195,8 +198,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_dwf_manager.findChild(QTableView, 'tbl_dscenario')
-        self._fill_manager_table('ve_cat_dwf')
-        self._set_label_current_dscenario_type(self.dlg_dwf_manager, scenario_type="dwf", from_open_dialog=True)
+        self._fill_manager_table('ve_cat_dwf', dialog=self.dlg_dwf_manager, scenario_type="dwf")
 
         # Populate custom context menu
         self.dlg_dwf_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -205,20 +207,24 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 've_cat_dwf', 'Catalogs'))
         self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                  've_cat_dwf', None))
+                                                                  've_cat_dwf', None,
+                                                                  dialog=self.dlg_dwf_manager,
+                                                                  scenario_type="dwf"))
         self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_dwf_manager, 've_cat_dwf', 3296))
         self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
-                                                                 've_cat_dwf'))
+                                                                 've_cat_dwf', dialog=self.dlg_dwf_manager, scenario_type="dwf"))
         self.dlg_dwf_manager.btn_update.clicked.connect(partial(self._manage_properties,
                                                 self.dlg_dwf_manager, 've_cat_dwf', True))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_dwf_manager, 've_cat_dwf'))
+                                                self.dlg_dwf_manager, 've_cat_dwf', scenario_type="dwf"))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_dwf_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
-                                                self.dlg_dwf_manager, self.tbl_dscenario, 've_cat_dwf'))
+                                                self.dlg_dwf_manager, self.tbl_dscenario, 've_cat_dwf', 'inp_options_dwfscenario_current', scenario_type="dwf"))
         self.dlg_dwf_manager.chk_active.stateChanged.connect(
-            partial(self._fill_manager_table, 've_cat_dwf'))
+            partial(self._fill_manager_table, 've_cat_dwf',
+                    dialog=self.dlg_dwf_manager,
+                    scenario_type="dwf"))
 
         self.dlg_dwf_manager.btn_update_dscenario.clicked.connect(
             partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf",
@@ -257,6 +263,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
+        
         self._fill_manager_table('ve_cat_dscenario')
 
         # CheckBox filter
@@ -331,7 +338,8 @@ class GwDscenarioManagerButton(GwAction):
 
         menu.exec(QCursor.pos())
 
-    def _manage_toggle_active(self, dialog, tableview, view):
+    def _manage_toggle_active(self, dialog, tableview, view, parameter=None, scenario_type=None):
+        """ Toggle the active state of selected items in the current table. """
 
         # Get selected row
         if tableview is None and view is None:
@@ -349,17 +357,21 @@ class GwDscenarioManagerButton(GwAction):
             col_idx = tools_qt.get_col_index_by_col_name(tableview, self.views_dict[view])
             if not col_idx:
                 col_idx = 0
-
-            col_id = index.sibling(index.row(), col_idx).data()
+        
+            scenario_id = index.sibling(index.row(), col_idx).data()
             active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
             active = tools_os.set_boolean(active)
 
-            sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {self.views_dict[view]} = {col_id}"
+            if parameter and tools_gw.get_config_value(parameter) and active and str(tools_gw.get_config_value(parameter)[0]) == str(scenario_id):
+                msg = "Cannot set inactive a current scenario. Please update current first."
+                tools_qgis.show_warning(msg, dialog=dialog)
+                return
+            sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {self.views_dict[view]} = {scenario_id}"
 
             tools_db.execute_sql(sql, log_sql=True)
 
         # Refresh tableview
-        self._fill_manager_table(view)
+        self._fill_manager_table(view, dialog=dialog, scenario_type=scenario_type)
 
     def save_user_values(self):
         pass
@@ -387,7 +399,7 @@ class GwDscenarioManagerButton(GwAction):
         active = model.index(row, col_active).data()
 
         # Verify that the selected scenario is active
-        if not active:
+        if not tools_os.set_boolean(active):
             msg = "Cannot set the current {0} scenario of an inactive scenario. Please activate it first."
             msg_params = (scenario_type,)
             tools_qgis.show_warning(msg, dialog=dialog, msg_params=msg_params)
@@ -399,7 +411,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Execute the stored procedure
         result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
-        print(result)
+        
         # Check if the stored procedure returned a successful status
         if result.get("status") == "Accepted":
             # Refresh the table view and set the label for the current scenario
@@ -460,8 +472,9 @@ class GwDscenarioManagerButton(GwAction):
 
         return complet_list
 
-    def _fill_manager_table(self, view, filter_active=None, filter_name=""):
-        """ Fill dscenario manager table """
+    def _fill_manager_table(self, view, filter_active=None, filter_name="", dialog=None, scenario_type=None):
+        """ Fill dscenario manager table and optionally update current label. """
+
         filter_active = 'true' if filter_active == 2 else self.chk_active.isChecked()
         if filter_name == "":
             filter_name = self.filter_name.text()
@@ -484,10 +497,13 @@ class GwDscenarioManagerButton(GwAction):
         # TODO: config_form_tableview
         # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
         tools_qt.set_tableview_config(self.tbl_dscenario)
-
+        # Optionally set current scenario label if context provided
+        
+        if dialog is not None and dialog.findChild(QWidget, 'lbl_vdefault_dscenario').isVisible() and scenario_type is not None:
+            self._set_label_current_dscenario_type(dialog, scenario_type=scenario_type, from_open_dialog=True)
         return complet_list
 
-    def _manage_btn_create(self, dialog, view):
+    def _manage_btn_create(self, dialog, view, scenario_type=None):
         """ Fill btn_create QMenu """
 
         # Functions
@@ -511,11 +527,11 @@ class GwDscenarioManagerButton(GwAction):
             num = value[0]
             label = value[1]
             action = create_menu.addAction(f"{label}")
-            action.triggered.connect(partial(self._open_toolbox_function, num, view, label=label))
+            action.triggered.connect(partial(self._open_toolbox_function, num, view, label=label, dialog=dialog, scenario_type=scenario_type))
 
         dialog.btn_create.setMenu(create_menu)
 
-    def _open_toolbox_function(self, function, view, signal=None, connect=None, label=None):
+    def _open_toolbox_function(self, function, view, signal=None, connect=None, label=None, dialog=None, scenario_type=None):
         """
         Execute currently selected function from combobox and dynamically append additional logic
         for specific scenarios without removing defaults.
@@ -533,8 +549,9 @@ class GwDscenarioManagerButton(GwAction):
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
 
         # Default connections
-        default_connect = [partial(self._fill_manager_table, view), partial(tools_gw.refresh_selectors)]
-
+        default_connect = [partial(self._fill_manager_table, view, dialog=dialog, scenario_type=scenario_type),
+                           partial(tools_gw.refresh_selectors)]
+        
         # Merge connect with defaults
         if connect is None:
             connect = default_connect
@@ -585,7 +602,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'copyFrom'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
-    def _delete_selected_dscenario(self, dialog, view):
+    def _delete_selected_dscenario(self, dialog, view, scenario_type=None):
         """ Deletes the selected dscenario """
 
         # Get selected row
@@ -611,7 +628,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_db.execute_sql(sql)
 
             # Refresh the table
-            self._fill_manager_table(view)
+            self._fill_manager_table(view, dialog=dialog, scenario_type=scenario_type)
 
     # endregion
 
@@ -813,6 +830,9 @@ class GwDscenarioManagerButton(GwAction):
 
     def _manage_current_changed(self):
         """ Manages tab changes """
+
+        if not hasattr(self, 'dlg_dscenario') or isdeleted(self.dlg_dscenario):
+            return
 
         # Fill current table
         self._fill_dscenario_table()
@@ -1044,9 +1064,11 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic', title=title)
 
     def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
+        """ Accept the properties dialog """
+        
         if not my_json:
             return
-
+        
         fields = json.dumps(my_json)
         id_val = ""
         if pkey:
@@ -1351,8 +1373,9 @@ class GwDscenarioManagerButton(GwAction):
             if selected_ids:
                 inserted = {f'{feature_type}': []}
                 for f in selected_ids:
-                    sql = f"INSERT INTO ve_{view}"
+                    sql = f"INSERT INTO {view}"
                     if view == 'inp_dscenario_demand':
+                        sql = f"INSERT INTO ve_{view}"
                         sql += " (dscenario_id, feature_id)"
                     sql += f" VALUES ({self.selected_dscenario_id}, '{f}');"
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)

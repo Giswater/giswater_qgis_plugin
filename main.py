@@ -159,6 +159,13 @@ class Giswater(QObject):
             tools_log.log_info(msg, parameter=str(e), msg_params=msg_params)
 
         try:
+            # Remove PSIGNALS
+            self._unset_psignals()
+        except Exception as e:
+            msg_params = ("self._unset_psignals()",)
+            tools_log.log_info(msg, parameter=str(e), msg_params=msg_params)
+
+        try:
             # Check if project is current loaded and remove giswater toolbars from qgis
             if self.load_project:
                 if self.load_project.plugin_toolbars:
@@ -368,7 +375,7 @@ class Giswater(QObject):
         # Set action and button as None
         self.action = None
         self.action_info = None
-        
+
         # Clear global load_project reference
         global_vars.load_project = None
 
@@ -381,6 +388,15 @@ class Giswater(QObject):
                 continue
             toolbar.removeAction(action)  # Remove from toolbar
             action.deleteLater()  # Schedule for deletion
+
+    def _unset_psignals(self):
+        """ Unset PSIGNALS (when plugin is disabled or reloaded) """
+
+        statusbar = self.iface.mainWindow().statusBar()
+        for widget in global_vars.psignals['widgets']:
+            statusbar.removeWidget(widget)
+            widget.deleteLater()
+        global_vars.psignals['widgets'].clear()
 
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
@@ -426,12 +442,6 @@ class Giswater(QObject):
         docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
         if docker_info:
             self.iface.removeDockWidget(docker_info)
-
-        # Remove 'current_psector' docker
-        if lib_vars.session_vars.get('current_psector'):
-            self.iface.removeDockWidget(lib_vars.session_vars['current_psector'])
-            lib_vars.session_vars['current_psector'].deleteLater()
-            lib_vars.session_vars['current_psector'] = None
 
         # Manage 'dialog_docker' from lib_vars.session_vars and remove it if exists
         tools_gw.close_docker()

@@ -104,6 +104,7 @@ class GwGisFileCreate:
 
         # Hide hidden group
         tools_gw.hide_group_from_toc('HIDDEN')
+        root.findGroup('HIDDEN').setItemVisibilityChecked(False)
         
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
@@ -122,6 +123,9 @@ class GwGisFileCreate:
         for group in groups:
             if isinstance(group, QgsLayerTreeGroup):
                 group.setExpanded(False)
+
+        # Set default project snapping settings
+        tools_qgis.set_project_snapping_settings()
 
         # Set camera position on ve_node
         global_vars.iface.mapCanvas().setExtent(tools_gw._get_extent_parameters(schema))

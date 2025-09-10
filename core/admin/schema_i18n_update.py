@@ -98,7 +98,7 @@ class GwSchemaI18NUpdate:
         msg = "Succesfully connected to {0}"
         msg_params = (host_org,)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
-        sql = "SELECT id, idval FROM i18n.cat_language"
+        sql = "SELECT id, idval FROM i18n.cat_language WHERE id != 'All'"
         rows = self._get_rows(sql, self.cursor_i18n)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "session", False)
@@ -242,7 +242,7 @@ class GwSchemaI18NUpdate:
         lang_columns = []
 
         if 'dbconfig_form_fields' in table:
-            columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            columns = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
                             f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
             if 'feat' in table:
@@ -318,6 +318,10 @@ class GwSchemaI18NUpdate:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}",
                             f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            
+        elif 'dblabel' in table:
+            columns = ["source", "project_type", "context", "vl_en_us"]
+            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}"]
 
         elif 'dbconfig_engine' in table:
             columns = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
@@ -395,11 +399,11 @@ class GwSchemaI18NUpdate:
                             if row['feature_type'] == feature_type:
                                 formname = row['feature_type'].lower()
                                 sql_text = (f'UPDATE {self.schema}.{row["context"]} SET label = {texts[0]}, tooltip = {texts[1]} '
-                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row["formtype"]}\' AND columnname = \'{row["source"]}\' ')
+                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row["formtype"]}\' AND tabname = \'{row["tabname"]}\' AND columnname = \'{row["source"]}\' ')
                                 break
                     else:
                         sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
-                                f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND columnname = '{row['source']}';\n")
+                                f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND tabname = '{row['tabname']}' AND columnname = '{row['source']}';\n")
 
                 elif 'dbparam_user' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]} "
@@ -452,6 +456,10 @@ class GwSchemaI18NUpdate:
                 elif 'dbtable' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
+                    
+                elif 'dblabel' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
+                                f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbconfig_engine' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]}, placeholder = {texts[2]} "
@@ -474,16 +482,16 @@ class GwSchemaI18NUpdate:
         values_by_context = {}
 
         updates = {}
-        project_types = [self.project_type, "utils"] if self.project_type in ["ud", "ws"] else [self.project_type]
         for row in rows:
-            if row['project_type'] not in project_types:
+            if row['project_type'] not in self.path_dic[file_type]["project_type"]:
                 continue
+            text = json.dumps(row["text"]).replace("'", "''")
             # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
-                key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"])
+                key = (row["source"], row["context"], text, row["formname"], row["formtype"], row["tabname"])
             else:
-                key = (row["source"], row["context"], row["text"])
+                key = (row["source"], row["context"], text)
             updates.setdefault(key, []).append(row)
 
         for key, related_rows in updates.items():
@@ -502,11 +510,7 @@ class GwSchemaI18NUpdate:
                 tools_log.log_error(msg, msg_params=msg_params)
                 continue
 
-            # Parse JSON safely
-            json_data = self.safe_parse(source, original_text)
-            if json_data is None:
-                return f'{context} - Error parsing JSON source (Log_info)'
-
+            text_json = json.loads(original_text.replace("''", "'"))
             # Translate fields
             for row in related_rows:
                 key_hint = row["hint"].rsplit('_', 1)[0]
@@ -517,31 +521,10 @@ class GwSchemaI18NUpdate:
                     default_text
                 )
 
-                if ", " in default_text and key_hint == "comboNames":
-                    default_list = default_text.split(", ")
-                    translated_list = translated.split(", ")
-                    for item in json_data:
-                        if isinstance(item, dict) and key_hint in item:
-                            if set(default_list).intersection(item["comboNames"]):
-                                item["comboNames"] = [
-                                    t if d in default_list else d
-                                    for d, t in zip(default_list, translated_list)
-                                ]
-                else:
-                    if isinstance(json_data, dict):
-                        for key_name, value in json_data.items():
-                            if key_name == key_hint and value == default_text:
-                                json_data[key_name] = translated
-                    elif isinstance(json_data, list):
-                        for item in json_data:
-                            if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
-                                item[key_hint] = translated
-                    else:
-                        msg = "Unexpected json_data structure!"
-                        tools_log.log_error(msg)
+                text_json = self.replace_transaltions(text_json, default_text, key_hint, translated)
 
             # Encode new JSON safely
-            new_text = json.dumps(json_data, ensure_ascii=False).replace("'", "''")
+            new_text = json.dumps(text_json, ensure_ascii=False).replace("'", "''")
 
             # Save the result grouped by context and column
             if context not in values_by_context:
@@ -558,10 +541,10 @@ class GwSchemaI18NUpdate:
 
             if context == "config_form_fields":
                 values_str = ",\n    ".join([
-                    f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
+                    f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', '{txt}')"
                     for source, row, txt, col in data
                 ])
-                sql_text = (f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                sql_text = (f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
                 print(sql_text)
             else:
                 values_str = ",\n    ".join([
@@ -797,72 +780,40 @@ class GwSchemaI18NUpdate:
         cur_dest.execute(final_query)
         conn_dest.commit()
 
-    def safe_parse(self, source, text):
-        try:
-            # Try JSON first (safer if it's valid JSON)
-            # First handle empty values 
-            modified = text.replace("False", "false").replace("True", "true").replace("None", "null")
-            
-            #Save values in special cases
-            modified = modified.replace(": ''", ': "a"').replace(":''", ': "a"').replace(':""', ': "a"')
-            modified = modified.replace("','. ", "',a'. ").replace("'T','TANK'", "a'T',a'TANK'a")
-            modified = modified.replace("-999,'ALL", "-999,a'ALL")
-            
-            # Adapt " in keys and values
-            modified = modified.replace("': '", '": "').replace("':'", '": "').replace("' :'", '": "').replace("' : '", '": "')
-            modified = modified.replace("': \"", '": "').replace("':\"", '": "').replace("' :\"", '": "').replace("' : \"", '": "')
-            modified = modified.replace("\": '", '": "').replace("\":'", '": "').replace("\" :\"", '": "').replace("\" : \"", '": "')
-            
-            modified = modified.replace("', '", '", "').replace("','", '", "').replace("' ,'", '", "').replace("' , '", '", "')
-            modified = modified.replace("', \"", '", "').replace("',\"", '", "').replace("' ,\"", '", "').replace("' , \"", '", "')
-            modified = modified.replace("\", '", '", "').replace("\",'", '", "').replace("\" ,'", '", "').replace("\" , '", '", "')
+    def replace_transaltions(self, json_data, default_text, key_hint, translated):
+        if ", " in default_text and key_hint == "comboNames":
+            default_list = default_text.split(", ")
+            translated_list = translated.split(", ")
+            for item in json_data:
+                if isinstance(item, dict) and key_hint in item:
+                    if set(default_list).intersection(item["comboNames"]):
+                        item["comboNames"] = [
+                            t if d in default_list else d
+                            for d, t in zip(default_list, translated_list)
+                        ]
+        elif isinstance(json_data, dict):
+            for key_name, value in json_data.items():
+                if key_name == key_hint and value == default_text:
+                    json_data[key_name] = translated
+        elif isinstance(json_data, list): 
+            if json_data is None:
+                json_data = []
+            else:
+                for i, item in enumerate(json_data):
+                    json_data[i] = self.replace_transaltions(item, default_text, key_hint, translated)
+        else:
+            msg = "Unexpected json_data structure!"
+            tools_log.log_error(msg)
+        
+        return json_data
 
-            #{ cases
-            modified = modified.replace("{'", '{"').replace("'}", '"}')
-            modified = modified.replace("': {", '": {').replace("':{", '": {').replace("' :{", '": {').replace("' : {", '": {')
-            
-            #Null cases
-            modified = modified.replace("': null", '": null').replace("':null", '": null').replace("' :null", '": null').replace("' : null", '": null')
-            modified = modified.replace("null, '", 'null, "').replace("null,'", 'null, "').replace("null ,'", 'null, "').replace("null , '", 'null, "')
-            
-            #False cases
-            modified = modified.replace("': false", '": false').replace("':false", '": false').replace("' :false", '": false').replace("' : false", '": false')
-            modified = modified.replace("false, '", 'false, "').replace("false,'", 'false, "').replace("false ,'", 'false, "').replace("false , '", 'false, "')
-            
-            #True cases
-            modified = modified.replace("': true", '": true').replace("':true", '": true').replace("' :true", '": true').replace("' : true", '": true')
-            modified = modified.replace("true, '", 'true, "').replace("true,'", 'true, "').replace("true ,'", 'true, "').replace("true , '", 'true, "')
-            
-            #Number cases
-            modified = re.sub(r'(\d+)(\]?)\s*,\s*\'', r'\1\2, "', modified)  # number], ' or number, '
-            modified = re.sub(r'\':\s*(\[?)(\d+)', r'": \1\2', modified)     # ': [number or ': number
-            
-            #Combo cases
-            modified = modified.replace("': ['", '": ["').replace("':'[", '": ["').replace("' :['", '": ["').replace("' : ''[", '": ["')
-            modified = modified.replace("'], '", '"], "').replace("'],'", '"], "').replace("'] ,'", '"], "').replace("'] , ''", '"], "')
-            
-            modified = modified.replace("']}", '"]}')
-            
-            # Replace remaining single quotes with double quotes for JSON compatibility
-            modified = modified.replace("''", "'")
-
-            # Reload values in special cases
-            modified = modified.replace(': "a"', ': ""')
-            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL'")
-
-            return json.loads(modified)
-        except json.JSONDecodeError as e:
-            msg = "Error parsing JSON source: {0} - e1: {1} -- {2}"
-            msg_params = (source, e, modified)
-            tools_log.log_error(msg, msg_params=msg_params)
-            return None
 
     def tables_dic(self):
         self.dbtables_dic = {
             "ws": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
                  #"dbtables": ["dbtable"]
@@ -870,7 +821,7 @@ class GwSchemaI18NUpdate:
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
                  ]
             },

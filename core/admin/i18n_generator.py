@@ -110,7 +110,7 @@ class GwI18NGenerator:
         type_db_file_translated = []
 
         if self.language == 'All':
-            sql = f"SELECT id FROM {self.schema_i18n}.cat_language WHERE idval != 'no_TR' and idval != 'All'"
+            sql = f"SELECT id FROM {self.schema_i18n}.cat_language WHERE idval != 'no_TR' and idval != 'All' and idval != 'pl_PL'"
             self.languages = self._get_rows(sql)
             self.languages = [language['id'] for language in self.languages]
             self.multiple_languages = True
@@ -140,9 +140,17 @@ class GwI18NGenerator:
                         if self.language not in translated_langs['db']:
                             translated_langs['db'].append(self.language)
                     elif status_all_db_msg is False:
-                        error_langs['db'].setdefault(self.language, []).append(text_error)
+                        if type_db_file not in error_langs['db']:
+                            error_langs['db'][type_db_file] = {self.language: []}
+                        if self.language not in error_langs['db'][type_db_file]:
+                            error_langs['db'][type_db_file][self.language] = []
+                        error_langs['db'][type_db_file][self.language].append(text_error)
                     elif status_all_db_msg is None:
-                        canceled_langs['db'].setdefault(self.language, []).append(text_error)
+                        if type_db_file not in canceled_langs['db']:
+                            canceled_langs['db'][type_db_file] = {self.language: []}
+                        if self.language not in canceled_langs['db'][type_db_file]:
+                            canceled_langs['db'][type_db_file][self.language] = []
+                        canceled_langs['db'][type_db_file][self.language].append(text_error)
                     if type_db_file not in type_db_file_translated:
                         type_db_file_translated.append(type_db_file)
 
@@ -159,10 +167,10 @@ class GwI18NGenerator:
             for type_db_file in type_db_file_translated:
                 msg += f'''{tools_qt.tr('Schemas translated:')} {type_db_file}\n'''
                 if error_langs['db']:
-                    text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in error_langs['db'].items())
+                    text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in error_langs['db'][type_db_file].items())
                     msg += f'''\t{tools_qt.tr('Database translation failed:')}{text}\n'''
                 if canceled_langs['db']:
-                    text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in canceled_langs['db'].items())
+                    text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in canceled_langs['db'][type_db_file].items())
                     msg += f'''\t{tools_qt.tr('Database translation canceled:')}{text}\n'''
                 if translated_langs['db']:
                     msg += f'''\t{tools_qt.tr('Database translation successful:')} {", ".join(translated_langs['db'])}\n'''
@@ -435,7 +443,7 @@ class GwI18NGenerator:
         lang_colums = []
 
         if table == 'dbconfig_form_fields':
-            colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbparam_user':
@@ -491,16 +499,20 @@ class GwI18NGenerator:
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
 
         if table == 'dbconfig_form_fields_json':
-            colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "hint", "text", "lb_en_us"]
+            colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "hint", "text", "lb_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
 
         elif table == 'dbconfig_form_fields_feat':
-            colums = ["feature_type","source", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            colums = ["feature_type","source", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif table == 'dbtable':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
+        elif table == 'dblabel':
+            colums = ["source", "project_type", "context", "vl_en_us"]
+            lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}"]
 
         elif table == 'su_basic_tables':
             colums = ["source", "project_type", "context", "na_en_us", "ob_en_us"]
@@ -598,13 +610,13 @@ class GwI18NGenerator:
                                 if row['feature_type'] == feature_type:
                                     if k != 0:
                                         values_str += ",\n"
-                                    values_str += f"('{row['source']}', '%_{row['feature_type'].lower()}%', '{row['formtype'].lower()}', {txt[0]}, {txt[1]})"
+                                    values_str += f"('{row['source']}', '%_{row['feature_type'].lower()}%', '{row['formtype'].lower()}', '{row['tabname']}', {txt[0]}, {txt[1]})"
                                     k = 1
                                     break
-                        file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype;\n\n")
+                        file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, tabname, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
                     else:
-                        values_str = ",\n    ".join([f"('{row['source']}', '{row['formname']}', '{row['formtype']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                        file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                        values_str = ",\n    ".join([f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', {txt[0]}, {txt[1]})" for row, txt in data])
+                        file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, tabname, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
 
                 elif "dbparam_user" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
@@ -692,12 +704,13 @@ class GwI18NGenerator:
         for row in rows:
             if row['project_type'] not in self.path_dic[file_type]["project_type"]:
                 continue
+            text = json.dumps(row["text"]).replace("'", "''")
             # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
-                key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"])
+                key = (row["source"], row["context"], text, row["formname"], row["formtype"], row["tabname"])
             else:
-                key = (row["source"], row["context"], row["text"])
+                key = (row["source"], row["context"], text)
             updates.setdefault(key, []).append(row)
 
         for key, related_rows in updates.items():
@@ -716,11 +729,7 @@ class GwI18NGenerator:
                 tools_log.log_error(msg, msg_params=msg_params)
                 continue
 
-            # Parse JSON safely
-            json_data = self.safe_parse(source, original_text)
-            if json_data is None:
-                return f'{context} - Error parsing JSON source (Log_info)'
-
+            text_json = json.loads(original_text.replace("''", "'"))
             # Translate fields
             for row in related_rows:
                 key_hint = row["hint"].rsplit('_', 1)[0]
@@ -731,31 +740,10 @@ class GwI18NGenerator:
                     default_text
                 )
 
-                if ", " in default_text and key_hint == "comboNames":
-                    default_list = default_text.split(", ")
-                    translated_list = translated.split(", ")
-                    for item in json_data:
-                        if isinstance(item, dict) and key_hint in item:
-                            if set(default_list).intersection(item["comboNames"]):
-                                item["comboNames"] = [
-                                    t if d in default_list else d
-                                    for d, t in zip(default_list, translated_list)
-                                ]
-                else:
-                    if isinstance(json_data, dict):
-                        for key_name, value in json_data.items():
-                            if key_name == key_hint and value == default_text:
-                                json_data[key_name] = translated
-                    elif isinstance(json_data, list):
-                        for item in json_data:
-                            if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
-                                item[key_hint] = translated
-                    else:
-                        msg = "Unexpected json_data structure!"
-                        tools_log.log_error(msg)
+                text_json = self.replace_transaltions(text_json, default_text, key_hint, translated)
 
             # Encode new JSON safely
-            new_text = json.dumps(json_data, ensure_ascii=False).replace("'", "''")
+            new_text = json.dumps(text_json, ensure_ascii=False).replace("'", "''")
 
             # Save the result grouped by context and column
             if context not in values_by_context:
@@ -771,10 +759,10 @@ class GwI18NGenerator:
 
                 if context == "config_form_fields":
                     values_str = ",\n    ".join([
-                        f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
+                        f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
                 else:
                     values_str = ",\n    ".join([
                         f"({source}, '{txt}')"
@@ -880,66 +868,32 @@ class GwI18NGenerator:
 
         return status
 
-    def safe_parse(self, source, text):
-        try:
-            # Try JSON first (safer if it's valid JSON)
-            # First handle empty values 
-
-            modified = text.replace("False", "false").replace("True", "true").replace("None", "null")
-            
-            #Save values in special cases
-            modified = modified.replace(": ''", ': "a"').replace(":''", ': "a"').replace(':""', ': "a"')
-            modified = modified.replace("','. ", "',a'. ").replace("'T','TANK'", "a'T',a'TANK'a")
-            modified = modified.replace("-999,'ALL", "-999,a'ALL")
-            
-            # Adapt " in keys and values
-            modified = modified.replace("': '", '": "').replace("':'", '": "').replace("' :'", '": "').replace("' : '", '": "')
-            modified = modified.replace("': \"", '": "').replace("':\"", '": "').replace("' :\"", '": "').replace("' : \"", '": "')
-            modified = modified.replace("\": '", '": "').replace("\":'", '": "').replace("\" :\"", '": "').replace("\" : \"", '": "')
-            
-            modified = modified.replace("', '", '", "').replace("','", '", "').replace("' ,'", '", "').replace("' , '", '", "')
-            modified = modified.replace("', \"", '", "').replace("',\"", '", "').replace("' ,\"", '", "').replace("' , \"", '", "')
-            modified = modified.replace("\", '", '", "').replace("\",'", '", "').replace("\" ,'", '", "').replace("\" , '", '", "')
-
-            #{ cases
-            modified = modified.replace("{'", '{"').replace("'}", '"}')
-            modified = modified.replace("': {", '": {').replace("':{", '": {').replace("' :{", '": {').replace("' : {", '": {')
-            
-            #Null cases
-            modified = modified.replace("': null", '": null').replace("':null", '": null').replace("' :null", '": null').replace("' : null", '": null')
-            modified = modified.replace("null, '", 'null, "').replace("null,'", 'null, "').replace("null ,'", 'null, "').replace("null , '", 'null, "')
-            
-            #False cases
-            modified = modified.replace("': false", '": false').replace("':false", '": false').replace("' :false", '": false').replace("' : false", '": false')
-            modified = modified.replace("false, '", 'false, "').replace("false,'", 'false, "').replace("false ,'", 'false, "').replace("false , '", 'false, "')
-            
-            #True cases
-            modified = modified.replace("': true", '": true').replace("':true", '": true').replace("' :true", '": true').replace("' : true", '": true')
-            modified = modified.replace("true, '", 'true, "').replace("true,'", 'true, "').replace("true ,'", 'true, "').replace("true , '", 'true, "')
-            
-            #Number cases
-            modified = re.sub(r'(\d+)(\]?)\s*,\s*\'', r'\1\2, "', modified)  # number], ' or number, '
-            modified = re.sub(r'\':\s*(\[?)(\d+)', r'": \1\2', modified)     # ': [number or ': number
-            
-            #Combo cases
-            modified = modified.replace("': ['", '": ["').replace("':'[", '": ["').replace("' :['", '": ["').replace("' : ''[", '": ["')
-            modified = modified.replace("'], '", '"], "').replace("'],'", '"], "').replace("'] ,'", '"], "').replace("'] , ''", '"], "')
-            
-            modified = modified.replace("']}", '"]}')
-            
-            # Replace remaining single quotes with double quotes for JSON compatibility
-            modified = modified.replace("''", "'")
-
-            # Reload values in special cases
-            modified = modified.replace(': "a"', ': ""')
-            modified = modified.replace("',a'. ", "','. ").replace("a'T',a'TANK'a", "'T','TANK'").replace("-999,a'ALL", "-999, 'ALL'")
-
-            return json.loads(modified.replace("None", "null"))
-        except json.JSONDecodeError as e:
-            msg = "Error parsing JSON source: {0} - e1: {1} -- {2}"
-            msg_params = (source, e, modified)
-            tools_log.log_error(msg, msg_params=msg_params)
-            return None
+    def replace_transaltions(self, json_data, default_text, key_hint, translated):
+        if ", " in default_text and key_hint == "comboNames":
+            default_list = default_text.split(", ")
+            translated_list = translated.split(", ")
+            for item in json_data:
+                if isinstance(item, dict) and key_hint in item:
+                    if set(default_list).intersection(item["comboNames"]):
+                        item["comboNames"] = [
+                            t if d in default_list else d
+                            for d, t in zip(default_list, translated_list)
+                        ]
+        elif isinstance(json_data, dict):
+            for key_name, value in json_data.items():
+                if key_name == key_hint and value == default_text:
+                    json_data[key_name] = translated
+        elif isinstance(json_data, list): 
+            if json_data is None:
+                json_data = []
+            else:
+                for i, item in enumerate(json_data):
+                    json_data[i] = self.replace_transaltions(item, default_text, key_hint, translated)
+        else:
+            msg = "Unexpected json_data structure!"
+            tools_log.log_error(msg)
+        
+        return json_data
 
     def _commit(self):
         """ Commit current database transaction """
@@ -1001,7 +955,7 @@ class GwI18NGenerator:
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
@@ -1012,7 +966,7 @@ class GwI18NGenerator:
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
@@ -1023,7 +977,7 @@ class GwI18NGenerator:
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson",
                     "dbconfig_form_fields_json"]
             },

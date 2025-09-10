@@ -74,6 +74,7 @@ class GwGo2IberTask(GwTask):
         self.go2epa_task.go2epa_export_inp = True
         self.go2epa_task.go2epa_execute_epa = False
         self.go2epa_task.go2epa_import_result = False
+        self.go2epa_task.export_subcatch = False
         self.go2epa_task.result_name = self.result_name
         self.go2epa_task.file_inp = self.folder_path + os.sep + "Iber_SWMM.inp"
         self.go2epa_task.file_rpt = self.folder_path + os.sep + "Iber_SWMM.rpt"

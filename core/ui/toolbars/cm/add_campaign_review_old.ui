@@ -465,7 +465,7 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <layout class="QHBoxLayout" name="lyt_selection">
             <item>
              <widget class="QLineEdit" name="campaign_feature_id"/>
             </item>
@@ -501,16 +501,6 @@
               <property name="icon">
                <iconset>
                 <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="btn_snapping">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="popupMode">
-               <enum>QToolButton::MenuButtonPopup</enum>
               </property>
              </widget>
             </item>

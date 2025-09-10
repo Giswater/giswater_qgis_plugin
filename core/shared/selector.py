@@ -262,9 +262,14 @@ class GwSelector:
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
                     widget.setLayoutDirection(Qt.LeftToRight)
 
+                    style = ""
+                    if field.get('stylesheet') is not None:
+                        style += field.get('stylesheet')
                     # Set background color every other item (if enabled)
                     if color_rows and order % 2 == 0:
-                        widget.setStyleSheet("background-color: #E9E7E3")
+                        style += "background-color: #E9E7E3"
+                    if style:
+                        widget.setStyleSheet(style)
 
                     # Add widget to layout
                     field['layoutname'] = gridlayout.objectName()
@@ -297,6 +302,17 @@ class GwSelector:
 
         if tab:
             main_tab.setCurrentWidget(tab)
+
+        # Refresh psector mode
+        current_psector = None
+        for user_value in json_result['body']['data']['userValues']:
+            if user_value['parameter'] == 'plan_psector_current':
+                current_psector = user_value['value']
+                break
+        if current_psector is not None:
+            tools_gw.set_psector_mode_enabled(enable=True, psector_id=current_psector, do_call_fct=False, force_change=True)
+        else:
+            tools_gw.set_psector_mode_enabled(enable=False, do_call_fct=False, force_change=True)
 
     # region private functions
 
@@ -397,7 +413,7 @@ class GwSelector:
             tools_qgis.show_message(message, level)
 
         # Apply zoom only to the selected tabs
-        if tab_name in ('tab_exploitation', 'tab_exploitation_add', 'tab_municipality', 'tab_macroexploitation', 'tab_macrosector', 'tab_sector', 'tab_psector'):
+        if tab_name in ('tab_exploitation', 'tab_exploitation_add', 'tab_municipality', 'tab_macroexploitation', 'tab_macrosector', 'tab_sector'):
             try:
                 # Zoom to feature
                 x1 = json_result['body']['data']['geometry']['x1']

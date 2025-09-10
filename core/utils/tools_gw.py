@@ -13,7 +13,7 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal, Dict, Optional, Any, Callable
+from typing import Literal, Dict, Optional, Any, Callable, Union
 import webbrowser
 import xml.etree.ElementTree as ET
 from sip import isdeleted
@@ -29,9 +29,9 @@ from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, Q
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QHBoxLayout, QTabWidget, \
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QDialog, QActionGroup
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QActionGroup
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -41,7 +41,7 @@ from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
 from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
-from ..ui.ui_manager import GwSelectorUi
+from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
@@ -327,11 +327,24 @@ def open_help_link(context, uiname, dlg=None):
     """ Opens the help link for the given dialog, or a default link if not found. """
 
     # Base URL for the documentation
-    domain = "https://docs.giswater.org"
-    language = "es_CR"  # TODO: get dynamic language
-    plugin_version = "testing"  # TODO: get dynamic version
+    domain = get_config_value('help_domain', table='config_param_system')
+    if domain is None:
+        domain = "https://docs.giswater.org"
+    else:
+        domain = domain[0]
 
-    if plugin_version == "":
+    language = "es_CR"  # TODO: get dynamic language when documentation is ready
+    plugin_version, _ = tools_qgis.get_plugin_version()
+
+    # plugin_version is {major}.{minor}.{patch}
+    # transform to major.minor
+    if plugin_version:
+        parts = plugin_version.split('.')
+        if len(parts) >= 2:
+            plugin_version = f"{parts[0]}.{parts[1]}"
+        else:
+            plugin_version = "latest"
+    else:
         plugin_version = "latest"
 
     base_url = f"{domain}/{plugin_version}/{language}/docs/giswater/for-users"
@@ -870,7 +883,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                 layer.setEditFormConfig(cfg)
 
     # Apply mapzone styling if this is a mapzone layer
-    mapzone_tables = ['presszone', 'dma', 'sector', 'dqa', 'minsector', 've_presszone', 've_dma', 've_sector', 've_dqa', 've_minsector']
+    mapzone_tables = ['presszone', 'dma', 'sector', 'dqa', 'minsector', 've_presszone', 've_dma', 've_sector', 've_dqa', 've_minsector', 've_minsector_mincut']
     if any(mapzone_table in tablename_og.lower() for mapzone_table in mapzone_tables):
         set_style_mapzones(schema_name)
 
@@ -1571,7 +1584,7 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
         tools_qt.set_widget_text(dialog, btn_accept, msg)
 
 
-def set_style_mapzones(schema_name: str | None = None) -> bool:
+def set_style_mapzones(schema_name: Union[str, None] = None) -> bool:
     """ Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function """
 
     extras = '"mapzones":""'
@@ -3442,7 +3455,7 @@ def manage_layer_manager(json_result, sql=None):
                     else:
                         group = "GW Layers"
                     style_id = lyr[layer_name]['style_id']
-                    add_layer_database(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                    add_layer_database(layer_name, the_geom, field_id, group=group, style_id=style_id, alias=lyr.get(layer_name).get('alias'))
                 tools_qgis.set_layer_visible(layer)
 
         # force reload dataProvider in order to reindex.
@@ -3571,8 +3584,8 @@ def update_default_action(dialog, action):
 
 
 def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT,
-                      callback: Callable[[], bool] | None = None, callback_kwargs: dict[str, Any] | None = None,
-                      callback_later: Callable = None, callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
+                      callback: Union[Callable[[], bool], None] = None, callback_kwargs: Union[dict[str, Any], None] = None,
+                      callback_later: Callable = None, callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
     """Create snapping button with menu (split button behavior)"""
 
     def handle_action(tool_type):
@@ -3640,7 +3653,7 @@ def get_expected_table_name(class_object, table_object, selection_mode):
     return expected_table_name
 
 
-def highlight_in_table_changed(callback_values: Callable[[], tuple[Any, Any, Any]] | None = None):
+def highlight_in_table_changed(callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
     class_object, dialog, expected_table_name = callback_values()
     highlight_features_in_table(class_object, dialog, expected_table_name)
 
@@ -3653,6 +3666,41 @@ def find_parent_tab(widget):
             return current
         current = current.parent()
     return None
+
+
+def _filter_ids_by_context(class_object, selection_mode: GwSelectionMode, feature_type: str, candidate_ids: list[str]) -> list[str]:
+    """Filter candidate ids according to the current selection context (LOT/CAMPAIGN).
+
+    Keeps logic centralized and returns a new filtered list of string ids.
+    """
+    ids = [str(i) for i in (candidate_ids or [])]
+
+    # LOT filter: only ids allowed by the campaign linked to the lot
+    if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        try:
+            lot_id = getattr(class_object, 'lot_id', None) or getattr(class_object, 'lot_id_value', None)
+        except Exception:
+            lot_id = None
+        if lot_id and hasattr(class_object, 'get_allowed_features_for_lot'):
+            try:
+                allowed = class_object.get_allowed_features_for_lot(int(lot_id), feature_type) or []
+                allowed_set = set(map(str, allowed))
+                return [i for i in ids if i in allowed_set]
+            except Exception:
+                return ids
+
+    # CAMPAIGN filter: allowed ids according to review/visit class restrictions
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) \
+       and hasattr(class_object, 'get_allowed_features_for_campaign'):
+        try:
+            allowed = class_object.get_allowed_features_for_campaign(feature_type)
+            if isinstance(allowed, list):
+                allowed_set = set(map(str, allowed))
+                return [i for i in ids if i in allowed_set]
+        except Exception:
+            return ids
+
+    return ids
 
 
 def highlight_features_in_table(class_object, dialog, expected_table_name):
@@ -3715,17 +3763,18 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     if not table_widgets:
         return
     table_widget = table_widgets[0]
+    table_widget.blockSignals(True)
 
     model = table_widget.model()
     selection_model = table_widget.selectionModel()
 
     # Handle cases where the table is empty
     table_ids = []
-
     if model:
         table_ids = [
             str(get_model_index(model, row, field_id)) for row in range(model.rowCount())
         ]
+    table_ids_original = table_ids.copy()
 
     # Ensure dictionary and list exist for storing feature IDs per feature type
     if not hasattr(class_object, "list_ids"):
@@ -3744,37 +3793,68 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
             if layer.selectedFeatureCount() > 0:
                 for feature in layer.selectedFeatures():
                     selected_id = str(feature.attribute(field_id))
-                    if selected_id and selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                    if selected_id:
                         selected_ids.append(selected_id)
-                        class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+                        if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                            class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
     # Ensure selections are added even if the table was initially empty
-    if not table_ids and selected_ids:
+    if not table_ids_original and selected_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = selected_ids
-    # Prevent UI interference while updating the table
-    table_widget.blockSignals(True)
-    expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
 
-    if selection_mode == GwSelectionMode.PSECTOR:
-        _insert_feature_psector(dialog, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
-        remove_selection()
+    # Filter current buffers and selection once, centrally.
+    feature_type = class_object.rel_feature_type
+    class_object.rel_list_ids[feature_type] = _filter_ids_by_context(
+        class_object, selection_mode, feature_type, class_object.rel_list_ids.get(feature_type, []))
+    selected_ids = _filter_ids_by_context(class_object, selection_mode, feature_type, selected_ids)
+
+    # Reflect filtered selection on the map
+    if selected_ids:
+        expr = QgsExpression(f"{field_id} IN ({','.join(f'{i}' for i in selected_ids)})")
+        tools_qgis.select_features_by_ids(feature_type, expr, class_object.rel_layers)
+
+    ids_to_insert = []
+    for id in class_object.rel_list_ids[class_object.rel_feature_type]:
+        if id not in table_ids_original:
+            ids_to_insert.append(id)
+
+    do_insert = False
+    if ids_to_insert:
+        msg = "Do you want to insert the selected features? {0}"
+        msg_params = (", ".join(ids_to_insert), )
+        do_insert = tools_qt.show_question(msg, msg_params=msg_params)
+    else:
+        # No new ids to insert: ensure we clear any selection on canvas
+        remove_selection(layers=class_object.rel_layers)
+
+    # If user closes/cancels the confirmation, just clear canvas selection
+    if not do_insert:
+        remove_selection(layers=class_object.rel_layers)
+
+    # Prevent UI interference while updating the table
+    expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
+    if selection_mode == GwSelectionMode.PSECTOR and do_insert:
+        _insert_feature_psector(dialog, class_object.rel_feature_type, ids=ids_to_insert)
         load_tableview_psector(dialog, class_object.rel_feature_type)
         set_model_signals(class_object)
-    elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
-        _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+        remove_selection()
+    elif selection_mode == GwSelectionMode.PSECTOR and not do_insert:
+        remove_selection()
+    elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) and do_insert:
+        _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=ids_to_insert)
         load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
-    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
-        _insert_feature_lot(dialog, class_object.rel_feature_type, class_object.lot_id, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT) and do_insert:
+        _insert_feature_lot(dialog, class_object.rel_feature_type, class_object.lot_id, ids=ids_to_insert)
         load_tableview_lot(dialog, class_object.rel_feature_type, class_object.lot_id, class_object.rel_layers)
-    elif selection_mode == GwSelectionMode.ELEMENT:
-        _insert_feature_elements(dialog, class_object.feature_id, class_object.rel_feature_type, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+    elif selection_mode == GwSelectionMode.ELEMENT and do_insert:
+        _insert_feature_elements(dialog, class_object.feature_id, class_object.rel_feature_type, ids=ids_to_insert)
         load_tableview_element(dialog, class_object.feature_id, class_object.rel_feature_type)
-    elif selection_mode == GwSelectionMode.FEATURE_END:
+    elif selection_mode == GwSelectionMode.FEATURE_END and do_insert:
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-    elif selection_mode == GwSelectionMode.VISIT:
-        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
+    elif selection_mode == GwSelectionMode.VISIT and do_insert:
+        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=ids_to_insert)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
-    elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
+    elif selection_mode == GwSelectionMode.MINCUT_CONNEC and do_insert:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     else:
@@ -3782,29 +3862,36 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
+    enable_feature_type(dialog, widget_table=table_object, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+
     table_widget.blockSignals(False)
 
     # Ensure selection of rows in the table based on the selected feature IDs from the map
+    model = table_widget.model()
+    selection_model = table_widget.selectionModel()
     if model and selection_model and selected_ids:
         selection_model.clearSelection()
-        selection_flags = QItemSelectionModel.Select | QItemSelectionModel.Rows | QItemSelectionModel.Current
 
         for row in range(model.rowCount()):
             model_index = get_model_index(model, row, field_id)
             row_value = str(model_index)
             if row_value in selected_ids:
-                selection_model.select(model_index, selection_flags)
-                table_widget.setCurrentIndex(model_index)
-                table_widget.scrollTo(model_index, QAbstractItemView.PositionAtCenter)
-                table_widget.selectionModel().setCurrentIndex(model_index,
-                                                              QItemSelectionModel.Select | QItemSelectionModel.Rows)
+                column_index = model.fieldIndex(field_id)
+                index = model.index(row, column_index)
+                selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
-    # Ensure proper table refresh
-    table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-    table_widget.viewport().update()
-    table_widget.repaint()
+    if class_object.callback_later_selection:
+        class_object.callback_later_selection()
 
-    enable_feature_type(dialog, widget_table=table_object, ids=class_object.rel_list_ids[class_object.rel_feature_type])
+
+def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
+    """Select IDs in table"""
+    widget_table, feature_type = class_object.get_expected_table(class_object, dialog, table_object)
+    if not widget_table or not widget_table.model() or not feature_type:
+        return
+
+    expr_filter = QgsExpression(f"{feature_type}_id IN ({','.join(f'{i}' for i in ids_to_select)})")
+    tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
 
 
 def get_model_index(model, row, field_name):
@@ -3826,32 +3913,39 @@ def get_model_index(model, row, field_name):
 def set_model_signals(class_object):
 
     class_object.rubber_band_point.reset()
-    class_object.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+    class_object.rubber_band_op.reset()
+    class_object.rubber_band_line.reset()
+    class_object.rubber_band_rectangle.reset()
 
-    filter_ = "psector_id = '" + str(class_object.psector_id) + "'"
+    if hasattr(class_object, 'psector_id') and class_object.psector_id:
+        psector_id = class_object.psector_id
+    else:
+        psector_id = tools_qt.get_text(class_object.dlg_plan_psector, 'tab_general_psector_id')
+
+    filter_ = "psector_id = '" + str(psector_id) + "'"
     class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
                     set_edit_triggers=QTableView.DoubleClicked, expr=filter_, feature_type="connec", field_id="connec_id")
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "ve_arc", "arc_id", class_object.rubber_band_point, 5
+        class_object._highlight_features_by_id, class_object.qtbl_arc, "ve_arc", "arc_id", class_object.rubber_band_point, 10, state_value=1
     ))
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-        class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 5
+        class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 10, state_value=0
     ))
 
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "ve_node", "node_id", class_object.rubber_band_point, 10
+        class_object._highlight_features_by_id, class_object.qtbl_node, "ve_node", "node_id", class_object.rubber_band_point, 5, state_value=1
     ))
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
-        class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5
+        class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5, state_value=0
     ))
 
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "ve_connec", "connec_id", class_object.rubber_band_point, 10
+        class_object._highlight_features_by_id, class_object.qtbl_connec, "ve_connec", "connec_id", class_object.rubber_band_point, 5, state_value=1
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-        class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5
+        class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5, state_value=0
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
         class_object._manage_tab_feature_buttons
@@ -3859,10 +3953,10 @@ def set_model_signals(class_object):
 
     if class_object.project_type.upper() == 'UD':
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "ve_gully", "gully_id", class_object.rubber_band_point, 10
+            class_object._highlight_features_by_id, class_object.qtbl_gully, "ve_gully", "gully_id", class_object.rubber_band_point, 5, state_value=1
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-            class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5
+            class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5, state_value=0
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._manage_tab_feature_buttons
@@ -3961,6 +4055,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         _insert_feature_psector(dialog, feature_type, ids=selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
+        set_model_signals(class_object)
     elif selection_mode == GwSelectionMode.CAMPAIGN:
         _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
@@ -4226,7 +4321,7 @@ def add_icon(widget, icon, folder="dialogs"):
         return False
 
 
-def get_icon(icon, folder="dialogs"):
+def get_icon(icon, folder="dialogs", log_info=True):
     # Get icons folder
     icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
@@ -4234,8 +4329,9 @@ def get_icon(icon, folder="dialogs"):
     if os.path.exists(icon_path):
         return QIcon(icon_path)
     else:
-        msg = "File not found"
-        tools_log.log_info(msg, parameter=icon_path)
+        if log_info:
+            msg = "File not found"
+            tools_log.log_info(msg, parameter=icon_path)
         return None
 
 
@@ -4583,7 +4679,13 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
 
     # Reset rubberband
-    reset_rubberband(class_object.rubber_band)
+    if selection_mode == GwSelectionMode.PSECTOR:
+        reset_rubberband(class_object.rubber_band_point)
+        reset_rubberband(class_object.rubber_band_op)
+        reset_rubberband(class_object.rubber_band_line)
+        reset_rubberband(class_object.rubber_band_rectangle)
+    else:
+        reset_rubberband(class_object.rubber_band)
 
     if selection_mode == GwSelectionMode.PSECTOR:
         class_object.rel_layers = remove_selection(layers=class_object.rel_layers)
@@ -4646,6 +4748,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
+        set_model_signals(class_object)
     elif selection_mode == GwSelectionMode.CAMPAIGN:
         state = None
         if extra_field is not None and len(selected_list) == 1:
@@ -4758,8 +4861,11 @@ def set_epsg():
     lib_vars.project_epsg = epsg
 
 
-def refresh_selectors(tab_name=None):
-    """ Refreshes the selectors' UI if it's open """
+def refresh_selectors(is_cm: bool = False):
+    """Refreshes the selector docker if it's open.
+
+    If is_cm=True, refresh the specific selector of campaign manager.
+    """
 
     # Get the selector UI if it's open
     windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
@@ -4769,13 +4875,21 @@ def refresh_selectors(tab_name=None):
         try:
             dialog = windows[0]
             selector = dialog.property('GwSelector')
-            selector.open_selector(reload_dlg=dialog)
+            if is_cm:
+                selector.open_selector(selector_type='selector_campaign', reload_dlg=dialog)
+            else:
+                selector.open_selector(reload_dlg=dialog)
         except Exception:
             pass
 
 
-def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
-    """ Executes a class' function (if the corresponding dialog is open) """
+def execute_class_function(dlg_class, func_name: str, kwargs: Optional[dict] = None):
+    """ 
+    Executes a class' function (if the corresponding dialog is open). 
+    kwargs can be a dictionary with the arguments to pass to the function.
+    If the argument is a string starting with '__self__', it will be replaced with the corresponding attribute of the class_obj.
+    (e.g. '__self__.dlg_psector_mng' will be replaced with self.dlg_psector_mng (self is the class_obj))
+    """
 
     # Get the dialog if it's open
     windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
@@ -4787,6 +4901,9 @@ def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
                 kwargs = {}
             dialog = windows[0]
             class_obj = dialog.property('class_obj')
+            for key, value in kwargs.items():
+                if isinstance(value, str) and value.startswith('__self__'):
+                    kwargs[key] = getattr(class_obj, value.split('.')[1])
             getattr(class_obj, func_name)(**kwargs)
         except Exception as e:
             msg = "Exception in {0} (executing {1} from {2}): {3}"
@@ -4813,59 +4930,106 @@ def open_dlg_help():
         return True
 
 
-def manage_current_psector_docker(psector_name=None):
+def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None, do_call_fct: bool = True, force_change: bool = False):
     """
-    Manage labels for the current_psector docker
+    Set psector mode enabled/disabled and update UI elements accordingly.
+
+    Args:
+        enable (Optional[bool]): If True, enables psector mode. If False, disables it.
+            If None, toggles current state.
+        psector_id (Optional[int]): ID of psector to set. If None, uses psector from cmb_psector_id.
+        do_call_fct (bool): If True, calls gw_fct_set_toggle_current procedure. Should be False if it was already called.
+        force_change (bool): If True, forces UI update. Useful when called from another function.
     """
-    if not isinstance(psector_name, (str, type(None))):
+
+    # Manage play/pause button
+    psignals_widgets = global_vars.psignals['widgets']
+    btn_psector_playpause = psignals_widgets[0]
+    if enable is None and btn_psector_playpause is not None:
+        active = btn_psector_playpause.property('psector_active')
+        enable = not active
+
+    # Manage psector combo box
+    cmb_changed = psector_id is not None
+    cmb_psector_id = psignals_widgets[1]
+    if psector_id is None and cmb_psector_id is not None:
+        psector_id = tools_qt.get_combo_value(None, cmb_psector_id)
+
+    # If cmb changed and psector mode is disabled
+    if not force_change and cmb_changed and enable:
         return
 
-    # Configuration
-    title = "Current psector"
-    icon_size = 12
-    if psector_name is None:
-        psector_name = ""
+    if not force_change and psector_id in (None, ""):
+        return
 
-    # Determine icon path based on psector_name
-    icon_filename = "140.png" if psector_name else "138.png"
-    icon_path = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}{icon_filename}"
+    # If cmb changed and psector mode is enabled, don't change the buttons
+    if force_change or not (cmb_changed and not enable):
+        _change_plan_mode_buttons(enable=enable, psector_id=psector_id, update_cmb_psector_id=force_change, cmb_changed=cmb_changed)
 
-    # Get or create dock widget
-    dock_widget = lib_vars.session_vars['current_psector']
-    if dock_widget is None:
-        dock_widget = QDockWidget()
-        dock_widget.setWindowTitle(title)
-        lib_vars.session_vars['current_psector'] = dock_widget
-        global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, dock_widget)
+    if do_call_fct:
+        # Prepare the JSON body for gw_fct_set_toggle_current
+        extras = f'"type": "psector", "id": "{psector_id}"'
+        body = create_body(extras=extras)
 
-    # Update dock widget content and title
-    dock_widget.setWindowTitle(title)
+        # Execute the stored procedure
+        result = execute_procedure("gw_fct_set_toggle_current", body)
+        global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
 
-    # Create content widget with horizontal layout
-    content_widget = QWidget()
-    layout = QHBoxLayout()
-    content_widget.setLayout(layout)
+        kwargs = {
+            "dialog": "__self__.dlg_psector_mng",
+            "result": result
+        }
+        execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
 
-    # Add icon if file exists
-    if os.path.exists(icon_path):
-        icon_label = QLabel()
-        pixmap = QPixmap(icon_path).scaled(icon_size, icon_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        if not pixmap.isNull():
-            icon_label.setPixmap(pixmap)
-        layout.addWidget(icon_label)
 
-    # Add text label
-    text_label = QLabel(psector_name)
-    layout.addWidget(text_label)
-    layout.addStretch()
+def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
+    """ Change plan mode buttons """
 
-    # Set widget and show
-    dock_widget.setWidget(content_widget)
+    psignals_widgets = global_vars.psignals['widgets']
+    btn_psector_playpause = psignals_widgets[0]
+    cmb_psector_id = psignals_widgets[1]
 
-    # Show dock widget if not already visible
-    if not dock_widget.isVisible():
-        dock_widget.show()
-        dock_widget.raise_()
+    # Update play/pause button
+    btn_psector_playpause.setProperty('psector_active', enable)
+    add_icon(btn_psector_playpause, "74" if enable else "73", f"toolbars{os.sep}status")
+    # Update psector status information
+    global_vars.psignals['psector_active'] = enable
+
+    # Change 'edit' buttons icons
+    if enable is not None and global_vars.load_project is not None:
+        buttons = global_vars.load_project.buttons
+        for key, button in buttons.items():  # NOTE: could be improved having a list with only the buttons to change
+            if key in (None, 'None'):
+                continue
+            toolbar_id = button.gw_name
+            icon_path = f"{key}p" if enable else f"{key}"
+            icon = get_icon(icon_path, f"toolbars{os.sep}{toolbar_id}", log_info=False)
+            if icon:
+                button.action.setIcon(icon)
+
+    # Update cmb_psector_id if needed
+    if update_cmb_psector_id and cmb_psector_id is not None:
+        fill_cmb_psector_id(cmb_psector_id, psector_id)
+        global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
+
+
+def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
+    """ Fill cmb_psector_id """
+    sql = "SELECT psector_id as id, name as idval FROM v_ui_plan_psector WHERE archived = false ORDER BY id ASC"
+    rows = tools_db.get_rows(sql)
+    disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
+    tools_qt.fill_combo_values(cmb_psector_id, rows)
+    if psector_id is not None:
+        tools_qt.set_combo_value(cmb_psector_id, psector_id, 0)
+    connect_signal(cmb_psector_id.currentIndexChanged, partial(manage_psector_change, cmb_psector_id),
+                   "psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change"
+    )
+
+
+def manage_psector_change(cmb_psector, index):
+    """ Manage psector change """
+    psector_id = tools_qt.get_combo_value(None, cmb_psector)
+    set_psector_mode_enabled(psector_id=psector_id)
 
 
 def create_sqlite_conn(file_name):
@@ -5604,6 +5768,10 @@ def _insert_feature_psector(dialog, feature_type, ids=None):
         sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
+        if feature_type in ('connec', 'gully'):
+            sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id, state) "
+            sql += f"VALUES('{ids[i]}', '{value}', 1) ON CONFLICT DO NOTHING;"
+            tools_db.execute_sql(sql)
         load_tableview_psector(dialog, feature_type)
 
 

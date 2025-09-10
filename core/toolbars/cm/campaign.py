@@ -18,6 +18,7 @@ from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, AddCampaignInventoryUi
 from ...shared.selector import GwSelector
+from ...utils.selection_widget import GwSelectionWidget
 
 
 class Campaign:
@@ -238,8 +239,6 @@ class Campaign:
 
         tools_gw.add_icon(self.dialog.btn_insert, '111')
         tools_gw.add_icon(self.dialog.btn_delete, '112')
-        tools_gw.add_icon(self.dialog.btn_snapping, '137')
-        tools_gw.add_icon(self.dialog.btn_expr_select, '178')
 
         self.dialog.rejected.connect(self._on_dialog_rejected)
 
@@ -477,6 +476,12 @@ class Campaign:
             self.is_new_campaign = False
             self._cleanup_map_selection()
 
+            # Ensure selector_campaign docker reflects the new/updated campaign immediately
+            try:
+                tools_gw.refresh_selectors(is_cm=True)
+            except Exception:
+                pass
+
             # Update campaign ID in the dialog
             campaign_id = result.get("body", {}).get("campaign_id")
             self.campaign_id = campaign_id
@@ -588,21 +593,15 @@ class Campaign:
             partial(self._update_feature_completer, self.dialog)
         )
         self.dialog.btn_delete.clicked.connect(self._check_and_disable_class_combos)
-
-        self.dialog.btn_snapping.clicked.connect(
-            partial(self._update_feature_completer, self.dialog)
-        )
-
-        self.dialog.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dialog, "campaign",
-                    selection_mode=GwSelectionMode.EXPRESSION_CAMPAIGN),
-        )
-        self.dialog.btn_expr_select.clicked.connect(
-            partial(self._update_feature_completer, self.dialog)
-        )
-
+        
         # Create menu for btn_snapping
-        tools_gw.menu_btn_snapping(self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
+        self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
+        general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
+        used_tools = ["rectangle", "polygon", "freehand", "circle"]
+        menu_variables = {"used_tools": used_tools}
+        expression_selection = {"callback_later": self._update_feature_completer}
+        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, expression_selection=expression_selection)
+        self.dialog.lyt_selection.addWidget(selection_widget, 0)
         
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
@@ -684,6 +683,39 @@ class Campaign:
         completer = QCompleter(values)
         completer.setCaseSensitivity(False)
         dlg.feature_id.setCompleter(completer)
+
+    def get_allowed_features_for_campaign(self, feature: str) -> Optional[List[Any]]:
+        """Return list of allowed feature IDs for current campaign and feature tab.
+
+        If campaign type is inventory (3), returns None to indicate no restriction.
+        """
+        id_column = f"{feature}_id"
+
+        # Inventory: no restriction
+        if self.campaign_type == 3:
+            return None
+
+        allowed_types: List[str] = []
+        if self.campaign_type == 1:
+            reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
+            allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
+        elif self.campaign_type == 2:
+            visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
+            allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
+
+        if not allowed_types:
+            return []
+
+        allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+        sql = f"""
+            SELECT p.{id_column}::text AS {id_column}
+            FROM {self.schema_parent}.{feature} p
+            JOIN {self.schema_parent}.cat_{feature} c
+              ON p.{feature}cat_id = c.id
+            WHERE c.{feature}_type IN ({allowed_types_str})
+        """
+        rows = tools_db.get_rows(sql)
+        return [row[id_column] for row in (rows or []) if row.get(id_column)]
 
     def _on_class_changed(self, sender: Optional[QComboBox] = None):
         """Called when the user changes the reviewclass or visitclass combo or when dialog opens"""
@@ -980,6 +1012,7 @@ class Campaign:
         msg = "{0} campaign(s) deleted."
         msg_params = (count,)
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
+        tools_gw.refresh_selectors(is_cm=True)
         self.filter_campaigns()
 
     def open_campaign(self, index: Optional[QModelIndex] = None):
