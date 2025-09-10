@@ -140,11 +140,10 @@ def delete_object(**kwargs):
         feature_type = tools_gw.get_signal_change_tab(dialog)
         tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
         qtable_name = f"{qtable_name}_x_{feature_type}"
-    elif qtable_name == 'tab_elements_tbl_elements':
-        check_for_frelem = True
     elif 'featureType' in complet_result['body']['feature']:
         feature_type = complet_result['body']['feature']['featureType']
         tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
+        check_for_frelem = True if qtable_name == 'tab_elements_tbl_elements' else False
     else:
         tablename = f"v_ui_{func_params['sourceview']}"
     qtable: QTableView = tools_qt.get_widget(dialog, f"{qtable_name}")
