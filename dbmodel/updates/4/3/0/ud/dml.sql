@@ -240,3 +240,127 @@ UPDATE config_toolbox
 	WHERE id=3292;
 
 UPDATE sys_table SET context='{"levels": ["EPA", "DSCENARIO"]}', alias = 'Lid Dscenario' WHERE id='ve_inp_dscenario_lids';
+
+-- 10/09/2025
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Name: (*)",
+    "value": null,
+    "tooltip": "Name for dscenario (mandatory)",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "name",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 1,
+    "placeholder": ""
+  },
+  {
+    "label": "Descript:",
+    "value": null,
+    "tooltip": "Descript for dscenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "descript",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 2,
+    "placeholder": ""
+  },
+  {
+    "label": "Parent:",
+    "value": null,
+    "tooltip": "Parent for dscenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "parent",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 3,
+    "placeholder": ""
+  },
+  {
+    "label": "Type:",
+    "value": null,
+    "tooltip": "Dscenario type",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "type",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_dscenario'' ORDER BY id",
+    "isMandatory": true,
+    "layoutorder": 4
+  },
+  {
+    "label": "Exploitation:",
+    "value": null,
+    "tooltip": "Dscenario type",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "expl",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation",
+    "isMandatory": true,
+    "layoutorder": 6
+  }
+]'::json
+	WHERE id=3134;
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Scenario name:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "name",
+    "widgettype": "text",
+    "layoutorder": 1
+  },
+  {
+    "label": "Scenario type:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "type",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario'' ORDER BY id",
+    "layoutorder": 2
+  },
+  {
+    "label": "Exploitation:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "exploitation",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id as id, name as idval FROM ve_exploitation",
+    "layoutorder": 4
+  },
+  {
+    "label": "Descript:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "descript",
+    "widgettype": "text",
+    "layoutorder": 5
+  }
+]'::json
+	WHERE id=3118;
+
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'POLL', 'POLL', NULL, NULL);
+
+UPDATE inp_typevalue SET idval='FRWEIR',id='FRWEIR' WHERE typevalue='inp_typevalue_dscenario' AND id='WEIR';
+UPDATE inp_typevalue SET idval='FRPUMP',id='FRPUMP' WHERE typevalue='inp_typevalue_dscenario' AND id='PUMP';
+UPDATE inp_typevalue SET idval='FRORIFICE',id='FRORIFICE' WHERE typevalue='inp_typevalue_dscenario' AND id='ORIFICE';
+UPDATE inp_typevalue SET idval='FROUTLET',id='FROUTLET' WHERE typevalue='inp_typevalue_dscenario' AND id='OUTLET';

@@ -56,7 +56,7 @@ BEGIN
     LIMIT 1;
 
     -- Determine the parameter name based on the provided type
-    CASE p_data->'data'->>'type'
+    CASE v_type
         WHEN 'netscenario' THEN
             parameter_name := 'plan_netscenario_current';
 
@@ -100,7 +100,7 @@ BEGIN
     END IF;
 
     -- Determine the query based on the provided type
-    CASE p_data->'data'->>'type'
+    CASE v_type
         WHEN 'netscenario' THEN
 		    query := 'SELECT t1.netscenario_id, t1.name FROM plan_netscenario AS t1 '
 		          || 'INNER JOIN config_param_user AS t2 ON t1.netscenario_id::text = t2.value '
