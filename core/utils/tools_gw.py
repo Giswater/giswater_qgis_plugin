@@ -4679,7 +4679,13 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
 
     # Reset rubberband
-    reset_rubberband(class_object.rubber_band)
+    if selection_mode == GwSelectionMode.PSECTOR:
+        reset_rubberband(class_object.rubber_band_point)
+        reset_rubberband(class_object.rubber_band_op)
+        reset_rubberband(class_object.rubber_band_line)
+        reset_rubberband(class_object.rubber_band_rectangle)
+    else:
+        reset_rubberband(class_object.rubber_band)
 
     if selection_mode == GwSelectionMode.PSECTOR:
         class_object.rel_layers = remove_selection(layers=class_object.rel_layers)
