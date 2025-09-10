@@ -16,7 +16,8 @@ from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QPixmap
-from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel, QSqlRecord
+from qgis.PyQt.QtCore import QAbstractTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer
@@ -57,6 +58,8 @@ class GwPsector:
         self.tablename_psector_x_node = "plan_psector_x_node"
         self.tablename_psector_x_connec = "plan_psector_x_connec"
         self.tablename_psector_x_gully = "plan_psector_x_gully"
+        self.no_editable_fields = ['state', 'psector_id', 'link_id', 'arc_id', 'node_id', 'connec_id', 
+                                'gully_id', 'id', '_link_geom_', '_userdefined_geom_', 'insert_user', 'insert_tstamp']
 
         self.qtbl_node = None
         self.qtbl_arc = None
@@ -192,6 +195,7 @@ class GwPsector:
                         set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="arc", field_id="arc_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
         self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
+        self.qtbl_arc.model().flags = lambda index: self.flags(index, self.qtbl_arc.model())
 
         self._manage_selection_changed_signals(GwFeatureTypes.ARC)
 
@@ -200,6 +204,7 @@ class GwPsector:
                         set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="node", field_id="node_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
         self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
+        self.qtbl_node.model().flags = lambda index: self.flags(index, self.qtbl_node.model())
 
         self._manage_selection_changed_signals(GwFeatureTypes.NODE)
 
@@ -208,6 +213,7 @@ class GwPsector:
                         set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="connec", field_id="connec_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
         self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
+        self.qtbl_connec.model().flags = lambda index: self.flags(index, self.qtbl_connec.model(), table_specific_editable=['arc_id'])
 
         self._manage_selection_changed_signals(GwFeatureTypes.CONNEC)
 
@@ -217,6 +223,7 @@ class GwPsector:
                             set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully", field_id="gully_id")
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
             self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
+            self.qtbl_gully.model().flags = lambda index: self.flags(index, self.qtbl_gully.model())
 
             self._manage_selection_changed_signals(GwFeatureTypes.GULLY)
 
@@ -495,9 +502,20 @@ class GwPsector:
         self.enable_buttons(psector_name != 'null' and not self.check_name(psector_name))
         self.set_tabs_enabled(psector_name != 'null' and not self.check_name(psector_name))
 
-    def flags(self, index, model, editable_columns=None):
+    def flags(self, index, model, editable_columns=None, table_specific_editable=None):
 
         column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
+        
+        # Check if column is specifically allowed to be editable for this table
+        if table_specific_editable and column_name in table_specific_editable:
+            if isinstance(model, QSqlTableModel):
+                return QSqlTableModel.flags(model, index)
+            return QStandardItemModel.flags(model, index)
+        
+        # If column is in non-editable list, make it non-editable
+        if column_name in self.no_editable_fields:
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            
         if editable_columns and column_name not in editable_columns:
             flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
             return flags
@@ -1391,7 +1409,7 @@ class GwPsector:
         model.select()
 
         # When change some field we need to refresh Qtableview and filter by psector_id
-        model.beforeUpdate.connect(partial(self.manage_update_state, model))
+        model.beforeUpdate.connect(partial(self.manage_update_model_relations, model))
         # model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
 
@@ -1432,6 +1450,136 @@ class GwPsector:
             row = selected_list[i].row()
             if str(widget.model().record(row).value('tab_general_psector_id')) != tools_qt.get_text(dialog, 'tab_general_psector_id'):
                 widget.hideRow(i)
+
+    
+    def manage_update_model_relations(self, model: QSqlTableModel, row: int, record: QSqlRecord):
+        """
+        Manage update model relations - INSERT if new, UPDATE if exists
+        :param model: QSqlModel of QTableView
+        :param row: index of updating row (passed by signal)
+        :param record: QSqlRecord (passed by signal)
+        """
+
+        # Get the table name from the model
+        table_name = model.tableName()
+        if not table_name:
+            return
+
+        # Build column lists and values for UPSERT operation
+        columns = []
+        values = []
+        update_clauses = []
+        
+        for column in range(model.columnCount()):
+            column_name = model.headerData(column, Qt.Horizontal, Qt.DisplayRole)
+            if column_name:
+                value = record.value(column_name)
+                columns.append(column_name)
+                
+                if value in [None, 'None', 'null', 'Null', 'NULL', '']:
+                    values.append('NULL')
+                    if column_name not in self.no_editable_fields:
+                        update_clauses.append(f"{column_name} = NULL")
+                elif column_name == 'addparam':
+                    values.append(f"'{str(value)}'::json")
+                    if column_name not in self.no_editable_fields:
+                        update_clauses.append(f"{column_name} = '{str(value)}'::json")
+                elif column_name == 'insert_tstamp':
+                    tstamp_str = value.toString("yyyy-MM-dd HH:mm:ss.zzz")
+                    values.append(f"'{tstamp_str}'::timestamp")
+                    if column_name not in self.no_editable_fields:
+                        update_clauses.append(f"{column_name} = '{tstamp_str}'::timestamp")
+                elif isinstance(value, str):
+                    # Properly escape values to prevent SQL injection
+                    escaped_value = str(value).replace("'", "''")
+                    values.append(f"'{escaped_value}'")
+                    # Only add to update clause if not in non-editable fields
+                    if column_name not in self.no_editable_fields:
+                        update_clauses.append(f"{column_name} = '{escaped_value}'")
+                else:
+                    values.append(str(value).upper())
+                    if column_name not in self.no_editable_fields:
+                        update_clauses.append(f"{column_name} = {str(value).upper()}")
+
+        # Execute UPSERT operation if we have data
+        if columns and values:
+            # Try INSERT first, then UPDATE if conflict occurs
+            # Using PostgreSQL's ON CONFLICT syntax for UPSERT
+            columns_str = ', '.join(columns)
+            values_str = ', '.join(values)
+            update_str = ', '.join(update_clauses) if update_clauses else columns_str
+            
+            # Determine the primary key or unique constraint
+            # Most psector tables use 'id' as primary key
+            conflict_column = 'id'
+            record_id = record.value('id')
+            
+            # If no ID, try to use a combination of psector_id and feature_id
+            if not record_id:
+                psector_id = record.value('psector_id')
+                feature_id = None
+                
+                # Determine feature ID column based on table name
+                if 'arc' in table_name:
+                    feature_id = record.value('arc_id')
+                    conflict_column = 'psector_id, arc_id'
+                elif 'node' in table_name:
+                    feature_id = record.value('node_id')
+                    conflict_column = 'psector_id, node_id'
+                elif 'connec' in table_name:
+                    feature_id = record.value('connec_id')
+                    conflict_column = 'psector_id, connec_id'
+                elif 'gully' in table_name:
+                    feature_id = record.value('gully_id')
+                    conflict_column = 'psector_id, gully_id'
+                
+                if not (psector_id and feature_id):
+                    return  # Cannot proceed without proper identifiers
+
+            # Build the UPSERT SQL
+            if update_clauses:
+                sql = (f"INSERT INTO {table_name} ({columns_str}) "
+                       f"VALUES ({values_str}) "
+                       f"ON CONFLICT ({conflict_column}) "
+                       f"DO UPDATE SET {update_str}")
+            else:
+                # If no updatable fields, just insert if not exists
+                sql = (f"INSERT INTO {table_name} ({columns_str}) "
+                       f"VALUES ({values_str}) "
+                       f"ON CONFLICT ({conflict_column}) DO NOTHING")
+            
+            # Execute the UPSERT
+            tools_db.execute_sql(sql)
+
+        # Determine which table widget to refresh based on table name
+        widget_to_refresh = None
+        table_specific_editable = None
+        qtbl_to_refresh = None
+        if 'arc' in table_name:
+            widget_to_refresh = self.qtbl_arc
+            qtbl_to_refresh = self.qtbl_arc
+        elif 'node' in table_name:
+            widget_to_refresh = self.qtbl_node
+            qtbl_to_refresh = self.qtbl_node
+        elif 'connec' in table_name:
+            widget_to_refresh = self.qtbl_connec
+            table_specific_editable = ['arc_id']
+            qtbl_to_refresh = self.qtbl_connec
+        elif 'gully' in table_name:
+            widget_to_refresh = self.qtbl_gully
+            table_specific_editable = ['arc_id']
+            qtbl_to_refresh = self.qtbl_gully
+        # Refresh the appropriate table
+        if widget_to_refresh:
+            if not hasattr(self, 'psector_id'):
+                self.psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+            filter_ = f"psector_id = '{self.psector_id}'"
+            self.fill_table(self.dlg_plan_psector, widget_to_refresh, table_name,
+                            set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+            qtbl_to_refresh.model().flags = lambda index: self.flags(index, qtbl_to_refresh.model(), table_specific_editable=table_specific_editable)
+
+        # Force a map refresh
+        tools_qgis.force_refresh_map_canvas()
 
     def manage_update_state(self, model, row, record):
         """
@@ -2564,9 +2712,7 @@ class GwPsector:
             self._highlight_features_by_id, tableview, tablename_op, feat_id_op, self.rubber_band_op, width, state_value=0
         ), 'psector', f"highlight_features_by_id_{tablename_op}_op")
 
-        # Manage connec/gully special cases
-        if feature_type in (GwFeatureTypes.CONNEC, GwFeatureTypes.GULLY):
-            tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
+        # Flags are now handled globally during table initialization
 
     # endregion
 
