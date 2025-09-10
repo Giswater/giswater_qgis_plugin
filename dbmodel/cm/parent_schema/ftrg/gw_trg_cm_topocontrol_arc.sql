@@ -23,7 +23,12 @@ DECLARE
     v_campaign_id integer;
     v_campaign_geom geometry;
     v_working_geom geometry;
+    v_prev_search_path text;
 BEGIN
+    -- Set transaction-local search_path (ensure cm and parent available) and remember previous
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, cm, PARENT_SCHEMA, public', TG_TABLE_SCHEMA), true);
+
     -- Get configurable tolerance from system parameters
     SELECT ((value::json)->>'value') INTO v_search_tolerance 
     FROM PARENT_SCHEMA.config_param_system 
@@ -34,6 +39,7 @@ BEGIN
     INTO v_disable_topocontrol;
 
     IF v_disable_topocontrol IS TRUE THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     END IF;
     
@@ -49,17 +55,20 @@ BEGIN
     IF TG_TABLE_NAME = 'om_campaign_x_arc' THEN
         -- Campaign table has the_geom
         IF NEW.the_geom IS NULL THEN
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RETURN NEW;
         END IF;
         
         -- Skip topology control for temporary geometries (like selection areas)
         -- Check if this is likely a temporary geometry by looking at the geometry properties
         IF ST_NumPoints(NEW.the_geom) < 2 THEN
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RETURN NEW;
         END IF;
         
         -- Skip if the geometry hasn't actually changed (prevents unnecessary processing)
         IF TG_OP = 'UPDATE' AND OLD.the_geom IS NOT NULL AND ST_Equals(NEW.the_geom, OLD.the_geom) THEN
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RETURN NEW;
         END IF;
         
@@ -75,10 +84,12 @@ BEGIN
         WHERE campaign_id = v_campaign_id AND arc_id = NEW.arc_id;
         
         IF v_campaign_geom IS NULL THEN
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RETURN NEW;
         END IF;
         v_working_geom := v_campaign_geom;
     ELSE
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     END IF;
 
@@ -87,12 +98,14 @@ BEGIN
 
     -- Additional safety checks to prevent crashes
     IF v_working_geom IS NULL OR ST_IsEmpty(v_working_geom) OR NOT ST_IsValid(v_working_geom) THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     END IF;
     
     -- For INSERT operations, be more lenient with topology control
     -- Skip topology control for INSERT if the geometry seems problematic
     IF TG_OP = 'INSERT' AND (ST_NumPoints(v_working_geom) < 2 OR ST_Length(v_working_geom) < 0.001) THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     END IF;
 
@@ -120,8 +133,10 @@ BEGIN
         -- For INSERT operations, be more lenient - just log a warning instead of raising exception
         IF TG_OP = 'INSERT' THEN
             RAISE WARNING 'Topology Warning: Campaign arc endpoints not within % units of a node. Arc will be inserted without topology control.', v_search_tolerance;
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RETURN NEW;
         ELSE
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RAISE EXCEPTION 'Topology Error: Campaign arc endpoints must be within % units of a node.', v_search_tolerance;
         END IF;
     END IF;
@@ -129,8 +144,10 @@ BEGIN
         -- For INSERT operations, be more lenient - just log a warning instead of raising exception
         IF TG_OP = 'INSERT' THEN
             RAISE WARNING 'Topology Warning: Campaign arc starts and ends at the same node (ID: %). Arc will be inserted without topology control.', v_node_start.node_id;
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RETURN NEW;
         ELSE
+            PERFORM set_config('search_path', v_prev_search_path, true);
             RAISE EXCEPTION 'Topology Error: Campaign arc cannot start and end at the same node (ID: %)', v_node_start.node_id;
         END IF;
     END IF;
@@ -154,7 +171,11 @@ BEGIN
 
 
     -- RETURN VALUE - SAVE THE CHANGES
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

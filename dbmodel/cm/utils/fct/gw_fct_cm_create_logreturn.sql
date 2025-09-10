@@ -25,11 +25,13 @@ v_result json;
 v_returntype text;
 v_querytext text;
 v_rec record;
+v_prev_search_path text;
 
 BEGIN
 
-	-- search path
-	SET search_path = "cm", public;
+	-- search path (transaction-local)
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'cm,public', true);
 	v_schemaname = 'cm';
 
 	-- get input parameters
@@ -98,8 +100,12 @@ BEGIN
 	v_result := COALESCE(v_result, '{}');
 
 	--  Return
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN v_result;
 
+EXCEPTION WHEN OTHERS THEN
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RAISE;
 END;
 
 $function$

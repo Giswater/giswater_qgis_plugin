@@ -29,7 +29,7 @@ DECLARE
     v_message text;
     v_target_srid integer;
     v_sql text;
-
+    v_prev_search_path text;
 
 BEGIN 
     -- Get params
@@ -40,8 +40,8 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
     INTO v_version;
 
-    --EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    SET search_path = "cm", public;
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
 
 
 	IF lower(p_type) = 'lot' then
@@ -124,8 +124,12 @@ BEGIN
             'data', json_build_object('info', 'lot/campaign geom updated')
         )
     );
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN v_ret;
 
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RETURN json_build_object('status','Failed','message',SQLERRM,'SQLSTATE',SQLSTATE);
 END;
 $function$
 ;

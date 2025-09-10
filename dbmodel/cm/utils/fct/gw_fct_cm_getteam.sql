@@ -15,14 +15,20 @@ DECLARE
     v_campaign_id integer;
     v_result json;
    v_orgname TEXT;
+   v_prev_search_path text;
 BEGIN
 
     -- Extract campaign_id from the input JSON
     v_campaign_id := (p_data->>'p_campaign_id')::integer;
    RAISE NOTICE 'v_campaign_id:: %', v_campaign_id;
 
+    -- Set transaction-local search_path
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
+
     -- If no campaign_id is found, return empty
     IF v_campaign_id IS NULL THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN '{"status": "Accepted", "body": {"data": []}}'::json;
     END IF;
 
@@ -39,8 +45,8 @@ BEGIN
 	        'body', json_build_object(
                 'organization_name', v_orgname,
 	        	'data', json_agg(
-		            json_build_object('id', ct.team_id, 'idval', ct.teamname)
-		        )
+	            	json_build_object('id', ct.team_id, 'idval', ct.teamname)
+	        	)
 	        )
 	    )
 	    INTO v_result
@@ -53,8 +59,8 @@ BEGIN
 	        'body', json_build_object(
                 'organization_name', v_orgname,
 	        	'data', json_agg(
-		            json_build_object('id', ct.team_id, 'idval', ct.teamname)
-		        )
+	            	json_build_object('id', ct.team_id, 'idval', ct.teamname)
+	        	)
 	        )
 	    )
 	    INTO v_result
@@ -67,12 +73,17 @@ BEGIN
      RAISE NOTICE 'v_result->: %', v_result->'body'->'data';
 
     IF v_result->'body'->>'data' IS NULL THEN
-     	RETURN '{"status": "Accepted", "body": {"data": [{"id": "", "idval": ""}]}}'::json;
+        PERFORM set_config('search_path', v_prev_search_path, true);
+    	RETURN '{"status": "Accepted", "body": {"data": [{"id": "", "idval": ""}]}}'::json;
 	ELSE
+        PERFORM set_config('search_path', v_prev_search_path, true);
 	    RETURN COALESCE(v_result, '{"status": "Accepted", "body": {"data": [{"id": "", "idval": ""}]}}'::json);
 	END IF;
 
 
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $function$
 ;

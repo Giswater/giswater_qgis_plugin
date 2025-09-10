@@ -24,10 +24,12 @@ v_triggerfromtable text;
 v_lot integer;
 v_code text;
 
+v_prev_search_path text;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, public', TG_TABLE_SCHEMA), true);
     v_featuretype:= TG_ARGV[0];
     v_project_type = (SELECT project_type FROM sys_version ORDER by 1 desc LIMIT 1);
     v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
@@ -103,6 +105,7 @@ BEGIN
 			END IF;
 		END IF;
 
+		PERFORM set_config('search_path', v_prev_search_path, true);
 		RETURN NEW;
 
 
@@ -154,12 +157,13 @@ BEGIN
 
 		END IF;
 
-
-	RETURN NEW;
+		PERFORM set_config('search_path', v_prev_search_path, true);
+		RETURN NEW;
 
 
     END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

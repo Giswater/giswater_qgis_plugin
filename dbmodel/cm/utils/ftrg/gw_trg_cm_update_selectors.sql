@@ -15,8 +15,10 @@ DECLARE
     rec RECORD;
    	selector_name TEXT;
   	table_name TEXT;
+    v_prev_search_path text;
 BEGIN
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', format('%I, public', TG_TABLE_SCHEMA), true);
     selector_name := TG_ARGV[0];
 
 	IF selector_name = 'campaign' THEN
@@ -40,6 +42,7 @@ BEGIN
 		        );
 		    END LOOP;
 
+			PERFORM set_config('search_path', v_prev_search_path, true);
 			RETURN NEW;
 
 		ELSIF TG_OP = 'UPDATE' THEN
@@ -65,11 +68,13 @@ BEGIN
 			    END LOOP;
 			END IF;
 
+			PERFORM set_config('search_path', v_prev_search_path, true);
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
 		    DELETE FROM cm.selector_campaign WHERE campaign_id = OLD.id;
-		   	RETURN NULL;
+		    	PERFORM set_config('search_path', v_prev_search_path, true);
+		    	RETURN NULL;
 
 		END IF;
 
@@ -94,6 +99,7 @@ BEGIN
 		        );
 		    END LOOP;
 
+			PERFORM set_config('search_path', v_prev_search_path, true);
 			RETURN NEW;
 
 		ELSIF TG_OP = 'UPDATE' THEN
@@ -119,19 +125,25 @@ BEGIN
 			    END LOOP;
 			END IF;
 
+			PERFORM set_config('search_path', v_prev_search_path, true);
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
 		   DELETE FROM cm.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
 
-		   	RETURN NULL;
+		    	PERFORM set_config('search_path', v_prev_search_path, true);
+		    	RETURN NULL;
 
 		END IF;
 
 	END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN NEW;
 
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

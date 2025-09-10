@@ -41,8 +41,12 @@ DECLARE
     v_view_exists boolean;
     v_processed_combinations text[] := ARRAY[]::text[];
     v_combination_key text;
+    v_prev_search_path text;
     
 BEGIN
+    -- Save current search_path and switch to cm (transaction-local)
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
     -- Initialize variables
     v_project_type := COALESCE((p_data->>'data')::json->>'projectType', 'WS');
     v_version := COALESCE((p_data->>'data')::json->>'version', '4.0');
@@ -414,10 +418,14 @@ BEGIN
         );
     END IF;
     
+    -- Restore previous search_path before returning
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN v_result;
     
 EXCEPTION WHEN OTHERS THEN
     GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    -- Ensure restoration on error
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN json_build_object(
         'status', 'Failed',
         'message', 'Unexpected error in catalog check: ' || SQLERRM,

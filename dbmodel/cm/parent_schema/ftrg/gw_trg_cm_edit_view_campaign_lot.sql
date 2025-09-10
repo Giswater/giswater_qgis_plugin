@@ -17,14 +17,18 @@ DECLARE
     v_tablename TEXT;
     v_field_id TEXT;
     v_querytext TEXT;
+    v_prev_search_path text;
+    v_field_value integer;
 BEGIN
-    -- Optional: Set search path
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    -- Set search_path transaction-locally and remember previous
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, public', TG_TABLE_SCHEMA), true);
 
     v_tablename := 'om_campaign_x_' || lower(v_feature_type);
     v_field_id  := lower(v_feature_type) || '_id';
 
     IF TG_OP = 'INSERT' THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
         -- Build UPDATE query with audit columns
@@ -36,9 +40,14 @@ BEGIN
                   update_at = NOW(),
                   update_by = current_user,
                   update_count = COALESCE(update_count,0)+1,
-                  update_log = COALESCE(update_log, ''[]''::jsonb) || ' ||
-            ' to_jsonb(json_build_object(''old_values'', $6, ''update_at'', NOW(), ''update_by'', current_user)) ' ||
-            ' WHERE campaign_id = $4 AND ' || quote_ident(v_field_id) || ' = $5';
+                  update_log = COALESCE(update_log, ''[]''::jsonb) || '
+            || ' to_jsonb(json_build_object(''old_values'', $6, ''update_at'', NOW(), ''update_by'', current_user)) '
+            || ' WHERE campaign_id = $4 AND ' || quote_ident(v_field_id) || ' = $5';
+
+        -- Dynamically fetch OLD.<field_id> into v_field_value
+        EXECUTE format('SELECT ($1).%I', v_field_id)
+        INTO v_field_value
+        USING OLD;
 
         EXECUTE v_querytext
         USING
@@ -46,11 +55,21 @@ BEGIN
             NEW.admin_observ,
             NEW.org_observ,
             OLD.campaign_id,
-            OLD.node_id,
+            v_field_value,
             row_to_json(OLD)::jsonb;
 
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
+        RETURN OLD;
     END IF;
+
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE

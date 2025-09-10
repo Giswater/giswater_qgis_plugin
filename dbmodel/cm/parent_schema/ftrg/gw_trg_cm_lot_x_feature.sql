@@ -26,7 +26,12 @@ DECLARE
     v_dest_columns TEXT;
     v_user_role_name TEXT;
     v_field_role_name TEXT := 'role_cm_field';
+    v_prev_search_path text;
 BEGIN
+    -- Save and set search_path transaction-locally
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, PARENT_SCHEMA, public', TG_TABLE_SCHEMA), true);
+
     -- Part 1: Logic for BEFORE trigger. Sets 'action' before the row is saved.
     IF TG_WHEN = 'BEFORE' THEN
         IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -45,6 +50,7 @@ BEGIN
                 END IF;
             END IF;
         END IF;
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW; -- Return the (potentially modified) row
     END IF;
 
@@ -94,9 +100,19 @@ BEGIN
                 END IF;
             END IF;
         END IF;
-        IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
+        IF TG_OP = 'DELETE' THEN 
+            PERFORM set_config('search_path', v_prev_search_path, true);
+            RETURN OLD; 
+        ELSE 
+            PERFORM set_config('search_path', v_prev_search_path, true);
+            RETURN NEW; 
+        END IF;
     END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN NULL; -- Should not happen
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $function$;

@@ -26,6 +26,7 @@ DECLARE
 	v_version text;
 	v_epsg integer;
 	v_schemaname text;
+	v_prev_search_path text;
 
 	-- dialog variables
     v_fid integer;
@@ -126,7 +127,8 @@ DECLARE
 
 BEGIN
 
-	SET search_path = 'pg_temp', 'cm', 'public';
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'pg_temp, cm, public', true);
 	v_schemaname := 'cm';
 
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
@@ -140,10 +142,12 @@ BEGIN
 	v_check_data_related := COALESCE((p_data->'data'->'parameters'->>'checkDataRelated')::boolean, false);
 
     IF v_fid IS NULL THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'error', 'message', 'Missing parameter: functionFid');
     END IF;
 
 	IF v_campaign_id IS NULL THEN
+		PERFORM set_config('search_path', v_prev_search_path, true);
 		RETURN json_build_object('status', 'error', 'message', 'Missing parameter: campaignId');
 	END IF;
 
@@ -1413,8 +1417,13 @@ BEGIN
 					'"missingLayers":'||v_missing_layers||'}'||
 			', "variables":{"setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 	--  Return
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN v_return;
 
+EXCEPTION
+	WHEN OTHERS THEN
+		PERFORM set_config('search_path', v_prev_search_path, true);
+		RAISE;
 END;
 $function$
 ;

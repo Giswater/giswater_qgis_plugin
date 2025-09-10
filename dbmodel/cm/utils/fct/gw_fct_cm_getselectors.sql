@@ -96,11 +96,13 @@ v_orderby_check boolean;
 v_sectorfrommacro boolean;
 v_explfrommacro boolean;
 v_project_type text;
+v_prev_search_path text;
 
 BEGIN
 
-	-- Set search path to local schema
-	SET search_path = "cm", public;
+	-- Save current search_path and set cm (transaction-local)
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'cm,public', true);
 
 	--  get system values
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
@@ -124,7 +126,7 @@ BEGIN
 
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
-		EXECUTE 'SET ROLE "'||v_cur_user||'"';
+		EXECUTE 'SET ROLE '||quote_ident(v_cur_user);
 	END IF;
 
 	-- profilactic control of schema name
@@ -429,11 +431,12 @@ BEGIN
 	v_uservalues = COALESCE(v_uservalues, '{}');
 	v_tiled = COALESCE(v_tiled, FALSE);
 
-	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
+	EXECUTE 'SET ROLE '||quote_ident(v_prev_cur_user);
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
+		PERFORM set_config('search_path', v_prev_search_path, true);
 		RETURN ('{"status":"Accepted"' ||
 		', "version":'|| v_version ||
 		', "message":"Not implemented"'||
@@ -447,6 +450,7 @@ BEGIN
 
 
 		-- Return formtabs
+		PERFORM set_config('search_path', v_prev_search_path, true);
 		RETURN json_build_object(
 		    'status', 'Accepted',
 		    'version', v_version,
@@ -474,6 +478,7 @@ BEGIN
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;

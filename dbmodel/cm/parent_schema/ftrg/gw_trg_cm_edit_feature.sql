@@ -29,10 +29,13 @@ v_update_where TEXT;
 v_num_pkeys integer;
 v_json_data JSON;
 v_feature TEXT := TG_ARGV[0];
+v_prev_search_path text;
 
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', PARENT_SCHEMA, public';
+	-- transaction-local search_path to target schema, parent, public
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', format('%I, PARENT_SCHEMA, public', TG_TABLE_SCHEMA), true);
 
 	-- get input params --
 	v_num_pkeys = 2; -- number OF pkeys (first "n" columns of the view)
@@ -76,62 +79,66 @@ BEGIN
 
    	IF TG_OP IN ('INSERT', 'UPDATE') THEN
 
-   		SELECT COALESCE(row_to_json(NEW), '{}') INTO v_json_data;
+  		SELECT COALESCE(row_to_json(NEW), '{}') INTO v_json_data;
 
    	ELSE
 
-   		SELECT COALESCE(row_to_json(OLD), '{}') INTO v_json_data;
+  		SELECT COALESCE(row_to_json(OLD), '{}') INTO v_json_data;
 
-   END IF;
+  	END IF;
   
 	-- offset 2 because the first two columns are id and campaign id. We need lot_id and feature_id
    	EXECUTE '
-    WITH aaa AS (
+   	WITH aaa AS (
 	   	SELECT column_name AS col FROM information_schema.COLUMNS 
 	  	WHERE table_schema = '||quote_literal(TG_TABLE_SCHEMA)||' AND table_name = '||quote_literal(TG_TABLE_NAME)||'
 	  	LIMIT '||v_num_pkeys||' OFFSET 2
-	), aux AS (
+		), aux AS (
    			SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
-	), prep_pkey_syntax AS (		
+		), prep_pkey_syntax AS (		
 		SELECT col, js->>col AS val FROM aux, aaa
-	), casi_aux AS (
+		), casi_aux AS (
 		SELECT concat(col, '' = '', val) AS casi FROM prep_pkey_syntax
-	)
+		)
 		SELECT string_agg(casi, '' AND '') FROM casi_aux'
 	INTO v_update_where;
 
 
 
 
-    IF TG_OP <> 'TRUNCATE' THEN -- INSERT, UPDATE, DELETE
+	IF TG_OP <> 'TRUNCATE' THEN -- INSERT, UPDATE, DELETE
 
-        v_input_json := jsonb_build_object(
-        'client', jsonb_build_object(
-            'device', 4,
-            'infoType', 1,
-            'lang', 'ES'
-            ),
-        'feature', '{}'::jsonb,
-        'data', jsonb_build_object(
-            'parameters', jsonb_build_object(
-                'action', TG_OP,
-                'searchSchema', v_search_schema,
-                'tgTableName', TG_TABLE_NAME,
-                'updateWhere', v_update_where,
-                'jsonData', v_json_data
-                )
-            )
-        );
+		v_input_json := jsonb_build_object(
+		'client', jsonb_build_object(
+		    'device', 4,
+		    'infoType', 1,
+		    'lang', 'ES'
+		    ),
+		'feature', '{}'::jsonb,
+		'data', jsonb_build_object(
+		    'parameters', jsonb_build_object(
+		        'action', TG_OP,
+		        'searchSchema', v_search_schema,
+		        'tgTableName', TG_TABLE_NAME,
+		        'updateWhere', v_update_where,
+		        'jsonData', v_json_data
+		        )
+		    )
+		);
 
-        PERFORM cm.gw_fct_cm_admin_dynamic_trigger(v_input_json);
+		PERFORM cm.gw_fct_cm_admin_dynamic_trigger(v_input_json);
 
 
 
-    END IF;
+	END IF;
 
+	PERFORM set_config('search_path', v_prev_search_path, true);
    RETURN NEW;
 
 
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $function$
 ;

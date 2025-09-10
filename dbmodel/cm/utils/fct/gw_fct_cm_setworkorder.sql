@@ -25,8 +25,10 @@ DECLARE
   v_result     JSON;
   v_schema     CONSTANT TEXT := 'cm';
   v_table      TEXT := (p_data->'feature'->>'tableName');
+  v_prev_search_path text;
 BEGIN
-  SET search_path = cm, public;
+  v_prev_search_path := current_setting('search_path');
+  PERFORM set_config('search_path', 'cm,public', true);
 
   -- see if we're updating or inserting
   SELECT workorder_id
@@ -108,7 +110,16 @@ BEGIN
                )
   );
 
+  PERFORM set_config('search_path', v_prev_search_path, true);
   RETURN v_result;
+
+EXCEPTION WHEN OTHERS THEN
+  PERFORM set_config('search_path', v_prev_search_path, true);
+  RETURN json_build_object(
+    'status','Failed',
+    'message', json_build_object('level', 3, 'text', SQLERRM),
+    'SQLSTATE', SQLSTATE
+  );
 END;
 
 $BODY$

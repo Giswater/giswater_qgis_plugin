@@ -22,7 +22,11 @@ DECLARE
   v_error_context text;
   predicate_log text;
   predicate_err text;
+  v_prev_search_path text;
 BEGIN
+  -- Save current search_path and switch to cm (transaction-local)
+  v_prev_search_path := current_setting('search_path');
+  PERFORM set_config('search_path', 'cm,public', true);
   -- Ensure schema exists (idempotent)
   PERFORM 1 FROM pg_namespace WHERE nspname = 'cm_audit';
   IF NOT FOUND THEN
@@ -87,9 +91,13 @@ BEGIN
         LIMIT 1)
     ) $sql$;
 
+  -- Restore previous search_path before returning
+  PERFORM set_config('search_path', v_prev_search_path, true);
   RETURN json_build_object('status','ok');
 EXCEPTION WHEN OTHERS THEN
   GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+  -- Ensure restoration on error
+  PERFORM set_config('search_path', v_prev_search_path, true);
   RETURN json_build_object('status','error','sqlstate',SQLSTATE,'message',SQLERRM,'context',v_error_context);
 END;
 $$;

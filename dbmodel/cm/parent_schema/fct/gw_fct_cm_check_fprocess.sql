@@ -38,10 +38,13 @@ DECLARE
 	v_cat varchar;
 	v_expl_id integer;
 	v_fid integer;
+	v_prev_search_path text;
 
 BEGIN
 
-	SET search_path = 'cm', public;
+	-- Save current search_path and switch to cm (transaction-local)
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'cm,public', true);
 	v_schemaname := 'cm';
 
     v_check_fid := (p_data->'data'->'parameters'->>'checkFid')::integer;
@@ -149,9 +152,14 @@ BEGIN
 
 	END IF;
 
-
+	-- Restore previous search_path before returning
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN '{}';
 
+EXCEPTION WHEN OTHERS THEN
+	-- Ensure restoration on error
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RAISE;
 END;
 $function$
 ;

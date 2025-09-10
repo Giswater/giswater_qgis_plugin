@@ -56,37 +56,39 @@ v_id_array text[];
 v_values_array json;
 v_field jsonb;
 v_layouts_to_remove text[];
+v_prev_search_path text;
 
 BEGIN
-    -- Set search path to local schema
-    SET search_path = "cm", public;
+	-- Set search path to local schema (transaction-local)
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'cm,public', true);
 
-    -- Get api version
-    SELECT value INTO v_version FROM config_param_system WHERE parameter='admin_version';
+	-- Get api version
+	SELECT value INTO v_version FROM config_param_system WHERE parameter='admin_version';
 
-    -- Get parameters from input
-    v_device = ((p_data ->>'client')::json->>'device')::integer;
-    v_cur_user = ((p_data ->>'client')::json->>'cur_user');
+	-- Get parameters from input
+	v_device = ((p_data ->>'client')::json->>'device')::integer;
+	v_cur_user = ((p_data ->>'client')::json->>'cur_user');
 	v_formname = ((p_data ->>'form')::json->>'formName');
 	v_formtype = ((p_data ->>'form')::json->>'formType');
 	v_tablename = ((p_data ->>'form')::json->>'tableName');
 	v_idname = ((p_data ->>'form')::json->>'idname');
 	v_id = ((p_data ->>'form')::json->>'id');
 
-    -- Get fields
-    SELECT gw_fct_cm_getformfields(
-        v_formname,
-        v_formtype,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        v_device,
-        NULL
-    ) INTO v_fields_array;
+	-- Get fields
+	SELECT gw_fct_cm_getformfields(
+		v_formname,
+		v_formtype,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		v_device,
+		NULL
+	) INTO v_fields_array;
 
 	IF array_length(v_fields_array, 1) IS NULL THEN
     	RAISE EXCEPTION 'Variable v_fields_array is empty. Check the "formName" or "formType" parameters: %', v_fields_array;
@@ -132,8 +134,8 @@ BEGIN
 		END LOOP;
 	END IF;
 
-    -- Loop through widgets
-    FOR i IN 1 .. array_length(v_fields_array, 1) LOOP
+	-- Loop through widgets
+	FOR i IN 1 .. array_length(v_fields_array, 1) LOOP
 	    v_widget := v_fields_array[i];
 
 	    -- Check if widgettype is tabwidget
@@ -231,13 +233,13 @@ BEGIN
 			                EXECUTE (v_widget->'widgetcontrols')::json->>'vdefault_querytext' INTO v_field_value;
 			            END IF;
 			        END IF;
-					IF v_field_value IS NOT NULL AND v_field_value != '' THEN
-						v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
-						v_widget := v_widget - 'widgetcontrols';
+				IF v_field_value IS NOT NULL AND v_field_value != '' THEN
+					v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
+					v_widget := v_widget - 'widgetcontrols';
 		        		v_fields_array[i] := v_widget;
-						v_field_value := '';
-					END IF;
-			    END IF;
+					v_field_value := '';
+				END IF;
+		    END IF;
 			END IF;
 	    END IF;
 	END LOOP;
@@ -269,6 +271,7 @@ BEGIN
 	v_form:= concat(v_form,'}' );
 
 	-- Return JSON
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN ('{
         "status": "Accepted",
         "version": ' || to_json(v_version) || ',
@@ -285,6 +288,7 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||
             ',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 END;

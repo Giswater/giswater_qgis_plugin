@@ -12,10 +12,11 @@ CREATE OR REPLACE FUNCTION cm.gw_trg_cm_edit_cat_team()
 $BODY$
 DECLARE
 
-
+v_prev_search_path text;
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, public', TG_TABLE_SCHEMA), true);
 
 
     IF TG_OP = 'INSERT' THEN
@@ -24,6 +25,7 @@ BEGIN
         	INSERT INTO cat_team (idval, descript, active)
             VALUES (NEW.idval, NEW.descript, NEW.active);
 
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -32,6 +34,7 @@ BEGIN
 		SET id=NEW.id, idval=NEW.idval, descript=NEW.descript, active=NEW.active
 		WHERE id=NEW.id;
 
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
 
 
@@ -39,10 +42,12 @@ BEGIN
 	 -- FEATURE DELETE
 		DELETE FROM cat_team WHERE id = OLD.id;
 
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN NULL;
 
      END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

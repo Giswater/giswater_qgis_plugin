@@ -14,7 +14,12 @@ DECLARE
     v_count integer;
     v_has_arc boolean := false;
     v_disable_topocontrol boolean := FALSE;
+    v_prev_search_path text;
 BEGIN
+    -- Set transaction-local search_path and remember previous
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, cm, PARENT_SCHEMA, public', TG_TABLE_SCHEMA), true);
+
     -- tolerance: reuse arc searchnodes if no node-specific param
     SELECT COALESCE(((value::json)->>'value')::double precision, 0.1)
     INTO v_tol
@@ -28,6 +33,7 @@ BEGIN
     INTO v_disable_topocontrol;
 
     IF v_disable_topocontrol IS TRUE THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     END IF;
 
@@ -47,7 +53,10 @@ BEGIN
         IF v_count > 0 THEN
             IF TG_OP = 'INSERT' THEN
                 RAISE WARNING 'Topology Warning: Duplicate node near existing node(s) in campaign % within tolerance.', v_campaign_id;
+                PERFORM set_config('search_path', v_prev_search_path, true);
+                RETURN NEW;
             ELSE
+                PERFORM set_config('search_path', v_prev_search_path, true);
                 RAISE EXCEPTION 'Topology Error: Duplicate node near existing node(s) in campaign % within tolerance.', v_campaign_id;
             END IF;
         END IF;
@@ -61,11 +70,15 @@ BEGIN
         IF NOT v_has_arc THEN
             IF TG_OP = 'INSERT' THEN
                 RAISE WARNING 'Topology Warning: Node % is not near any campaign arc (tol=%).', NEW.node_id, v_tol;
+                PERFORM set_config('search_path', v_prev_search_path, true);
+                RETURN NEW;
             ELSE
+                PERFORM set_config('search_path', v_prev_search_path, true);
                 RAISE EXCEPTION 'Topology Error: Node % is not near any campaign arc (tol=%).', NEW.node_id, v_tol;
             END IF;
         END IF;
 
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
 
     ELSIF TG_TABLE_NAME = 'om_campaign_lot_x_node' THEN
@@ -82,7 +95,10 @@ BEGIN
         IF v_count > 0 THEN
             IF TG_OP = 'INSERT' THEN
                 RAISE WARNING 'Topology Warning: Duplicate node near existing node(s) in lot % within tolerance.', NEW.lot_id;
+                PERFORM set_config('search_path', v_prev_search_path, true);
+                RETURN NEW;
             ELSE
+                PERFORM set_config('search_path', v_prev_search_path, true);
                 RAISE EXCEPTION 'Topology Error: Duplicate node near existing node(s) in lot % within tolerance.', NEW.lot_id;
             END IF;
         END IF;
@@ -105,15 +121,23 @@ BEGIN
         IF NOT v_has_arc THEN
             IF TG_OP = 'INSERT' THEN
                 RAISE WARNING 'Topology Warning: Node % is not near any lot/campaign arc (tol=%).', NEW.node_id, v_tol;
+                PERFORM set_config('search_path', v_prev_search_path, true);
+                RETURN NEW;
             ELSE
+                PERFORM set_config('search_path', v_prev_search_path, true);
                 RAISE EXCEPTION 'Topology Error: Node % is not near any lot/campaign arc (tol=%).', NEW.node_id, v_tol;
             END IF;
         END IF;
 
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
     END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE COST 100;

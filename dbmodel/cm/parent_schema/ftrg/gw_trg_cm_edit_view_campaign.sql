@@ -19,10 +19,12 @@ DECLARE
     v_tablename TEXT;
     v_field_id TEXT;
     v_querytext TEXT;
+    v_prev_search_path text;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, public', TG_TABLE_SCHEMA), true);
 
       v_tablename := 'om_campaign_x_' || lower(v_feature_type);
       v_field_id  := lower(v_feature_type) || '_id';
@@ -42,6 +44,12 @@ BEGIN
 
     END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RETURN NEW;
+
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

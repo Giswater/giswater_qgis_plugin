@@ -42,8 +42,12 @@ v_feature_type TEXT;
 v_sql_feature TEXT;
 v_update_where TEXT;
 v_search_schema TEXT;
+v_prev_search_path TEXT;
 
 BEGIN
+
+	-- Save current search_path
+	v_prev_search_path := current_setting('search_path');
 
 	SET search_path = "cm", public;
 
@@ -171,8 +175,14 @@ BEGIN
 
 	DROP TABLE IF EXISTS temp_new_vals;
 
+	-- Restore previous search_path before returning
+	PERFORM set_config('search_path', v_prev_search_path, true);
 RETURN v_result;
 
+EXCEPTION WHEN OTHERS THEN
+	-- Ensure restoration on error
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RAISE;
 END;
 $function$
 ;

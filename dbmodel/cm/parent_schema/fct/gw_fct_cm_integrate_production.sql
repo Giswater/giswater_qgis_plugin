@@ -40,11 +40,14 @@ v_tot_del integer := 0;
 v_cat_result json;
 v_cat_log text;
 v_catalogs_created integer := 0;
+v_prev_search_path text;
 
 
 BEGIN
 
-   	SET search_path = "PARENT_SCHEMA", public;
+	-- Save current search_path and switch to parent schema (transaction-local)
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'PARENT_SCHEMA,public', true);
 	v_cmschema = 'cm';
    	v_parentschema = 'PARENT_SCHEMA';
 
@@ -80,19 +83,19 @@ BEGIN
 
 	     -- set querytext
 	     v_querytext :=
-        'INSERT INTO ' || v_catfeature.target_layer || ' ' ||
-        'SELECT ' || v_column_list || ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
-        'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
-        'USING (' || v_catfeature.column_id || ') ' ||
-        		'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
+       'INSERT INTO ' || v_catfeature.target_layer || ' ' ||
+       'SELECT ' || v_column_list || ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
+       'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+       'USING (' || v_catfeature.column_id || ') ' ||
+      		'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
 
-        execute v_querytext;
-        GET DIAGNOSTICS v_ins = ROW_COUNT;
-        v_tot_ins := v_tot_ins + v_ins;
+       execute v_querytext;
+       GET DIAGNOSTICS v_ins = ROW_COUNT;
+       v_tot_ins := v_tot_ins + v_ins;
 
 	    -- update (action = 2)
 		-- get columns excluding those are not used
-        SELECT string_agg(format('%I = s.%I', column_name, column_name), ', ')
+       SELECT string_agg(format('%I = s.%I', column_name, column_name), ', ')
 	    INTO v_update_list
 	    FROM information_schema.columns
 	    WHERE table_name = v_catfeature.target_layer
@@ -100,31 +103,31 @@ BEGIN
 
 
 	    v_querytext :=
-        'UPDATE ' || v_catfeature.target_layer || ' t SET ' || v_update_list ||
-        ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
-        'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
-        'USING (' || v_catfeature.column_id || ') ' ||
-        'WHERE t.' || v_catfeature.column_id || ' = s.' || v_catfeature.column_id ||
-        ' AND l.action = 2 AND l.lot_id IN (' ||
-            'SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign ||
-                 ');';
+       'UPDATE ' || v_catfeature.target_layer || ' t SET ' || v_update_list ||
+       ' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
+       'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+       'USING (' || v_catfeature.column_id || ') ' ||
+       'WHERE t.' || v_catfeature.column_id || ' = s.' || v_catfeature.column_id ||
+       ' AND l.action = 2 AND l.lot_id IN (' ||
+           'SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign ||
+                ');';
 
-        execute v_querytext;
-        GET DIAGNOSTICS v_upd = ROW_COUNT;
-        v_tot_upd := v_tot_upd + v_upd;
+       execute v_querytext;
+       GET DIAGNOSTICS v_upd = ROW_COUNT;
+       v_tot_upd := v_tot_upd + v_upd;
 
 		-- delete (action = 3)
 		v_querytext =
 		'DELETE FROM ' || v_catfeature.target_layer ||
 		' WHERE ' || v_catfeature.column_id || ' IN (SELECT ' || v_catfeature.column_id ||
 		' FROM ' || v_cmschema || '.' || v_catfeature.source_layer ||' s ' ||
-        ' JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
-        ' USING (' || v_catfeature.column_id || ') ' ||
-        	 ' WHERE action = 3 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
+       ' JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+       ' USING (' || v_catfeature.column_id || ') ' ||
+      		 ' WHERE action = 3 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
 
-        execute v_querytext;
-        GET DIAGNOSTICS v_del = ROW_COUNT;
-        v_tot_del := v_tot_del + v_del;
+       execute v_querytext;
+       GET DIAGNOSTICS v_del = ROW_COUNT;
+       v_tot_del := v_tot_del + v_del;
 
 	END LOOP;
 
@@ -156,19 +159,21 @@ BEGIN
     );
     v_result_point := COALESCE(v_result_point, '{}');
 
-	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	--  Build return and restore search_path
+	v_result := gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
   		     ',"data":{ "info":'||v_result_info||','||
-  				'"point":'||v_result_point||
-  			'}}'||
-  	    '}')::json, 3426, null, null, null);
+ 				'"point":'||v_result_point||
+ 			'}}'||
+ 	    '}')::json, 3426, null, null, null);
 
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RETURN v_result;
 
-  	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	--RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
-
+EXCEPTION WHEN OTHERS THEN
+	-- Ensure restoration on error
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RAISE;
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE

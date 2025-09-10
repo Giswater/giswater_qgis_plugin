@@ -69,11 +69,13 @@ v_explfrommacro boolean;
 v_expl_x_user boolean;
 v_project_type text;
 v_psector_current_value integer;
+v_prev_search_path text;
 
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "cm", public;
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'cm,public', true);
 	v_schemaname = 'cm';
 
 	--  get api version
@@ -246,6 +248,7 @@ BEGIN
 	    )
 	);
 
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN gw_fct_cm_getselectors(v_return::json);
 
 	--Exception handling
@@ -253,6 +256,9 @@ BEGIN
 	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
+EXCEPTION WHEN OTHERS THEN
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RAISE;
 END;
 
 $BODY$

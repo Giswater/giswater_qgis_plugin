@@ -24,8 +24,10 @@ DECLARE
 	v_team			integer;
 	v_campaign		integer;
 	v_sql			text;
+	v_prev_search_path text;
 BEGIN
-    SET search_path = "cm", public;
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
 
     -- Extract fields from JSON
     v_fields := (p_data -> 'data' -> 'fields')::json;
@@ -95,9 +97,11 @@ BEGIN
         )
     );
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN v_result;
 
 EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN json_build_object(
         'status', 'Failed',
         'message', json_build_object('level', 3, 'text', SQLERRM),

@@ -18,7 +18,11 @@ DECLARE
     v_campaign_id INTEGER;
     v_exists BOOLEAN;
 	v_new_feature BOOLEAN := false;
+	v_prev_search_path text;
 BEGIN
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', format('%I, public', TG_TABLE_SCHEMA), true);
+
     -- Get the lot_id and feature_id from the new record
     v_lot_id := NEW.lot_id;
     EXECUTE format('SELECT ($1).%I_id', v_feature)
@@ -56,14 +60,21 @@ BEGIN
 		    v_feature, v_feature)
 		USING v_campaign_id, v_feature_id, NEW.status;
 
+		PERFORM set_config('search_path', v_prev_search_path, true);
 	    RETURN NEW;
 	END IF;
 
     IF NOT v_exists THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NULL;
     END IF;
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN NEW;
+
+EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $function$
 ;

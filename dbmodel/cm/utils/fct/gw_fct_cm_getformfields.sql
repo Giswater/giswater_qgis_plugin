@@ -69,11 +69,13 @@ v_currency text;
 v_filter_widgets text = '';
 v_user_roles TEXT[];
 v_min_role TEXT;
+v_prev_search_path text;
 
 BEGIN
 
-	-- Set search path to local schema
-	SET search_path = "cm", public;
+	-- Set search path to local schema (transaction-local)
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', 'cm,public', true);
 
 	-- Get schema name
 	schemas_array := current_schemas(FALSE);
@@ -405,7 +407,8 @@ BEGIN
 	-- Convert to json
 	fields := array_to_json(fields_array);
 
-	-- Return
+	-- Restore and return
+	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN fields_array;
 
 END;

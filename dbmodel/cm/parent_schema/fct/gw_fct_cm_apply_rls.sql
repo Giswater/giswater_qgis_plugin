@@ -31,7 +31,11 @@ DECLARE
   tbls text := '';
   v_return json := '{}'::json;
   v_error_context text;
+  v_prev_search_path text;
 BEGIN
+  -- Save current search_path and switch to cm (transaction-local)
+  v_prev_search_path := current_setting('search_path');
+  PERFORM set_config('search_path', 'cm,public', true);
   -- parent schema is injected at build time via token PARENT_SCHEMA
   -- Build resolver cm.current_org_id()
   FOR r IN SELECT * FROM jsonb_array_elements(role_org_map) LOOP
@@ -325,10 +329,14 @@ BEGIN
   PERFORM cm.apply_cm_audit_rls(role_org_map);
 
   v_return := json_build_object('status','ok','roles',role_org_map,'features',p_features);
+  -- Restore previous search_path before returning
+  PERFORM set_config('search_path', v_prev_search_path, true);
   RETURN v_return;
 
 EXCEPTION WHEN OTHERS THEN
   GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+  -- Ensure restoration on error
+  PERFORM set_config('search_path', v_prev_search_path, true);
   RETURN json_build_object('status','error','sqlstate',SQLSTATE,'message',SQLERRM,'context',v_error_context);
 END;
 $$;

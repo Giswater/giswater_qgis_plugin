@@ -42,9 +42,11 @@ DECLARE
     v_formname text;
     v_input json;
     v_campaign_id text;
+    v_prev_search_path text;
 BEGIN
-    -- Set search path
-    SET search_path = "cm", public;
+    -- Set search path transaction-locally
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
 
     -- Get version (similar to campaign version)
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
@@ -164,6 +166,7 @@ BEGIN
     v_fields_json := COALESCE(v_fields_json, '{}');
 
     -- Create return JSON
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
       ',"body":{"form":' || v_forminfo ||
          ', "feature":'|| v_featureinfo ||

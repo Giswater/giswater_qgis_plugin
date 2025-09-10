@@ -29,10 +29,12 @@ DECLARE
     v_vals TEXT;
     v_sets TEXT;
     v_rec RECORD;
+    v_prev_search_path text;
 
 BEGIN
-    -- Set search path
-    SET search_path = cm, public;
+    -- Set search path transaction-locally and remember previous
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
     v_schemaname = 'cm';
 
     -- Get version
@@ -150,6 +152,7 @@ BEGIN
 	PERFORM cm.gw_fct_cm_polygon_geom(json_build_object('id', v_newid, 'name', 'campaign'));
 
     -- Return success response
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN json_build_object(
         'status', v_status,
         'message', 'Campaign saved successfully',
@@ -158,6 +161,7 @@ BEGIN
     );
 
 EXCEPTION WHEN OTHERS THEN
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN json_build_object(
         'status', 'Failed',
         'NOSQLERR', SQLERRM,

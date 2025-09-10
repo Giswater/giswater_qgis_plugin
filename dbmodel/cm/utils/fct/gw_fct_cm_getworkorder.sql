@@ -35,8 +35,10 @@ DECLARE
     aux_json        json;
     v_featureinfo   json;
     v_formname      text;
+    v_prev_search_path text;
 BEGIN
-    SET search_path = cm, public;
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
 
     EXECUTE
       'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
@@ -124,6 +126,7 @@ BEGIN
 	v_version := COALESCE(v_version, '{}');
 	v_fields_json := COALESCE(v_fields_json, '{}');
 
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN PARENT_SCHEMA.gw_fct_json_create_return(
       (
         '{"status":"Accepted",'

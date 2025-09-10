@@ -24,6 +24,7 @@ DECLARE
     v_version text;
     v_epsg integer;
     v_schemaname text;
+    v_prev_search_path text;
 
     -- variables
     v_querytext text;
@@ -32,7 +33,9 @@ DECLARE
 
 BEGIN
 
-    SET search_path = 'pg_temp', 'cm', 'public';
+    -- Save current search_path and switch to cm (transaction-local)
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'pg_temp,cm,public', true);
     v_schemaname := 'cm';
 
     SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
@@ -95,8 +98,14 @@ BEGIN
             '}'||
         '}}')::json;
     --  Return
+    -- Restore previous search_path before returning
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN v_return;
 
+EXCEPTION WHEN OTHERS THEN
+    -- Ensure restoration on error
+    PERFORM set_config('search_path', v_prev_search_path, true);
+    RAISE;
 END;
 $function$
 ; 

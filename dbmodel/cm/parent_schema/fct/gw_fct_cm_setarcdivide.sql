@@ -55,9 +55,12 @@ DECLARE
     v_new_arc1_id integer;
     v_new_arc2_id integer;
 
+    v_prev_search_path text;
+
 BEGIN
-    -- Search path
-    SET search_path = "cm", public;
+    -- Search path (transaction-local)
+    v_prev_search_path := current_setting('search_path');
+    PERFORM set_config('search_path', 'cm,public', true);
     v_schemaname = 'cm';
 
     v_node_id := (p_data->'feature'->'id'->>0)::integer;
@@ -67,10 +70,12 @@ BEGIN
     
     SELECT the_geom, state INTO v_node_geom, v_state_node FROM PARENT_SCHEMA.node WHERE node_id = v_node_id;
     IF v_node_geom IS NULL THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'Failed', 'message', 'Node not found');
     END IF;
 
     IF v_state_node = 0 THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'Failed', 'message', 'Node state is 0');
     END IF;
 
@@ -88,6 +93,7 @@ BEGIN
     END IF;
     
     IF v_isarcdivide IS NOT TRUE THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'Failed', 'message', 'Node type is not configured to divide arcs');
     END IF;
 
@@ -116,10 +122,12 @@ BEGIN
     ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
 
     IF v_arc_id IS NULL THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'Failed', 'message', 'No arc found to divide within tolerance');
     END IF;
 
     IF v_state_arc = 0 THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'Failed', 'message', 'Arc state is 0');
     END IF;
     
@@ -131,6 +139,7 @@ BEGIN
     v_line2 := ST_LineSubstring(v_arc_geom, v_intersect_loc, 1.0);
 
     IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
+        PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN json_build_object('status', 'Failed', 'message', 'Division point is at the start or end of the arc');
     END IF;
 
@@ -284,6 +293,7 @@ BEGIN
     v_message := 'Arc ' || v_arc_id || ' divided into ' || v_new_arc1_id || ' and ' || v_new_arc2_id;
 
     -- Return
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN json_build_object(
         'status', v_status, 
         'message', v_message,
@@ -293,6 +303,7 @@ BEGIN
 
 EXCEPTION WHEN OTHERS THEN
     GET STACKED DIAGNOSTICS v_message = PG_EXCEPTION_CONTEXT;
+    PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN json_build_object('status', 'Failed', 'message', SQLERRM, 'context', v_message);
 END;
 $BODY$

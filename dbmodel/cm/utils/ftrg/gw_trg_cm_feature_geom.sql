@@ -15,8 +15,12 @@ DECLARE
 	v_feature TEXT := TG_ARGV[0];
 	v_campaign integer;
 	id_value bigint;
+	v_prev_search_path text;
 
 BEGIN
+	v_prev_search_path := current_setting('search_path');
+	PERFORM set_config('search_path', format('%I, PARENT_SCHEMA, public', TG_TABLE_SCHEMA), true);
+
 	SELECT campaign_id INTO v_campaign FROM om_campaign_lot WHERE lot_id = NEW.lot_id;
 	
 	-- perform only when insert or the geometry is different
@@ -41,7 +45,11 @@ BEGIN
 
 	END IF;
 
+	PERFORM set_config('search_path', v_prev_search_path, true);
     RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RAISE;
 END;
 $function$
 ; 
