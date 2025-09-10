@@ -213,6 +213,7 @@ class GwRecursiveEpa(GwTask):
         if self.function_failed:
             if self.json_result is None or not self.json_result:
                 msg = "Function failed finished"
+                msg_params = (self.function_name,)
                 tools_log.log_warning(msg, msg_params=msg_params)
             if self.complet_result:
                 if 'status' in self.complet_result:
@@ -607,6 +608,7 @@ class GwRecursiveEpa(GwTask):
         json_rpt = '[' + str(json_rpt[:-2]) + ']'
         self.json_rpt = json_rpt
 
+        self.json_rpt = self.json_rpt.replace("\\", "/")
         self._close_file()
         del full_file
 

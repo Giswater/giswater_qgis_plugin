@@ -263,7 +263,7 @@ class GwGo2EpaManagerButton(GwAction):
             # check network type
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_type')
             network_type = index.sibling(row, col_idx).data()
-        if not selected_rows or network_type == 'NETWORK DMA':
+        if not selected_rows or network_type == 'NETWORK DMA' or len(selected_rows) > 1:
             set_corporate_enabled, archive_enabled = False, False
         self.dlg_manager.btn_toggle_corporate.setEnabled(set_corporate_enabled)
         self.dlg_manager.btn_archive.setEnabled(archive_enabled)
