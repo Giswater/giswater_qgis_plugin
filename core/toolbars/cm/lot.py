@@ -165,7 +165,7 @@ class AddNewLot:
 
         self_variables = {"selection_mode": GwSelectionMode.LOT, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_lot, "table_object": "lot"}
-        used_tools = ["freehand"]
+        used_tools = ["rectangle", "polygon", "freehand", "circle"]
         menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection}
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._select_by_expression}
@@ -310,6 +310,9 @@ class AddNewLot:
         if campaign_sector_id is not None:
             self.set_widget_value(sector_combo, campaign_sector_id)
             sector_combo.setEnabled(False)
+
+        # Update relations tab enable/disable based on campaign relations
+        self._check_enable_tab_relations()
 
     def load_lot_dialog(self, lot_id: Optional[int]):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
@@ -521,10 +524,23 @@ class AddNewLot:
 
     def _check_enable_tab_relations(self):
         name_widget = self.get_widget_by_columnname(self.dlg_lot, "name")
-        if not name_widget:
-            return
+        name_ok = bool(name_widget.text().strip()) if name_widget else False
 
-        enable = bool(name_widget.text().strip())
+        campaign_combo = self.dlg_lot.findChild(QComboBox, "tab_data_campaign_id")
+        campaign_id = campaign_combo.currentData() if campaign_combo else None
+
+        has_relations = False
+        if campaign_id:
+            features = ["arc", "node", "connec", "link"]
+            if tools_gw.get_project_type() == 'ud':
+                features.append("gully")
+            for feature in features:
+                sql = f"SELECT 1 FROM cm.om_campaign_x_{feature} WHERE campaign_id = {campaign_id} LIMIT 1"
+                if tools_db.get_row(sql):
+                    has_relations = True
+                    break
+
+        enable = name_ok and has_relations
         self.dlg_lot.tab_widget.setTabEnabled(self.dlg_lot.tab_widget.indexOf(self.dlg_lot.RelationsTab), enable)
 
     def _on_tab_change(self, index: int):
