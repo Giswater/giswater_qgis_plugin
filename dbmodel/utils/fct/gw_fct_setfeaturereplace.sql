@@ -603,6 +603,11 @@ BEGIN
 			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_id||''';';
 		END IF;
 
+		-- when the arc is obsolete, set node_1 and node_2 to null
+		IF v_feature_type = 'arc' THEN
+			UPDATE arc SET node_1 = NULL, node_2 = NULL WHERE arc_id = v_old_id;
+		END IF;
+
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3302", "function":"2714", "parameters":{"v_old_id":"'||v_old_id||'", "v_workcat_id_end":"'||quote_nullable(v_workcat_id_end)||'", "v_enddate":"'||quote_nullable(v_enddate)||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
