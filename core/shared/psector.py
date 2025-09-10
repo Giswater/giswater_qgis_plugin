@@ -1026,6 +1026,7 @@ class GwPsector:
                     tools_db.execute_sql(sql)
                     self.update = True
                     self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
+                    self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
                     tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id[0], do_call_fct=False, force_change=True)
 
         sql = ("UPDATE config_param_user "
