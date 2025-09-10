@@ -1846,7 +1846,7 @@ BEGIN
 				d.expl_id = ARRAY[0], d.muni_id = ARRAY[0], d.sector_id = ARRAY[0],
 				updated_at = now(),
 				updated_by = current_user
-				WHERE exists en old_drainzone and not exists in temp_pgr_mapzone(drainzone_id amb geometria);
+				WHERE exists en old_drainzone and not exists in temp_pgr_mapzone(drainzone_id);
 				*/
 			END IF;
 		END IF;
