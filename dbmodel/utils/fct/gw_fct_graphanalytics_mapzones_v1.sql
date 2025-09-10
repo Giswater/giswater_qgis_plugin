@@ -496,7 +496,7 @@ BEGIN
 	IF v_from_zero = TRUE THEN
 		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_table_name
 		INTO v_mapzone_id;
-		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(v_mapzone_name, m.id);
+		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_mapzone_name), m.id);
 	ELSE
 		IF v_netscenario IS NOT NULL THEN
 			IF v_mapzone_name = 'DMA' THEN
@@ -1256,7 +1256,7 @@ BEGIN
 				v_query_text_aux := '
 					sector_id = CASE
 						WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.sector_ids
-						ELSE NULL
+						ELSE ARRAY[0]
 					END,
 				';
 			ELSE
@@ -1267,11 +1267,11 @@ BEGIN
 			UPDATE '||v_table_name||' m
 				SET expl_id = CASE
     				WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.expl_ids
-    				ELSE NULL
+    				ELSE ARRAY[0] 
 				END,
 				muni_id = CASE
     				WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.muni_ids
-					ELSE NULL
+					ELSE ARRAY[0]
 				END,
 				'||v_query_text_aux||'
 				updated_at = now(),
