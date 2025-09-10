@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import QSettings
 from ....ui.ui_manager import RecursiveEpaUi
 from ....threads.recursive_epa import GwRecursiveEpa
 from ..... import global_vars
-from .....libs import tools_qt
+from .....libs import tools_qt, lib_vars
 from ....utils import tools_gw
 
 
@@ -96,7 +96,7 @@ class RecursiveEpa():
                 inf_text += f"\n{list3}"
         response = tools_qt.show_question(msg, inf_text=inf_text, force_action=True)
         if response:
-            self.recursive_epa = GwRecursiveEpa("Recursive Go2Epa", prefix, folder_path, settings, global_vars.plugin_dir)
+            self.recursive_epa = GwRecursiveEpa("Recursive Go2Epa", prefix, folder_path, settings, lib_vars.plugin_dir)
             self.recursive_epa.change_btn_accept.connect(self._enable_cancel_btn)
             self.recursive_epa.time_changed.connect(self._set_remaining_time)
             QgsApplication.taskManager().addTask(self.recursive_epa)
