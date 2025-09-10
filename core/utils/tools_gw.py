@@ -3728,6 +3728,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     if not table_widgets:
         return
     table_widget = table_widgets[0]
+    table_widget.blockSignals(True)
 
     model = table_widget.model()
     selection_model = table_widget.selectionModel()
@@ -3738,6 +3739,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         table_ids = [
             str(get_model_index(model, row, field_id)) for row in range(model.rowCount())
         ]
+    table_ids_original = table_ids.copy()
 
     # Ensure dictionary and list exist for storing feature IDs per feature type
     if not hasattr(class_object, "list_ids"):
@@ -3761,15 +3763,12 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
                         if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
                             class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
     # Ensure selections are added even if the table was initially empty
-    if not table_ids and selected_ids:
+    if not table_ids_original and selected_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = selected_ids
-    # Prevent UI interference while updating the table
-    table_widget.blockSignals(True)
-    expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
-
+    
     ids_to_insert = []
     for id in class_object.rel_list_ids[class_object.rel_feature_type]:
-        if id not in table_ids:
+        if id not in table_ids_original:
             ids_to_insert.append(id)
 
     do_insert = False
@@ -3778,6 +3777,8 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         msg_params = (", ".join(ids_to_insert), )
         do_insert = tools_qt.show_question(msg, msg_params=msg_params)
 
+    # Prevent UI interference while updating the table
+    expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
     if selection_mode == GwSelectionMode.PSECTOR and do_insert:
         _insert_feature_psector(dialog, class_object.rel_feature_type, ids=ids_to_insert)
         remove_selection()

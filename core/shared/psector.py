@@ -274,14 +274,10 @@ class GwPsector:
             partial(self._manage_tab_feature_buttons))
         viewname = 've_plan_psector_x_other'
 
-        self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector"}
+        self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector", "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
         menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"]}
-        highlight_variables = {"callback_values": self.callback_values}
-        invert_selection = True
-        zoom_to_selection = True
-        selection_on_top = True
-        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, highlight_variables=highlight_variables, invert_selection=invert_selection, zoom_to_selection=zoom_to_selection, selection_on_top=selection_on_top)
+        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables)
         self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
 
         self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))

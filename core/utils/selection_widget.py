@@ -31,8 +31,7 @@ class GwSelectionWidget(QWidget):
     """
 
     def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None,
-                 highlight_variables: dict = None, invert_selection: bool = False, expression_selection: dict = None,
-                 zoom_to_selection: bool = False, selection_on_top: bool = False):
+                 highlight_variables: dict = None, expression_selection: dict = None):
         """
         Initialize the selection widget.
         
@@ -40,7 +39,6 @@ class GwSelectionWidget(QWidget):
             parent: Parent widget
             menu_variables: Dict for menu button initialization
             highlight_variables: Dict for highlight features methods
-            invert_selection: Dict for invert selection functionality
         """
         super().__init__()
 
@@ -61,16 +59,16 @@ class GwSelectionWidget(QWidget):
             self.init_highlight_features_methods(**general_variables, **highlight_variables)
 
         # Invert selection
-        if invert_selection:
+        if self_varibles.get("invert_selection", False):
             self.init_invert_selection(**general_variables)
 
         if expression_selection:
             self.init_expression_selection(**general_variables, **expression_selection)
 
-        if zoom_to_selection:
+        if self_varibles.get("zoom_to_selection", False):
             self.init_zoom_to_selection(**general_variables)
 
-        if selection_on_top:
+        if self_varibles.get("selection_on_top", False):
             self.init_selection_on_top(**general_variables)
 
     # region utility functions

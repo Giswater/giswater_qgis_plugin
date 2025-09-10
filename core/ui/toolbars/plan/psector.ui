@@ -152,7 +152,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_17">
+        <layout class="QHBoxLayout" name="lyt_selection">
          <item>
           <widget class="QLineEdit" name="feature_id"/>
          </item>
