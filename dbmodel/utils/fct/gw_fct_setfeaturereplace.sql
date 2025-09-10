@@ -604,7 +604,7 @@ BEGIN
 		END IF;
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3302", "function":"2714", "parameters":{"v_old_id":"'||v_old_id||'", "v_workcat_id_end":"'||v_workcat_id_end||'", "v_enddate":"'||v_enddate||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3302", "function":"2714", "parameters":{"v_old_id":"'||v_old_id||'", "v_workcat_id_end":"'||quote_nullable(v_workcat_id_end)||'", "v_enddate":"'||quote_nullable(v_enddate)||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 		IF v_id IS NOT NULL THEN
 			IF v_workcat_id_end IS NOT NULL THEN
@@ -616,7 +616,7 @@ BEGIN
 			END IF;
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3304", "function":"2714", "parameters":{"v_workcat_id_end":"'||v_workcat_id_end||'", "v_enddate":"'||v_enddate||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
+                       "data":{"message":"3304", "function":"2714", "parameters":{"v_workcat_id_end":"'||quote_nullable(v_workcat_id_end)||'", "v_enddate":"'||quote_nullable(v_enddate)||'"}, "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3306", "function":"2714", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true}}$$)';
