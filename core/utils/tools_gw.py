@@ -41,7 +41,7 @@ from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
 from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
-from ..ui.ui_manager import GwSelectorUi
+from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
@@ -4892,8 +4892,14 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         body = create_body(extras=extras)
 
         # Execute the stored procedure
-        execute_procedure("gw_fct_set_toggle_current", body)
+        result = execute_procedure("gw_fct_set_toggle_current", body)
         global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
+
+        kwargs = {
+            "dialog": "__self__.dlg_psector_mng",
+            "result": result
+        }
+        execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
