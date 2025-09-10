@@ -25,6 +25,7 @@ from ...utils.selection_mode import GwSelectionMode
 from ...utils.selection_widget import GwSelectionWidget
 from ....global_vars import GwFeatureTypes
 
+
 class AddNewLot:
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
