@@ -4803,8 +4803,13 @@ def refresh_selectors(tab_name=None):
             pass
 
 
-def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
-    """ Executes a class' function (if the corresponding dialog is open) """
+def execute_class_function(dlg_class, func_name: str, kwargs: Optional[dict] = None):
+    """ 
+    Executes a class' function (if the corresponding dialog is open). 
+    kwargs can be a dictionary with the arguments to pass to the function.
+    If the argument is a string starting with '__self__', it will be replaced with the corresponding attribute of the class_obj.
+    (e.g. '__self__.dlg_psector_mng' will be replaced with self.dlg_psector_mng (self is the class_obj))
+    """
 
     # Get the dialog if it's open
     windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
@@ -4816,6 +4821,9 @@ def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
                 kwargs = {}
             dialog = windows[0]
             class_obj = dialog.property('class_obj')
+            for key, value in kwargs.items():
+                if isinstance(value, str) and value.startswith('__self__'):
+                    kwargs[key] = getattr(class_obj, value.split('.')[1])
             getattr(class_obj, func_name)(**kwargs)
         except Exception as e:
             msg = "Exception in {0} (executing {1} from {2}): {3}"
