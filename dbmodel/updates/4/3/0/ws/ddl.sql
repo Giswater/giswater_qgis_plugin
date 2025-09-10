@@ -7,3 +7,5 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"rpt_inp_pattern_value", "column":"result_id", "dataType":"varchar(100)"}}$$);

@@ -148,7 +148,7 @@ BEGIN
 
 	IF v_status = 'Accepted' THEN
 
-		v_stats = (SELECT array_to_json(array_agg(error_message)) FROM temp_audit_check_data WHERE result_id='stats' AND fid=114 AND cur_user=current_user);
+		v_stats = (SELECT array_to_json(array_agg(error_message)) FROM temp_audit_check_data WHERE result_id=p_result AND fid=114 AND cur_user=current_user);
 
 		UPDATE rpt_cat_result SET rpt_stats = v_stats WHERE result_id=p_result;
 
