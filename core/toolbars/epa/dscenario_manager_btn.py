@@ -498,7 +498,8 @@ class GwDscenarioManagerButton(GwAction):
         # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
         tools_qt.set_tableview_config(self.tbl_dscenario)
         # Optionally set current scenario label if context provided
-        if dialog is not None and scenario_type is not None:
+        
+        if dialog is not None and dialog.findChild(QWidget, 'lbl_vdefault_dscenario').isVisible() and scenario_type is not None:
             self._set_label_current_dscenario_type(dialog, scenario_type=scenario_type, from_open_dialog=True)
         return complet_list
 
