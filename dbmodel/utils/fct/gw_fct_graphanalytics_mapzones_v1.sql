@@ -496,7 +496,7 @@ BEGIN
 	IF v_from_zero = TRUE THEN
 		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_table_name
 		INTO v_mapzone_id;
-		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(v_mapzone_name, '-', m.id);
+		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(v_mapzone_name, m.id);
 	ELSE
 		IF v_netscenario IS NOT NULL THEN
 			IF v_mapzone_name = 'DMA' THEN
@@ -1153,7 +1153,7 @@ BEGIN
 			IF v_from_zero = TRUE THEN
 				IF v_project_type = 'WS' THEN
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], ARRAY[0], m.the_geom, now(), current_user,
+					SELECT m.mapzone_id[1], m.mapzone_id[1], m.name, ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
 							json_build_object(
@@ -1165,7 +1165,7 @@ BEGIN
 					FROM temp_pgr_mapzone m
 					JOIN temp_pgr_node n ON n.mapzone_id = m.component
 					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
-					GROUP BY m.mapzone_id[1], m.the_geom';
+					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 
 					-- update to_arc in man_ tables
 					FOR rec_man IN
@@ -1185,7 +1185,7 @@ BEGIN
 
 				ELSE
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
-					SELECT m.mapzone_id[1], m.mapzone_id[1], m.mapzone_id[1], ARRAY[0], m.the_geom, now(), current_user,
+					SELECT m.mapzone_id[1], m.mapzone_id[1], m.name, ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
 							json_build_object(
@@ -1196,7 +1196,7 @@ BEGIN
 					FROM temp_pgr_mapzone m
 					JOIN temp_pgr_node n ON n.mapzone_id = m.component
 					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
-					GROUP BY m.mapzone_id[1], m.the_geom';
+					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 				END IF;
 				EXECUTE v_query_text;
 
