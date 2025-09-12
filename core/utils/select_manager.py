@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import math
+from enum import Enum
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtCore import Qt
@@ -19,14 +20,28 @@ from ..utils.snap_manager import GwSnapManager
 from .selection_mode import GwSelectionMode
 
 
+class GwSelectionType(Enum):
+    """Enum for different selection types"""
+    RECTANGLE = "rectangle"
+    POLYGON = "polygon" 
+    CIRCLE = "circle"
+    FREEHAND = "freehand"
+    POINT = "point"  # Single point selection mode
+    DEFAULT = "rectangle"  # Default to rectangle for backward compatibility
+
+
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, save_rectangle=False):
+    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, 
+                 save_rectangle=False, selection_type: GwSelectionType = GwSelectionType.DEFAULT):
         """
-        :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
+        Unified selection manager supporting multiple selection types
+        :param class_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)
         :param dialog: (QDialog)
         :param selection_mode: (GwSelectionMode)
+        :param save_rectangle: (Boolean) Whether to save rectangle coordinates
+        :param selection_type: (GwSelectionType) Type of selection tool to use
         """
 
         self.class_object = class_object
@@ -36,105 +51,88 @@ class GwSelectManager(QgsMapTool):
         self.dialog = dialog
         self.selection_mode = selection_mode
         self.save_rectangle = save_rectangle
+        self.selection_type = selection_type
         
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
         self.snapper_manager = GwSnapManager(self.iface)
 
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, "line")
+        # Initialize rubber bands for different selection types
+        self._init_rubber_bands()
+        
+        # Common properties
+        self.selected_features = []
+        self._reset_selection()
+        
+    def _init_rubber_bands(self):
+        """Initialize rubber bands based on selection type"""
+        # Always use polygon type for rubber band to support filled rectangles
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, "polygon")
+            
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(2)
-        self._reset_selection()
-        self.selected_features = []
-
-        tools_qgis.refresh_map_canvas()
+        
+        # Additional rubber band for circle center marker
+        if self.selection_type == GwSelectionType.CIRCLE:
+            self.center_marker = tools_gw.create_rubberband(self.canvas, "point")
+            self.center_marker.setColor(QColor(255, 0, 0))
+            self.center_marker.setWidth(3)
+            self.center_marker.setIconSize(8)
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasPressEvent(self, event):
-
         if event.button() == Qt.LeftButton:
-            self.start_point = self.toMapCoordinates(event.pos())
-            self.end_point = self.start_point
-            self.is_emitting_point = True
-            self._show_rectangle(self.start_point, self.end_point)
+            point = self.toMapCoordinates(event.pos())
+            
+            if self.selection_type == GwSelectionType.POINT:
+                self._handle_point_selection(event)
+            elif self.selection_type in [GwSelectionType.RECTANGLE, GwSelectionType.DEFAULT]:
+                self._handle_rectangle_press(point)
+            elif self.selection_type == GwSelectionType.POLYGON:
+                self._handle_polygon_press(point)
+            elif self.selection_type == GwSelectionType.CIRCLE:
+                self._handle_circle_press(point)
+            elif self.selection_type == GwSelectionType.FREEHAND:
+                self._handle_freehand_press(point)
+                
         elif event.button() == Qt.RightButton:
-            # Right-click deletes/cancels the drawing
-            self.rubber_band.hide()
-            self.is_emitting_point = False
-            self.start_point = None
-            self.end_point = None
+            self._handle_right_click()
 
     def canvasReleaseEvent(self, event):
-
-        self.is_emitting_point = False
-        rectangle = self._get_rectangle()
-        if self.save_rectangle:
-            xmin = rectangle.xMinimum()
-            xmax = rectangle.xMaximum()
-            ymin = rectangle.yMinimum()
-            ymax = rectangle.yMaximum()
-            tools_qt.set_widget_text(self.save_rectangle, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
-            self.rubber_band.hide()
-            return
-        selected_rectangle = None
-
-        if QApplication.keyboardModifiers() in (Qt.ControlModifier, (Qt.ControlModifier | Qt.ShiftModifier)):
-            unselect = True
+        if event.button() == Qt.LeftButton:
+            if self.selection_type == GwSelectionType.POINT:
+                # Point selection is handled in canvasPressEvent
+                pass
+            elif self.selection_type in [GwSelectionType.RECTANGLE, GwSelectionType.DEFAULT]:
+                self._handle_rectangle_release(event)
+            elif self.selection_type == GwSelectionType.CIRCLE:
+                self._handle_circle_release(event)
+            elif self.selection_type == GwSelectionType.FREEHAND:
+                self._handle_freehand_release(event)
         else:
-            unselect = False
-
-        if event.button() != Qt.LeftButton:
             self.rubber_band.hide()
-            return
-
-        # Reconnect signal to enhance process
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
-        for i, layer in enumerate(self.class_object.rel_layers[self.class_object.rel_feature_type]):
-            # Selection by rectangle
-            if rectangle:
-                if selected_rectangle is None:
-                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
-                # If Ctrl or Ctrl+Shift clicked: remove features to selection
-                if unselect:
-                    layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
-                # If not clicked: add features to selection
-                else:
-                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
-
-            # Selection one by one
-            else:
-                event_point = self.snapper_manager.get_event_point(event)
-                result = self.snapper_manager.snap_to_project_config_layers(event_point)
-                if result.isValid():
-                    # Get the point. Leave selection
-                    self.snapper_manager.get_snapped_feature(result, True)
-
-        self.rubber_band.hide()
-
-        # Check system variable to keep drawing
-        keep_drawing = tools_gw.get_config_parser('dialogs_actions', 'keep_drawing', "user", "init", prefix=False)
-        keep_drawing = tools_os.set_boolean(keep_drawing, False)
-
-        if keep_drawing:
-            global_vars.canvas.setMapTool(GwSelectManager(self.class_object, self.table_object, self.dialog, self.selection_mode))
-            cursor = tools_gw.get_cursor_multiple_selection()
-            global_vars.canvas.setCursor(cursor)
 
     def canvasMoveEvent(self, event):
-
-        if not self.is_emitting_point:
-            return
-
-        self.end_point = self.toMapCoordinates(event.pos())
-        self._show_rectangle(self.start_point, self.end_point)
+        point = self.toMapCoordinates(event.pos())
+        
+        if self.selection_type in [GwSelectionType.RECTANGLE, GwSelectionType.DEFAULT]:
+            self._handle_rectangle_move(point)
+        elif self.selection_type == GwSelectionType.POLYGON:
+            self._handle_polygon_move(point)
+        elif self.selection_type == GwSelectionType.CIRCLE:
+            self._handle_circle_move(point)
+        elif self.selection_type == GwSelectionType.FREEHAND:
+            self._handle_freehand_move(event, point)
 
     def deactivate(self):
-
         self.rubber_band.hide()
+        if hasattr(self, 'center_marker'):
+            self.center_marker.hide()
+        if hasattr(self.iface, 'statusBarIface'):
+            self.iface.statusBarIface().clearMessage()
         QgsMapTool.deactivate(self)
 
     def activate(self):
@@ -143,25 +141,82 @@ class GwSelectManager(QgsMapTool):
     def keyPressEvent(self, event):
         """Handle keyboard input"""
         if event.key() == Qt.Key_Escape:
-            # Escape key deletes/cancels the drawing
-            self.rubber_band.hide()
-            self.is_emitting_point = False
-            self.start_point = None
-            self.end_point = None
+            self._clear_drawing()
+        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            if self.selection_type == GwSelectionType.CIRCLE and hasattr(self, 'center_point') and self.center_point:
+                self._finish_circle_selection(self.center_point, getattr(self, 'current_radius', 0))
 
     # endregion
 
     # region private functions
 
     def _reset_selection(self):
-        """ Reset values """
+        """Reset values for all selection types"""
+        # Rectangle/Default
         self.start_point = None
         self.end_point = None
         self.is_emitting_point = False
+        
+        # Polygon
+        self.points = []
+        self.is_drawing = False
+        
+        # Circle
+        self.center_point = None
+        self.current_radius = 0
+        
+        # Freehand
+        self.min_distance = 5.0
+        
         self._reset_rubber_band()
 
-    def _show_rectangle(self, start_point, end_point):
+    def _clear_drawing(self):
+        """Clear all drawing elements"""
+        self.rubber_band.hide()
+        if hasattr(self, 'center_marker'):
+            self.center_marker.hide()
+        self._reset_selection()
 
+    def _reset_rubber_band(self):
+        try:
+            # Always use polygon type for rubber band
+            tools_gw.reset_rubberband(self.rubber_band, "polygon")
+        except Exception:
+            pass
+
+    # Rectangle selection handlers
+    def _handle_rectangle_press(self, point):
+        self.start_point = point
+        self.end_point = self.start_point
+        self.is_emitting_point = True
+        self._show_rectangle(self.start_point, self.end_point)
+
+    def _handle_rectangle_move(self, point):
+        if not self.is_emitting_point:
+            return
+        self.end_point = point
+        self._show_rectangle(self.start_point, self.end_point)
+
+    def _handle_rectangle_release(self, event):
+        self.is_emitting_point = False
+        rectangle = self._get_rectangle()
+        
+        if self.save_rectangle and rectangle:
+            xmin = rectangle.xMinimum()
+            xmax = rectangle.xMaximum()
+            ymin = rectangle.yMinimum()
+            ymax = rectangle.yMaximum()
+            tools_qt.set_widget_text(self.save_rectangle, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
+            self.rubber_band.hide()
+            return
+
+        if event.button() != Qt.LeftButton:
+            self.rubber_band.hide()
+            return
+
+        self._perform_selection(rectangle, event)
+
+    def _show_rectangle(self, start_point, end_point):
         self._reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
@@ -178,65 +233,21 @@ class GwSelectManager(QgsMapTool):
         self.rubber_band.show()
 
     def _get_rectangle(self):
-
         if self.start_point is None or self.end_point is None:
             return None
         elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():
             return None
-
         return QgsRectangle(self.start_point, self.end_point)
 
-    def _reset_rubber_band(self):
+    # Polygon selection handlers
+    def _handle_polygon_press(self, point):
+        self.points.append(point)
+        self.is_drawing = True
+        self._update_polygon()
 
-        try:
-            tools_gw.reset_rubberband(self.rubber_band, "polygon")
-        except Exception:
-            pass
-
-    # endregion
-
-
-class GwPolygonSelectManager(QgsMapTool):
-    """Polygon selection tool"""
-
-    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
-        self.class_object = class_object
-        self.iface = global_vars.iface
-        self.canvas = global_vars.canvas
-        self.table_object = table_object
-        self.dialog = dialog
-        self.selection_mode = selection_mode
-        
-        QgsMapTool.__init__(self, self.canvas)
-        self.snapper_manager = GwSnapManager(self.iface)
-        
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, "polygon")
-        self.rubber_band.setColor(QColor(255, 100, 255))
-        self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
-        self.rubber_band.setWidth(2)
-        self.points = []
-        self.is_drawing = False
-
-        tools_qgis.refresh_map_canvas()
-
-    def activate(self):
-        """Activate the tool and preselect features."""
-        pass
-
-    def canvasPressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            point = self.toMapCoordinates(event.pos())
-            self.points.append(point)
-            self.is_drawing = True
-            self._update_polygon()
-        elif event.button() == Qt.RightButton:
-            # Finish polygon and select
-            self._finish_selection()
-
-    def canvasMoveEvent(self, event):
+    def _handle_polygon_move(self, point):
         if self.is_drawing and self.points:
-            # Show preview of polygon
-            temp_points = self.points + [self.toMapCoordinates(event.pos())]
+            temp_points = self.points + [point]
             self._draw_polygon(temp_points)
 
     def _update_polygon(self):
@@ -249,114 +260,28 @@ class GwPolygonSelectManager(QgsMapTool):
             self.rubber_band.addPoint(point, i == len(points) - 1)
         self.rubber_band.show()
 
-    def _finish_selection(self):
-        if len(self.points) < 3:
-            return
-
-        # Create polygon geometry
-        polygon = QgsGeometry.fromPolygonXY([self.points])
-
-        if QApplication.keyboardModifiers() in (Qt.ControlModifier, (Qt.ControlModifier | Qt.ShiftModifier)):
-            unselect = True
-        else:
-            unselect = False
-        
-        # Reconnect signal
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
-        
-        # Select features within polygon using precise geometry predicate
-        wkt = polygon.asWkt()
-        behavior = QgsVectorLayer.RemoveFromSelection if unselect else QgsVectorLayer.AddToSelection
-        for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-            layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
-
-        # Clean up
-        self.rubber_band.hide()
-        self.points = []
-        self.is_drawing = False
-
-    def deactivate(self):
-        self.rubber_band.hide()
-        QgsMapTool.deactivate(self)
-
-    def keyPressEvent(self, event):
-        """Handle keyboard input"""
-        if event.key() == Qt.Key_Escape:
-            self.rubber_band.hide()
-            self.points = []
-            self.is_drawing = False
-
-
-class GwCircleSelectManager(QgsMapTool):
-    """Circle selection tool - Two-click method: first click for center, second click for radius"""
-
-    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
-        self.class_object = class_object
-        self.iface = global_vars.iface
-        self.canvas = global_vars.canvas
-        self.table_object = table_object
-        self.dialog = dialog
-        self.selection_mode = selection_mode
-        
-        QgsMapTool.__init__(self, self.canvas)
-        self.snapper_manager = GwSnapManager(self.iface)
-        
-        # Create rubber band for circle outline
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, "polygon")
-        self.rubber_band.setColor(QColor(255, 100, 255))
-        self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
-        self.rubber_band.setWidth(2)
-        
-        # Create center point marker
-        self.center_marker = tools_gw.create_rubberband(self.canvas, "point")
-        self.center_marker.setColor(QColor(255, 0, 0))
-        self.center_marker.setWidth(3)
-        self.center_marker.setIconSize(8)
-        
-        self.center_point = None
-        self.step = 0  # 0 = waiting for center, 1 = waiting for radius
-        self.current_radius = 0
-
-        tools_qgis.refresh_map_canvas()
-
-    def activate(self):
-        """Activate the tool and preselect features."""
-        pass
-
-    def canvasPressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            # First click: set center point
-            self.center_point = self.toMapCoordinates(event.pos())
-            
-            # Show center point marker
+    # Circle selection handlers
+    def _handle_circle_press(self, point):
+        self.center_point = point
+        if hasattr(self, 'center_marker'):
             self.center_marker.reset()
             self.center_marker.addPoint(self.center_point)
             self.center_marker.show()
 
-        elif event.button() == Qt.RightButton:
-            # Right-click deletes/cancels the drawing
-            self._clear_drawing()
-
-    def canvasMoveEvent(self, event):
+    def _handle_circle_move(self, point):
         if self.center_point:
-            # Show preview circle while moving mouse
-            current_point = self.toMapCoordinates(event.pos())
             self.current_radius = math.sqrt(
-                (current_point.x() - self.center_point.x())**2 + 
-                (current_point.y() - self.center_point.y())**2
+                (point.x() - self.center_point.x())**2 + 
+                (point.y() - self.center_point.y())**2
             )
             self._draw_circle(self.center_point, self.current_radius)
             
-            # Update status bar with radius info
             if hasattr(self.iface, 'statusBarIface'):
                 radius_text = f"Circle radius: {self.current_radius:.2f} map units - Click to confirm"
                 self.iface.statusBarIface().showMessage(radius_text, 0)
 
-    def canvasReleaseEvent(self, event):
-        # Consume all release events to prevent canvas panning
-        if event.button() == Qt.LeftButton:
-            # Second click: set radius and complete selection
+    def _handle_circle_release(self, event):
+        if self.center_point:
             current_point = self.toMapCoordinates(event.pos())
             self.current_radius = math.sqrt(
                 (current_point.x() - self.center_point.x())**2 + 
@@ -364,31 +289,16 @@ class GwCircleSelectManager(QgsMapTool):
             )
             
             if self.current_radius > 0:
-                self._finish_selection(self.center_point, self.current_radius)
+                self._finish_circle_selection(self.center_point, self.current_radius)
             else:
                 self._clear_drawing()
 
-    def canvasDoubleClickEvent(self, event):
-        # Not needed for two-click method
-        pass
-
-    def keyPressEvent(self, event):
-        """Handle keyboard input"""
-        if event.key() == Qt.Key_Escape:
-            self._clear_drawing()
-        elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
-            if self.step == 1 and self.center_point and self.current_radius > 0:
-                self._finish_selection(self.center_point, self.current_radius)
-
     def _draw_circle(self, center, radius, segments=64):
-        """Draw circle with more segments for smoother appearance"""
         if radius <= 0:
             return
             
-        # Reset rubber band with polygon geometry type
         self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
         
-        # Create circle points
         points = []
         for i in range(segments):
             angle = 2 * math.pi * i / segments
@@ -396,191 +306,223 @@ class GwCircleSelectManager(QgsMapTool):
             y = center.y() + radius * math.sin(angle)
             points.append(QgsPointXY(x, y))
         
-        # Create polygon geometry from points
         if points:
             circle_polygon = QgsGeometry.fromPolygonXY([points])
             self.rubber_band.setToGeometry(circle_polygon, None)
         
         self.rubber_band.show()
 
-    def _finish_selection(self, center, radius, keep_visible=False):
-        """Complete the circle selection"""
+    def _finish_circle_selection(self, center, radius):
         if radius <= 0:
             self._clear_drawing()
             return
             
-        # Create circle geometry using buffer
         circle_geom = QgsGeometry.fromPointXY(center).buffer(radius, 64)
+        self._perform_geometry_selection(circle_geom)
         
-        # Check if the selection is 
-        if QApplication.keyboardModifiers() in (Qt.ControlModifier, (Qt.ControlModifier | Qt.ShiftModifier)):
-            unselect = True
-        else:
-            unselect = False
-
-        # Reconnect signal
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
-        
-        # Select features within circle
-        selected_count = 0
-        wkt = circle_geom.asWkt()
-        behavior = QgsVectorLayer.RemoveFromSelection if unselect else QgsVectorLayer.AddToSelection
-        for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-            before = layer.selectedFeatureCount()
-            layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
-            after = layer.selectedFeatureCount()
-            selected_count += max(0, after - before)
-
-        # Show selection result in status bar
         if hasattr(self.iface, 'statusBarIface'):
-            result_text = f"Selected {selected_count} features in circle (radius: {radius:.2f})"
+            result_text = f"Circle selection completed (radius: {radius:.2f})"
             self.iface.statusBarIface().showMessage(result_text, 3000)
-
-        # Clean up or keep visible
-        if not keep_visible:
-            self._clear_drawing()
-        else:
-            self.step = 0
-
-    def _clear_drawing(self):
-        """Clear all drawing elements"""
-        self.rubber_band.hide()
-        self.center_marker.hide()
-        self.center_point = None
-        self.current_radius = 0
-        self.step = 0
-
-    def deactivate(self):
-        """Clean up when tool is deactivated"""
+        
         self._clear_drawing()
-        if hasattr(self.iface, 'statusBarIface'):
-            self.iface.statusBarIface().clearMessage()
-        QgsMapTool.deactivate(self)
 
+    # Freehand selection handlers
+    def _handle_freehand_press(self, point):
+        self.points = [point]
+        self.is_drawing = True
+        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.addPoint(point, False)
+        self.rubber_band.show()
 
-class GwFreehandSelectManager(QgsMapTool):
-    """Freehand drawing selection tool"""
+    def _handle_freehand_move(self, event, point):
+        if self.is_drawing and self.points:
+            last_point = self.points[-1]
+            last_screen = self.toCanvasCoordinates(last_point)
+            current_screen = event.pos()
+            pixel_distance = ((current_screen.x() - last_screen.x())**2 + 
+                            (current_screen.y() - last_screen.y())**2)**0.5
+            
+            if pixel_distance >= self.min_distance:
+                self.points.append(point)
+                self._update_freehand_rubber_band()
 
-    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
-        self.class_object = class_object
-        self.iface = global_vars.iface
-        self.canvas = global_vars.canvas
-        self.table_object = table_object
-        self.dialog = dialog
-        self.selection_mode = selection_mode
-        
-        QgsMapTool.__init__(self, self.canvas)
-        self.snapper_manager = GwSnapManager(self.iface)
-        
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, "polygon")
-        self.rubber_band.setColor(QColor(255, 100, 255))
-        self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
-        self.rubber_band.setWidth(2)
-        self.points = []
-        self.is_drawing = False
-        self.min_distance = 5.0  # Minimum distance between points in pixels
-
-        tools_qgis.refresh_map_canvas()
-
-    def activate(self):
-        """Activate the tool and preselect features."""
-        pass
-
-    def canvasPressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            point = self.toMapCoordinates(event.pos())
-            self.points = [point]  # Start new freehand path
-            self.is_drawing = True
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
-            self.rubber_band.addPoint(point, False)
-            self.rubber_band.show()
-        elif event.button() == Qt.RightButton:
-            # Right-click deletes/cancels the drawing
-            self.is_drawing = False
-            self.rubber_band.hide()
-            self.points = []
-
-    def canvasMoveEvent(self, event):
+    def _handle_freehand_release(self, event):
         if self.is_drawing:
-            current_point = self.toMapCoordinates(event.pos())
-            
-            # Only add point if it's far enough from the last point
-            if self.points:
-                last_point = self.points[-1]
-                # Convert to screen coordinates to check pixel distance
-                last_screen = self.toCanvasCoordinates(last_point)
-                current_screen = event.pos()
-                pixel_distance = ((current_screen.x() - last_screen.x())**2 + 
-                                (current_screen.y() - last_screen.y())**2)**0.5
-                
-                if pixel_distance >= self.min_distance:
-                    self.points.append(current_point)
-                    self._update_rubber_band()
-    
-    def _update_rubber_band(self):
-        """Update rubber band to show current freehand path as a filled polygon"""
-        if len(self.points) >= 2:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
-            # Add all points to create the polygon outline
-            for i, point in enumerate(self.points):
-                self.rubber_band.addPoint(point, False)
-            # Close the polygon by adding the first point again
-            self.rubber_band.addPoint(self.points[0], True)
-            self.rubber_band.show()
-
-    def canvasReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton and self.is_drawing:
             self.is_drawing = False
             
-            # Close the polygon if we have enough points
             if len(self.points) >= 3:
-                # Final update to show closed polygon
-                self._update_rubber_band()
-                self._finish_selection()
+                self._update_freehand_rubber_band()
+                self._finish_freehand_selection()
             else:
-                # Not enough points, clear the drawing
                 self.rubber_band.hide()
                 self.points = []
 
-    def keyPressEvent(self, event):
-        # Allow Escape key to cancel current drawing
-        if event.key() == Qt.Key_Escape:
-            self.is_drawing = False
-            self.rubber_band.hide()
-            self.points = []
+    def _update_freehand_rubber_band(self):
+        if len(self.points) >= 2:
+            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            for i, point in enumerate(self.points):
+                self.rubber_band.addPoint(point, False)
+            self.rubber_band.addPoint(self.points[0], True)
+            self.rubber_band.show()
 
-    def _finish_selection(self):
+    def _finish_freehand_selection(self):
         if len(self.points) < 3:
             return
-
-        # Create polygon geometry from freehand points
-        polygon = QgsGeometry.fromPolygonXY([self.points])
-
-        if QApplication.keyboardModifiers() in (Qt.ControlModifier, (Qt.ControlModifier | Qt.ShiftModifier)):
-            unselect = True
-        else:
-            unselect = False
         
-        # Reconnect signal
+        polygon = QgsGeometry.fromPolygonXY([self.points])
+        self._perform_geometry_selection(polygon)
+        
+        self.rubber_band.hide()
+        self.points = []
+
+    # Right click handler
+    def _handle_point_selection(self, event):
+        """Handle point selection mode - select features by clicking on them"""
+        # Check modifier keys
+        ctrl_pressed = QApplication.keyboardModifiers() & Qt.ControlModifier
+        shift_pressed = QApplication.keyboardModifiers() & Qt.ShiftModifier
+        
+        # Determine selection behavior
+        if ctrl_pressed and shift_pressed:
+            behavior = QgsVectorLayer.RemoveFromSelection
+        elif ctrl_pressed and not shift_pressed:
+            behavior = QgsVectorLayer.AddToSelection
+        else:
+            behavior = QgsVectorLayer.SetSelection
+            
+        # Get snapped feature
+        event_point = self.snapper_manager.get_event_point(event)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+
+        # Connect selection changed signal
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
+            
+        if result.isValid():
+            # Get the layer and feature ID
+            layer = result.layer()
+            feature_id = result.featureId()
+            
+            # Apply selection
+            if behavior == QgsVectorLayer.SetSelection:
+                # Clear all selections first
+                for l in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+                    l.removeSelection()
+                # Then select the new feature
+                layer.select([feature_id])
+            elif behavior == QgsVectorLayer.AddToSelection:
+                layer.select([feature_id])
+            else:  # RemoveFromSelection
+                layer.deselect([feature_id])
+            
+        self._check_keep_drawing()
+
+    def _handle_right_click(self):
+        if self.selection_type == GwSelectionType.POLYGON and len(self.points) >= 3:
+            self._finish_polygon_selection()
+        else:
+            self._clear_drawing()
+
+    def _finish_polygon_selection(self):
+        if len(self.points) < 3:
+            return
+        
+        polygon = QgsGeometry.fromPolygonXY([self.points])
+        self._perform_geometry_selection(polygon)
+        
+        self.rubber_band.hide()
+        self.points = []
+        self.is_drawing = False
+
+    # Common selection methods
+    def _perform_selection(self, rectangle=None, event=None):
+        """Perform selection for rectangle or point selection"""
+        # Check modifier keys
+        ctrl_pressed = QApplication.keyboardModifiers() & Qt.ControlModifier
+        shift_pressed = QApplication.keyboardModifiers() & Qt.ShiftModifier
+        
+        # Determine selection behavior:
+        # Ctrl+Shift = Remove from selection
+        # Ctrl only = Add to existing selection  
+        # No modifiers = Replace selection (clear previous and select new)
+        if ctrl_pressed and shift_pressed:
+            selection_behavior = "remove"
+        elif ctrl_pressed and not shift_pressed:
+            selection_behavior = "add"
+        else:
+            selection_behavior = "replace"
+        
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
         
-        # Select features within polygon using precise geometry predicate
-        wkt = polygon.asWkt()
-        behavior = QgsVectorLayer.RemoveFromSelection if unselect else QgsVectorLayer.AddToSelection
+        if rectangle:
+            selected_rectangle = None
+            for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+                if selected_rectangle is None:
+                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
+                
+                if selection_behavior == "remove":
+                    layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
+                elif selection_behavior == "add":
+                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
+                else:  # replace
+                    layer.selectByRect(selected_rectangle, layer.SetSelection)
+        else:
+            # Point selection
+            if event:
+                event_point = self.snapper_manager.get_event_point(event)
+                result = self.snapper_manager.snap_to_project_config_layers(event_point)
+                if result.isValid():
+                    self.snapper_manager.get_snapped_feature(result, True)
+
+        self.rubber_band.hide()
+        self._check_keep_drawing()
+
+    def _perform_geometry_selection(self, geometry):
+        """Perform selection using geometry (for polygon, circle, freehand)"""
+        # Check modifier keys
+        ctrl_pressed = QApplication.keyboardModifiers() & Qt.ControlModifier
+        shift_pressed = QApplication.keyboardModifiers() & Qt.ShiftModifier
+        
+        # Determine selection behavior:
+        # Ctrl+Shift = Remove from selection
+        # Ctrl only = Add to existing selection  
+        # No modifiers = Replace selection (clear previous and select new)
+        if ctrl_pressed and shift_pressed:
+            behavior = QgsVectorLayer.RemoveFromSelection
+        elif ctrl_pressed and not shift_pressed:
+            behavior = QgsVectorLayer.AddToSelection
+        else:
+            behavior = QgsVectorLayer.SetSelection
+        
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
+        
+        wkt = geometry.asWkt()
+        
         for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
             layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
 
-        # Clean up
-        self.rubber_band.hide()
-        self.points = []
+        self._check_keep_drawing()
 
-    def deactivate(self):
-        self.rubber_band.hide()
-        self.is_drawing = False
-        self.points = []
-        QgsMapTool.deactivate(self)
+    def _check_keep_drawing(self):
+        """Check if we should keep the drawing tool active"""
+        keep_drawing = tools_gw.get_config_parser('dialogs_actions', 'keep_drawing', "user", "init", prefix=False)
+        keep_drawing = tools_os.set_boolean(keep_drawing, False)
+
+        if keep_drawing:
+            global_vars.canvas.setMapTool(GwSelectManager(
+                self.class_object, self.table_object, self.dialog, 
+                self.selection_mode, self.save_rectangle, self.selection_type
+            ))
+            cursor = tools_gw.get_cursor_multiple_selection()
+            global_vars.canvas.setCursor(cursor)
+
+    # endregion
 
 
-
+# Backward compatibility aliases for existing code
+GwPolygonSelectManager = lambda *args, **kwargs: GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.POLYGON)
+GwCircleSelectManager = lambda *args, **kwargs: GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.CIRCLE)
+GwFreehandSelectManager = lambda *args, **kwargs: GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.FREEHAND)
+GwPointSelectManager = lambda *args, **kwargs: GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.POINT)
