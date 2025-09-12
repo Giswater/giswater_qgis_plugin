@@ -125,7 +125,6 @@ DECLARE
 	v_mapzone_id int4;
 	v_pgr_distance integer;
 	v_pgr_root_vids int[];
-	v_drainzone_old int[]; -- used when 'DWFZONE'
 
 	-- query variables
 	v_query_text text;
@@ -497,7 +496,7 @@ BEGIN
 	IF v_from_zero = TRUE THEN
 		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_table_name
 		INTO v_mapzone_id;
-		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_mapzone_name), m.id);
+		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_mapzone_name), (v_mapzone_id + m.id));
 	ELSE
 		IF v_netscenario IS NOT NULL THEN
 			IF v_mapzone_name = 'DMA' THEN
@@ -564,11 +563,6 @@ BEGIN
 		WHERE n.node_id = s.node_id AND n.graph_delimiter = 'MINSECTOR';
 	ELSE
 		IF v_mapzone_name = 'DWFZONE' THEN
-			SELECT array_agg(DISTINCT d.drainzone_id ORDER BY d.drainzone_id )
-			INTO v_drainzone_old 
-			FROM v_temp_pgr_mapzone_old m
-			JOIN dwfzone d on m.old_mapzone_id = d.dwfzone_id;
-			
 			UPDATE temp_pgr_mapzone m SET min_node = agg.min_node
 			FROM (
 				SELECT c.component, MIN(n.node_id) AS min_node
@@ -1666,6 +1660,7 @@ BEGIN
 				INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_pgr_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
 
 			ELSIF v_mapzone_name = 'DWFZONE' THEN
+				-- update dwfzone_outfall
 				WITH outfalls AS (
 					SELECT node AS pgr_node_id, array_agg(start_vid  ORDER BY start_vid) AS dwfzone_outfall
 					FROM temp_pgr_drivingdistance
@@ -1800,21 +1795,21 @@ BEGIN
 				HAVING max(CARDINALITY(m.mapzone_id)) = 1
 				AND NOT EXISTS (SELECT 1 FROM drainzone d WHERE d.drainzone_id = m.drainzone_id );
 
-				UPDATE drainzone d SET the_geom = 
-					CASE 
-						WHEN m.max_dwfzones = 1 THEN m.the_geom
-						ELSE NULL
-					END,
-					updated_at = now(),
-					updated_by = current_user
-				FROM (
-					SELECT drainzone_id, max(CARDINALITY(mapzone_id)) AS max_dwfzones, st_union(the_geom) AS the_geom 
-					FROM temp_pgr_mapzone
-					GROUP BY drainzone_id
-					) m
-				WHERE d.drainzone_id = m.drainzone_id
-				;
-				
+				-- clear geometries of drainzones that are not assigned before updating dwfne.drainzone_id
+				UPDATE drainzone d SET the_geom = NULL, 
+				updated_at = now(),
+				updated_by = current_user
+				WHERE EXISTS (
+					SELECT 1 
+					FROM v_temp_pgr_mapzone_old m 
+					JOIN dwfzone dw ON m.old_mapzone_id = dw.dwfzone_id
+					WHERE d.drainzone_id = dw.drainzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_mapzone m 
+					WHERE m.drainzone_id = d.drainzone_id
+				);
+
 				UPDATE dwfzone d SET drainzone_id =
 					CASE 
 						WHEN max_dwfzones = 1 then m.drainzone_id
@@ -1836,33 +1831,69 @@ BEGIN
 				WHERE NOT EXISTS (SELECT 1 FROM temp_pgr_mapzone m WHERE d.dwfzone_id = ANY (m.mapzone_id))
 				AND EXISTS (SELECT 1 FROM temp_pgr_mapzone m WHERE d.drainzone_id = m.drainzone_id);
 
-				-- clear geometries of drainzones that are not assigned
-				UPDATE drainzone SET the_geom = NULL
-				WHERE NOT EXISTS (SELECT 1 FROM node n JOIN dwfzone USING (dwfzone_id) WHERE n.dwfzone_id = dwfzone.dwfzone_id)
-				  AND NOT EXISTS (SELECT 1 FROM arc a JOIN dwfzone USING (dwfzone_id) WHERE a.dwfzone_id = dwfzone.dwfzone_id);
-
-				/*TODO 
-				UPDATE drainzone d SET d.the_geom = NULL, 
-				d.expl_id = ARRAY[0], d.muni_id = ARRAY[0], d.sector_id = ARRAY[0],
-				updated_at = now(),
-				updated_by = current_user
-				WHERE exists en old_drainzone and not exists in temp_pgr_mapzone(drainzone_id);
-				*/
+				WITH 
+					temp_dwfzone AS (
+						SELECT d.dwfzone_id, d.drainzone_id, d.the_geom,
+						expl_id, muni_id, sector_id
+						FROM temp_pgr_mapzone m
+						JOIN dwfzone d ON d.dwfzone_id = m.mapzone_id[1]
+						WHERE d.drainzone_id >0
+					),
+					geom AS (
+						SELECT drainzone_id, st_union(the_geom) AS the_geom
+						FROM temp_dwfzone
+						GROUP BY drainzone_id
+					),
+					expl AS (
+						SELECT a.drainzone_id, array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_id
+						FROM (
+							SELECT drainzone_id, unnest(expl_id) AS expl_id FROM temp_dwfzone
+						) a
+						GROUP BY a.drainzone_id
+					),
+					muni AS (
+						SELECT a.drainzone_id, array_agg(DISTINCT a.muni_id ORDER BY a.muni_id)AS muni_id
+						FROM (
+							SELECT drainzone_id, unnest(muni_id) AS muni_id FROM temp_dwfzone
+						) a
+						GROUP BY a.drainzone_id
+					),
+					sector AS (
+						SELECT a.drainzone_id, array_agg(DISTINCT a.sector_id ORDER BY a.sector_id)AS sector_id
+						FROM (
+							SELECT drainzone_id, unnest(sector_id) AS sector_id FROM temp_dwfzone
+						) a
+						GROUP BY a.drainzone_id
+					)
+				UPDATE drainzone d
+				SET the_geom = g.the_geom, 
+					expl_id = e.expl_id, 
+					muni_id =m.muni_id, 
+					sector_id = s.sector_id,
+					updated_at = now(),
+					updated_by = current_user
+				FROM geom g
+				JOIN expl e USING(drainzone_id)
+				JOIN muni m USING(drainzone_id)
+				JOIN sector s USING(drainzone_id)
+				WHERE d.drainzone_id =g.drainzone_id; 
 			END IF;
 		END IF;
 
-		-- clear geometries of mapzones that are not assigned to any feature TODO - REWRITE USING EXISTS IN v_temp_pgr_mapzone_old and NOT EXISTS in temp_pgr_mapzone
+		-- clear geometries of mapzones that are not assigned to any featureNG EXISTS IN v_temp_pgr_mapzone_old and NOT EXISTS in temp_pgr_mapzone
 		v_query_text = '
-			UPDATE '||v_table_name||' SET the_geom = NULL
-			WHERE NOT EXISTS (
+			UPDATE '||v_table_name||' SET the_geom = NULL,
+				updated_at = now(),
+				updated_by = current_user
+			WHERE EXISTS (
 				SELECT 1
-				FROM node n
-				WHERE n.'||v_mapzone_field||' = '||v_table_name||'.'||v_mapzone_field||'
+				FROM v_temp_pgr_mapzone_old m
+				WHERE m.old_mapzone_id = '||v_table_name||'.'||v_mapzone_field||'
 			)
 			AND NOT EXISTS (
 				SELECT 1
-				FROM arc a
-				WHERE a.'||v_mapzone_field||' = '||v_table_name||'.'||v_mapzone_field||'
+				FROM temp_pgr_mapzone m
+				WHERE '||v_table_name||'.'||v_mapzone_field||' = ANY(m.mapzone_id)
 			);';
 		EXECUTE v_query_text;
 	END IF;
