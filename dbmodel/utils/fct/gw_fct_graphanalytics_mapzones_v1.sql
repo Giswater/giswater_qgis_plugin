@@ -1788,8 +1788,8 @@ BEGIN
 					FROM temp_pgr_arc';
 
 				-- update DRAINZONE table
-				INSERT INTO drainzone (drainzone_id, code, created_at, created_by)
-				SELECT m.drainzone_id, m.drainzone_id, now(), current_user
+				INSERT INTO drainzone (drainzone_id, code, name, created_at, created_by)
+				SELECT m.drainzone_id, m.drainzone_id, concat('drainzone',m.drainzone_id), now(), current_user
 				FROM temp_pgr_mapzone m
 				GROUP BY m.drainzone_id
 				HAVING max(CARDINALITY(m.mapzone_id)) = 1
