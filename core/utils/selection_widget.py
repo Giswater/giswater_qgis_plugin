@@ -10,7 +10,8 @@ from typing import Any, Callable, Union  # Literal, Dict, Optional,
 
 from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
 from qgis.core import QgsExpression
-from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, QHBoxLayout, QPushButton
+from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, \
+                    QHBoxLayout, QPushButton, QGridLayout
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtCore import QItemSelectionModel
 
@@ -44,14 +45,17 @@ class GwSelectionWidget(QWidget):
 
         self.selection_mode = self_varibles.get("selection_mode", GwSelectionMode.DEFAULT)
         self.method = self_varibles.get("method", "selected")
+        self.number_rows = self_varibles.get("number_rows", 1)
+        self.number_buttons = 0
+        self.highlight_method_active = False
 
         # Create layout
-        self.lyt_selection = QHBoxLayout(self)
+        self.lyt_selection = QGridLayout(self)
         self.lyt_selection.setContentsMargins(0, 0, 0, 0)
         self.lyt_selection.setSpacing(2)
 
         # Create selection button
-        if menu_variables:
+        if menu_variables:  
             self.init_selection_btn(**general_variables, **menu_variables)
 
         # Activate highlight features methods
@@ -72,6 +76,9 @@ class GwSelectionWidget(QWidget):
             # selection_on_top_variables can be None; ensure we pass a mapping
             extra_kwargs = selection_on_top_variables or {}
             self.init_selection_on_top(**general_variables, **extra_kwargs)
+        
+        if self.number_rows > 1 and self.number_buttons > 1:
+            self.reorder_lyt_selection()
 
     # region utility functions
 
@@ -85,7 +92,7 @@ class GwSelectionWidget(QWidget):
         Returns:
             The parent QTabWidget or None if not found
         """
-        current = widget
+        current = widget.parent()
         while current is not None:
             if isinstance(current, QTabWidget):
                 return current
@@ -143,6 +150,8 @@ class GwSelectionWidget(QWidget):
             self.btn_snapping.clicked.disconnect()
         except Exception:
             pass
+        class_object.highlight_method_active = self.highlight_method_active
+        class_object.highlight_features_method = self.highlight_features_method
         tools_gw.selection_init(class_object, dialog, table_object, self.selection_mode, tool_type)
 
     def init_selection_btn(self, class_object: Any, dialog: QDialog, table_object: str, used_tools: list[str],
@@ -166,7 +175,7 @@ class GwSelectionWidget(QWidget):
             self.activate_selection_mode(class_object, dialog, table_object, tool_type)
 
         # Action group to keep exclusivity
-        tools = {"rectangle": "137.png", "polygon": "180.svg", "freehand": "182.svg", "circle": "181.svg", "point": "181.svg"}
+        tools = {"rectangle": "137.png", "polygon": "180.svg", "freehand": "182.svg", "circle": "181.svg", "point": "179.png"}
 
         # Create btn_snapping as menu or button widget
         if used_tools and len(used_tools) > 1:
@@ -202,7 +211,8 @@ class GwSelectionWidget(QWidget):
                                                       self.selection_mode, tool_type))
 
         # Add btn_snapping to layout and create actions
-        self.lyt_selection.addWidget(self.btn_snapping)
+        self.lyt_selection.addWidget(self.btn_snapping, 0, self.number_buttons)
+        self.number_buttons += 1
 
     # endregion menu btn_snapping
 
@@ -221,8 +231,6 @@ class GwSelectionWidget(QWidget):
             self.highlight_features_in_table(class_object, dialog, table_object)
         elif self.method == "selected":
             self.highlight_features_selected_in_table(class_object, dialog, table_object)
-        elif self.method == "psector":
-            self.highlight_features_psector_in_table(class_object, dialog, table_object)
 
     def highlight_in_tab_changed(self, class_object: Any, dialog: QDialog, table_object: str,
                                  parent_tab: QTabWidget):
@@ -236,7 +244,7 @@ class GwSelectionWidget(QWidget):
             parent_tab: The parent tab widget
         """
         widget = parent_tab.widget(parent_tab.currentIndex())
-        if widget.objectName() in ("tab_relations", "tab_features"):
+        if widget.objectName() in ("tab_relations", "tab_features", "tab_rel", "RelationsTab"):
             self.highlight_features_method(class_object, dialog, table_object)
         else:
             tools_qgis.refresh_map_canvas()
@@ -296,6 +304,7 @@ class GwSelectionWidget(QWidget):
             connected_signal: Whether this is called from a connected signal
         """
         # Refresh map canvas and reset rubberband
+        self.highlight_method_active = True
         tools_qgis.refresh_map_canvas()
         all_rubberbands = global_vars.active_rubberbands
         for rubberband in all_rubberbands:
@@ -305,17 +314,18 @@ class GwSelectionWidget(QWidget):
         widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
 
         # Validate table and model
-        if not widget_table or not widget_table.selectionModel() or not feature_type:
+        data_model = widget_table.model()
+        if not widget_table or not feature_type or not data_model:
             return
 
+        # Validate selection model
         selection_model = widget_table.selectionModel()
         if not selection_model or selection_model.selectedRows() == 0:
             tools_gw.remove_selection(layers=class_object.rel_layers)
             return
-
-        data_model = widget_table.model()
-        if not data_model:
-            return
+        elif not connected_signal:
+            selection_model.selectionChanged.connect(partial(self.highlight_features_selected_in_table,
+                                                   class_object, dialog, table_object, True))
 
         # Get feature IDs from table
         id_column_name = f"{feature_type}_id"
@@ -335,40 +345,6 @@ class GwSelectionWidget(QWidget):
         # Select features on map
         expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
         tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
-
-        if not connected_signal:
-            selection_model.selectionChanged.connect(partial(self.highlight_features_selected_in_table,
-                                                   class_object, dialog, table_object, True))
-
-    def highlight_features_psector_in_table(self, class_object: Any, dialog: QDialog, table_object: str,
-                                            disconnect: bool = True, connect: bool = True):
-        """
-        Highlight features psector in table by drawing lines.
-        
-        Args:
-            class_object: The class object
-            dialog: The dialog
-            table_object: The table name
-        """
-        # Refresh map canvas and reset rubberband
-        tools_qgis.refresh_map_canvas()
-        all_rubberbands = global_vars.active_rubberbands
-        for rubberband in all_rubberbands:
-            tools_gw.reset_rubberband(rubberband)
-
-        widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
-
-        selection_model = widget_table.selectionModel()
-        if not selection_model or selection_model.selectedRows() == 0:
-            return
-
-        data_model = widget_table.model()
-        if not data_model:
-            return
-
-        id_column_name = f"{feature_type}_id"
-        id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)  # noqa: F841
-        state_column_index = tools_qt.get_col_index_by_col_name(widget_table, "state")  # noqa: F841
 
     def highlight_features_in_table(self, class_object: Any, dialog: QDialog, table_object: str):
         """
@@ -428,7 +404,8 @@ class GwSelectionWidget(QWidget):
         tools_gw.add_icon(btn_invert, "183")
         btn_invert.setToolTip("Invert the current selection in the table")
         btn_invert.clicked.connect(partial(self.invert_table_selection, class_object, dialog, table_object))
-        self.lyt_selection.addWidget(btn_invert)
+        self.lyt_selection.addWidget(btn_invert, 0, self.number_buttons)
+        self.number_buttons += 1
 
     def invert_table_selection(self, class_object: Any, dialog: QDialog, table_object: str):
         """
@@ -491,7 +468,8 @@ class GwSelectionWidget(QWidget):
         # Connect button click
         self.btn_expression.clicked.connect(partial(self.expression_selection, class_object, dialog, table_object,
                                                   callback, callback_later))
-        self.lyt_selection.addWidget(self.btn_expression)
+        self.lyt_selection.addWidget(self.btn_expression, 0, self.number_buttons)
+        self.number_buttons += 1
 
     def expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
                              callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
@@ -528,7 +506,8 @@ class GwSelectionWidget(QWidget):
         tools_gw.add_icon(btn_zoom_to_selection, "176")
         btn_zoom_to_selection.setToolTip("Zoom to selection")
         btn_zoom_to_selection.clicked.connect(partial(self.zoom_to_selection, class_object, dialog, table_object))
-        self.lyt_selection.addWidget(btn_zoom_to_selection, 0)
+        self.lyt_selection.addWidget(btn_zoom_to_selection, 0, self.number_buttons)
+        self.number_buttons += 1
 
     def zoom_to_selection(self, class_object: Any, dialog: QDialog, table_object: str):
         """
@@ -588,7 +567,8 @@ class GwSelectionWidget(QWidget):
         tools_gw.add_icon(self.btn_selection_on_top, "175")
         self.btn_selection_on_top.setToolTip("Show selection on top")
         self.btn_selection_on_top.setCheckable(True)
-        self.lyt_selection.addWidget(self.btn_selection_on_top, 0)
+        self.lyt_selection.addWidget(self.btn_selection_on_top, 0, self.number_buttons)
+        self.number_buttons += 1
 
         # Store original model and button state
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
@@ -771,3 +751,38 @@ class GwSelectionWidget(QWidget):
             return target_item
 
     # endregion selection on top
+
+    # region reorder layout
+
+    def reorder_lyt_selection(self) -> None:
+        """
+        Reorder the layout of the selection widget into a proper grid layout.
+        
+        Transforms the current horizontal layout into a grid layout with the specified
+        number of rows, distributing widgets evenly across columns.
+        """            
+        # Collect all widgets from the current layout
+        self.widgets = []
+        while self.lyt_selection.count():
+            item = self.lyt_selection.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+                self.widgets.append(widget)
+
+        # Early return if no widgets to reorder
+        if not self.widgets:
+            return
+
+        # Calculate columns per row (ceiling division to ensure all widgets fit)
+        total_widgets = len(self.widgets)
+        cols_per_row = (total_widgets + self.number_rows - 1) // self.number_rows
+
+        # Reinsert widgets in grid order
+        for i, widget in enumerate(self.widgets):
+            row = i // cols_per_row
+            col = i % cols_per_row
+            self.lyt_selection.addWidget(widget, row, col)
+
+    # endregion reorder layout
+

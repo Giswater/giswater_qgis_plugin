@@ -44,7 +44,8 @@ from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
-from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
+from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, \
+                                    GwFreehandSelectManager, GwPointSelectManager
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
@@ -3535,6 +3536,8 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
         select_manager = GwCircleSelectManager(class_object, table_object, dialog, selection_mode)
     elif tool_type == "freehand":
         select_manager = GwFreehandSelectManager(class_object, table_object, dialog, selection_mode)
+    elif tool_type == "point":
+        select_manager = GwPointSelectManager(class_object, table_object, dialog, selection_mode)
     else:
         select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode)
 
@@ -3880,8 +3883,13 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
                 index = model.index(row, column_index)
                 selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
-    if class_object.callback_later_selection:
+    # Safely check and call callback if it exists
+    if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
         class_object.callback_later_selection()
+
+    # Safely check highlight method
+    if hasattr(class_object, 'highlight_method_active') and class_object.highlight_method_active:
+        class_object.highlight_features_method(class_object, dialog, table_object)
 
 
 def select_ids_in_table(class_object, dialog, table_object, ids_to_select):

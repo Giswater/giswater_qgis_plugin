@@ -275,17 +275,6 @@ class Campaign:
 
         self._update_feature_completer(self.dialog)
 
-        self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                               self.dialog.tbl_campaign_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
-        self.dialog.tbl_campaign_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                self.dialog.tbl_campaign_x_node, "ve_node", "node_id", self.rubber_band, 10))
-        self.dialog.tbl_campaign_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                  self.dialog.tbl_campaign_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
-        self.dialog.tbl_campaign_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dialog.tbl_campaign_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
-        self.dialog.tbl_campaign_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dialog.tbl_campaign_x_link, "ve_link", "link_id", self.rubber_band, 10))
-
         for table_name in [
             "tbl_campaign_x_arc",
             "tbl_campaign_x_node",
@@ -555,23 +544,6 @@ class Campaign:
         table_object = "campaign_inventory" if self.campaign_type == 3 else "campaign"
         tools_gw.get_signal_change_tab(self.dialog)
 
-        highlight_config = {
-            "arc": {"size": 5},
-            "node": {"size": 10},
-            "connec": {"size": 10},
-            "link": {"size": 10},
-            "gully": {"size": 10}
-        }
-
-        for name, config in highlight_config.items():
-            tbl = getattr(self.dialog, f"tbl_campaign_x_{name}", None)
-            if tbl:
-                layer = f"ve_{name}"
-                id_column = f"{name}_id"
-                size = config["size"]
-                tbl.clicked.connect(
-                    partial(tools_qgis.highlight_feature_by_id, tbl, layer, id_column, self.rubber_band, size))
-
         self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
         self.dialog.tab_feature.currentChanged.connect(
@@ -597,11 +569,15 @@ class Campaign:
         # Create menu for btn_snapping
         self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
-        used_tools = ["rectangle", "polygon", "freehand", "circle"]
+        used_tools = ["rectangle", "polygon", "freehand", "circle", "point"]
         menu_variables = {"used_tools": used_tools}
+        highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._update_feature_completer}
-        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, expression_selection=expression_selection)
+        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection=expression_selection)
         self.dialog.lyt_selection.addWidget(selection_widget, 0)
+
+    def callback_values(self):
+        return self, self.dialog, "campaign"
         
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
