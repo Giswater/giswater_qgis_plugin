@@ -26,7 +26,7 @@ v_error_context text;
 v_errortext text;
 v_qgis_init_guide_map boolean;
 v_user text;
-v_isaudit text;
+v_isaudit boolean;
 v_rol_exists bool;
 v_project_type text;
 v_version text;
@@ -115,7 +115,7 @@ BEGIN
 	IF (v_isaudit IS DISTINCT FROM TRUE) AND (v_qgis_init_guide_map OR v_sectorisexplismuni) THEN -- v_sectorisexplismuni IS used ALSO here NOT ONLY IN selectors
 		DELETE FROM selector_expl WHERE cur_user = current_user;
 		DELETE FROM selector_sector WHERE cur_user = current_user;
-		DELETE FROM selector_muni WHERE cur_user = current_user;
+		DELETE FROM selector_municipality WHERE cur_user = current_user;
 		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 		DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
@@ -124,7 +124,7 @@ BEGIN
 			EXECUTE 'SET search_path = '||v_addschema||', public';
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			DELETE FROM selector_sector WHERE cur_user = current_user;
-			DELETE FROM selector_muni WHERE cur_user = current_user;
+			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
@@ -148,7 +148,7 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
-	
+
 	-- Force network selector in case of null values
 	IF (SELECT count(*) FROM selector_network WHERE cur_user=current_user) < 1 THEN
 	  	INSERT INTO selector_network (network_id, cur_user) VALUES (1, current_user);
@@ -191,7 +191,7 @@ BEGIN
 	INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('plan_psector_current', NULL, current_user)
 	ON CONFLICT("parameter", cur_user) DO NOTHING;
 	UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-	
+
     -- Control null
 	v_message := COALESCE(v_message, '{}');
 	v_return := COALESCE(v_return,'{}');
