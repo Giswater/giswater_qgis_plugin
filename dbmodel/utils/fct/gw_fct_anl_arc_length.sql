@@ -31,8 +31,9 @@ v_array text;
 v_version text;
 v_error_context text;
 v_count integer;
-v_arclength numeric;
+v_shorterthan numeric;
 v_fid integer=387;
+v_biggerthan numeric;
 
 BEGIN
 
@@ -46,7 +47,9 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_arclength := ((p_data ->>'data')::json->>'parameters')::json->>'arcLength';
+	v_shorterthan := ((p_data ->>'data')::json->>'parameters')::json->>'shorterThan';
+	v_biggerthan := ((p_data ->>'data')::json->>'parameters')::json->>'biggerThan';
+
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
@@ -61,16 +64,12 @@ BEGIN
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, node_1, node_2, expl_id, fid, the_geom, length)
 		SELECT arc_id, arccat_id, state, node_1, node_2, expl_id, '||v_fid||', the_geom, st_length(the_geom) 
-		FROM  '||v_worklayer||' WHERE arc_id IN ('||v_array||') AND  st_length(the_geom)  < '||v_arclength||';';
+		FROM  '||v_worklayer||' WHERE arc_id IN ('||v_array||') AND  (st_length(the_geom)  < '||v_shorterthan||' OR st_length(the_geom) > '||v_biggerthan||');';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, node_1, node_2, expl_id, fid, the_geom, length)
 		SELECT arc_id, arccat_id, state, node_1, node_2, expl_id, '||v_fid||', the_geom, st_length(the_geom) 
-		FROM  '||v_worklayer||' WHERE  st_length(the_geom)  < '||v_arclength||';';
+		FROM  '||v_worklayer||' WHERE  (st_length(the_geom)  < '||v_shorterthan||' OR st_length(the_geom) > '||v_biggerthan||');';
 	END IF;
-
-	-- set selector
-	DELETE FROM selector_audit WHERE fid=v_fid AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (v_fid, current_user);
 
 	-- get results
 	--lines
@@ -90,13 +89,17 @@ BEGIN
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 
-	IF v_count = 0 THEN
+	IF v_count = 0 then
+	
+		INSERT INTO audit_check_data (fid,error_message) values (v_fid, 'There are no arcs with outlayers values');
+		/*
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3570", "function":"3052", "parameters":{"v_arclength":"'||v_arclength||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
-		
-	ELSE
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3572", "function":"3052", "parameters":{"v_arclength":"'||v_arclength||'", "v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
+                       "data":{"message":"3570", "function":"3052", "parameters":{"v_shorterthan":"'||v_shorterthan||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
+		*/
+	else
+		INSERT INTO audit_check_data (fid,error_message) values (v_fid, concat('There are ',v_count, ' arcs with outlayers values'));
+		--EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+         --              "data":{"message":"3572", "function":"3052", "parameters":{"v_shorterthan":"'||v_shorterthan||'", "v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT v_fid,  concat ('Arc_id: ',array_agg(arc_id), '.' ), v_count
