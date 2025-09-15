@@ -301,6 +301,14 @@ BEGIN
 		AND v.closed IS FALSE;
 	END IF;
 
+	-- save as graph_delimiter the arcs 'INITOVERFLOWPATH', without creating new arcs (modif will not be set to TRUE neither for node_1 nor for the arc)
+	IF v_project_type = 'UD' THEN
+		UPDATE temp_pgr_arc t
+        SET graph_delimiter = 'INITOVERFLOWPATH'
+        FROM v_temp_arc v
+        WHERE v.arc_id = t.arc_id AND v.initoverflowpath;
+    END IF;
+
 	-- NODES MAPZONES
 	-- Nodes that are the starting/ending points of mapzones
 	IF v_from_zero THEN
@@ -344,70 +352,105 @@ BEGIN
 		-- common query
 		v_query_text := v_query_text || ') AS s WHERE n.node_id = s.node_id';
 		EXECUTE v_query_text;
-		-- Nodes forceClosed
-		v_query_text :=
-			'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
-			FROM (
-				SELECT (json_array_elements_text(graphconfig->''forceClosed''))::int4 AS node_id
-				FROM ' || v_table_name || ' 
-			';
 
-		-- netscenario query
-		IF v_netscenario IS NOT NULL THEN
-			v_query_text := v_query_text || 'WHERE netscenario_id = ' || v_netscenario || ' AND graphconfig IS NOT NULL AND active';
+		-- Nodes forceClosed acording init parameters - for ws; for ud forceClosed are arcs
+		IF v_project_type = 'WS' THEN
+			v_query_text :=
+				'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
+				FROM (
+					SELECT (json_array_elements_text(graphconfig->''forceClosed''))::int4 AS node_id
+					FROM ' || v_table_name || ' 
+				';
+
+			-- netscenario query
+			IF v_netscenario IS NOT NULL THEN
+				v_query_text := v_query_text || 'WHERE netscenario_id = ' || v_netscenario || ' AND graphconfig IS NOT NULL AND active';
+			ELSE
+				v_query_text := v_query_text || 'WHERE graphconfig IS NOT NULL AND active';
+			END IF;
+
+			-- common query
+			v_query_text := v_query_text || ') AS s WHERE n.node_id = s.node_id';
+			EXECUTE v_query_text;
+
 		ELSE
-			v_query_text := v_query_text || 'WHERE graphconfig IS NOT NULL AND active';
+			v_query_text :=
+				'UPDATE temp_pgr_arc a SET graph_delimiter = ''FORCECLOSED'' 
+				FROM (
+					SELECT (json_array_elements_text(graphconfig->''forceClosed''))::int4 AS arc_id
+					FROM ' || v_table_name || ' 
+				';
+
+			-- netscenario query
+			IF v_netscenario IS NOT NULL THEN
+				v_query_text := v_query_text || 'WHERE netscenario_id = ' || v_netscenario || ' AND graphconfig IS NOT NULL AND active';
+			ELSE
+				v_query_text := v_query_text || 'WHERE graphconfig IS NOT NULL AND active';
+			END IF;
+
+			-- common query
+			v_query_text := v_query_text || ') AS s WHERE a.arc_id = s.arc_id';
+			EXECUTE v_query_text;
 		END IF;
 
-		-- common query
-		v_query_text := v_query_text || ') AS s WHERE n.node_id = s.node_id';
-		EXECUTE v_query_text;
+		-- Nodes forceOpen acording init parameters - only for ws; for ud forceOpen are arcs
+		IF v_project_type = 'WS' THEN
+			v_query_text :=
+				'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
+				FROM (
+					SELECT (json_array_elements_text(graphconfig->''ignore''))::int4 AS node_id
+					FROM ' || v_table_name || ' 
+				';
 
-		-- Nodes "ignore", should not be disconnected
-		v_query_text :=
-			'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
-			FROM (
-				SELECT (json_array_elements_text(graphconfig->''ignore''))::int4 AS node_id
-				FROM ' || v_table_name || ' 
-			';
+			-- netscenario query
+			IF v_netscenario IS NOT NULL THEN
+				v_query_text := v_query_text || 'WHERE netscenario_id = ' || v_netscenario || ' AND graphconfig IS NOT NULL AND active';
+			ELSE
+				v_query_text := v_query_text || 'WHERE graphconfig IS NOT NULL AND active';
+			END IF;
 
-		-- netscenario query
-		IF v_netscenario IS NOT NULL THEN
-			v_query_text := v_query_text || 'WHERE netscenario_id = ' || v_netscenario || ' AND graphconfig IS NOT NULL AND active';
-		ELSE
-			v_query_text := v_query_text || 'WHERE graphconfig IS NOT NULL AND active';
+			-- common query
+			v_query_text := v_query_text || ') AS s WHERE n.node_id = s.node_id';
+			EXECUTE v_query_text;
+		ELSE 
+			v_query_text :=
+				'UPDATE temp_pgr_arc a SET graph_delimiter = ''IGNORE'' 
+				FROM (
+					SELECT (json_array_elements_text(graphconfig->''ignore''))::int4 AS arc_id
+					FROM ' || v_table_name || ' 
+				';
+
+			-- netscenario query
+			IF v_netscenario IS NOT NULL THEN
+				v_query_text := v_query_text || 'WHERE netscenario_id = ' || v_netscenario || ' AND graphconfig IS NOT NULL AND active';
+			ELSE
+				v_query_text := v_query_text || 'WHERE graphconfig IS NOT NULL AND active';
+			END IF;
+
+			-- common query
+			v_query_text := v_query_text || ') AS s WHERE a.arc_id = s.arc_id';
+			EXECUTE v_query_text;
 		END IF;
-
-		-- common query
-		v_query_text := v_query_text || ') AS s WHERE n.node_id = s.node_id';
-		EXECUTE v_query_text;
 
     END IF;
 
-	IF v_project_type = 'UD' THEN
-        UPDATE temp_pgr_node t
-        SET to_arc = a.to_arc
-        FROM (
-                SELECT pgr_node_1, array_agg(arc_id) AS to_arc
-                FROM temp_pgr_arc
-                GROUP BY pgr_node_1
-            ) a
-        WHERE t.graph_delimiter = v_mapzone_name AND t.modif = TRUE AND t.pgr_node_id = a.pgr_node_1;
+	-- Nodes forceClosed acording init parameters - for ws; for ud forceClosed are arcs
+	IF v_project_type = 'WS' THEN
+		UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'FORCECLOSED'
+		WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
+	ELSE
+		UPDATE temp_pgr_arc a SET graph_delimiter = 'FORCECLOSED'
+		WHERE a.arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
+	END IF;
 
-		-- save as graph_delimiter the arcs 'INITOVERFLOWPATH', without creating new arcs (modif will not be set to TRUE neither for node_1 nor for the arc)
-		UPDATE temp_pgr_arc t
-        SET graph_delimiter = 'INITOVERFLOWPATH'
-        FROM v_temp_arc v
-        WHERE v.arc_id = t.arc_id AND v.initoverflowpath;
-    END IF;
-
-	-- Nodes forceClosed acording init parameters
-	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'FORCECLOSED'
-	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
-
-	-- Nodes forceOpen acording init parameters
-	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'IGNORE'
-	WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
+	-- Nodes forceOpen acording init parameters - for ws; for ud forceOpen are arcs
+	IF v_project_type = 'WS' THEN
+		UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'IGNORE'
+		WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
+	ELSE
+		UPDATE temp_pgr_arc a SET graph_delimiter = 'IGNORE'
+		WHERE a.arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
+	END IF;
 
 
 	-- Generate new arcs
@@ -433,12 +476,6 @@ BEGIN
         UPDATE temp_pgr_arc  SET cost = -1, reverse_cost = -1
         WHERE graph_delimiter = v_mapzone_name
         AND old_arc_id = ANY (to_arc);
-
-		-- arcs that connects with nodes IGNORE
-        UPDATE temp_pgr_arc t
-	    SET cost = 1, reverse_cost = 1
-	    FROM temp_pgr_node n
-	    WHERE n.pgr_node_id IN (t.pgr_node_1, t.pgr_node_2) AND n.graph_delimiter = 'IGNORE';
 	END IF;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
@@ -462,13 +499,13 @@ BEGIN
 	IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
 		v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
 			FROM temp_pgr_arc
-			WHERE graph_delimiter <> ''INITOVERFLOWPATH'' AND reverse_cost < 0'; -- if pgr_node_1 or pgr_node_2 have graph_delimiter = IGNORE, the arcs will not be filtered
+			WHERE graph_delimiter <> ''INITOVERFLOWPATH'''; 
 	ELSE
 		v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
 			FROM temp_pgr_arc';
 	END IF;
 
-	DELETE FROM temp_pgr_drivingdistance;
+	TRUNCATE temp_pgr_drivingdistance;
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
     (
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
