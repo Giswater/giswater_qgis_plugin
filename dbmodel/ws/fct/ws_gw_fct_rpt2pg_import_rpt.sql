@@ -92,13 +92,13 @@ BEGIN
 		DELETE FROM temp_t_csv WHERE source='rpt_node' AND (csv3='m' or csv5 = 'Hours');
 
 		INSERT INTO rpt_node (node_id, result_id, "time", demand, head, press, quality)
-		SELECT csv1::integer, v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric
+		SELECT csv1, v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric
 		FROM temp_t_csv WHERE source='rpt_node' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
 		-- arcs
 	   	DELETE FROM temp_t_csv WHERE source='rpt_arc' AND (csv1='Link' or csv1='Length' or csv1='Analysis' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 		INSERT INTO rpt_arc(arc_id,result_id,"time", flow, vel, headloss, other)
-		SELECT csv1::integer,v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::TEXT
+		SELECT csv1,v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::TEXT
 		FROM temp_t_csv WHERE source='rpt_arc' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
 	else
