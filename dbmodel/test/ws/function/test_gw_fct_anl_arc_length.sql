@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},"feature":{"tableName":"ve_arc",
-    "featureType":"ARC", "id":[2001,2002]}, "data":{"selectionMode":"previousSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
+    "featureType":"ARC", "id":[2001,2002]}, "data":{"selectionMode":"previousSelection","parameters":{"shorterThan":"5", "biggerThan":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted"'
 );
@@ -41,7 +41,7 @@ SELECT is (
 
 SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"tableName":"ve_arc",
-    "featureType":"ARC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"arcLength":"3"}}}$$)::JSON)->>'status',
+    "featureType":"ARC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"shorterThan":"5", "biggerThan":"3"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_length -> wholeSelection returns status "Accepted"'
 );
