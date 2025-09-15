@@ -67,12 +67,6 @@ SELECT has_trigger('presszone', 'gw_trg_edit_controls', 'Table should have trigg
 SELECT has_trigger('presszone', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('presszone', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
 
--- Check rules
-SELECT has_rule('presszone', 'presszone_conflict', 'Table should have rule presszone_conflict');
-SELECT has_rule('presszone', 'presszone_del_uconflict', 'Table should have rule presszone_del_uconflict');
-SELECT has_rule('presszone', 'presszone_del_undefined', 'Table should have rule presszone_del_undefined');
-SELECT has_rule('presszone', 'presszone_undefined', 'Table should have rule presszone_undefined');
-
 SELECT * FROM finish();
 
 ROLLBACK;

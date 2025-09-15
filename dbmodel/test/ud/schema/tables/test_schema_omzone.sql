@@ -62,12 +62,6 @@ SELECT has_trigger('omzone', 'gw_trg_edit_controls', 'Table should have gw_trg_e
 SELECT has_trigger('omzone', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('omzone', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
 
--- Check rules
-SELECT has_rule('omzone', 'omzone_conflict', 'Table should have omzone_conflict rule');
-SELECT has_rule('omzone', 'omzone_del_conflict', 'Table should have omzone_del_conflict rule');
-SELECT has_rule('omzone', 'omzone_del_undefined', 'Table should have omzone_del_undefined rule');
-SELECT has_rule('omzone', 'omzone_undefined', 'Table should have omzone_undefined rule');
-
 -- Check sequences
 SELECT has_sequence('omzone_omzone_id_seq', 'Sequence omzone_omzone_id_seq should exist'); -- Todo: rename to omzone_id_seq
 

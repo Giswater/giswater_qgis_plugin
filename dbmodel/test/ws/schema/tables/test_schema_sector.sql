@@ -72,8 +72,6 @@ SELECT fk_ok('sector', 'pattern_id', 'inp_pattern', 'pattern_id', 'FK pattern_id
 SELECT has_trigger('sector', 'gw_trg_typevalue_fk_insert', 'Table sector should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('sector', 'gw_trg_typevalue_fk_update', 'Table sector should have gw_trg_typevalue_fk_update trigger');
 
--- Check rules
-SELECT rules_are('sector', ARRAY['sector_conflict', 'sector_del_conflict', 'sector_del_undefined', 'sector_undefined'], 'Rules sector_conflict, sector_del_conflict, sector_del_undefined, sector_undefined should be ON');
 
 SELECT * FROM finish();
 

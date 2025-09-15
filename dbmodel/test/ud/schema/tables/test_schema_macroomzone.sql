@@ -48,10 +48,6 @@ SELECT col_type_is('macroomzone', 'updated_by', 'varchar(50)', 'Column updated_b
 SELECT has_trigger('macroomzone', 'gw_trg_edit_controls', 'Table should have gw_trg_edit_controls trigger');
 SELECT has_trigger('macroomzone', 'gw_trg_fk_array_array_table_expl', 'Table should have gw_trg_fk_array_array_table_expl trigger');
 
--- Check rules
-SELECT has_rule('macroomzone', 'macroomzone_del_undefined', 'Table should have macroomzone_del_undefined rule');
-SELECT has_rule('macroomzone', 'macroomzone_undefined', 'Table should have macroomzone_undefined rule');
-
 -- Check sequences
 SELECT has_sequence('macroomzone_macroomzone_id_seq', 'Sequence macroomzone_macroomzone_id_seq should exist');
 

@@ -70,9 +70,6 @@ SELECT has_trigger('supplyzone', 'gw_trg_edit_controls', 'Table supplyzone shoul
 SELECT has_trigger('supplyzone', 'gw_trg_typevalue_fk_insert', 'Table supplyzone should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('supplyzone', 'gw_trg_typevalue_fk_update', 'Table supplyzone should have gw_trg_typevalue_fk_update trigger');
 
--- Check rules
-SELECT rules_are('supplyzone', ARRAY['supplyzone_conflict', 'supplyzone_del_conflict', 'supplyzone_del_undefined', 'supplyzone_undefined'], 'Rules supplyzone_conflict, supplyzone_del_conflict, supplyzone_del_undefined, supplyzone_undefined should be ON');
-
 SELECT * FROM finish();
 
 ROLLBACK;

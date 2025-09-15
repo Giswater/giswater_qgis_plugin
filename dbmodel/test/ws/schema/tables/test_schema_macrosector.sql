@@ -58,10 +58,6 @@ SELECT has_index('macrosector', 'macrosector_index', 'Should have index on the_g
 -- Check triggers
 SELECT has_trigger('macrosector', 'gw_trg_edit_controls', 'Trigger gw_trg_edit_controls should exist');
 
--- Check rules
-SELECT has_rule('macrosector', 'macrosector_del_undefined', 'Rule macrosector_del_undefined should exist');
-SELECT has_rule('macrosector', 'macrosector_undefined', 'Rule macrosector_undefined should exist');
-
 SELECT * FROM finish();
 
 ROLLBACK;

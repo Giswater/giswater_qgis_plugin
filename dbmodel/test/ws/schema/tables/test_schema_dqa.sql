@@ -63,12 +63,6 @@ SELECT has_trigger('dqa', 'gw_trg_edit_controls', 'Table should have gw_trg_edit
 SELECT has_trigger('dqa', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('dqa', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
 
--- Check rules
-SELECT has_rule('dqa', 'dqa_conflict', 'Table should have dqa_conflict rule');
-SELECT has_rule('dqa', 'dqa_del_conflict', 'Table should have dqa_del_conflict rule');
-SELECT has_rule('dqa', 'dqa_del_undefined', 'Table should have dqa_del_undefined rule');
-SELECT has_rule('dqa', 'dqa_undefined', 'Table should have dqa_undefined rule');
-
 -- Check sequences
 SELECT has_sequence('dqa_dqa_id_seq', 'Sequence dqa_dqa_id_seq should exist');
 

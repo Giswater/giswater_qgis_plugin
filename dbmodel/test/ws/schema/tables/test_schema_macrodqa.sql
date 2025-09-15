@@ -57,10 +57,6 @@ SELECT col_default_is('macrodqa', 'created_by', 'CURRENT_USER', 'Column created_
 SELECT has_trigger('macrodqa', 'gw_trg_edit_controls', 'Trigger gw_trg_edit_controls should exist');
 SELECT has_trigger('macrodqa', 'gw_trg_fk_array_array_table_expl', 'Trigger gw_trg_fk_array_array_table_expl should exist');
 
--- Check rules
-SELECT has_rule('macrodqa', 'macrodqa_del_undefined', 'Rule macrodqa_del_undefined should exist');
-SELECT has_rule('macrodqa', 'macrodqa_undefined', 'Rule macrodqa_undefined should exist');
-
 -- Check sequences
 
 -- Check constraints

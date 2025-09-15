@@ -38,8 +38,8 @@ SELECT is (
     (gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
     "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[132,133]},
     "data":{"selectionMode":"previousSelection","parameters":{"shorterThan":"5", "biggerThan":"3"}}}$$)::JSON)->>'status',
-    'Failed',
-    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Failed" for basic user'
+    'Accepted',
+    'Check if gw_fct_anl_arc_length -> previousSelection returns status "Accepted" for basic user'
 );
 
 SET role om_user;

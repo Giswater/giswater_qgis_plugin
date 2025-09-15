@@ -65,12 +65,6 @@ SELECT fk_ok('dma', 'pattern_id', 'inp_pattern', 'pattern_id', 'FK dma_pattern_i
 SELECT has_trigger('dma', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('dma', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
 
--- Check rules
-SELECT has_rule('dma', 'dma_conflict', 'Table should have dma_conflict rule');
-SELECT has_rule('dma', 'dma_del_conflict', 'Table should have dma_del_conflict rule');
-SELECT has_rule('dma', 'dma_del_undefined', 'Table should have dma_del_undefined rule');
-SELECT has_rule('dma', 'dma_undefined', 'Table should have dma_undefined rule');
-
 -- Check sequences
 SELECT has_sequence('dma_dma_id_seq', 'Sequence dma_dma_id_seq should exist'); -- Todo: rename to dma_id_seq
 

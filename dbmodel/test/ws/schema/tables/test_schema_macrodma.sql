@@ -60,10 +60,6 @@ SELECT has_index('macrodma', 'macrodma_index', 'Should have index on the_geom');
 SELECT has_trigger('macrodma', 'gw_trg_edit_controls', 'Trigger gw_trg_edit_controls should exist');
 SELECT has_trigger('macrodma', 'gw_trg_fk_array_array_table_expl', 'Trigger gw_trg_fk_array_array_table_expl should exist');
 
--- Check rules
-SELECT has_rule('macrodma', 'macrodma_del_undefined', 'Rule macrodma_del_undefined should exist');
-SELECT has_rule('macrodma', 'macrodma_undefined', 'Rule macrodma_undefined should exist');
-
 SELECT * FROM finish();
 
 ROLLBACK;

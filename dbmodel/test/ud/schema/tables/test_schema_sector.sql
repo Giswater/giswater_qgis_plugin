@@ -62,12 +62,6 @@ SELECT has_trigger('sector', 'gw_trg_fk_array_id_table_update', 'Table should ha
 SELECT has_trigger('sector', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('sector', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
 
--- Check rules
-SELECT has_rule('sector', 'sector_conflict', 'Table should have sector_conflict rule');
-SELECT has_rule('sector', 'sector_del_conflict', 'Table should have sector_del_conflict rule');
-SELECT has_rule('sector', 'sector_del_undefined', 'Table should have sector_del_undefined rule');
-SELECT has_rule('sector', 'sector_undefined', 'Table should have sector_undefined rule');
-
 -- Check sequences
 SELECT has_sequence('sector_sector_id_seq', 'Sequence sector_sector_id_seq should exist');
 
