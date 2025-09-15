@@ -12,6 +12,19 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getmessage(p_data json)
 $BODY$
 
 /*
+There are three types of messages: 'UI', 'AUDIT', and 'DEBUG' (see edit_typevalue table).
+UI: Show message on UI
+AUDIT: Save message on audit table
+DEBUG: Show message on debug table (TODO)
+
+Messages criticity:
+0: Accepted -> NO exception
+1: Warning -> NO exception
+2: Error -> Execption
+*/		
+
+
+/* EXAMPLES
 SELECT SCHEMA_NAME.gw_fct_getmessage($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
@@ -63,24 +76,24 @@ BEGIN
 	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_message_debug';
 
 	-- Get parameters from input json
-	v_message_id = lower(((p_data ->>'data')::json->>'message')::text);
-	v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
-	v_parameters = ((p_data ->>'data')::json->>'parameters')::text;
-	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
-	v_isprocess = lower(((p_data ->>'data')::json->>'is_process')::text);
+	v_message_id = lower(p_data->'data'->>'message');
+	v_function_id = lower(p_data->'data'->>'function');
+	v_parameters = p_data->'data'->>'parameters';
+	v_variables = lower(p_data->'data'->>'variables');
+	v_isprocess = lower(p_data->'data'->>'is_process');
 
-	v_fid = lower(((p_data ->>'data')::json->>'fid')::text);
-	v_result_id = ((p_data ->>'data')::json->>'result_id')::text;
-	v_temp_table = ((p_data ->>'data')::json->>'tempTable')::text;
-	v_criticity = ((p_data ->>'data')::json->>'criticity')::integer;
-	v_is_header = ((p_data ->>'data')::json->>'is_header')::boolean;
-	v_label_id = ((p_data ->>'data')::json->>'label_id')::integer;
-	v_prefix_id = ((p_data ->>'data')::json->>'prefix_id')::integer;
-	v_fcount = ((p_data ->>'data')::json->>'fcount')::integer;
-	v_header_separator_id = ((p_data ->>'data')::json->>'separator_id')::integer;
-	v_table_id = ((p_data ->>'data')::json->>'table_id')::text;
-	v_column_id = ((p_data ->>'data')::json->>'column_id')::text;
-	v_cur_user = ((p_data ->>'data')::json->>'cur_user')::text;
+	v_fid = lower(p_data->'data'->>'fid');
+	v_result_id = p_data->'data'->>'result_id';
+	v_temp_table = p_data->'data'->>'tempTable';
+	v_criticity = p_data->'data'->>'criticity';
+	v_is_header = p_data->'data'->>'is_header';
+	v_label_id = p_data->'data'->>'label_id';
+	v_prefix_id = p_data->'data'->>'prefix_id';
+	v_fcount = p_data->'data'->>'fcount';
+	v_header_separator_id = p_data->'data'->>'separator_id';
+	v_table_id = p_data->'data'->>'table_id';
+	v_column_id = p_data->'data'->>'column_id';
+	v_cur_user = p_data->'data'->>'cur_user';
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -218,10 +231,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- There are three types of messages: 'UI', 'AUDIT', and 'DEBUG' (see edit_typevalue table).
-	-- UI: Show message on UI
-	-- AUDIT: Save message on audit table
-	-- DEBUG: Show message on debug table (TODO)
 	IF rec_cat_error.message_type = 'UI' OR rec_cat_error.message_type IS NULL THEN
 		-- message process
 		IF v_isprocess THEN
