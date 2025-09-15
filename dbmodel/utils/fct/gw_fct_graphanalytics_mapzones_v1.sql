@@ -1204,6 +1204,7 @@ BEGIN
 					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
 					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 
+					-- update to_arc in man_ tables due to the new to_arc getted from the arrange network
 					UPDATE man_pump SET to_arc = tn.to_arc[1]
 					FROM temp_pgr_node tn
 					WHERE tn.node_id = man_pump.node_id

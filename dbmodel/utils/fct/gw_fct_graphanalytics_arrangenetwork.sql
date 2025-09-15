@@ -287,6 +287,7 @@ BEGIN
             SELECT pgr_node_id, node_id
             FROM temp_pgr_node
             WHERE graph_delimiter = ''' || v_mapzone_name || '''
+            AND graph_delimiter <> ''SECTOR''
             AND to_arc IS NULL
             AND node_id IS NOT NULL
         ), nodes_to_update AS (
