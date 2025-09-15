@@ -1204,21 +1204,15 @@ BEGIN
 					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
 					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 
-					-- update to_arc in man_ tables
-					FOR rec_man IN
-						SELECT rn.node_id, tn.to_arc[1] AS to_arc, sfc.man_table
-						FROM node rn
-						JOIN temp_pgr_node tn ON tn.node_id = rn.node_id
-						JOIN cat_node cn ON cn.id = rn.nodecat_id
-						JOIN cat_feature_node cfn ON cfn.id = cn.node_type
-						JOIN cat_feature cf ON cf.id = cfn.id
-						JOIN sys_feature_class sfc ON sfc.id = cf.feature_class
-						WHERE tn.to_arc IS NOT NULL AND tn.node_id IS NOT NULL
-						AND sfc.man_table <> 'man_tank'
-					LOOP
-						EXECUTE format('UPDATE %I SET to_arc = $1 WHERE node_id = $2', rec_man.man_table)
-						USING rec_man.to_arc, rec_man.node_id;
-					END LOOP;
+					UPDATE man_pump SET to_arc = tn.to_arc[1]
+					FROM temp_pgr_node tn
+					WHERE tn.node_id = man_pump.node_id
+					AND tn.to_arc IS NOT NULL AND tn.node_id IS NOT NULL;
+
+					UPDATE man_meter SET to_arc = tn.to_arc[1]
+					FROM temp_pgr_node tn
+					WHERE tn.node_id = man_meter.node_id
+					AND tn.to_arc IS NOT NULL AND tn.node_id IS NOT NULL;
 
 				ELSE
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
