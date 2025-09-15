@@ -54,3 +54,6 @@ UPDATE inp_gully SET outlet_type =null,  gully_method = null, weir_cd =null , or
 DELETE FROM raingage;
 DELETE from inp_timeseries;
 DELETE from inp_lid;
+
+-- orrifice in node 237
+DELETE FROM "element" WHERE element_id = 100021;
