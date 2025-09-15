@@ -14,6 +14,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_controls()
 $BODY$
 DECLARE
 v_featurefield varchar;
+v_mapzone_id_value integer;
 v_featurenew varchar;
 v_featureold varchar;
 v_projecttype text;
@@ -58,6 +59,19 @@ BEGIN
 
     RETURN NULL;
   ELSE
+    -- Protect system records with id 0 or -1 from deletion on mapzones
+    IF TG_OP = 'DELETE' THEN
+      IF v_featurefield IN ('expl_id', 'dwfzone_id', 'drainzone_id', 'sector_id', 'presszone_id', 'dqa_id', 
+      'supplyzone_id', 'omzone_id', 'macrosector_id', 'macroomzone_id', 'macrodqa_id', 'macrodma_id', 'macroexpl_id') THEN
+        EXECUTE format('SELECT ($1).%I', v_featurefield) INTO v_mapzone_id_value USING OLD;
+        IF v_mapzone_id_value = 0 OR v_mapzone_id_value = -1 THEN
+          EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+          "data":{"message":"4356", "function":"2718","parameters":{"id": '||v_mapzone_id_value||'}}}$$);';
+          RETURN NULL;
+        END IF;
+      END IF;
+    END IF;
+
     -- Lock level control behavior based on system and user variables:
     --
     -- CASE 1: Both system and user variables disabled
