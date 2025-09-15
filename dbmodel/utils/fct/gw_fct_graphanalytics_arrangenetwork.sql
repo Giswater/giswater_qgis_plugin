@@ -183,7 +183,7 @@ BEGIN
 	    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1
 	    WHERE n.modif AND a.modif1
     LOOP
-	    INSERT INTO temp_pgr_node (old_node_id, modif, graph_delimiter) VALUES (v_record.node_id, FALSE, v_record.n_graph_delimiter);
+	    INSERT INTO temp_pgr_node (old_node_id, modif, graph_delimiter, to_arc) VALUES (v_record.node_id, FALSE, v_record.n_graph_delimiter, v_record.to_arc);
         SELECT LAST_VALUE INTO v_pgr_node_id FROM temp_pgr_node_pgr_node_id_seq;
 	    UPDATE temp_pgr_arc SET pgr_node_1 = v_pgr_node_id, node_1 = NULL
 	    WHERE pgr_arc_id = v_record.pgr_arc_id;
@@ -199,7 +199,7 @@ BEGIN
 	    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_2
 	    WHERE n.modif AND a.modif2
     LOOP
-	    INSERT INTO temp_pgr_node (old_node_id, modif, graph_delimiter) VALUES (v_record.node_id, FALSE, v_record.n_graph_delimiter);
+	    INSERT INTO temp_pgr_node (old_node_id, modif, graph_delimiter, to_arc) VALUES (v_record.node_id, FALSE, v_record.n_graph_delimiter, v_record.to_arc);
         SELECT LAST_VALUE INTO v_pgr_node_id FROM temp_pgr_node_pgr_node_id_seq;
 	    UPDATE temp_pgr_arc SET pgr_node_2 = v_pgr_node_id, node_2 = NULL
 	    WHERE pgr_arc_id = v_record.pgr_arc_id;
@@ -210,28 +210,16 @@ BEGIN
 
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc t
-        SET closed = n.closed, broken = n.broken, to_arc = n.to_arc
+        SET closed = n.closed, broken = n.broken
         FROM temp_pgr_node n
         WHERE COALESCE(t.node_1, t.node_2) = n.node_id
         AND t.graph_delimiter = 'MINSECTOR';
 
         UPDATE temp_pgr_node t
-        SET closed = n.closed, broken = n.broken, to_arc = n.to_arc
+        SET closed = n.closed, broken = n.broken
         FROM temp_pgr_node n
         WHERE t.old_node_id = n.node_id
         AND t.graph_delimiter = 'MINSECTOR';
-
-        UPDATE temp_pgr_arc t
-        SET to_arc = n.to_arc
-        FROM temp_pgr_node n
-        WHERE COALESCE(t.node_1, t.node_2) = n.node_id
-        AND t.graph_delimiter = v_graph_delimiter;
-
-        UPDATE temp_pgr_node t
-        SET to_arc = n.to_arc
-        FROM temp_pgr_node n
-        WHERE t.old_node_id = n.node_id
-        AND t.graph_delimiter = v_graph_delimiter;
 
         -- closed valves
         UPDATE temp_pgr_arc a
