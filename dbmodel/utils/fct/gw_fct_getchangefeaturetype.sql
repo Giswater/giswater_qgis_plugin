@@ -28,7 +28,7 @@ DECLARE
 	v_table_name text;
 	v_form text;
 	v_addparam json;
-	v_featurecat_ids text[];
+	v_featurecat_ids json;
 	v_catalogs_ids text[];
 	v_fluids text[];
 	v_locations text[];
@@ -146,7 +146,7 @@ BEGIN
 
         IF (aux_json->>'columnname') = 'feature_type_new' then
 
-            SELECT array_agg(id) into v_featurecat_ids FROM cat_feature WHERE parent_layer = v_table_name AND active is True group by parent_layer order by 1;
+            SELECT to_json(array_agg(id ORDER BY id)) into v_featurecat_ids FROM cat_feature WHERE parent_layer = v_table_name AND active is True;
             -- fill combo values
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_featurecat_ids, '{}'));
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_featurecat_ids, '{}'));
