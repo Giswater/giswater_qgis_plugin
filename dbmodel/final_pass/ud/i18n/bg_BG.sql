@@ -507,16 +507,7 @@ UPDATE config_form_fields AS t
 SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
-    ('node_type', 'v_rpt_comp_nodeinflow_sum', 'form_feature', 'tab_none', 'Тип възел:', 'node_type - Тип на възела.'),
-    ('max_latinf', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Max latinf:', 'max_latinf'),
-    ('i_f0', 'inp_snowmelt', 'form_feature', 'tab_none', 'I f0:', 'В непроходим район, част от площта, покрита със сняг, когато съотношението между дълбочината на снега и дълбочината при 100% покритие е 0.'),
-    ('node_id', 'inp_dscenario_storage', 'form_feature', 'tab_none', 'Node id:', 'Node id:'),
-    ('cd', 've_inp_orifice', 'form_feature', 'tab_none', 'Cd:', 'Коефициент на разтоварване (без единици).'),
-    ('custom_b_param', 've_epa_netgully', 'form_feature', 'tab_epa', 'Персонализиран параметър b:', 'Custom b parameter'),
     ('annotation', 've_inp_storage', 'form_feature', 'tab_none', 'Анотация:', 'Annotation'),
-    ('orate', 've_inp_flwreg_orifice', 'form_feature', 'tab_none', 'Orate:', 'Orate'),
-    ('rotation', 've_plan_psector', 'form_feature', 'tab_none', 'Rotation:', 'Rotation:'),
-    ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstamp:', 'Tstamp'),
     ('tbl_frelem_dsc_weir', 'node', 'form_feature', 'tab_elements', NULL, NULL),
     ('id', 'v_rpt_high_flowinest_ind', 'form_feature', 'tab_none', 'ID:', 'ID'),
     ('link', 'cat_mat_node', 'form_feature', 'tab_none', 'Link:', 'link - Field to store link to information related to the node.'),
@@ -3787,6 +3778,15 @@ FROM (
     ('old_nodecat_id', 've_review_audit_node', 'form_feature', 'tab_none', 'Old node cat id:', 'old_nodecat_id'),
     ('isprofilesurface', 'cat_feature_node', 'form_feature', 'tab_none', 'Profile surface:', 'Profile surface'),
     ('hydro_expl', 'search', 'form_feature', 'tab_none', 'Exploitation:', 'Exploitation'),
+    ('node_type', 'v_rpt_comp_nodeinflow_sum', 'form_feature', 'tab_none', 'Тип възел:', 'node_type - Тип на възела.'),
+    ('max_latinf', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Max latinf:', 'max_latinf'),
+    ('i_f0', 'inp_snowmelt', 'form_feature', 'tab_none', 'I f0:', 'В непроходим район, част от площта, покрита със сняг, когато съотношението между дълбочината на снега и дълбочината при 100% покритие е 0.'),
+    ('node_id', 'inp_dscenario_storage', 'form_feature', 'tab_none', 'Node id:', 'Node id:'),
+    ('cd', 've_inp_orifice', 'form_feature', 'tab_none', 'Cd:', 'Коефициент на разтоварване (без единици).'),
+    ('custom_b_param', 've_epa_netgully', 'form_feature', 'tab_epa', 'Персонализиран параметър b:', 'Custom b parameter'),
+    ('orate', 've_inp_flwreg_orifice', 'form_feature', 'tab_none', 'Orate:', 'Orate'),
+    ('rotation', 've_plan_psector', 'form_feature', 'tab_none', 'Rotation:', 'Rotation:'),
+    ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstamp:', 'Tstamp'),
     ('state_type', 've_inp_netgully', 'form_feature', 'tab_data', 'Вид държава:', 'state_type - Типът на състоянието на елемента. Позволява да се получи по-подробна информация за състоянието. Да се избере от наличните в зависимост от избраното състояние'),
     ('gully_id', 've_inp_gully', 'form_feature', 'tab_data', 'Идентификатор на улея:', 'gully_id - Идентификатор на канавката. Не е необходимо да го въвеждате, той е автоматичен сериен'),
     ('gullycat_id', 've_inp_netgully', 'form_feature', 'tab_data', 'Gullycat id:', 'gullycat_id'),
@@ -8096,7 +8096,6 @@ FROM (
     ('arc', NULL, 'Table of spatial objects representing arcs.'),
     ('v_plan_result_arc', NULL, 'View related to cost results for arcs'),
     ('v_ui_visit_incid_gully', NULL, 'v_ui_visit_incid_gully'),
-    ('ve_raingage', NULL, 'Shows editable information about raingages.'),
     ('cat_work', 'Work catalog', 'Catalog of construction works.'),
     ('ve_gully_ginlet', 'Ginlet', 'Custom editable view for GINLET'),
     ('man_conduitlink', NULL, 'man_conduitlink'),
@@ -8137,7 +8136,8 @@ FROM (
     ('v_value_relation', 'Domain value', 'Domain value table'),
     ('v_ui_visit_incid_node', NULL, 'v_ui_visit_incid_node'),
     ('ve_element_ecover', 'Ecover', 'Custom editable view for ECOVER'),
-    ('archived_psector_connec', NULL, 'archived_psector_connec')
+    ('archived_psector_connec', NULL, 'archived_psector_connec'),
+    ('ve_raingage', 'Inp Raingage', 'Shows editable information about raingages.')
 ) AS v(id, alias, descript)
 WHERE t.id = v.id;
 

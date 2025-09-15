@@ -507,16 +507,7 @@ UPDATE config_form_fields AS t
 SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
-    ('node_type', 'v_rpt_comp_nodeinflow_sum', 'form_feature', 'tab_none', 'Typ des Knotens:', 'nodetype_id - Knotentyp. Sie wird automatisch auf der Grundlage von nodecat_id ausgefüllt.'),
-    ('max_latinf', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Max latinf:', 'max_latinf'),
-    ('i_f0', 'inp_snowmelt', 'form_feature', 'tab_none', 'I f0:', 'Der Anteil der schneebedeckten Fläche in einem unbewachsenen Gebiet, wenn das Verhältnis zwischen der Schneehöhe und der Tiefe bei 100%iger Bedeckung 0 ist.'),
-    ('node_id', 'inp_dscenario_storage', 'form_feature', 'tab_none', 'Knotenpunkt-ID:', 'Knotenpunkt-ID:'),
-    ('cd', 've_inp_orifice', 'form_feature', 'tab_none', 'Cd:', 'Abflusskoeffizient (ohne Einheit).'),
-    ('custom_b_param', 've_epa_netgully', 'form_feature', 'tab_epa', 'Benutzerdefinierter b-Parameter:', 'Benutzerdefinierter b-Parameter'),
     ('annotation', 've_inp_storage', 'form_feature', 'tab_none', 'Anmerkung:', 'Anmerkung'),
-    ('orate', 've_inp_flwreg_orifice', 'form_feature', 'tab_none', 'Orate:', 'Orate'),
-    ('rotation', 've_plan_psector', 'form_feature', 'tab_none', 'Rotation:', 'Rotation:'),
-    ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstempel:', 'Tstempel'),
     ('tbl_frelem_dsc_weir', 'node', 'form_feature', 'tab_elements', NULL, NULL),
     ('id', 'v_rpt_high_flowinest_ind', 'form_feature', 'tab_none', 'ID:', 'ID'),
     ('link', 'cat_mat_node', 'form_feature', 'tab_none', 'Link:', 'link - Field to store link to information related to the node.'),
@@ -3787,6 +3778,15 @@ FROM (
     ('old_nodecat_id', 've_review_audit_node', 'form_feature', 'tab_none', 'Alter Knoten cat id:', 'alte_nodecat_id'),
     ('isprofilesurface', 'cat_feature_node', 'form_feature', 'tab_none', 'Profiloberfläche:', 'Profiloberfläche'),
     ('hydro_expl', 'search', 'form_feature', 'tab_none', 'Betrieb:', 'Betrieb'),
+    ('node_type', 'v_rpt_comp_nodeinflow_sum', 'form_feature', 'tab_none', 'Typ des Knotens:', 'nodetype_id - Knotentyp. Sie wird automatisch auf der Grundlage von nodecat_id ausgefüllt.'),
+    ('max_latinf', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Max latinf:', 'max_latinf'),
+    ('i_f0', 'inp_snowmelt', 'form_feature', 'tab_none', 'I f0:', 'Der Anteil der schneebedeckten Fläche in einem unbewachsenen Gebiet, wenn das Verhältnis zwischen der Schneehöhe und der Tiefe bei 100%iger Bedeckung 0 ist.'),
+    ('node_id', 'inp_dscenario_storage', 'form_feature', 'tab_none', 'Knotenpunkt-ID:', 'Knotenpunkt-ID:'),
+    ('cd', 've_inp_orifice', 'form_feature', 'tab_none', 'Cd:', 'Abflusskoeffizient (ohne Einheit).'),
+    ('custom_b_param', 've_epa_netgully', 'form_feature', 'tab_epa', 'Benutzerdefinierter b-Parameter:', 'Benutzerdefinierter b-Parameter'),
+    ('orate', 've_inp_flwreg_orifice', 'form_feature', 'tab_none', 'Orate:', 'Orate'),
+    ('rotation', 've_plan_psector', 'form_feature', 'tab_none', 'Rotation:', 'Rotation:'),
+    ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstempel:', 'Tstempel'),
     ('state_type', 've_inp_netgully', 'form_feature', 'tab_data', 'Zustand art:', 'zustand_art'),
     ('gully_id', 've_inp_gully', 'form_feature', 'tab_data', 'Gully id:', 'gully_id'),
     ('gullycat_id', 've_inp_netgully', 'form_feature', 'tab_data', 'Gullycat id:', 'gullycat_id'),
@@ -8096,7 +8096,6 @@ FROM (
     ('arc', NULL, 'Table of spatial objects representing arcs.'),
     ('v_plan_result_arc', NULL, 'View related to cost results for arcs'),
     ('v_ui_visit_incid_gully', NULL, 'v_ui_visit_incid_gully'),
-    ('ve_raingage', 'Inp Raingage', 'Zeigt bearbeitbare Informationen über Ragingages an.'),
     ('cat_work', 'Work catalog', 'Catalog of construction works.'),
     ('ve_gully_ginlet', 'Ginlet', 'Custom editable view for GINLET'),
     ('man_conduitlink', NULL, 'man_conduitlink'),
@@ -8137,7 +8136,8 @@ FROM (
     ('v_value_relation', 'Domain value', 'Domain value table'),
     ('v_ui_visit_incid_node', NULL, 'v_ui_visit_incid_node'),
     ('ve_element_ecover', 'Ecover', 'Custom editable view for ECOVER'),
-    ('archived_psector_connec', NULL, 'archived_psector_connec')
+    ('archived_psector_connec', NULL, 'archived_psector_connec'),
+    ('ve_raingage', 'Inp Raingage', 'Zeigt bearbeitbare Informationen über Ragingages an.')
 ) AS v(id, alias, descript)
 WHERE t.id = v.id;
 
