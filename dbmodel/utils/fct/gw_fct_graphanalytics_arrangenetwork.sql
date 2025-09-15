@@ -248,11 +248,6 @@ BEGIN
     SET cost = -1, reverse_cost = -1
     WHERE a.graph_delimiter  = 'FORCECLOSED';
 
-    -- IGNORE
-    UPDATE temp_pgr_arc a
-    SET cost = 1, reverse_cost = 1
-    WHERE a.graph_delimiter  = 'IGNORE';
-
     -- calculate to_arc of node parents in from zero mode
     IF v_from_zero AND v_project_type = 'WS' THEN
         v_query_text := 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 

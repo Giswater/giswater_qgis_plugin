@@ -414,7 +414,7 @@ BEGIN
 			EXECUTE v_query_text;
 		ELSE 
 			v_query_text :=
-				'UPDATE temp_pgr_arc a SET graph_delimiter = ''IGNORE'' 
+				'UPDATE temp_pgr_arc a SET cost = 1, reverse_cost = 1, graph_delimiter = ''IGNORE'' 
 				FROM (
 					SELECT (json_array_elements_text(graphconfig->''ignore''))::int4 AS arc_id
 					FROM ' || v_table_name || ' 
@@ -448,7 +448,7 @@ BEGIN
 		UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'IGNORE'
 		WHERE n.node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 	ELSE
-		UPDATE temp_pgr_arc a SET graph_delimiter = 'IGNORE'
+		UPDATE temp_pgr_arc a SET cost = 1, reverse_cost = 1, graph_delimiter = 'IGNORE'
 		WHERE a.arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 	END IF;
 
