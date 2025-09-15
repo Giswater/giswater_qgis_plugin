@@ -11,7 +11,7 @@ from typing import Any, Callable, Union  # Literal, Dict, Optional,
 from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
 from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, \
-                    QHBoxLayout, QPushButton, QGridLayout
+                    QPushButton, QGridLayout
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtCore import QItemSelectionModel
 
@@ -55,7 +55,7 @@ class GwSelectionWidget(QWidget):
         self.lyt_selection.setSpacing(2)
 
         # Create selection button
-        if menu_variables:  
+        if menu_variables:
             self.init_selection_btn(**general_variables, **menu_variables)
 
         # Activate highlight features methods
@@ -76,7 +76,7 @@ class GwSelectionWidget(QWidget):
             # selection_on_top_variables can be None; ensure we pass a mapping
             extra_kwargs = selection_on_top_variables or {}
             self.init_selection_on_top(**general_variables, **extra_kwargs)
-        
+
         if self.number_rows > 1 and self.number_buttons > 1:
             self.reorder_lyt_selection()
 
@@ -760,7 +760,7 @@ class GwSelectionWidget(QWidget):
         
         Transforms the current horizontal layout into a grid layout with the specified
         number of rows, distributing widgets evenly across columns.
-        """            
+        """
         # Collect all widgets from the current layout
         self.widgets = []
         while self.lyt_selection.count():
