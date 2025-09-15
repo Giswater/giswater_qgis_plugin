@@ -1,0 +1,3 @@
+4.4.0
+*************
+- Add shorterThan and biggerThan in gw_fct_anl_arc_length
