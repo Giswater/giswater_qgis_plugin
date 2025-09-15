@@ -16,3 +16,7 @@ WHERE id = 3052;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4356, 'Cannot delete system mapzone with id: %id%', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
+
+-- 15/09/2025
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3514, 'gw_fct_cm_admin_manage_fields', 'utils', 'function', 'json', 'json', 'Funtion to auto-update cm views and tables to match their parent definitions.', 'role_admin', NULL, 'core', NULL);
