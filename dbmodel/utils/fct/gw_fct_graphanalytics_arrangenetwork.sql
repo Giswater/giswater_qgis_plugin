@@ -189,7 +189,7 @@ BEGIN
 	    WHERE pgr_arc_id = v_record.pgr_arc_id;
 	    INSERT INTO temp_pgr_arc (old_arc_id, pgr_node_1, pgr_node_2, node_1, graph_delimiter, cost, reverse_cost, to_arc)
 	    VALUES (v_record.arc_id, v_record.pgr_node_1, v_pgr_node_id, v_record.node_1,
-        CASE WHEN v_record.a_graph_delimiter = 'NONE' THEN v_record.n_graph_delimiter ELSE v_record.a_graph_delimiter END, v_cost, v_reverse_cost, v_record.to_arc);
+        v_record.n_graph_delimiter, v_cost, v_reverse_cost, v_record.to_arc);
     END LOOP;
 
     -- Disconnect arcs with modif = TRUE at nodes with modif2 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost
@@ -205,7 +205,7 @@ BEGIN
 	    WHERE pgr_arc_id = v_record.pgr_arc_id;
 	    INSERT INTO temp_pgr_arc(old_arc_id, pgr_node_1, pgr_node_2, node_2, graph_delimiter, cost, reverse_cost)
 	    VALUES (v_record.arc_id, v_pgr_node_id, v_record.pgr_node_2, v_record.node_2,
-        CASE WHEN v_record.a_graph_delimiter = 'NONE' THEN v_record.n_graph_delimiter ELSE v_record.a_graph_delimiter END, v_cost, v_reverse_cost);
+        v_record.n_graph_delimiter, v_cost, v_reverse_cost);
     END LOOP;
 
     IF v_project_type = 'WS' THEN
@@ -255,12 +255,15 @@ BEGIN
         AND a.old_arc_id <> ALL (a.to_arc);
     END IF;
 
-    -- nodes FORCECLOSED
+    -- FORCECLOSED
     UPDATE temp_pgr_arc a
     SET cost = -1, reverse_cost = -1
     WHERE a.graph_delimiter  = 'FORCECLOSED';
 
-
+    -- IGNORE
+    UPDATE temp_pgr_arc a
+    SET cost = 1, reverse_cost = 1
+    WHERE a.graph_delimiter  = 'IGNORE';
 
     IF v_project_type = 'WS' THEN
         v_source := 'pgr_node_1';
@@ -274,7 +277,7 @@ BEGIN
         IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
             v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
                 FROM temp_pgr_arc
-                WHERE graph_delimiter <> ''INITOVERFLOWPATH'' AND reverse_cost < 0'; -- if pgr_node_1 or pgr_node_2 have graph_delimiter = IGNORE, the arcs will not be filtered
+                WHERE graph_delimiter <> ''INITOVERFLOWPATH''';
         ELSIF v_project_type = 'UD' THEN
             v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
                 FROM temp_pgr_arc';
