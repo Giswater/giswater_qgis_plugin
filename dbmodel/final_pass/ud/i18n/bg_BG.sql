@@ -209,8 +209,8 @@ FROM (
     ('edit_connectype_vdefault', 'Тип по подразбиране за connec (родителски слой):', 'Тип по подразбиране за connec, когато се използва родителски слой (v_edit_connec)'),
     ('edit_addfield_p34_vdefault', 'weir_param_1:', 'Default value of addfield weir_param_1 for WEIR'),
     ('edit_arc_keepdepthval_when_reverse_geom', NULL, 'Ако има стойност, при обръщане на дъгата ще се разменят само стойностите на идентификаторите от възли_1 и_2, като стойностите на дълбочината в същия възел (y1, y2, custom_y1, custom_y2, elev_1, elev_2, custom_elev_1, custom_elev_2, sys_elev_1, sys_elev_2) ще останат в същия възел.'),
-    ('feat_vlink_vdefault', 'Default catalog for vlink', 'Value default catalog for vlink cat_feature'),
     ('inp_options_force_main_equation', 'Уравнение на магистралата:', 'Стойност на уравнението на магистралата, което определя дали уравнението на Хейзън-Уилямс (H-W) или уравнението на Дарси-Вайсбах (D-W) ще се използва за изчисляване на загубите от триене при поток под налягане в канали, на които е присвоена форма на кръгово сечение на магистралата.'),
+    ('feat_vlink_vdefault', 'Default catalog for vlink:', 'Value default catalog for vlink cat_feature'),
     ('edit_connec_category_vdefault', 'Категория Connec:', 'Стойност по подразбиране на типа категория за свързване'),
     ('inp_options_start_date', 'Дата на започване:', 'Стойност на началната дата, която е датата, на която започва симулацията'),
     ('plan_psector_force_delete', 'Планирана функция за принудително изтриване:', 'Принудително изтриване, когато функцията е изтрита от един псектор и повече не се появява в друг псектор'),
@@ -1618,7 +1618,6 @@ FROM (
     ('curve_id', 've_inp_dscenario_flwreg_pump', 'form_feature', 'tab_none', 'Идентификатор на кривата:', 'Curve ID'),
     ('result_id', 'v_rpt_comp_outfallload_sum', 'form_feature', 'tab_none', 'Идентификатор на резултата:', 'result_id - Идентификатор на резултата'),
     ('time_days', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Време в дни:', 'Time in days'),
-    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diamter:', 'Internal diamter'),
     ('model_id', 'cat_arc', 'form_feature', 'tab_none', 'Model:', 'model'),
     ('new_matcat_id', 've_review_audit_node', 'form_feature', 'tab_none', 'Нов идентификатор на Matcat:', 'new_matcat_id'),
     ('ysur', 've_inp_dscenario_storage', 'form_feature', 'tab_none', 'Ysur:', 'ysur:'),
@@ -3789,6 +3788,7 @@ FROM (
     ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstamp:', 'Tstamp'),
     ('state_type', 've_inp_netgully', 'form_feature', 'tab_data', 'Вид държава:', 'state_type - Типът на състоянието на елемента. Позволява да се получи по-подробна информация за състоянието. Да се избере от наличните в зависимост от избраното състояние'),
     ('gully_id', 've_inp_gully', 'form_feature', 'tab_data', 'Идентификатор на улея:', 'gully_id - Идентификатор на канавката. Не е необходимо да го въвеждате, той е автоматичен сериен'),
+    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diameter:', 'Internal diameter'),
     ('gullycat_id', 've_inp_netgully', 'form_feature', 'tab_data', 'Gullycat id:', 'gullycat_id'),
     ('gully_type', 've_inp_gully', 'form_feature', 'tab_data', 'Вид на улея:', 'gully_type - Тип на улука. За да изберете от каталога с типове улуци'),
     ('state_type', 've_inp_gully', 'form_feature', 'tab_data', 'Вид държава:', 'state_type - Типът на състоянието на елемента. Позволява да се получи по-подробна информация за състоянието. Да се избере от наличните в зависимост от избраното състояние'),
@@ -3864,7 +3864,6 @@ FROM (
     ('tab_drain', 'tabname_typevalue', 'tab_drain'),
     ('tab_weir', 'tabname_typevalue', 'tab_weir'),
     ('actionVisitStart', 'formactions_typevalue', 'Начало на посещението'),
-    ('actionSetToArc', 'formactions_typevalue', 'Задайте to_arc'),
     ('actionCatalog', 'formactions_typevalue', 'Промяна на каталога'),
     ('actionLink', 'formactions_typevalue', 'Отворена връзка'),
     ('actionMapZone', 'formactions_typevalue', 'Добавяне на Mapzone'),
@@ -4202,7 +4201,8 @@ FROM (
     ('lyt_hydrometer_1', 'layout_name_typevalue', 'lyt_hydrometer_1'),
     ('lyt_element_mng_2', 'layout_name_typevalue', 'lyt_element_mng_2'),
     ('numeric', 'datatype_typevalue', 'numeric'),
-    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1')
+    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1'),
+    ('actionSetToArc', 'formactions_typevalue', 'Задайте to_arc')
 ) AS v(source, formname, idval)
 WHERE t.id = v.source AND t.typevalue = v.formname;
 
@@ -7269,7 +7269,6 @@ FROM (
     ('ve_elem_pump', 'Pump', 'Custom editable view for PUMP'),
     ('vcv_emitters', NULL, 'View emitters for epatools'),
     ('rpt_lidperformance_sum', NULL, 'Contains the results of LID performance simulations.'),
-    ('ve_inp_dscenario_lids', NULL, 'v_edit_inp_dscenario_lids'),
     ('vi_timeseries', NULL, 'Used to export to SWMM the information about time series with absolute type'),
     ('vi_aquifers', NULL, 'Used to export to SWMM information about aquifers'),
     ('rpt_flowrouting_cont', NULL, 'Contains the results of flow routing continuity simulations.'),
@@ -7281,6 +7280,7 @@ FROM (
     ('ve_node_pump_station', 'Pump_Station', 'Custom editable view for PUMP_STATION'),
     ('ve_inp_flwreg_orifice', 'Flowreg Orifice', 'View with the information of flow regulators type orifice'),
     ('man_outfall', NULL, 'Additional information for outfall management'),
+    ('ve_inp_dscenario_lids', 'Lids Dscenario', 'v_edit_inp_dscenario_lids'),
     ('ve_node_sewer_storage', 'Sewer_Storage', 'Custom editable view for SEWER_STORAGE'),
     ('ve_cat_feature_gully', 'Gully features', 'Editable view for cat_feature_gully configuration'),
     ('v_plan_current_psector', 'Plan current psector', 'View to show current planified sector'),

@@ -209,8 +209,8 @@ FROM (
     ('edit_connectype_vdefault', 'Tipo predeterminado para connec (capa principal):', 'Tipo predeterminado para conexión cuando se usa la capa principal (v_edit_connec)'),
     ('edit_addfield_p34_vdefault', 'weir_param_1:', 'Default value of addfield weir_param_1 for WEIR'),
     ('edit_arc_keepdepthval_when_reverse_geom', NULL, 'Si el valor, cuando se invierte el arco, solo se intercambiarán los valores de ID de node_1 y node_2, manteniendo los valores de profundidad en el mismo nodo (y1, y2, custom_y1, custom_y2, elev_1, elev_2, custom_elev_1, custom_elev_2, sys_elev_1, sys_elev_2) permanecerán en el mismo nodo'),
-    ('feat_vlink_vdefault', 'Default catalog for vlink', 'Value default catalog for vlink cat_feature'),
     ('inp_options_force_main_equation', 'Ecuación principal de la fuerza:', 'Value of force main equation, which establishes whether the Hazen-Williams (H-W) or the Darcy-Weisbach (D-W) equation will be used to compute friction losses for pressurized flow in conduits that have been assigned a Circular Force Main crosssection shape'),
+    ('feat_vlink_vdefault', 'Default catalog for vlink:', 'Value default catalog for vlink cat_feature'),
     ('edit_connec_category_vdefault', 'Categoría de connec:', 'Valor predeterminado del tipo de categoría para conectar'),
     ('inp_options_start_date', 'Fecha de inicio:', 'Valor de la fecha de inicio, que es la fecha en que comienza la simulación'),
     ('plan_psector_force_delete', 'Forzar la eliminaciónl elemento planificado:', 'Forzar la eliminación cuando el elemento se elimine de un psector y ya no aparezca en otro psector'),
@@ -1618,7 +1618,6 @@ FROM (
     ('curve_id', 've_inp_dscenario_flwreg_pump', 'form_feature', 'tab_none', 'Id de curva:', 'curve_id - Identificador de la curva'),
     ('result_id', 'v_rpt_comp_outfallload_sum', 'form_feature', 'tab_none', 'Id de resultado:', 'result_id - Identificador del resultado'),
     ('time_days', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Tiempo en días:', 'Time in days'),
-    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diamter:', 'Internal diamter'),
     ('model_id', 'cat_arc', 'form_feature', 'tab_none', 'Model:', 'model'),
     ('new_matcat_id', 've_review_audit_node', 'form_feature', 'tab_none', 'Nuevo ID del catálogo de materiales:', 'new_matcat_id'),
     ('ysur', 've_inp_dscenario_storage', 'form_feature', 'tab_none', 'Ysur:', 'ysur:'),
@@ -3789,6 +3788,7 @@ FROM (
     ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstamp:', 'Tstamp'),
     ('state_type', 've_inp_netgully', 'form_feature', 'tab_data', 'Tipo de estado:', 'state_type - Tipo de estado del elemento. Permite obtener más detalle del estado. A seleccionar de los disponibles en función del estado escogido'),
     ('gully_id', 've_inp_gully', 'form_feature', 'tab_data', 'Id del sumidero:', 'gully_id - Identificador del sumidero. No es necesario introducirlo, es un serial automático'),
+    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diameter:', 'Internal diameter'),
     ('gullycat_id', 've_inp_netgully', 'form_feature', 'tab_data', 'Gullycat id:', 'gullycat_id'),
     ('gully_type', 've_inp_gully', 'form_feature', 'tab_data', 'Tipo de sumidero:', 'gully_type - Tipo de sumidero. A seleccionar del catálogo de tipos de gully'),
     ('state_type', 've_inp_gully', 'form_feature', 'tab_data', 'Tipo de estado:', 'state_type - Tipo de estado del elemento. Permite obtener más detalle del estado. A seleccionar de los disponibles en función del estado escogido'),
@@ -3864,7 +3864,6 @@ FROM (
     ('tab_drain', 'tabname_typevalue', 'tab_drain'),
     ('tab_weir', 'tabname_typevalue', 'tab_weir'),
     ('actionVisitStart', 'formactions_typevalue', 'Empezar visita'),
-    ('actionSetToArc', 'formactions_typevalue', 'Establecer to_arc'),
     ('actionCatalog', 'formactions_typevalue', 'Canviar catálogo'),
     ('actionLink', 'formactions_typevalue', 'Abrir enlace'),
     ('actionMapZone', 'formactions_typevalue', 'Añadir Maozone'),
@@ -4202,7 +4201,8 @@ FROM (
     ('lyt_hydrometer_1', 'layout_name_typevalue', 'lyt_hydrometer_1'),
     ('lyt_element_mng_2', 'layout_name_typevalue', 'lyt_element_mng_2'),
     ('numeric', 'datatype_typevalue', 'numeric'),
-    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1')
+    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1'),
+    ('actionSetToArc', 'formactions_typevalue', 'Establecer to_arc')
 ) AS v(source, formname, idval)
 WHERE t.id = v.source AND t.typevalue = v.formname;
 
@@ -7269,7 +7269,6 @@ FROM (
     ('ve_elem_pump', 'Pump', 'Custom editable view for PUMP'),
     ('vcv_emitters', NULL, 'View emitters for epatools'),
     ('rpt_lidperformance_sum', NULL, 'Contains the results of LID performance simulations.'),
-    ('ve_inp_dscenario_lids', NULL, 'v_edit_inp_dscenario_lids'),
     ('vi_timeseries', NULL, 'Used to export to SWMM the information about time series with absolute type'),
     ('vi_aquifers', NULL, 'Used to export to SWMM information about aquifers'),
     ('rpt_flowrouting_cont', NULL, 'Contains the results of flow routing continuity simulations.'),
@@ -7281,6 +7280,7 @@ FROM (
     ('ve_node_pump_station', 'Pump_Station', 'Custom editable view for PUMP_STATION'),
     ('ve_inp_flwreg_orifice', 'Flowreg Orifice', 'View with the information of flow regulators type orifice'),
     ('man_outfall', NULL, 'Additional information for outfall management'),
+    ('ve_inp_dscenario_lids', 'Lids Dscenario', 'v_edit_inp_dscenario_lids'),
     ('ve_node_sewer_storage', 'Sewer_Storage', 'Custom editable view for SEWER_STORAGE'),
     ('ve_cat_feature_gully', 'Objetos tipo sumidero', 'Editable view for cat_feature_gully configuration'),
     ('v_plan_current_psector', 'Plan current psector', 'View to show current planified sector'),

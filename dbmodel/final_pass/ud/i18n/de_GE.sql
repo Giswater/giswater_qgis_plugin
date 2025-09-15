@@ -209,8 +209,8 @@ FROM (
     ('edit_connectype_vdefault', 'Standardtyp für connec (übergeordnete Ebene):', 'Standardtyp für Connec, wenn die übergeordnete Ebene (v_edit_connec) verwendet wird'),
     ('edit_addfield_p34_vdefault', 'weir_param_1:', 'Standardwert des Zusatzfeldes weir_param_1 für WEIR'),
     ('edit_arc_keepdepthval_when_reverse_geom', NULL, 'Wenn Wert, wenn Bogen umgekehrt wird nur id Werte von node_1 und node_2 ausgetauscht werden, halten Tiefe Werte auf dem gleichen Knoten (y1, y2, custom_y1, custom_y2, elev_1, elev_2, custom_elev_1, custom_elev_2, sys_elev_1, sys_elev_2) werden auf dem gleichen Knoten bleiben'),
-    ('feat_vlink_vdefault', 'Standardkatalog für vlink', 'Wert Standardkatalog für vlink cat_feature'),
     ('inp_options_force_main_equation', 'Gleichung für die Kraftwerksleitung:', 'Wert der Kraftwerksgleichung, der festlegt, ob die Hazen-Williams (H-W)- oder die Darcy-Weisbach (D-W)-Gleichung zur Berechnung der Reibungsverluste für Druckströmungen in Kanälen verwendet wird, denen ein kreisförmiger Kraftwerksquerschnitt zugewiesen wurde'),
+    ('feat_vlink_vdefault', 'Standardkatalog für vlink', 'Wert Standardkatalog für vlink cat_feature'),
     ('edit_connec_category_vdefault', 'Kategorie Connec:', 'Standardwert des Kategorietyps für die Konnektivität'),
     ('inp_options_start_date', 'Startdatum:', 'Wert des Startdatums, d. h. des Datums, an dem die Simulation beginnt'),
     ('plan_psector_force_delete', 'Geplantes Merkmal "Löschen erzwingen":', 'Löschen erzwingen, wenn ein Merkmal aus einem Sektor gelöscht wird und in einem anderen Sektor nicht mehr erscheint'),
@@ -1618,7 +1618,6 @@ FROM (
     ('curve_id', 've_inp_dscenario_flwreg_pump', 'form_feature', 'tab_none', 'Kurven-ID:', 'Kurven-ID'),
     ('result_id', 'v_rpt_comp_outfallload_sum', 'form_feature', 'tab_none', 'Ergebnis id:', 'result_id - Ergebnis-ID'),
     ('time_days', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', 'Zeit in Tagen:', 'Zeit in Tagen'),
-    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diamter:', 'Internal diamter'),
     ('model_id', 'cat_arc', 'form_feature', 'tab_none', 'Model:', 'model'),
     ('new_matcat_id', 've_review_audit_node', 'form_feature', 'tab_none', 'Neue Matcat-ID:', 'neue_matcat_id'),
     ('ysur', 've_inp_dscenario_storage', 'form_feature', 'tab_none', 'Ysur:', 'ysur:'),
@@ -3789,6 +3788,7 @@ FROM (
     ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstempel:', 'Tstempel'),
     ('state_type', 've_inp_netgully', 'form_feature', 'tab_data', 'Zustand art:', 'zustand_art'),
     ('gully_id', 've_inp_gully', 'form_feature', 'tab_data', 'Gully id:', 'gully_id'),
+    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diameter:', 'Internal diameter'),
     ('gullycat_id', 've_inp_netgully', 'form_feature', 'tab_data', 'Gullycat id:', 'gullycat_id'),
     ('gully_type', 've_inp_gully', 'form_feature', 'tab_data', 'Gully-Typ:', 'Gully-Typ'),
     ('state_type', 've_inp_gully', 'form_feature', 'tab_data', 'Zustand art:', 'zustand_art'),
@@ -3864,7 +3864,6 @@ FROM (
     ('tab_drain', 'tabname_typevalue', 'tab_drain'),
     ('tab_weir', 'tabname_typevalue', 'tab_weir'),
     ('actionVisitStart', 'formactions_typevalue', 'Start Besuch'),
-    ('actionSetToArc', 'formactions_typevalue', 'to_arc einstellen'),
     ('actionCatalog', 'formactions_typevalue', 'Katalog ändern'),
     ('actionLink', 'formactions_typevalue', 'Link öffnen'),
     ('actionMapZone', 'formactions_typevalue', 'Mapzone hinzufügen'),
@@ -4202,7 +4201,8 @@ FROM (
     ('lyt_hydrometer_1', 'layout_name_typevalue', 'lyt_hydrometer_1'),
     ('lyt_element_mng_2', 'layout_name_typevalue', 'lyt_element_mng_2'),
     ('numeric', 'datatype_typevalue', 'numerisch'),
-    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1')
+    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1'),
+    ('actionSetToArc', 'formactions_typevalue', 'to_arc einstellen')
 ) AS v(source, formname, idval)
 WHERE t.id = v.source AND t.typevalue = v.formname;
 
@@ -7269,7 +7269,6 @@ FROM (
     ('ve_elem_pump', 'Pumpe', 'Individuell bearbeitbare Ansicht für PUMP'),
     ('vcv_emitters', NULL, 'Emittenten für epatools anzeigen'),
     ('rpt_lidperformance_sum', NULL, 'Enthält die Ergebnisse von LID-Leistungssimulationen.'),
-    ('ve_inp_dscenario_lids', NULL, 'v_edit_inp_inp_dscenario_lids'),
     ('vi_timeseries', NULL, 'Wird verwendet, um die Informationen über Zeitreihen mit absolutem Typ in SWMM zu exportieren'),
     ('vi_aquifers', NULL, 'Dient dem Export von Informationen über Grundwasserleiter in SWMM'),
     ('rpt_flowrouting_cont', NULL, 'Enthält die Ergebnisse von Flow Routing Continuity Simulationen.'),
@@ -7281,6 +7280,7 @@ FROM (
     ('ve_node_pump_station', 'Pump_Station', 'Benutzerdefinierte editierbare Ansicht für PUMP_STATION'),
     ('ve_inp_flwreg_orifice', 'Flowreg Blende', 'Ansicht mit den Informationen des Durchflussreglers Typ Blende'),
     ('man_outfall', NULL, 'Zusätzliche Informationen für das Management von Abflüssen'),
+    ('ve_inp_dscenario_lids', 'Lids Dscenario', 'v_edit_inp_inp_dscenario_lids'),
     ('ve_node_sewer_storage', 'Kanalisation_Storage', 'Benutzerdefinierte editierbare Ansicht für SEWER_STORAGE'),
     ('ve_cat_feature_gully', 'Katalog der Gully-Eigenschaften', 'Editierbare Ansicht für die Konfiguration von cat_feature_gully'),
     ('v_plan_current_psector', 'Plan Stromsektor', 'Ansicht zur Anzeige des aktuell geplanten Sektors'),

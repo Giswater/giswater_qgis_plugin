@@ -209,8 +209,8 @@ FROM (
     ('edit_connectype_vdefault', 'connec（親レイヤー）のデフォルトタイプ：', '親レイヤー(v_edit_connec)使用時のconnecのデフォルトタイプ'),
     ('edit_addfield_p34_vdefault', 'weir_param_1:', 'Default value of addfield weir_param_1 for WEIR'),
     ('edit_arc_keepdepthval_when_reverse_geom', NULL, '値が指定された場合、アークが反転したときに、node_1 と node_2 の id 値のみが交換され、同じノードの深さの値 (y1, y2, custom_y1, custom_y2, elev_1, elev_2, custom_elev_1, custom_elev_2, sys_elev_1, sys_elev_2) は同じノードに残ります。'),
-    ('feat_vlink_vdefault', 'Default catalog for vlink', 'Value default catalog for vlink cat_feature'),
     ('inp_options_force_main_equation', 'フォースメインの方程式：', '円形フォースメインの断面形状が割り当てられた管路内の加圧された流れの摩擦損失 を計算するために、Hazen-Williams（H-W）方程式と Darcy-Weisbach（D-W）方程式のどちらを使用するかを決定する。'),
+    ('feat_vlink_vdefault', 'Default catalog for vlink:', 'Value default catalog for vlink cat_feature'),
     ('edit_connec_category_vdefault', 'コネックのカテゴリー：', 'コネクションのカテゴリータイプのデフォルト値'),
     ('inp_options_start_date', '開始日', 'シミュレーションを開始する日付。'),
     ('plan_psector_force_delete', '強制削除予定機能：', 'あるセクタからフィーチャーが削除され、他のセクタにフィーチャーが表示されなくなった場合、そのフィーチャーを強制的に削除する。'),
@@ -1618,7 +1618,6 @@ FROM (
     ('curve_id', 've_inp_dscenario_flwreg_pump', 'form_feature', 'tab_none', 'カーブID:', 'Curve ID'),
     ('result_id', 'v_rpt_comp_outfallload_sum', 'form_feature', 'tab_none', '結果ID：:', 'result_id - 結果 ID.'),
     ('time_days', 'v_rpt_nodeinflow_sum', 'form_feature', 'tab_none', '日数:', 'Time in days'),
-    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diamter:', 'Internal diamter'),
     ('model_id', 'cat_arc', 'form_feature', 'tab_none', 'Model:', 'model'),
     ('new_matcat_id', 've_review_audit_node', 'form_feature', 'tab_none', '新しい matcat id:', 'new_matcat_id'),
     ('ysur', 've_inp_dscenario_storage', 'form_feature', 'tab_none', 'Ysur:', 'ysur:'),
@@ -3789,6 +3788,7 @@ FROM (
     ('tstamp', 've_exploitation', 'form_feature', 'tab_none', 'Tstamp:', 'Tstamp'),
     ('state_type', 've_inp_netgully', 'form_feature', 'tab_data', '州タイプ:', 'state_type - 要素の状態タイプ。状態の詳細を取得することができます。選択された状態に応じて利用可能なものから選択する'),
     ('gully_id', 've_inp_gully', 'form_feature', 'tab_data', 'ガリーID:', 'gully_id - ガリーの識別子。入力する必要はありません。'),
+    ('dint', 'cat_link', 'form_feature', 'tab_none', 'Internal diameter:', 'Internal diameter'),
     ('gullycat_id', 've_inp_netgully', 'form_feature', 'tab_data', 'Gullycat id:', 'gullycat_id'),
     ('gully_type', 've_inp_gully', 'form_feature', 'tab_data', 'ガリータイプ:', 'gully_type - 排水口のタイプ．ガリータイプのカタログから選択する'),
     ('state_type', 've_inp_gully', 'form_feature', 'tab_data', '州タイプ:', 'state_type - 要素の状態タイプ。状態の詳細を取得することができます。選択された状態に応じて利用可能なものから選択する'),
@@ -3864,7 +3864,6 @@ FROM (
     ('tab_drain', 'tabname_typevalue', 'tab_drain'),
     ('tab_weir', 'tabname_typevalue', 'tab_weir'),
     ('actionVisitStart', 'formactions_typevalue', '訪問開始'),
-    ('actionSetToArc', 'formactions_typevalue', 'to_arcを設定する'),
     ('actionCatalog', 'formactions_typevalue', 'カタログ変更'),
     ('actionLink', 'formactions_typevalue', 'リンクを開く'),
     ('actionMapZone', 'formactions_typevalue', 'マップゾーンを追加'),
@@ -4202,7 +4201,8 @@ FROM (
     ('lyt_hydrometer_1', 'layout_name_typevalue', 'lyt_hydrometer_1'),
     ('lyt_element_mng_2', 'layout_name_typevalue', 'lyt_element_mng_2'),
     ('numeric', 'datatype_typevalue', 'numeric'),
-    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1')
+    ('lyt_epa_data_1', 'layout_name_typevalue', 'lyt_epa_data_1'),
+    ('actionSetToArc', 'formactions_typevalue', 'to_arcを設定する')
 ) AS v(source, formname, idval)
 WHERE t.id = v.source AND t.typevalue = v.formname;
 
@@ -7269,7 +7269,6 @@ FROM (
     ('ve_elem_pump', 'Pump', 'Custom editable view for PUMP'),
     ('vcv_emitters', NULL, 'View emitters for epatools'),
     ('rpt_lidperformance_sum', NULL, 'Contains the results of LID performance simulations.'),
-    ('ve_inp_dscenario_lids', NULL, 'v_edit_inp_dscenario_lids'),
     ('vi_timeseries', NULL, 'Used to export to SWMM the information about time series with absolute type'),
     ('vi_aquifers', NULL, 'Used to export to SWMM information about aquifers'),
     ('rpt_flowrouting_cont', NULL, 'Contains the results of flow routing continuity simulations.'),
@@ -7281,6 +7280,7 @@ FROM (
     ('ve_node_pump_station', 'Pump_Station', 'Custom editable view for PUMP_STATION'),
     ('ve_inp_flwreg_orifice', 'Flowreg Orifice', 'View with the information of flow regulators type orifice'),
     ('man_outfall', NULL, 'Additional information for outfall management'),
+    ('ve_inp_dscenario_lids', 'Lids Dscenario', 'v_edit_inp_dscenario_lids'),
     ('ve_node_sewer_storage', 'Sewer_Storage', 'Custom editable view for SEWER_STORAGE'),
     ('ve_cat_feature_gully', 'Gully features', 'Editable view for cat_feature_gully configuration'),
     ('v_plan_current_psector', 'Plan current psector', 'View to show current planified sector'),
