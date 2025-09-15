@@ -80,7 +80,7 @@ BEGIN
 					, rec_csv.csv18::float, rec_csv.csv19::float, rec_csv.csv20::float, rec_csv.csv21::float, rec_csv.csv22::float, rec_csv.csv23::float, rec_csv.csv24::float, rec_csv.csv25::float
 					, rec_csv.csv26::float, rec_csv.csv27::float, rec_csv.csv28::float);
 				ELSE
-					INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, null, null, rec_csv.csv3::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
+					INSERT INTO inp_pattern (pattern_id, observ, tscode, tsparameters, expl_id, log) VALUES (rec_csv.csv1, rec_csv.csv2, null, null, rec_csv.csv3::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
 				END IF;
 
 			ELSIF rec_csv.csv1 IN (SELECT pattern_id FROM inp_pattern) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
