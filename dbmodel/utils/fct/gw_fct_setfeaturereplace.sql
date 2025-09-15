@@ -465,8 +465,8 @@ BEGIN
 			LOOP
 
 				v_query_string_update = 'UPDATE '||v_feature_childtable_name_new||' SET '||rec_addfields.column_name||' = '
-										'(SELECT '||rec_addfields.column_name||' FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||' = '||quote_literal(v_id)||' ) '
-										'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_id)||';';
+										'(SELECT '||rec_addfields.column_name||' FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||' = '||quote_literal(v_old_id)||' ) '
+										'WHERE '||v_feature_childtable_name_new||'.'||v_id_column||' = '||quote_literal(v_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update;
 
