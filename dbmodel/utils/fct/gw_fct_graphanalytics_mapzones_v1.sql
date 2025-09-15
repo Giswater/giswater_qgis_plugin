@@ -279,6 +279,11 @@ BEGIN
 		AND n.to_arc IS NOT NULL
 		AND n.closed = FALSE
 		AND n.broken = FALSE;
+
+		-- NODES watersource (SECTOR)
+		UPDATE temp_pgr_node n  SET modif = TRUE
+		WHERE  n.graph_delimiter = 'SECTOR'
+		AND n.graph_delimiter <> v_mapzone_name;
 	END IF;
 
 	-- CLOSED AND OPEN VALVES FROM NETSCENARIO

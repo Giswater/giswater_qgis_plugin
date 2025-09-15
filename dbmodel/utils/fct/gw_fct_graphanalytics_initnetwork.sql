@@ -163,6 +163,14 @@ BEGIN
         AND t.graph_delimiter = 'NONE'
         AND v_graph_delimiter = ANY(n.graph_delimiter);
 
+        -- water source (SECTOR) graph_delimiter
+        UPDATE temp_pgr_node t
+        SET graph_delimiter = 'SECTOR'
+        FROM v_temp_node n
+        WHERE t.node_id = n.node_id
+        AND t.graph_delimiter = 'NONE'
+        AND 'SECTOR' = ANY(n.graph_delimiter);
+
         IF v_project_type = 'WS' THEN
             UPDATE temp_pgr_node t
             SET to_arc = a.to_arc
@@ -173,7 +181,7 @@ BEGIN
                 WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                 GROUP BY m.node_id
             ) a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
 
             UPDATE temp_pgr_node t
             SET to_arc = a.to_arc
@@ -184,7 +192,7 @@ BEGIN
                 WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                 GROUP BY m.node_id
                 )a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
 
             UPDATE temp_pgr_node t
             SET to_arc = a.to_arc
@@ -195,7 +203,7 @@ BEGIN
                 WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                 GROUP BY m.node_id
                 )a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
 
             UPDATE temp_pgr_node t
             SET to_arc = a.to_arc
@@ -206,7 +214,7 @@ BEGIN
                 WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                 GROUP BY m.node_id
                 )a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
 
             -- SET TO_ARC from METER
             UPDATE temp_pgr_node t

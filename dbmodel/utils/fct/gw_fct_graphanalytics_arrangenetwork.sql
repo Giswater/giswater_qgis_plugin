@@ -34,7 +34,7 @@ DECLARE
     v_reverse_cost integer=0;
     v_query_text TEXT;
     v_pgr_root_vids INT[];
-    v_pgr_distance INTEGER = 1000000;
+    v_pgr_distance INTEGER;
     v_source TEXT;
     v_target TEXT;
 
@@ -113,6 +113,31 @@ BEGIN
 		FROM  temp_pgr_node n
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
 		WHERE n.modif = TRUE AND n.graph_delimiter = 'MINSECTOR' AND n.to_arc IS NOT NULL AND a.arc_id <> ALL(n.to_arc)
+        ), arcs_modif AS (
+            SELECT
+                pgr_arc_id,
+                bool_or(pgr_node_id = pgr_node_1) AS modif1,
+                bool_or( pgr_node_id = pgr_node_2) AS modif2
+            FROM arcs_selected
+            GROUP BY pgr_arc_id
+        )
+        UPDATE temp_pgr_arc t
+        SET modif1= s.modif1,
+            modif2= s.modif2
+        FROM arcs_modif s
+        WHERE t.pgr_arc_id= s.pgr_arc_id;
+
+        -- ARCS watersource (SECTOR WHEN v_mapzone_name <> 'SECTOR'), only the inletArcs
+        WITH arcs_selected AS (
+		SELECT
+			a.pgr_arc_id,
+			n.pgr_node_id,
+			a.pgr_node_1,
+			a.pgr_node_2
+		FROM  temp_pgr_node n
+		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
+		WHERE n.modif = TRUE AND n.graph_delimiter = 'SECTOR' AND n.graph_delimiter <> v_mapzone_name
+        AND n.to_arc IS NOT NULL AND a.arc_id <> ALL(n.to_arc)
         ), arcs_modif AS (
             SELECT
                 pgr_arc_id,
@@ -235,11 +260,11 @@ BEGIN
         AND a.to_arc IS NOT NULL
         AND a.closed = FALSE;
 
-        -- for mapzone graph_delimiter - the inlet arcs behave like checkvalves
+        -- for mapzone graph_delimiter and the watersources (SECTOR) - the inlet arcs behave like checkvalves
         UPDATE temp_pgr_arc a
         SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
             reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-        WHERE a.graph_delimiter = v_graph_delimiter
+        WHERE a.graph_delimiter IN (v_graph_delimiter, 'SECTOR')
         AND a.old_arc_id <> ALL (a.to_arc);
     END IF;
 
@@ -259,6 +284,9 @@ BEGIN
                 WHERE ''SECTOR'' = ANY(v.graph_delimiter)'
         INTO v_pgr_root_vids;
 
+        EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
+        INTO v_pgr_distance;
+
         INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
         (
             SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
@@ -273,38 +301,45 @@ BEGIN
             AND graph_delimiter <> ''SECTOR''
             AND to_arc IS NULL
             AND node_id IS NOT NULL
-        ), nodes_to_update AS (
-            SELECT node 
-            FROM temp_pgr_drivingdistance tpd
-            JOIN node_parents n ON tpd.pred = n.pgr_node_id
-        ), correct_to_arc AS (
-            SELECT *
-            FROM temp_pgr_arc tpa
-            JOIN nodes_to_update nu ON (tpa.pgr_node_1 = nu.node OR tpa.pgr_node_2 = nu.node)
-            JOIN node_parents np ON (tpa.node_1 = np.node_id OR tpa.node_2 = np.node_id)
+        ), 
+        arc_parents AS (
+            SELECT pgr_arc_id, old_arc_id
+            FROM temp_pgr_arc
+            WHERE graph_delimiter = ''' || v_mapzone_name || '''
+            AND graph_delimiter <> ''SECTOR''
+        ),
+        nodes_to_update AS (
+            SELECT d.pred as pgr_node_id, d.edge, a.old_arc_id
+            FROM temp_pgr_drivingdistance d
+            JOIN node_parents n ON d.pred = n.pgr_node_id
+            JOIN arc_parents a ON d.edge = a.pgr_arc_id
         )
         UPDATE temp_pgr_node t
         SET to_arc = a.to_arc
         FROM (
             SELECT pgr_node_id, array_agg(old_arc_id) AS to_arc
-            FROM correct_to_arc
+            FROM nodes_to_update
             GROUP BY pgr_node_id
         ) a
-        WHERE t.pgr_node_id = a.pgr_node_id;';
+        WHERE t.pgr_node_id = a.pgr_node_id';
 
         EXECUTE v_query_text;
-
-        UPDATE temp_pgr_arc t
-        SET to_arc = n.to_arc
-        FROM temp_pgr_node n
-        WHERE COALESCE(t.node_1, t.node_2) = n.node_id
-        AND t.graph_delimiter = v_graph_delimiter;
 
         UPDATE temp_pgr_node t
         SET to_arc = n.to_arc
         FROM temp_pgr_node n
         WHERE t.old_node_id = n.node_id
-        AND t.graph_delimiter = v_graph_delimiter;
+        AND t.graph_delimiter = v_graph_delimiter
+        AND t.to_arc IS NULL;
+
+        UPDATE temp_pgr_arc t
+        SET to_arc = n.to_arc
+        FROM temp_pgr_node n
+        WHERE COALESCE(t.node_1, t.node_2) = n.node_id
+        AND t.graph_delimiter = v_graph_delimiter
+        AND n.graph_delimiter = v_graph_delimiter
+        AND t.to_arc IS NULL
+        AND n.to_arc IS NOT NULL;
 
         -- for mapzone graph_delimiter - the inlet arcs behave like checkvalves
         UPDATE temp_pgr_arc a
