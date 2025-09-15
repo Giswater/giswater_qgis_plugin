@@ -8,7 +8,7 @@ or (at your option) any later version.
 --FUNCTION CODE: 3464
 
 CREATE OR REPLACE FUNCTION cm.gw_trg_cm_update_selectors()
-  RETURNS json AS
+  RETURNS trigger
 $BODY$
 
 DECLARE
@@ -26,20 +26,18 @@ BEGIN
 		IF TG_OP = 'INSERT' THEN
 
 		    FOR rec IN
-		        SELECT DISTINCT user_id
+		        SELECT DISTINCT cu.username AS cur_user
 				FROM om_campaign oc
-				JOIN cat_organization co USING(organization_id)
-				JOIN cat_team ct USING(organization_id)
+				JOIN cat_team ct ON ct.organization_id = oc.organization_id
 				JOIN cat_user cu USING(team_id)
-				WHERE ct.role_id IN ('role_admin', 'role_manager')
-				AND oc.id = NEW.id
+				WHERE ct.role_id IN ('role_cm_admin', 'role_cm_manager')
+				AND oc.campaign_id = NEW.campaign_id
 		    LOOP
-		        INSERT INTO cm.selector_campaign (id, campaign_id, cur_user)
+		        INSERT INTO selector_campaign (campaign_id, cur_user)
 		        VALUES (
-		            nextval('cm.selector_campaign_id_seq'::regclass),
-		            NEW.id,
-		            rec.user_id
-		        );
+		            NEW.campaign_id,
+		            rec.cur_user
+		        ) ON CONFLICT DO NOTHING;
 		    END LOOP;
 
 			PERFORM set_config('search_path', v_prev_search_path, true);
@@ -48,23 +46,21 @@ BEGIN
 		ELSIF TG_OP = 'UPDATE' THEN
 
 			IF NEW.organization_id != OLD.organization_id THEN
-			    DELETE FROM cm.selector_campaign WHERE campaign_id = OLD.id;
+			    DELETE FROM selector_campaign WHERE campaign_id = OLD.campaign_id;
 
 				FOR rec IN
-			        SELECT DISTINCT user_id
+			        SELECT DISTINCT cu.username AS cur_user
 					FROM om_campaign oc
-					JOIN cat_organization co USING(organization_id)
-					JOIN cat_team ct USING(organization_id)
+					JOIN cat_team ct ON ct.organization_id = oc.organization_id
 					JOIN cat_user cu USING(team_id)
-					WHERE ct.role_id IN ('role_admin', 'role_manager')
-					AND oc.id = NEW.id
+					WHERE ct.role_id IN ('role_cm_admin', 'role_cm_manager')
+					AND oc.campaign_id = NEW.campaign_id
 			    LOOP
-			        INSERT INTO cm.selector_campaign (id, campaign_id, cur_user)
+			        INSERT INTO selector_campaign (campaign_id, cur_user)
 			        VALUES (
-			            nextval('cm.selector_campaign_id_seq'::regclass),
-			            NEW.id,
-			            rec.user_id
-			        );
+			            NEW.campaign_id,
+			            rec.cur_user
+			        ) ON CONFLICT DO NOTHING;
 			    END LOOP;
 			END IF;
 
@@ -72,7 +68,7 @@ BEGIN
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
-		    DELETE FROM cm.selector_campaign WHERE campaign_id = OLD.id;
+		    DELETE FROM selector_campaign WHERE campaign_id = OLD.campaign_id;
 		    	PERFORM set_config('search_path', v_prev_search_path, true);
 		    	RETURN NULL;
 
@@ -83,20 +79,20 @@ BEGIN
 		IF TG_OP = 'INSERT' THEN
 
 		    FOR rec IN
-		        SELECT DISTINCT user_id
+		        SELECT DISTINCT cu.username AS cur_user
 				FROM om_campaign oc
-				JOIN cat_organization co USING(organization_id)
-				JOIN cat_team ct USING(organization_id)
+				JOIN cat_team ct ON ct.organization_id = oc.organization_id
 				JOIN cat_user cu USING(team_id)
-				WHERE ct.role_id IN ('role_admin', 'role_manager', 'role_field')
-				AND oc.id = NEW.id
+				WHERE ct.role_id = 'role_cm_admin'
+				   OR (ct.role_id = 'role_cm_manager')
+				   OR (ct.role_id = 'role_cm_field' AND ct.team_id = NEW.team_id)
+				AND oc.campaign_id = NEW.campaign_id
 		    LOOP
-		        INSERT INTO cm.selector_campaign_lot (id, lot_id, cur_user)
+		        INSERT INTO selector_lot (lot_id, cur_user)
 		        VALUES (
-		            nextval('cm.selector_campaign_lot_id_seq'::regclass),
 		            NEW.lot_id,
-		            rec.user_id
-		        );
+		            rec.cur_user
+		        ) ON CONFLICT DO NOTHING;
 		    END LOOP;
 
 			PERFORM set_config('search_path', v_prev_search_path, true);
@@ -104,24 +100,24 @@ BEGIN
 
 		ELSIF TG_OP = 'UPDATE' THEN
 
-			IF NEW.campaign_id != OLD.campaign_id THEN
-			    DELETE FROM cm.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
+			IF NEW.campaign_id != OLD.campaign_id OR NEW.team_id != OLD.team_id THEN
+			    DELETE FROM selector_lot WHERE lot_id = OLD.lot_id;
 
 				FOR rec IN
-			        SELECT DISTINCT user_id
+			        SELECT DISTINCT cu.username AS cur_user
 					FROM om_campaign oc
-					JOIN cat_organization co USING(organization_id)
-					JOIN cat_team ct USING(organization_id)
+					JOIN cat_team ct ON ct.organization_id = oc.organization_id
 					JOIN cat_user cu USING(team_id)
-					WHERE ct.role_id IN ('role_admin', 'role_manager', 'role_field')
-					AND oc.id = NEW.id
+					WHERE ct.role_id = 'role_cm_admin'
+					   OR (ct.role_id = 'role_cm_manager')
+					   OR (ct.role_id = 'role_cm_field' AND ct.team_id = NEW.team_id)
+					AND oc.campaign_id = NEW.campaign_id
 			    LOOP
-			        INSERT INTO cm.selector_campaign_lot (id, lot_id, cur_user)
+			        INSERT INTO selector_lot (lot_id, cur_user)
 			        VALUES (
-			            nextval('cm.selector_campaign_lot_id_seq'::regclass),
 			            NEW.lot_id,
-			            rec.user_id
-			        );
+			            rec.cur_user
+			        ) ON CONFLICT DO NOTHING;
 			    END LOOP;
 			END IF;
 
@@ -129,7 +125,7 @@ BEGIN
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
-		   DELETE FROM cm.selector_campaign_lot WHERE lot_id = OLD.lot_id AND user_id = rec.user_id;
+		   DELETE FROM selector_lot WHERE lot_id = OLD.lot_id;
 
 		    	PERFORM set_config('search_path', v_prev_search_path, true);
 		    	RETURN NULL;
@@ -138,8 +134,8 @@ BEGIN
 
 	END IF;
 
-    PERFORM set_config('search_path', v_prev_search_path, true);
-    RETURN NEW;
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RETURN NEW;
 
 EXCEPTION WHEN OTHERS THEN
     PERFORM set_config('search_path', v_prev_search_path, true);

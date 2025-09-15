@@ -249,7 +249,7 @@ BEGIN
 	);
 
 	PERFORM set_config('search_path', v_prev_search_path, true);
-	RETURN gw_fct_cm_getselectors(v_return::json);
+	RETURN cm.gw_fct_cm_getselectors(v_return::json);
 
 	--Exception handling
 	--EXCEPTION WHEN OTHERS THEN
