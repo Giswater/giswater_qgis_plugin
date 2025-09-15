@@ -14,7 +14,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_controls()
 $BODY$
 DECLARE
 v_featurefield varchar;
-v_mapzone_id_value integer;
+v_mapzone_id_value_old integer;
+v_mapzone_id_value_new integer;
 v_featurenew varchar;
 v_featureold varchar;
 v_projecttype text;
@@ -60,15 +61,20 @@ BEGIN
     RETURN NULL;
   ELSE
     -- Protect system records with id 0 or -1 from deletion on mapzones
-    IF TG_OP = 'DELETE' THEN
-      IF v_featurefield IN ('expl_id', 'dwfzone_id', 'drainzone_id', 'sector_id', 'presszone_id', 'dqa_id', 
-      'supplyzone_id', 'omzone_id', 'macrosector_id', 'macroomzone_id', 'macrodqa_id', 'macrodma_id', 'macroexpl_id') THEN
-        EXECUTE format('SELECT ($1).%I', v_featurefield) INTO v_mapzone_id_value USING OLD;
-        IF v_mapzone_id_value = 0 OR v_mapzone_id_value = -1 THEN
-          EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-          "data":{"message":"4356", "function":"2718","parameters":{"id": '||v_mapzone_id_value||'}}}$$);';
-          RETURN NULL;
-        END IF;
+    IF v_featurefield IN ('expl_id', 'dwfzone_id', 'drainzone_id', 'sector_id', 'presszone_id', 'dqa_id', 
+    'supplyzone_id', 'omzone_id', 'macrosector_id', 'macroomzone_id', 'macrodqa_id', 'macrodma_id', 'macroexpl_id') THEN
+      EXECUTE format('SELECT ($1).%I', v_featurefield) INTO v_mapzone_id_value_old USING OLD;
+      EXECUTE format('SELECT ($1).%I', v_featurefield) INTO v_mapzone_id_value_new USING NEW;
+      IF TG_OP = 'DELETE' AND v_mapzone_id_value_old = -1 THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"4356", "function":"2718","parameters":{"id": '||v_mapzone_id_value_old||'}}}$$);';
+        RETURN NULL;
+      ELSIF TG_OP = 'UPDATE' AND (
+        (v_mapzone_id_value_old = 0 AND v_mapzone_id_value_new <> 0) OR 
+        (v_mapzone_id_value_old = -1 AND v_mapzone_id_value_new <> -1)
+      ) THEN
+        -- Do nothing it cannot be updated
+        RETURN NULL; 
       END IF;
     END IF;
 
