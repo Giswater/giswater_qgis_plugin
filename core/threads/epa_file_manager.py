@@ -532,7 +532,7 @@ class GwEpaFileManager(GwTask):
 
         # Build a map of tokens -> target table using `config_fprocess.target` for this process (`fid`)
         # The `target` column is stored like a JSON-ish list of strings. We flatten it here into a dict.
-        sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid};"
+        sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid} ORDER BY orderby;"
         rows = tools_db.get_rows(sql)
         sources = {}
         for row in rows:
@@ -630,7 +630,7 @@ class GwEpaFileManager(GwTask):
                     if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
                         target = "'" + v + "'"
                         _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
-                        if _time.search(sp_n[3]):
+                        if len(sp_n) > 3 and _time.search(sp_n[3]):
                             col40 = "'" + sp_n[3] + "'"
                 except IndexError:
                     pass
