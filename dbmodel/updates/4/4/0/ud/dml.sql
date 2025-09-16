@@ -103,3 +103,7 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET "label"='Sector ID:'
 	WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+
+-- 16/09/2025
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+VALUES('man_ginlet', NULL, 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT DO NOTHING;
