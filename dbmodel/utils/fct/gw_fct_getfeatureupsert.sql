@@ -1153,12 +1153,11 @@ BEGIN
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
 			ELSIF (aux_json->>'widgettype')='button' and ((aux_json->>'columnname') = 'node_1' OR (aux_json->>'columnname') = 'node_2') THEN
                 IF (SELECT value::boolean FROM config_param_system WHERE parameter='admin_node_code_on_arc' ) is true THEN
-                    SELECT code into label_value FROM node WHERE node_id = field_value;
+                    SELECT code into label_value FROM node WHERE node_id = field_value::integer;
                     label_value := COALESCE(label_value, '');
                     v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'valueLabel', label_value);
-                ELSE
-                    v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
                 END IF;
+                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 
 			ELSIF (aux_json->>'widgettype') !='button' THEN
 
