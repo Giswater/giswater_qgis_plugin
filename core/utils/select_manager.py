@@ -99,7 +99,7 @@ class GwSelectManager(QgsMapTool):
                 self._handle_freehand_press(point)
 
         elif event.button() == Qt.RightButton:
-            self._handle_right_click()
+            self._handle_right_click(event)
 
     def canvasReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -417,8 +417,10 @@ class GwSelectManager(QgsMapTool):
 
         self._check_keep_drawing()
 
-    def _handle_right_click(self):
+    def _handle_right_click(self, event):
         if self.selection_type == GwSelectionType.POLYGON and len(self.points) >= 3:
+            point = self.toMapCoordinates(event.pos())
+            self.points.append(point)
             self._finish_polygon_selection()
         else:
             self._clear_drawing()
