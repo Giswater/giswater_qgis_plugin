@@ -8,7 +8,7 @@ or (at your option) any later version.
 --FUNCTION CODE: 3464
 
 CREATE OR REPLACE FUNCTION cm.gw_trg_cm_update_selectors()
-  RETURNS trigger
+  RETURNS trigger AS
 $BODY$
 
 DECLARE
