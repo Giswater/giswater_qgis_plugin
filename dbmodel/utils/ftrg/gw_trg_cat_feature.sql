@@ -103,12 +103,6 @@ BEGIN
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
 		ON CONFLICT (id) DO NOTHING;
 
-		IF upper(v_projecttype) = 'UD' AND NEW.feature_type = 'LINK' THEN
-			v_querytext = concat('SELECT DISTINCT ON (cl.id) cl.id, cl.id AS idval FROM link l JOIN cat_link cl ON l.linkcat_id = cl.id WHERE l.link_type = ', quote_literal(NEW.id));
-
-			UPDATE sys_param_user SET dv_querytext = v_querytext, dv_orderby_id = true WHERE id = concat('feat_',v_id,'_vdefault');
-		END IF;
-
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
