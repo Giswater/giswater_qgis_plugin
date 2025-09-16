@@ -107,3 +107,8 @@ UPDATE config_form_fields
 -- 16/09/2025
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
 VALUES('man_ginlet', NULL, 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT DO NOTHING;
+
+UPDATE om_typevalue SET idval = 'STORMWATER' WHERE typevalue = 'fluid_type' AND id = '1';
+UPDATE om_typevalue SET idval = 'COMBINED DILUTED' WHERE typevalue = 'fluid_type' AND id = '2';
+UPDATE om_typevalue SET idval = 'SEWAGE' WHERE typevalue = 'fluid_type' AND id = '3';
+UPDATE om_typevalue SET idval = 'COMBINED' WHERE typevalue = 'fluid_type' AND id = '4';

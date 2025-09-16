@@ -4451,7 +4451,6 @@ FROM (
 ('expl_id2', '%_connec%', 'form_feature', 'tab_data', 'Exploitation 2:', 'expl_id2'),
 ('open_element', '%_link%', 'form_feature', 'tab_elements', NULL, 'Open element'),
 ('category_type', '%_connec%', 'form_feature', 'tab_data', 'Category type:', 'category_type'),
-('sector_id', '%_node%', 'form_feature', 'tab_data', 'Sector:', 'sector_id'),
 ('tbl_element_x_connec', '%_element%', 'form_feature', 'tab_features', ':', ':'),
 ('btn_expr_select', '%_element%', 'form_feature', 'tab_features', NULL, NULL),
 ('placement_type', '%_node%', 'form_feature', 'tab_data', 'Placement Type:', 'Placement Type'),
@@ -4639,7 +4638,6 @@ FROM (
 ('location_type', '%_link%', 'form_feature', 'tab_data', 'Location Type:', 'Location Type'),
 ('soilcat_id', '%_node%', 'form_feature', 'tab_data', 'Soilcat id:', 'soilcat_id - Relacionado con el catalogo de suelos (cat_soil)'),
 ('macroexpl_id', '%_arc%', 'form_feature', 'tab_data', 'Macroexploitation:', 'macroexpl_id'),
-('sector_id', '%_connec%', 'form_feature', 'tab_data', 'Sector:', 'sector_id - Hydraulic sector identifier related to the primary key of sector table'),
 ('soilcat_id', '%_connec%', 'form_feature', 'tab_data', 'Soilcat id:', 'soilcat_id - ID of the soil related to the connect.'),
 ('elementcat_id', '%_element%', 'form_feature', 'tab_data', 'Catalog:', 'Catalog'),
 ('height', '%_node%', 'form_feature', 'tab_data', 'Height:', 'Height:'),
@@ -4670,7 +4668,9 @@ FROM (
 ('label_quadrant', '%_arc%', 'form_feature', 'tab_data', 'Label quadrant:', 'label_quadrant'),
 ('custom_top_elev', '%_node%', 'form_feature', 'tab_data', 'Custom top elev:', 'custom_top_elev'),
 ('gis_length', '%_link%', 'form_feature', 'tab_data', 'Gis length:', 'Gis length'),
-('macroexpl_id', '%_node%', 'form_feature', 'tab_data', 'Macroexploitation:', 'macroexpl_id')
+('macroexpl_id', '%_node%', 'form_feature', 'tab_data', 'Macroexploitation:', 'macroexpl_id'),
+('sector_id', '%_node%', 'form_feature', 'tab_data', 'Sector ID:', 'sector_id'),
+('sector_id', '%_connec%', 'form_feature', 'tab_data', 'Sector ID:', 'sector_id - Hydraulic sector identifier related to the primary key of sector table')
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
