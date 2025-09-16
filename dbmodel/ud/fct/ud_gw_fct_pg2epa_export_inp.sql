@@ -573,9 +573,18 @@ BEGIN
 		    CASE WHEN inp_lid_value.value_3 = 0 THEN 0 ELSE inp_lid_value.value_3 END AS other2,
 		    CASE WHEN inp_lid_value.value_4 = 0 THEN 0 ELSE inp_lid_value.value_4 END AS other3,
 		    CASE WHEN inp_lid_value.value_5 = 0 THEN 0 ELSE inp_lid_value.value_5 END AS other4,
-		    CASE WHEN inp_lid_value.value_6::numeric = 0 THEN '0' ELSE inp_lid_value.value_6::text END AS other5,
-		    CASE WHEN inp_lid_value.value_7::numeric = 0 THEN '0' ELSE inp_lid_value.value_7::text END AS other6,
-		    CASE WHEN inp_lid_value.value_8::numeric = 0 THEN '0' ELSE inp_lid_value.value_8::text END AS other7
+		    CASE 
+			    WHEN inp_lid_value.value_6 ~ '^[0-9]+(\.[0-9]+)?$' AND inp_lid_value.value_6::NUMERIC = 0 THEN '0'
+			    ELSE inp_lid_value.value_6::TEXT
+			END AS other5,
+			CASE 
+			    WHEN inp_lid_value.value_7 ~ '^[0-9]+(\.[0-9]+)?$' AND inp_lid_value.value_7::NUMERIC = 0 THEN '0'
+			    ELSE inp_lid_value.value_7::TEXT
+			END AS other6,
+			CASE 
+			    WHEN inp_lid_value.value_8 ~ '^[0-9]+(\.[0-9]+)?$' AND inp_lid_value.value_8::NUMERIC = 0 THEN '0'
+			    ELSE inp_lid_value.value_8::TEXT
+			END AS other7
 		   FROM inp_lid_value
 		     JOIN inp_lid USING (lidco_id)
 		     JOIN (select distinct (lidco_id) from ve_inp_dscenario_lids)a USING (lidco_id)
