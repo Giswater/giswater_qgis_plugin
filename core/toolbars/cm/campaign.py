@@ -592,7 +592,7 @@ class Campaign:
         used_tools = ["rectangle", "polygon", "freehand", "circle", "point"]
         menu_variables = {"used_tools": used_tools}
         highlight_variables = {"callback_values": self.callback_values}
-        expression_selection = {"callback_later": self._update_feature_completer}
+        expression_selection = {"callback_later": partial(self._update_feature_completer, self.dialog)}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection=expression_selection)
         self.dialog.lyt_selection.addWidget(selection_widget, 0)
 
