@@ -116,6 +116,25 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="grb_parameters">
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="chk_add_tab_data">
+        <property name="text">
+         <string>Translate tab_data</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="grb_dest_conn">
      <property name="enabled">
       <bool>true</bool>
