@@ -1195,7 +1195,7 @@ BEGIN
 			END IF;
 		ELSE
 			IF v_from_zero = TRUE THEN
-				IF v_project_type = 'WS' THEN
+				IF v_project_type = 'WS' AND v_mapzone_name <> 'SECTOR' THEN
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
 					SELECT m.mapzone_id[1], m.mapzone_id[1], m.name, ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
@@ -1212,15 +1212,26 @@ BEGIN
 					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 
 					-- update to_arc in man_ tables due to the new to_arc getted from the arrange network
-					UPDATE man_pump SET to_arc = tn.to_arc[1]
+					UPDATE man_pump m SET to_arc = tn.to_arc[1]
 					FROM temp_pgr_node tn
-					WHERE tn.node_id = man_pump.node_id
-					AND tn.to_arc IS NOT NULL AND tn.node_id IS NOT NULL;
+					WHERE tn.node_id = m.node_id
+					AND tn.graph_delimiter = v_mapzone_name
+					AND tn.to_arc IS NOT NULL 
+					AND m.to_arc IS NULL;
 
-					UPDATE man_meter SET to_arc = tn.to_arc[1]
+					UPDATE man_meter m SET to_arc = tn.to_arc[1]
 					FROM temp_pgr_node tn
-					WHERE tn.node_id = man_meter.node_id
-					AND tn.to_arc IS NOT NULL AND tn.node_id IS NOT NULL;
+					WHERE tn.node_id = m.node_id
+					AND tn.graph_delimiter = v_mapzone_name
+					AND tn.to_arc IS NOT NULL 
+					AND m.to_arc IS NULL;
+
+					UPDATE man_valve m SET to_arc = tn.to_arc[1]
+					FROM temp_pgr_node tn
+					WHERE tn.node_id = m.node_id
+					AND tn.graph_delimiter = v_mapzone_name
+					AND tn.to_arc IS NOT NULL 
+					AND m.to_arc IS NULL;
 
 				ELSE
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
