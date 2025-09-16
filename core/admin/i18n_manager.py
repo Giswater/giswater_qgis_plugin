@@ -1707,7 +1707,6 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1716,7 +1715,6 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
@@ -1856,4 +1854,6 @@ class GwSchemaI18NManager:
         message = "Date of creation"
         message = "Date of last update"
         message = "In schema"
-        message = "In schema"
+        message = "Dscenario manager"
+        message = "Hydrology scenario manager"
+        message = "DWF scenario manager"
