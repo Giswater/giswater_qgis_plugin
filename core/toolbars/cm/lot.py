@@ -10,6 +10,7 @@ import json
 from typing import Any, Dict, List, Optional
 
 from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QItemSelectionModel
+from qgis.core import QgsExpression
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
@@ -171,6 +172,7 @@ class AddNewLot:
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._select_by_expression}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection)
+        self.selection_widget = selection_widget
         self.dlg_lot.lyt_selection.addWidget(selection_widget, 0)
 
         # Always set multi-row and full row selection for relation tables, both on create and edit
@@ -186,10 +188,10 @@ class AddNewLot:
         for table_name in relation_table_names:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
-                tools_qt.set_tableview_config(view, sortingEnabled=False)
-
-        # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
-        global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
+                tools_qt.set_tableview_config(view, sortingEnabled=True)
+                view.setSelectionBehavior(QAbstractItemView.SelectRows)
+                view.setSelectionMode(QAbstractItemView.ExtendedSelection)  # or SingleSelection
+                view.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
@@ -472,6 +474,17 @@ class AddNewLot:
                     f"ORDER BY id"
                 )
                 self.populate_tableview(view, sql)
+        
+        # Bind table selection to selectByIds via _select_layers_from_table
+        for feature in features:
+            table_widget_name = f"tbl_campaign_lot_x_{feature}"
+            view = getattr(self.dlg_lot, table_widget_name, None)
+            if view and view.selectionModel():
+                tools_gw.connect_signal(
+                    view.selectionModel().selectionChanged,
+                    partial(self._select_layers_from_table, feature, view),
+                    'lot', f"lot_select_layers_{feature}"
+                )
 
     def get_widget_by_columnname(self, dialog: QWidget, columnname: str) -> Optional[QWidget]:
         """Find a widget in a dialog by its 'columnname' property."""
@@ -714,6 +727,7 @@ class AddNewLot:
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
+        tools_gw.disconnect_signal('lot')
         tools_qgis.force_refresh_map_canvas()
 
     def _refresh_relations_table(self):
@@ -1165,6 +1179,7 @@ class AddNewLot:
             "ve_node": ("node_id", self.dlg_lot.tbl_campaign_lot_x_node),
             "ve_arc": ("arc_id", self.dlg_lot.tbl_campaign_lot_x_arc),
             "ve_connec": ("connec_id", self.dlg_lot.tbl_campaign_lot_x_connec),
+            "ve_link": ("link_id", self.dlg_lot.tbl_campaign_lot_x_link),
             "ve_gully": ("gully_id", self.dlg_lot.tbl_campaign_lot_x_gully),
         }
         if tablename not in mapping_dict:
@@ -1191,6 +1206,35 @@ class AddNewLot:
 
                 if f"{feature_id}" in feature_ids:
                     selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+
+    def _select_layers_from_table(self, feature: str, view: QTableView, *args):
+        """Select current table rows on map layers (Campaign-like yellow selection)."""
+        try:
+            model = view.model()
+            sel = view.selectionModel()
+            if not model or not sel:
+                return
+            id_col = f"{feature}_id"
+            col_idx = tools_qt.get_col_index_by_col_name(view, id_col)
+            if col_idx is None or col_idx == -1:
+                return
+            ids = []
+            for idx in sel.selectedRows():
+                try:
+                    ids.append(str(model.index(idx.row(), col_idx).data()))
+                except Exception:
+                    continue
+            if not ids:
+                return
+            if feature not in self.rel_layers or not self.rel_layers.get(feature):
+                self.rel_layers[feature] = tools_gw.get_layers_from_feature_type(feature)
+            layers = self.rel_layers.get(feature) or []
+            if not layers:
+                return
+            expr = QgsExpression(f"{id_col} IN ({','.join(ids)})")
+            tools_qgis.select_features_by_ids(feature, expr, self.rel_layers)
+        except Exception:
+            pass
 
     def _update_feature_completer_lot(self, dlg: QDialog):
         # Identify the current tab and derive feature info
@@ -1224,6 +1268,7 @@ class AddNewLot:
             GwFeatureTypes.ARC: (self.dlg_lot.tbl_campaign_lot_x_arc, "ve_arc", "arc_id", self.rb_red, 5),
             GwFeatureTypes.NODE: (self.dlg_lot.tbl_campaign_lot_x_node, "ve_node", "node_id", self.rb_red, 10),
             GwFeatureTypes.CONNEC: (self.dlg_lot.tbl_campaign_lot_x_connec, "ve_connec", "connec_id", self.rb_red, 10),
+            GwFeatureTypes.LINK: (self.dlg_lot.tbl_campaign_lot_x_link, "ve_link", "link_id", self.rb_red, 10),
             GwFeatureTypes.GULLY: (self.dlg_lot.tbl_campaign_lot_x_gully, "ve_gully", "gully_id", self.rb_red, 10),
         }
         tableview, tablename, feat_id, rb, width = tableview_map.get(feature_type, (None, None, None, None, None))

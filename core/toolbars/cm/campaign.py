@@ -288,6 +288,26 @@ class Campaign:
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
+        # Wire selectionChanged
+        try:
+            if hasattr(self.dialog, 'tbl_campaign_x_arc') and self.dialog.tbl_campaign_x_arc.selectionModel():
+                self.dialog.tbl_campaign_x_arc.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
+            if hasattr(self.dialog, 'tbl_campaign_x_node') and self.dialog.tbl_campaign_x_node.selectionModel():
+                self.dialog.tbl_campaign_x_node.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_node, "ve_node", "node_id", self.rubber_band, 10))
+            if hasattr(self.dialog, 'tbl_campaign_x_connec') and self.dialog.tbl_campaign_x_connec.selectionModel():
+                self.dialog.tbl_campaign_x_connec.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
+            if hasattr(self.dialog, 'tbl_campaign_x_link') and self.dialog.tbl_campaign_x_link.selectionModel():
+                self.dialog.tbl_campaign_x_link.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_link, "ve_link", "link_id", self.rubber_band, 10))
+            if self.project_type == 'ud' and hasattr(self.dialog, 'tbl_campaign_x_gully') and self.dialog.tbl_campaign_x_gully.selectionModel():
+                self.dialog.tbl_campaign_x_gully.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
+        except Exception:
+            pass
+
     def _on_dialog_rejected(self):
         """Clean up resources when the dialog is rejected."""
         self._cleanup_map_selection()
