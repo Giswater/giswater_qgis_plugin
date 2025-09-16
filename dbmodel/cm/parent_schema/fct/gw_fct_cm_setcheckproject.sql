@@ -1295,12 +1295,20 @@ BEGIN
 	-- ENDSECTION
 
 	-- Insert summary messages at the end
-    v_total_checks_executed := COALESCE(v_outlier_rules_checked, 0) + COALESCE(v_mandatory_checks_count, 0) + COALESCE(v_fprocess_checks_count, 0);
+    -- Count actual log rows (INFO/WARNING/ERROR) written for this run, excluding headers/separators and this total line
+    SELECT COUNT(*) INTO v_total_checks_executed
+    FROM t_audit_check_data
+    WHERE fid = v_fid
+      AND criticity IN (1,2,3)
+      AND error_message NOT IN (
+          'CONTROL DE CALIDAD','------------------------------','',
+          'ERRORES CRÍTICOS','----------------------',
+          'ALERTAS','--------------','INFO','-------'
+      )
+      AND error_message NOT LIKE 'INFO: Total checks executed:%';
 
-    IF v_total_checks_executed > 0 THEN
-        INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
-        VALUES (v_fid, current_user, 1, format('INFO: Total checks executed: %s', v_total_checks_executed));
-    END IF;
+    INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
+    VALUES (v_fid, current_user, 1, format('INFO: Total checks executed: %s', v_total_checks_executed));
 
     -- If nodes are not in scope for this campaign/lot, remove node-only informational noise
     IF NOT v_has_nodes_in_scope THEN
