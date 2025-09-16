@@ -453,8 +453,12 @@ class GwSchemaI18NUpdate:
                                 f"WHERE objectname = '{row['source']}' AND columnname = '{row['columnname']}';\n")
 
                 elif 'dbtable' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
-                                f"WHERE id = '{row['source']}';\n")
+                    if self.project_type == "cm":
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
+                                    f"WHERE id = '%_{row['source']}';\n")
+                    else:
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
+                                    f"WHERE id = '{row['source']}';\n")
                     
                 elif 'dblabel' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "

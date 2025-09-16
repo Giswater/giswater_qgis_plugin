@@ -655,7 +655,11 @@ class GwI18NGenerator:
                     file.write(f"UPDATE {context} AS t\nSET idval = v.idval, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, typevalue, idval, descript)\nWHERE t.id = v.id AND t.typevalue = v.typevalue;\n\n")
 
                 elif "dbtable" in table:
-                    values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
+                    values_str = ""
+                    if file_type == "cm":
+                        values_str = ",\n    ".join([f"('%_{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data if row['source'] != '0'])
+                    else:
+                        values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data if row])
                     file.write(f"UPDATE {context} AS t\nSET alias = v.alias, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, alias, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "su_basic_tables" in table:

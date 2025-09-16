@@ -518,6 +518,9 @@ class GwSchemaI18NManager:
                         clean_row[col_name] = ''
                     if col_name == "project_type" and ((value == "utils" and self.project_type in ['ws', 'ud']) or value == None):
                         clean_row[col_name] = self.project_type
+                    if self.project_type == "cm" and col_name == "source" and table_i18n == "dbtable":
+                        values = value.split("_")
+                        clean_row[col_name] = values[-2] + "_" + values[-1]
                 cleaned_i18n.append(clean_row)
             rows_i18n = cleaned_i18n
 
@@ -534,6 +537,9 @@ class GwSchemaI18NManager:
                     value = clean_row.get(col, '')
                     if value is None:
                         clean_row[col] = ''
+                    if self.project_type == "cm" and col == "id" and table_org == "sys_table":
+                        values = value.split("_")
+                        clean_row[col] = values[-2] + "_" + values[-1]
                 cleaned_org.append(clean_row)
             rows_org = cleaned_org
 
@@ -1526,8 +1532,6 @@ class GwSchemaI18NManager:
                 tables_org = ["sys_typevalue"]
             if self.project_type in ["ws", "ud"]:
                 tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
-        elif "dbfprocess" in table_i18n and self.project_type == "cm":
-            tables_org = ["sys_fprocess_cm"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbconfig_form_fields_json" in table_i18n or "dbconfig_form_fields_feat" in table_i18n:
@@ -1723,9 +1727,7 @@ class GwSchemaI18NManager:
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json", "dbfprocess",
-                             "dbtable", "dbconfig_form_tableview"],
-                "dbtables": ["dbconfig_param_system", "dbtypevalue", "dbconfig_form_fields_json"],
+                             "dbtypevalue", "dbfprocess", "dbtable", "dbconfig_form_fields_json"],
                 "sutables": []
             },
         }
