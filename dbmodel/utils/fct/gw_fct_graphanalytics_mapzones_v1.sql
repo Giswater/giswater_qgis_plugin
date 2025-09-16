@@ -145,6 +145,8 @@ DECLARE
 	v_message text;
 	v_response JSON;
 
+	v_error_context text;
+
 BEGIN
 
 	-- Search path
@@ -1971,6 +1973,10 @@ BEGIN
 			}
 		}
 	}')::json, 3508, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+
+	EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
