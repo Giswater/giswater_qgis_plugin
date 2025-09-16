@@ -894,10 +894,6 @@
 			<translation>    title = {{Modeling and Analyzing Urban Networks and Amenities with OSMnx}},</translation>
 		</message>
 		<message>
-			<source> If you have different addfields in your feature, they will be deleted.</source>
-			<translation> If you have different addfields in your feature, they will be deleted.</translation>
-		</message>
-		<message>
 			<source>This will also delete all related entries in the sys_style table.Confirm Cascade Delete</source>
 			<translation>This will also delete all related entries in the sys_style table.Confirm Cascade Delete</translation>
 		</message>
@@ -2594,10 +2590,6 @@
 			<translation>Task 'Connect link' execute procedure '{0}' with parameters: '{1}', '{2}', '{3}'</translation>
 		</message>
 		<message>
-			<source>Replace feature</source>
-			<translation>Replace feature</translation>
-		</message>
-		<message>
 			<source>Please select a municipality to proceed with this import.</source>
 			<translation>Please select a municipality to proceed with this import.</translation>
 		</message>
@@ -3510,10 +3502,6 @@
 			<translation>Importación fallida</translation>
 		</message>
 		<message>
-			<source>Are you sure you want to replace selected feature with a new one?\n If you have different addfields in your feature, they will be deleted.</source>
-			<translation>Are you sure you want to replace selected feature with a new one?\n If you have different addfields in your feature, they will be deleted.</translation>
-		</message>
-		<message>
 			<source>(Unable to create one extension. Packages must be installed, consult your administrator)</source>
 			<translation>(Unable to create one extension. Packages must be installed, consult your administrator)</translation>
 		</message>
@@ -3532,6 +3520,10 @@
 		<message>
 			<source>Error reading file</source>
 			<translation>Error reading file</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to replace selected feature with a new one?\n If you have different addfields in your feature, they will be deleted.</source>
+			<translation>Are you sure you want to replace selected feature with a new one?\n If you have different addfields in your feature, they will be deleted.</translation>
 		</message>
 		<message>
 			<source>Record deleted</source>
@@ -3582,8 +3574,16 @@
 			<translation>Key not found: '{0}'</translation>
 		</message>
 		<message>
+			<source> If you have different addfields in your feature, they will be deleted.</source>
+			<translation> If you have different addfields in your feature, they will be deleted.</translation>
+		</message>
+		<message>
 			<source>Selected {0}</source>
 			<translation>Selected {0}</translation>
+		</message>
+		<message>
+			<source>Replace feature</source>
+			<translation>Replace feature</translation>
 		</message>
 		<message>
 			<source>\n</source>
@@ -4922,16 +4922,16 @@
 			<translation>Debe ingresar una identificación del elemento de red</translation>
 		</message>
 		<message>
+			<source>Replace feature done successfully</source>
+			<translation>Replace feature done successfully</translation>
+		</message>
+		<message>
 			<source>Object already associated with this feature</source>
 			<translation>Objeto ya asociado con ese elemento de red</translation>
 		</message>
 		<message>
 			<source>Overwrite</source>
 			<translation>Overwrite</translation>
-		</message>
-		<message>
-			<source>Replace feature done successfully</source>
-			<translation>Replace feature done successfully</translation>
 		</message>
 		<message>
 			<source>Parameter widgetfunction is null for widget hyperlink</source>
@@ -5502,10 +5502,6 @@
 			<translation>¿Seguro que quiere desconectar estos elementos?</translation>
 		</message>
 		<message>
-			<source>Are you sure you want to replace selected feature with a new one?</source>
-			<translation>¿Está seguro de que desea reemplazar el elemento de red seleccionado por uno de nuevo?</translation>
-		</message>
-		<message>
 			<source>Are you sure you want to update the data?</source>
 			<translation>¿Está seguro de que quiere actualizar los datos?</translation>
 		</message>
@@ -5516,6 +5512,10 @@
 		<message>
 			<source>Without replacements</source>
 			<translation>Sin sustituciones</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to replace selected feature with a new one?</source>
+			<translation>¿Está seguro de que desea reemplazar el elemento de red seleccionado por uno de nuevo?</translation>
 		</message>
 		<message>
 			<source>Graph must be unprojected to add edge bearings.</source>
@@ -14443,7 +14443,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>go2epa_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Gestor de resultados Epa</translation>
+			<translation>Gestor de resultados EPA</translation>
 		</message>
 		<message>
 			<source>lbl_result_id</source>
@@ -14471,7 +14471,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>dlg_go2epa_manager</source>
-			<translation>Gestor de resultados Epa</translation>
+			<translation>Gestor de resultados EPA</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_manager</source>
