@@ -4619,7 +4619,6 @@ FROM (
     (4022, 'Missing node_1 or node_2 on arcs: %v_arc_list%. Please check your data before continue', NULL),
     (2040, 'Reduced geometry is not a Linestring, (arc_id,geom type)= %arc_id%, %geom_type%', NULL),
     (3646, 'Removing node %v_node% -> Done', NULL),
-    (3072, 'It is not possible to connect link closer than 0.25 meters from nod2arc features in order to prevent conflits if this node may be a nod2arc', 'Please check it before continue'),
     (3034, 'Inventory state and state type of planified features has been updated', NULL),
     (3116, '%id% does not exists, impossible to delete it', NULL),
     (1082, 'Nonexistent arc_id: %arc_id%', NULL),
@@ -4639,7 +4638,6 @@ FROM (
     (3514, 'Process executed for hydrant: %rec_hydrant%.', NULL),
     (3298, '%v_count% operative/planned links(s) have been reconnected', NULL),
     (3318, 'New feature %v_id% inserted into arc table.', NULL),
-    (3288, 'Replace feature done successfully', NULL),
     (3806, 'Type: %v_netscenario_type%', NULL),
     (3338, 'New node and old node are delimiters of the same mapzone. Configuration will be updated.', NULL),
     (2084, 'The module does not exists. Module = %module%', NULL),
@@ -4682,7 +4680,9 @@ FROM (
     (3294, '%v_count% operative gully(s) have been reconnected', NULL),
     (3296, '%v_count% planned gully(s) have been reconnected', NULL),
     (1098, 'It''s not allowe to have node with state(1) or(2) over one existing node with state(1)', 'Use the button replace node. It''s not possible to have more than one nodes with the same state at the same position'),
-    (3068, 'The dma/period defined on the dma-period table (ext_rtc_scada_dma_period) has a pattern_id defined', 'Please check it before continue.')
+    (3068, 'The dma/period defined on the dma-period table (ext_rtc_scada_dma_period) has a pattern_id defined', 'Please check it before continue.'),
+    (3288, 'Replace feature done successfully', NULL),
+    (3072, 'It is not possible to connect link closer than 0.25 meters from nod2arc features in order to prevent conflits if this node may be a nod2arc', 'Please check it before continue')
 ) AS v(id, error_message, hint_message)
 WHERE t.id = v.id;
 
@@ -5166,7 +5166,6 @@ FROM (
     (2798, 'Parameters for advanced user'),
     (2566, 'Get atrribute tcatalog of a feature'),
     (2460, NULL),
-    (3072, 'Function to replace features on planning mode'),
     (2446, NULL),
     (3192, 'Function to manage date selector'),
     (3206, 'Function to get node from coordinates'),
@@ -5185,6 +5184,7 @@ FROM (
     (3006, 'Function that sets flow direction in inp and mapzone tables'),
     (3388, 'Function to insert or update columns dynamically through triggers'),
     (3040, 'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry'),
+    (3072, 'Function to replace features on planning mode'),
     (3442, 'Builds a complete, multi-tab selector interface. It dynamically generates each tab and its selectable items based on extensive database configurations, user roles, and current selections'),
     (2972, NULL),
     (1132, NULL),
@@ -7582,7 +7582,6 @@ FROM (
 ('expl_id2', '%_connec%', 'form_feature', 'tab_data', 'Exploitation 2:', 'expl_id2'),
 ('open_element', '%_link%', 'form_feature', 'tab_elements', NULL, 'Open element'),
 ('category_type', '%_connec%', 'form_feature', 'tab_data', 'Category type:', 'category_type'),
-('sector_id', '%_node%', 'form_feature', 'tab_data', 'Sector:', 'sector_id'),
 ('tbl_element_x_connec', '%_element%', 'form_feature', 'tab_features', ':', ':'),
 ('btn_expr_select', '%_element%', 'form_feature', 'tab_features', NULL, NULL),
 ('placement_type', '%_node%', 'form_feature', 'tab_data', 'Placement Type:', 'Placement Type'),
@@ -7770,7 +7769,6 @@ FROM (
 ('location_type', '%_link%', 'form_feature', 'tab_data', 'Location Type:', 'Location Type'),
 ('soilcat_id', '%_node%', 'form_feature', 'tab_data', 'Soilcat id:', 'soilcat_id - Relacionado con el catalogo de suelos (cat_soil)'),
 ('macroexpl_id', '%_arc%', 'form_feature', 'tab_data', 'Macroexploitation:', 'macroexpl_id'),
-('sector_id', '%_connec%', 'form_feature', 'tab_data', 'Sector:', 'sector_id - Hydraulic sector identifier related to the primary key of sector table'),
 ('soilcat_id', '%_connec%', 'form_feature', 'tab_data', 'Soilcat id:', 'soilcat_id - ID of the soil related to the connect.'),
 ('elementcat_id', '%_element%', 'form_feature', 'tab_data', 'Catalog:', 'Catalog'),
 ('height', '%_node%', 'form_feature', 'tab_data', 'Height:', 'Height:'),
@@ -7801,7 +7799,9 @@ FROM (
 ('label_quadrant', '%_arc%', 'form_feature', 'tab_data', 'Label quadrant:', 'label_quadrant'),
 ('custom_top_elev', '%_node%', 'form_feature', 'tab_data', 'Custom top elev:', 'custom_top_elev'),
 ('gis_length', '%_link%', 'form_feature', 'tab_data', 'Gis length:', 'Gis length'),
-('macroexpl_id', '%_node%', 'form_feature', 'tab_data', 'Macroexploitation:', 'macroexpl_id')
+('macroexpl_id', '%_node%', 'form_feature', 'tab_data', 'Macroexploitation:', 'macroexpl_id'),
+('sector_id', '%_node%', 'form_feature', 'tab_data', 'Sector ID:', 'sector_id'),
+('sector_id', '%_connec%', 'form_feature', 'tab_data', 'Sector ID:', 'sector_id - Hydraulic sector identifier related to the primary key of sector table')
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 

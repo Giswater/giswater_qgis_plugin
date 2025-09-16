@@ -17,3 +17,89 @@ UPDATE dma SET descript='Undefined',"name"='Undefined',code='0' WHERE dma_id=0;
 INSERT INTO dma (dma_id, code, "name", descript, dma_type, muni_id, expl_id, sector_id, avg_press, pattern_id, effc, graphconfig, stylesheet, lock_level, link, addparam, active, the_geom, created_at, created_by, updated_at, updated_by) VALUES(-1, '-1', 'Conflict', 'Dma used on graphanalytics algorithm when two ore more zones has conflict in terms of some interconnection.', NULL, NULL, '{0}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL);
 
 UPDATE sys_table SET alias='Lids Dscenario',addparam='{"pkey":"dscenario_id, subc_id"}'::json WHERE id='ve_inp_dscenario_lids';
+
+-- 15/09/2025
+DELETE FROM sys_param_user WHERE id='edit_gully_linkcat_vdefault';
+
+-- Internal diameter
+UPDATE config_form_fields
+	SET "label"='Internal diameter:',tooltip='Internal diameter'
+	WHERE formname='cat_link' AND formtype='form_feature' AND columnname='dint' AND tabname='tab_none';
+
+
+-- 16/09/2025
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_chamber' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_change' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_circ_manhole' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_highpoint' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_jump' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_junction' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_netgully' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_netinit' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_outfall' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_overflow_storage' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_pump_station' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_rect_manhole' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_register' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_sandbox' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_sewer_storage' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_virtual_node' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_weir' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_wwtp' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_out_manhole' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_cjoin' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_connec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';

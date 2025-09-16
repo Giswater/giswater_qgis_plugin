@@ -946,3 +946,140 @@ WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='state
 
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_valve''', dv_isnullvalue=true WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_epa';
+
+-- 16/09/2025
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_adaptation' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_air_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_bypass_register' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_check_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_clorinathor' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_control_register' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_curve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_endline' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_expantank' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_filter' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_fl_contr_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_flexunion' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_flowmeter' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_gen_purp_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_green_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_hydrant' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_junction' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_manhole' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_netsamplepoint' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_outfall_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_pr_break_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_pr_reduc_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_pressure_meter' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_pump' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_reduction' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_register' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_source' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_t' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_tank' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_valve_register' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_waterwell' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_x' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_fountain' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_greentap' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_tap' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_connec_wjoin' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Sector ID:'
+	WHERE formname='ve_node_water_connection' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+
+UPDATE config_form_fields SET layoutorder = 1 WHERE formname ilike 've_arc%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'sector_id' AND layoutname = 'lyt_bot_1';
+UPDATE config_form_fields SET layoutorder = 2 WHERE formname ilike 've_arc%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
