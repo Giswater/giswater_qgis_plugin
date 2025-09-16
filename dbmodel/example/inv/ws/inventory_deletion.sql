@@ -9,6 +9,9 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE sector DISABLE TRIGGER gw_trg_edit_controls;
+ALTER TABLE dqa DISABLE TRIGGER gw_trg_edit_controls;
+
 UPDATE config_param_user SET value = true where parameter = 'plan_psector_force_delete';
 
 UPDATE arc SET sector_id = expl_id;
@@ -57,8 +60,11 @@ UPDATE node SET dqa_id=0 ;
 UPDATE connec SET dqa_id=0 ;
 UPDATE link SET dqa_id=0 ;
 
-DELETE FROM dqa;
+DELETE FROM dqa WHERE dqa_id > 0;
 
 UPDATE man_valve SET to_arc=null WHERE node_id = 1083;
 UPDATE inp_valve SET setting=null WHERE node_id = 1083;
 UPDATE man_pump SET to_arc=null WHERE node_id = 1105;
+
+ALTER TABLE sector ENABLE TRIGGER gw_trg_edit_controls;
+ALTER TABLE dqa ENABLE TRIGGER gw_trg_edit_controls;
