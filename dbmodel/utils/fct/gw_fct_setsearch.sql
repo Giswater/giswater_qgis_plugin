@@ -309,7 +309,7 @@ BEGIN
 				FOR v_network_all IN SELECT value FROM config_param_system WHERE parameter like '%basic_search_network_%' 
 				LOOP
 					IF  v_network_all->>'search_type' IS NOT NULL THEN
-						v_partial = concat('SELECT ',v_network_all->>'sys_id_field',' AS sys_id, ', v_network_all->>'sys_search_field',' AS search_field, ', v_network_all->>'cat_field',' AS cat_id,', 
+						v_partial = concat('SELECT ',v_network_all->>'sys_id_field',' AS sys_id, ', v_network_all->>'sys_search_field','::text AS search_field, ', v_network_all->>'cat_field',' AS cat_id,', 
 							quote_literal(v_network_all->>'sys_id_field')::text,' AS sys_idname,',quote_literal(v_network_all->>'search_type')::text,' AS search_type, ',
 							quote_literal(v_network_all->>'sys_table_id')::text,'::text AS sys_table_id 
 							FROM ', v_network_all->>'sys_table_id');
@@ -323,7 +323,7 @@ BEGIN
 				v_querytext = reverse(substring(reverse (v_querytext),7,9999));
 			ELSE
 				-- buid querytext
-				v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
+				v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,'::text AS search_field, ', v_network_catalog,' AS cat_id,', 
 						quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_searchtype)::text,' AS search_type, ',
 						quote_literal(v_network_layername)::text,'::text AS sys_table_id 
 						FROM ', v_network_layername);
