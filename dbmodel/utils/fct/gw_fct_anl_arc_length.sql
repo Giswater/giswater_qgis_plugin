@@ -89,17 +89,12 @@ BEGIN
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
 
-	IF v_count = 0 then
-	
-		INSERT INTO audit_check_data (fid,error_message) values (v_fid, 'There are no arcs with outlayers values');
-		/*
+	IF v_count = 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3570", "function":"3052", "parameters":{"v_shorterthan":"'||v_shorterthan||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
-		*/
-	else
-		INSERT INTO audit_check_data (fid,error_message) values (v_fid, concat('There are ',v_count, ' arcs with outlayers values'));
-		--EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-         --              "data":{"message":"3572", "function":"3052", "parameters":{"v_shorterthan":"'||v_shorterthan||'", "v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
+                "data":{"message":"3570", "function":"3052", "parameters":null, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
+	ELSE
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                "data":{"message":"3572", "function":"3052", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT v_fid,  concat ('Arc_id: ',array_agg(arc_id), '.' ), v_count

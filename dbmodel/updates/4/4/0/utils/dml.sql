@@ -26,3 +26,7 @@ UPDATE config_form_fields SET layoutorder = 2 WHERE formname ilike 've_arc%' AND
 UPDATE config_typevalue
 	SET idval='Set To Arc'
 	WHERE typevalue='formactions_typevalue' AND id='actionSetToArc';
+
+-- 16/09/2025
+UPDATE sys_message SET error_message = 'There are no arcs with outlayers values' WHERE id = 3570;
+UPDATE sys_message SET error_message = 'There are %v_count% arcs with outlayers values' WHERE id = 3572;
