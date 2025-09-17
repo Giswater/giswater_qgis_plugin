@@ -450,7 +450,8 @@ class GwSelectionWidget(QWidget):
     # region expression selection
 
     def init_expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
-                                   callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
+                                   callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None,
+                                   callback_later_values: dict = None):
         """
         Initialize expression selection functionality.
         
@@ -467,12 +468,13 @@ class GwSelectionWidget(QWidget):
         self.btn_expression.setToolTip("Select features by expression")
         # Connect button click
         self.btn_expression.clicked.connect(partial(self.expression_selection, class_object, dialog, table_object,
-                                                  callback, callback_later))
+                                                  callback, callback_later, callback_later_values))
         self.lyt_selection.addWidget(self.btn_expression, 0, self.number_buttons)
         self.number_buttons += 1
 
     def expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
-                             callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
+                             callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None,
+                             callback_later_values: dict = None):
         """
         Select features by expression.
         
@@ -487,7 +489,11 @@ class GwSelectionWidget(QWidget):
             return
         tools_gw.select_with_expression_dialog(class_object, dialog, table_object, self.selection_mode)
         if callback_later:
-            callback_later()
+            if callback_later_values:
+                kwargs = callback_later_values()
+                callback_later(**kwargs)
+            else:
+                callback_later()
 
     # endregion expression selection
 
@@ -567,14 +573,10 @@ class GwSelectionWidget(QWidget):
         tools_gw.add_icon(self.btn_selection_on_top, "175")
         self.btn_selection_on_top.setToolTip("Show selection on top")
         self.btn_selection_on_top.setCheckable(True)
+        self.btn_selection_on_top.setChecked(False)
         self.lyt_selection.addWidget(self.btn_selection_on_top, 0, self.number_buttons)
         self.number_buttons += 1
-
-        # Store original model and button state
-        widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
-        if widget_table and widget_table.model():
-            widget_table.setProperty('original_model', widget_table.model())
-            widget_table.setProperty('selection_on_top', False)
+        self.previous_selected_ids = None
 
         # Connect signals
         self.btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object, callback_later))
@@ -587,23 +589,20 @@ class GwSelectionWidget(QWidget):
         if not widget_table or not widget_table.model() or not widget_table.selectionModel():
             return
 
-        checked = widget_table.property('selection_on_top')
-        selected_ids = self.get_selected_ids(widget_table)
-
-        if not checked or widget_table.property('previous_selected_ids') != selected_ids:
-            # Store current model if not already stored
-            if not widget_table.property('original_model'):
-                widget_table.setProperty('original_model', widget_table.model())
+        checked = self.btn_selection_on_top.isChecked()
+        selected_ids = self.get_selected_ids(widget_table, class_object, dialog, table_object)
+        self.update_default_model(widget_table, class_object, dialog, table_object)
+            
+        if checked or self.previous_selected_ids != selected_ids:
             if widget_table.selectionModel():
-                widget_table.setProperty('previous_selected_ids', selected_ids)
-            self.show_selection_on_top(widget_table)
-            widget_table.setProperty('selection_on_top', True)
+                self.previous_selected_ids = selected_ids
+            self.show_selection_on_top(widget_table, class_object, dialog, table_object)
             self.btn_selection_on_top.setChecked(True)  # Update button state
         else:
             # Get the current and original models
             current_model = widget_table.model()
-            original_model = widget_table.property('original_model')
-            if original_model and current_model:
+            default_model = self.default_model
+            if default_model and current_model:
                 # Get the feature type and find ID column
                 _, feature_type = self.get_expected_table(class_object, dialog, table_object)
                 if not feature_type:
@@ -626,56 +625,219 @@ class GwSelectionWidget(QWidget):
                     current_data[row_id] = row_data
 
                 # Update original model with current data
-                for row in range(original_model.rowCount()):
-                    row_id = str(original_model.data(original_model.index(row, id_col)))
+                for row in range(default_model.rowCount()):
+                    row_id = str(default_model.data(default_model.index(row, id_col)))
                     if row_id in current_data:
-                        for col in range(original_model.columnCount()):
-                            target_index = original_model.index(row, col)
+                        for col in range(default_model.columnCount()):
+                            target_index = default_model.index(row, col)
                             current_item = current_data[row_id][col]
                             # Copy all roles from current item to original model
                             for role in range(Qt.UserRole + 100):  # Copy all possible roles
                                 data = current_item.data(role)
                                 if data is not None:
-                                    original_model.setData(target_index, data, role)
-
-                # Restore model with updated data
-                widget_table.setModel(original_model)
-                # Restore selection
-                self.restore_selection(widget_table, selected_ids)
-                widget_table.setProperty('selection_on_top', False)
-                self.btn_selection_on_top.setChecked(False)  # Update button state
+                                    default_model.setData(target_index, data, role)
+                
+                # Set the default model back to the table to restore original order
+                widget_table.setModel(default_model)
+                # Restore the previous selection using the correct method
+                if self.previous_selected_ids:
+                    self.restore_selection(widget_table, self.previous_selected_ids, class_object, dialog, table_object)
+                self.btn_selection_on_top.setChecked(False)
 
         if callback_later:
             callback_later()
 
-    def get_selected_ids(self, widget_table):
-        """Get IDs of selected rows"""
+    def update_default_model(self, widget_table, class_object=None, dialog=None, table_object=None):
+        """
+        Update the default model with the current model data.
+        
+        This function synchronizes the default model with any changes made to the current model,
+        preserving the original row order while updating data for existing rows and adding new ones.
+        It maintains all item data roles and properties during the update process.
+        
+        Args:
+            widget_table: The QTableView widget containing the current model
+            class_object: The class object (optional, used to determine feature type)
+            dialog: The dialog (optional, used to determine feature type)
+            table_object: The table object name (optional, used to determine feature type)
+        """
+        current_model = widget_table.model()
+        if not current_model:
+            return
+            
+        # Initialize default model on first call
+        if not hasattr(self, 'default_model') or self.default_model is None:
+            # Create a deep copy of the current model as the default
+            self.default_model = QStandardItemModel()
+            self.default_model.setHorizontalHeaderLabels([
+                current_model.headerData(i, Qt.Horizontal) 
+                for i in range(current_model.columnCount())
+            ])
+            
+            # Copy all rows from current model to default model
+            for row in range(current_model.rowCount()):
+                row_items = []
+                for col in range(current_model.columnCount()):
+                    source_index = current_model.index(row, col)
+                    item = QStandardItem()
+                    copied_item = self.copy_item_data(current_model, source_index, item)
+                    row_items.append(copied_item)
+                self.default_model.appendRow(row_items)
+            return
+
+        # Validate models
+        if (not isinstance(current_model, QStandardItemModel) or 
+            not isinstance(self.default_model, QStandardItemModel)):
+            return
+            
+        if current_model.columnCount() == 0 or self.default_model.columnCount() == 0:
+            return
+
+        # Determine the correct ID column based on feature type
+        id_column_index = 0  # Default fallback
+        if class_object and dialog and table_object:
+            try:
+                _, feature_type = self.get_expected_table(class_object, dialog, table_object)
+                if feature_type:
+                    id_column_name = f"{feature_type}_id"
+                    id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
+                    if id_column_index == -1:
+                        id_column_index = 0  # Fallback to first column
+            except Exception:
+                id_column_index = 0  # Fallback to first column
+
+        # Create ID mappings for efficient lookup using the correct ID column
+        current_id_to_row = {}
+        for row in range(current_model.rowCount()):
+            row_id = str(current_model.data(current_model.index(row, id_column_index)))
+            if row_id:  # Only add non-empty IDs
+                current_id_to_row[row_id] = row  # Store row index, not data
+
+        # Create new updated model
+        updated_model = QStandardItemModel()
+        updated_model.setHorizontalHeaderLabels([
+            current_model.headerData(i, Qt.Horizontal) 
+            for i in range(current_model.columnCount())
+        ])
+
+        # Track which current rows have been processed
+        processed_current_rows = set()
+
+        # First pass: Update existing rows in default model order
+        for default_row in range(self.default_model.rowCount()):
+            default_id = str(self.default_model.data(self.default_model.index(default_row, id_column_index)))
+            
+            if default_id in current_id_to_row:
+                # Row exists in current model - use current data
+                current_row = current_id_to_row[default_id]
+                processed_current_rows.add(current_row)
+                
+                row_items = []
+                for col in range(current_model.columnCount()):
+                    source_index = current_model.index(current_row, col)
+                    item = QStandardItem()
+                    copied_item = self.copy_item_data(current_model, source_index, item)
+                    row_items.append(copied_item)
+                updated_model.appendRow(row_items)
+
+        # Second pass: Add new rows from current model that weren't in default model
+        for current_row in range(current_model.rowCount()):
+            if current_row not in processed_current_rows:
+                row_items = []
+                for col in range(current_model.columnCount()):
+                    source_index = current_model.index(current_row, col)
+                    item = QStandardItem()
+                    copied_item = self.copy_item_data(current_model, source_index, item)
+                    row_items.append(copied_item)
+                updated_model.appendRow(row_items)
+
+        # Replace the default model with the updated one
+        self.default_model = updated_model
+
+    def get_selected_ids(self, widget_table, class_object=None, dialog=None, table_object=None):
+        """
+        Get IDs of selected rows using the correct {feature}_id column
+        
+        Args:
+            widget_table: The QTableView widget
+            class_object: The class object (optional, used to determine feature type)
+            dialog: The dialog (optional, used to determine feature type)
+            table_object: The table object name (optional, used to determine feature type)
+            
+        Returns:
+            List of selected row IDs
+        """
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
         selected_ids = []
 
-        if selection_model and selection_model.hasSelection():
-            for index in selection_model.selectedRows():
-                selected_ids.append(str(model.data(model.index(index.row(), 0))))
+        if not selection_model or not selection_model.hasSelection():
+            return selected_ids
+
+        # Determine the correct ID column based on feature type
+        id_column_index = 0  # Default fallback
+        if class_object and dialog and table_object:
+            try:
+                _, feature_type = self.get_expected_table(class_object, dialog, table_object)
+                if feature_type:
+                    id_column_name = f"{feature_type}_id"
+                    id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
+                    if id_column_index == -1:
+                        id_column_index = 0  # Fallback to first column
+            except Exception:
+                id_column_index = 0  # Fallback to first column
+
+        for index in selection_model.selectedRows():
+            row_id = str(model.data(model.index(index.row(), id_column_index)))
+            if row_id:  # Only add non-empty IDs
+                selected_ids.append(row_id)
         return selected_ids
 
-    def restore_selection(self, widget_table, selected_ids):
-        """Restore selection based on IDs"""
+    def restore_selection(self, widget_table, selected_ids, class_object=None, dialog=None, table_object=None):
+        """
+        Restore selection based on IDs using the correct {feature}_id column
+        
+        Args:
+            widget_table: The QTableView widget
+            selected_ids: List of IDs to select
+            class_object: The class object (optional, used to determine feature type)
+            dialog: The dialog (optional, used to determine feature type)
+            table_object: The table object name (optional, used to determine feature type)
+        """
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
 
         if not model or not selection_model:
             return
 
+        # Determine the correct ID column based on feature type
+        id_column_index = 0  # Default fallback
+        if class_object and dialog and table_object:
+            try:
+                _, feature_type = self.get_expected_table(class_object, dialog, table_object)
+                if feature_type:
+                    id_column_name = f"{feature_type}_id"
+                    id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
+                    if id_column_index == -1:
+                        id_column_index = 0  # Fallback to first column
+            except Exception:
+                id_column_index = 0  # Fallback to first column
+
         for row in range(model.rowCount()):
-            row_id = str(model.data(model.index(row, 0)))
+            row_id = str(model.data(model.index(row, id_column_index)))
             if row_id in selected_ids:
                 index = model.index(row, 0)
                 selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
-    def show_selection_on_top(self, widget_table):
+    def show_selection_on_top(self, widget_table, class_object=None, dialog=None, table_object=None):
         """
         Moves the selected rows in a QTableView to the top while preserving all data roles and delegates
+        
+        Args:
+            widget_table: The QTableView widget
+            class_object: The class object (optional, used to determine feature type)
+            dialog: The dialog (optional, used to determine feature type)
+            table_object: The table object name (optional, used to determine feature type)
         """
         if not widget_table or not widget_table.model() or not widget_table.selectionModel():
             return
@@ -685,8 +847,8 @@ class GwSelectionWidget(QWidget):
         if not selection_model or not selection_model.hasSelection():
             return
 
-        # Remember selected IDs
-        selected_ids = self.get_selected_ids(widget_table)
+        # Remember selected IDs using the correct {feature}_id column
+        selected_ids = self.get_selected_ids(widget_table, class_object, dialog, table_object)
 
         # Create a new model
         temp_model = QStandardItemModel()
@@ -696,8 +858,8 @@ class GwSelectionWidget(QWidget):
         for col in range(model.columnCount()):
             delegate = widget_table.itemDelegateForColumn(col)
             if delegate:
-                widget_table.setItemDelegateForColumn(col, None)  # Remove from old model
-                temp_model.setItemDelegateForColumn(col, delegate)  # Set on new model
+                widget_table.setItemDelegateForColumn(col, None) 
+                temp_model.setItemDelegateForColumn(col, delegate)
 
         # First add selected rows
         selected_rows = sorted([index.row() for index in selection_model.selectedRows()])
@@ -724,8 +886,8 @@ class GwSelectionWidget(QWidget):
         # Set the new model
         widget_table.setModel(temp_model)
 
-        # Restore selection
-        self.restore_selection(widget_table, selected_ids)
+        # Restore selection using the correct {feature}_id column
+        self.restore_selection(widget_table, selected_ids, class_object, dialog, table_object)
 
     def copy_item_data(self, model, source_index, target_item):
             # List of common Qt roles to preserve

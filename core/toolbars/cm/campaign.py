@@ -592,12 +592,15 @@ class Campaign:
         used_tools = ["rectangle", "polygon", "freehand", "circle", "point"]
         menu_variables = {"used_tools": used_tools}
         highlight_variables = {"callback_values": self.callback_values}
-        expression_selection = {"callback_later": partial(self._update_feature_completer, self.dialog)}
+        expression_selection = {"callback_later": self._update_feature_completer, "callback_later_values": self.callback_values_later}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection=expression_selection)
         self.dialog.lyt_selection.addWidget(selection_widget, 0)
 
     def callback_values(self):
         return self, self.dialog, "campaign"
+
+    def callback_values_later(self):
+        return {"dlg": self.dialog}
         
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
