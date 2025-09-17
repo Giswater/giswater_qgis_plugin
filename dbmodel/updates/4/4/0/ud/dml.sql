@@ -112,3 +112,9 @@ UPDATE om_typevalue SET idval = 'STORMWATER' WHERE typevalue = 'fluid_type' AND 
 UPDATE om_typevalue SET idval = 'COMBINED DILUTED' WHERE typevalue = 'fluid_type' AND id = '2';
 UPDATE om_typevalue SET idval = 'SEWAGE' WHERE typevalue = 'fluid_type' AND id = '3';
 UPDATE om_typevalue SET idval = 'COMBINED' WHERE typevalue = 'fluid_type' AND id = '4';
+
+-- 17/09/2025
+UPDATE config_form_fields SET columnname = 'dwfzone_id', label = 'Dwfzone', tooltip = 'dwfzone_id', 
+	dv_querytext = 'SELECT dwfzone_id as id, name as idval FROM dwfzone WHERE dwfzone_id = 0 UNION SELECT dwfzone_id as id, name as idval FROM dwfzone WHERE dwfzone_id IS NOT NULL AND active IS TRUE',
+	dv_querytext_filterc = ' AND dwfzone.expl_id'
+WHERE formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
