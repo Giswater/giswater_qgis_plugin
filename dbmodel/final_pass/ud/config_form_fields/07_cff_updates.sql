@@ -867,5 +867,9 @@ UPDATE config_form_fields
 	SET "label"='Sector ID:'
 	WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
 
-UPDATE config_form_fields SET layoutorder = 1 WHERE formname ilike 've_arc%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'sector_id' AND layoutname = 'lyt_bot_1';
-UPDATE config_form_fields SET layoutorder = 2 WHERE formname ilike 've_arc%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
+UPDATE config_form_fields SET layoutorder = 1 WHERE formname ilike 've_%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'sector_id' AND layoutname = 'lyt_bot_1';
+UPDATE config_form_fields SET layoutorder = 2 WHERE formname ilike 've_%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
+
+-- 17/09/2025
+UPDATE config_form_fields SET columnname = 'dwfzone_id', label = 'Dwfzone', tooltip = 'dwfzone_id', dv_querytext = 'SELECT dwfzone_id as id, name as idval FROM dwfzone WHERE dwfzone_id = 0 UNION SELECT dwfzone_id as id, name as idval FROM dwfzone WHERE dwfzone_id IS NOT NULL AND active IS TRUE'
+WHERE formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
