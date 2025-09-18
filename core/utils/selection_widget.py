@@ -586,12 +586,16 @@ class GwSelectionWidget(QWidget):
         Toggle between showing selection on top or restoring original order
         """
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
-        if not widget_table or not widget_table.model() or not widget_table.selectionModel():
+        if not widget_table or not widget_table.model():
+            return
+
+        self.update_default_model(widget_table, class_object, dialog, table_object)
+
+        if not widget_table.selectionModel():
             return
 
         checked = self.btn_selection_on_top.isChecked()
         selected_ids = self.get_selected_ids(widget_table, class_object, dialog, table_object)
-        self.update_default_model(widget_table, class_object, dialog, table_object)
             
         if checked or self.previous_selected_ids != selected_ids:
             if widget_table.selectionModel():
@@ -643,6 +647,8 @@ class GwSelectionWidget(QWidget):
                 if self.previous_selected_ids:
                     self.restore_selection(widget_table, self.previous_selected_ids, class_object, dialog, table_object)
                 self.btn_selection_on_top.setChecked(False)
+            
+        self.highlight_features_method(class_object, dialog, table_object)
 
         if callback_later:
             callback_later()
