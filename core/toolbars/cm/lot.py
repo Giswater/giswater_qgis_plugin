@@ -168,7 +168,7 @@ class AddNewLot:
         self_variables = {"selection_mode": GwSelectionMode.LOT, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_lot, "table_object": "lot"}
         used_tools = ["rectangle", "polygon", "freehand", "circle"]
-        menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection}
+        menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection, "callback_later": self._refresh_relations_table}
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._select_by_expression}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection)
@@ -731,9 +731,29 @@ class AddNewLot:
         tools_qgis.force_refresh_map_canvas()
 
     def _refresh_relations_table(self):
-        """Callback to refresh relations using the current lot_id."""
+        """Callback to refresh relations and apply table config if first insert."""
         if self.lot_id:
+            # Check if this was the first insert by checking if table was empty before
+            current_tab = self.dlg_lot.tab_feature.currentWidget()
+            if current_tab:
+                feature_type = current_tab.objectName().replace('tab_', '')
+                table_widget_name = f"tbl_campaign_lot_x_{feature_type}"
+                table_view = getattr(self.dlg_lot, table_widget_name, None)
+                
+                if table_view and table_view.model():
+                    # If table has exactly 1 row now, it means it was the first insert
+                    if table_view.model().rowCount() == 1:
+                        self._apply_table_config_for_feature(table_view, feature_type)
+                    return
+                
+            # If we can't determine or table is empty, reload relations
             self._load_lot_relations(self.lot_id)
+
+    def _apply_table_config_for_feature(self, table_view, feature_type):
+        """Apply table configuration for a specific feature type."""
+        table_name = f"om_campaign_lot_x_{feature_type}"
+        dialog_ref = self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot
+        tools_gw.set_tablemodel_config(dialog_ref, table_view, table_name, schema_name="cm")
 
     def _update_completer_and_relations(self):
         """Helper to update both the feature completer and the relations table."""
@@ -763,12 +783,12 @@ class AddNewLot:
         """Handles the 'select with expression' button click action."""
         self._update_feature_completer_lot(self.dlg_lot)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
+    def populate_tableview(self, qtable: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
         if not data:
-            view.setModel(QStandardItemModel())  # Clear view
+            qtable.setModel(QStandardItemModel())  # Clear view
             return
 
         # Auto-detect column names if not provided
@@ -783,8 +803,22 @@ class AddNewLot:
                 value = str(row.get(col_name, ''))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
-        view.setModel(model)
-        view.resizeColumnsToContents()
+        qtable.setModel(model)
+        
+        # Determine table configuration based on widget name
+        widget_name = qtable.objectName()
+        if "tbl_campaign_lot_x_" in widget_name:
+            # Extract feature type from widget name (e.g., "tbl_campaign_lot_x_arc" -> "arc")
+            feature_type = widget_name.replace("tbl_campaign_lot_x_", "")
+            table_name = f"om_campaign_lot_x_{feature_type}"
+        elif "tbl_lots" in widget_name:
+            # For lot manager table
+            table_name = "v_ui_lot"
+        else:
+            # Default fallback
+            table_name = "v_ui_lot"
+        
+        tools_gw.set_tablemodel_config(self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot, qtable, table_name, schema_name="cm")
 
     def get_current_user(self) -> Optional[Dict[str, Any]]:
         """
@@ -1042,22 +1076,23 @@ class AddNewLot:
             model = index.model()
             row = index.row()
             id_index = model.index(row, 0)
-            lot_id = model.data(id_index)
+            lot_ids = [model.data(id_index)]
         else:
             selected = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
             if not selected:
                 msg = "Please select a lot to open."
                 tools_qgis.show_warning(msg, dialog=self.dlg_lot_man)
                 return
-            lot_id = selected[0].data()
-
-        try:
-            lot_id = int(lot_id)
-            if lot_id > 0:
-                self.manage_lot(lot_id=lot_id, is_new=False)
-        except (ValueError, TypeError):
-            msg = "Invalid lot ID."
-            tools_qgis.show_warning(msg)
+            lot_ids = [index.data() for index in selected]
+            
+        for lot_id in lot_ids:
+            try:
+                lot_id = int(lot_id)
+                if lot_id > 0:
+                    self.manage_lot(lot_id=lot_id, is_new=False)
+            except (ValueError, TypeError):
+                msg = "Invalid lot ID."
+                tools_qgis.show_warning(msg)
 
     def delete_lot(self):
         """Delete selected lot(s) with confirmation."""
@@ -1563,6 +1598,7 @@ class AddNewLot:
 
         # Apply model to table
         table.setModel(model)
+        tools_gw.set_tablemodel_config(self.dlg_resources_man, table, table_name, schema_name="cm")
 
     def selected_row(self, tablename: str):
         """ Handle double click selected row """

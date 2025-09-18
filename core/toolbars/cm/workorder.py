@@ -93,12 +93,12 @@ class Workorder:
 
         self.populate_tableview(self.manager_dialog.tbl_workorder, sql)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
+    def populate_tableview(self, qtable: QTableView, query: str, columns: list[str] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
         if not data:
-            view.setModel(QStandardItemModel())  # Clear view
+            qtable.setModel(QStandardItemModel())  # Clear view
             return
 
         # Auto-detect column names if not provided
@@ -113,8 +113,8 @@ class Workorder:
                 value = str(row.get(col_name, ''))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
-        view.setModel(model)
-        view.resizeColumnsToContents()
+        qtable.setModel(model)
+        tools_gw.set_tablemodel_config(self.dlg_lot_man, qtable, "workorder", schema_name="cm")
 
     def open_workorder_dialog(self, is_update=False):
         """Open dynamic form dialog for new or existing workorder"""

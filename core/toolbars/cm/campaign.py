@@ -516,6 +516,33 @@ class Campaign:
         tools_gw.remove_selection(True, layers=self.rel_layers)
         tools_qgis.force_refresh_map_canvas()
 
+    def _refresh_relations_table(self):
+        """Callback to refresh relations and apply table config if first insert."""
+        if self.campaign_id:
+            # Check if this was the first insert by checking if table was empty before
+            current_tab = self.dialog.tab_feature.currentWidget()
+            if not current_tab:
+                return
+            
+            feature_type = current_tab.objectName().replace('tab_', '')
+            table_widget_name = f"tbl_campaign_x_{feature_type}"
+            table_view = getattr(self.dialog, table_widget_name, None)
+            
+            if table_view and table_view.model():
+                # If table has exactly 1 row now, it means it was the first insert
+                if table_view.model().rowCount() == 1:
+                    self._apply_table_config_for_feature(table_view, feature_type)
+                return
+                
+            # If we can't determine or table is empty, reload relations
+            self._load_campaign_relations(self.campaign_id)
+
+    def _apply_table_config_for_feature(self, table_view, feature_type):
+        """Apply table configuration for a specific feature type."""
+        table_name = f"om_campaign_x_{feature_type}"
+        dialog_ref = self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog
+        tools_gw.set_tablemodel_config(dialog_ref, table_view, table_name, schema_name="cm")
+
     def _get_checkbox_value_as_string(self, dialog: QDialog, widget: QCheckBox) -> str:
         """Helper to get QCheckBox value as a lowercase string ('true'/'false')."""
         return str(tools_qt.is_checked(dialog, widget)).lower()
@@ -571,7 +598,7 @@ class Campaign:
         )
 
         self.dialog.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None)
+            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None, self._refresh_relations_table)
         )
         self.dialog.btn_insert.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
@@ -579,7 +606,7 @@ class Campaign:
         self.dialog.btn_insert.clicked.connect(self._check_and_disable_class_combos)
 
         self.dialog.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None)
+            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None, self._refresh_relations_table)
         )
         self.dialog.btn_delete.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
@@ -590,7 +617,7 @@ class Campaign:
         self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
         used_tools = ["rectangle", "polygon", "freehand", "circle", "point"]
-        menu_variables = {"used_tools": used_tools}
+        menu_variables = {"used_tools": used_tools, "callback_later": self._refresh_relations_table}
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._update_feature_completer, "callback_later_values": self.callback_values_later}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection=expression_selection)
@@ -860,12 +887,12 @@ class Campaign:
             enabled = tab_type in normalized
             tab_widget.setTabEnabled(i, enabled)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
+    def populate_tableview(self, qtable: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
         if not data:
-            view.setModel(QStandardItemModel())  # Clear view
+            qtable.setModel(QStandardItemModel())  # Clear view
             return
 
         # Auto-detect column names if not provided
@@ -880,8 +907,19 @@ class Campaign:
                 value = str(row.get(col_name, ''))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
-        view.setModel(model)
-        view.resizeColumnsToContents()
+        qtable.setModel(model)
+        
+        # Determine table configuration based on widget name
+        widget_name = qtable.objectName()
+        if "tbl_campaign_x_" in widget_name:
+            # Extract feature type from widget name (e.g., "tbl_campaign_x_arc" -> "arc")
+            feature_type = widget_name.replace("tbl_campaign_x_", "")
+            table_name = f"om_campaign_x_{feature_type}"
+        else:
+            # Default for campaign manager table
+            table_name = "v_ui_campaign"
+        
+        tools_gw.set_tablemodel_config(self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog, qtable, table_name, schema_name="cm")
 
     # Campaign manager
     def load_campaigns_into_manager(self):
@@ -1022,7 +1060,7 @@ class Campaign:
             model = index.model()
             row = index.row()
             id_index = model.index(row, 0)
-            campaign_id = model.data(id_index)
+            campaign_ids = [model.data(id_index)]
 
         # If called by button, no index → get selected row
         else:
@@ -1032,16 +1070,17 @@ class Campaign:
                 tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
-            campaign_id = selected[0].data()
-
-        try:
-            campaign_id = int(campaign_id)
-            if campaign_id > 0:
-                self.load_campaign_dialog(campaign_id, parent=self.manager_dialog)
-                self._check_and_disable_class_combos()
-        except (ValueError, TypeError):
-            msg = "Invalid campaign ID."
-            tools_qgis.show_warning(msg)
+            campaign_ids = [index.data() for index in selected]
+            
+        for campaign_id in campaign_ids:
+            try:
+                campaign_id = int(campaign_id)
+                if campaign_id > 0:
+                    self.load_campaign_dialog(campaign_id, parent=self.manager_dialog)
+                    self._check_and_disable_class_combos()
+            except (ValueError, TypeError):
+                msg = "Invalid campaign ID."
+                tools_qgis.show_warning(msg)
 
 
 def update_expl_sector_combos(**kwargs: Any):
