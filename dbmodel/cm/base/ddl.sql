@@ -675,6 +675,20 @@ CREATE TABLE sys_fprocess (
 	CONSTRAINT sys_fprocess_pkey PRIMARY KEY (fid)
 );
 
+CREATE TABLE config_form_tableview (
+	location_type varchar(50) NOT NULL,
+	project_type varchar(50) NOT NULL,
+	objectname varchar(50) NOT NULL,
+	columnname varchar(50) NOT NULL,
+	columnindex int2 NULL,
+	visible bool NULL,
+	width int4 NULL,
+	alias varchar(50) NULL,
+	"style" json NULL,
+	addparam json NULL,
+	CONSTRAINT config_form_tableview_pkey PRIMARY KEY (objectname, columnname)
+);
+
 CREATE TABLE audit_check_data (
 	id serial4 NOT NULL,
 	fid int2 NULL,

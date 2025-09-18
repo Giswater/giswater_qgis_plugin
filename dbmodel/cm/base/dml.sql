@@ -255,3 +255,97 @@ INSERT INTO config_form_fields VALUES ('generic', 'team_create', 'tab_none', 'na
 INSERT INTO config_form_fields VALUES ('generic', 'team_create', 'tab_none', 'code', 'lyt_data_2', 2, 'text', 'text', 'Code:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}', NULL, NULL, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('generic', 'team_create', 'tab_none', 'descript', 'lyt_data_2', 3, 'text', 'textarea', 'Description:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":true}', NULL, NULL, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('generic', 'team_create', 'tab_none', 'active', 'lyt_data_2', 4, 'boolean', 'check', 'Active:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}', '{"vdefault_value":"true"}', NULL, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+-- Fill config_form_tableview
+DO $$
+DECLARE
+  v_location_type text;
+  v_table text;
+  v_column text;
+  v_alias text;
+  v_index int;
+  v_tables text[][];
+  i int;
+BEGIN
+  v_tables := ARRAY[['campaign_form', 'v_ui_campaign'], ['lot_form', 'v_ui_lot'], ['workorder_form', 'v_ui_workorder'], ['resources_form', 'cat_organization'], ['resources_form', 'cat_team'], ['resources_form', 'cat_user'], ['campaign_relations', 'om_campaign_x_arc'], ['campaign_relations', 'om_campaign_x_node'], ['campaign_relations', 'om_campaign_x_connec'], ['campaign_relations', 'om_campaign_x_link'], ['campaign_relations', 'om_campaign_x_gully'], ['lot_relations', 'om_campaign_lot_x_arc'], ['lot_relations', 'om_campaign_lot_x_node'], ['lot_relations', 'om_campaign_lot_x_connec'], ['lot_relations', 'om_campaign_lot_x_link'], ['lot_relations', 'om_campaign_lot_x_gully']];
+  
+  FOR i IN 1..array_length(v_tables, 1) LOOP
+    v_location_type := v_tables[i][1];
+    v_table := v_tables[i][2];
+    v_index := 1;
+    
+    FOR v_column IN SELECT column_name FROM information_schema.columns WHERE table_schema = 'cm' AND table_name = v_table LOOP
+      v_alias := upper(left(v_column, 1)) || substr(v_column, 2);
+      v_alias := replace(v_alias, '_', ' ');
+      INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, style, addparam) 
+      VALUES (v_location_type, 'cm', v_table, v_column, v_index, true, NULL, v_alias, NULL, NULL);
+      v_index := v_index + 1;
+    END LOOP;
+  END LOOP;
+END $$;
+
+-- Rewrite some aliases
+UPDATE config_form_tableview
+	SET alias='End date'
+	WHERE objectname='v_ui_campaign' AND columnname='enddate';
+UPDATE config_form_tableview
+	SET alias='End date'
+	WHERE objectname='v_ui_campaign_lot' AND columnname='enddate';
+UPDATE config_form_tableview
+	SET alias='Real end date'
+	WHERE objectname='v_ui_campaign' AND columnname='real_enddate';
+UPDATE config_form_tableview
+	SET alias='Real end date'
+	WHERE objectname='v_ui_campaign_lot' AND columnname='real_enddate';
+UPDATE config_form_tableview
+	SET alias='Real start date'
+	WHERE objectname='v_ui_campaign_lot' AND columnname='real_startdate';
+UPDATE config_form_tableview
+	SET alias='Real start date'
+	WHERE objectname='v_ui_campaign' AND columnname='real_startdate';
+UPDATE config_form_tableview
+	SET alias='Team name'
+	WHERE objectname='cat_team' AND columnname='teamname';
+UPDATE config_form_tableview
+	SET alias='User name'
+	WHERE objectname='cat_user' AND columnname='username';
+UPDATE config_form_tableview
+	SET alias='Org. name'
+	WHERE objectname='cat_organization' AND columnname='orgname';
+
+-- Insert missing aliases
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('resources_form','cm','cat_team','orgname',3,true,'Org. name');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('resources_form','cm','cat_user','code',2,true,'Code');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('resources_form','cm','cat_user','teamname',3,true,'Team name');
+
+-- Delete extra aliases
+DELETE FROM config_form_tableview
+	WHERE objectname='cat_organization' AND columnname='expl_id';
+DELETE FROM config_form_tableview
+	WHERE objectname='cat_organization' AND columnname='sector_id';
+DELETE FROM config_form_tableview
+	WHERE objectname='cat_team' AND columnname='organization_id';
+DELETE FROM config_form_tableview
+	WHERE objectname='cat_user' AND columnname='team_id';
+DELETE FROM config_form_tableview
+	WHERE objectname='cat_user' AND columnname='roles';
+
+-- Reorder columnindex
+UPDATE config_form_tableview
+	SET columnindex=5
+	WHERE objectname='cat_user' AND columnname='username';
+UPDATE config_form_tableview
+	SET columnindex=6
+	WHERE objectname='cat_organization' AND columnname='active';
+UPDATE config_form_tableview
+	SET columnindex=4
+	WHERE objectname='cat_team' AND columnname='orgname';
+UPDATE config_form_tableview
+	SET columnindex=3
+	WHERE objectname='cat_user' AND columnname='code';
+UPDATE config_form_tableview
+	SET columnindex=4
+	WHERE objectname='cat_user' AND columnname='active';
