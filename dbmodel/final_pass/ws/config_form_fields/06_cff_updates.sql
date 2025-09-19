@@ -1083,3 +1083,6 @@ UPDATE config_form_fields
 
 UPDATE config_form_fields SET layoutorder = 1 WHERE formname ilike 've_%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'sector_id' AND layoutname = 'lyt_bot_1';
 UPDATE config_form_fields SET layoutorder = 2 WHERE formname ilike 've_%' AND formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
+
+-- 19/09/2025
+UPDATE config_form_fields SET widgettype = 'text', iseditable = true WHERE formname = 've_sector' AND columnname = 'sector_id';

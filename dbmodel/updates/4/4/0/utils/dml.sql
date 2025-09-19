@@ -30,3 +30,6 @@ UPDATE config_typevalue
 -- 16/09/2025
 UPDATE sys_message SET error_message = 'There are no arcs with outlayers values' WHERE id = 3570;
 UPDATE sys_message SET error_message = 'There are %v_count% arcs with outlayers values' WHERE id = 3572;
+
+-- 19/09/2025
+UPDATE config_form_fields SET widgettype = 'text', iseditable = true WHERE formname = 've_sector' AND columnname = 'sector_id';
