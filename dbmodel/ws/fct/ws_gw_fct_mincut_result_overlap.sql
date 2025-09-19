@@ -218,7 +218,7 @@ BEGIN
 					FROM om_mincut_arc JOIN arc a USING (arc_id) WHERE result_id = -2;
 
 					-- getting the number of connecs with additional affectation
-					SELECT count(*) FROM ve_connec JOIN temp_anl_arc USING (arc_id) WHERE fid = 131 AND result_id::integer = -2	INTO v_addaffconnecs;
+					SELECT count(*) FROM ve_connec JOIN temp_anl_arc USING (arc_id) WHERE fid = 131 AND result_id::integer = -2::integer INTO v_addaffconnecs;
 
 					IF v_addaffconnecs > 0 THEN -- there is a overlap (temporal & spatial intersection) with additional connecs affected
 
