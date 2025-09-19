@@ -349,7 +349,7 @@ class GwSelectionWidget(QWidget):
         if id_column_index == -1:
             return
 
-        ids_to_select= []
+        ids_to_select = []
         for row in selection_model.selectedRows():
             id_value = str(data_model.data(data_model.index(row.row(), id_column_index)))
             if id_value not in ids_to_select:
