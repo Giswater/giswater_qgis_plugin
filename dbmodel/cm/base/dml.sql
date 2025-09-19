@@ -267,7 +267,7 @@ DECLARE
   v_tables text[][];
   i int;
 BEGIN
-  v_tables := ARRAY[['campaign_form', 'v_ui_campaign'], ['lot_form', 'v_ui_lot'], ['workorder_form', 'v_ui_workorder'], ['resources_form', 'cat_organization'], ['resources_form', 'cat_team'], ['resources_form', 'cat_user'], ['campaign_relations', 'om_campaign_x_arc'], ['campaign_relations', 'om_campaign_x_node'], ['campaign_relations', 'om_campaign_x_connec'], ['campaign_relations', 'om_campaign_x_link'], ['campaign_relations', 'om_campaign_x_gully'], ['lot_relations', 'om_campaign_lot_x_arc'], ['lot_relations', 'om_campaign_lot_x_node'], ['lot_relations', 'om_campaign_lot_x_connec'], ['lot_relations', 'om_campaign_lot_x_link'], ['lot_relations', 'om_campaign_lot_x_gully']];
+  v_tables := ARRAY[['campaign_form', 'v_ui_campaign'], ['lot_form', 'v_ui_campaign_lot'], ['workorder_form', 'workorder'], ['resources_form', 'cat_organization'], ['resources_form', 'cat_team'], ['resources_form', 'cat_user'], ['campaign_relations', 'om_campaign_x_arc'], ['campaign_relations', 'om_campaign_x_node'], ['campaign_relations', 'om_campaign_x_connec'], ['campaign_relations', 'om_campaign_x_link'], ['campaign_relations', 'om_campaign_x_gully'], ['lot_relations', 'om_campaign_lot_x_arc'], ['lot_relations', 'om_campaign_lot_x_node'], ['lot_relations', 'om_campaign_lot_x_connec'], ['lot_relations', 'om_campaign_lot_x_link'], ['lot_relations', 'om_campaign_lot_x_gully']];
   
   FOR i IN 1..array_length(v_tables, 1) LOOP
     v_location_type := v_tables[i][1];
@@ -312,6 +312,10 @@ UPDATE config_form_tableview
 UPDATE config_form_tableview
 	SET alias='Org. name'
 	WHERE objectname='cat_organization' AND columnname='orgname';
+UPDATE config_form_tableview
+	SET alias='Start date'
+	WHERE objectname='workorder' AND columnname='startdate';
+
 
 -- Insert missing aliases
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
@@ -349,3 +353,7 @@ UPDATE config_form_tableview
 UPDATE config_form_tableview
 	SET columnindex=4
 	WHERE objectname='cat_user' AND columnname='active';
+
+UPDATE config_form_tableview
+	SET objectname='v_ui_lot'
+	WHERE objectname='v_ui_campaign_lot';
