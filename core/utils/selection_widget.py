@@ -185,7 +185,7 @@ class GwSelectionWidget(QWidget):
             # Create actions for each tool type
             for tool_type in used_tools:
                 icon_path = os.path.join(lib_vars.plugin_dir, "icons", "dialogs", tools[tool_type])
-                action = QAction(QIcon(icon_path), tool_type, dialog)
+                action = QAction(QIcon(icon_path), tool_type.capitalize(), dialog)
                 action.setProperty('has_icon', True)
                 action.triggered.connect(partial(handle_action, tool_type))
                 ag.addAction(action)
@@ -700,7 +700,7 @@ class GwSelectionWidget(QWidget):
             return
 
         # Determine the correct ID column based on feature type
-        id_column_index = 0  # Default fallback
+        id_column_index = 0
         if class_object and dialog and table_object:
             try:
                 _, feature_type = self.get_expected_table(class_object, dialog, table_object)
@@ -708,9 +708,9 @@ class GwSelectionWidget(QWidget):
                     id_column_name = f"{feature_type}_id"
                     id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
                     if id_column_index == -1:
-                        id_column_index = 0  # Fallback to first column
+                        id_column_index = 0
             except Exception:
-                id_column_index = 0  # Fallback to first column
+                id_column_index = 0 
 
         # Create ID mappings for efficient lookup using the correct ID column
         current_id_to_row = {}

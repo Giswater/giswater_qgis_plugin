@@ -114,7 +114,7 @@ class Workorder:
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
         qtable.setModel(model)
-        tools_gw.set_tablemodel_config(self.dlg_lot_man, qtable, "workorder", schema_name="cm")
+        tools_gw.set_tablemodel_config(self.manager_dialog, qtable, "workorder", schema_name="cm")
 
     def open_workorder_dialog(self, is_update=False):
         """Open dynamic form dialog for new or existing workorder"""
