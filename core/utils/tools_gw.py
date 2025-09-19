@@ -44,12 +44,12 @@ from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
-from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, \
-                                    GwFreehandSelectManager, GwPointSelectManager
+from ..utils.select_manager import GwSelectManager
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 from .selection_mode import GwSelectionMode
+from .select_manager import GwSelectionType
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
@@ -3530,19 +3530,18 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
         class_object.rel_feature_type = 'arc'
 
     # Choose selection tool based on tool_type
-    if tool_type == "polygon":
-        select_manager = GwPolygonSelectManager(class_object, table_object, dialog, selection_mode)
-    elif tool_type == "circle":
-        select_manager = GwCircleSelectManager(class_object, table_object, dialog, selection_mode)
-    elif tool_type == "freehand":
-        select_manager = GwFreehandSelectManager(class_object, table_object, dialog, selection_mode)
-    elif tool_type == "point":
-        select_manager = GwPointSelectManager(class_object, table_object, dialog, selection_mode)
-    else:
-        select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode)
+    try:
+        selection_type_enum = GwSelectionType(tool_type)
+    except ValueError:
+        selection_type_enum = GwSelectionType.DEFAULT
+    
+    select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode, selection_type=selection_type_enum)
 
     global_vars.canvas.setMapTool(select_manager)
-    cursor = get_cursor_multiple_selection()
+    if selection_type_enum == GwSelectionType.POINT:
+        cursor = QCursor(Qt.CrossCursor)
+    else:
+        cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 

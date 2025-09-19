@@ -8,12 +8,13 @@ or (at your option) any later version.
 import math
 from enum import Enum
 from typing import Optional
+from functools import partial
 from qgis.PyQt.QtCore import QEvent
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QApplication
-from qgis.PyQt.QtCore import Qt, QPoint
+from qgis.PyQt.QtWidgets import QApplication, QWidget
+from qgis.PyQt.QtCore import Qt
 from qgis.core import (QgsPointXY, QgsRectangle, QgsGeometry, QgsWkbTypes, QgsVectorLayer,
-                    QgsPointLocator, QgsPoint, QgsFeature)
+                    QgsFeature, QgsFeatureRequest)
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsMapCanvas, QgisInterface
 from qgis.PyQt.QtWidgets import QDialog
 
@@ -71,7 +72,7 @@ class GwSelectManager(QgsMapTool):
 
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
-
+        
         # Initialize rubber bands and vertex marker for different selection types
         self._init_rubber_bands()
         
@@ -149,6 +150,8 @@ class GwSelectManager(QgsMapTool):
             self._handle_circle_move(point)
         elif self.selection_type == GwSelectionType.FREEHAND:
             self._handle_freehand_move(event, point)
+        elif self.selection_type == GwSelectionType.POINT:
+            self._handle_point_move(event, point)
 
     def deactivate(self):
         self.rubber_band.hide()
@@ -188,12 +191,16 @@ class GwSelectManager(QgsMapTool):
         if cache_key in self.feature_cache:
             return self.feature_cache[cache_key]
             
-        feature = self.snapper_manager.get_snapped_feature(
-            QgsPointLocator.Match(QgsPointLocator.Vertex, layer, feature_id, 0, QgsPoint())
-        )
-        if feature:
-            self.feature_cache[cache_key] = feature
-            return feature
+        # Get feature directly from layer using feature request
+        feature_request = QgsFeatureRequest().setFilterFid(feature_id)
+        try:
+            feature = next(layer.getFeatures(feature_request))
+            if feature:
+                self.feature_cache[cache_key] = feature
+                return feature
+        except StopIteration:
+            # Feature not found
+            pass
             
         return None
 
@@ -409,6 +416,29 @@ class GwSelectManager(QgsMapTool):
             if pixel_distance >= self.min_distance:
                 self.points.append(point)
                 self._update_freehand_rubber_band()
+    
+    def _handle_point_move(self, event, point):
+        """ Mouse move event for point selection with snapping to valid layers """
+        if not self.snapper_manager:
+            return
+
+        # Hide marker initially
+        if self.vertex_marker:
+            self.vertex_marker.hide()
+            
+        # Get event point for snapping
+        event_point = self.snapper_manager.get_event_point(point=point)
+        if not event_point:
+            return
+            
+        # Snap to project config layers to find any valid features
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        if result.isValid():
+            # Check if the snapped layer is in our valid selection layers
+            snapped_layer = self.snapper_manager.get_snapped_layer(result)
+            if snapped_layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+                # Show vertex marker for valid features that can be selected
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def _handle_freehand_release(self, event):
         if self.is_drawing:
@@ -442,59 +472,8 @@ class GwSelectManager(QgsMapTool):
     # Right click handler
     def _handle_point_selection(self, event):
         """Handle point selection mode - select features by clicking on them"""
-        # Check modifier keys
-        ctrl_pressed = QApplication.keyboardModifiers() & Qt.ControlModifier
-        shift_pressed = QApplication.keyboardModifiers() & Qt.ShiftModifier
-
-        # Determine selection behavior
-        if ctrl_pressed and shift_pressed:
-            behavior = QgsVectorLayer.RemoveFromSelection
-        elif ctrl_pressed and not shift_pressed:
-            behavior = QgsVectorLayer.AddToSelection
-        else:
-            behavior = QgsVectorLayer.SetSelection
-
-        # Get snapped feature
-        event_point = None
-        x = None
-        y = None
-        try:
-            if event:
-                x = event.pos().x()
-                y = event.pos().y()
-            event_point = QPoint(int(x), int(y))
-        except Exception:
-            pass
-
-        # Snapping
-        result = self.snapper.snapToMap(event_point)
-        if result.isValid():
-            # Get the point and add marker on it
-            point = QgsPointXY(result.point())
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-
-            # Get the layer and feature ID
-            layer = result.layer()
-            feature_id = result.featureId()
-
-            # Connect selection changed signal
-            tools_qgis.disconnect_signal_selection_changed()
-            tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
-
-            # Apply selection
-            if behavior == QgsVectorLayer.SetSelection:
-                # Clear all selections first
-                for lyr in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-                    lyr.removeSelection()
-                # Then select the new feature
-                layer.select([feature_id])
-            elif behavior == QgsVectorLayer.AddToSelection:
-                layer.select([feature_id])
-            else:  # RemoveFromSelection
-                layer.deselect([feature_id])
-
-        self._check_keep_drawing()
+        point = self.toMapCoordinates(event.pos())
+        self._perform_selection(point, event)
 
     def _handle_right_click(self, event):
         if self.selection_type == GwSelectionType.POLYGON and len(self.points) >= 3:
@@ -532,18 +511,20 @@ class GwSelectManager(QgsMapTool):
         else:
             return GwSelectionBehavior.DEFAULT
 
-    def _perform_selection(self, rectangle=None, event=None):
+    def _perform_selection(self, geometry=None, event=None):
         """Perform selection for rectangle or point selection"""
         selection_behavior = self._get_selection_behavior()
 
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
 
-        if rectangle:
+        # Handle different geometry types
+        if isinstance(geometry, QgsRectangle):
+            # Rectangle selection
             selected_rectangle = None
             for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
                 if selected_rectangle is None:
-                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
+                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, geometry)
 
                 if selection_behavior == GwSelectionBehavior.REMOVE:
                     layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
@@ -551,11 +532,20 @@ class GwSelectManager(QgsMapTool):
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
                 else:  # GwSelectionBehavior.REPLACE or DEFAULT
                     layer.selectByRect(selected_rectangle, layer.SetSelection)
-        else:
-            selection_success = self._perform_point_selection(event, selection_behavior)
+        elif isinstance(geometry, QgsPointXY) and event:
+            # Point selection
+            selection_success = self._perform_point_selection(event)
+            self.vertex_marker.hide()
             if not selection_success:
                 # If point selection failed, we might want to keep the tool active
                 # for another attempt, depending on the failure reason
+                self._check_keep_drawing()
+                return
+        elif geometry is None and event:
+            # Legacy point selection (when called with rectangle=None)
+            selection_success = self._perform_point_selection(event)
+            self.vertex_marker.hide()
+            if not selection_success:
                 self._check_keep_drawing()
                 return
 
@@ -589,7 +579,7 @@ class GwSelectManager(QgsMapTool):
 
         self._check_keep_drawing()
 
-    def _perform_point_selection(self, event: QEvent, selection_behavior: GwSelectionBehavior) -> bool:
+    def _perform_point_selection(self, event: QEvent) -> bool:
         """
         Perform point-based selection on all relevant layers
         Args:
@@ -599,13 +589,15 @@ class GwSelectManager(QgsMapTool):
             bool: True if selection was successful, False otherwise
         """
         if not event:
-            tools_qgis.show_warning("No event provided for point selection", 2)
+            msg = "No event provided for point selection"
+            tools_qgis.show_warning(msg, 2)
             return False
 
         try:
             event_point = self.snapper_manager.get_event_point(event)
             if event_point is None:
-                tools_qgis.show_warning("Could not determine event point coordinates", 2)
+                msg = "Could not determine event point coordinates"
+                tools_qgis.show_warning(msg, 2)
                 return False
 
             result = self.snapper_manager.snap_to_project_config_layers(event_point)
@@ -616,19 +608,22 @@ class GwSelectManager(QgsMapTool):
 
             feature_id = self.snapper_manager.get_snapped_feature_id(result)
             if feature_id is None:
-                tools_qgis.show_warning("Could not get feature ID from snapped point", 2)
+                msg = "Could not get feature ID from snapped point"
+                tools_qgis.show_warning(msg, 2)
                 return False
 
             # Get the snapped layer to verify it exists in our layer list
             snapped_layer = self.snapper_manager.get_snapped_layer(result)
             if snapped_layer not in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-                tools_qgis.show_warning("Snapped feature is not in a valid layer", 2)
+                msg = "Snapped feature is not in a valid layer"
+                tools_qgis.show_warning(msg, 2)
                 return False
 
             # Get and cache the feature
             feature = self._get_cached_feature(snapped_layer, feature_id)
             if not feature:
-                tools_qgis.show_warning("Could not retrieve feature from layer", 2)
+                msg = "Could not retrieve feature from layer"
+                tools_qgis.show_warning(msg, 2)
                 return False
 
             # Update vertex marker position
@@ -638,21 +633,26 @@ class GwSelectManager(QgsMapTool):
                 self.vertex_marker.show()
 
             # Perform selection on all related layers
+            selection_behavior = self._get_selection_behavior()
+            
+            # Convert behavior enum to QgsVectorLayer selection behavior
+            if selection_behavior == GwSelectionBehavior.REMOVE:
+                qgs_behavior = QgsVectorLayer.RemoveFromSelection
+            elif selection_behavior == GwSelectionBehavior.ADD:
+                qgs_behavior = QgsVectorLayer.AddToSelection
+            else:  # GwSelectionBehavior.REPLACE or DEFAULT
+                qgs_behavior = QgsVectorLayer.SetSelection
+            
+            wkt = QgsGeometry.fromPointXY(point).asWkt()
             for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
-                # Check if the feature exists in this layer
-                layer_feature = self._get_cached_feature(layer, feature_id)
-                if layer_feature:
-                    if selection_behavior == GwSelectionBehavior.REMOVE:
-                        layer.deselect([feature_id])
-                    elif selection_behavior == GwSelectionBehavior.ADD:
-                        layer.appendSelection([feature_id])
-                    else:  # GwSelectionBehavior.REPLACE or DEFAULT
-                        layer.select([feature_id])
+                layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", qgs_behavior)
 
             return True
 
         except Exception as e:
-            tools_qgis.show_warning(f"Error during point selection: {str(e)}", 2)
+            msg = "Error during point selection: {0}"
+            msg_params = (str(e), )
+            tools_qgis.show_warning(msg, msg_params=msg_params)
             return False
 
     def _check_keep_drawing(self):
@@ -669,20 +669,3 @@ class GwSelectManager(QgsMapTool):
             global_vars.canvas.setCursor(cursor)
 
     # endregion
-
-
-# Backward compatibility aliases for existing code
-def GwPolygonSelectManager(*args, **kwargs):
-    return GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.POLYGON)
-
-
-def GwCircleSelectManager(*args, **kwargs):
-    return GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.CIRCLE)
-
-
-def GwFreehandSelectManager(*args, **kwargs):
-    return GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.FREEHAND)
-
-
-def GwPointSelectManager(*args, **kwargs):
-    return GwSelectManager(*args, **kwargs, selection_type=GwSelectionType.POINT)
