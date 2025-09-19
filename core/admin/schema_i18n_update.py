@@ -836,7 +836,7 @@ class GwSchemaI18NUpdate:
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbfprocess"],
+                             "dbtypevalue", "dbtable", "dbconfig_form_tableview", "dbfprocess", "dbconfig_form_fields_json"],
                 "project_type": ["cm"]
             },
         }

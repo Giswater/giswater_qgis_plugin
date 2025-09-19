@@ -1727,7 +1727,7 @@ class GwSchemaI18NManager:
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbfprocess", "dbtable", "dbconfig_form_fields_json"],
+                             "dbtypevalue", "dbfprocess", "dbtable", "dbconfig_form_tableview", "dbconfig_form_fields_json"],
                 "sutables": []
             },
         }

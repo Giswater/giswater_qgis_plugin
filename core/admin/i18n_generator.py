@@ -998,7 +998,7 @@ class GwI18NGenerator:
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
                 "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
+                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbconfig_form_tableview", "dbfprocess"]
             }
         }
 
