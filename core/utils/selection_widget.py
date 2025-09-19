@@ -33,7 +33,7 @@ class GwSelectionWidget(QWidget):
 
     def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None,
                  highlight_variables: dict = None, expression_selection: dict = None, selection_on_top_variables: dict = None):
-        f"""
+        """
         Initialize the selection widget.
         
         Args:

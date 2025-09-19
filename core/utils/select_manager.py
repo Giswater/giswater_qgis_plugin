@@ -8,10 +8,9 @@ or (at your option) any later version.
 import math
 from enum import Enum
 from typing import Optional
-from functools import partial
 from qgis.PyQt.QtCore import QEvent
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QApplication, QWidget
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtCore import Qt
 from qgis.core import (QgsPointXY, QgsRectangle, QgsGeometry, QgsWkbTypes, QgsVectorLayer,
                     QgsFeature, QgsFeatureRequest)

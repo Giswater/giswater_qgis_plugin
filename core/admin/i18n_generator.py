@@ -166,13 +166,13 @@ class GwI18NGenerator:
         if type_db_file_translated:
             for type_db_file in type_db_file_translated:
                 msg += f'''{tools_qt.tr('Schemas translated:')} {type_db_file}\n'''
-                if error_langs['db']:
+                if error_langs['db'] and type_db_file in error_langs['db'] and error_langs['db'][type_db_file]:
                     text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in error_langs['db'][type_db_file].items())
                     msg += f'''\t{tools_qt.tr('Database translation failed:')}{text}\n'''
-                if canceled_langs['db']:
+                if canceled_langs['db'] and type_db_file in canceled_langs['db'] and canceled_langs['db'][type_db_file]:
                     text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in canceled_langs['db'][type_db_file].items())
                     msg += f'''\t{tools_qt.tr('Database translation canceled:')}{text}\n'''
-                if translated_langs['db']:
+                if translated_langs['db'] and type_db_file in translated_langs['db'] and translated_langs['db'][type_db_file]:
                     msg += f'''\t{tools_qt.tr('Database translation successful:')} {", ".join(translated_langs['db'])}\n'''
 
         if msg != '':
