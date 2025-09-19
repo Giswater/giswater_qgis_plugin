@@ -33,13 +33,29 @@ class GwSelectionWidget(QWidget):
 
     def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None,
                  highlight_variables: dict = None, expression_selection: dict = None, selection_on_top_variables: dict = None):
-        """
+        f"""
         Initialize the selection widget.
         
         Args:
-            parent: Parent widget
-            menu_variables: Dict for menu button initialization
-            highlight_variables: Dict for highlight features methods
+            self_varibles: Dict of variables that are used in more than one button but separately
+                "selection_mode": The selection mode
+                "method": The method to highlight features
+                "number_rows": The number of rows to add to the layout
+            general_variables: Dict of variables used simultaniously to intialize any button:
+                "class_object": The class object
+                "dialog": The dialog    
+                "table_object": The table object name
+            menu_variables: Dict for menu button initialization:
+                "used_tools": The tools to use
+                "callback": The callback function
+                "callback_later": The callback function to execute after selection
+            highlight_variables: Dict for highlight features methods:
+                "callback_values": The callback function to execute after selection
+            expression_selection: Dict for expression selection:
+                "callback_later": The callback function to execute after selection
+                "callback_later_values": The callback function to get the updated values for callback_later
+            selection_on_top_variables: Dict for selection on top:
+                "callback_later": The callback function to execute after selection
         """
         super().__init__()
 
@@ -175,7 +191,7 @@ class GwSelectionWidget(QWidget):
             self.activate_selection_mode(class_object, dialog, table_object, tool_type)
 
         # Action group to keep exclusivity
-        tools = {"rectangle": "137.png", "polygon": "180.svg", "freehand": "182.svg", "circle": "181.svg", "point": "179.png"}
+        tools = {"rectangle": "137.png", "polygon": "180.svg", "freehand": "182.svg", "circle": "181.svg", "point": "156.png"}
 
         # Create btn_snapping as menu or button widget
         if used_tools and len(used_tools) > 1:
@@ -333,10 +349,11 @@ class GwSelectionWidget(QWidget):
         if id_column_index == -1:
             return
 
-        ids_to_select = []
+        ids_to_select= []
         for row in selection_model.selectedRows():
-            id_value = data_model.data(data_model.index(row.row(), id_column_index))
-            ids_to_select.append(id_value)
+            id_value = str(data_model.data(data_model.index(row.row(), id_column_index)))
+            if id_value not in ids_to_select:
+                ids_to_select.append(id_value)
 
         if not ids_to_select:
             tools_gw.remove_selection(layers=class_object.rel_layers)
@@ -382,9 +399,6 @@ class GwSelectionWidget(QWidget):
         # Select features on map
         expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
         tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
-
-        # Activate rubberband highlighting
-        tools_qgis.highlight_features_selected_in_table(class_object, dialog, table_object, feature_type)
 
     # endregion highlight features in table
 
@@ -451,7 +465,7 @@ class GwSelectionWidget(QWidget):
 
     def init_expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
                                    callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None,
-                                   callback_later_values: dict = None):
+                                   callback_later_values: Callable = None):
         """
         Initialize expression selection functionality.
         
@@ -461,6 +475,7 @@ class GwSelectionWidget(QWidget):
             table_object: The table name
             callback: Optional callback function
             callback_later: Optional callback to execute after selection
+            callback_later_values: Optional callback to get the updated values for callback_later
         """
         # Create expression button
         self.btn_expression = QToolButton(self)
@@ -474,7 +489,7 @@ class GwSelectionWidget(QWidget):
 
     def expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
                              callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None,
-                             callback_later_values: dict = None):
+                             callback_later_values: Callable = None):
         """
         Select features by expression.
         
@@ -484,6 +499,7 @@ class GwSelectionWidget(QWidget):
             table_object: The table name
             callback: Optional callback function
             callback_later: Optional callback to execute after selection
+            callback_later_values: Optional callback to get the updated values for callback_later
         """
         if callback and callback() is False:
             return
@@ -567,6 +583,7 @@ class GwSelectionWidget(QWidget):
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+            callback_later: Optional callback to execute after selection
         """
         # Create button
         self.btn_selection_on_top = QPushButton(self)  # Store as instance variable
