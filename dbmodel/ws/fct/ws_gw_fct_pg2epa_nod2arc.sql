@@ -41,6 +41,11 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+	CREATE INDEX IF NOT EXISTS temp_t_node_node2arc_gix
+	ON temp_t_node USING GIST (the_geom) WHERE node_type = 'NODE2ARC';
+	CREATE INDEX IF NOT EXISTS temp_t_arc_reducedpipe_idx
+	ON temp_t_arc(id) WHERE arc_type = 'REDUCED-PIPE';
+
 	-- Profilactic controls for nodarc value
 	SELECT min(st_length(the_geom)) FROM temp_t_arc JOIN selector_sector ON selector_sector.sector_id=temp_t_arc.sector_id
 		INTO v_nodarc_min;
@@ -279,13 +284,72 @@ BEGIN
 		  WHERE b.node_id::text  = temp_t_node.node_id';
 
 		RAISE NOTICE ' Update geometries and topology for existing arcs (REDUCED-PIPE)' ;
-		EXECUTE 'UPDATE temp_t_arc SET node_1=null, arc_type = ''REDUCED-PIPE'', epa_type = ''PIPE'', the_geom = ST_linesubstring(temp_t_arc.the_geom, ('||0.5*v_nod2arc||' / st_length(temp_t_arc.the_geom)) , 1) 
-			FROM temp_t_node n WHERE n.node_id = node_1 AND n.epa_type =''TODELETE'' AND geometrytype(temp_t_arc.the_geom) =''LINESTRING''';
-		EXECUTE 'UPDATE temp_t_arc SET node_2=null, arc_type = ''REDUCED-PIPE'', epa_type = ''PIPE'', the_geom = ST_linesubstring(temp_t_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' /  st_length(temp_t_arc.the_geom)))
-			FROM temp_t_node n WHERE n.node_id = node_2 AND n.epa_type =''TODELETE'' AND geometrytype(temp_t_arc.the_geom) =''LINESTRING''';
-		UPDATE temp_t_arc a SET node_1 = n.node_id FROM temp_t_node n WHERE st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.001) and n.node_type =  'NODE2ARC' and a.arc_type = 'REDUCED-PIPE';
-		UPDATE temp_t_arc a SET node_2 = n.node_id FROM temp_t_node n WHERE st_dwithin(st_endpoint(a.the_geom), n.the_geom, 0.001) and n.node_type = 'NODE2ARC' and a.arc_type = 'REDUCED-PIPE';
+	
+		WITH cand AS (
+			SELECT a.id,
+					a.the_geom,
+					-- Flags: Â¿hay que recortar por el inicio/fin?
+					(n1.node_id IS NOT NULL) AS cut_start,
+					(n2.node_id IS NOT NULL) AS cut_end,
+					-- Longitud por fila (se usa una sola vez)
+					st_length(a.the_geom) AS len
+			FROM temp_t_arc a
+			LEFT JOIN temp_t_node n1
+				ON n1.node_id = a.node_1 AND n1.epa_type = 'TODELETE'
+			LEFT JOIN temp_t_node n2
+				ON n2.node_id = a.node_2 AND n2.epa_type = 'TODELETE'
+			WHERE GeometryType(a.the_geom) = 'LINESTRING'
+			)
+			UPDATE temp_t_arc a
+			SET
+			node_1  = CASE WHEN c.cut_start THEN NULL ELSE a.node_1 END,
+			node_2  = CASE WHEN c.cut_end   THEN NULL ELSE a.node_2 END,
+			arc_type = CASE WHEN c.cut_start OR c.cut_end THEN 'REDUCED-PIPE' ELSE a.arc_type END,
+			epa_type = CASE WHEN c.cut_start OR c.cut_end THEN 'PIPE'          ELSE a.epa_type END,
+			the_geom = CASE
+						WHEN c.cut_start AND NOT c.cut_end
+							THEN ST_LineSubstring(a.the_geom, (0.5 * v_nod2arc / c.len), 1)
+						WHEN c.cut_end   AND NOT c.cut_start
+							THEN ST_LineSubstring(a.the_geom, 0, (1 - 0.5 * v_nod2arc / c.len))
+						WHEN c.cut_start AND c.cut_end
+							THEN ST_LineSubstring(
+									a.the_geom,
+									(0.5 * v_nod2arc / c.len),
+									(1 - 0.5 * v_nod2arc / c.len)
+								)
+						ELSE a.the_geom
+						END
+			FROM cand c
+			WHERE a.id = c.id
+			AND (c.cut_start OR c.cut_end);
+	
+--		UPDATE temp_t_arc SET node_1=null, arc_type = 'REDUCED-PIPE', epa_type = 'PIPE', the_geom = ST_linesubstring(temp_t_arc.the_geom, (0.5*v_nod2arc / st_length(temp_t_arc.the_geom)) , 1) 
+--			FROM temp_t_node n WHERE n.node_id = node_1 AND n.epa_type ='TODELETE' AND geometrytype(temp_t_arc.the_geom) ='LINESTRING';
+--		UPDATE temp_t_arc SET node_2=null, arc_type = 'REDUCED-PIPE', epa_type = 'PIPE', the_geom = ST_linesubstring(temp_t_arc.the_geom, 0, ( 1 - 0.5*v_nod2arc /  st_length(temp_t_arc.the_geom)))
+--			FROM temp_t_node n WHERE n.node_id = node_2 AND n.epa_type ='TODELETE' AND geometrytype(temp_t_arc.the_geom) ='LINESTRING';
 
+	
+		UPDATE temp_t_arc a
+			SET 
+				node_1 = COALESCE((
+					SELECT n.node_id
+					FROM temp_t_node n
+					WHERE n.node_type = 'NODE2ARC'
+						AND st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.001)
+					LIMIT 1
+				), node_1),
+				node_2 = COALESCE((
+					SELECT n.node_id
+					FROM temp_t_node n
+					WHERE n.node_type = 'NODE2ARC'
+						AND st_dwithin(st_endpoint(a.the_geom), n.the_geom, 0.001)
+					LIMIT 1
+				), node_2)
+			WHERE a.arc_type = 'REDUCED-PIPE';
+		
+--		UPDATE temp_t_arc a SET node_1 = n.node_id FROM temp_t_node n WHERE st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.001) and n.node_type =  'NODE2ARC' and a.arc_type = 'REDUCED-PIPE';
+--		UPDATE temp_t_arc a SET node_2 = n.node_id FROM temp_t_node n WHERE st_dwithin(st_endpoint(a.the_geom), n.the_geom, 0.001) and n.node_type = 'NODE2ARC' and a.arc_type = 'REDUCED-PIPE';
+	
 	ELSE -- checking for inconsistencies
 
 		RAISE NOTICE ' Mark old node from node table';
@@ -336,6 +400,8 @@ BEGIN
 	UNION
 	SELECT arc_id,node_2 FROM arc JOIN query ON query.node_id = node_2;
 
+	CREATE INDEX IF NOT EXISTS idx_t_arc_endpoint_node_id ON t_arc_endpoint(node_id);
+	CREATE INDEX IF NOT EXISTS idx_t_arc_endpoint_arc_id ON t_arc_endpoint(arc_id);
 	-- delete the nodarc not-used existing arcs
 	DELETE FROM temp_t_arc WHERE arc_id IN (SELECT concat(node_id,'_n2a') FROM t_arc_endpoint);
 
