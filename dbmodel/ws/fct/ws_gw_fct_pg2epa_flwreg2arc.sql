@@ -148,6 +148,9 @@ BEGIN
 			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam,
 			arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);
 		
+			IF flwreg_rec.epa_type = 'FRVALVE' THEN
+				UPDATE temp_t_arc SET status = valve_rec.status WHERE arc_id = record_new_arc.arc_id;
+			END IF;
 		ELSE
 						
 		END IF;

@@ -536,7 +536,9 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_status AS
 	 SELECT arc_id, status FROM temp_t_arc WHERE (status::text = 'CLOSED'::text OR status::text = 'OPEN'::text) AND epa_type::text = 'VALVE'::text
 	UNION
-	 SELECT arc_id, status FROM temp_t_arc WHERE status::text = 'CLOSED'::text AND epa_type::text = 'PUMP'::text;
+	 SELECT arc_id, status FROM temp_t_arc WHERE status::text = 'CLOSED'::text AND epa_type::text = 'PUMP'::text
+	UNION
+	 SELECT arc_id, status FROM temp_t_arc WHERE (status::text = 'CLOSED'::text OR status::text = 'OPEN'::text) AND epa_type::text = 'FRVALVE'::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_tags AS
