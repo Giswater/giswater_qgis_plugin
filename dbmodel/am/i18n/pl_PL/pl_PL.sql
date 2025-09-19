@@ -18,16 +18,16 @@ FROM (
     ('expected_year', 'SH', 'Expected annual weight', 'Weight in final matrix per year of renewal', NULL),
     ('compliance', 'SH', 'Regulatory weight', 'Weight in final matrix for regulatory compliance', NULL),
     ('drate', 'SH', 'Discount rate (%)', 'Real price discount rate. Takes into account price increases by discounting inflation.', NULL),
-    ('strategic_1', 'WM', 'Strategic', NULL, NULL),
-    ('strategic_2', 'WM', 'Strategic', NULL, NULL),
-    ('longevity_1', 'WM', 'Longevity', NULL, NULL),
-    ('longevity_2', 'WM', 'Longevity', NULL, NULL),
-    ('compliance_1', 'WM', 'Regulatory', NULL, NULL),
-    ('compliance_2', 'WM', 'Regulatory', NULL, NULL),
-    ('strategic', 'SH', 'Strategic weight', 'Weight in final matrix by strategic factors', NULL),
-    ('mleak_1', 'WM', 'Probability of failure', NULL, NULL),
-    ('mleak_2', 'WM', 'Probability of failure', NULL, NULL),
-    ('rleak_1', 'WM', 'Actual breaks', NULL, NULL)
+    ('strategic_1', 'WM', 'Strategiczny', NULL, NULL),
+    ('strategic_2', 'WM', 'Strategiczny', NULL, NULL),
+    ('longevity_1', 'WM', 'Długowieczność', NULL, NULL),
+    ('longevity_2', 'WM', 'Długowieczność', NULL, NULL),
+    ('compliance_1', 'WM', 'Regulacyjne', NULL, NULL),
+    ('compliance_2', 'WM', 'Regulacyjne', NULL, NULL),
+    ('strategic', 'SH', 'Waga strategiczna', 'Waga w końcowej macierzy według czynników strategicznych', NULL),
+    ('mleak_1', 'WM', 'Prawdopodobieństwo awarii', NULL, NULL),
+    ('mleak_2', 'WM', 'Prawdopodobieństwo awarii', NULL, NULL),
+    ('rleak_1', 'WM', 'Rzeczywiste przerwy', NULL, NULL)
 ) AS v(parameter, method, label, descript, placeholder)
 WHERE t.parameter = v.parameter AND t.method = v.method;
 
@@ -35,8 +35,8 @@ UPDATE value_result_type AS t
 SET idval = v.idval
 FROM (
     VALUES
-    ('SELECTION', 'SELECTION'),
-    ('GLOBAL', 'GLOBAL')
+    ('SELECTION', 'SELEKCJA'),
+    ('GLOBAL', 'GLOBALNY')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 
@@ -44,9 +44,9 @@ UPDATE value_status AS t
 SET idval = v.idval
 FROM (
     VALUES
-    ('CANCELED', 'CANCELED'),
-    ('FINISHED', 'FINISHED'),
-    ('ON PLANNING', 'ON PLANNING')
+    ('CANCELED', 'ODWOŁANE'),
+    ('FINISHED', 'ZAKOŃCZONE'),
+    ('ON PLANNING', 'O PLANOWANIU')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 
