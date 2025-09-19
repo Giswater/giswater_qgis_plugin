@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import math
 from enum import Enum
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Optional
 from qgis.PyQt.QtCore import QEvent
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
