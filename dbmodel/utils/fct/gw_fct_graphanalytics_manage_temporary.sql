@@ -162,6 +162,20 @@ BEGIN
             IF v_fct_name = 'DWFZONE' THEN
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN  min_node int4;
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN  drainzone_id INTEGER DEFAULT 0;
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath (
+                    seq INT8 NOT NULL,
+                    "depth" INT8 NULL,
+                    start_vid INT8 NULL,
+                    pred INT8 NULL,
+                    node INT8 NULL,
+                    edge INT8 NULL,
+                    "cost" FLOAT8 NULL,
+                    agg_cost FLOAT8 NULL,
+                    CONSTRAINT temp_pgr_drivingdistance_initoverflowpath_pkey PRIMARY KEY (seq)
+                );
+            CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_start_vid_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (start_vid);
+            CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_node_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (node);
+            CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_edge_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (edge);
             END IF;
         END IF;
 
@@ -952,6 +966,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector_graph;
         DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
+        DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
         DROP TABLE IF EXISTS temp_pgr_minsector_mincut;
 
         DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
