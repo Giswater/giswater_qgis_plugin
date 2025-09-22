@@ -9,3 +9,5 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_frvalve", "column":"status", "dataType":"varchar(16)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"inp_dscenario_frvalve", "column":"status", "dataType":"varchar(18)"}}$$);

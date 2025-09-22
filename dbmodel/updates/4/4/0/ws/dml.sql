@@ -199,3 +199,10 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET "label"='Sector ID:'
 	WHERE formname='ve_node_water_connection' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype,
+"label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id,
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden,web_layoutorder)
+VALUES('inp_dscenario_frvalve', 'form_feature', 'tab_none', 'status', 'lyt_main_1', 9, 'string', 'combo', 'Status:', 'Status', NULL,
+false, NULL, true, NULL, NULL, 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_valve''',
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
