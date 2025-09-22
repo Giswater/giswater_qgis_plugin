@@ -213,17 +213,16 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- manage selector of current psector in psector-mode.
-	IF v_tabname = 'tab_psector' THEN 
+	-- manage selector psector in psector-mode
+	SELECT value::INT INTO v_cur_psector FROM config_param_user WHERE PARAMETER = 'plan_psector_current' AND cur_user = current_user;
 	
-		SELECT value::INT INTO v_cur_psector FROM config_param_user WHERE PARAMETER = 'plan_psector_current' AND cur_user = current_user;
-	
-		IF v_cur_psector IS NOT NULL -- MODE psector ON
-		AND ( -- unselect psector in different ways 
-			(v_cur_psector != v_id::integer) IS TRUE
+	IF v_cur_psector IS NOT NULL AND (v_tabname = 'tab_psector' OR v_tabname = 'tab_exploitation') THEN  -- mode psector ON
+		
+		--unselect psector in different ways
+		IF (v_cur_psector != v_id::integer) IS TRUE
 			OR v_checkall IS FALSE 
 			OR (v_id::int = v_cur_psector AND v_value = 'False')
-		)
+			OR (v_tabname = 'tab_exploitation' AND v_id::int NOT IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
 		
 		THEN
 			
