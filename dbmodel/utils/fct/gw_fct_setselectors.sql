@@ -79,6 +79,7 @@ v_expl_x_user boolean;
 v_project_type text;
 v_psector_current_value integer;
 v_sectorisexplismuni boolean;
+v_cur_psector integer;
 
 BEGIN
 
@@ -210,6 +211,41 @@ BEGIN
 			JOIN config_user_x_expl USING (expl_id)
 			where username = current_user and m.id > 0;
 		END IF;
+	END IF;
+
+	-- manage selector of current psector in psector-mode.
+	IF v_tabname = 'tab_psector' THEN 
+	
+		SELECT value::INT INTO v_cur_psector FROM config_param_user WHERE PARAMETER = 'plan_psector_current' AND cur_user = current_user;
+	
+		IF v_cur_psector IS NOT NULL -- MODE psector ON
+		AND ( -- unselect psector in different ways 
+			(v_cur_psector != v_id::integer) IS TRUE
+			OR v_checkall IS FALSE 
+			OR (v_id::int = v_cur_psector AND v_value = 'False')
+		)
+		
+		THEN
+			
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		    "data":{"message":"4358", "function":"3142", "parameters":{}}}$$)';
+		   
+			SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message 
+			FROM sys_message
+			WHERE id = 4358;
+		
+			v_geometry := COALESCE(v_geometry, '{}');
+			v_uservalues := COALESCE(v_uservalues, '{}');
+			v_action := COALESCE(v_action, 'null');
+			v_message := COALESCE(v_message, '{}');
+		
+			v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
+			"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
+	
+			RETURN gw_fct_getselectors(v_return);
+	
+		END IF;
+	
 	END IF;
 
 	-- manage check all

@@ -33,3 +33,6 @@ UPDATE sys_message SET error_message = 'There are %v_count% arcs with outlayers 
 
 -- 19/09/2025
 UPDATE config_form_fields SET widgettype = 'text', iseditable = true WHERE formname = 've_sector' AND columnname = 'sector_id';
+
+INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4358, 'It is not allowed to deactivate your current psector. Click on the Play button to exit psector mode and then, deactivate the psector.', 0, true, 'utils', 'core', 'UI');
