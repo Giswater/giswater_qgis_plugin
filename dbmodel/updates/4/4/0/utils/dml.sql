@@ -48,3 +48,9 @@ SELECT * FROM (WITH
 				when value = ''C-M'' and (min < 0.011 or max > 0.017) then 1
 				else 0 END roughness
 		from rgh, hdl) a WHERE roughness = 1' WHERE fid = 377;
+
+UPDATE sys_fprocess SET query_text = '
+SELECT a.arc_id FROM ve_arc a 
+LEFT JOIN cat_arc b ON a.arccat_id = b.id
+LEFT JOIN cat_mat_roughness c USING (matcat_id)
+WHERE b.matcat_id IS NOT NULL AND c.roughness IS NULL' WHERE fid = 433;
