@@ -5615,36 +5615,77 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
 
 
 def get_cm_user_role():
-    """Get user role from the cm database schema, if it exists."""
+    """Get user's CM role only when user and DB have CM access.
 
-    # First, check if the 'cm' schema exists to avoid errors on projects without it.
+    - Skip entirely if schema doesn't exist or user lacks USAGE on it.
+    - Avoid UI error popups by using is_admin=True on low-level queries.
+    - Prefer role-membership short-circuit to avoid touching CM tables when unnecessary.
+    """
+
+    # Check schema exists
     if not tools_db.check_schema('cm'):
         return None
 
-    # Try with username first, fallback to loginname if it fails
-    try:
-        sql = f"""
-            SELECT t.role_id
-            FROM cm.cat_user AS u
-            JOIN cm.cat_team AS t ON u.team_id = t.team_id
-            WHERE u.username = '{tools_db.get_current_user()}'
+    # Check current_user can use CM schema
+    has_usage = tools_db.get_row(
+        "SELECT has_schema_privilege(current_user, 'cm', 'USAGE')",
+        is_admin=True,
+    )
+    if not has_usage or not has_usage[0]:
+        return None
+
+    # If user has no CM-related roles, skip table queries
+    cm_roles = tools_db.get_row(
         """
-        result = tools_db.get_row(sql)
-        return result if result else None
-    except Exception:
-        # If username fails, try with loginname
-        try:
-            sql = f"""
-                SELECT t.role_id
-                FROM cm.cat_user AS u
-                JOIN cm.cat_team AS t ON u.team_id = t.team_id
-                WHERE u.loginname = '{tools_db.get_current_user()}'
-            """
-            result = tools_db.get_row(sql)
-            return result if result else None
-        except Exception:
-            # If both queries fail, return None safely
-            return None
+        SELECT EXISTS (
+            SELECT 1
+            FROM pg_auth_members am
+            JOIN pg_roles r_user ON am.member = r_user.oid
+            JOIN pg_roles r_role ON am.roleid = r_role.oid
+            WHERE r_user.rolname = current_user
+              AND r_role.rolname ILIKE 'role_cm%%'
+        )
+        """,
+        is_admin=True,
+    )
+    if not cm_roles or not cm_roles[0]:
+        return None
+
+    # Ensure SELECT on the two CM tables before querying
+    can_sel_user = tools_db.get_row(
+        "SELECT has_table_privilege(current_user, 'cm.cat_user', 'SELECT')",
+        is_admin=True,
+    )
+    can_sel_team = tools_db.get_row(
+        "SELECT has_table_privilege(current_user, 'cm.cat_team', 'SELECT')",
+        is_admin=True,
+    )
+    if not can_sel_user or not can_sel_user[0] or not can_sel_team or not can_sel_team[0]:
+        return None
+
+    # Try with username first, fallback to loginname; suppress popups
+    sql = (
+        f"""
+        SELECT t.role_id
+        FROM cm.cat_user AS u
+        JOIN cm.cat_team AS t ON u.team_id = t.team_id
+        WHERE u.username = '{tools_db.get_current_user()}'
+        """
+    )
+    result = tools_db.get_row(sql, is_admin=True)
+    if result:
+        return result
+
+    sql = (
+        f"""
+        SELECT t.role_id
+        FROM cm.cat_user AS u
+        JOIN cm.cat_team AS t ON u.team_id = t.team_id
+        WHERE u.loginname = '{tools_db.get_current_user()}'
+        """
+    )
+    result = tools_db.get_row(sql, is_admin=True)
+    return result if result else None
 
 
 def get_ids_from_qtable(qtable, id_column):

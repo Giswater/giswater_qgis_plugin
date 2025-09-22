@@ -843,8 +843,16 @@ class GwLoadProject(QObject):
         if not tools_db.check_schema('cm'):
             return
 
+        # Require USAGE on cm; avoid error popups
+        has_usage = tools_db.get_row(
+            "SELECT has_schema_privilege(current_user, 'cm', 'USAGE')",
+            is_admin=True,
+        )
+        if not has_usage or not has_usage[0]:
+            return
+
         sql = "SELECT campaign_id FROM cm.selector_campaign WHERE cur_user = current_user LIMIT 1"
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, is_thread=True)
         campaign_id = rows[0][0] if rows else None
         
         if not campaign_id:
