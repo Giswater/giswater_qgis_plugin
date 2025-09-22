@@ -53,11 +53,19 @@ class Campaign:
         self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
         self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
 
-        # Populate combo date type
-
-        rows = [['real_startdate', tools_qt.tr('Start date', 'cm')], ['real_enddate', tools_qt.tr('End date', 'cm')], ['startdate', tools_qt.tr('Planned start date', 'cm')],
-                ['enddate', tools_qt.tr('Planned end date', 'cm')]]
+        # Populate combo date type (planned dates first, then real dates)
+        rows = [
+            ['startdate', tools_qt.tr('Start date', 'cm')],
+            ['enddate', tools_qt.tr('End date', 'cm')],
+            ['real_startdate', tools_qt.tr('Real start date', 'cm')],
+            ['real_enddate', tools_qt.tr('Real end date', 'cm')]
+        ]
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
+        # Default to planned Start date
+        try:
+            self.manager_dialog.campaign_cmb_date_filter_type.setCurrentIndex(0)
+        except Exception:
+            pass
 
         # Fill combo values for campaign status (based on sys_typevalue table)
         sql = "SELECT id, idval FROM cm.sys_typevalue WHERE typevalue = 'campaign_status' ORDER BY id"
@@ -938,16 +946,17 @@ class Campaign:
 
         sql = f"""
             SELECT
-                MIN({field})::date AS min_date,
-                MAX({field})::date AS max_date
+                COALESCE(MIN({field})::date, current_date) AS min_date,
+                COALESCE(MAX({field})::date, current_date) AS max_date
             FROM cm.om_campaign
             WHERE {field} IS NOT NULL
         """
-        result = tools_db.get_row(sql)
+        result = tools_db.get_row(sql, is_admin=True)
 
         if result:
-            min_date = result.get("min_date")
-            max_date = result.get("max_date")
+            # psycopg2 DictRow supports key access; fallback for tuple
+            min_date = result.get("min_date") if hasattr(result, 'get') else result[0]
+            max_date = result.get("max_date") if hasattr(result, 'get') else result[1]
 
             if min_date:
                 self.manager_dialog.date_event_from.setDate(min_date)
@@ -993,8 +1002,9 @@ class Campaign:
                 self.manager_dialog.date_event_to.setDate(date_from)
                 date_to = date_from  # Update variable too
 
-            date_format_low = self.campaign_date_format + ' 00:00:00'
-            date_format_high = self.campaign_date_format + ' 23:59:59'
+            # Ensure forward-compatible format and inclusive range
+            date_format_low = 'yyyy-MM-dd 00:00:00'
+            date_format_high = 'yyyy-MM-dd 23:59:59'
 
             interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
             date_filter = f"({date_type} BETWEEN {interval}"
