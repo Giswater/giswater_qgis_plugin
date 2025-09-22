@@ -36,3 +36,15 @@ UPDATE config_form_fields SET widgettype = 'text', iseditable = true WHERE formn
 
 INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4358, 'It is not allowed to deactivate your current psector. Click on the Play button to exit psector mode and then, deactivate the psector.', 0, true, 'utils', 'core', 'UI');
+
+
+UPDATE sys_fprocess SET query_text = '
+SELECT * FROM (WITH 
+	rgh as (SELECT min(roughness), max(roughness) FROM cat_mat_roughness),
+	hdl as (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter=''inp_options_headloss'')
+	SELECT 
+		case when value = ''D-W'' and (min < 0.0025 or max > 0.15) then 1 
+				when value = ''H-W'' and (min < 110 or max > 150) then 1
+				when value = ''C-M'' and (min < 0.011 or max > 0.017) then 1
+				else 0 END roughness
+		from rgh, hdl) a WHERE roughness = 1' WHERE fid = 377;
