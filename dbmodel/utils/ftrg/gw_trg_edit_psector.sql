@@ -106,7 +106,7 @@ BEGIN
 		text3=NEW.text3, text4=NEW.text4, text5=NEW.text5, text6=NEW.text6, num_value=NEW.num_value, workcat_id=new.workcat_id, workcat_id_plan=new.workcat_id_plan, parent_id=new.parent_id, updated_at=now(), updated_by=current_user
 		WHERE psector_id=OLD.psector_id;
 	
-		--set v_action when status Executed or Canceled --CUIDAO: HAY UN RANGO DE VALUES Q HACEN REFE AL EXECUTE PSECTOR. 
+		--set v_action when status Executed or Canceled
 			IF NEW.status IN (3, 4) THEN
 				v_action='Execute psector';
 			ELSIF NEW.status IN (5, 6) THEN
@@ -118,7 +118,7 @@ BEGIN
 			END IF;
 
 		-- update psector status to EXECUTED (On Service)
-		IF (OLD.status != NEW.status) AND (NEW.status = 5) THEN
+		IF (OLD.status != NEW.status) AND (NEW.status IN (3, 4)) THEN
 
 			-- get workcat id
 			IF NEW.workcat_id IS NULL THEN
