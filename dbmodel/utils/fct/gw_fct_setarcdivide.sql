@@ -1120,6 +1120,19 @@ BEGIN
 		END IF;
 	END IF;
 
+	IF (SELECT EXISTS (SELECT arc_id FROM plan_psector_x_arc WHERE arc_id = v_arc_id)) IS TRUE THEN -- the divided arc IS involved INTO a psector WITH p_state=0
+		
+		-- downgrade the features, as the divided arc will be eventually downgraded according to plan_psector_x_arc.status
+		INSERT INTO plan_psector_x_node (node_id, psector_id, state, insert_tstamp, insert_user)
+		SELECT v_node_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+		
+		INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, insert_tstamp, insert_user)
+		SELECT rec_aux1.arc_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+	
+		INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, insert_tstamp, insert_user)
+		SELECT rec_aux2.arc_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+
+	END IF;
 
 	-- get results
 	-- info
