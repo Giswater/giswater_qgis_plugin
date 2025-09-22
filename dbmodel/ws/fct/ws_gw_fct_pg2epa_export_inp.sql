@@ -428,11 +428,15 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_reactions AS
 	 SELECT 'BULK'::text AS param, inp_pipe.arc_id::text, inp_pipe.bulk_coeff::text AS coeff FROM inp_pipe LEFT JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE inp_pipe.bulk_coeff IS NOT NULL
 	UNION
-	 SELECT 'WALL'::text AS param, inp_pipe.arc_id::text, inp_pipe.wall_coeff::text AS coeff FROM inp_pipe JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE inp_pipe.wall_coeff IS NOT NULL
+	 SELECT 'WALL'::text AS param, inp_pipe.arc_id::text, inp_pipe.wall_coeff::text AS coeff FROM inp_pipe LEFT JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE inp_pipe.wall_coeff IS NOT NULL
 	UNION
 	 SELECT 'BULK'::text AS param, p.arc_id::text, p.bulk_coeff::text AS coeff  FROM inp_dscenario_pipe p LEFT JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE p.bulk_coeff IS NOT NULL
 	 UNION
-	 SELECT 'WALL'::text AS param, p.arc_id::text, p.wall_coeff::text AS coeff  FROM inp_dscenario_pipe p JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE p.wall_coeff IS NOT NULL
+	 SELECT 'WALL'::text AS param, p.arc_id::text, p.wall_coeff::text AS coeff  FROM inp_dscenario_pipe p LEFT JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE p.wall_coeff IS NOT NULL
+	UNION
+	 SELECT 'BULK'::text AS param, p.element_id::text, p.bulk_coeff::text AS coeff  FROM inp_frshortpipe p LEFT JOIN temp_arc ON p.element_id::text = temp_arc.arc_id::text WHERE p.bulk_coeff IS NOT NULL
+	 UNION
+	 SELECT 'WALL'::text AS param, p.element_id::text, p.wall_coeff::text AS coeff  FROM inp_frshortpipe p LEFT JOIN temp_arc ON p.element_id::text = temp_arc.arc_id::text WHERE p.wall_coeff IS NOT NULL
 	UNION
 	 SELECT sys_param_user.idval AS param, NULL::character varying AS arc_id, config_param_user.value::character varying AS coeff FROM config_param_user
 	  JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text

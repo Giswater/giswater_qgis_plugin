@@ -42,6 +42,7 @@ v_curve	text;
 v_arc_id text;
 v_node_1 text;
 v_geom	public.geometry;
+shortpipe_rec record;
 
 
 BEGIN
@@ -127,6 +128,8 @@ BEGIN
 				v_addparam=concat('{"valve_type":"',valve_rec.valve_type,'", "setting":"',valve_rec.setting,'", "curve_id":"',valve_rec.curve_id,'", "status":"',valve_rec.status,'",
 				 "minorloss":"',valve_rec.minorloss,'", "to_arc":"',valve_rec.to_arc,'", "add_settings":"',valve_rec.add_settings,'"}');
 			ELSIF flwreg_rec.epa_type = 'FRSHORTPIPE' THEN
+				SELECT * INTO shortpipe_rec FROM ve_inp_frshortpipe WHERE element_id = flwreg_rec.element_id;
+
 				IF EXISTS (SELECT 1 FROM temp_t_node WHERE node_id = concat(flwreg_rec.node_id, '_n2a_1')) THEN
 					UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',arc_rec.roughness,'"}')
 					FROM ve_inp_frshortpipe
@@ -150,6 +153,8 @@ BEGIN
 		
 			IF flwreg_rec.epa_type = 'FRVALVE' THEN
 				UPDATE temp_t_arc SET status = valve_rec.status WHERE arc_id = record_new_arc.arc_id;
+			ELSIF flwreg_rec.epa_type = 'FRSHORTPIPE' THEN
+				UPDATE temp_t_arc SET status = shortpipe_rec.status, roughness = arc_rec.roughness, minorloss = shortpipe_rec.minorloss WHERE arc_id = record_new_arc.arc_id;
 			END IF;
 		ELSE
 						

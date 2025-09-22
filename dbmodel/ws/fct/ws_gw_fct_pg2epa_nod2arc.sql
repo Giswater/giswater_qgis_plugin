@@ -89,7 +89,7 @@ BEGIN
 	IF p_only_mandatory_nodarc IS FALSE THEN -- shortpipes & tcv valves
 		v_querytext = 'SELECT a.*, s.to_arc FROM temp_t_node a JOIN inp_shortpipe i ON i.node_id::text = a.node_id 
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id
-					   LEFT JOIN man_frelem ON s.node_id=man_frelem.node_id WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL
+					   LEFT JOIN man_frelem ON a.node_id=man_frelem.node_id::text WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL
 					   UNION
 					   SELECT a.*, s.to_arc FROM temp_t_node a JOIN inp_valve i ON i.node_id::text = a.node_id 
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id
