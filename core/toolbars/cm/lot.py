@@ -981,14 +981,19 @@ class AddNewLot:
         current_date = QDate.currentDate()
 
         where_clause = ""
-        username = tools_db.get_current_user()
-        sql = f"""
-            SELECT t.role_id, t.organization_id
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.username = '{username}'
-        """
-        user_info = tools_db.get_row(sql)
+        # Guard privilege for org filter
+        user_info = None
+        try:
+            username = tools_db.get_current_user()
+            sql = f"""
+                SELECT t.role_id, t.organization_id
+                FROM cm.cat_user u
+                JOIN cm.cat_team t ON u.team_id = t.team_id
+                WHERE u.username = '{username}'
+            """
+            user_info = tools_db.get_row(sql, is_admin=True)
+        except Exception:
+            user_info = None
 
         if user_info:
             role = user_info[0]
@@ -1012,14 +1017,18 @@ class AddNewLot:
         filters = []
 
         # Directly query the cm schema to get user's role and organization
-        username = tools_db.get_current_user()
-        sql = f"""
-            SELECT t.role_id, t.organization_id
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.username = '{username}'
-        """
-        user_info = tools_db.get_row(sql)
+        user_info = None
+        try:
+            username = tools_db.get_current_user()
+            sql = f"""
+                SELECT t.role_id, t.organization_id
+                FROM cm.cat_user u
+                JOIN cm.cat_team t ON u.team_id = t.team_id
+                WHERE u.username = '{username}'
+            """
+            user_info = tools_db.get_row(sql, is_admin=True)
+        except Exception:
+            user_info = None
 
         if user_info:
             role = user_info[0]
@@ -1679,7 +1688,7 @@ class AddNewLot:
         # If deleting users, get their login names first to also drop the DB user
         login_names_to_drop = []
         if tablename == "cat_user":
-            login_names_rows = tools_db.get_rows(f"SELECT username FROM cm.cat_user WHERE {idname} IN ({ids})")
+            login_names_rows = tools_db.get_rows(f"SELECT username FROM cm.cat_user WHERE {idname} IN ({ids})", is_thread=True)
             if login_names_rows:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 

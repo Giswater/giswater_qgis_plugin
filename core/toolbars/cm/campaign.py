@@ -48,6 +48,19 @@ class Campaign:
 
         self.manager_dialog = CampaignManagementUi(self)
         tools_gw.load_settings(self.manager_dialog)
+
+        # Privilege guard: quietly exit if user has no CM access
+        try:
+            if not tools_db.check_schema('cm'):
+                return
+            has_usage = tools_db.get_row(
+                "SELECT has_schema_privilege(current_user, 'cm', 'USAGE')",
+                is_admin=True,
+            )
+            if not has_usage or not has_usage[0]:
+                return
+        except Exception:
+            return
         self.load_campaigns_into_manager()
 
         self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
@@ -969,14 +982,19 @@ class Campaign:
         filters = []
 
         # Directly query the cm schema to get user's role and organization
-        username = tools_db.get_current_user()
-        sql = f"""
-            SELECT t.role_id, t.organization_id
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.username = '{username}'
-        """
-        user_info = tools_db.get_row(sql)
+        # Guard org filter with privileges and suppress popups
+        user_info = None
+        try:
+            username = tools_db.get_current_user()
+            sql = f"""
+                SELECT t.role_id, t.organization_id
+                FROM cm.cat_user u
+                JOIN cm.cat_team t ON u.team_id = t.team_id
+                WHERE u.username = '{username}'
+            """
+            user_info = tools_db.get_row(sql, is_admin=True)
+        except Exception:
+            user_info = None
 
         if user_info:
             role = user_info[0]
