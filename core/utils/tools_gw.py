@@ -4864,7 +4864,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
                 else:
                     state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
-        load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
+        load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.rel_layers)
 
     elif selection_mode == GwSelectionMode.LOT:
         state = None

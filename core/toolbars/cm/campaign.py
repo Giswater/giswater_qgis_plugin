@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 from typing import Optional, List, Any, Dict, Union
 
-from qgis.PyQt.QtCore import QDate, QModelIndex
+from qgis.PyQt.QtCore import QDate, QModelIndex, QStringListModel
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, \
     QTableView, QToolBar, QActionGroup, QDialog
@@ -336,26 +336,29 @@ class Campaign:
     def _load_campaign_relations(self, campaign_id: int):
         """
         Load related elements into campaign relation tabs for the given ID.
-        Includes 'gully' only if project type is UD.
-        Uses inventory-specific tables for inventory campaigns.
+        Uses the generic loader to bind a QSqlTableModel per feature table,
+        so table selections map directly to DB field names for actions like delete.
         """
-        table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
-
         features = ["arc", "node", "connec", "link"]
         if self.project_type == 'ud':
             features.append("gully")
 
         for feature in features:
-            table_widget_name = f"tbl_campaign_x_{feature}"
-            view = getattr(self.dialog, table_widget_name, None)
-            if view:
-                db_table = f"{table_prefix}{feature}"
-                sql = (
-                    f"SELECT * FROM cm.{db_table} "
-                    f"WHERE campaign_id = {campaign_id} "
-                    f"ORDER BY id"
-                )
-                self.populate_tableview(view, sql)
+            try:
+                tools_gw.load_tableview_campaign(self.dialog, feature, campaign_id, self.rel_layers)
+            except Exception:
+                # Fallback to old path if needed
+                table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
+                table_widget_name = f"tbl_campaign_x_{feature}"
+                view = getattr(self.dialog, table_widget_name, None)
+                if view:
+                    db_table = f"cm.{table_prefix}{feature}"
+                    sql = (
+                        f"SELECT * FROM {db_table} "
+                        f"WHERE campaign_id = {campaign_id} "
+                        f"ORDER BY id"
+                    )
+                    self.populate_tableview(view, sql)
 
     def create_widget_from_field(self, field: Dict[str, Any], response: Dict[str, Any]) -> Optional[QWidget]:
         """Create a Qt widget based on field metadata"""
@@ -694,9 +697,8 @@ class Campaign:
     def _update_feature_completer(self, dlg: QDialog):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         feature = tab_name.replace('tab_', '')
-        id_column = f"{feature}_id"
 
-        # Get allowed feature types
+        # Build allowed subtype list for CURRENT feature (can be empty = no restriction)
         allowed_types = []
         if self.campaign_type == 1:
             reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
@@ -704,32 +706,57 @@ class Campaign:
         elif self.campaign_type == 2:
             visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
             allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
-        elif self.campaign_type == 3:
-            # For inventory campaigns, allow all feature types - no restrictions
-            return
+        # inventory: allowed_types stays []
 
-        if not allowed_types:
-            return
+        # Ensure a single reusable model+completer (avoid recreating QCompleter per keystroke)
+        if not hasattr(self, '_feature_id_model') or self._feature_id_model is None:
+            self._feature_id_model = QStringListModel(dlg)
 
-        allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+        if not hasattr(self, '_feature_id_completer') or self._feature_id_completer is None:
+            self._feature_id_completer = QCompleter(self._feature_id_model, dlg)
+            self._feature_id_completer.setCaseSensitivity(False)
+            self._feature_id_completer.setCompletionMode(QCompleter.PopupCompletion)
+            dlg.feature_id.setCompleter(self._feature_id_completer)
 
-        sql = f"""
-            SELECT p.{id_column}::text
-            FROM {self.schema_parent}.{feature} p
-            JOIN {self.schema_parent}.cat_{feature} c
-                ON p.{feature}cat_id = c.id
-            WHERE c.{feature}_type IN ({allowed_types_str})
-            LIMIT 100
+        # Rewire textEdited to our typeahead (no timers; reuse completer/model like set_typeahead)
+        try:
+            dlg.feature_id.textEdited.disconnect()
+        except Exception:
+            pass
+        dlg.feature_id.textEdited.connect(partial(self._feature_id_typeahead, dlg, feature, allowed_types))
+
+    def _feature_id_typeahead(self, dlg: QDialog, feature: str, allowed_types: List[str], text: str = ''):
+        """Query server on each keystroke and feed the completer with up to 100 items.
+
+        This mirrors the app-wide pattern: connect textEdited -> slot -> DB query -> set QCompleter.
         """
-        result = tools_db.get_rows(sql)
-        if not result:
-            return
+        id_column = f"{feature}_id"
+        value_list = []
+        if text and len(text) >= 1:
+            safe = str(text).replace("'", "''")
+            base_sql = f"SELECT p.{id_column}::text AS val FROM {self.schema_parent}.{feature} p"
+            where_sql = f" WHERE p.{id_column}::text ILIKE '{safe}%|'".replace('|', '')
+            join_sql = ''
 
-        values = [row[id_column] for row in result if row.get(id_column)]
+            if allowed_types:
+                allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+                join_sql = f" JOIN {self.schema_parent}.cat_{feature} c ON p.{feature}cat_id = c.id"
+                where_sql += f" AND c.{feature}_type IN ({allowed_types_str})"
 
-        completer = QCompleter(values)
-        completer.setCaseSensitivity(False)
-        dlg.feature_id.setCompleter(completer)
+            sql = base_sql + join_sql + where_sql + f" ORDER BY p.{id_column} LIMIT 100"
+            rows = tools_db.get_rows(sql)
+            value_list = [r.get('val') for r in (rows or []) if r.get('val')]
+
+        # Update the shared model; keep the same QCompleter instance attached to the line edit
+        if hasattr(self, '_feature_id_model') and self._feature_id_model is not None:
+            self._feature_id_model.setStringList(value_list)
+            # Only show popup when there is user text and some results
+            if text and value_list:
+                try:
+                    if dlg.feature_id.completer():
+                        dlg.feature_id.completer().complete()
+                except Exception:
+                    pass
 
     def get_allowed_features_for_campaign(self, feature: str) -> Optional[List[Any]]:
         """Return list of allowed feature IDs for current campaign and feature tab.

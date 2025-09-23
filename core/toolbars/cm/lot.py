@@ -9,7 +9,7 @@ from functools import partial
 import json
 from typing import Any, Dict, List, Optional
 
-from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QItemSelectionModel
+from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QItemSelectionModel, QStringListModel
 from qgis.core import QgsExpression
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
@@ -420,22 +420,6 @@ class AddNewLot:
     def _on_tab_feature_changed(self):
         # Update self.rel_feature_type just like in Campaign
         self.rel_feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
-
-    def get_allowed_features_for_lot(self, lot_id: int, feature: str) -> List[Any]:
-        """Only be able to make the relations to the features id that come from campaign """
-        # feature: "arc", "node", etc.
-        row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
-        campaign_id = row[0] if row else None
-        if not campaign_id:
-            return []
-
-        feature_table = f"cm.om_campaign_x_{feature}"
-        feature_id = f"{feature}_id"
-        sql = f"SELECT {feature_id} FROM {feature_table} WHERE campaign_id = {campaign_id}"
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            return []
-        return [row[feature_id] for row in rows]
 
     def enable_feature_tabs_by_campaign(self, lot_id: int):
         row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
@@ -1295,14 +1279,61 @@ class AddNewLot:
         if not lot_id:
             return
 
-        allowed_ids = self.get_allowed_features_for_lot(lot_id, feature)  # Returns a list of IDs
-
-        # Set up the completer
+        # Set up per-keystroke typeahead (prefix, LIMIT 100) against campaign-linked IDs only
         feature_id_lineedit = dlg.findChild(QLineEdit, "feature_id")
         if feature_id_lineedit:
-            completer = QCompleter([str(x) for x in allowed_ids])
-            completer.setCaseSensitivity(False)
-            feature_id_lineedit.setCompleter(completer)
+            # Reuse one model/completer
+            if not hasattr(self, '_lot_feature_model') or self._lot_feature_model is None:
+                self._lot_feature_model = QStringListModel(dlg)
+            if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
+                self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
+                self._lot_feature_completer.setCaseSensitivity(False)
+                self._lot_feature_completer.setCompletionMode(QCompleter.PopupCompletion)
+                feature_id_lineedit.setCompleter(self._lot_feature_completer)
+
+            try:
+                feature_id_lineedit.textEdited.disconnect()
+            except Exception:
+                pass
+            feature_id_lineedit.textEdited.connect(partial(self._lot_feature_typeahead, dlg, feature, lot_id))
+
+    def _lot_feature_typeahead(self, dlg: QDialog, feature: str, lot_id: int, text: str = ''):
+        """Typeahead for lot: search only among features attached to the selected campaign.
+
+        SQL uses campaign_id derived from lot and filters by id prefix with LIMIT 100.
+        """
+        if not text:
+            # Clear to avoid massive preload
+            if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+                self._lot_feature_model.setStringList([])
+            return
+
+        # Resolve campaign
+        row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
+        campaign_id = row[0] if row else None
+        if not campaign_id:
+            if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+                self._lot_feature_model.setStringList([])
+            return
+
+        id_col = f"{feature}_id"
+        safe = str(text).replace("'", "''")
+        sql = (
+            f"SELECT {id_col}::text AS val "
+            f"FROM cm.om_campaign_x_{feature} "
+            f"WHERE campaign_id = {campaign_id} "
+            f"  AND {id_col}::text ILIKE '{safe}%|'".replace('|', '') +
+            f" ORDER BY {id_col} LIMIT 100"
+        )
+        rows = tools_db.get_rows(sql)
+        values = [r.get('val') for r in (rows or []) if r.get('val')]
+        if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+            self._lot_feature_model.setStringList(values)
+            try:
+                if self.dlg_lot and self.dlg_lot.feature_id and self.dlg_lot.feature_id.completer():
+                    self.dlg_lot.feature_id.completer().complete()
+            except Exception:
+                pass
 
     def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes, connect=True, disconnect=True):
         """
