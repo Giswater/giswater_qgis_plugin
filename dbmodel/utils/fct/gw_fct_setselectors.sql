@@ -96,21 +96,21 @@ BEGIN
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- Get input parameters:
-	v_tabname := (p_data ->> 'data')::json->> 'tabName';
-	v_selectortype := (p_data ->> 'data')::json->> 'selectorType';
-	v_id := (p_data ->> 'data')::json->> 'id';
-	v_ids := (p_data ->> 'data')::json->> 'ids';
-	v_value := (p_data ->> 'data')::json->> 'value';
-	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
-	v_checkall := (p_data ->> 'data')::json->> 'checkAll';
-	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
-	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
-	v_disableparent := (p_data ->> 'data')::json->> 'disableParent';
+	v_tabname := p_data->'data'->>'tabName';
+	v_selectortype := p_data->'data'->>'selectorType';
+	v_id := p_data->'data'->>'id';
+	v_ids := p_data->'data'->>'ids';
+	v_value := p_data->'data'->>'value';
+	v_isalone := p_data->'data'->>'isAlone';
+	v_checkall := p_data->'data'->>'checkAll';
+	v_addschema := p_data->'data'->>'addSchema';
+	v_useatlas := p_data->'data'->>'useAtlas';
+	v_disableparent := p_data->'data'->>'disableParent';
 	v_data = p_data->>'data';
-	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
-	v_device := (p_data ->> 'client')::json->> 'device';
+	v_cur_user := p_data->'client'->>'cur_user';
+	v_device := p_data->'client'->>'device';
 
-	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
+	v_tiled := (p_data->'client'->>'tiled')::boolean;
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
 		EXECUTE 'SET ROLE "'||v_cur_user||'"';
@@ -370,7 +370,7 @@ BEGIN
 			ELSIF v_tabname = 'tab_macroexploitation' THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
 				INSERT INTO selector_expl
-				SELECT DISTINCT expl_id, current_user FROM exploitation WHERE active is true and macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user)
+				SELECT DISTINCT expl_id, current_user FROM exploitation WHERE active is true and macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user AND macroexpl_id > 0)
 				ON CONFLICT (expl_id, cur_user) DO NOTHING;
 			END IF;
 
@@ -381,7 +381,7 @@ BEGIN
 			DELETE FROM selector_sector WHERE cur_user = current_user;
 
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user AND expl_id > 0)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- those that are in expl_visibility
@@ -398,7 +398,7 @@ BEGIN
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user AND expl_id > 0);
 
 			-- those that are in expl_visibility
 			INSERT INTO selector_municipality
@@ -423,13 +423,13 @@ BEGIN
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)
+			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 		
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)
+			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 
@@ -442,7 +442,7 @@ BEGIN
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user AND muni_id > 0)
 			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 			-- macrosector
@@ -451,7 +451,7 @@ BEGIN
 			-- sector
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user AND muni_id > 0)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
