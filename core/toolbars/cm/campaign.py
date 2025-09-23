@@ -1242,7 +1242,6 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         sql_sector += " WHERE " + " AND ".join(filters)
 
     sql_sector += " ORDER BY name"
-    print(f"DEBUG: Final SQL Query: {sql_sector}")
     current_sector_data = sector_widget.currentData()
     rows_sector = tools_db.get_rows(sql_sector)
     tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
