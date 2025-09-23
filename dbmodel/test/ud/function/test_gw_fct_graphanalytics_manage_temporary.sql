@@ -21,7 +21,7 @@ SELECT is (
 
 -- Check if temporary tables exist after CREATE
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_mapzone' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_mapzone' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_mapzone table exists after CREATE'
 );
 
@@ -31,17 +31,17 @@ SELECT ok(
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_arc table exists after CREATE'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_drivingdistance' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_drivingdistance' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_drivingdistance table exists after CREATE'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_audit_check_data' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_audit_check_data' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_audit_check_data table exists after CREATE'
 );
 
@@ -86,27 +86,27 @@ SELECT is (
 
 -- Check if temporary tables exist after DROP
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_mapzone' AND table_type = 'LOCAL TEMPORARY';),
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_mapzone' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_mapzone table does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_node' AND table_type = 'LOCAL TEMPORARY';),
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_node' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_node table does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc' AND table_type = 'LOCAL TEMPORARY';),
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_arc table does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_drivingdistance' AND table_type = 'LOCAL TEMPORARY';),
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_drivingdistance' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_drivingdistance table does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_audit_check_data' AND table_type = 'LOCAL TEMPORARY';),
+    NOT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_audit_check_data' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_audit_check_data table does not exist after DROP'
 );
 
@@ -151,7 +151,7 @@ SELECT is (
 
 -- Check if temporary tables exist after CREATE
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_mapzone' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_mapzone' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_mapzone table exists after CREATE'
 );
 
@@ -161,17 +161,17 @@ SELECT ok(
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_arc' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_arc table exists after CREATE'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_drivingdistance' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_pgr_drivingdistance' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_pgr_drivingdistance table exists after CREATE'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_audit_check_data' AND table_type = 'LOCAL TEMPORARY';),
+    EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_name = 'temp_audit_check_data' AND table_type = 'LOCAL TEMPORARY'),
     'Check if temp_audit_check_data table exists after CREATE'
 );
 
