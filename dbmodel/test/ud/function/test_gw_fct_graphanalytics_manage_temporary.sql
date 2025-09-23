@@ -47,32 +47,32 @@ SELECT ok(
 
 -- Check if temporary views exist after CREATE with use_psector false
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_arc' AND table_type = 'VIEW'),
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_arc'),
     'Check if v_temp_arc view exists after CREATE with use_psector false'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_node' AND table_type = 'VIEW'),
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_node'),
     'Check if v_temp_node view exists after CREATE with use_psector false'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_connec' AND table_type = 'VIEW'),
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_connec'),
     'Check if v_temp_connec view exists after CREATE with use_psector false'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_gully' AND table_type = 'VIEW'),
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_gully'),
     'Check if v_temp_gully view exists after CREATE with use_psector false'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_connec' AND table_type = 'VIEW'),
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_connec'),
     'Check if v_temp_link_connec view exists after CREATE with use_psector false'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_gully' AND table_type = 'VIEW'),
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_gully'),
     'Check if v_temp_link_gully view exists after CREATE with use_psector false'
 );
 
@@ -112,33 +112,33 @@ SELECT ok(
 
 -- Check if temporary views exist after DROP
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_arc' AND table_type = 'VIEW'),
+    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_arc'),
     'Check if v_temp_arc view does not exist after DROP'
 );
 
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_node' AND table_type = 'VIEW'),
+    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_node'),
     'Check if v_temp_node view does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_connec' AND table_type = 'VIEW'),
+    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_connec'),
     'Check if v_temp_connec view does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_gully' AND table_type = 'VIEW'),
+    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_gully'),
     'Check if v_temp_gully view does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_connec' AND table_type = 'VIEW'),
+    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_connec'),
     'Check if v_temp_link_connec view does not exist after DROP'
 );
 
 SELECT ok(
-    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_gully' AND table_type = 'VIEW'),
+    NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_gully'),
     'Check if v_temp_link_gully view does not exist after DROP'
 );
 
@@ -177,33 +177,33 @@ SELECT ok(
 
 -- Check if temporary views exist after CREATE with use_psector true
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_arc' AND table_type = 'VIEW'),
-    'Check if v_temp_arc view exists after CREATE with use_psector false'
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_arc'),
+    'Check if v_temp_arc view exists after CREATE with use_psector true'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_node' AND table_type = 'VIEW'),
-    'Check if v_temp_node view exists after CREATE with use_psector false'
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_node'),
+    'Check if v_temp_node view exists after CREATE with use_psector true'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_connec' AND table_type = 'VIEW'),
-    'Check if v_temp_connec view exists after CREATE with use_psector false'
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_connec'),
+    'Check if v_temp_connec view exists after CREATE with use_psector true'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_gully' AND table_type = 'VIEW'),
-    'Check if v_temp_gully view exists after CREATE with use_psector false'
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_gully'),
+    'Check if v_temp_gully view exists after CREATE with use_psector true'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_connec' AND table_type = 'VIEW'),
-    'Check if v_temp_link_connec view exists after CREATE with use_psector false'
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_connec'),
+    'Check if v_temp_link_connec view exists after CREATE with use_psector true'
 );
 
 SELECT ok(
-    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_gully' AND table_type = 'VIEW'),
-    'Check if v_temp_link_gully view exists after CREATE with use_psector false'
+    EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'v_temp_link_gully'),
+    'Check if v_temp_link_gully view exists after CREATE with use_psector true'
 );
 
 -- Finish the test
