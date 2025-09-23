@@ -521,7 +521,18 @@ class GwSelectManager(QgsMapTool):
         if isinstance(geometry, QgsRectangle):
             # Rectangle selection
             selected_rectangle = None
-            for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+            # Support multi-type selection when rel_feature_type == 'all'
+            if getattr(self.class_object, 'rel_feature_type', None) == 'all':
+                types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+                if not types_to_select or len(types_to_select) <= 1:
+                    types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
+                layer_groups = []
+                for ft in types_to_select:
+                    layer_groups.extend(self.class_object.rel_layers.get(ft, []))
+            else:
+                layer_groups = self.class_object.rel_layers[self.class_object.rel_feature_type]
+
+            for layer in layer_groups:
                 if selected_rectangle is None:
                     selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, geometry)
 
@@ -573,7 +584,18 @@ class GwSelectManager(QgsMapTool):
 
         wkt = geometry.asWkt()
 
-        for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+        # Support multi-type selection when rel_feature_type == 'all'
+        if getattr(self.class_object, 'rel_feature_type', None) == 'all':
+            types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+            if not types_to_select or len(types_to_select) <= 1:
+                types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
+            layer_groups = []
+            for ft in types_to_select:
+                layer_groups.extend(self.class_object.rel_layers.get(ft, []))
+        else:
+            layer_groups = self.class_object.rel_layers[self.class_object.rel_feature_type]
+
+        for layer in layer_groups:
             layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", behavior)
 
         self._check_keep_drawing()
@@ -613,7 +635,19 @@ class GwSelectManager(QgsMapTool):
 
             # Get the snapped layer to verify it exists in our layer list
             snapped_layer = self.snapper_manager.get_snapped_layer(result)
-            if snapped_layer not in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+            # Validate snapped layer against current selection scope (single or multi-type)
+            if getattr(self.class_object, 'rel_feature_type', None) == 'all':
+                types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+                if not types_to_select or len(types_to_select) <= 1:
+                    types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
+                valid_layers = []
+                for ft in types_to_select:
+                    valid_layers.extend(self.class_object.rel_layers.get(ft, []))
+                is_valid_layer = snapped_layer in valid_layers
+            else:
+                is_valid_layer = snapped_layer in self.class_object.rel_layers[self.class_object.rel_feature_type]
+
+            if not is_valid_layer:
                 msg = "Snapped feature is not in a valid layer"
                 tools_qgis.show_warning(msg, 2)
                 return False
@@ -643,7 +677,18 @@ class GwSelectManager(QgsMapTool):
                 qgs_behavior = QgsVectorLayer.SetSelection
             
             wkt = QgsGeometry.fromPointXY(point).asWkt()
-            for layer in self.class_object.rel_layers[self.class_object.rel_feature_type]:
+            # Apply selection in scope
+            if getattr(self.class_object, 'rel_feature_type', None) == 'all':
+                types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+                if not types_to_select or len(types_to_select) <= 1:
+                    types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
+                layer_groups = []
+                for ft in types_to_select:
+                    layer_groups.extend(self.class_object.rel_layers.get(ft, []))
+            else:
+                layer_groups = self.class_object.rel_layers[self.class_object.rel_feature_type]
+
+            for layer in layer_groups:
                 layer.selectByExpression(f"intersects($geometry, geom_from_wkt('{wkt}'))", qgs_behavior)
 
             return True

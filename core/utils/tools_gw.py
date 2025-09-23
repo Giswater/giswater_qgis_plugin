@@ -3529,6 +3529,32 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     if class_object.rel_feature_type in ('all', None):
         class_object.rel_feature_type = 'arc'
 
+    # Campaign-only: when multiple relation tabs are enabled, select across all enabled types
+    try:
+        if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+            types_all = ["arc", "node", "connec", "link"]
+            try:
+                if getattr(class_object, 'project_type', '').lower() == 'ud':
+                    types_all.append("gully")
+            except Exception:
+                pass
+
+            enabled_types = []
+            tab_feature = getattr(dialog, 'tab_feature', None)
+            for ft in types_all:
+                tab = getattr(dialog, f"tab_{ft}", None)
+                if tab_feature is None or tab is None:
+                    continue
+                idx = tab_feature.indexOf(tab)
+                if idx != -1 and tab_feature.isTabEnabled(idx):
+                    enabled_types.append(ft)
+
+            if len(enabled_types) > 1:
+                class_object.rel_feature_type = 'all'
+                class_object.multi_enabled_types = enabled_types
+    except Exception:
+        pass
+
     # Choose selection tool based on tool_type
     try:
         selection_type_enum = GwSelectionType(tool_type)
@@ -3636,6 +3662,31 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         tools_qgis.disconnect_signal_selection_changed()
 
     field_id = f"{class_object.rel_feature_type}_id"
+
+    # Campaign-only: if more than one relation tab is enabled, run a multi-type insert
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+        try:
+            # Detect whether at least two relation tabs are enabled/available
+            multi_enabled = 0
+            for ft in ("arc", "node", "connec", "link", "gully"):
+                tab = getattr(dialog, f"tab_{ft}", None)
+                tab_feature = getattr(dialog, 'tab_feature', None)
+                if tab_feature and tab is not None:
+                    idx = tab_feature.indexOf(tab)
+                    if idx != -1 and tab_feature.isTabEnabled(idx):
+                        multi_enabled += 1
+            if multi_enabled >= 2:
+                # Defer multi-type processing until selection stabilizes
+                if not getattr(class_object, '_pending_multi_insert', False):
+                    try:
+                        from qgis.PyQt.QtCore import QTimer
+                        class_object._pending_multi_insert = True
+                        QTimer.singleShot(0, partial(_campaign_multi_insert_processing, class_object, dialog, table_object, selection_mode))
+                    except Exception:
+                        _campaign_multi_insert_processing(class_object, dialog, table_object, selection_mode)
+                return
+        except Exception:
+            pass
 
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
@@ -3775,6 +3826,127 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Safely check highlight method
     if hasattr(class_object, 'highlight_method_active') and class_object.highlight_method_active:
         class_object.highlight_features_method(class_object, dialog, table_object)
+
+
+def _campaign_multi_insert_processing(class_object, dialog, table_object, selection_mode):
+    """Process Campaign multi-tab insert using the same confirmation flow and existing helpers."""
+    try:
+        # Clear pending flag now that we are running
+        try:
+            if getattr(class_object, '_pending_multi_insert', False):
+                class_object._pending_multi_insert = False
+        except Exception:
+            pass
+
+        # Build selected ids per type from current canvas selection
+        types = ["arc", "node", "connec", "link", "gully"]
+        per_type_ids_to_insert = {}
+        for ft in types:
+            ft_field_id = f"{ft}_id"
+            # Try to read existing table ids; if model is not ready, treat as empty
+            table_ids_ft = []
+            try:
+                widget_ft = tools_qt.get_widget(dialog, f"tbl_{table_object}_x_{ft}")
+                model_ft = widget_ft.model() if widget_ft and hasattr(widget_ft, 'model') else None
+                if model_ft:
+                    table_ids_ft = [str(get_model_index(model_ft, row, ft_field_id)) for row in range(model_ft.rowCount())]
+            except Exception:
+                table_ids_ft = []
+
+            # Collect selected ids from layers
+            selected_ids_ft = []
+            for layer in (class_object.rel_layers or {}).get(ft, []) or []:
+                if layer and layer.selectedFeatureCount() > 0:
+                    for feature in layer.selectedFeatures():
+                        sid = str(feature.attribute(ft_field_id))
+                        if sid and sid not in selected_ids_ft:
+                            selected_ids_ft.append(sid)
+            if not selected_ids_ft:
+                continue
+
+            # Filter by context
+            try:
+                selected_ids_ft = _filter_ids_by_context(class_object, selection_mode, ft, selected_ids_ft)
+            except Exception:
+                pass
+
+            ids_to_insert_ft = [sid for sid in selected_ids_ft if sid and (sid not in table_ids_ft)]
+            if ids_to_insert_ft:
+                per_type_ids_to_insert[ft] = ids_to_insert_ft
+
+        if not per_type_ids_to_insert:
+            remove_selection(layers=class_object.rel_layers)
+            return
+
+        # Visually reflect only the IDs that will be inserted (match single-tab UX)
+        try:
+            remove_selection(layers=class_object.rel_layers)
+            for ft, ids_list in per_type_ids_to_insert.items():
+                if not ids_list:
+                    continue
+                id_col = f"{ft}_id"
+                expr = QgsExpression(f"{id_col} IN ({','.join(str(i) for i in ids_list)})")
+                tools_qgis.select_features_by_ids(ft, expr, class_object.rel_layers)
+        except Exception:
+            pass
+
+        # Confirm once
+        try:
+            lines = []
+            for ft, ids_list in per_type_ids_to_insert.items():
+                preview = ", ".join(ids_list[:10])
+                if len(ids_list) > 10:
+                    preview += ", ..."
+                lines.append(f"{ft}: {len(ids_list)} [{preview}]")
+            msg = "Do you want to insert the selected features?\n{0}"
+            if not tools_qt.show_question(msg, msg_params=("\n".join(lines),)):
+                remove_selection(layers=class_object.rel_layers)
+                return
+        except Exception:
+            pass
+
+        # Insert per type
+        for ft, ids_list in per_type_ids_to_insert.items():
+            _insert_feature_campaign(dialog, ft, class_object.campaign_id, ids=ids_list)
+            load_tableview_campaign(dialog, ft, class_object.campaign_id, class_object.rel_layers)
+            # Select inserted rows in the corresponding table so tab switching highlights them
+            try:
+                qtable = tools_qt.get_widget(dialog, f"tbl_campaign_x_{ft}")
+                if qtable and qtable.model() and qtable.selectionModel():
+                    id_col_name = f"{ft}_id"
+                    # Find column index (QSqlTableModel preferred)
+                    if hasattr(qtable.model(), 'fieldIndex'):
+                        id_col_idx = qtable.model().fieldIndex(id_col_name)
+                    else:
+                        id_col_idx = -1
+                        for c in range(qtable.model().columnCount()):
+                            if qtable.model().headerData(c, Qt.Horizontal) == id_col_name:
+                                id_col_idx = c
+                                break
+                    if id_col_idx != -1:
+                        sel_model = qtable.selectionModel()
+                        sel_model.clearSelection()
+                        ids_set = set(map(str, ids_list))
+                        for row in range(qtable.model().rowCount()):
+                            val = str(qtable.model().index(row, id_col_idx).data())
+                            if val in ids_set:
+                                index = qtable.model().index(row, id_col_idx)
+                                sel_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+            except Exception:
+                pass
+
+        # Keep the same post-insert callback semantics
+        if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
+            try:
+                class_object.callback_later_selection()
+            except Exception:
+                pass
+    except Exception:
+        # Swallow to avoid breaking other flows; per-tab logic already handled earlier
+        try:
+            remove_selection(layers=class_object.rel_layers)
+        except Exception:
+            pass
 
 
 def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
