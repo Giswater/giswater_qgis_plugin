@@ -70,7 +70,8 @@ BEGIN
 		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end)
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
-		JOIN cat_node c ON c.id=nodecat_id';
+		JOIN cat_node c ON c.id=nodecat_id
+		WHERE n.sector_id > 0';
 
 	EXECUTE v_querytext;
 
