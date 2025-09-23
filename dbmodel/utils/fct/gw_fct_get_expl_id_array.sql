@@ -33,7 +33,8 @@ BEGIN
     -- For user selected exploitations
     IF p_expl_id = '-901' THEN
         SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-        FROM selector_expl;
+        FROM selector_expl
+        WHERE cur_user = current_user;
     -- For all exploitations
     ELSIF p_expl_id = '-902' THEN
         SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
