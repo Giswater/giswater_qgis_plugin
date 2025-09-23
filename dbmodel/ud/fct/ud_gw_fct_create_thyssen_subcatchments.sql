@@ -22,6 +22,7 @@ DECLARE
   v_fid integer := 640;
   v_sql text;
   v_fprocessname TEXT;
+ v_clip_table TEXT;
 BEGIN
 
 	-- Set search path to local schema
@@ -56,6 +57,21 @@ BEGIN
 	
 	raise notice 'fast subc';
 
+	IF v_clip IS NOT NULL then
+
+		IF v_clip = 'muni' THEN
+			v_clip_table = 'ext_municipality';
+		ELSE
+			v_clip_table = v_clip;
+		END IF;
+	
+	ELSE
+	
+		v_clip = 'muni';
+		v_clip_table = 'ext_municipality';
+		
+	END IF;
+
 	/* ----------------------------------------------------------------------------
 		FAST SUBCATCHMENTS:
 		- Voronoi per municipality (smaller point sets)
@@ -64,40 +80,20 @@ BEGIN
 		- Semi-join to ve_node using the chosen clip layer (no giant IN lists)
 		- Assign cells to nodes with && + ST_Contains (index-friendly)
 		---------------------------------------------------------------------------*/
-	v_sql := format($FMT$
+	
+		execute  '
 		INSERT INTO inp_subcatchment (subc_id, outlet_id, sector_id, muni_id, hydrology_id, descript, the_geom)
-		WITH junc AS (
-		SELECT n.node_id, n.sector_id, n.muni_id, n.the_geom
-		FROM node n
-		JOIN (SELECT DISTINCT %1$I_id FROM ve_node) f
-			ON f.%1$I_id = n.%1$I_id
-		WHERE n.epa_type = 'JUNCTION'
-		),
-		voro AS (
-		SELECT j.muni_id,
-				(ST_Dump(
-					ST_VoronoiPolygons(
-					ST_Collect(j.the_geom),
-					0.0,
-					m.the_geom   -- extend_to: already clipped to municipality
-					)
-				)).geom AS cell
-		FROM junc j
-		JOIN ext_municipality m ON m.muni_id = j.muni_id
-		GROUP BY j.muni_id, m.the_geom
-		),
-		assigned AS (
-		SELECT j.node_id, j.sector_id, j.muni_id, v.cell
-		FROM junc j
-		JOIN voro v ON v.muni_id = j.muni_id
-		WHERE v.cell && j.the_geom
-			AND ST_Contains(v.cell, j.the_geom)
+		WITH mec AS (
+			SELECT (st_dump(st_voronoipolygons(ST_Collect(the_geom)))).geom AS the_geom
+			FROM node WHERE epa_type = ''JUNCTION''
 		)
-		SELECT 'S' || node_id, node_id, sector_id, muni_id, $1, 'flag_create_subcatchments', cell
-		FROM assigned
-	$FMT$, v_clip);
+		SELECT concat(''S'', b.node_id), b.node_id, b.sector_id, b.muni_id, '||v_hyd||', ''flag_create_subcatchments'', st_intersection(a.the_geom, m.the_geom) FROM mec a 
+		JOIN node b ON st_intersects(a.the_geom, b.the_geom)
+		JOIN '||v_clip_table||' m USING ('||v_clip||'_id)';
 
-	EXECUTE v_sql USING v_hyd;
+		
+
+	UPDATE inp_subcatchment SET descript = 'flag_create_subcatchments';
 
 
 	/* ATTRIBUTES */
@@ -106,9 +102,9 @@ BEGIN
 
     WITH z AS (
 		SELECT subc_id, 
-		(ST_SummaryStatsAgg(ST_Clip(ST_Slope(rast, 1, '32BF', 'DEGREES'), s.the_geom), 1, TRUE)).mean AS slope 
-		FROM ext_raster_dem r JOIN inp_subcatchment s ON st_intersects(r.rast, s.the_geom) 
-		WHERE s.descript = 'flag_create_subcatchments'
+		(ST_SummaryStatsAgg(ST_Clip(r.rast, s.the_geom), 1, TRUE)).mean AS slope 
+		FROM ext_raster_slope r JOIN inp_subcatchment s ON st_intersects(r.rast, s.the_geom) 
+		--WHERE s.descript = 'flag_create_subcatchments'
 		--AND (stats).count > 0     -- evita NULLs cuando el clip no pisa pixeles
 		GROUP BY s.subc_id
 	)
@@ -117,37 +113,6 @@ BEGIN
 	FROM z
 	WHERE t.subc_id = z.subc_id;     
               
-              
-              
-	-- clip
-	CREATE TEMP TABLE tmp_subc ON COMMIT DROP AS
-	SELECT
-	s.subc_id || '_' || v.sector_id              AS subc_id,
-	s.outlet_id,
-	v.sector_id,
-	s.muni_id,
-	s.hydrology_id,
-	ST_CollectionExtract(
-		ST_MakeValid(
-		ST_Intersection(s.the_geom, v.the_geom)
-		), 3
-	) AS the_geom
-	FROM inp_subcatchment s
-	JOIN ve_sector v
-	ON s.the_geom && v.the_geom
-	AND ST_Intersects(s.the_geom, v.the_geom);
-
-	-- Remove empty spaces and noisy data
-	DELETE FROM tmp_subc
-	WHERE ST_IsEmpty(the_geom) OR ST_Area(the_geom) < 1.0;
-
-	-- Keep a flag in order to clip the new created subcatchments
-	DELETE FROM inp_subcatchment
-	WHERE descript = 'flag_create_subcatchments';
-
-	INSERT INTO inp_subcatchment (subc_id, outlet_id, sector_id, muni_id, hydrology_id, the_geom)
-	SELECT subc_id, outlet_id, sector_id, muni_id, hydrology_id, the_geom
-	FROM tmp_subc;
 
 	-- Clean empty geometries
 	DELETE FROM inp_subcatchment
