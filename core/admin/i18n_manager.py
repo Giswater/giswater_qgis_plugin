@@ -1524,7 +1524,7 @@ class GwSchemaI18NManager:
             if self.project_type in ["am", "cm"]:
                 tables_org = ["sys_typevalue"]
             if self.project_type in ["ws", "ud"]:
-                tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
+                tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue", "inp_typevalue"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbconfig_form_fields_json" in table_i18n or "dbconfig_form_fields_feat" in table_i18n:
