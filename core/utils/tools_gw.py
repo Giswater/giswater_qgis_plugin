@@ -3573,77 +3573,6 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
         deactivation_function()
 
 
-def activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type):
-    """ Selection snapping """
-    add_icon(dialog.btn_snapping, "137")
-    dialog.btn_snapping.clicked.connect(
-        partial(selection_init, class_object, dialog, table_object, selection_mode, tool_type))
-    selection_init(class_object, dialog, table_object, selection_mode, tool_type)
-
-
-def update_default_action(dialog, action):
-    dialog.btn_snapping.setDefaultAction(action)
-
-
-def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT,
-                      callback: Union[Callable[[], bool], None] = None, callback_kwargs: Union[dict[str, Any], None] = None,
-                      callback_later: Callable = None, callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
-    """Create snapping button with menu (split button behavior)"""
-
-    def handle_action(tool_type):
-        if callback and callback() is False:
-            return
-        activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type)
-        if callback_later:
-            callback_later()
-
-    # Action group to keep exclusivity
-    tools = [("rectangle", "137.png"), ("polygon", "180.svg"), ("freehand", "182.svg"), ("circle", "181.svg")]
-    ag = QActionGroup(dialog)
-
-    # Action 1
-    for tool_type, icon_path in tools:
-        icon_path = os.path.join(lib_vars.plugin_dir, "icons", "dialogs", icon_path)
-        action = QAction(QIcon(icon_path), tool_type, dialog)
-        action.setProperty('has_icon', True)
-        action.triggered.connect(partial(handle_action, tool_type))
-        ag.addAction(action)
-
-    # Menu with both actions
-    menu = QMenu(dialog)
-    menu.addActions(ag.actions())
-
-    # Create a QToolButton that behaves like a split button
-    dialog.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)  # left = default, arrow = menu
-    dialog.btn_snapping.setMenu(menu)
-
-    # Set initial default action
-    dialog.btn_snapping.setDefaultAction(ag.actions()[0])
-
-    menu.triggered.connect(partial(update_default_action, dialog))
-
-    # parent_tab = find_parent_tab(dialog.btn_snapping)
-
-    # expected_table_name = get_expected_table_name(class_object, table_object, selection_mode)
-
-    # widget_table = tools_qt.get_widget(dialog, expected_table_name)
-    # parent_tab_table = find_parent_tab(widget_table)
-
-    # if callback_values and parent_tab_table:
-    #     parent_tab_table.currentChanged.connect(partial(highlight_in_table_changed, callback_values))
-    # if parent_tab:
-    #     parent_tab.currentChanged.connect(partial(highlight_in_tab_changed, class_object, dialog, expected_table_name, parent_tab))
-
-
-def highlight_in_tab_changed(class_object, dialog, expected_table_name, parent_tab):
-    widget = parent_tab.widget(parent_tab.currentIndex())
-    if widget.objectName() in ("tab_relations", "tab_features"):
-        highlight_features_in_table(class_object, dialog, expected_table_name)
-    else:
-        tools_qgis.refresh_map_canvas()
-        reset_rubberband(class_object.rubber_band)
-
-
 def get_expected_table_name(class_object, table_object, selection_mode):
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
@@ -3653,11 +3582,6 @@ def get_expected_table_name(class_object, table_object, selection_mode):
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
     return expected_table_name
-
-
-def highlight_in_table_changed(callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
-    class_object, dialog, expected_table_name = callback_values()
-    highlight_features_in_table(class_object, dialog, expected_table_name)
 
 
 def find_parent_tab(widget):
@@ -3703,44 +3627,6 @@ def _filter_ids_by_context(class_object, selection_mode: GwSelectionMode, featur
             return ids
 
     return ids
-
-
-def highlight_features_in_table(class_object, dialog, expected_table_name):
-    """Selects all features on the map that are currently listed in the given table widget."""
-
-    # Refresh map canvas
-    tools_qgis.refresh_map_canvas()
-    reset_rubberband(class_object.rubber_band)
-
-    # Get main variables
-    widget_table = tools_qt.get_widget(dialog, expected_table_name)
-    feature_type = class_object.rel_feature_type or expected_table_name.split('_')[-1]
-
-    # Check if table is valid
-    if not widget_table or not widget_table.model() or not feature_type:
-        return
-
-    model = widget_table.model()
-    if not model or model.rowCount() == 0:
-        remove_selection(layers=class_object.rel_layers)
-        return
-
-    id_column_name = f"{feature_type}_id"
-    id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
-    if id_column_index == -1:
-        return
-
-    ids_to_select = [str(model.index(row, id_column_index).data()) for row in range(model.rowCount())]
-
-    if not ids_to_select:
-        remove_selection(layers=class_object.rel_layers)
-        return
-
-    expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
-    tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
-
-    # Activate rubberband function
-    tools_qgis.highlight_features_selected_in_table(class_object, dialog, expected_table_name, feature_type)
 
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):

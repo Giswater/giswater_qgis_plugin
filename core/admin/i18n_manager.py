@@ -573,8 +573,6 @@ class GwSchemaI18NManager:
     def _json_update(self, table_i18n, table_org):
         """ Update the table with the json format """
 
-        print('aaaaaaaaaa')
-
         if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
             self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "lb_en_us"]
             pk_column_org =["formname", "formtype", "tabname", "columnname"]
@@ -584,12 +582,8 @@ class GwSchemaI18NManager:
             pk_column_org = ["id"]
             pk_column_i18n = ["source"]
 
-        print('bbbbbbbbbb')
-
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
         self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
-
-        print('ccccccccccc')
 
         # Set the column to update in the table_org (filterparam, inputparams, widgetcontrols)
         column = ""
@@ -609,7 +603,6 @@ class GwSchemaI18NManager:
         where_clause = " OR ".join(where_conditions) if where_conditions else "TRUE"
 
         query = f"""SELECT {', '.join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org} WHERE {where_clause}"""
-        print(query)
         rows_org = self._get_rows(query, self.cursor_org)
 
         # Prepare batch insert
