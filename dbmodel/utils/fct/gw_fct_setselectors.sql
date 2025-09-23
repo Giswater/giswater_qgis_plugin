@@ -504,14 +504,27 @@ BEGIN
 		EXECUTE' INSERT INTO selector_municipality 
 		SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
 
-		-- macroexpl
-		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-
 		-- expl
 		DELETE FROM selector_expl WHERE cur_user = current_user;
-		INSERT INTO selector_expl
-		SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-		ON CONFLICT (expl_id, cur_user) DO NOTHING;
+		IF v_sectorisexplismuni THEN			
+			INSERT INTO selector_expl SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
+			IN (SELECT expl_id FROM exploitation WHERE active);
+		ELSE	
+			INSERT INTO selector_expl
+			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			ON CONFLICT (expl_id, cur_user) DO NOTHING;
+		END IF;
+	
+		-- macroexpl
+		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+		IF v_sectorisexplismuni THEN			
+			INSERT INTO selector_macroexpl SELECT macroexpl_id, current_user FROM SCHEMA_NAME.selector_macroexpl sm WHERE cur_user = current_user AND macroexpl_id 
+			IN (SELECT macroexpl_id FROM macroexploitation m WHERE active);
+		
+			INSERT INTO selector_expl SELECT expl_id, current_user FROM exploitation 
+			WHERE macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user)
+			ON CONFLICT (expl_id, cur_user) DO NOTHING;
+		END IF;
 		
 		-- macrosector
 		DELETE FROM selector_macrosector WHERE cur_user = current_user;
@@ -519,7 +532,7 @@ BEGIN
 		-- sector
 		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 		IF v_sectorisexplismuni THEN			
-			INSERT INTO selector_sector SELECT expl_id, current_user FROM ud.selector_expl WHERE cur_user = current_user AND expl_id 
+			INSERT INTO selector_sector SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
 			IN (SELECT sector_id FROM sector WHERE active);
 		ELSE 
 			INSERT INTO selector_sector
