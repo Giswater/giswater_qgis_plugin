@@ -637,7 +637,7 @@ class Campaign:
         # Create menu for btn_snapping
         self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
-        used_tools = ["rectangle", "polygon", "freehand", "circle"]
+        used_tools = ["rectangle", "polygon", "freehand", "circle", "point"]
         menu_variables = {"used_tools": used_tools, "callback_later": self._refresh_relations_table}
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._update_feature_completer, "callback_later_values": self.callback_values_later}
