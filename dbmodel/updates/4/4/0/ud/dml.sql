@@ -118,3 +118,9 @@ UPDATE config_form_fields SET columnname = 'dwfzone_id', label = 'Dwfzone', tool
 	dv_querytext = 'SELECT dwfzone_id as id, name as idval FROM dwfzone WHERE dwfzone_id = 0 UNION SELECT dwfzone_id as id, name as idval FROM dwfzone WHERE dwfzone_id IS NOT NULL AND active IS TRUE',
 	dv_querytext_filterc = ' AND dwfzone.expl_id'
 WHERE formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzone_id' AND layoutname = 'lyt_bot_1';
+
+-- 23/09/2025
+UPDATE sys_param_user SET isenabled=NULL WHERE id='edit_featureval_fluid_vdefault';
+UPDATE sys_param_user SET isenabled=NULL WHERE id='edit_feature_fluid_vdefault';
+UPDATE sys_param_user SET isenabled=NULL WHERE id='edit_arc_fluid_vdefault';
+UPDATE sys_param_user SET isenabled=NULL WHERE id='edit_node_fluid_vdefault';
