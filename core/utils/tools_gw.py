@@ -3562,7 +3562,7 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
         selection_type_enum = GwSelectionType(tool_type)
     except ValueError:
         selection_type_enum = GwSelectionType.DEFAULT
-    
+
     select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode, selection_type=selection_type_enum)
 
     global_vars.canvas.setMapTool(select_manager)
@@ -5085,6 +5085,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
             "result": result
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
+        refresh_selectors()
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
