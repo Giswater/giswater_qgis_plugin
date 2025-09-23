@@ -219,11 +219,10 @@ BEGIN
 	IF v_cur_psector IS NOT NULL AND (v_tabname = 'tab_psector' OR v_tabname = 'tab_exploitation') THEN  -- mode psector ON
 		
 		--unselect psector in different ways
-		IF (v_cur_psector != v_id::integer) IS TRUE
-			OR v_checkall IS FALSE 
-			OR (v_id::int = v_cur_psector AND v_value = 'False')
+		IF (v_cur_psector = v_id::integer AND v_value = 'False')
+			OR v_checkall IS FALSE
+			OR (v_cur_psector != v_id::integer AND v_isalone)
 			OR (v_tabname = 'tab_exploitation' AND v_id::int NOT IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
-		
 		THEN
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
