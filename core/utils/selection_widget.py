@@ -12,8 +12,7 @@ from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
 from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, \
                     QPushButton, QGridLayout
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtCore import QItemSelectionModel
+from qgis.PyQt.QtCore import Qt, QItemSelectionModel, QItemSelection
 
 from . import tools_gw
 from ...libs import tools_qt, tools_qgis, lib_vars  # tools_db,
@@ -423,7 +422,7 @@ class GwSelectionWidget(QWidget):
 
     def invert_table_selection(self, class_object: Any, dialog: QDialog, table_object: str):
         """
-        Invert the current selection in the table.
+        Invert the current selection in the table using efficient QItemSelection.
         
         Args:
             class_object: The class object
@@ -440,24 +439,14 @@ class GwSelectionWidget(QWidget):
         if not selection_model or not data_model:
             return
 
-        # Get all row indices
-        all_rows = set(range(data_model.rowCount()))
-        selected_rows = set()
-
-        # Get currently selected rows
-        for index in selection_model.selectedRows():
-            selected_rows.add(index.row())
-
-        # Calculate rows to select (invert selection)
-        rows_to_select = all_rows - selected_rows
-
-        # Clear current selection
-        selection_model.clearSelection()
-
-        # Select the inverted rows
-        for row in rows_to_select:
-            index = data_model.index(row, 0)
-            selection_model.select(index, selection_model.Select | selection_model.Rows)
+        # Create a selection that includes all rows
+        all_rows = QItemSelection(
+            data_model.index(0, 0),
+            data_model.index(data_model.rowCount() - 1, data_model.columnCount() - 1)
+        )
+        
+        # Toggle the selection state using XOR operation
+        selection_model.select(all_rows, QItemSelectionModel.Toggle | QItemSelectionModel.Rows)
 
     # endregion invert selection
 
