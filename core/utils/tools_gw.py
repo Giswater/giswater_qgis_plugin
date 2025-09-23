@@ -871,7 +871,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             tools_qgis.set_layer_visible(layer, recursive=False, visible=False)
 
     if the_geom is not None and the_geom != 'None':
-        layer.setCrs(QgsCoordinateReferenceSystem(auth_id))
+        layer.setCrs(QgsCoordinateReferenceSystem(f"EPSG:{auth_id}"))
 
     if extent is not None:
         layer.setExtent(extent)
