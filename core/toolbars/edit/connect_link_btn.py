@@ -5,10 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from enum import Enum
 from functools import partial
 
-from qgis.PyQt.QtCore import QRect, Qt
+from qgis.PyQt.QtCore import QRect, Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication, QActionGroup, QWidget, QAction, QMenu
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsFeatureRequest
@@ -20,11 +19,6 @@ from ...utils.snap_manager import GwSnapManager
 from ...threads.connect_link import GwConnectLink
 from ...ui.ui_manager import GwConnectLinkUi
 from ..maptool import GwMaptool
-
-
-class SelectAction(Enum):
-    CONNEC_LINK = tools_qt.tr('Connec to network')
-    GULLY_LINK = tools_qt.tr('Gully to network')
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -66,9 +60,22 @@ class GwConnectLinkButton(GwMaptool):
     def clicked_event(self):
         """ Event when button is clicked """
 
-        if self.project_type == 'ws':
-            self.feature_type = 'connec'
+        # If a last selection exists (persisted in config), open that dialog directly
+        last_ft = tools_gw.get_config_parser('btn_connect_link', 'last_feature_type', "user", "session")
+        if last_ft not in (None, 'None', ''):
+            self.feature_type = str(last_ft)
             self.open_dlg()
+            return
+
+        # Otherwise pop the menu below the button (like utilities/element)
+        try:
+            button = self.action.associatedWidgets()[1]
+            menu_point = button.mapToGlobal(QPoint(0, button.height()))
+            self.menu.popup(menu_point)
+        except Exception:
+            if self.project_type == 'ws':
+                self.feature_type = 'connec'
+                self.open_dlg()
 
     def open_dlg(self):
         """ Main function to open 'Connect to network' dialog """
@@ -141,9 +148,24 @@ class GwConnectLinkButton(GwMaptool):
             action.triggered.connect(partial(self._set_to_arc, idx))
 
         btn_set_to_arc.setMenu(set_to_arc_menu)
+
+        # When clicking the main button, run last selection if present; otherwise open the menu
+        try:
+            btn_set_to_arc.clicked.disconnect()
+        except Exception:
+            pass
+        btn_set_to_arc.clicked.connect(partial(self._btn_set_to_arc_clicked, btn_set_to_arc))
         
         # Set initial button state
         self._update_set_to_arc_button_state()
+
+    def _btn_set_to_arc_clicked(self, btn):
+        # Always open the dropdown menu; do not reuse last selection
+        try:
+            if hasattr(btn, 'showMenu'):
+                btn.showMenu()
+        except Exception:
+            pass
 
     def _make_arc_field_readonly(self):
         """ Make arc field read-only (fallback if database config doesn't work) """
@@ -214,37 +236,31 @@ class GwConnectLinkButton(GwMaptool):
         self._update_set_to_arc_button_state()
 
     def _fill_action_menu(self):
-        """Fill the dropdown menu with actions."""
+        """Fill the dropdown menu with actions (runtime memory of last selection)."""
 
-        # Disconnect and remove previous signals and actions
+        # Disconnect and remove previous actions
         for action in self.menu.actions():
-            action.disconnect()  # Disconnect signals
-            self.menu.removeAction(action)  # Remove from menu
+            try:
+                action.disconnect()
+            except Exception:
+                pass
+            self.menu.removeAction(action)
 
-        # Create actions for the menu
         ag = QActionGroup(self.iface.mainWindow())
-        for action in SelectAction:
-            # Use `action.value` for user-friendly labels
-            obj_action = QAction(action.value, ag)
-            self.menu.addAction(obj_action)
-            # connect signal
-            obj_action.triggered.connect(self._action_triggered)
+        entries = ((tools_qt.tr('Connec to network'), 'connec'),
+                   (tools_qt.tr('Gully to network'), 'gully'))
+        for label, feature_type in entries:
+            act = QAction(label, ag)
+            self.menu.addAction(act)
+            act.triggered.connect(partial(self._open_connect_dialog, feature_type))
+            act.triggered.connect(partial(self._save_last_main_selection, feature_type))
 
-    def _action_triggered(self):
-        """ Action triggered event """
+    def _save_last_main_selection(self, feature_type):
+        # Persist last selected feature type using config (like select_manager)
+        tools_gw.set_config_parser('btn_connect_link', 'last_feature_type', feature_type)
 
-        # Get the action that was triggered
-        action = self.sender()
-
-        # Check if the action is valid
-        if action is None:
-            return
-
-        # Get the selected action from the menu
-        selected_action = SelectAction(action.text())
-
-        # Open dialog based on selected action
-        self.feature_type = 'connec' if selected_action == SelectAction.CONNEC_LINK else 'gully'
+    def _open_connect_dialog(self, feature_type):
+        self.feature_type = feature_type
         self.open_dlg()
 
     # endregion
