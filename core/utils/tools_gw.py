@@ -871,6 +871,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             tools_qgis.set_layer_visible(layer, recursive=False, visible=False)
 
     if the_geom is not None and the_geom != 'None':
+        layer.setCrs(QgsCoordinateReferenceSystem(auth_id))
+    if layer.crs().isValid() is False:
         layer.setCrs(QgsCoordinateReferenceSystem(f"EPSG:{auth_id}"))
 
     if extent is not None:
@@ -5039,6 +5041,16 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         # Execute the stored procedure
         result = execute_procedure("gw_fct_set_toggle_current", body)
         global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
+
+        # Set selectors
+        extras = f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":"{psector_id}", "isAlone":"False", "value":"True", "addSchema":"NULL"'
+        body = create_body(extras=extras)
+        result = execute_procedure("gw_fct_setselectors", body)
+
+        # Refresh selectors
+        extras = '"selectorType":"selector_basic", "filterText":""'
+        body = create_body(extras=extras)
+        result = execute_procedure("gw_fct_getselectors", body)
 
         kwargs = {
             "dialog": "__self__.dlg_psector_mng",
