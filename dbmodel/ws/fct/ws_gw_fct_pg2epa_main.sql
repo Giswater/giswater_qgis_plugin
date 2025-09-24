@@ -126,7 +126,13 @@ BEGIN
 		IF v_network_type = 1 THEN
 			SELECT array_agg(dma_id) INTO v_dma_id FROM dma WHERE dma_type = 'TRANSMISSION' AND dma_id > 0;
 		ELSIF v_network_type = 5 THEN
-			SELECT array_agg(dma_id) INTO v_dma_id FROM dma WHERE dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = 'inp_options_selecteddma' AND cur_user = current_user);
+			IF (SELECT value::integer FROM config_param_user WHERE parameter = 'inp_options_selecteddma' AND cur_user = current_user) IS NOT NULL THEN
+				SELECT array_agg(dma_id) INTO v_dma_id FROM dma WHERE dma_id = (SELECT value::integer FROM config_param_user WHERE parameter = 'inp_options_selecteddma' AND cur_user = current_user);
+			ELSE
+				SELECT error_message INTO v_message FROM sys_message WHERE id = 4360;
+
+				RETURN ('{"status":"Failed","message":{"level":1, "text":"'||v_message||'"}}')::json;
+			END IF;
 		END IF;
 
 		-- setting selectors

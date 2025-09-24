@@ -59,3 +59,9 @@ WHERE b.matcat_id IS NOT NULL AND c.roughness IS NULL' WHERE fid = 433;
 UPDATE sys_fprocess 
 SET except_msg='pumps with curve defined by 3 points found. Check if this 3-points has thresholds defined (133%) acording SWMM user''s manual'
 WHERE fid=172;
+
+-- 24/09/2025
+UPDATE sys_param_user SET dv_isnullvalue=true WHERE id='inp_options_selecteddma';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4360, 'There is no dma selected. Please select one in the options', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
