@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_netscenario_dma',
     ARRAY[
         'netscenario_id', 'dma_id', 'dma_name', 'pattern_id', 'graphconfig', 'the_geom',
-        'active', 'lastupdate', 'lastupdate_user', 'stylesheet', 'expl_id2'
+        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id2'
     ],
     'Table plan_netscenario_dma should have the correct columns'
 );
@@ -37,15 +37,15 @@ SELECT col_type_is('plan_netscenario_dma', 'pattern_id', 'character varying(16)'
 SELECT col_type_is('plan_netscenario_dma', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('plan_netscenario_dma', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('plan_netscenario_dma', 'active', 'boolean', 'Column active should be boolean');
-SELECT col_type_is('plan_netscenario_dma', 'lastupdate', 'timestamp without time zone', 'Column lastupdate should be timestamp without time zone');
-SELECT col_type_is('plan_netscenario_dma', 'lastupdate_user', 'character varying(50)', 'Column lastupdate_user should be character varying(50)');
+SELECT col_type_is('plan_netscenario_dma', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('plan_netscenario_dma', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
 SELECT col_type_is('plan_netscenario_dma', 'stylesheet', 'json', 'Column stylesheet should be json');
 SELECT col_type_is('plan_netscenario_dma', 'expl_id2', 'integer', 'Column expl_id2 should be integer');
 
 -- Check default values
 SELECT col_default_is('plan_netscenario_dma', 'active', 'true', 'Default value for active should be true');
-SELECT col_has_default('plan_netscenario_dma', 'lastupdate', 'Column lastupdate should have a default value');
-SELECT col_default_is('plan_netscenario_dma', 'lastupdate_user', 'CURRENT_USER', 'Default value for lastupdate_user should be CURRENT_USER');
+SELECT col_has_default('plan_netscenario_dma', 'updated_at', 'Column updated_at should have a default value');
+SELECT col_default_is('plan_netscenario_dma', 'updated_by', 'CURRENT_USER', 'Default value for updated_by should be CURRENT_USER');
 
 -- Check foreign keys
 SELECT has_fk('plan_netscenario_dma', 'Table plan_netscenario_dma should have foreign keys');

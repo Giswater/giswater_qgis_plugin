@@ -217,4 +217,11 @@ UPDATE config_toolbox SET inputparams='[
 {"label": "Mapzone constructor method:", "value": null, "comboIds": [0, 1, 2, 3, 4], "datatype": "integer", "comboNames": ["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER", "LINK & PIPE BUFFER"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 6}, 
 {"label": "Pipe buffer", "value": null, "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "datatype": "float", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 7, "placeholder": "5-30"}]'::json WHERE id=3256;
 
+ALTER TABLE plan_netscenario_dma RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE plan_netscenario_dma ALTER COLUMN updated_at TYPE timestamptz USING updated_at::timestamptz;
+ALTER TABLE plan_netscenario_dma RENAME COLUMN lastupdate_user TO updated_by;
+
+ALTER TABLE plan_netscenario_presszone RENAME COLUMN lastupdate TO updated_at;
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN updated_at TYPE timestamptz USING updated_at::timestamptz;
+ALTER TABLE plan_netscenario_presszone RENAME COLUMN lastupdate_user TO updated_by;
 

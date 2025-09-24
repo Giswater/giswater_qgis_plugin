@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_netscenario_presszone',
     ARRAY[
         'netscenario_id', 'presszone_id', 'presszone_name', 'head', 'graphconfig', 'the_geom',
-        'active', 'lastupdate', 'lastupdate_user', 'presszone_type', 'stylesheet', 'expl_id2'
+        'active', 'updated_at', 'updated_by', 'presszone_type', 'stylesheet', 'expl_id2'
     ],
     'Table plan_netscenario_presszone should have the correct columns'
 );
@@ -37,16 +37,16 @@ SELECT col_type_is('plan_netscenario_presszone', 'head', 'numeric(12,2)', 'Colum
 SELECT col_type_is('plan_netscenario_presszone', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('plan_netscenario_presszone', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('plan_netscenario_presszone', 'active', 'boolean', 'Column active should be boolean');
-SELECT col_type_is('plan_netscenario_presszone', 'lastupdate', 'timestamp without time zone', 'Column lastupdate should be timestamp without time zone');
-SELECT col_type_is('plan_netscenario_presszone', 'lastupdate_user', 'character varying(50)', 'Column lastupdate_user should be character varying(50)');
+SELECT col_type_is('plan_netscenario_presszone', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('plan_netscenario_presszone', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
 SELECT col_type_is('plan_netscenario_presszone', 'presszone_type', 'text', 'Column presszone_type should be text');
 SELECT col_type_is('plan_netscenario_presszone', 'stylesheet', 'json', 'Column stylesheet should be json');
 SELECT col_type_is('plan_netscenario_presszone', 'expl_id2', 'integer', 'Column expl_id2 should be integer');
 
 -- Check default values
 SELECT col_default_is('plan_netscenario_presszone', 'active', 'true', 'Default value for active should be true');
-SELECT col_has_default('plan_netscenario_presszone', 'lastupdate', 'Column lastupdate should have a default value');
-SELECT col_default_is('plan_netscenario_presszone', 'lastupdate_user', 'CURRENT_USER', 'Default value for lastupdate_user should be CURRENT_USER');
+SELECT col_has_default('plan_netscenario_presszone', 'updated_at', 'Column updated_at should have a default value');
+SELECT col_default_is('plan_netscenario_presszone', 'updated_by', 'CURRENT_USER', 'Default value for updated_by should be CURRENT_USER');
 
 -- Check foreign keys
 SELECT has_fk('plan_netscenario_presszone', 'Table plan_netscenario_presszone should have foreign keys');
