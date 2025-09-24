@@ -62,7 +62,7 @@ BEGIN
 	END IF;
 
 	-- POINTS:
-		IF lower(v_project_type) = 'ws' THEN
+	IF lower(v_project_type) = 'ws' THEN
 
 		v_querytext = concat ('WITH mapzone_query as (select * from ',v_mapzone,' WHERE active)
 				SELECT n.node_id::text AS feature_id, ''nodeParent''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL::float  AS rotation, n.the_geom
@@ -111,23 +111,23 @@ BEGIN
 							FROM ve_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
 		END IF;
 
-		v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
-
-		v_querytext = concat('SELECT jsonb_agg(features.feature)
-				FROM (
-				SELECT jsonb_build_object(
-				''type'',       ''Feature'',
-				''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-				''properties'', to_jsonb(row) - ''the_geom''
-				) AS feature
-				FROM (', v_querytext, ') row) features');
-
-		EXECUTE v_querytext INTO v_result;
-
 	ELSE
 		-- TODO: for ud
 
 	END IF;
+
+	v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
+
+	v_querytext = concat('SELECT jsonb_agg(features.feature)
+			FROM (
+			SELECT jsonb_build_object(
+			''type'',       ''Feature'',
+			''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+			''properties'', to_jsonb(row) - ''the_geom''
+			) AS feature
+			FROM (', v_querytext, ') row) features');
+
+	EXECUTE v_querytext INTO v_result;
 
 	-- profilactic nulls;
 	v_result := COALESCE(v_result, '{}');
@@ -137,6 +137,7 @@ BEGIN
 		v_result_point = concat ('{"layerName": "Graphconfig", "geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
+	v_result = null;
 	-- LINES:
 	IF lower(v_project_type) = 'ws' THEN
 
@@ -144,20 +145,20 @@ BEGIN
 		-- TODO: for ud
 	END IF;
 
-		-- profilactic nulls;
-	v_result := COALESCE(v_result, '{}');
-	IF v_result = '{}' THEN
-		v_result_line = '{"layerName": "Graphconfig", "geometryType":"", "features":[]}';
-	ELSE
-		v_result_line = concat ('{"layerName": "Graphconfig", "geometryType":"LineString", "features":',v_result, '}');
-	END IF;
+	-- profilactic nulls;
+	-- v_result := COALESCE(v_result, '{}');
+	-- IF v_result = '{}' THEN
+	-- 	v_result_line = '{"layerName": "Graphconfig", "geometryType":"", "features":[]}';
+	-- ELSE
+	-- 	v_result_line = concat ('{"layerName": "Graphconfig", "geometryType":"LineString", "features":',v_result, '}');
+	-- END IF;
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 	     ',"body":{"form":{}'||
 		     ',"data":{ "info":{},'||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
+				'"line":{},'||
 				'"polygon":{}}'||
 	    '}}')::json, 3302, null, null, null);
 
