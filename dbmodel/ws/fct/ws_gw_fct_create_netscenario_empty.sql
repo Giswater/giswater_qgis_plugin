@@ -48,12 +48,12 @@ BEGIN
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data
-	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
-	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
-	v_parent_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'parent';
-	v_netscenario_type :=  ((p_data ->>'data')::json->>'parameters')::json->>'type';
-	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
-	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
+	v_name :=  p_data->'data'->'parameters'->>'name';
+	v_descript :=  p_data->'data'->'parameters'->>'descript';
+	v_parent_id :=  p_data->'data'->'parameters'->>'parent';
+	v_netscenario_type :=  p_data->'data'->'parameters'->>'type';
+	v_active :=  p_data->'data'->'parameters'->>'active';
+	v_expl_id :=  p_data->'data'->'parameters'->>'expl';
 
 
 	-- Reset values
@@ -116,7 +116,7 @@ BEGIN
 			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 		ELSIF v_netscenario_type = 'PRESSZONE' THEN
 			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,presszone_name, head, graphconfig, the_geom, active)
-			SELECT v_scenarioid, presszone_id, name, head, graphconfig, the_geom, TRUE FROM presszone WHERE presszone_id= '0' OR presszone_id= '-1'
+			SELECT v_scenarioid, presszone_id, name, head, graphconfig, the_geom, TRUE FROM presszone WHERE presszone_id= 0 OR presszone_id= -1
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 

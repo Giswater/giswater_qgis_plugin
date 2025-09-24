@@ -77,7 +77,7 @@ BEGIN
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,', "netscenario":"',v_netscenario,'"}}}');
 
 	IF v_mapzones_version = 1 THEN
-		RETURN gw_fct_graphanalytics_mapzones_v1(v_data);
+		RETURN gw_fct_graphanalytics_mapzones_v1(v_data::jsonb);
 	ELSE
 		RETURN gw_fct_graphanalytics_mapzones(v_data);
 	END IF;
