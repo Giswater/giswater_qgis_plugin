@@ -331,13 +331,15 @@ BEGIN
 				FROM (
 					SELECT 
 						' || v_mapzone_field || ' AS mapzone_id,
-						ARRAY(
-							SELECT value::int
-							FROM json_array_elements_text(use_item->''toArc'') AS elem(value)
-						) AS to_arc,
+						CASE jsonb_typeof(use_item->''toArc'')
+							WHEN ''array'' THEN ARRAY(SELECT value::int FROM jsonb_array_elements_text(use_item->''toArc'') AS elem(value))
+							WHEN ''string'' THEN ARRAY[(use_item->>''toArc'')::int]
+							WHEN ''number'' THEN ARRAY[(use_item->>''toArc'')::int]
+							ELSE ARRAY[]::int[]
+						END AS to_arc,
 						(use_item->>''nodeParent'')::int AS node_id
 					FROM ' || v_table_name || ',
-						LATERAL json_array_elements(graphconfig->''use'') AS use_item
+						LATERAL jsonb_array_elements((graphconfig->''use'')::jsonb) AS use_item
 				';
 		ELSE
 			v_query_text :=
