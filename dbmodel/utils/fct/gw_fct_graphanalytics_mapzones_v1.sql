@@ -1400,6 +1400,7 @@ BEGIN
 				FROM temp_pgr_arc ta
 				JOIN mapzones m ON m.component = ta.mapzone_id
 				WHERE c.arc_id = ta.arc_id
+				AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
 				AND c.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM m.mapzone_id
 			';
 			EXECUTE v_query_text;
@@ -1420,7 +1421,7 @@ BEGIN
 				JOIN mapzones m ON m.component = ta.mapzone_id
 				JOIN connec c ON ta.arc_id = c.arc_id
 				WHERE l.feature_id = c.connec_id
-				AND l.feature_type = ''CONNEC''
+				AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
 				AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM m.mapzone_id
 			';
 			EXECUTE v_query_text;
@@ -1441,6 +1442,7 @@ BEGIN
 					FROM temp_pgr_arc ta
 					JOIN mapzones m ON m.component = ta.mapzone_id
 					WHERE g.arc_id = ta.arc_id
+					AND EXISTS (SELECT 1 FROM v_temp_gully t WHERE t.gully_id = g.gully_id)
 					AND g.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM m.mapzone_id
 				';
 				EXECUTE v_query_text;
@@ -1461,7 +1463,7 @@ BEGIN
 					JOIN mapzones m ON m.component = ta.mapzone_id
 					JOIN gully g ON ta.arc_id = g.arc_id
 					WHERE l.feature_id = g.gully_id
-					AND l.feature_type = ''GULLY''
+					AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
 					AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM m.mapzone_id
 				';
 				EXECUTE v_query_text;
@@ -1502,6 +1504,7 @@ BEGIN
 					JOIN connec c USING (arc_id)
 					WHERE c.feature_type = ''CONNEC'' AND c.connec_id = l.feature_id
 					)
+				AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
 				AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
@@ -1538,6 +1541,7 @@ BEGIN
 				AND NOT EXISTS (
 					SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = c.arc_id
 				)
+				AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
 				AND c.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
@@ -1553,6 +1557,7 @@ BEGIN
 					AND NOT EXISTS (
 						SELECT 1 FROM temp_pgr_arc ta WHERE ta.arc_id = g.arc_id
 					)
+					AND EXISTS (SELECT 1 FROM v_temp_gully t WHERE t.gully_id = g.gully_id)
 					AND g.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 					';
 					EXECUTE v_query_text;
@@ -1569,6 +1574,7 @@ BEGIN
 						JOIN gully g USING (arc_id)
 						WHERE l.feature_type = ''GULLY'' AND g.gully_id = l.feature_id
 					)
+					AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
 					AND l.'||quote_ident(v_mapzone_field)||' IS DISTINCT FROM 0
 				';
 				EXECUTE v_query_text;
@@ -1642,6 +1648,7 @@ BEGIN
 						WHERE EXISTS (
 							SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id
 						)
+						AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
 					) t
 					WHERE c.connec_id = t.connec_id
 					AND (c.staticpressure IS DISTINCT FROM t.staticpressure);
@@ -1673,6 +1680,7 @@ BEGIN
 							JOIN temp_pgr_arc t USING (arc_id)
 							WHERE l.feature_id = c.connec_id
 						)
+						AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
 					) t
 					WHERE l.link_id = t.link_id
 					AND (
