@@ -1786,6 +1786,20 @@ BEGIN
 					SELECT 1 FROM temp_pgr_mapzone m 
 					WHERE m.drainzone_id = d.drainzone_id
 				);
+				
+				-- clear the geometries of drainzones that have at least on dwfzone in conflict in dwfzone
+				UPDATE drainzone d SET the_geom = NULL,
+				updated_at = now(),
+				updated_by = current_user
+				WHERE EXISTS (
+					SELECT 1 
+					FROM (
+						SELECT drainzone_id from temp_pgr_mapzone 
+						GROUP BY drainzone_id
+						HAVING max(CARDINALITY(mapzone_id)) > 1
+					) m 
+					WHERE m.drainzone_id = d.drainzone_id
+				);
 
 				UPDATE dwfzone d SET drainzone_id =
 					CASE 
