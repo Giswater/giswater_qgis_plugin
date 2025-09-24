@@ -778,7 +778,7 @@ class Campaign:
             allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
 
         if not allowed_types:
-            return []
+            return None
 
         allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
         sql = f"""
@@ -815,10 +815,20 @@ class Campaign:
             if self._is_reviewclass_for_all(selected_id):
                 self.dialog.tab_feature.setCurrentIndex(0)
 
+            # Force refresh completers for all relation tabs
+            for i in range(self.dialog.tab_feature.count()):
+                tab = self.dialog.tab_feature.widget(i)
+                if tab:
+                    self.dialog.tab_feature.setCurrentIndex(i)
+                    self._update_feature_completer(self.dialog)
+
         elif sender == self.visitclass_combo:
             feature_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", selected_id)
         else:
             return
+        
+        if self.campaign_id:          # campaign was already saved at least once
+            self.save_campaign(True)  # from_tab_change=True => silent (doesn't close dialog)
 
         self._manage_tabs_enabled(feature_types)
 
