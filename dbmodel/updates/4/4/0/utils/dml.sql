@@ -54,3 +54,8 @@ SELECT a.arc_id FROM ve_arc a
 LEFT JOIN cat_arc b ON a.arccat_id = b.id
 LEFT JOIN cat_mat_roughness c USING (matcat_id)
 WHERE b.matcat_id IS NOT NULL AND c.roughness IS NULL' WHERE fid = 433;
+
+-- 24/09/2025
+UPDATE sys_fprocess 
+SET except_msg='pumps with curve defined by 3 points found. Check if this 3-points has thresholds defined (133%) acording SWMM user''s manual'
+WHERE fid=172;
