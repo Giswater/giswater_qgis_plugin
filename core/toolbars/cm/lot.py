@@ -26,7 +26,6 @@ from ...utils.selection_mode import GwSelectionMode
 from ...utils.selection_widget import GwSelectionWidget
  
 
-
 class AddNewLot:
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
@@ -863,8 +862,6 @@ class AddNewLot:
 
         tools_gw.open_dialog(self.dlg_lot_man, dlg_name="lot_management")
 
-    
-
     def load_lots_into_manager(self):
         """Load campaign data into the campaign management table"""
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
@@ -1024,8 +1021,6 @@ class AddNewLot:
         tools_gw.refresh_selectors(is_cm=True)
         self.filter_lot()
 
-    
-
     def _select_layers_from_table(self, feature: str, view: QTableView, *args):
         """Select current table rows on map layers (Campaign-like yellow selection)."""
         try:
@@ -1125,8 +1120,6 @@ class AddNewLot:
                     self.dlg_lot.feature_id.completer().complete()
             except Exception:
                 pass
-
-    
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
@@ -1603,9 +1596,7 @@ class AddNewLot:
             msg = "No records selected"
             tools_qgis.show_warning(msg)
 
-        return values
-
-    
+        return values   
 
     def _check_and_disable_campaign_combo(self):
         """Disable campaign combo if any relations exist."""
