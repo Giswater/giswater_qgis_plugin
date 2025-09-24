@@ -65,3 +65,247 @@ UPDATE sys_param_user SET dv_isnullvalue=true WHERE id='inp_options_selecteddma'
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4360, 'There is no dma selected. Please select one in the options', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
+
+-- 24/09/2025
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+VALUES ('ve_link','tab_event','Events','List of events','role_basic',
+'[{"actionName":"actionEdit",  "disabled":false},
+{"actionName":"actionZoom",  "disabled":false},
+{"actionName":"actionCentered",  "disabled":false},
+{"actionName":"actionZoomOut" , "disabled":false},
+{"actionName":"actionCatalog",  "disabled":false},
+{"actionName":"actionWorkcat",  "disabled":false},
+{"actionName":"actionCopyPaste",  "disabled":false},
+{"actionName":"actionLink",  "disabled":false},
+{"actionName":"actionMapZone",  "disabled":false},
+{"actionName":"actionSetToArc",  "disabled":false},
+{"actionName":"actionGetParentId",  "disabled":false},
+{"actionName":"actionGetArcId", "disabled":false},
+{"actionName": "actionRotation","disabled": false},
+{"actionName":"actionInterpolate", "disabled":false}]'::json,
+5,'{4,5}') ON CONFLICT (formname, tabname) DO NOTHING;
+
+INSERT INTO config_form_list (listname,query_text,device,listtype,listclass,vdefault)
+VALUES ('tbl_event_x_link','SELECT * FROM v_ui_event_x_link WHERE event_id IS NOT NULL',4,'tab','list','{"orderBy":"1", "orderType": "ASC"}'::json)
+ON CONFLICT (listname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_event','date_event_from','lyt_event_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": ">="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_event','date_event_to','lyt_event_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": "<="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_event','parameter_type','lyt_event_1',3,'string','combo','Parameter type:','Parameter type:',false,false,true,false,true,'SELECT DISTINCT parameter_type as id, parameter_type as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_event','parameter_id','lyt_event_1',4,'string','combo','Parameter:','Parameter:',false,false,true,false,true,'SELECT id as id, id as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link','form_feature','tab_event','btn_open_visit','lyt_event_2',1,'button','Open visit',false,false,true,false,false,'{"icon":"127"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_manager", "parameters":{"columnfind": "visit_id", "targetwidget": "tab_event_tbl_event_cf", "sourceview": "event"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link','form_feature','tab_event','btn_new_visit','lyt_event_2',2,'button','New visit',false,false,true,false,false,'{"icon":"119"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "new_visit", "module": "info", "parameters":{}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link','form_feature','tab_event','hspacer_event_1','lyt_event_2',3,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link','form_feature','tab_event','btn_open_gallery','lyt_event_2',4,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"onContextMenu":"Open gallery"}'::json,'{"functionName": "open_gallery", "module": "info", "parameters":{"targetwidget":"tab_event_tbl_event_cf", "columnfind": ["visit_id", "event_id"], "sourceview":"visit"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link','form_feature','tab_event','btn_open_visit_doc','lyt_event_2',5,'button','Open visit document',false,false,true,false,false,'{"icon":"147"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit document"}'::json,'{"functionName": "open_visit_document", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind": "visit_id"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link','form_feature','tab_event','btn_open_visit_event','lyt_event_2',6,'button','Open visit event',false,false,true,false,false,'{"icon":"144"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit event"}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_event','tbl_event_cf','lyt_event_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false,5)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_visit','date_visit_from','lyt_visit_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":">="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "Start date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_visit','date_visit_to','lyt_visit_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":"<="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "End date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_visit','visit_class','lyt_visit_1',3,'string','combo','Visit class:','Visit class:',false,false,true,false,false,'SELECT id, idval FROM config_visit_class WHERE feature_type IN (''LINK'',''ALL'') ',false,'{"labelPosition": "top"}'::json,'{"functionName": "manage_visit_class","parameters": {}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link','form_feature','tab_visit','hspacer_lyt_document_1','lyt_visit_2',1,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link','form_feature','tab_visit','open_gallery','lyt_visit_2',2,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_files", "module": "info", "parameters":{"targetwidget":"tab_visit_tbl_visits"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link','form_feature','tab_visit','tbl_visits','lyt_visit_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json,false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_event','date_event_from','lyt_event_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": ">="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_event','date_event_to','lyt_event_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": "<="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_event','parameter_type','lyt_event_1',3,'string','combo','Parameter type:','Parameter type:',false,false,true,false,true,'SELECT DISTINCT parameter_type as id, parameter_type as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_event','parameter_id','lyt_event_1',4,'string','combo','Parameter:','Parameter:',false,false,true,false,true,'SELECT id as id, id as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_event','btn_open_visit','lyt_event_2',1,'button','Open visit',false,false,true,false,false,'{"icon":"127"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_manager", "parameters":{"columnfind": "visit_id", "targetwidget": "tab_event_tbl_event_cf", "sourceview": "event"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_event','btn_new_visit','lyt_event_2',2,'button','New visit',false,false,true,false,false,'{"icon":"119"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "new_visit", "module": "info", "parameters":{}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_event','hspacer_event_1','lyt_event_2',3,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_event','btn_open_gallery','lyt_event_2',4,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"onContextMenu":"Open gallery"}'::json,'{"functionName": "open_gallery", "module": "info", "parameters":{"targetwidget":"tab_event_tbl_event_cf", "columnfind": ["visit_id", "event_id"], "sourceview":"visit"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_event','btn_open_visit_doc','lyt_event_2',5,'button','Open visit document',false,false,true,false,false,'{"icon":"147"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit document"}'::json,'{"functionName": "open_visit_document", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind": "visit_id"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_event','btn_open_visit_event','lyt_event_2',6,'button','Open visit event',false,false,true,false,false,'{"icon":"144"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit event"}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_event','tbl_event_cf','lyt_event_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false,5)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_visit','date_visit_from','lyt_visit_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":">="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "Start date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_visit','date_visit_to','lyt_visit_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":"<="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "End date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_visit','visit_class','lyt_visit_1',3,'string','combo','Visit class:','Visit class:',false,false,true,false,false,'SELECT id, idval FROM config_visit_class WHERE feature_type IN (''LINK'',''ALL'') ',false,'{"labelPosition": "top"}'::json,'{"functionName": "manage_visit_class","parameters": {}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_visit','hspacer_lyt_document_1','lyt_visit_2',1,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_pipelink','form_feature','tab_visit','open_gallery','lyt_visit_2',2,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_files", "module": "info", "parameters":{"targetwidget":"tab_visit_tbl_visits"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_pipelink','form_feature','tab_visit','tbl_visits','lyt_visit_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json,false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','date_event_from','lyt_event_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": ">="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','date_event_to','lyt_event_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": "<="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','parameter_type','lyt_event_1',3,'string','combo','Parameter type:','Parameter type:',false,false,true,false,true,'SELECT DISTINCT parameter_type as id, parameter_type as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','parameter_id','lyt_event_1',4,'string','combo','Parameter:','Parameter:',false,false,true,false,true,'SELECT id as id, id as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','btn_open_visit','lyt_event_2',1,'button','Open visit',false,false,true,false,false,'{"icon":"127"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_manager", "parameters":{"columnfind": "visit_id", "targetwidget": "tab_event_tbl_event_cf", "sourceview": "event"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','btn_new_visit','lyt_event_2',2,'button','New visit',false,false,true,false,false,'{"icon":"119"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "new_visit", "module": "info", "parameters":{}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','hspacer_event_1','lyt_event_2',3,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','btn_open_gallery','lyt_event_2',4,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"onContextMenu":"Open gallery"}'::json,'{"functionName": "open_gallery", "module": "info", "parameters":{"targetwidget":"tab_event_tbl_event_cf", "columnfind": ["visit_id", "event_id"], "sourceview":"visit"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','btn_open_visit_doc','lyt_event_2',5,'button','Open visit document',false,false,true,false,false,'{"icon":"147"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit document"}'::json,'{"functionName": "open_visit_document", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind": "visit_id"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','btn_open_visit_event','lyt_event_2',6,'button','Open visit event',false,false,true,false,false,'{"icon":"144"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit event"}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_event','tbl_event_cf','lyt_event_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false,5)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_visit','date_visit_from','lyt_visit_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":">="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "Start date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_visit','date_visit_to','lyt_visit_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":"<="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "End date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_visit','visit_class','lyt_visit_1',3,'string','combo','Visit class:','Visit class:',false,false,true,false,false,'SELECT id, idval FROM config_visit_class WHERE feature_type IN (''LINK'',''ALL'') ',false,'{"labelPosition": "top"}'::json,'{"functionName": "manage_visit_class","parameters": {}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_visit','hspacer_lyt_document_1','lyt_visit_2',1,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_conduitlink','form_feature','tab_visit','open_gallery','lyt_visit_2',2,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_files", "module": "info", "parameters":{"targetwidget":"tab_visit_tbl_visits"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_conduitlink','form_feature','tab_visit','tbl_visits','lyt_visit_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json,false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_event','date_event_from','lyt_event_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": ">="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_event','date_event_to','lyt_event_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign": "<="}'::json,'{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}'::json,'tbl_event_x_link',false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_event','parameter_type','lyt_event_1',3,'string','combo','Parameter type:','Parameter type:',false,false,true,false,true,'SELECT DISTINCT parameter_type as id, parameter_type as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_event','parameter_id','lyt_event_1',4,'string','combo','Parameter:','Parameter:',false,false,true,false,true,'SELECT id as id, id as idval FROM config_visit_parameter WHERE feature_type IN (''LINK'', ''ALL'') ',true,'{"labelPosition": "top"}'::json,'{"functionName": "filter_table", "parameters":{}}'::json,'tbl_event_x_link',false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_event','btn_open_visit','lyt_event_2',1,'button','Open visit',false,false,true,false,false,'{"icon":"127"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_manager", "parameters":{"columnfind": "visit_id", "targetwidget": "tab_event_tbl_event_cf", "sourceview": "event"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_event','btn_new_visit','lyt_event_2',2,'button','New visit',false,false,true,false,false,'{"icon":"119"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "new_visit", "module": "info", "parameters":{}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_event','hspacer_event_1','lyt_event_2',3,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_event','btn_open_gallery','lyt_event_2',4,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"onContextMenu":"Open gallery"}'::json,'{"functionName": "open_gallery", "module": "info", "parameters":{"targetwidget":"tab_event_tbl_event_cf", "columnfind": ["visit_id", "event_id"], "sourceview":"visit"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_event','btn_open_visit_doc','lyt_event_2',5,'button','Open visit document',false,false,true,false,false,'{"icon":"147"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit document"}'::json,'{"functionName": "open_visit_document", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind": "visit_id"}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_event','btn_open_visit_event','lyt_event_2',6,'button','Open visit event',false,false,true,false,false,'{"icon":"144"}'::json,'{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit event"}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false);
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_event','tbl_event_cf','lyt_event_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit_event", "module": "info", "parameters":{"columnfind":["visit_id", "event_id"]}}'::json,'tbl_event_x_link',false,5)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_visit','date_visit_from','lyt_visit_1',1,'date','datetime','From:','From:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":">="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "Start date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,1)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_visit','date_visit_to','lyt_visit_1',2,'date','datetime','To:','To:',false,false,true,false,true,'{"labelPosition": "top", "filterSign":"<="}'::json,'{"functionName": "filter_table", "parameters": {"columnfind": "End date", "targetwidget": "tab_visit_tbl_visits"}}'::json,false,2)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_isnullvalue,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_visit','visit_class','lyt_visit_1',3,'string','combo','Visit class:','Visit class:',false,false,true,false,false,'SELECT id, idval FROM config_visit_class WHERE feature_type IN (''LINK'',''ALL'') ',false,'{"labelPosition": "top"}'::json,'{"functionName": "manage_visit_class","parameters": {}}'::json,'tbl_event_x_link',false,3)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_visit','hspacer_lyt_document_1','lyt_visit_2',1,'hspacer',false,false,true,false,false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden)
+VALUES ('ve_link_vlink','form_feature','tab_visit','open_gallery','lyt_visit_2',2,'button','Open gallery',false,false,true,false,false,'{"icon":"145"}'::json,'{"saveValue":false, "filterSign":"="}'::json,'{"functionName": "open_visit_files", "module": "info", "parameters":{"targetwidget":"tab_visit_tbl_visits"}}'::json,'tbl_event_x_link',false)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,widgettype,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,widgetfunction,hidden,web_layoutorder)
+VALUES ('ve_link_vlink','form_feature','tab_visit','tbl_visits','lyt_visit_3',1,'tableview',false,false,false,false,false,'{"saveValue": false}'::json,'{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json,false,4)
+ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
+
+UPDATE config_form_fields
+SET widgetfunction='{"functionName": "open_url"}'::json
+WHERE formname='ve_link' AND formtype='form_feature' AND columnname='link' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetfunction='{"functionName": "open_url"}'::json
+WHERE formname='ve_link_pipelink' AND formtype='form_feature' AND columnname='link' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetfunction='{"functionName": "open_url"}'::json
+WHERE formname='ve_link_conduitlink' AND formtype='form_feature' AND columnname='link' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetfunction='{"functionName": "open_url"}'::json
+WHERE formname='ve_link_vlink' AND formtype='form_feature' AND columnname='link' AND tabname='tab_data';
