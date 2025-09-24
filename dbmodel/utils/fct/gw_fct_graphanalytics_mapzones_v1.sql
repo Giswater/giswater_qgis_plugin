@@ -1712,118 +1712,57 @@ BEGIN
 				INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_pgr_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
 
 			ELSIF v_mapzone_name = 'DWFZONE' THEN
-				-- update dwfzone_outfall
+				-- update dwfzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.dwfzone_outfall = NULL)
 				WITH outfalls AS (
 					SELECT d.node AS pgr_node_id, array_agg(n.node_id  ORDER BY n.node_id) AS dwfzone_outfall
 					FROM temp_pgr_drivingdistance d
 					JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id
+					WHERE EXISTS (
+						SELECT 1 FROM temp_pgr_mapzone m 
+						WHERE CARDINALITY(m.mapzone_id) = 1
+						AND m.component = n.mapzone_id
+					)
 					GROUP BY d.node
 				)
 				UPDATE node n SET dwfzone_outfall = o.dwfzone_outfall
-				FROM temp_pgr_node pn
-				JOIN outfalls o USING (pgr_node_id)
+				FROM temp_pgr_node pn  
+				LEFT JOIN  outfalls o USING (pgr_node_id)
 				WHERE n.node_id = pn.node_id
-				AND n.dwfzone_id > 0
-				AND n.dwfzone_outfall::int[] IS DISTINCT FROM o.dwfzone_outfall;
+				AND n.dwfzone_outfall IS DISTINCT FROM o.dwfzone_outfall;
 
-				WITH arc_updates AS (
-					SELECT a.arc_id, n.dwfzone_outfall
-					FROM arc a
-					JOIN temp_pgr_arc ta ON a.arc_id = ta.arc_id
-					JOIN node n ON
-						(n.node_id = a.node_1 AND ta.reverse_cost >= 0)
-						OR (n.node_id = a.node_2 AND ta.cost >= 0)
-					WHERE a.dwfzone_id > 0
-					AND a.dwfzone_outfall IS DISTINCT FROM n.dwfzone_outfall
-				)
-				UPDATE arc a SET dwfzone_outfall = u.dwfzone_outfall
-				FROM arc_updates u
-				WHERE a.arc_id = u.arc_id;
+				UPDATE arc a SET dwfzone_outfall = n.dwfzone_outfall
+				FROM node n 
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = a.arc_id)
+				AND a.node_2 = n.node_id 
+				AND a.dwfzone_outfall IS DISTINCT FROM n.dwfzone_outfall;
 
 				UPDATE connec c SET dwfzone_outfall = a.dwfzone_outfall
-				FROM arc a
-				WHERE c.arc_id = a.arc_id
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = a.arc_id
-				)
-				AND c.dwfzone_id > 0
+				FROM arc a 
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
+				AND c.arc_id = a.arc_id
 				AND c.dwfzone_outfall IS DISTINCT FROM a.dwfzone_outfall;
 
 				UPDATE gully g SET dwfzone_outfall = a.dwfzone_outfall
-				FROM arc a
-				WHERE g.arc_id = a.arc_id
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = a.arc_id
-				)
-				AND g.dwfzone_id > 0
+				FROM arc a 
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = g.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_gully t WHERE t.gully_id = g.gully_id)
+				AND g.arc_id = a.arc_id
 				AND g.dwfzone_outfall IS DISTINCT FROM a.dwfzone_outfall;
 
 				UPDATE link l SET dwfzone_outfall = c.dwfzone_outfall
 				FROM connec c
-				WHERE l.feature_id = c.connec_id
-				AND l.feature_type = 'CONNEC'
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = c.arc_id
-				)
-				AND l.dwfzone_id > 0
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
+				AND l.feature_id = c.connec_id
 				AND l.dwfzone_outfall IS DISTINCT FROM c.dwfzone_outfall;
 
 				UPDATE link l SET dwfzone_outfall = g.dwfzone_outfall
 				FROM gully g
-				WHERE l.feature_id = g.gully_id
-				AND l.feature_type = 'GULLY'
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = g.arc_id
-				)
-				AND l.dwfzone_id > 0
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = g.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
+				AND l.feature_id = g.gully_id
 				AND l.dwfzone_outfall IS DISTINCT FROM g.dwfzone_outfall;
-
-				-- update dwfzone_outfall for disconnected or conflicted dwfzone
-				UPDATE node n SET dwfzone_outfall = NULL, drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
-				AND n.dwfzone_id <= 0
-				AND n.dwfzone_outfall IS NOT NULL;
-
-				UPDATE arc a SET dwfzone_outfall = NULL, drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
-				AND a.dwfzone_id <= 0
-				AND a.dwfzone_outfall IS NOT NULL;
-
-				UPDATE connec c SET dwfzone_outfall = NULL, drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
-				AND c.dwfzone_id <= 0
-				AND c.dwfzone_outfall IS NOT NULL;
-
-				UPDATE gully g SET dwfzone_outfall = NULL, drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= g.arc_id)
-				AND g.dwfzone_id <= 0
-				AND g.dwfzone_outfall IS NOT NULL;
-
-				UPDATE link l SET dwfzone_outfall = NULL, drainzone_outfall = NULL
-				WHERE EXISTS (
-					SELECT 1 FROM temp_pgr_arc t
-					JOIN connec c USING (arc_id)
-					WHERE c.connec_id= l.feature_id AND l.feature_type = 'CONNEC'
-				)
-				AND l.dwfzone_id <= 0
-				AND l.dwfzone_outfall IS NOT NULL;
-
-				UPDATE link l SET dwfzone_outfall = NULL, drainzone_outfall = NULL
-				WHERE EXISTS (
-					SELECT 1 FROM temp_pgr_arc t
-					JOIN gully g USING (arc_id)
-					WHERE g.gully_id = l.feature_id AND l.feature_type = 'GULLY'
-				)
-				AND l.dwfzone_id <= 0
-				AND l.dwfzone_outfall IS NOT NULL;
 
 				-- update DRAINZONE table
 				INSERT INTO drainzone (drainzone_id, code, name, created_at, created_by)
@@ -1833,7 +1772,7 @@ BEGIN
 				HAVING max(CARDINALITY(m.mapzone_id)) = 1
 				AND NOT EXISTS (SELECT 1 FROM drainzone d WHERE d.drainzone_id = m.drainzone_id );
 
-				-- clear geometries of drainzones that are not assigned before updating dwfne.drainzone_id
+				-- clear geometries of drainzones that are not assigned before updating dwfzone.drainzone_id
 				UPDATE drainzone d SET the_geom = NULL, 
 				updated_at = now(),
 				updated_by = current_user
@@ -1850,7 +1789,7 @@ BEGIN
 
 				UPDATE dwfzone d SET drainzone_id =
 					CASE 
-						WHEN max_dwfzones = 1 then m.drainzone_id
+						WHEN m.max_dwfzones = 1 then m.drainzone_id
 						ELSE -1
 					END,
 					updated_at = now(),
@@ -1860,8 +1799,7 @@ BEGIN
 						drainzone_id, 
 						max(CARDINALITY(mapzone_id)) over(PARTITION BY drainzone_id) AS max_dwfzones
 					FROM temp_pgr_mapzone) m
-				WHERE d.dwfzone_id = ANY (m.mapzone_id)
-				AND d.drainzone_id IS DISTINCT FROM m.drainzone_id;
+				WHERE d.dwfzone_id = ANY (m.mapzone_id);
 
 				UPDATE dwfzone d SET drainzone_id = 0,
 					updated_at = now(),
@@ -1917,8 +1855,8 @@ BEGIN
 				WHERE d.drainzone_id =g.drainzone_id; 
 
 				--update drainzone_outfall 
-				-- flood from node_2 of arcs initoverflowpath TRUE that are not in a conflict drainzone
-				EXECUTE 'SELECT array_agg(a.pgr_node_2)::INT[] 
+				-- flood from node_1 of arcs initoverflowpath TRUE that are not in a conflict drainzone
+				EXECUTE 'SELECT array_agg(a.pgr_node_1)::INT[] 
 					FROM temp_pgr_arc a
 					WHERE a.graph_delimiter = ''INITOVERFLOWPATH''
 					AND EXISTS (
@@ -1941,137 +1879,59 @@ BEGIN
 						FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 					);
 
-				WITH outfalls AS (
-					SELECT di.node AS pgr_node_id, array_agg(DISTINCT n.node_id  ORDER BY n.node_id) AS drainzone_outfall
+				WITH outfalls_start_vid AS (
+					SELECT di.start_vid, n.node_id
+					FROM (SELECT DISTINCT start_vid FROM temp_pgr_drivingdistance_initoverflowpath) di
+					JOIN temp_pgr_arc a ON a.pgr_node_1 = di.start_vid
+					JOIN temp_pgr_drivingdistance d ON a.pgr_node_2 = d.node
+					JOIN  temp_pgr_node n ON d.start_vid = n.pgr_node_id
+					WHERE a.graph_delimiter = 'INITOVERFLOWPATH'
+				),
+				outfalls AS (
+					SELECT di.node AS pgr_node_id, array_agg(DISTINCT o.node_id  ORDER BY o.node_id) AS drainzone_outfall
 					FROM temp_pgr_drivingdistance_initoverflowpath di
-					JOIN temp_pgr_drivingdistance d ON di.start_vid = d.node
-					JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id
+					JOIN outfalls_start_vid o ON o.start_vid = di.start_vid
 					GROUP BY di.node
 				)
 				UPDATE node n SET drainzone_outfall = o.drainzone_outfall
 				FROM temp_pgr_node pn
-				JOIN outfalls o USING (pgr_node_id)
+				LEFT JOIN outfalls o USING (pgr_node_id)
 				WHERE n.node_id = pn.node_id
-				AND n.drainzone_outfall::int[] IS DISTINCT FROM o.drainzone_outfall;
+				AND n.drainzone_outfall IS DISTINCT FROM o.drainzone_outfall;
 
-				WITH arc_updates AS (
-					SELECT a.arc_id, n.drainzone_outfall
-					FROM arc a
-					JOIN temp_pgr_arc ta ON a.arc_id = ta.arc_id
-					JOIN node n ON
-						(n.node_id = a.node_1 AND ta.reverse_cost >= 0)
-						OR (n.node_id = a.node_2 AND ta.cost >= 0)
-					WHERE EXISTS (
-						SELECT 1 FROM dwfzone d 
-						WHERE d.dwfzone_id = a.dwfzone_id 
-						AND d.drainzone_id >0	
-					)						
-					AND a.drainzone_outfall IS DISTINCT FROM n.drainzone_outfall
-				)
-				UPDATE arc a SET drainzone_outfall = u.drainzone_outfall
-				FROM arc_updates u
-				WHERE a.arc_id = u.arc_id;
+				UPDATE arc a SET drainzone_outfall = n.drainzone_outfall
+				FROM node n 
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = a.arc_id)
+				AND a.node_2 = n.node_id 
+				AND a.drainzone_outfall IS DISTINCT FROM n.drainzone_outfall;
 
 				UPDATE connec c SET drainzone_outfall = a.drainzone_outfall
-				FROM arc a
-				WHERE c.arc_id = a.arc_id
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = a.arc_id
-				)
-				AND EXISTS (
-					SELECT 1 FROM dwfzone d 
-					WHERE d.dwfzone_id = a.dwfzone_id 
-					AND d.drainzone_id >0	
-				)	
+				FROM arc a 
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
+				AND c.arc_id = a.arc_id
 				AND c.drainzone_outfall IS DISTINCT FROM a.drainzone_outfall;
 
 				UPDATE gully g SET drainzone_outfall = a.drainzone_outfall
-				FROM arc a
-				WHERE g.arc_id = a.arc_id
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = a.arc_id
-				)
-				AND EXISTS (
-					SELECT 1 FROM dwfzone d 
-					WHERE d.dwfzone_id = a.dwfzone_id 
-					AND d.drainzone_id >0	
-				)	
+				FROM arc a 
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = g.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_gully t WHERE t.gully_id = g.gully_id)
+				AND g.arc_id = a.arc_id
 				AND g.drainzone_outfall IS DISTINCT FROM a.drainzone_outfall;
 
 				UPDATE link l SET drainzone_outfall = c.drainzone_outfall
 				FROM connec c
-				WHERE l.feature_id = c.connec_id
-				AND l.feature_type = 'CONNEC'
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = c.arc_id
-				)
-				AND EXISTS (
-					SELECT 1 FROM dwfzone d 
-					WHERE d.dwfzone_id = c.dwfzone_id 
-					AND d.drainzone_id >0	
-				)	
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
+				AND l.feature_id = c.connec_id
 				AND l.drainzone_outfall IS DISTINCT FROM c.drainzone_outfall;
 
 				UPDATE link l SET drainzone_outfall = g.drainzone_outfall
 				FROM gully g
-				WHERE l.feature_id = g.gully_id
-				AND l.feature_type = 'GULLY'
-				AND EXISTS (
-					SELECT 1
-					FROM temp_pgr_arc ta
-					WHERE ta.arc_id = g.arc_id
-				)
-				AND EXISTS (
-					SELECT 1 FROM dwfzone d 
-					WHERE d.dwfzone_id = g.dwfzone_id 
-					AND d.drainzone_id >0	
-				)
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = g.arc_id)
+				AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
+				AND l.feature_id = g.gully_id
 				AND l.drainzone_outfall IS DISTINCT FROM g.drainzone_outfall;
-
-				-- update drainzone_outfall for disconnected or conflicted drainzones
-				UPDATE node n SET drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
-				AND EXISTS (SELECT 1 FROM dwfzone d WHERE d.dwfzone_id = n.dwfzone_id AND d.drainzone_id <= 0)	
-				AND n.dwfzone_outfall IS NOT NULL;
-
-				UPDATE arc a SET drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= a.arc_id)
-				AND EXISTS (SELECT 1 FROM dwfzone d WHERE d.dwfzone_id = a.dwfzone_id AND d.drainzone_id <= 0)
-				AND a.dwfzone_outfall IS NOT NULL;
-
-				UPDATE connec c SET drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= c.arc_id)
-				AND EXISTS (SELECT 1 FROM dwfzone d WHERE d.dwfzone_id = c.dwfzone_id AND d.drainzone_id <= 0)
-				AND c.dwfzone_outfall IS NOT NULL;
-
-				UPDATE gully g SET drainzone_outfall = NULL
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id= g.arc_id)
-				AND EXISTS (SELECT 1 FROM dwfzone d WHERE d.dwfzone_id = g.dwfzone_id AND d.drainzone_id <= 0)
-				AND g.dwfzone_outfall IS NOT NULL;
-
-				UPDATE link l SET drainzone_outfall = NULL
-				WHERE EXISTS (
-					SELECT 1 FROM temp_pgr_arc t
-					JOIN connec c USING (arc_id)
-					WHERE c.connec_id= l.feature_id AND l.feature_type = 'CONNEC'
-				)
-				AND EXISTS (SELECT 1 FROM dwfzone d WHERE d.dwfzone_id = l.dwfzone_id AND d.drainzone_id <= 0)
-				AND l.dwfzone_outfall IS NOT NULL;
-
-				UPDATE link l SET drainzone_outfall = NULL
-				WHERE EXISTS (
-					SELECT 1 FROM temp_pgr_arc t
-					JOIN gully g USING (arc_id)
-					WHERE g.gully_id = l.feature_id AND l.feature_type = 'GULLY'
-				)
-				AND EXISTS (SELECT 1 FROM dwfzone d WHERE d.dwfzone_id = l.dwfzone_id AND d.drainzone_id <= 0)
-				AND l.dwfzone_outfall IS NOT NULL;
 
 			END IF;
 		END IF;
