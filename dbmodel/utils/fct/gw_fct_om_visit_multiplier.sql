@@ -63,7 +63,7 @@ BEGIN
 	v_querytext =  'SELECT * FROM om_visit_x_node WHERE visit_id = '||(v_visitid)||' UNION 
 			SELECT * FROM om_visit_x_arc WHERE visit_id = '||(v_visitid)||' UNION 
 			SELECT * FROM om_visit_x_connec WHERE visit_id = '||(v_visitid)||' UNION 
-			SELECT id, visit_id, link_id, is_last FROM om_visit_x_link WHERE visit_id = '||(v_visitid); -- due to link_id is integer and others id are text
+			SELECT id, visit_id, link_id, is_last, link_uuid FROM om_visit_x_link WHERE visit_id = '||(v_visitid); -- due to link_id is integer and others id are text
 
 	IF v_project_type = 'UD' THEN
 		v_querytext = concat(v_querytext, ' UNION SELECT * FROM om_visit_x_gully WHERE visit_id = '||(v_visitid));
