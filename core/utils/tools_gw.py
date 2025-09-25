@@ -335,20 +335,9 @@ def open_help_link(context, uiname, dlg=None):
         domain = domain[0]
 
     language = "es_CR"  # TODO: get dynamic language when documentation is ready
-    plugin_version, _ = tools_qgis.get_plugin_version()
-
-    # plugin_version is {major}.{minor}.{patch}
-    # transform to major.minor
-    if plugin_version:
-        parts = plugin_version.split('.')
-        if len(parts) >= 2:
-            plugin_version = f"{parts[0]}.{parts[1]}"
-        else:
-            plugin_version = "latest"
-    else:
-        plugin_version = "latest"
-
-    base_url = f"{domain}/{plugin_version}/{language}/docs/giswater/for-users"
+    
+    # Always use 'latest' to avoid errors when plugin version is diferent than docs
+    base_url = f"{domain}/latest/{language}/docs/giswater/for-users"
 
     uiname = uiname.replace("_", "-").replace(" ", "-").lower() + ".html"  # sanitize uiname
 
