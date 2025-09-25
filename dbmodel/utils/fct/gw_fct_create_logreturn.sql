@@ -56,7 +56,17 @@ BEGIN
 	ELSIF v_returntype = 'info' THEN
 
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM t_audit_check_data order by criticity desc, id asc) row;
+		FROM (
+			SELECT 
+				ROW_NUMBER() OVER (ORDER BY criticity DESC, error_message ASC) AS id,
+				error_message AS message,
+				criticity
+			FROM (
+				SELECT DISTINCT error_message, criticity
+				FROM t_audit_check_data
+			) t
+			ORDER BY criticity DESC, message ASC
+		) row;
 		v_result := COALESCE(v_result, '{}');
 		v_result := concat ('{"geometryType":"", "values":',v_result, '}');
 
