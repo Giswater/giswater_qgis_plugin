@@ -111,23 +111,22 @@ BEGIN
 							FROM ve_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
 		END IF;
 
+		v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
+
+		v_querytext = concat('SELECT jsonb_agg(features.feature)
+				FROM (
+				SELECT jsonb_build_object(
+				''type'',       ''Feature'',
+				''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+				''properties'', to_jsonb(row) - ''the_geom''
+				) AS feature
+				FROM (', v_querytext, ') row) features');
+
+		EXECUTE v_querytext INTO v_result;
 	ELSE
 		-- TODO: for ud
 
 	END IF;
-
-	v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
-
-	v_querytext = concat('SELECT jsonb_agg(features.feature)
-			FROM (
-			SELECT jsonb_build_object(
-			''type'',       ''Feature'',
-			''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-			''properties'', to_jsonb(row) - ''the_geom''
-			) AS feature
-			FROM (', v_querytext, ') row) features');
-
-	EXECUTE v_querytext INTO v_result;
 
 	-- profilactic nulls;
 	v_result := COALESCE(v_result, '{}');

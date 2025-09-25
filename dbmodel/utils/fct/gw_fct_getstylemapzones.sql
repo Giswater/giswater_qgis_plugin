@@ -58,9 +58,9 @@ v_idname text;
 v_minsector json;
 v_coldminsector text;
 v_tradminsector text;
-v_modeminsector text;
+v_modeminsector text = 'Random';
 v_minsector_mincut json;
-v_modeminsector_mincut text;
+v_modeminsector_mincut text = 'Random';
 v_coldminsector_mincut text;
 v_tradminsector_mincut text;
 
