@@ -139,7 +139,6 @@ v_selected_idval text;
 v_errcontext text;
 v_querystring text;
 v_msgerr json;
-v_epa text;
 v_elevation numeric(12,4);
 v_staticpressure numeric(12,3);
 label_value text;
@@ -697,16 +696,6 @@ BEGIN
 		END IF;
 	
 	ELSIF v_tg_op ='UPDATE' OR v_tg_op ='SELECT' then
-
-		-- getting values from feature
-		IF v_idname = 'connec_id' THEN
-			v_epa = 'connec';
-		ELSIF v_idname IN ('arc_id', 'node_id', 'gully_id') then
-
-			EXECUTE ('SELECT epa_type FROM ' || substring(v_idname, 0, length(v_idname)-2) || ' WHERE ' || v_idname || ' = ' || v_id::integer || '') INTO v_epa;
-
-		END IF;
-
 		IF v_idname_array is not null then
 
 			v_querystring = 'SELECT (row_to_json(a)) FROM (SELECT * FROM '|| v_table_id || ' ';
