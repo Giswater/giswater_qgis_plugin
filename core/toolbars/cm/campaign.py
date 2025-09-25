@@ -726,35 +726,42 @@ class Campaign:
         dlg.feature_id.textEdited.connect(partial(self._feature_id_typeahead, dlg, feature, allowed_types))
 
     def _feature_id_typeahead(self, dlg: QDialog, feature: str, allowed_types: List[str], text: str = ''):
-        """Query server on each keystroke and feed the completer with up to 100 items.
-
-        This mirrors the app-wide pattern: connect textEdited -> slot -> DB query -> set QCompleter.
-        """
-        id_column = f"{feature}_id"
+        """Query server on each keystroke and feed the completer with up to 100 items."""
         value_list = []
         if text and len(text) >= 1:
-            safe = str(text).replace("'", "''")
-            base_sql = f"SELECT p.{id_column}::text AS val FROM {self.schema_parent}.{feature} p"
-            where_sql = f" WHERE p.{id_column}::text ILIKE '{safe}%|'".replace('|', '')
-            join_sql = ''
+            # Get all allowed feature IDs using the same logic as map selection
+            allowed_feature_ids = self.get_allowed_features_for_campaign(feature)
+            
+            if allowed_feature_ids:
+                # Filter by text input from the allowed IDs
+                safe = str(text).replace("'", "''")
+                matching_ids = [fid for fid in allowed_feature_ids if str(fid).startswith(safe)]
+                value_list = matching_ids[:100]  # Limit to 100 results
+            else:
+                # If no restrictions, use the original logic
+                id_column = f"{feature}_id"
+                safe = str(text).replace("'", "''")
+                base_sql = f"SELECT p.{id_column}::text AS val FROM {self.schema_parent}.{feature} p"
+                where_sql = f" WHERE p.{id_column}::text ILIKE '{safe}%|'".replace('|', '')
+                sql = base_sql + where_sql + f" ORDER BY p.{id_column} LIMIT 100"
+                rows = tools_db.get_rows(sql)
+                value_list = [r.get('val') for r in (rows or []) if r.get('val')]
 
-            if allowed_types:
-                allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
-                join_sql = f" JOIN {self.schema_parent}.cat_{feature} c ON p.{feature}cat_id = c.id"
-                where_sql += f" AND c.{feature}_type IN ({allowed_types_str})"
-
-            sql = base_sql + join_sql + where_sql + f" ORDER BY p.{id_column} LIMIT 100"
-            rows = tools_db.get_rows(sql)
-            value_list = [r.get('val') for r in (rows or []) if r.get('val')]
-
-        # Update the shared model; keep the same QCompleter instance attached to the line edit
+        # Force our completer to be the one that works
         if hasattr(self, '_feature_id_model') and self._feature_id_model is not None:
+            # Clear any existing completer and force ours
+            dlg.feature_id.setCompleter(None)
+            
+            # Set our model with the filtered data
             self._feature_id_model.setStringList(value_list)
+            
+            # Reattach our completer
+            dlg.feature_id.setCompleter(self._feature_id_completer)
+            
             # Only show popup when there is user text and some results
             if text and value_list:
                 try:
-                    if dlg.feature_id.completer():
-                        dlg.feature_id.completer().complete()
+                    dlg.feature_id.completer().complete()
                 except Exception:
                     pass
 
@@ -789,7 +796,8 @@ class Campaign:
             WHERE c.{feature}_type IN ({allowed_types_str})
         """
         rows = tools_db.get_rows(sql)
-        return [row[id_column] for row in (rows or []) if row.get(id_column)]
+        result = [row[id_column] for row in (rows or []) if row.get(id_column)]
+        return result
 
     def _on_class_changed(self, sender: Optional[QComboBox] = None):
         """Called when the user changes the reviewclass or visitclass combo or when dialog opens"""
@@ -872,7 +880,8 @@ class Campaign:
             WHERE r.reviewclass_id = {reviewclass_id}
         """
         rows = tools_db.get_rows(sql)
-        return [r["object_id"] for r in rows or []]
+        result = [r["object_id"] for r in rows or []]
+        return result
 
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int) -> List[str]:
         """

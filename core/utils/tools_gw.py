@@ -5657,12 +5657,14 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
             )
             toggled = True
 
-        for feature_id in ids or []:
+        if ids:
+            # Batch insert for better performance with large numbers of features
+            ids_list = "', '".join(str(id) for id in ids)
             sql = f"""
                 INSERT INTO {tablename} ({insert_cols})
                 SELECT {select_cols}
                 {from_clause}
-                WHERE p.{feature_type}_id = {feature_id}
+                WHERE p.{feature_type}_id IN ('{ids_list}')
                 ON CONFLICT DO NOTHING;
             """
             tools_db.execute_sql(sql)
@@ -5828,25 +5830,26 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
         tools_qgis.show_warning(msg)
         return
 
-    # Special handling for arcs to include node_1 and node_2
-    if feature_type == 'arc':
-        for feature_id in ids or []:
+    if ids:
+        # Special handling for arcs to include node_1 and node_2
+        if feature_type == 'arc':
+            ids_list = "', '".join(str(id) for id in ids)
             sql = f"""
                 INSERT INTO {tablename} (lot_id, arc_id, status, code, node_1, node_2)
-                SELECT {lot_id}, {feature_id}, 1, code, node_1, node_2
+                SELECT {lot_id}, arc_id, 1, code, node_1, node_2
                 FROM {lib_vars.schema_name}.arc
-                WHERE arc_id = {feature_id}
+                WHERE arc_id IN ('{ids_list}')
                 ON CONFLICT DO NOTHING;
             """
             tools_db.execute_sql(sql)
-    else:
-        # Standard insertion for other feature types
-        for feature_id in ids or []:
+        else:
+            # Standard insertion for other feature types
+            ids_list = "', '".join(str(id) for id in ids)
             sql = f"""
                 INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
-                SELECT {lot_id}, {feature_id}, 1, code
+                SELECT {lot_id}, {feature_type}_id, 1, code
                 FROM {lib_vars.schema_name}.{feature_type}
-                WHERE {feature_type}_id = {feature_id}
+                WHERE {feature_type}_id IN ('{ids_list}')
                 ON CONFLICT DO NOTHING;
             """
             tools_db.execute_sql(sql)
