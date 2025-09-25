@@ -26,7 +26,7 @@ SELECT columns_are(
   'expl_id', 'muni_id', 'sector_id', 'omzone_id', 'omunit_id', 'function_type', 'category_type', 'location_type', 'observ', 'comment', 'link',
   'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'brand_id', 'model_id', 'serial_number', 'asset_id', 'verified', 'datasource',
   'label_x', 'label_y', 'label_rotation', 'rotation', 'inventory', 'publish', 'trace_featuregeom', 'lock_level', 'expl_visibility', 'created_at', 
-  'created_by', 'updated_at', 'updated_by', 'the_geom'
+  'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid'
     ],
     'Table element should have the correct columns'
 
@@ -78,6 +78,7 @@ SELECT col_type_is('element', 'created_by', 'varchar(50)', 'Column created_by sh
 SELECT col_type_is('element', 'updated_at', 'timestamptz', 'Column updated_at should be timestamptz');
 SELECT col_type_is('element', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('element', 'the_geom', 'public.geometry(point, 25831)', 'Column the_geom should be public.geometry(point, 25831)');
+SELECT col_type_is('element', 'uuid', 'uuid', 'Column uuid should be uuid');
 
 
 

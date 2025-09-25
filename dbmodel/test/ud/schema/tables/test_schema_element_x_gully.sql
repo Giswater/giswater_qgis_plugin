@@ -20,7 +20,7 @@ SELECT has_table('element_x_gully'::name, 'Table element_x_gully should exist');
 SELECT columns_are(
     'element_x_gully',
     ARRAY[
-        'element_id', 'gully_id'
+        'element_id', 'gully_id', 'gully_uuid'
     ],
     'Table element_x_gully should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('element_x_gully', ARRAY['element_id', 'gully_id'], 'Columns el
 -- Check column types
 SELECT col_type_is('element_x_gully', 'element_id', 'int4', 'Column element_id should be int4');
 SELECT col_type_is('element_x_gully', 'gully_id', 'int4', 'Column gully_id should be int4');
+SELECT col_type_is('element_x_gully', 'gully_uuid', 'uuid', 'Column gully_uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('element_x_gully', 'Table element_x_gully should have foreign keys');

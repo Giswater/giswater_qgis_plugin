@@ -34,7 +34,7 @@ SELECT columns_are(
         'model_id', 'serial_number', 'asset_id', 'adate', 'adescript', 'verified', 'uncertain', 'datasource',
         'label_x', 'label_y', 'label_rotation', 'label_quadrant', 'inventory', 'publish', 'is_scadamap',
         'lock_level', 'initoverflowpath', 'inverted_slope', 'negative_offset', 'expl_visibility', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'meandering'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'meandering', 'uuid'
     ],
     'Table arc should have the correct columns'
 );
@@ -147,6 +147,7 @@ SELECT col_type_is('arc', 'updated_at', 'timestamptz', 'Column updated_at should
 SELECT col_type_is('arc', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('arc', 'the_geom', 'geometry(linestring, 25831)', 'Column the_geom should be geometry(linestring, 25831)');
 SELECT col_type_is('arc', 'meandering', 'integer', 'Column meandering should be integer');
+SELECT col_type_is('arc', 'uuid', 'uuid', 'Column uuid should be uuid');
 
 -- Check default values
 SELECT col_has_default('arc', 'arc_id', 'Column arc_id should have default value');

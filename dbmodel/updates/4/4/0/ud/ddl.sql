@@ -13,3 +13,9 @@ ALTER TABLE element_x_gully DROP CONSTRAINT element_x_gully_element_id_fkey;
 ALTER TABLE element_x_gully DROP CONSTRAINT element_x_gully_gully_id_fkey;
 ALTER TABLE element_x_gully ADD CONSTRAINT element_x_gully_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE element_x_gully ADD CONSTRAINT element_x_gully_gully_id_fkey FOREIGN KEY (gully_id) REFERENCES gully(gully_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- 25/09/2025 add uuid to tables
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"uuid", "dataType":"uuid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element_x_gully", "column":"gully_uuid", "dataType":"uuid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_x_gully", "column":"gully_uuid", "dataType":"uuid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"doc_x_gully", "column":"gully_uuid", "dataType":"uuid"}}$$);

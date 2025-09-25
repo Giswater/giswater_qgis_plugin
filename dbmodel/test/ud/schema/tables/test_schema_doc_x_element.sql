@@ -20,7 +20,7 @@ SELECT has_table('doc_x_element'::name, 'Table doc_x_element should exist');
 SELECT columns_are(
     'doc_x_element',
     ARRAY[
-        'doc_id', 'element_id'
+        'doc_id', 'element_id', 'element_uuid'
     ],
     'Table doc_x_element should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('doc_x_element', ARRAY['doc_id', 'element_id'], 'Columns doc_id
 -- Check column types
 SELECT col_type_is('doc_x_element', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
 SELECT col_type_is('doc_x_element', 'element_id', 'int4', 'Column element_id should be int4');
+SELECT col_type_is('doc_x_element', 'element_uuid', 'uuid', 'Column element_uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('doc_x_element', 'Table doc_x_element should have foreign keys');

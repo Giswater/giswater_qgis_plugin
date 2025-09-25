@@ -22,7 +22,7 @@ SELECT has_table('doc_x_link'::name, 'Table doc_x_link should exist');
 SELECT columns_are(
     'doc_x_link',
     ARRAY[
-      'doc_id', 'link_id'
+      'doc_id', 'link_id', 'link_uuid'
     ],
     'Table doc_x_link should have the correct columns'
 
@@ -30,6 +30,7 @@ SELECT columns_are(
 -- check columns names
 SELECT col_type_is('doc_x_link', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
 SELECT col_type_is('doc_x_link', 'link_id', 'int4', 'Column link_id should be int4');
+SELECT col_type_is('doc_x_link', 'link_uuid', 'uuid', 'Column link_uuid should be uuid');
 
 
 

@@ -20,7 +20,7 @@ SELECT has_table('om_visit_x_link'::name, 'Table om_visit_x_link should exist');
 SELECT columns_are(
     'om_visit_x_link',
     ARRAY[
-        'id', 'visit_id', 'link_id', 'is_last'
+        'id', 'visit_id', 'link_id', 'is_last', 'link_uuid'
     ],
     'Table om_visit_x_link should have the correct columns'
 );
@@ -33,6 +33,7 @@ SELECT col_type_is('om_visit_x_link', 'id', 'bigint', 'Column id should be bigin
 SELECT col_type_is('om_visit_x_link', 'visit_id', 'bigint', 'Column visit_id should be bigint');
 SELECT col_type_is('om_visit_x_link', 'link_id', 'integer', 'Column link_id should be integer');
 SELECT col_type_is('om_visit_x_link', 'is_last', 'boolean', 'Column is_last should be boolean');
+SELECT col_type_is('om_visit_x_link', 'link_uuid', 'uuid', 'Column link_uuid should be uuid');
 
 -- Check default values
 SELECT col_default_is('om_visit_x_link', 'is_last', 'true', 'Column is_last should default to true');

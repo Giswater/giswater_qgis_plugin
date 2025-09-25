@@ -20,7 +20,7 @@ SELECT has_table('doc_x_connec'::name, 'Table doc_x_connec should exist');
 SELECT columns_are(
     'doc_x_connec',
     ARRAY[
-        'doc_id', 'connec_id'
+        'doc_id', 'connec_id', 'connec_uuid'
     ],
     'Table doc_x_connec should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('doc_x_connec', ARRAY['doc_id', 'connec_id'], 'Columns doc_id a
 -- Check column types
 SELECT col_type_is('doc_x_connec', 'doc_id', 'varchar(30)', 'Column doc_id should varchar(30)');
 SELECT col_type_is('doc_x_connec', 'connec_id', 'int4', 'Column connec_id should be int4');
+SELECT col_type_is('doc_x_connec', 'connec_uuid', 'uuid', 'Column connec_uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('doc_x_connec', 'Table doc_x_connec should have foreign keys');

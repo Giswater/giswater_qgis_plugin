@@ -26,7 +26,7 @@ SELECT columns_are(
         'staticpressure1', 'staticpressure2', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'verified', 'supplyzone_id', 'custom_length', 'datasource',
         'omzone_id', 'lock_level', 'annotation', 'comment', 'descript', 'link', 'location_type', 'num_value', 'observ',
-        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'state_type', 'brand_id', 'model_id'
+        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'state_type', 'brand_id', 'model_id', 'uuid'
     ],
     'Table link should have the correct columns'
 );
@@ -69,6 +69,7 @@ SELECT col_type_is('link', 'staticpressure1', 'numeric(12,3)', 'Column staticpre
 SELECT col_type_is('link', 'staticpressure2', 'numeric(12,3)', 'Column staticpressure2 should be numeric(12,3)');
 SELECT col_type_is('link', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('link', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
+SELECT col_type_is('link', 'uuid', 'uuid', 'Column uuid should be uuid');
 
 -- Check not null constraints
 SELECT col_not_null('link', 'linkcat_id', 'Column linkcat_id should be NOT NULL');

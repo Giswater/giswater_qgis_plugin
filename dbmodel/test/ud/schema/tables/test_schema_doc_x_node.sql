@@ -22,7 +22,7 @@ SELECT has_table('doc_x_node'::name, 'Table doc_x_node should exist');
 SELECT columns_are(
     'doc_x_node',
     ARRAY[
-      'doc_id', 'node_id'
+      'doc_id', 'node_id', 'node_uuid'
     ],
     'Table doc_x_node should have the correct columns'
 
@@ -30,6 +30,7 @@ SELECT columns_are(
 -- check columns names
 SELECT col_type_is('doc_x_node', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
 SELECT col_type_is('doc_x_node', 'node_id', 'int4', 'Column node_id should be int4');
+SELECT col_type_is('doc_x_node', 'node_uuid', 'uuid', 'Column node_uuid should be uuid');
 
 
 

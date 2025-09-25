@@ -26,7 +26,7 @@ SELECT columns_are(
         'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'feature_type',
         'top_elev', 'expl_visibility', 'trace_featuregeom', 'geometry_type', 'epa_type',
         'muni_id', 'sector_id', 'omzone_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level',
-        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid'
     ],
     'Table element should have the correct columns'
 );
@@ -80,6 +80,7 @@ SELECT col_type_is('element', 'created_at', 'timestamp with time zone', 'Column 
 SELECT col_type_is('element', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
 SELECT col_type_is('element', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('element', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('element', 'uuid', 'uuid', 'Column uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('element', 'Table element should have foreign keys');

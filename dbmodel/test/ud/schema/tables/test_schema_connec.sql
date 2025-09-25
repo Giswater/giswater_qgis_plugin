@@ -32,7 +32,7 @@ SELECT columns_are(
         'pjoint_type', 'access_type', 'placement_type', 'accessibility', 'asset_id', 'adate', 'adescript',
         'verified', 'uncertain', 'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation',
         'label_quadrant', 'inventory', 'publish', 'lock_level', 'expl_visibility', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'diagonal', 'brand_id', 'model_id', 'om_state'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'diagonal', 'brand_id', 'model_id', 'om_state', 'uuid'
     ],
     'Table connec should have the correct columns'
 );
@@ -131,6 +131,7 @@ SELECT col_type_is('connec', 'diagonal', 'varchar(50)', 'Column diagonal should 
 SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('connec', 'om_state', 'int4', 'Column om_state should be int4');
+SELECT col_type_is('connec', 'uuid', 'uuid', 'Column uuid should be uuid');
 
 -- Check default values
 SELECT col_has_default('connec', 'connec_id', 'Column connec_id should have default value');

@@ -20,7 +20,7 @@ SELECT has_table('om_visit_x_node'::name, 'Table om_visit_x_node should exist');
 SELECT columns_are(
     'om_visit_x_node',
     ARRAY[
-        'id', 'visit_id', 'node_id', 'is_last'
+        'id', 'visit_id', 'node_id', 'is_last', 'node_uuid'
     ],
     'Table om_visit_x_node should have the correct columns'
 );
@@ -33,6 +33,7 @@ SELECT col_type_is('om_visit_x_node', 'id', 'bigint', 'Column id should be bigin
 SELECT col_type_is('om_visit_x_node', 'visit_id', 'bigint', 'Column visit_id should be bigint');
 SELECT col_type_is('om_visit_x_node', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('om_visit_x_node', 'is_last', 'boolean', 'Column is_last should be boolean');
+SELECT col_type_is('om_visit_x_node', 'node_uuid', 'uuid', 'Column node_uuid should be uuid');
 
 -- Check default values
 SELECT col_default_is('om_visit_x_node', 'is_last', 'true', 'Column is_last should default to true');

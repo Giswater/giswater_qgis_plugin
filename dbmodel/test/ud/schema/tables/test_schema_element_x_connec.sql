@@ -20,7 +20,7 @@ SELECT has_table('element_x_connec'::name, 'Table element_x_connec should exist'
 SELECT columns_are(
     'element_x_connec',
     ARRAY[
-        'element_id', 'connec_id'
+        'element_id', 'connec_id', 'connec_uuid'
     ],
     'Table element_x_connec should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('element_x_connec', ARRAY['element_id', 'connec_id'], 'Columns 
 -- Check column types
 SELECT col_type_is('element_x_connec', 'element_id', 'int4', 'Column element_id should be int4');
 SELECT col_type_is('element_x_connec', 'connec_id', 'int4', 'Column connec_id should be int4');
+SELECT col_type_is('element_x_connec', 'connec_uuid', 'uuid', 'Column connec_uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('element_x_connec', 'Table element_x_connec should have foreign keys');

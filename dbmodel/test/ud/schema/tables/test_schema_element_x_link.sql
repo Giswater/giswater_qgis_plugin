@@ -20,7 +20,7 @@ SELECT has_table('element_x_link'::name, 'Table element_x_link should exist');
 SELECT columns_are(
     'element_x_link',
     ARRAY[
-        'element_id', 'link_id'
+        'element_id', 'link_id', 'link_uuid'
     ],
     'Table element_x_link should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('element_x_link', ARRAY['element_id', 'link_id'], 'Columns elem
 -- Check column types
 SELECT col_type_is('element_x_link', 'element_id', 'int4', 'Column element_id should be int4');
 SELECT col_type_is('element_x_link', 'link_id', 'int4', 'Column link_id should be int4');
+SELECT col_type_is('element_x_link', 'link_uuid', 'uuid', 'Column link_uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('element_x_link', 'Table element_x_link should have foreign keys');

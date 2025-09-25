@@ -20,7 +20,7 @@ SELECT has_table('element_x_node'::name, 'Table element_x_node should exist');
 SELECT columns_are(
     'element_x_node',
     ARRAY[
-        'element_id', 'node_id'
+        'element_id', 'node_id', 'node_uuid'
     ],
     'Table element_x_node should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('element_x_node', ARRAY['element_id', 'node_id'], 'Columns elem
 -- Check column types
 SELECT col_type_is('element_x_node', 'element_id', 'integer', 'Column element_id should be integer');
 SELECT col_type_is('element_x_node', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('element_x_node', 'node_uuid', 'uuid', 'Column node_uuid should be uuid');
 
 -- Check foreign keys
 SELECT has_fk('element_x_node', 'Table element_x_node should have foreign keys');

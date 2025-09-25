@@ -22,7 +22,7 @@ SELECT has_table('element_x_node'::name, 'Table element_x_node should exist');
 SELECT columns_are(
     'element_x_node',
     ARRAY[
-      'element_id', 'node_id'
+      'element_id', 'node_id', 'node_uuid'
     ],
     'Table element_x_node should have the correct columns'
 
@@ -30,6 +30,7 @@ SELECT columns_are(
 -- check columns names
 SELECT col_type_is('element_x_node', 'element_id', 'int4', 'Column element_id should be int4');
 SELECT col_type_is('element_x_node', 'node_id', 'int4', 'Column node_id should be int4');
+SELECT col_type_is('element_x_node', 'node_uuid', 'uuid', 'Column node_uuid should be uuid');
 
 
 
