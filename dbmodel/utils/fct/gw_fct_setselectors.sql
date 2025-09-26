@@ -216,13 +216,16 @@ BEGIN
 	-- manage selector psector in psector-mode
 	SELECT value::INT INTO v_cur_psector FROM config_param_user WHERE PARAMETER = 'plan_psector_current' AND cur_user = current_user;
 	
-	IF v_cur_psector IS NOT NULL AND (v_tabname = 'tab_psector' OR v_tabname = 'tab_exploitation') THEN  -- mode psector ON
-		
+	IF v_cur_psector IS NOT NULL AND v_tabname IN ('tab_psector', 'tab_exploitation', 'tab_sector') THEN  -- mode psector ON
 		--unselect psector in different ways
 		IF (v_cur_psector = v_id::integer AND v_value = 'False')
 			OR v_checkall IS FALSE
 			OR (v_cur_psector != v_id::integer AND v_isalone)
-			OR (v_tabname = 'tab_exploitation' AND v_id::int NOT IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
+			OR (v_tabname = 'tab_exploitation' AND v_id::int IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
+			OR (
+				v_tabname = 'tab_sector' AND 
+				v_id::int IN (SELECT s.sector_id FROM plan_psector pp JOIN sector s ON pp.expl_id = ANY (s.expl_id) WHERE psector_id = v_cur_psector)
+				)
 		THEN
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -410,6 +413,11 @@ BEGIN
 			SELECT DISTINCT muni_id, current_user FROM link WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(link.expl_visibility))
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
+			-- psector
+			DELETE FROM selector_psector WHERE psector_id NOT IN
+			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+
+
 		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
 			IF  v_tabname = 'tab_macrosector' THEN
@@ -430,6 +438,11 @@ BEGIN
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
+
+			-- psector
+			DELETE FROM selector_psector WHERE psector_id NOT IN
+			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+
 
 
 		-- inserting muni_id from selected muni
