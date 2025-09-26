@@ -9,7 +9,8 @@ from functools import partial
 import json
 from typing import Any, Dict, List, Optional
 
-from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QItemSelectionModel
+from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QStringListModel
+from qgis.core import QgsExpression
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                   QComboBox, QCompleter, QDateEdit, QDialog,
@@ -23,10 +24,16 @@ from ....libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 from ...utils.selection_widget import GwSelectionWidget
-from ....global_vars import GwFeatureTypes
-
+ 
 
 class AddNewLot:
+    """Handles lot creation, management, and database operations"""
+    
+    # Valid feature types for lots
+    VALID_FEATURE_TYPES = ['arc', 'node', 'connec', 'gully', 'link']
+    
+    # Maximum results for typeahead
+    MAX_TYPEAHEAD_RESULTS = 100
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
@@ -102,7 +109,7 @@ class AddNewLot:
             # Clear initial data cache after first run
             self.initial_lot_data = {}
         else:
-            print("[DEBUG] Critical: Could not find 'tab_data_campaign_id' widget to connect signal.")
+            pass
 
         # Reference key widgets
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
@@ -167,10 +174,11 @@ class AddNewLot:
         self_variables = {"selection_mode": GwSelectionMode.LOT, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dlg_lot, "table_object": "lot"}
         used_tools = ["rectangle", "polygon", "freehand", "circle"]
-        menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection}
+        menu_variables = {"used_tools": used_tools, "callback": self._init_snapping_selection, "callback_later": self._refresh_relations_table}
         highlight_variables = {"callback_values": self.callback_values}
         expression_selection = {"callback_later": self._select_by_expression}
         selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection)
+        self.selection_widget = selection_widget
         self.dlg_lot.lyt_selection.addWidget(selection_widget, 0)
 
         # Always set multi-row and full row selection for relation tables, both on create and edit
@@ -186,15 +194,16 @@ class AddNewLot:
         for table_name in relation_table_names:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
-                tools_qt.set_tableview_config(view, sortingEnabled=False)
-
-        # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
-        global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
+                tools_qt.set_tableview_config(view, sortingEnabled=True)
+                view.setSelectionBehavior(QAbstractItemView.SelectRows)
+                view.setSelectionMode(QAbstractItemView.ExtendedSelection)  # or SingleSelection
+                view.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
     def callback_values(self):
+        """Return callback values for selection widget operations."""
         return (self, self.dlg_lot, "lot")
 
     def _on_campaign_changed(self):
@@ -416,26 +425,12 @@ class AddNewLot:
         return creation_func() if creation_func else None
 
     def _on_tab_feature_changed(self):
+        """Handle feature tab change events."""
         # Update self.rel_feature_type just like in Campaign
         self.rel_feature_type = tools_gw.get_signal_change_tab(self.dlg_lot, self.excluded_layers)
 
-    def get_allowed_features_for_lot(self, lot_id: int, feature: str) -> List[Any]:
-        """Only be able to make the relations to the features id that come from campaign """
-        # feature: "arc", "node", etc.
-        row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
-        campaign_id = row[0] if row else None
-        if not campaign_id:
-            return []
-
-        feature_table = f"cm.om_campaign_x_{feature}"
-        feature_id = f"{feature}_id"
-        sql = f"SELECT {feature_id} FROM {feature_table} WHERE campaign_id = {campaign_id}"
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            return []
-        return [row[feature_id] for row in rows]
-
     def enable_feature_tabs_by_campaign(self, lot_id: int):
+        """Enable or disable feature tabs based on campaign relations."""
         row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
         campaign_id = row[0] if row else None
         if not campaign_id:
@@ -472,6 +467,17 @@ class AddNewLot:
                     f"ORDER BY id"
                 )
                 self.populate_tableview(view, sql)
+        
+        # Bind table selection to selectByIds via _select_layers_from_table
+        for feature in features:
+            table_widget_name = f"tbl_campaign_lot_x_{feature}"
+            view = getattr(self.dlg_lot, table_widget_name, None)
+            if view and view.selectionModel():
+                tools_gw.connect_signal(
+                    view.selectionModel().selectionChanged,
+                    partial(self._select_layers_from_table, feature, view),
+                    'lot', f"lot_select_layers_{feature}"
+                )
 
     def get_widget_by_columnname(self, dialog: QWidget, columnname: str) -> Optional[QWidget]:
         """Find a widget in a dialog by its 'columnname' property."""
@@ -711,15 +717,37 @@ class AddNewLot:
         self._cleanup_map_selection()
 
     def _cleanup_map_selection(self):
+        """Clean up map selections and disconnect signals."""
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
+        tools_gw.disconnect_signal('lot')
         tools_qgis.force_refresh_map_canvas()
 
     def _refresh_relations_table(self):
-        """Callback to refresh relations using the current lot_id."""
+        """Callback to refresh relations and apply table config if first insert."""
         if self.lot_id:
+            # Check if this was the first insert by checking if table was empty before
+            current_tab = self.dlg_lot.tab_feature.currentWidget()
+            if current_tab:
+                feature_type = current_tab.objectName().replace('tab_', '')
+                table_widget_name = f"tbl_campaign_lot_x_{feature_type}"
+                table_view = getattr(self.dlg_lot, table_widget_name, None)
+                
+                if table_view and table_view.model():
+                    # If table has exactly 1 row now, it means it was the first insert
+                    if table_view.model().rowCount() == 1:
+                        self._apply_table_config_for_feature(table_view, feature_type)
+                    return
+                
+            # If we can't determine or table is empty, reload relations
             self._load_lot_relations(self.lot_id)
+
+    def _apply_table_config_for_feature(self, table_view, feature_type):
+        """Apply table configuration for a specific feature type."""
+        table_name = f"om_campaign_lot_x_{feature_type}"
+        dialog_ref = self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot
+        tools_gw.set_tablemodel_config(dialog_ref, table_view, table_name, schema_name="cm")
 
     def _update_completer_and_relations(self):
         """Helper to update both the feature completer and the relations table."""
@@ -746,15 +774,15 @@ class AddNewLot:
         self._update_feature_completer_lot(self.dlg_lot)
 
     def _select_by_expression(self):
-        """Handles the 'select with expression' button click action."""
+        """Handle the 'select with expression' button click action."""
         self._update_feature_completer_lot(self.dlg_lot)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
+    def populate_tableview(self, qtable: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
         if not data:
-            view.setModel(QStandardItemModel())  # Clear view
+            qtable.setModel(QStandardItemModel())  # Clear view
             return
 
         # Auto-detect column names if not provided
@@ -769,8 +797,22 @@ class AddNewLot:
                 value = str(row.get(col_name, ''))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
-        view.setModel(model)
-        view.resizeColumnsToContents()
+        qtable.setModel(model)
+        
+        # Determine table configuration based on widget name
+        widget_name = qtable.objectName()
+        if "tbl_campaign_lot_x_" in widget_name:
+            # Extract feature type from widget name (e.g., "tbl_campaign_lot_x_arc" -> "arc")
+            feature_type = widget_name.replace("tbl_campaign_lot_x_", "")
+            table_name = f"om_campaign_lot_x_{feature_type}"
+        elif "tbl_lots" in widget_name:
+            # For lot manager table
+            table_name = "v_ui_lot"
+        else:
+            # Default fallback
+            table_name = "v_ui_lot"
+        
+        tools_gw.set_tablemodel_config(self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot, qtable, table_name, schema_name="cm")
 
     def get_current_user(self) -> Optional[Dict[str, Any]]:
         """
@@ -831,98 +873,6 @@ class AddNewLot:
 
         tools_gw.open_dialog(self.dlg_lot_man, dlg_name="lot_management")
 
-    def _show_selection_on_top(self, qtable):
-        """
-        Moves the selected rows in a QTableView to the top.
-        """
-        model = qtable.model()
-        selection_model = qtable.selectionModel()
-        if not selection_model or not selection_model.hasSelection():
-            return
-
-        selected_rows = [index.row() for index in selection_model.selectedRows()]
-        selected_rows.sort()
-
-        # Extract items from selected rows
-        rows_data = []
-        for row in selected_rows:
-            row_items = [model.item(row, col) for col in range(model.columnCount())]
-            rows_data.append([QStandardItem(item.text()) if item else QStandardItem() for item in row_items])
-
-        # Remove selected rows from the bottom up to avoid index shifting issues
-        for row in reversed(selected_rows):
-            model.removeRow(row)
-
-        # Insert rows at the top
-        for i, row_data in enumerate(rows_data):
-            model.insertRow(i, row_data)
-
-        # Restore selection on the moved rows
-        for i in range(len(rows_data)):
-            qtable.selectRow(i)
-
-    def _get_feature_geometries_from_lot(self, lot_id, select_features=False):
-        """
-        Get all feature geometries associated with a given lot_id.
-        If select_features is True, it will also select the features on the map.
-        """
-        geometries = []
-        feature_types = ['arc', 'node', 'connec', 'link']
-        if tools_gw.get_project_type() == 'ud':
-            feature_types.append('gully')
-
-        for ft in feature_types:
-            table_name = f"om_campaign_lot_x_{ft}"
-            id_name = f"{ft}_id"
-            sql = f"SELECT {id_name} FROM cm.{table_name} WHERE lot_id = {lot_id}"
-            rows = tools_db.get_rows(sql)
-            if not rows:
-                continue
-
-            feature_ids = [row[0] for row in rows]
-            layers = tools_gw.get_layers_from_feature_type(ft)
-            for layer in layers:
-                if layer.isValid():
-                    if select_features:
-                        layer.selectByIds(feature_ids)
-                    else:
-                        for feat in layer.getFeatures(f"{id_name} IN ({','.join(map(str, feature_ids))})"):
-                            geometries.append(feat.geometry())
-        return geometries
-
-    def _zoom_to_selection(self):
-        """
-        Zoom to the combined extent of all features related to the selected lots.
-        """
-        selected_rows = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
-        if not selected_rows:
-            tools_qgis.show_warning("Please select a lot to zoom to.", dialog=self.dlg_lot_man)
-            return
-
-        model = self.dlg_lot_man.tbl_lots.model()
-        lot_ids = [model.data(model.index(row.row(), 0)) for row in selected_rows]
-
-        all_geometries = []
-        for lot_id in lot_ids:
-            try:
-                lot_id = int(lot_id)
-                geometries = self._get_feature_geometries_from_lot(lot_id)
-                all_geometries.extend(geometries)
-            except (ValueError, TypeError):
-                continue
-
-        if not all_geometries:
-            return
-
-        # Combine all bounding boxes
-        bounding_box = all_geometries[0].boundingBox()
-        for geom in all_geometries[1:]:
-            bounding_box.combineExtentWith(geom.boundingBox())
-
-        # Zoom the map canvas
-        canvas = self.iface.mapCanvas()
-        canvas.zoomToFeatureExtent(bounding_box)
-
     def load_lots_into_manager(self):
         """Load campaign data into the campaign management table"""
         if not hasattr(self.dlg_lot_man, "tbl_lots"):
@@ -933,14 +883,19 @@ class AddNewLot:
         current_date = QDate.currentDate()
 
         where_clause = ""
-        username = tools_db.get_current_user()
-        sql = f"""
-            SELECT t.role_id, t.organization_id
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.username = '{username}'
-        """
-        user_info = tools_db.get_row(sql)
+        # Guard privilege for org filter
+        user_info = None
+        try:
+            username = tools_db.get_current_user()
+            sql = f"""
+                SELECT t.role_id, t.organization_id
+                FROM cm.cat_user u
+                JOIN cm.cat_team t ON u.team_id = t.team_id
+                WHERE u.username = '{username}'
+            """
+            user_info = tools_db.get_row(sql, is_admin=True)
+        except Exception:
+            user_info = None
 
         if user_info:
             role = user_info[0]
@@ -964,14 +919,18 @@ class AddNewLot:
         filters = []
 
         # Directly query the cm schema to get user's role and organization
-        username = tools_db.get_current_user()
-        sql = f"""
-            SELECT t.role_id, t.organization_id
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.username = '{username}'
-        """
-        user_info = tools_db.get_row(sql)
+        user_info = None
+        try:
+            username = tools_db.get_current_user()
+            sql = f"""
+                SELECT t.role_id, t.organization_id
+                FROM cm.cat_user u
+                JOIN cm.cat_team t ON u.team_id = t.team_id
+                WHERE u.username = '{username}'
+            """
+            user_info = tools_db.get_row(sql, is_admin=True)
+        except Exception:
+            user_info = None
 
         if user_info:
             role = user_info[0]
@@ -1028,22 +987,23 @@ class AddNewLot:
             model = index.model()
             row = index.row()
             id_index = model.index(row, 0)
-            lot_id = model.data(id_index)
+            lot_ids = [model.data(id_index)]
         else:
             selected = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
             if not selected:
                 msg = "Please select a lot to open."
                 tools_qgis.show_warning(msg, dialog=self.dlg_lot_man)
                 return
-            lot_id = selected[0].data()
-
-        try:
-            lot_id = int(lot_id)
-            if lot_id > 0:
-                self.manage_lot(lot_id=lot_id, is_new=False)
-        except (ValueError, TypeError):
-            msg = "Invalid lot ID."
-            tools_qgis.show_warning(msg)
+            lot_ids = [index.data() for index in selected]
+            
+        for lot_id in lot_ids:
+            try:
+                lot_id = int(lot_id)
+                if lot_id > 0:
+                    self.manage_lot(lot_id=lot_id, is_new=False)
+            except (ValueError, TypeError):
+                msg = "Invalid lot ID."
+                tools_qgis.show_warning(msg)
 
     def delete_lot(self):
         """Delete selected lot(s) with confirmation."""
@@ -1072,127 +1032,37 @@ class AddNewLot:
         tools_gw.refresh_selectors(is_cm=True)
         self.filter_lot()
 
-    def _on_lot_selection_changed(self, selected, deselected):
-        """
-        Selects features on the map when a lot is selected in the table.
-        """
-        # Clear previous selections
-        for layer_group in self.rel_layers.values():
-            for layer in layer_group:
-                layer.removeSelection()
-
-        model = self.dlg_lot_man.tbl_lots.model()
-        selection_model = self.dlg_lot_man.tbl_lots.selectionModel()
-
-        if not selection_model.hasSelection():
-            return
-
-        lot_ids = []
-        for index in selection_model.selectedRows():
-            lot_id = model.data(model.index(index.row(), 0))
-            try:
-                lot_ids.append(int(lot_id))
-            except (ValueError, TypeError):
-                continue
-
-        self.iface.mapCanvas().refresh()
-
-    def _get_current_relations_table(self):
-        """Gets the current visible table view in the relations tab."""
-        current_tab_widget = self.dlg_lot.tab_feature.currentWidget()
-        if not current_tab_widget:
-            return None, None
-
-        feature = current_tab_widget.objectName().replace('tab_', '')
-        if not feature:
-            return None, None
-
-        table_widget_name = f"tbl_campaign_lot_x_{feature}"
-        table_view = self.dlg_lot.findChild(QTableView, table_widget_name)
-        return table_view, feature
-
-    def _show_selection_on_top_relations(self):
-        """Moves selected rows to the top for the current relations table."""
-        table_view, _ = self._get_current_relations_table()
-        if table_view:
-            self._show_selection_on_top(table_view)
-
-    def _zoom_to_selection_relations(self):
-        """Zooms to the selected features in the current relations table."""
-        table_view, feature_type = self._get_current_relations_table()
-        if not table_view or not feature_type:
-            return
-
-        selection_model = table_view.selectionModel()
-        if not selection_model or not selection_model.hasSelection():
-            tools_qgis.show_warning("Please select an element to zoom to.", dialog=self.dlg_lot)
-            return
-
-        model = table_view.model()
-        id_column_index = -1
-        id_col_name = f'{feature_type}_id'
-
-        for i in range(model.columnCount()):
-            if model.headerData(i, Qt.Horizontal) == id_col_name:
-                id_column_index = i
-                break
-
-        if id_column_index == -1:
-            tools_qgis.show_warning(f"Could not find ID column '{id_col_name}'.", dialog=self.dlg_lot)
-            return
-
-        selected_rows = selection_model.selectedRows()
-        feature_ids = [model.data(model.index(row.row(), id_column_index)) for row in selected_rows]
-
-        if not feature_ids:
-            return
-
-        # Use the generic zoom function to match psector's behavior
-        tools_gw.zoom_to_feature_by_id(f"ve_{feature_type}", id_col_name, feature_ids)
-
-    def _manage_selection_changed(self, layer):
-        if layer is None:
-            return
-
-        if layer.providerType() != 'postgres':
-            return
-
-        tablename = tools_qgis.get_layer_source_table_name(layer)
-        if not tablename:
-            return
-
-        mapping_dict = {
-            "ve_node": ("node_id", self.dlg_lot.tbl_campaign_lot_x_node),
-            "ve_arc": ("arc_id", self.dlg_lot.tbl_campaign_lot_x_arc),
-            "ve_connec": ("connec_id", self.dlg_lot.tbl_campaign_lot_x_connec),
-            "ve_gully": ("gully_id", self.dlg_lot.tbl_campaign_lot_x_gully),
-        }
-        if tablename not in mapping_dict:
-            return
-        
-        idname, tableview = mapping_dict[tablename]
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            feature_ids = [f"{feature.attribute(idname)}" for feature in features]
-
-            # Select in table
-            selection_model = tableview.selectionModel()
-
-            # Clear previous selection
-            selection_model.clearSelection()
-
-            model = tableview.model()
-
-            # Loop through the model rows to find matching feature_ids
-            for row in range(model.rowCount()):
-                index = model.index(row, 0)
-                feature_id = model.data(index)
-
-                if f"{feature_id}" in feature_ids:
-                    selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+    def _select_layers_from_table(self, feature: str, view: QTableView, *args):
+        """Select current table rows on map layers (Campaign-like yellow selection)."""
+        try:
+            model = view.model()
+            sel = view.selectionModel()
+            if not model or not sel:
+                return
+            id_col = f"{feature}_id"
+            col_idx = tools_qt.get_col_index_by_col_name(view, id_col)
+            if col_idx is None or col_idx == -1:
+                return
+            ids = []
+            for idx in sel.selectedRows():
+                try:
+                    ids.append(str(model.index(idx.row(), col_idx).data()))
+                except Exception:
+                    continue
+            if not ids:
+                return
+            if feature not in self.rel_layers or not self.rel_layers.get(feature):
+                self.rel_layers[feature] = tools_gw.get_layers_from_feature_type(feature)
+            layers = self.rel_layers.get(feature) or []
+            if not layers:
+                return
+            expr = QgsExpression(f"{id_col} IN ({','.join(ids)})")
+            tools_qgis.select_features_by_ids(feature, expr, self.rel_layers)
+        except Exception:
+            pass
 
     def _update_feature_completer_lot(self, dlg: QDialog):
+        """Update the feature completer for lot based on current tab and lot restrictions."""
         # Identify the current tab and derive feature info
         tab_widget = dlg.tab_feature.currentWidget()
         if not tab_widget:
@@ -1207,39 +1077,96 @@ class AddNewLot:
         if not lot_id:
             return
 
-        allowed_ids = self.get_allowed_features_for_lot(lot_id, feature)  # Returns a list of IDs
-
-        # Set up the completer
+        # Set up per-keystroke typeahead (prefix, LIMIT 100) against campaign-linked IDs only
         feature_id_lineedit = dlg.findChild(QLineEdit, "feature_id")
         if feature_id_lineedit:
-            completer = QCompleter([str(x) for x in allowed_ids])
-            completer.setCaseSensitivity(False)
-            feature_id_lineedit.setCompleter(completer)
+            self._ensure_lot_completer_infrastructure(dlg, feature_id_lineedit)
+            self._connect_lot_typeahead_handler(dlg, feature_id_lineedit, feature, lot_id)
 
-    def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes, connect=True, disconnect=True):
-        """
-        Manage the selection changed signals for the tableview based on the feature type
-        """
-        tableview_map = {
-            GwFeatureTypes.ARC: (self.dlg_lot.tbl_campaign_lot_x_arc, "ve_arc", "arc_id", self.rb_red, 5),
-            GwFeatureTypes.NODE: (self.dlg_lot.tbl_campaign_lot_x_node, "ve_node", "node_id", self.rb_red, 10),
-            GwFeatureTypes.CONNEC: (self.dlg_lot.tbl_campaign_lot_x_connec, "ve_connec", "connec_id", self.rb_red, 10),
-            GwFeatureTypes.GULLY: (self.dlg_lot.tbl_campaign_lot_x_gully, "ve_gully", "gully_id", self.rb_red, 10),
-        }
-        tableview, tablename, feat_id, rb, width = tableview_map.get(feature_type, (None, None, None, None, None))
-        if tableview is None:
-            return
+    def _ensure_lot_completer_infrastructure(self, dlg: QDialog, feature_id_lineedit: QLineEdit):
+        """Ensure lot completer model and completer are properly initialized."""
+        # Reuse one model/completer
+        if not hasattr(self, '_lot_feature_model') or self._lot_feature_model is None:
+            self._lot_feature_model = QStringListModel(dlg)
+        if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
+            self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
+            self._lot_feature_completer.setCaseSensitivity(False)
+            self._lot_feature_completer.setCompletionMode(QCompleter.PopupCompletion)
+            feature_id_lineedit.setCompleter(self._lot_feature_completer)
 
-        if disconnect:
-            tools_gw.disconnect_signal('lot', f"highlight_features_by_id_{tablename}")
+    def _connect_lot_typeahead_handler(self, dlg: QDialog, feature_id_lineedit: QLineEdit, feature: str, lot_id: int):
+        """Connect the lot typeahead handler to the feature ID line edit."""
+        try:
+            feature_id_lineedit.textEdited.disconnect()
+        except Exception:
+            pass
+        feature_id_lineedit.textEdited.connect(partial(self._lot_feature_typeahead, dlg, feature, lot_id))
 
-        if not connect:
-            return
+    def _lot_feature_typeahead(self, dlg: QDialog, feature: str, lot_id: int, text: str = ''):
+        """Typeahead for lot: search only among features attached to the selected campaign."""
+        value_list = []
+        if text and len(text) >= 1:
+            # Get all allowed feature IDs for this lot's campaign
+            allowed_feature_ids = self.get_allowed_features_for_lot(feature, lot_id)
+            
+            if allowed_feature_ids:
+                # Filter by text input from the allowed IDs with case-insensitive matching
+                safe = str(text).replace("'", "''")
+                matching_ids = [fid for fid in allowed_feature_ids if str(fid).lower().startswith(safe.lower())]
+                value_list = matching_ids[:self.MAX_TYPEAHEAD_RESULTS]  # Limit to max results
 
-        # Highlight features by id using the generic helper
-        tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
-            tools_qgis.highlight_features_by_id, tableview, tablename, feat_id, rb, width
-        ), 'lot', f"highlight_features_by_id_{tablename}")
+        # Force our completer to be the one that works
+        if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+            self._update_lot_completer_model(dlg, value_list, text)
+
+    def _update_lot_completer_model(self, dlg: QDialog, value_list: List[str], text: str):
+        """Update the lot completer model with filtered data and trigger completion."""
+        # Clear any existing completer and force ours
+        dlg.feature_id.setCompleter(None)
+        
+        # Set our model with the filtered data
+        self._lot_feature_model.setStringList(value_list)
+        
+        # Reattach our completer
+        dlg.feature_id.setCompleter(self._lot_feature_completer)
+        
+        # Only show popup when there is user text and some results
+        if text and value_list:
+            try:
+                dlg.feature_id.completer().complete()
+            except Exception:
+                pass
+
+    def get_allowed_features_for_lot(self, feature: str, lot_id: int) -> Optional[List[Any]]:
+        """Return list of allowed feature IDs for the lot's campaign and feature tab."""
+        if not feature or feature not in self.VALID_FEATURE_TYPES:
+            return None
+            
+        if not lot_id or lot_id <= 0:
+            return None
+            
+        try:
+            # Get campaign from lot with validation
+            row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
+            if not row or not row[0]:
+                return None
+                
+            campaign_id = row[0]
+            id_column = f"{feature}_id"
+            
+            # Get all feature IDs from the campaign for this feature type
+            sql = f"""
+                SELECT {id_column}::text AS {id_column}
+                FROM cm.om_campaign_x_{feature}
+                WHERE campaign_id = {campaign_id}
+                ORDER BY {id_column}
+            """
+            rows = tools_db.get_rows(sql)
+            result = [row[id_column] for row in (rows or []) if row.get(id_column)]
+            return result
+        except Exception:
+            # Return None if there's any database error
+            return None
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
@@ -1518,6 +1445,7 @@ class AddNewLot:
 
         # Apply model to table
         table.setModel(model)
+        tools_gw.set_tablemodel_config(self.dlg_resources_man, table, table_name, schema_name="cm")
 
     def selected_row(self, tablename: str):
         """ Handle double click selected row """
@@ -1598,7 +1526,7 @@ class AddNewLot:
         # If deleting users, get their login names first to also drop the DB user
         login_names_to_drop = []
         if tablename == "cat_user":
-            login_names_rows = tools_db.get_rows(f"SELECT username FROM cm.cat_user WHERE {idname} IN ({ids})")
+            login_names_rows = tools_db.get_rows(f"SELECT username FROM cm.cat_user WHERE {idname} IN ({ids})", is_thread=True)
             if login_names_rows:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
@@ -1715,23 +1643,7 @@ class AddNewLot:
             msg = "No records selected"
             tools_qgis.show_warning(msg)
 
-        return values
-
-    def _get_role_from_team_name(self, team_name: str) -> Optional[str]:
-        """Determines the database role based on the team name."""
-        if not team_name:
-            return None
-
-        team_name_lower = team_name.lower()
-
-        if "admin" in team_name_lower:
-            return "role_cm_admin"
-        elif "manager" in team_name_lower:
-            return "role_cm_manager"
-        elif "field" in team_name_lower:
-            return "role_cm_field"
-        else:
-            return "role_basic"
+        return values   
 
     def _check_and_disable_campaign_combo(self):
         """Disable campaign combo if any relations exist."""

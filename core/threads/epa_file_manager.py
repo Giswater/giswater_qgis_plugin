@@ -131,14 +131,14 @@ class GwEpaFileManager(GwTask):
             if self.active_epa_layers:
                 # Load EPA layers before making them visible
                 self._load_epa_layers()
-                
+
                 # Activate EPA layers in TOC
                 project = QgsProject.instance()
-                
+
                 # Get EPA group from layer tree
-                root = project.layerTreeRoot() 
+                root = project.layerTreeRoot()
                 epa_group = root.findGroup('EPA')
-                
+
                 # Make EPA group and all child layers visible if group exists
                 if epa_group:
                     epa_group.setItemVisibilityChecked(True)
@@ -422,7 +422,7 @@ class GwEpaFileManager(GwTask):
 
     def _load_epa_layers(self):
         """ Load EPA layers if they are not already loaded """
-        
+
         # Get EPA layers from database
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
@@ -439,29 +439,29 @@ class GwEpaFileManager(GwTask):
             if field['context'] is not None:
                 context = json.loads(field['context'])
                 levels = context['levels']
-                
+
                 # Check if this is an EPA RESULTS layer
                 if len(levels) > 1 and levels[0] == 'EPA' and levels[1] == 'RESULTS':
                     tablename = field['tableName']
-                    
+
                     # Check if layer is not already loaded
                     if tablename not in layer_list:
                         layer_name = tablename
                         the_geom = field['geomField'] if field['geomField'] != "None" else None
                         geom_field = field['tableId']
-                        
+
                         if geom_field:
                             geom_field = geom_field.replace(" ", "")
                             group = levels[0]
                             sub_group = levels[1]
                             alias = field['layerName'] if field['layerName'] is not None else field['tableName']
-                            
+
                             # Add layer to TOC
                             style_id = "-1"
                             if lib_vars.project_vars['current_style'] is not None:
                                 style_id = lib_vars.project_vars['current_style']
-                            
-                            tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, 
+
+                            tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group,
                                                       style_id=style_id, alias=alias, force_create_group=True)
 
         return True
@@ -494,16 +494,45 @@ class GwEpaFileManager(GwTask):
             return status
 
     def _read_rpt_file(self, file_path: str = None):
+        """
+        Parse an EPANET/SWMM RPT text file and build a JSON-serializable row list string.
 
+        Behavior overview:
+        - Reads the RPT file line by line and tokenizes each line into columns `col1..colN`.
+        - Resolves a "target" table for each line using `config_fprocess.target` mappings for the current `fid`.
+        - Extracts a time string (HH:MM:SS) into a special `col40` when present.
+        - Produces `self.json_rpt` as a JSON array string with entries like:
+          {"target":"'<table>'", "col40":"'<HH:MM:SS>'", "col1":"<val>", ...}
+          Note: values that appear as "''" are converted to `null`.
+
+        Special handling:
+        - If the config variable `force_import_velocity_higher_50ms` is set, any literal ">50" is coerced to "50".
+          Otherwise, encountering ">50" aborts with an error (velocity must be numeric).
+        - Detects overlapped numeric columns (e.g., numbers containing two dots) and aborts with a guidance message,
+          unless the line is part of version/input headers.
+        - Attempts to split tokens that contain a minus sign glued to numbers (e.g., "123-45") into separate pieces.
+
+        Side effects:
+        - Sets `self.json_rpt` with the built JSON array string (consumed by `_exec_import_function`).
+        - Sets `self.error_msg` and `self.error_msg_params` on failure.
+        - Advances progress via `self.setProgress` and respects cancellation with `self.isCanceled`.
+
+        Returns:
+        - True on success, False if parsing is cancelled or an unrecoverable format error is detected.
+        """
+
+        # Read normalization flag: optionally coerce literal ">50" velocities to numeric "50"
         replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
         replace = tools_os.set_boolean(replace, default=False)
 
+        # Open file and load all lines (we keep the file handle to close it later)
         self.file_rpt = open(file_path, "r+", errors='replace')
         full_file = self.file_rpt.readlines()
         progress = 0
 
-        # Create dict with sources
-        sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid};"
+        # Build a map of tokens -> target table using `config_fprocess.target` for this process (`fid`)
+        # The `target` column is stored like a JSON-ish list of strings. We flatten it here into a dict.
+        sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid} ORDER BY orderby;"
         rows = tools_db.get_rows(sql)
         sources = {}
         for row in rows:
@@ -512,7 +541,7 @@ class GwEpaFileManager(GwTask):
             for i in item:
                 sources[i.strip()] = row[0].strip()
 
-        # While we don't find a match with the target, target and col40 must be null
+        # Initialize default fields. Until we match a source token, `target` and `col40` remain "null".
         target = "null"
         col40 = "null"
         json_rpt = ""
@@ -521,22 +550,25 @@ class GwEpaFileManager(GwTask):
 
         for line_number, row in enumerate(full_file):
 
+            # Abort gracefully if the task is cancelled
             if self.isCanceled():
                 self._close_file()
                 del full_file
                 return False
 
             progress += 1
+            # Skip comments/separators commonly used in EPANET/SWMM reports
             if '**' in row or '--' in row:
                 continue
 
+            # Normalize velocity literal if allowed by config; otherwise it will be treated as an error later
             if replace and '>50' in row:
                 row = row.replace('>50', '50')
 
             row = row.rstrip()
             dirty_list = row.split(' ')
 
-            # Clean unused items
+            # Compact multiple spaces into a clean list of tokens
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '':
                     dirty_list.pop(x)
@@ -544,6 +576,7 @@ class GwEpaFileManager(GwTask):
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
+                    # Split tokens that look like numbers glued with minus signs (e.g., "123-45...")
                     if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
@@ -556,6 +589,7 @@ class GwEpaFileManager(GwTask):
                         json_elem = dirty_list[x][last_index:i]
                         sp_n.append(json_elem)
 
+                    # Detect overlapped numeric columns (two dots in the same token), which indicates broken alignment
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
                             msg = "Error near line {0} -> {1}"
@@ -571,6 +605,7 @@ class GwEpaFileManager(GwTask):
                             self._close_file()
                             del full_file
                             return False
+                    # Velocity reported as ">50" is invalid unless normalization is enabled above
                     elif bool(re.search('>50', str(dirty_list[x]))):
                         msg = "Error near line {0} -> {1}"
                         msg_params = (line_number + 1, dirty_list,)
@@ -589,13 +624,13 @@ class GwEpaFileManager(GwTask):
                     else:
                         sp_n.append(dirty_list[x])
 
-            # Find strings into dict and set target column
+            # Try to resolve the `target` table from the first tokens of the line
             for k, v in sources.items():
                 try:
                     if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
                         target = "'" + v + "'"
                         _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
-                        if _time.search(sp_n[3]):
+                        if len(sp_n) > 3 and _time.search(sp_n[3]):
                             col40 = "'" + sp_n[3] + "'"
                 except IndexError:
                     pass
@@ -603,6 +638,7 @@ class GwEpaFileManager(GwTask):
                     tools_log.log_info(type(e).__name__)
 
             if len(sp_n) > 0:
+                # Assemble a JSON object string for this line: target/col40 + dynamic col1..colN
                 json_elem = f'"target": "{target}", "col40": "{col40}", '
                 for x in range(0, len(sp_n)):
                     json_elem += f'"col{x + 1}":'
@@ -616,11 +652,12 @@ class GwEpaFileManager(GwTask):
                 json_elem = '{' + str(json_elem[:-2]) + '}, '
                 json_rpt += json_elem
 
-            # Update progress bar
+            # Update progress bar every ~1000 lines
             if progress % 1000 == 0:
                 self.setProgress((line_number * 100) / row_count)
 
         # Manage JSON
+        # Finalize the JSON array string (strip the trailing comma+space added during the loop)
         json_rpt = '[' + str(json_rpt[:-2]) + ']'
         self.json_rpt = json_rpt
 

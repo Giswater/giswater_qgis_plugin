@@ -166,13 +166,13 @@ class GwI18NGenerator:
         if type_db_file_translated:
             for type_db_file in type_db_file_translated:
                 msg += f'''{tools_qt.tr('Schemas translated:')} {type_db_file}\n'''
-                if error_langs['db']:
+                if error_langs['db'] and type_db_file in error_langs['db'] and error_langs['db'][type_db_file]:
                     text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in error_langs['db'][type_db_file].items())
                     msg += f'''\t{tools_qt.tr('Database translation failed:')}{text}\n'''
-                if canceled_langs['db']:
+                if canceled_langs['db'] and type_db_file in canceled_langs['db'] and canceled_langs['db'][type_db_file]:
                     text = '\n'.join(f"\t\t{lang}: {', '.join(msg)}" for lang, msg in canceled_langs['db'][type_db_file].items())
                     msg += f'''\t{tools_qt.tr('Database translation canceled:')}{text}\n'''
-                if translated_langs['db']:
+                if translated_langs['db'] and type_db_file in translated_langs['db'] and translated_langs['db'][type_db_file]:
                     msg += f'''\t{tools_qt.tr('Database translation successful:')} {", ".join(translated_langs['db'])}\n'''
 
         if msg != '':
@@ -403,11 +403,7 @@ class GwI18NGenerator:
         self._write_header(cfg_path + file_name, file_type)
         dbtables = self.path_dic[file_type]['tables']
         if self.language == 'no_TR':
-            if file_type not in ['i18n_ws', 'i18n_ud']:
-                return True, f"{file_type}, not translated"
-            dbtables = ['dbconfig_form_fields', 'dbconfig_param_system', 'dbconfig_typevalue',
-                              'dbconfig_form_tableview', 'dbconfig_form_fields_feat']
-            self.lower_lang = 'en_us'
+            return True, f"{file_type}, not translated"
         for dbtable in dbtables:
             result = self._get_table_values(dbtable)
             
@@ -655,7 +651,11 @@ class GwI18NGenerator:
                     file.write(f"UPDATE {context} AS t\nSET idval = v.idval, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, typevalue, idval, descript)\nWHERE t.id = v.id AND t.typevalue = v.typevalue;\n\n")
 
                 elif "dbtable" in table:
-                    values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
+                    values_str = ""
+                    if file_type == "cm":
+                        values_str = ",\n    ".join([f"('%_{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data if row['source'] != '0'])
+                    else:
+                        values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data if row])
                     file.write(f"UPDATE {context} AS t\nSET alias = v.alias, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, alias, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "su_basic_tables" in table:
@@ -994,7 +994,7 @@ class GwI18NGenerator:
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
                 "tables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
+                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbconfig_form_tableview", "dbfprocess"]
             }
         }
 

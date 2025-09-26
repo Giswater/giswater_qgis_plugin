@@ -278,7 +278,6 @@ class GwFeatureReplaceButton(GwMaptool):
                f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        rows.insert(0, ['', ''])
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
         tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 

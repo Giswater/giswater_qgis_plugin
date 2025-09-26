@@ -13,7 +13,7 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal, Dict, Optional, Any, Callable, Union
+from typing import Literal, Dict, Optional, Union
 import webbrowser
 import xml.etree.ElementTree as ET
 from sip import isdeleted
@@ -25,13 +25,13 @@ from functools import partial
 from datetime import datetime
 
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp, \
-    QItemSelectionModel
+    QItemSelectionModel, QTimer
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QActionGroup
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -44,11 +44,12 @@ from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
-from ..utils.select_manager import GwSelectManager, GwPolygonSelectManager, GwCircleSelectManager, GwFreehandSelectManager
+from ..utils.select_manager import GwSelectManager
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 from .selection_mode import GwSelectionMode
+from .select_manager import GwSelectionType
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
@@ -334,20 +335,9 @@ def open_help_link(context, uiname, dlg=None):
         domain = domain[0]
 
     language = "es_CR"  # TODO: get dynamic language when documentation is ready
-    plugin_version, _ = tools_qgis.get_plugin_version()
-
-    # plugin_version is {major}.{minor}.{patch}
-    # transform to major.minor
-    if plugin_version:
-        parts = plugin_version.split('.')
-        if len(parts) >= 2:
-            plugin_version = f"{parts[0]}.{parts[1]}"
-        else:
-            plugin_version = "latest"
-    else:
-        plugin_version = "latest"
-
-    base_url = f"{domain}/{plugin_version}/{language}/docs/giswater/for-users"
+    
+    # Always use 'latest' to avoid errors when plugin version is diferent than docs
+    base_url = f"{domain}/latest/{language}/docs/giswater/for-users"
 
     uiname = uiname.replace("_", "-").replace(" ", "-").lower() + ".html"  # sanitize uiname
 
@@ -871,6 +861,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if the_geom is not None and the_geom != 'None':
         layer.setCrs(QgsCoordinateReferenceSystem(auth_id))
+    if layer.crs().isValid() is False:
+        layer.setCrs(QgsCoordinateReferenceSystem(f"EPSG:{auth_id}"))
 
     if extent is not None:
         layer.setExtent(extent)
@@ -3528,18 +3520,45 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     if class_object.rel_feature_type in ('all', None):
         class_object.rel_feature_type = 'arc'
 
+    # Campaign-only: when multiple relation tabs are enabled, select across all enabled types
+    try:
+        if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+            types_all = ["arc", "node", "connec", "link"]
+            try:
+                if getattr(class_object, 'project_type', '').lower() == 'ud':
+                    types_all.append("gully")
+            except Exception:
+                pass
+
+            enabled_types = []
+            tab_feature = getattr(dialog, 'tab_feature', None)
+            for ft in types_all:
+                tab = getattr(dialog, f"tab_{ft}", None)
+                if tab_feature is None or tab is None:
+                    continue
+                idx = tab_feature.indexOf(tab)
+                if idx != -1 and tab_feature.isTabEnabled(idx):
+                    enabled_types.append(ft)
+
+            if len(enabled_types) > 1:
+                class_object.rel_feature_type = 'all'
+                class_object.multi_enabled_types = enabled_types
+    except Exception:
+        pass
+
     # Choose selection tool based on tool_type
-    if tool_type == "polygon":
-        select_manager = GwPolygonSelectManager(class_object, table_object, dialog, selection_mode)
-    elif tool_type == "circle":
-        select_manager = GwCircleSelectManager(class_object, table_object, dialog, selection_mode)
-    elif tool_type == "freehand":
-        select_manager = GwFreehandSelectManager(class_object, table_object, dialog, selection_mode)
-    else:
-        select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode)
+    try:
+        selection_type_enum = GwSelectionType(tool_type)
+    except ValueError:
+        selection_type_enum = GwSelectionType.DEFAULT
+
+    select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode, selection_type=selection_type_enum)
 
     global_vars.canvas.setMapTool(select_manager)
-    cursor = get_cursor_multiple_selection()
+    if selection_type_enum == GwSelectionType.POINT:
+        cursor = QCursor(Qt.CrossCursor)
+    else:
+        cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 
@@ -3571,77 +3590,6 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
         deactivation_function()
 
 
-def activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type):
-    """ Selection snapping """
-    add_icon(dialog.btn_snapping, "137")
-    dialog.btn_snapping.clicked.connect(
-        partial(selection_init, class_object, dialog, table_object, selection_mode, tool_type))
-    selection_init(class_object, dialog, table_object, selection_mode, tool_type)
-
-
-def update_default_action(dialog, action):
-    dialog.btn_snapping.setDefaultAction(action)
-
-
-def menu_btn_snapping(class_object: Any, dialog: QDialog, table_object: str, selection_mode=GwSelectionMode.DEFAULT,
-                      callback: Union[Callable[[], bool], None] = None, callback_kwargs: Union[dict[str, Any], None] = None,
-                      callback_later: Callable = None, callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
-    """Create snapping button with menu (split button behavior)"""
-
-    def handle_action(tool_type):
-        if callback and callback() is False:
-            return
-        activate_selection_mode(class_object, dialog, table_object, selection_mode, tool_type)
-        if callback_later:
-            callback_later()
-
-    # Action group to keep exclusivity
-    tools = [("rectangle", "137.png"), ("polygon", "180.svg"), ("freehand", "182.svg"), ("circle", "181.svg")]
-    ag = QActionGroup(dialog)
-
-    # Action 1
-    for tool_type, icon_path in tools:
-        icon_path = os.path.join(lib_vars.plugin_dir, "icons", "dialogs", icon_path)
-        action = QAction(QIcon(icon_path), tool_type, dialog)
-        action.setProperty('has_icon', True)
-        action.triggered.connect(partial(handle_action, tool_type))
-        ag.addAction(action)
-
-    # Menu with both actions
-    menu = QMenu(dialog)
-    menu.addActions(ag.actions())
-
-    # Create a QToolButton that behaves like a split button
-    dialog.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)  # left = default, arrow = menu
-    dialog.btn_snapping.setMenu(menu)
-
-    # Set initial default action
-    dialog.btn_snapping.setDefaultAction(ag.actions()[0])
-
-    menu.triggered.connect(partial(update_default_action, dialog))
-
-    # parent_tab = find_parent_tab(dialog.btn_snapping)
-
-    # expected_table_name = get_expected_table_name(class_object, table_object, selection_mode)
-
-    # widget_table = tools_qt.get_widget(dialog, expected_table_name)
-    # parent_tab_table = find_parent_tab(widget_table)
-
-    # if callback_values and parent_tab_table:
-    #     parent_tab_table.currentChanged.connect(partial(highlight_in_table_changed, callback_values))
-    # if parent_tab:
-    #     parent_tab.currentChanged.connect(partial(highlight_in_tab_changed, class_object, dialog, expected_table_name, parent_tab))
-
-
-def highlight_in_tab_changed(class_object, dialog, expected_table_name, parent_tab):
-    widget = parent_tab.widget(parent_tab.currentIndex())
-    if widget.objectName() in ("tab_relations", "tab_features"):
-        highlight_features_in_table(class_object, dialog, expected_table_name)
-    else:
-        tools_qgis.refresh_map_canvas()
-        reset_rubberband(class_object.rubber_band)
-
-
 def get_expected_table_name(class_object, table_object, selection_mode):
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
@@ -3651,11 +3599,6 @@ def get_expected_table_name(class_object, table_object, selection_mode):
         expected_table_name = f"tbl_{table_object}_x_{class_object.rel_feature_type}"
 
     return expected_table_name
-
-
-def highlight_in_table_changed(callback_values: Union[Callable[[], tuple[Any, Any, Any]], None] = None):
-    class_object, dialog, expected_table_name = callback_values()
-    highlight_features_in_table(class_object, dialog, expected_table_name)
 
 
 def find_parent_tab(widget):
@@ -3703,42 +3646,38 @@ def _filter_ids_by_context(class_object, selection_mode: GwSelectionMode, featur
     return ids
 
 
-def highlight_features_in_table(class_object, dialog, expected_table_name):
-    """Selects all features on the map that are currently listed in the given table widget."""
+def _campaign_multi_tab_shortcut(class_object, dialog, table_object, selection_mode) -> bool:
+    """Return True if handled Campaign multi-tab insert directly here.
 
-    # Refresh map canvas
-    tools_qgis.refresh_map_canvas()
-    reset_rubberband(class_object.rubber_band)
+    This isolates the Campaign multi-tab early-exit logic to keep
+    selection_changed below simpler for flake8 C901.
+    """
+    if selection_mode not in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+        return False
 
-    # Get main variables
-    widget_table = tools_qt.get_widget(dialog, expected_table_name)
-    feature_type = class_object.rel_feature_type or expected_table_name.split('_')[-1]
+    try:
+        multi_enabled = 0
+        tab_feature = getattr(dialog, 'tab_feature', None)
+        for ft in ("arc", "node", "connec", "link", "gully"):
+            tab = getattr(dialog, f"tab_{ft}", None)
+            if tab_feature and tab is not None:
+                idx = tab_feature.indexOf(tab)
+                if idx != -1 and tab_feature.isTabEnabled(idx):
+                    multi_enabled += 1
+        if multi_enabled < 2:
+            return False
 
-    # Check if table is valid
-    if not widget_table or not widget_table.model() or not feature_type:
-        return
+        if getattr(class_object, '_pending_multi_insert', False):
+            return True
 
-    model = widget_table.model()
-    if not model or model.rowCount() == 0:
-        remove_selection(layers=class_object.rel_layers)
-        return
-
-    id_column_name = f"{feature_type}_id"
-    id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
-    if id_column_index == -1:
-        return
-
-    ids_to_select = [str(model.index(row, id_column_index).data()) for row in range(model.rowCount())]
-
-    if not ids_to_select:
-        remove_selection(layers=class_object.rel_layers)
-        return
-
-    expr_filter = QgsExpression(f"{id_column_name} IN ({','.join(f'{i}' for i in ids_to_select)})")
-    tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
-
-    # Activate rubberband function
-    tools_qgis.highlight_features_selected_in_table(class_object, dialog, expected_table_name, feature_type)
+        try:
+            class_object._pending_multi_insert = True
+            QTimer.singleShot(0, partial(_campaign_multi_insert_processing, class_object, dialog, table_object, selection_mode))
+        except Exception:
+            _campaign_multi_insert_processing(class_object, dialog, table_object, selection_mode)
+        return True
+    except Exception:
+        return False
 
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
@@ -3748,6 +3687,10 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         tools_qgis.disconnect_signal_selection_changed()
 
     field_id = f"{class_object.rel_feature_type}_id"
+
+    # Campaign-only early path extracted for readability
+    if _campaign_multi_tab_shortcut(class_object, dialog, table_object, selection_mode):
+        return
 
     if selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
         expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
@@ -3880,8 +3823,149 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
                 index = model.index(row, column_index)
                 selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
-    if class_object.callback_later_selection:
+    # Safely check and call callback if it exists
+    if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
         class_object.callback_later_selection()
+
+    # Safely check highlight method
+    if hasattr(class_object, 'highlight_method_active') and class_object.highlight_method_active:
+        class_object.highlight_features_method(class_object, dialog, table_object)
+
+
+def _get_enabled_types(dialog) -> list:
+    enabled = []
+    tab_feature = getattr(dialog, 'tab_feature', None)
+    for ft in ("arc", "node", "connec", "link", "gully"):
+        tab = getattr(dialog, f"tab_{ft}", None)
+        if tab_feature and tab is not None:
+            idx = tab_feature.indexOf(tab)
+            if idx != -1 and tab_feature.isTabEnabled(idx):
+                enabled.append(ft)
+    return enabled
+
+
+def _collect_ids_to_insert(class_object, dialog, table_object, selection_mode, enabled_types) -> dict:
+    per_type = {}
+    for ft in enabled_types:
+        field = f"{ft}_id"
+        table_ids = []
+        try:
+            widget = tools_qt.get_widget(dialog, f"tbl_{table_object}_x_{ft}")
+            model = widget.model() if widget and hasattr(widget, 'model') else None
+            if model:
+                table_ids = [str(get_model_index(model, row, field)) for row in range(model.rowCount())]
+        except Exception:
+            table_ids = []
+
+        selected = []
+        for layer in (class_object.rel_layers or {}).get(ft, []) or []:
+            if layer and layer.selectedFeatureCount() > 0:
+                for feature in layer.selectedFeatures():
+                    sid = str(feature.attribute(field))
+                    if sid and sid not in selected:
+                        selected.append(sid)
+        if not selected:
+            continue
+        try:
+            selected = _filter_ids_by_context(class_object, selection_mode, ft, selected)
+        except Exception:
+            pass
+
+        to_insert = [sid for sid in selected if sid and (sid not in table_ids)]
+        if to_insert:
+            per_type[ft] = to_insert
+    return per_type
+
+
+def _highlight_map_for_inserts(class_object, per_type_ids):
+    try:
+        remove_selection(layers=class_object.rel_layers)
+        for ft, ids_list in per_type_ids.items():
+            if not ids_list:
+                continue
+            id_col = f"{ft}_id"
+            expr = QgsExpression(f"{id_col} IN ({','.join(str(i) for i in ids_list)})")
+            tools_qgis.select_features_by_ids(ft, expr, class_object.rel_layers)
+    except Exception:
+        pass
+
+
+def _confirm_multi_insert(per_type_ids) -> bool:
+    try:
+        lines = []
+        for ft, ids_list in per_type_ids.items():
+            preview = ", ".join(ids_list[:10])
+            if len(ids_list) > 10:
+                preview += ", ..."
+            lines.append(f"{ft}: {len(ids_list)} [{preview}]")
+        msg = "Do you want to insert the selected features?\n{0}"
+        return bool(tools_qt.show_question(msg, msg_params=("\n".join(lines),)))
+    except Exception:
+        return True
+
+
+def _select_rows_in_tables(dialog, ft, ids_list):
+    try:
+        qtable = tools_qt.get_widget(dialog, f"tbl_campaign_x_{ft}")
+        if qtable and qtable.model() and qtable.selectionModel():
+            id_col_name = f"{ft}_id"
+            if hasattr(qtable.model(), 'fieldIndex'):
+                id_col_idx = qtable.model().fieldIndex(id_col_name)
+            else:
+                id_col_idx = -1
+                for c in range(qtable.model().columnCount()):
+                    if qtable.model().headerData(c, Qt.Horizontal) == id_col_name:
+                        id_col_idx = c
+                        break
+            if id_col_idx != -1:
+                sel_model = qtable.selectionModel()
+                sel_model.clearSelection()
+                ids_set = set(map(str, ids_list))
+                for row in range(qtable.model().rowCount()):
+                    val = str(qtable.model().index(row, id_col_idx).data())
+                    if val in ids_set:
+                        index = qtable.model().index(row, id_col_idx)
+                        sel_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+    except Exception:
+        pass
+
+
+def _campaign_multi_insert_processing(class_object, dialog, table_object, selection_mode):
+    """Process Campaign multi-tab insert using existing helpers; split into small steps."""
+    try:
+        # Clear pending flag now that we are running
+        try:
+            if getattr(class_object, '_pending_multi_insert', False):
+                class_object._pending_multi_insert = False
+        except Exception:
+            pass
+
+        enabled_types = _get_enabled_types(dialog)
+        per_type = _collect_ids_to_insert(class_object, dialog, table_object, selection_mode, enabled_types)
+        if not per_type:
+            remove_selection(layers=class_object.rel_layers)
+            return
+
+        _highlight_map_for_inserts(class_object, per_type)
+        if not _confirm_multi_insert(per_type):
+            remove_selection(layers=class_object.rel_layers)
+            return
+
+        for ft, ids_list in per_type.items():
+            _insert_feature_campaign(dialog, ft, class_object.campaign_id, ids=ids_list)
+            load_tableview_campaign(dialog, ft, class_object.campaign_id, class_object.rel_layers)
+            _select_rows_in_tables(dialog, ft, ids_list)
+
+        if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
+            try:
+                class_object.callback_later_selection()
+            except Exception:
+                pass
+    except Exception:
+        try:
+            remove_selection(layers=class_object.rel_layers)
+        except Exception:
+            pass
 
 
 def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
@@ -4769,7 +4853,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
                 else:
                     state = model.item(selected_list[0].row(), col_index).text()
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
-        load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
+        load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.rel_layers)
 
     elif selection_mode == GwSelectionMode.LOT:
         state = None
@@ -4975,11 +5059,22 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         result = execute_procedure("gw_fct_set_toggle_current", body)
         global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
 
+        # Set selectors
+        extras = f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":"{psector_id}", "isAlone":"False", "value":"True", "addSchema":"NULL"'
+        body = create_body(extras=extras)
+        result = execute_procedure("gw_fct_setselectors", body)
+
+        # Refresh selectors
+        extras = '"selectorType":"selector_basic", "filterText":""'
+        body = create_body(extras=extras)
+        result = execute_procedure("gw_fct_getselectors", body)
+
         kwargs = {
             "dialog": "__self__.dlg_psector_mng",
             "result": result
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
+        refresh_selectors()
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
@@ -5020,7 +5115,7 @@ def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
     disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
     tools_qt.fill_combo_values(cmb_psector_id, rows)
     if psector_id is not None:
-        tools_qt.set_combo_value(cmb_psector_id, psector_id, 0)
+        tools_qt.set_combo_value(cmb_psector_id, psector_id, 0, add_new=False)
     connect_signal(cmb_psector_id.currentIndexChanged, partial(manage_psector_change, cmb_psector_id),
                    "psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change"
     )
@@ -5551,12 +5646,14 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
             )
             toggled = True
 
-        for feature_id in ids or []:
+        if ids:
+            # Batch insert for better performance with large numbers of features
+            ids_list = "', '".join(str(id) for id in ids)
             sql = f"""
                 INSERT INTO {tablename} ({insert_cols})
                 SELECT {select_cols}
                 {from_clause}
-                WHERE p.{feature_type}_id = {feature_id}
+                WHERE p.{feature_type}_id IN ('{ids_list}')
                 ON CONFLICT DO NOTHING;
             """
             tools_db.execute_sql(sql)
@@ -5608,36 +5705,77 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
 
 
 def get_cm_user_role():
-    """Get user role from the cm database schema, if it exists."""
+    """Get user's CM role only when user and DB have CM access.
 
-    # First, check if the 'cm' schema exists to avoid errors on projects without it.
+    - Skip entirely if schema doesn't exist or user lacks USAGE on it.
+    - Avoid UI error popups by using is_admin=True on low-level queries.
+    - Prefer role-membership short-circuit to avoid touching CM tables when unnecessary.
+    """
+
+    # Check schema exists
     if not tools_db.check_schema('cm'):
         return None
 
-    # Try with username first, fallback to loginname if it fails
-    try:
-        sql = f"""
-            SELECT t.role_id
-            FROM cm.cat_user AS u
-            JOIN cm.cat_team AS t ON u.team_id = t.team_id
-            WHERE u.username = '{tools_db.get_current_user()}'
+    # Check current_user can use CM schema
+    has_usage = tools_db.get_row(
+        "SELECT has_schema_privilege(current_user, 'cm', 'USAGE')",
+        is_admin=True,
+    )
+    if not has_usage or not has_usage[0]:
+        return None
+
+    # If user has no CM-related roles, skip table queries
+    cm_roles = tools_db.get_row(
         """
-        result = tools_db.get_row(sql)
-        return result if result else None
-    except Exception:
-        # If username fails, try with loginname
-        try:
-            sql = f"""
-                SELECT t.role_id
-                FROM cm.cat_user AS u
-                JOIN cm.cat_team AS t ON u.team_id = t.team_id
-                WHERE u.loginname = '{tools_db.get_current_user()}'
-            """
-            result = tools_db.get_row(sql)
-            return result if result else None
-        except Exception:
-            # If both queries fail, return None safely
-            return None
+        SELECT EXISTS (
+            SELECT 1
+            FROM pg_auth_members am
+            JOIN pg_roles r_user ON am.member = r_user.oid
+            JOIN pg_roles r_role ON am.roleid = r_role.oid
+            WHERE r_user.rolname = current_user
+              AND r_role.rolname ILIKE 'role_cm%%'
+        )
+        """,
+        is_admin=True,
+    )
+    if not cm_roles or not cm_roles[0]:
+        return None
+
+    # Ensure SELECT on the two CM tables before querying
+    can_sel_user = tools_db.get_row(
+        "SELECT has_table_privilege(current_user, 'cm.cat_user', 'SELECT')",
+        is_admin=True,
+    )
+    can_sel_team = tools_db.get_row(
+        "SELECT has_table_privilege(current_user, 'cm.cat_team', 'SELECT')",
+        is_admin=True,
+    )
+    if not can_sel_user or not can_sel_user[0] or not can_sel_team or not can_sel_team[0]:
+        return None
+
+    # Try with username first, fallback to loginname; suppress popups
+    sql = (
+        f"""
+        SELECT t.role_id
+        FROM cm.cat_user AS u
+        JOIN cm.cat_team AS t ON u.team_id = t.team_id
+        WHERE u.username = '{tools_db.get_current_user()}'
+        """
+    )
+    result = tools_db.get_row(sql, is_admin=True)
+    if result:
+        return result
+
+    sql = (
+        f"""
+        SELECT t.role_id
+        FROM cm.cat_user AS u
+        JOIN cm.cat_team AS t ON u.team_id = t.team_id
+        WHERE u.loginname = '{tools_db.get_current_user()}'
+        """
+    )
+    result = tools_db.get_row(sql, is_admin=True)
+    return result if result else None
 
 
 def get_ids_from_qtable(qtable, id_column):
@@ -5681,25 +5819,26 @@ def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
         tools_qgis.show_warning(msg)
         return
 
-    # Special handling for arcs to include node_1 and node_2
-    if feature_type == 'arc':
-        for feature_id in ids or []:
+    if ids:
+        # Special handling for arcs to include node_1 and node_2
+        if feature_type == 'arc':
+            ids_list = "', '".join(str(id) for id in ids)
             sql = f"""
                 INSERT INTO {tablename} (lot_id, arc_id, status, code, node_1, node_2)
-                SELECT {lot_id}, {feature_id}, 1, code, node_1, node_2
+                SELECT {lot_id}, arc_id, 1, code, node_1, node_2
                 FROM {lib_vars.schema_name}.arc
-                WHERE arc_id = {feature_id}
+                WHERE arc_id IN ('{ids_list}')
                 ON CONFLICT DO NOTHING;
             """
             tools_db.execute_sql(sql)
-    else:
-        # Standard insertion for other feature types
-        for feature_id in ids or []:
+        else:
+            # Standard insertion for other feature types
+            ids_list = "', '".join(str(id) for id in ids)
             sql = f"""
                 INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
-                SELECT {lot_id}, {feature_id}, 1, code
+                SELECT {lot_id}, {feature_type}_id, 1, code
                 FROM {lib_vars.schema_name}.{feature_type}
-                WHERE {feature_type}_id = {feature_id}
+                WHERE {feature_type}_id IN ('{ids_list}')
                 ON CONFLICT DO NOTHING;
             """
             tools_db.execute_sql(sql)

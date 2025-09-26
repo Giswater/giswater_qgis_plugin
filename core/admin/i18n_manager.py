@@ -37,6 +37,8 @@ class GwSchemaI18NManager:
         self.conflict_project_type = []
         self.schema_i18n = "i18n"
         self.delete_old_keys = False
+        self.schemas = []
+        self.all_schemas_org = []
 
     def init_dialog(self):
         """ Constructor """
@@ -221,6 +223,7 @@ class GwSchemaI18NManager:
     def _update_i18n_datbase(self):
         """ Determine which part of the database update (ws, ud, am, pyhton...) """
         self.project_types = []
+        self.schemas = []
 
         if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_dialogs):
             self.project_types.extend(["ws", "ud"])
@@ -234,12 +237,18 @@ class GwSchemaI18NManager:
 
         if self.project_types:
             self._update_db_tables()
+            self.schemas.extend(self.all_schemas_org)
 
         if self.py_messages:
             self._update_py_messages()
+            self.schemas.append("Python")
 
         if self.py_dialogs:
             self._update_py_dialogs()
+            self.schemas.append("Dialogs")
+
+        if self.schemas:
+            self._update_cat_version()
 
         msg = "Process completed"
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -264,6 +273,9 @@ class GwSchemaI18NManager:
             self.schema_org = self.project_type
             if self.project_type not in ["am", "cm"]:
                 self.schema_org = f"{self.project_type}{major_version}_trans"
+
+            if self.schema_org not in self.all_schemas_org:
+                self.all_schemas_org.append(self.schema_org)
 
             # Check if the schema exists
             schema_exists = self._detect_schema(self.schema_org)
@@ -368,6 +380,8 @@ class GwSchemaI18NManager:
 
         # Get the primary keys
         pk_columns = [col for col in columns_i18n if not col.endswith("_en_us")]
+        if "su_feature" in table_i18n:
+            pk_columns.append("lb_en_us")
         pk_columns_str = ", ".join(pk_columns)
 
         # Insert the rows
@@ -390,6 +404,8 @@ class GwSchemaI18NManager:
                 update_values_str = ", ".join(update_values)
                 query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str})
                                 ON CONFLICT ({pk_columns_str}) DO UPDATE SET {update_values_str};\n"""
+                if "su_feature" in table_i18n:
+                    print(query_insert)
         return query_insert
 
 
@@ -461,13 +477,12 @@ class GwSchemaI18NManager:
 
         # Update the su_basic_tables table (It has a different format, more than one table_org)
         elif 'su_basic_tables' in table_i18n:
-            columns_i18n = ["source", "na_en_us", "ob_en_us"]
+            columns_i18n = ["source", "na_en_us"]
             columns_org = ["id", "name"]
             if table_org == "value_state" and self.project_type in ["ud", "ws"]:
+                columns_i18n.append("ob_en_us")
                 columns_org = ["id", "name", "observ"]
-            elif table_org == "sys_label":
-                columns_org = ["id", "idval"]
-            elif self.project_type == "am":
+            elif table_org == "sys_label" or self.project_type == "am":
                 columns_org = ["id", "idval"]
 
         elif 'su_feature' in table_i18n:
@@ -518,6 +533,9 @@ class GwSchemaI18NManager:
                         clean_row[col_name] = ''
                     if col_name == "project_type" and ((value == "utils" and self.project_type in ['ws', 'ud']) or value == None):
                         clean_row[col_name] = self.project_type
+                    if self.project_type == "cm" and col_name == "source" and table_i18n == "dbtable":
+                        values = value.split("_")
+                        clean_row[col_name] = values[-2] + "_" + values[-1]
                 cleaned_i18n.append(clean_row)
             rows_i18n = cleaned_i18n
 
@@ -534,6 +552,9 @@ class GwSchemaI18NManager:
                     value = clean_row.get(col, '')
                     if value is None:
                         clean_row[col] = ''
+                    if self.project_type == "cm" and col == "id" and table_org == "sys_table":
+                        values = value.split("_")
+                        clean_row[col] = values[-2] + "_" + values[-1]
                 cleaned_org.append(clean_row)
             rows_org = cleaned_org
 
@@ -567,8 +588,6 @@ class GwSchemaI18NManager:
     def _json_update(self, table_i18n, table_org):
         """ Update the table with the json format """
 
-        print('aaaaaaaaaa')
-
         if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
             self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "lb_en_us"]
             pk_column_org =["formname", "formtype", "tabname", "columnname"]
@@ -578,12 +597,8 @@ class GwSchemaI18NManager:
             pk_column_org = ["id"]
             pk_column_i18n = ["source"]
 
-        print('bbbbbbbbbb')
-
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
         self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
-
-        print('ccccccccccc')
 
         # Set the column to update in the table_org (filterparam, inputparams, widgetcontrols)
         column = ""
@@ -603,7 +618,6 @@ class GwSchemaI18NManager:
         where_clause = " OR ".join(where_conditions) if where_conditions else "TRUE"
 
         query = f"""SELECT {', '.join(pk_column_org)}, {column} FROM {self.schema_org}.{table_org} WHERE {where_clause}"""
-        print(query)
         rows_org = self._get_rows(query, self.cursor_org)
 
         # Prepare batch insert
@@ -1444,8 +1458,62 @@ class GwSchemaI18NManager:
 
             return dialog_name, toolbar_name, source
 
-
     #endregion
+
+    # region cat_version
+    def _update_cat_version(self):
+        """ Update the cat_version table """
+        for schema in self.schemas:
+            print(schema[0:2].lower())
+            if schema[0:2].lower() in ["ws", "ud", "am", "cm"]:
+                table_org = f"{schema}.sys_version"
+                self._update_cat_version_table(table_org)
+            else:
+                self._update_cat_version_python(schema)
+
+    def _update_cat_version_table(self, table_org):
+        """ Update the cat_version table """
+        query = f"SELECT giswater, project_type FROM {table_org} ORDER BY id DESC LIMIT 1;"
+        self.cursor_org.execute(query)
+        rows = self.cursor_org.fetchall()
+        version = rows[0]['giswater']
+        schema = rows[0]['project_type']
+        
+        query = f"SELECT iterations FROM {self.schema_i18n}.cat_version WHERE project_type = '{schema}' AND version = '{version}' ORDER BY iterations DESC LIMIT 1;"
+        self.cursor_i18n.execute(query)
+        iteration = self.cursor_i18n.fetchone()
+        if not iteration:
+            query = f"INSERT INTO {self.schema_i18n}.cat_version (project_type, version, iterations, lastupdate) VALUES ('{schema}', '{version}', 1, now());"
+        else:
+            iteration = iteration[0] + 1
+            query = f"UPDATE {self.schema_i18n}.cat_version SET iterations = {iteration}, lastupdate = now() WHERE project_type = '{schema}' AND version = '{version}';"
+        
+        try:
+            self.cursor_i18n.execute(query)
+        except Exception as e:
+            tools_qt.manage_exception_db(e, query, pause_on_exception=True)
+        self.conn_i18n.commit()
+
+    def _update_cat_version_python(self, schema):
+        """ Update the cat_version table """
+        version = tools_qgis.get_plugin_version()[0]
+        query = f"SELECT iterations FROM {self.schema_i18n}.cat_version WHERE project_type = '{schema}' AND version = '{version}' ORDER BY iterations DESC LIMIT 1;"
+        self.cursor_i18n.execute(query)
+        iteration = self.cursor_i18n.fetchone()
+        if not iteration:
+            query = f"INSERT INTO {self.schema_i18n}.cat_version (project_type, version, iterations, lastupdate) VALUES ('{schema}', '{version}', 1, now());"
+        else:
+            iteration = iteration[0] + 1
+            query = f"UPDATE {self.schema_i18n}.cat_version SET iterations = {iteration}, lastupdate = now() WHERE project_type = '{schema}' AND version = '{version}';"
+
+        try:
+            self.cursor_i18n.execute(query)
+        except Exception as e:
+            tools_qt.manage_exception_db(e, query, pause_on_exception=True)
+        self.conn_i18n.commit()
+
+    # endregion
+    
     # region Global funcitons
 
     def _beautify_text(self, text):
@@ -1525,9 +1593,7 @@ class GwSchemaI18NManager:
             if self.project_type in ["am", "cm"]:
                 tables_org = ["sys_typevalue"]
             if self.project_type in ["ws", "ud"]:
-                tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue"]
-        elif "dbfprocess" in table_i18n and self.project_type == "cm":
-            tables_org = ["sys_fprocess_cm"]
+                tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue", "inp_typevalue"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbconfig_form_fields_json" in table_i18n or "dbconfig_form_fields_feat" in table_i18n:
@@ -1707,7 +1773,6 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1716,7 +1781,6 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_form_fields_json"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
@@ -1725,9 +1789,7 @@ class GwSchemaI18NManager:
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json", "dbfprocess",
-                             "dbtable", "dbconfig_form_tableview"],
-                "dbtables": ["dbconfig_param_system", "dbtypevalue", "dbconfig_form_fields_json"],
+                             "dbtypevalue", "dbfprocess", "dbtable", "dbconfig_form_tableview", "dbconfig_form_fields_json"],
                 "sutables": []
             },
         }
@@ -1856,4 +1918,6 @@ class GwSchemaI18NManager:
         message = "Date of creation"
         message = "Date of last update"
         message = "In schema"
-        message = "In schema"
+        message = "Dscenario manager"
+        message = "Hydrology scenario manager"
+        message = "DWF scenario manager"

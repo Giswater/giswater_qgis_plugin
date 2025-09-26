@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>430</width>
-    <height>460</height>
+    <height>497</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -397,6 +397,9 @@
             </item>
             <item row="0" column="1" colspan="2">
              <widget class="QLineEdit" name="feature_type">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string/>
               </property>

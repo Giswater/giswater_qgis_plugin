@@ -240,6 +240,18 @@ class GwArcFusionButton(GwMaptool):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_fusion.cmb_new_cat, rows)
         tools_qt.set_autocompleter(self.dlg_fusion.cmb_new_cat)
+        
+        sql = f"""
+            SELECT arccat_id::text 
+            FROM ve_arc 
+            WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}
+            GROUP BY arccat_id 
+            HAVING COUNT(*) = 2
+            LIMIT 1
+        """
+        row = tools_db.get_row(sql)
+        if row:
+            tools_qt.set_selected_item(self.dlg_fusion, self.dlg_fusion.cmb_new_cat, row[0])
 
         # Get linked arcs to the selected node
         sql = f"SELECT arc_id, arccat_id FROM ve_arc WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}"

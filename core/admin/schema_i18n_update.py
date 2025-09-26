@@ -18,9 +18,6 @@ from ..utils import tools_gw
 from ...libs import lib_vars, tools_qt, tools_db, tools_log, tools_qgis
 from ... import global_vars
 from PyQt5.QtWidgets import QApplication
-from qgis.PyQt.QtWidgets import QToolBar, QDockWidget, QTreeView, QWidget
-from qgis.PyQt.QtCore import Qt
-from qgis.core import QgsProject
 
 class GwSchemaI18NUpdate:
 
@@ -157,6 +154,7 @@ class GwSchemaI18NUpdate:
         # Initalize the language and the message (for errors,etc)
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
+        self.add_tab_data = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_add_tab_data)
 
         # Run the updater of db_files and look at the result
         status_cfg_msg, errors = self._copy_db_files()
@@ -338,12 +336,13 @@ class GwSchemaI18NUpdate:
         sql = ""
         if self.lower_lang == 'en_us':
             sql = (f"SELECT {', '.join(columns)} "
-               f"FROM {table} "
-               f"ORDER BY context")
+               f"FROM {table} ")
         else:
             sql = (f"SELECT {', '.join(columns)}, {', '.join(lang_columns)} "
-               f"FROM {table} "
-               f"ORDER BY context")
+               f"FROM {table} ")
+        if not self.add_tab_data and 'config_form_fields' in table:
+            sql += "WHERE tabname != 'tab_data' "
+        sql += "ORDER BY context;"
         rows = self._get_rows(sql, self.cursor_i18n)
 
         # Return the corresponding information
@@ -454,8 +453,12 @@ class GwSchemaI18NUpdate:
                                 f"WHERE objectname = '{row['source']}' AND columnname = '{row['columnname']}';\n")
 
                 elif 'dbtable' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
-                                f"WHERE id = '{row['source']}';\n")
+                    if self.project_type == "cm":
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
+                                    f"WHERE id = '%_{row['source']}';\n")
+                    else:
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
+                                    f"WHERE id = '{row['source']}';\n")
                     
                 elif 'dblabel' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
@@ -478,12 +481,12 @@ class GwSchemaI18NUpdate:
                     tools_db.dao.rollback()
 
     def _write_dbjson_values(self, rows):
-        closing = False
         values_by_context = {}
+        project_type = [self.project_type, "utils"] if self.project_type in ["ws", "ud"] else [self.project_type]
 
         updates = {}
         for row in rows:
-            if row['project_type'] not in self.path_dic[file_type]["project_type"]:
+            if row['project_type'] not in project_type:
                 continue
             text = json.dumps(row["text"]).replace("'", "''")
             # Set key depending on context
@@ -815,7 +818,8 @@ class GwSchemaI18NUpdate:
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                 ]
+                 ],
+                 "project_type": ["ws", "utils"]
                  #"dbtables": ["dbtable"]
             },
             "ud": {
@@ -823,14 +827,17 @@ class GwSchemaI18NUpdate:
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
                     "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
-                 ]
+                 ],
+                 "project_type": ["ud", "utils"]
             },
             "am": {
-                "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]
+                "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"],
+                "project_type": ["am"]
             },
             "cm": {
                 "dbtables": ["dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system",
-                             "dbtypevalue", "dbconfig_form_fields_json", "dbtable", "dbtypevalue", "dbfprocess"]
+                             "dbtypevalue", "dbtable", "dbconfig_form_tableview", "dbfprocess", "dbconfig_form_fields_json"],
+                "project_type": ["cm"]
             },
         }
 

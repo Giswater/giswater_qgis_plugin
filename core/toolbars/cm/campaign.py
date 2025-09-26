@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 from typing import Optional, List, Any, Dict, Union
 
-from qgis.PyQt.QtCore import QDate, QModelIndex
+from qgis.PyQt.QtCore import QDate, QModelIndex, QStringListModel
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, \
     QTableView, QToolBar, QActionGroup, QDialog
@@ -23,6 +23,17 @@ from ...utils.selection_widget import GwSelectionWidget
 
 class Campaign:
     """Handles campaign creation, management, and database operations"""
+    
+    # Constants for campaign types
+    CAMPAIGN_TYPE_REVIEW = 1
+    CAMPAIGN_TYPE_VISIT = 2
+    CAMPAIGN_TYPE_INVENTORY = 3
+    
+    # Valid feature types for campaigns
+    VALID_FEATURE_TYPES = ['arc', 'node', 'connec', 'gully', 'link']
+    
+    # Maximum results for typeahead
+    MAX_TYPEAHEAD_RESULTS = 100
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
         self.visitclass_combo: Optional[QComboBox] = None
@@ -48,16 +59,37 @@ class Campaign:
 
         self.manager_dialog = CampaignManagementUi(self)
         tools_gw.load_settings(self.manager_dialog)
+
+        # Privilege guard: quietly exit if user has no CM access
+        try:
+            if not tools_db.check_schema('cm'):
+                return
+            has_usage = tools_db.get_row(
+                "SELECT has_schema_privilege(current_user, 'cm', 'USAGE')",
+                is_admin=True,
+            )
+            if not has_usage or not has_usage[0]:
+                return
+        except Exception:
+            return
         self.load_campaigns_into_manager()
 
         self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
         self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
 
-        # Populate combo date type
-
-        rows = [['real_startdate', tools_qt.tr('Start date', 'cm')], ['real_enddate', tools_qt.tr('End date', 'cm')], ['startdate', tools_qt.tr('Planned start date', 'cm')],
-                ['enddate', tools_qt.tr('Planned end date', 'cm')]]
+        # Populate combo date type (planned dates first, then real dates)
+        rows = [
+            ['startdate', tools_qt.tr('Start date', 'cm')],
+            ['enddate', tools_qt.tr('End date', 'cm')],
+            ['real_startdate', tools_qt.tr('Real start date', 'cm')],
+            ['real_enddate', tools_qt.tr('Real end date', 'cm')]
+        ]
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
+        # Default to planned Start date
+        try:
+            self.manager_dialog.campaign_cmb_date_filter_type.setCurrentIndex(0)
+        except Exception:
+            pass
 
         # Fill combo values for campaign status (based on sys_typevalue table)
         sql = "SELECT id, idval FROM cm.sys_typevalue WHERE typevalue = 'campaign_status' ORDER BY id"
@@ -275,17 +307,6 @@ class Campaign:
 
         self._update_feature_completer(self.dialog)
 
-        self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                               self.dialog.tbl_campaign_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
-        self.dialog.tbl_campaign_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                self.dialog.tbl_campaign_x_node, "ve_node", "node_id", self.rubber_band, 10))
-        self.dialog.tbl_campaign_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                  self.dialog.tbl_campaign_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
-        self.dialog.tbl_campaign_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dialog.tbl_campaign_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
-        self.dialog.tbl_campaign_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dialog.tbl_campaign_x_link, "ve_link", "link_id", self.rubber_band, 10))
-
         for table_name in [
             "tbl_campaign_x_arc",
             "tbl_campaign_x_node",
@@ -299,6 +320,26 @@ class Campaign:
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
+        # Wire selectionChanged
+        try:
+            if hasattr(self.dialog, 'tbl_campaign_x_arc') and self.dialog.tbl_campaign_x_arc.selectionModel():
+                self.dialog.tbl_campaign_x_arc.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
+            if hasattr(self.dialog, 'tbl_campaign_x_node') and self.dialog.tbl_campaign_x_node.selectionModel():
+                self.dialog.tbl_campaign_x_node.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_node, "ve_node", "node_id", self.rubber_band, 10))
+            if hasattr(self.dialog, 'tbl_campaign_x_connec') and self.dialog.tbl_campaign_x_connec.selectionModel():
+                self.dialog.tbl_campaign_x_connec.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
+            if hasattr(self.dialog, 'tbl_campaign_x_link') and self.dialog.tbl_campaign_x_link.selectionModel():
+                self.dialog.tbl_campaign_x_link.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_link, "ve_link", "link_id", self.rubber_band, 10))
+            if self.project_type == 'ud' and hasattr(self.dialog, 'tbl_campaign_x_gully') and self.dialog.tbl_campaign_x_gully.selectionModel():
+                self.dialog.tbl_campaign_x_gully.selectionModel().selectionChanged.connect(partial(
+                    tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
+        except Exception:
+            pass
+
     def _on_dialog_rejected(self):
         """Clean up resources when the dialog is rejected."""
         self._cleanup_map_selection()
@@ -306,26 +347,29 @@ class Campaign:
     def _load_campaign_relations(self, campaign_id: int):
         """
         Load related elements into campaign relation tabs for the given ID.
-        Includes 'gully' only if project type is UD.
-        Uses inventory-specific tables for inventory campaigns.
+        Uses the generic loader to bind a QSqlTableModel per feature table,
+        so table selections map directly to DB field names for actions like delete.
         """
-        table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
-
         features = ["arc", "node", "connec", "link"]
         if self.project_type == 'ud':
             features.append("gully")
 
         for feature in features:
-            table_widget_name = f"tbl_campaign_x_{feature}"
-            view = getattr(self.dialog, table_widget_name, None)
-            if view:
-                db_table = f"{table_prefix}{feature}"
-                sql = (
-                    f"SELECT * FROM cm.{db_table} "
-                    f"WHERE campaign_id = {campaign_id} "
-                    f"ORDER BY id"
-                )
-                self.populate_tableview(view, sql)
+            try:
+                tools_gw.load_tableview_campaign(self.dialog, feature, campaign_id, self.rel_layers)
+            except Exception:
+                # Fallback to old path if needed
+                table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
+                table_widget_name = f"tbl_campaign_x_{feature}"
+                view = getattr(self.dialog, table_widget_name, None)
+                if view:
+                    db_table = f"cm.{table_prefix}{feature}"
+                    sql = (
+                        f"SELECT * FROM {db_table} "
+                        f"WHERE campaign_id = {campaign_id} "
+                        f"ORDER BY id"
+                    )
+                    self.populate_tableview(view, sql)
 
     def create_widget_from_field(self, field: Dict[str, Any], response: Dict[str, Any]) -> Optional[QWidget]:
         """Create a Qt widget based on field metadata"""
@@ -424,6 +468,7 @@ class Campaign:
                 widget.setCurrentIndex(fallback_index)
 
     def _on_tab_change(self, index: int):
+        """Handle tab change events in the campaign dialog."""
         # Get the tab object at the changed index
         tab = self.dialog.tab_widget.widget(index)
         if tab.objectName() == "tab_relations" and self.is_new_campaign and not self.campaign_saved:
@@ -502,10 +547,38 @@ class Campaign:
             tools_qgis.show_warning(result.get("message", msg))
 
     def _cleanup_map_selection(self):
+        """Clean up map selections and disconnect signals."""
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
         tools_qgis.force_refresh_map_canvas()
+
+    def _refresh_relations_table(self):
+        """Callback to refresh relations and apply table config if first insert."""
+        if self.campaign_id:
+            # Check if this was the first insert by checking if table was empty before
+            current_tab = self.dialog.tab_feature.currentWidget()
+            if not current_tab:
+                return
+            
+            feature_type = current_tab.objectName().replace('tab_', '')
+            table_widget_name = f"tbl_campaign_x_{feature_type}"
+            table_view = getattr(self.dialog, table_widget_name, None)
+            
+            if table_view and table_view.model():
+                # If table has exactly 1 row now, it means it was the first insert
+                if table_view.model().rowCount() == 1:
+                    self._apply_table_config_for_feature(table_view, feature_type)
+                return
+                
+            # If we can't determine or table is empty, reload relations
+            self._load_campaign_relations(self.campaign_id)
+
+    def _apply_table_config_for_feature(self, table_view, feature_type):
+        """Apply table configuration for a specific feature type."""
+        table_name = f"om_campaign_x_{feature_type}"
+        dialog_ref = self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog
+        tools_gw.set_tablemodel_config(dialog_ref, table_view, table_name, schema_name="cm")
 
     def _get_checkbox_value_as_string(self, dialog: QDialog, widget: QCheckBox) -> str:
         """Helper to get QCheckBox value as a lowercase string ('true'/'false')."""
@@ -549,28 +622,12 @@ class Campaign:
         return ", ".join([f'"{k}":{v}' for k, v in fields.items()])
 
     def setup_tab_relations(self):
+        """Setup the relations tab with event handlers and selection widgets."""
         # self.dialog.tab_relations.setCurrentIndex(0)
         self.rel_feature_type = tools_gw.get_signal_change_tab(self.dialog)
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         table_object = "campaign_inventory" if self.campaign_type == 3 else "campaign"
         tools_gw.get_signal_change_tab(self.dialog)
-
-        highlight_config = {
-            "arc": {"size": 5},
-            "node": {"size": 10},
-            "connec": {"size": 10},
-            "link": {"size": 10},
-            "gully": {"size": 10}
-        }
-
-        for name, config in highlight_config.items():
-            tbl = getattr(self.dialog, f"tbl_campaign_x_{name}", None)
-            if tbl:
-                layer = f"ve_{name}"
-                id_column = f"{name}_id"
-                size = config["size"]
-                tbl.clicked.connect(
-                    partial(tools_qgis.highlight_feature_by_id, tbl, layer, id_column, self.rubber_band, size))
 
         self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
@@ -579,7 +636,7 @@ class Campaign:
         )
 
         self.dialog.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None)
+            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None, self._refresh_relations_table)
         )
         self.dialog.btn_insert.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
@@ -587,7 +644,7 @@ class Campaign:
         self.dialog.btn_insert.clicked.connect(self._check_and_disable_class_combos)
 
         self.dialog.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None)
+            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None, self._refresh_relations_table)
         )
         self.dialog.btn_delete.clicked.connect(
             partial(self._update_feature_completer, self.dialog)
@@ -597,11 +654,20 @@ class Campaign:
         # Create menu for btn_snapping
         self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
-        used_tools = ["rectangle", "polygon", "freehand", "circle"]
-        menu_variables = {"used_tools": used_tools}
-        expression_selection = {"callback_later": self._update_feature_completer}
-        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, expression_selection=expression_selection)
+        used_tools = ["rectangle", "polygon", "freehand", "circle", "point"]
+        menu_variables = {"used_tools": used_tools, "callback_later": self._refresh_relations_table}
+        highlight_variables = {"callback_values": self.callback_values}
+        expression_selection = {"callback_later": self._update_feature_completer, "callback_later_values": self.callback_values_later}
+        selection_widget = GwSelectionWidget(self_variables, general_variables, menu_variables, highlight_variables, expression_selection=expression_selection)
         self.dialog.lyt_selection.addWidget(selection_widget, 0)
+
+    def callback_values(self):
+        """Return callback values for selection widget operations."""
+        return self, self.dialog, "campaign"
+
+    def callback_values_later(self):
+        """Return callback values for later execution in selection operations."""
+        return {"dlg": self.dialog}
         
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
@@ -628,15 +694,18 @@ class Campaign:
                 self.visitclass_combo.setEnabled(False)
 
     def _on_tab_feature_changed(self):
+        """Handle feature tab change events."""
         self.rel_feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
 
     def get_widget_by_columnname(self, dialog: QDialog, columnname: str) -> Optional[QWidget]:
+        """Find a widget in the dialog by its columnname property."""
         for widget in dialog.findChildren(QWidget):
             if widget.property("columnname") == columnname:
                 return widget
         return None
 
     def _check_enable_tab_relations(self):
+        """Enable or disable the relations tab based on campaign name."""
         name_widget = self.get_widget_by_columnname(self.dialog, "name")
         if not name_widget:
             return
@@ -645,77 +714,149 @@ class Campaign:
         self.dialog.tab_widget.setTabEnabled(self.dialog.tab_widget.indexOf(self.dialog.tab_relations), enable)
 
     def _update_feature_completer(self, dlg: QDialog):
-        tab_name = dlg.tab_feature.currentWidget().objectName()
-        feature = tab_name.replace('tab_', '')
-        id_column = f"{feature}_id"
+        """Update the feature completer based on current tab and campaign restrictions."""
+        tab_widget = dlg.tab_feature.currentWidget()
+        if not tab_widget:
+            return
+            
+        feature = tab_widget.objectName().replace('tab_', '')
+        if not feature:
+            return
 
-        # Get allowed feature types
+        # Build allowed subtype list for CURRENT feature (can be empty = no restriction)
+        allowed_types = self._get_allowed_types_for_feature(feature)
+
+        # Initialize completer infrastructure if needed
+        self._ensure_completer_infrastructure(dlg)
+
+        # Rewire textEdited to our typeahead (no timers; reuse completer/model like set_typeahead)
+        self._connect_typeahead_handler(dlg, feature, allowed_types)
+
+    def _get_allowed_types_for_feature(self, feature: str) -> List[str]:
+        """Get allowed feature types based on campaign type and selected class."""
         allowed_types = []
         if self.campaign_type == 1:
             reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
-            allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
+            if reviewclass_id:
+                allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
         elif self.campaign_type == 2:
             visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
-            allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
-        elif self.campaign_type == 3:
-            # For inventory campaigns, allow all feature types - no restrictions
-            return
+            if visitclass_id:
+                allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
+        # inventory: allowed_types stays []
+        return allowed_types
 
-        if not allowed_types:
-            return
+    def _ensure_completer_infrastructure(self, dlg: QDialog):
+        """Ensure completer model and completer are properly initialized."""
+        if not hasattr(self, '_feature_id_model') or self._feature_id_model is None:
+            self._feature_id_model = QStringListModel(dlg)
 
-        allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+        if not hasattr(self, '_feature_id_completer') or self._feature_id_completer is None:
+            self._feature_id_completer = QCompleter(self._feature_id_model, dlg)
+            self._feature_id_completer.setCaseSensitivity(False)
+            self._feature_id_completer.setCompletionMode(QCompleter.PopupCompletion)
+            dlg.feature_id.setCompleter(self._feature_id_completer)
 
-        sql = f"""
-            SELECT p.{id_column}::text
-            FROM {self.schema_parent}.{feature} p
-            JOIN {self.schema_parent}.cat_{feature} c
-                ON p.{feature}cat_id = c.id
-            WHERE c.{feature}_type IN ({allowed_types_str})
-            LIMIT 100
-        """
-        result = tools_db.get_rows(sql)
-        if not result:
-            return
+    def _connect_typeahead_handler(self, dlg: QDialog, feature: str, allowed_types: List[str]):
+        """Connect the typeahead handler to the feature ID line edit."""
+        try:
+            dlg.feature_id.textEdited.disconnect()
+        except Exception:
+            pass
+        dlg.feature_id.textEdited.connect(partial(self._feature_id_typeahead, dlg, feature, allowed_types))
 
-        values = [row[id_column] for row in result if row.get(id_column)]
+    def _feature_id_typeahead(self, dlg: QDialog, feature: str, allowed_types: List[str], text: str = ''):
+        """Query server on each keystroke and feed the completer with up to 100 items."""
+        value_list = []
+        if text and len(text) >= 1:
+            # Get all allowed feature IDs using the same logic as map selection
+            allowed_feature_ids = self.get_allowed_features_for_campaign(feature)
+            
+            if allowed_feature_ids:
+                # Filter by text input from the allowed IDs with case-insensitive matching
+                safe = str(text).replace("'", "''")
+                matching_ids = [fid for fid in allowed_feature_ids if str(fid).lower().startswith(safe.lower())]
+                value_list = matching_ids[:self.MAX_TYPEAHEAD_RESULTS]  # Limit to max results
+            else:
+                # If no restrictions, use the original logic with improved SQL
+                value_list = self._get_unrestricted_features(feature, text)
 
-        completer = QCompleter(values)
-        completer.setCaseSensitivity(False)
-        dlg.feature_id.setCompleter(completer)
+        # Force our completer to be the one that works
+        if hasattr(self, '_feature_id_model') and self._feature_id_model is not None:
+            self._update_completer_model(dlg, value_list, text)
+
+    def _get_unrestricted_features(self, feature: str, text: str) -> List[str]:
+        """Get features when no restrictions are applied (inventory campaigns or 'ALL' review class)."""
+        id_column = f"{feature}_id"
+        safe = str(text).replace("'", "''")
+        base_sql = f"SELECT p.{id_column}::text AS val FROM {self.schema_parent}.{feature} p"
+        where_sql = f" WHERE p.{id_column}::text ILIKE '{safe}%'"
+        sql = base_sql + where_sql + f" ORDER BY p.{id_column} LIMIT {self.MAX_TYPEAHEAD_RESULTS}"
+        rows = tools_db.get_rows(sql)
+        return [r.get('val') for r in (rows or []) if r.get('val')]
+
+    def _update_completer_model(self, dlg: QDialog, value_list: List[str], text: str):
+        """Update the completer model with filtered data and trigger completion."""
+        # Clear any existing completer and force ours
+        dlg.feature_id.setCompleter(None)
+        
+        # Set our model with the filtered data
+        self._feature_id_model.setStringList(value_list)
+        
+        # Reattach our completer
+        dlg.feature_id.setCompleter(self._feature_id_completer)
+        
+        # Only show popup when there is user text and some results
+        if text and value_list:
+            try:
+                dlg.feature_id.completer().complete()
+            except Exception:
+                pass
 
     def get_allowed_features_for_campaign(self, feature: str) -> Optional[List[Any]]:
         """Return list of allowed feature IDs for current campaign and feature tab.
 
         If campaign type is inventory (3), returns None to indicate no restriction.
         """
+        if not feature or feature not in self.VALID_FEATURE_TYPES:
+            return None
+            
         id_column = f"{feature}_id"
 
         # Inventory: no restriction
-        if self.campaign_type == 3:
+        if self.campaign_type == self.CAMPAIGN_TYPE_INVENTORY:
             return None
 
         allowed_types: List[str] = []
-        if self.campaign_type == 1:
+        if self.campaign_type == self.CAMPAIGN_TYPE_REVIEW:
             reviewclass_id = tools_qt.get_combo_value(self.dialog, self.reviewclass_combo)
+            if not reviewclass_id:
+                return None
             allowed_types = self.get_allowed_feature_subtypes(feature, reviewclass_id)
-        elif self.campaign_type == 2:
+        elif self.campaign_type == self.CAMPAIGN_TYPE_VISIT:
             visitclass_id = tools_qt.get_combo_value(self.dialog, self.visitclass_combo)
+            if not visitclass_id:
+                return None
             allowed_types = self.get_allowed_feature_subtypes_visit(visitclass_id)
 
         if not allowed_types:
-            return []
+            return None
 
-        allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
-        sql = f"""
-            SELECT p.{id_column}::text AS {id_column}
-            FROM {self.schema_parent}.{feature} p
-            JOIN {self.schema_parent}.cat_{feature} c
-              ON p.{feature}cat_id = c.id
-            WHERE c.{feature}_type IN ({allowed_types_str})
-        """
-        rows = tools_db.get_rows(sql)
-        return [row[id_column] for row in (rows or []) if row.get(id_column)]
+        try:
+            allowed_types_str = ", ".join([f"'{t}'" for t in allowed_types])
+            sql = f"""
+                SELECT p.{id_column}::text AS {id_column}
+                FROM {self.schema_parent}.{feature} p
+                JOIN {self.schema_parent}.cat_{feature} c
+                  ON p.{feature}cat_id = c.id
+                WHERE c.{feature}_type IN ({allowed_types_str})
+            """
+            rows = tools_db.get_rows(sql)
+            result = [row[id_column] for row in (rows or []) if row.get(id_column)]
+            return result
+        except Exception:
+            # Return None if there's any database error
+            return None
 
     def _on_class_changed(self, sender: Optional[QComboBox] = None):
         """Called when the user changes the reviewclass or visitclass combo or when dialog opens"""
@@ -741,10 +882,20 @@ class Campaign:
             if self._is_reviewclass_for_all(selected_id):
                 self.dialog.tab_feature.setCurrentIndex(0)
 
+            # Force refresh completers for all relation tabs
+            for i in range(self.dialog.tab_feature.count()):
+                tab = self.dialog.tab_feature.widget(i)
+                if tab:
+                    self.dialog.tab_feature.setCurrentIndex(i)
+                    self._update_feature_completer(self.dialog)
+
         elif sender == self.visitclass_combo:
             feature_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", selected_id)
         else:
             return
+        
+        if self.campaign_id:          # campaign was already saved at least once
+            self.save_campaign(True)  # from_tab_change=True => silent (doesn't close dialog)
 
         self._manage_tabs_enabled(feature_types)
 
@@ -788,7 +939,8 @@ class Campaign:
             WHERE r.reviewclass_id = {reviewclass_id}
         """
         rows = tools_db.get_rows(sql)
-        return [r["object_id"] for r in rows or []]
+        result = [r["object_id"] for r in rows or []]
+        return result
 
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int) -> List[str]:
         """
@@ -861,12 +1013,12 @@ class Campaign:
             enabled = tab_type in normalized
             tab_widget.setTabEnabled(i, enabled)
 
-    def populate_tableview(self, view: QTableView, query: str, columns: Optional[List[str]] = None):
+    def populate_tableview(self, qtable: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
 
         data = tools_db.get_rows(query)
         if not data:
-            view.setModel(QStandardItemModel())  # Clear view
+            qtable.setModel(QStandardItemModel())  # Clear view
             return
 
         # Auto-detect column names if not provided
@@ -881,8 +1033,19 @@ class Campaign:
                 value = str(row.get(col_name, ''))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
-        view.setModel(model)
-        view.resizeColumnsToContents()
+        qtable.setModel(model)
+        
+        # Determine table configuration based on widget name
+        widget_name = qtable.objectName()
+        if "tbl_campaign_x_" in widget_name:
+            # Extract feature type from widget name (e.g., "tbl_campaign_x_arc" -> "arc")
+            feature_type = widget_name.replace("tbl_campaign_x_", "")
+            table_name = f"om_campaign_x_{feature_type}"
+        else:
+            # Default for campaign manager table
+            table_name = "v_ui_campaign"
+        
+        tools_gw.set_tablemodel_config(self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog, qtable, table_name, schema_name="cm")
 
     # Campaign manager
     def load_campaigns_into_manager(self):
@@ -901,16 +1064,17 @@ class Campaign:
 
         sql = f"""
             SELECT
-                MIN({field})::date AS min_date,
-                MAX({field})::date AS max_date
+                COALESCE(MIN({field})::date, current_date) AS min_date,
+                COALESCE(MAX({field})::date, current_date) AS max_date
             FROM cm.om_campaign
             WHERE {field} IS NOT NULL
         """
-        result = tools_db.get_row(sql)
+        result = tools_db.get_row(sql, is_admin=True)
 
         if result:
-            min_date = result.get("min_date")
-            max_date = result.get("max_date")
+            # psycopg2 DictRow supports key access; fallback for tuple
+            min_date = result.get("min_date") if hasattr(result, 'get') else result[0]
+            max_date = result.get("max_date") if hasattr(result, 'get') else result[1]
 
             if min_date:
                 self.manager_dialog.date_event_from.setDate(min_date)
@@ -923,14 +1087,19 @@ class Campaign:
         filters = []
 
         # Directly query the cm schema to get user's role and organization
-        username = tools_db.get_current_user()
-        sql = f"""
-            SELECT t.role_id, t.organization_id
-            FROM cm.cat_user u
-            JOIN cm.cat_team t ON u.team_id = t.team_id
-            WHERE u.username = '{username}'
-        """
-        user_info = tools_db.get_row(sql)
+        # Guard org filter with privileges and suppress popups
+        user_info = None
+        try:
+            username = tools_db.get_current_user()
+            sql = f"""
+                SELECT t.role_id, t.organization_id
+                FROM cm.cat_user u
+                JOIN cm.cat_team t ON u.team_id = t.team_id
+                WHERE u.username = '{username}'
+            """
+            user_info = tools_db.get_row(sql, is_admin=True)
+        except Exception:
+            user_info = None
 
         if user_info:
             role = user_info[0]
@@ -956,8 +1125,9 @@ class Campaign:
                 self.manager_dialog.date_event_to.setDate(date_from)
                 date_to = date_from  # Update variable too
 
-            date_format_low = self.campaign_date_format + ' 00:00:00'
-            date_format_high = self.campaign_date_format + ' 23:59:59'
+            # Ensure forward-compatible format and inclusive range
+            date_format_low = 'yyyy-MM-dd 00:00:00'
+            date_format_high = 'yyyy-MM-dd 23:59:59'
 
             interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
             date_filter = f"({date_type} BETWEEN {interval}"
@@ -1023,7 +1193,7 @@ class Campaign:
             model = index.model()
             row = index.row()
             id_index = model.index(row, 0)
-            campaign_id = model.data(id_index)
+            campaign_ids = [model.data(id_index)]
 
         # If called by button, no index → get selected row
         else:
@@ -1033,16 +1203,17 @@ class Campaign:
                 tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
-            campaign_id = selected[0].data()
-
-        try:
-            campaign_id = int(campaign_id)
-            if campaign_id > 0:
-                self.load_campaign_dialog(campaign_id, parent=self.manager_dialog)
-                self._check_and_disable_class_combos()
-        except (ValueError, TypeError):
-            msg = "Invalid campaign ID."
-            tools_qgis.show_warning(msg)
+            campaign_ids = [index.data() for index in selected]
+            
+        for campaign_id in campaign_ids:
+            try:
+                campaign_id = int(campaign_id)
+                if campaign_id > 0:
+                    self.load_campaign_dialog(campaign_id, parent=self.manager_dialog)
+                    self._check_and_disable_class_combos()
+            except (ValueError, TypeError):
+                msg = "Invalid campaign ID."
+                tools_qgis.show_warning(msg)
 
 
 def update_expl_sector_combos(**kwargs: Any):
@@ -1176,7 +1347,6 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         sql_sector += " WHERE " + " AND ".join(filters)
 
     sql_sector += " ORDER BY name"
-    print(f"DEBUG: Final SQL Query: {sql_sector}")
     current_sector_data = sector_widget.currentData()
     rows_sector = tools_db.get_rows(sql_sector)
     tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)

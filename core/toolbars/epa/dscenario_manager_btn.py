@@ -97,8 +97,8 @@ class GwDscenarioManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [[tools_qt.tr('Dscenario'), '_open_dscenario_manager'], [tools_qt.tr('Hydrology scenario'), '_open_hydrology_manager'],
-                   [tools_qt.tr('DWF scenario'), '_open_dwf_manager']]
+        buttons = [[tools_qt.tr('Dscenario manager'), '_open_dscenario_manager'], [tools_qt.tr('Hydrology scenario manager'), '_open_hydrology_manager'],
+                   [tools_qt.tr('DWF scenario manager'), '_open_dwf_manager']]
 
         for button in buttons:
             button_name = button[0]
@@ -301,7 +301,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
-        self.dlg_dscenario_manager.setWindowTitle(tools_qt.tr('Dscenario'))
+        self.dlg_dscenario_manager.setWindowTitle(tools_qt.tr('Dscenario manager'))
 
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """

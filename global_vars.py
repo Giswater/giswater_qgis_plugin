@@ -19,6 +19,7 @@ class GwFeatureTypes(Enum):
     NODE = "node"
     CONNEC = "connec"
     GULLY = "gully"
+    LINK = "link"
 
     @classmethod
     def from_index(cls, index):

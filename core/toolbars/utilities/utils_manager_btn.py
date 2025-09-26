@@ -69,7 +69,8 @@ class GwUtilsManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Mapzones manager', '_mapzones_manager'], ['Workcat manager', '_workcat_manager']]
+        buttons = [[tools_qt.tr('Mapzones manager'), '_mapzones_manager'], 
+                    [tools_qt.tr('Workcat manager'), '_workcat_manager']]
         role = tools_gw.get_role_permissions(lib_vars.project_vars.get('project_role'))
         if role in ('role_plan', 'role_admin', 'role_system'):
             buttons.append(['Style manager', '_style_manager'])
