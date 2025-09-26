@@ -336,8 +336,10 @@ BEGIN
 			v_uuid_column := v_tablefeature||'_uuid';
 			v_uuid_value := (v_new_data->>v_uuid_column)::uuid;
 
-			EXECUTE 'SELECT '||v_feature_id_name||' FROM '||v_tablefeature||' WHERE uuid = '||v_uuid_value||' LIMIT 1'
-			INTO v_feature_id;
+			IF v_uuid_value IS NOT NULL THEN
+				EXECUTE 'SELECT '||v_feature_id_name||' FROM '||v_tablefeature||' WHERE uuid = '||v_uuid_value||' LIMIT 1'
+				INTO v_feature_id;
+			END IF;
 
 			IF v_feature_id IS NOT NULL THEN
 				EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_feature_id_name||', element_id, '||v_uuid_column||') VALUES ('||v_feature_id||','||NEW.element_id||','||v_uuid_value||') ON CONFLICT 
