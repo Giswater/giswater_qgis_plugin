@@ -5115,7 +5115,7 @@ def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
     disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
     tools_qt.fill_combo_values(cmb_psector_id, rows)
     if psector_id is not None:
-        tools_qt.set_combo_value(cmb_psector_id, psector_id, 0)
+        tools_qt.set_combo_value(cmb_psector_id, psector_id, 0, add_new=False)
     connect_signal(cmb_psector_id.currentIndexChanged, partial(manage_psector_change, cmb_psector_id),
                    "psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change"
     )
