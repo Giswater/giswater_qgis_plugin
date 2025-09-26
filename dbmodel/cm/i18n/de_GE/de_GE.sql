@@ -107,42 +107,42 @@ UPDATE sys_typevalue AS t
 SET idval = v.idval, descript = v.descript
 FROM (
     VALUES
-    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
-    ('6', 'lot_feature_status', 'ANGESAGT', NULL),
-    ('6', 'campaign_status', 'EXECUTED', NULL),
-    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('8', 'lot_status', 'ABNAHMEBEREIT', NULL),
+    ('6', 'campaign_feature_status', 'ANGESAGT', NULL),
+    ('2', 'campaign_feature_status', 'NICHT BESUCHT', NULL),
+    ('7', 'lot_status', 'ABGELEHNT', NULL),
     ('5', 'campaign_status', 'STAND-BY', NULL),
+    ('3', 'campaign_status', 'ZUGEORDNET', NULL),
     ('4', 'lot_status', 'IM GANG', NULL),
     ('6', 'lot_status', 'EXECUTED (OPERATIV setzen und Trace speichern)', NULL),
-    ('2', 'campaign_type', 'BESUCHE', NULL),
-    ('7', 'lot_status', 'ABGELEHNT', NULL),
-    ('9', 'lot_status', 'AKZEPTIERT', NULL),
-    ('9', 'campaign_status', 'AKZEPTIERT', NULL),
     ('4', 'lot_feature_status', 'WIEDERBESUCHEN', NULL),
-    ('4', 'campaign_feature_status', 'WIEDERBESUCHEN', NULL),
-    ('2', 'campaign_feature_status', 'NICHT BESUCHT', NULL),
-    ('4', 'campaign_status', 'IM GANG', NULL),
-    ('2', 'campaign_status', 'GEPLANT', NULL),
-    ('5', 'lot_feature_status', 'AKZEPTIERT', NULL),
-    ('1', 'lot_feature_status', 'GEPLANT', NULL),
-    ('8', 'lot_status', 'ABNAHMEBEREIT', NULL),
-    ('10', 'lot_status', 'ANGESAGT', NULL),
-    ('6', 'campaign_feature_status', 'ANGESAGT', NULL),
-    ('3', 'campaign_status', 'ZUGEORDNET', NULL),
-    ('3', 'lot_status', 'ZUGEORDNET', NULL),
-    ('2', 'lot_feature_status', 'NICHT BESUCHT', NULL),
-    ('2', 'lot_status', 'GEPLANT', NULL),
-    ('1', 'campaign_type', 'REVIEW', NULL),
-    ('7', 'campaign_status', 'ABGELEHNT', NULL),
-    ('5', 'campaign_feature_status', 'AKZEPTIERT', NULL),
-    ('1', 'campaign_feature_status', 'GEPLANT', NULL),
-    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
-    ('1', 'lot_status', 'PLANUNG', NULL),
-    ('3', 'lot_feature_status', 'BESUCHT', NULL),
-    ('10', 'campaign_status', 'ANGESAGT', NULL),
-    ('3', 'campaign_type', 'INVENTUR', NULL),
+    ('6', 'lot_feature_status', 'ANGESAGT', NULL),
+    ('2', 'campaign_type', 'BESUCHE', NULL),
+    ('5', 'lot_status', 'STAND-BY', NULL),
     ('1', 'campaign_status', 'PLANUNG', NULL),
-    ('5', 'lot_status', 'STAND-BY', NULL)
+    ('9', 'lot_status', 'AKZEPTIERT', NULL),
+    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
+    ('1', 'lot_feature_status', 'GEPLANT', NULL),
+    ('10', 'lot_status', 'ANGESAGT', NULL),
+    ('3', 'lot_status', 'ZUGEORDNET', NULL),
+    ('2', 'lot_status', 'GEPLANT', NULL),
+    ('5', 'campaign_feature_status', 'AKZEPTIERT', NULL),
+    ('3', 'campaign_type', 'INVENTUR', NULL),
+    ('4', 'campaign_feature_status', 'WIEDERBESUCHEN', NULL),
+    ('1', 'campaign_feature_status', 'GEPLANT', NULL),
+    ('4', 'campaign_status', 'IM GANG', NULL),
+    ('1', 'lot_status', 'PLANUNG', NULL),
+    ('2', 'campaign_status', 'GEPLANT', NULL),
+    ('7', 'campaign_status', 'ABGELEHNT', NULL),
+    ('2', 'lot_feature_status', 'NICHT BESUCHT', NULL),
+    ('5', 'lot_feature_status', 'AKZEPTIERT', NULL),
+    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
+    ('10', 'campaign_status', 'ANGESAGT', NULL),
+    ('3', 'lot_feature_status', 'BESUCHT', NULL),
+    ('6', 'campaign_status', 'EXECUTED', NULL),
+    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('1', 'campaign_type', 'REVIEW', NULL),
+    ('9', 'campaign_status', 'AKZEPTIERT', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -150,11 +150,11 @@ UPDATE config_form_fields AS t
 SET widgetcontrols = v.text::json
 FROM (
 	VALUES
-	('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
-    ('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+	('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('active', 'lot', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('txt_info', 'generic', 'check_project_cm', 'tab_data', '{"vdefault_value": "Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}'),
-    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
+    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+    ('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
 ) AS v(columnname, formname, formtype, tabname, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
@@ -328,11 +328,11 @@ UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
     VALUES
-    (203, 'Knoten mit Zustand 1 dupliziert.', 'Es gibt keine doppelten Knoten mit Zustand 1', 'Duplizierte Knoten prüfen'),
     (200, 'Es gibt einige Benutzer, denen kein Team zugewiesen ist.', 'Allen Benutzern ist ein Team zugewiesen.', 'Konsistenz der Benutzer prüfen'),
     (202, 'Es gibt einige verwaiste Knotenpunkte', 'Es gibt keine verwaisten Knotenpunkte.', 'Verwaiste Knoten prüfen'),
     (100, 'Nullwert in der Spalte %check_column% von %table_name%', 'Die %check_column% auf %table_name% haben korrekte Werte.', 'Nullen auf Konsistenz prüfen'),
-    (201, 'Teams, denen keine Benutzer zugewiesen sind.', 'Allen Teams sind Benutzer zugewiesen.', 'Konsistenz der Teams prüfen')
+    (201, 'Teams, denen keine Benutzer zugewiesen sind.', 'Allen Teams sind Benutzer zugewiesen.', 'Konsistenz der Teams prüfen'),
+    (203, 'Knoten mit Zustand 1 dupliziert.', 'Es gibt keine doppelten Knoten mit Zustand 1', 'Duplizierte Knoten prüfen')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

@@ -107,42 +107,42 @@ UPDATE sys_typevalue AS t
 SET idval = v.idval, descript = v.descript
 FROM (
     VALUES
-    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
-    ('6', 'lot_feature_status', 'ANULAT', NULL),
-    ('6', 'campaign_status', 'EXECUTED', NULL),
-    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('8', 'lot_status', 'GATA DE ACCEPTARE', NULL),
+    ('6', 'campaign_feature_status', 'ANULAT', NULL),
+    ('2', 'campaign_feature_status', 'NEVIZITAT', NULL),
+    ('7', 'lot_status', 'REJECTAT', NULL),
     ('5', 'campaign_status', 'STAND-BY', NULL),
+    ('3', 'campaign_status', 'ATRIBUIT', NULL),
     ('4', 'lot_status', 'ÎN CURS DE DESFĂȘURARE', NULL),
     ('6', 'lot_status', 'EXECUTAT', NULL),
-    ('2', 'campaign_type', 'VIZITA', NULL),
-    ('7', 'lot_status', 'REJECTAT', NULL),
-    ('9', 'lot_status', 'ACCEPTAT', NULL),
-    ('9', 'campaign_status', 'ACCEPTAT', NULL),
     ('4', 'lot_feature_status', 'VIZITAȚI DIN NOU', NULL),
-    ('4', 'campaign_feature_status', 'VIZITAȚI DIN NOU', NULL),
-    ('2', 'campaign_feature_status', 'NEVIZITAT', NULL),
-    ('4', 'campaign_status', 'ÎN CURS DE DESFĂȘURARE', NULL),
-    ('2', 'campaign_status', 'PLANIFICAT', NULL),
-    ('5', 'lot_feature_status', 'ACCEPTAT', NULL),
-    ('1', 'lot_feature_status', 'PLANIFICAT', NULL),
-    ('8', 'lot_status', 'GATA DE ACCEPTARE', NULL),
-    ('10', 'lot_status', 'ANULAT', NULL),
-    ('6', 'campaign_feature_status', 'ANULAT', NULL),
-    ('3', 'campaign_status', 'ATRIBUIT', NULL),
-    ('3', 'lot_status', 'ATRIBUIT', NULL),
-    ('2', 'lot_feature_status', 'NEVIZITAT', NULL),
-    ('2', 'lot_status', 'PLANIFICAT', NULL),
-    ('1', 'campaign_type', 'RECENZIE', NULL),
-    ('7', 'campaign_status', 'REJECTAT', NULL),
-    ('5', 'campaign_feature_status', 'ACCEPTAT', NULL),
-    ('1', 'campaign_feature_status', 'PLANIFICAT', NULL),
-    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
-    ('1', 'lot_status', 'PLANIFICARE', NULL),
-    ('3', 'lot_feature_status', 'VĂZUT', NULL),
-    ('10', 'campaign_status', 'ANULAT', NULL),
-    ('3', 'campaign_type', 'INVENTAR', NULL),
+    ('6', 'lot_feature_status', 'ANULAT', NULL),
+    ('2', 'campaign_type', 'VIZITA', NULL),
+    ('5', 'lot_status', 'STAND-BY', NULL),
     ('1', 'campaign_status', 'PLANIFICARE', NULL),
-    ('5', 'lot_status', 'STAND-BY', NULL)
+    ('9', 'lot_status', 'ACCEPTAT', NULL),
+    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
+    ('1', 'lot_feature_status', 'PLANIFICAT', NULL),
+    ('10', 'lot_status', 'ANULAT', NULL),
+    ('3', 'lot_status', 'ATRIBUIT', NULL),
+    ('2', 'lot_status', 'PLANIFICAT', NULL),
+    ('5', 'campaign_feature_status', 'ACCEPTAT', NULL),
+    ('3', 'campaign_type', 'INVENTAR', NULL),
+    ('4', 'campaign_feature_status', 'VIZITAȚI DIN NOU', NULL),
+    ('1', 'campaign_feature_status', 'PLANIFICAT', NULL),
+    ('4', 'campaign_status', 'ÎN CURS DE DESFĂȘURARE', NULL),
+    ('1', 'lot_status', 'PLANIFICARE', NULL),
+    ('2', 'campaign_status', 'PLANIFICAT', NULL),
+    ('7', 'campaign_status', 'REJECTAT', NULL),
+    ('2', 'lot_feature_status', 'NEVIZITAT', NULL),
+    ('5', 'lot_feature_status', 'ACCEPTAT', NULL),
+    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
+    ('10', 'campaign_status', 'ANULAT', NULL),
+    ('3', 'lot_feature_status', 'VĂZUT', NULL),
+    ('6', 'campaign_status', 'EXECUTED', NULL),
+    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('1', 'campaign_type', 'RECENZIE', NULL),
+    ('9', 'campaign_status', 'ACCEPTAT', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -150,11 +150,11 @@ UPDATE config_form_fields AS t
 SET widgetcontrols = v.text::json
 FROM (
 	VALUES
-	('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
-    ('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+	('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('active', 'lot', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('txt_info', 'generic', 'check_project_cm', 'tab_data', '{"vdefault_value": "Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}'),
-    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
+    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+    ('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
 ) AS v(columnname, formname, formtype, tabname, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
@@ -328,11 +328,11 @@ UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
     VALUES
-    (203, 'noduri dublate cu starea 1.', 'Nu există noduri duplicate cu starea 1', 'Verificarea nodurilor duplicate'),
     (200, 'Există unii utilizatori cărora nu li s-a atribuit nicio echipă.', 'Toți utilizatorii au atribuită o echipă.', 'Verificarea consistenței utilizatorilor'),
     (202, 'Există câteva noduri orfane', 'Nu există noduri orfane.', 'Verificarea nodurilor orfane'),
     (100, 'valoare nulă pe coloana %check_column% din %table_name%', '%check_column% de pe %table_name% au valori corecte.', 'Verificarea consistenței nulităților'),
-    (201, 'echipe fără utilizatori atribuiți.', 'Toate echipele au utilizatori atribuiți.', 'Verificarea consistenței echipelor')
+    (201, 'echipe fără utilizatori atribuiți.', 'Toate echipele au utilizatori atribuiți.', 'Verificarea consistenței echipelor'),
+    (203, 'noduri dublate cu starea 1.', 'Nu există noduri duplicate cu starea 1', 'Verificarea nodurilor duplicate')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

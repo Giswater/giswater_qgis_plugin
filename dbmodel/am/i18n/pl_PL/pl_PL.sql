@@ -9,7 +9,7 @@ UPDATE config_engine_def AS t
 SET label = v.label, descript = v.descript, placeholder = v.placeholder
 FROM (
     VALUES
-    ('rleak_2', 'WM', 'Actual breaks', NULL, NULL),
+    ('rleak_2', 'WM', 'Rzeczywiste przerwy', NULL, NULL),
     ('flow_1', 'WM', 'Working capital', NULL, NULL),
     ('flow_2', 'WM', 'Working capital', NULL, NULL),
     ('nrw_1', 'WM', 'ANC', NULL, NULL),

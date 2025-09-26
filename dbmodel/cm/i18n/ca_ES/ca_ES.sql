@@ -107,42 +107,42 @@ UPDATE sys_typevalue AS t
 SET idval = v.idval, descript = v.descript
 FROM (
     VALUES
-    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
-    ('6', 'lot_feature_status', 'CANCELED', NULL),
-    ('6', 'campaign_status', 'EXECUTED', NULL),
-    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('8', 'lot_status', 'READY-TO-ACCEPT', NULL),
+    ('6', 'campaign_feature_status', 'CANCELED', NULL),
+    ('2', 'campaign_feature_status', 'NOT VISITED', NULL),
+    ('7', 'lot_status', 'REJECTED', NULL),
     ('5', 'campaign_status', 'STAND-BY', NULL),
+    ('3', 'campaign_status', 'ASSIGNED', NULL),
     ('4', 'lot_status', 'ON GOING', NULL),
     ('6', 'lot_status', 'EXECUTED', NULL),
-    ('2', 'campaign_type', 'VISIT', NULL),
-    ('7', 'lot_status', 'REJECTED', NULL),
-    ('9', 'lot_status', 'ACCEPTED', NULL),
-    ('9', 'campaign_status', 'ACCEPTED', NULL),
     ('4', 'lot_feature_status', 'VISIT AGAIN', NULL),
-    ('4', 'campaign_feature_status', 'VISIT AGAIN', NULL),
-    ('2', 'campaign_feature_status', 'NOT VISITED', NULL),
-    ('4', 'campaign_status', 'ON GOING', NULL),
-    ('2', 'campaign_status', 'PLANIFIED', NULL),
-    ('5', 'lot_feature_status', 'ACCEPTED', NULL),
-    ('1', 'lot_feature_status', 'PLANIFIED', NULL),
-    ('8', 'lot_status', 'READY-TO-ACCEPT', NULL),
-    ('10', 'lot_status', 'CANCELED', NULL),
-    ('6', 'campaign_feature_status', 'CANCELED', NULL),
-    ('3', 'campaign_status', 'ASSIGNED', NULL),
-    ('3', 'lot_status', 'ASSIGNED', NULL),
-    ('2', 'lot_feature_status', 'NOT VISITED', NULL),
-    ('2', 'lot_status', 'PLANIFIED', NULL),
-    ('1', 'campaign_type', 'REVIEW', NULL),
-    ('7', 'campaign_status', 'REJECTED', NULL),
-    ('5', 'campaign_feature_status', 'ACCEPTED', NULL),
-    ('1', 'campaign_feature_status', 'PLANIFIED', NULL),
-    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
-    ('1', 'lot_status', 'PLANIFYING', NULL),
-    ('3', 'lot_feature_status', 'VISITED', NULL),
-    ('10', 'campaign_status', 'CANCELED', NULL),
-    ('3', 'campaign_type', 'INVENTORY', NULL),
+    ('6', 'lot_feature_status', 'CANCELED', NULL),
+    ('2', 'campaign_type', 'VISIT', NULL),
+    ('5', 'lot_status', 'STAND-BY', NULL),
     ('1', 'campaign_status', 'PLANIFYING', NULL),
-    ('5', 'lot_status', 'STAND-BY', NULL)
+    ('9', 'lot_status', 'ACCEPTED', NULL),
+    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
+    ('1', 'lot_feature_status', 'PLANIFIED', NULL),
+    ('10', 'lot_status', 'CANCELED', NULL),
+    ('3', 'lot_status', 'ASSIGNED', NULL),
+    ('2', 'lot_status', 'PLANIFIED', NULL),
+    ('5', 'campaign_feature_status', 'ACCEPTED', NULL),
+    ('3', 'campaign_type', 'INVENTORY', NULL),
+    ('4', 'campaign_feature_status', 'VISIT AGAIN', NULL),
+    ('1', 'campaign_feature_status', 'PLANIFIED', NULL),
+    ('4', 'campaign_status', 'ON GOING', NULL),
+    ('1', 'lot_status', 'PLANIFYING', NULL),
+    ('2', 'campaign_status', 'PLANIFIED', NULL),
+    ('7', 'campaign_status', 'REJECTED', NULL),
+    ('2', 'lot_feature_status', 'NOT VISITED', NULL),
+    ('5', 'lot_feature_status', 'ACCEPTED', NULL),
+    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
+    ('10', 'campaign_status', 'CANCELED', NULL),
+    ('3', 'lot_feature_status', 'VISITED', NULL),
+    ('6', 'campaign_status', 'EXECUTED', NULL),
+    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('1', 'campaign_type', 'REVIEW', NULL),
+    ('9', 'campaign_status', 'ACCEPTED', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -150,11 +150,11 @@ UPDATE config_form_fields AS t
 SET widgetcontrols = v.text::json
 FROM (
 	VALUES
-	('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
-    ('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+	('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('active', 'lot', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('txt_info', 'generic', 'check_project_cm', 'tab_data', '{"vdefault_value": "Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}'),
-    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
+    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+    ('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
 ) AS v(columnname, formname, formtype, tabname, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
@@ -328,11 +328,11 @@ UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
     VALUES
-    (203, 'nodes duplicated with state 1.', 'There are no nodes duplicated with state 1', 'Check duplicated nodes'),
     (200, 'There are some users with no team assigned.', 'All users have a team assigned.', 'Check users consistence'),
     (202, 'There are some orphan nodes', 'There aren''t orphan nodes.', 'Check orphan nodes'),
     (100, 'null value on the column %check_column% of %table_name%', 'The %check_column% on %table_name% have correct values.', 'Check nulls consistence'),
-    (201, 'teams with no users assigned.', 'All teams have users assigned.', 'Check teams consistence')
+    (201, 'teams with no users assigned.', 'All teams have users assigned.', 'Check teams consistence'),
+    (203, 'nodes duplicated with state 1.', 'There are no nodes duplicated with state 1', 'Check duplicated nodes')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

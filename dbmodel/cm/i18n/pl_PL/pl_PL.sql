@@ -107,42 +107,42 @@ UPDATE sys_typevalue AS t
 SET idval = v.idval, descript = v.descript
 FROM (
     VALUES
-    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
-    ('6', 'lot_feature_status', 'ODWOŁANE', NULL),
-    ('6', 'campaign_status', 'EXECUTED', NULL),
-    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('8', 'lot_status', 'GOTOWY DO PRZYJĘCIA', NULL),
+    ('6', 'campaign_feature_status', 'ODWOŁANE', NULL),
+    ('2', 'campaign_feature_status', 'NIE ODWIEDZONO', NULL),
+    ('7', 'lot_status', 'ODRZUCONY', NULL),
     ('5', 'campaign_status', 'STAND-BY', NULL),
+    ('3', 'campaign_status', 'PRZYPISANY', NULL),
     ('4', 'lot_status', 'NA BIEŻĄCO', NULL),
     ('6', 'lot_status', 'WYKONANE', NULL),
-    ('2', 'campaign_type', 'WIZYTA', NULL),
-    ('7', 'lot_status', 'ODRZUCONY', NULL),
-    ('9', 'lot_status', 'PRZYJĘTY', NULL),
-    ('9', 'campaign_status', 'PRZYJĘTY', NULL),
     ('4', 'lot_feature_status', 'ODWIEDŹ PONOWNIE', NULL),
-    ('4', 'campaign_feature_status', 'ODWIEDŹ PONOWNIE', NULL),
-    ('2', 'campaign_feature_status', 'NIE ODWIEDZONO', NULL),
-    ('4', 'campaign_status', 'NA BIEŻĄCO', NULL),
-    ('2', 'campaign_status', 'PLANOWANE', NULL),
-    ('5', 'lot_feature_status', 'PRZYJĘTY', NULL),
-    ('1', 'lot_feature_status', 'PLANOWANE', NULL),
-    ('8', 'lot_status', 'GOTOWY DO PRZYJĘCIA', NULL),
-    ('10', 'lot_status', 'ODWOŁANE', NULL),
-    ('6', 'campaign_feature_status', 'ODWOŁANE', NULL),
-    ('3', 'campaign_status', 'PRZYPISANY', NULL),
-    ('3', 'lot_status', 'PRZYPISANY', NULL),
-    ('2', 'lot_feature_status', 'NIE ODWIEDZONO', NULL),
-    ('2', 'lot_status', 'PLANOWANE', NULL),
-    ('1', 'campaign_type', 'PRZEGLĄD', NULL),
-    ('7', 'campaign_status', 'ODRZUCONY', NULL),
-    ('5', 'campaign_feature_status', 'PRZYJĘTY', NULL),
-    ('1', 'campaign_feature_status', 'PLANOWANE', NULL),
-    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
-    ('1', 'lot_status', 'PLANOWANIE', NULL),
-    ('3', 'lot_feature_status', 'ODWIEDZONY', NULL),
-    ('10', 'campaign_status', 'ODWOŁANE', NULL),
-    ('3', 'campaign_type', 'INWENTARYZACJA', NULL),
+    ('6', 'lot_feature_status', 'ODWOŁANE', NULL),
+    ('2', 'campaign_type', 'WIZYTA', NULL),
+    ('5', 'lot_status', 'STAND-BY', NULL),
     ('1', 'campaign_status', 'PLANOWANIE', NULL),
-    ('5', 'lot_status', 'STAND-BY', NULL)
+    ('9', 'lot_status', 'PRZYJĘTY', NULL),
+    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
+    ('1', 'lot_feature_status', 'PLANOWANE', NULL),
+    ('10', 'lot_status', 'ODWOŁANE', NULL),
+    ('3', 'lot_status', 'PRZYPISANY', NULL),
+    ('2', 'lot_status', 'PLANOWANE', NULL),
+    ('5', 'campaign_feature_status', 'PRZYJĘTY', NULL),
+    ('3', 'campaign_type', 'INWENTARYZACJA', NULL),
+    ('4', 'campaign_feature_status', 'ODWIEDŹ PONOWNIE', NULL),
+    ('1', 'campaign_feature_status', 'PLANOWANE', NULL),
+    ('4', 'campaign_status', 'NA BIEŻĄCO', NULL),
+    ('1', 'lot_status', 'PLANOWANIE', NULL),
+    ('2', 'campaign_status', 'PLANOWANE', NULL),
+    ('7', 'campaign_status', 'ODRZUCONY', NULL),
+    ('2', 'lot_feature_status', 'NIE ODWIEDZONO', NULL),
+    ('5', 'lot_feature_status', 'PRZYJĘTY', NULL),
+    ('8', 'campaign_status', 'READY-TO-ACCEPT', NULL),
+    ('10', 'campaign_status', 'ODWOŁANE', NULL),
+    ('3', 'lot_feature_status', 'ODWIEDZONY', NULL),
+    ('6', 'campaign_status', 'EXECUTED', NULL),
+    ('3', 'campaign_feature_status', 'VISITED', NULL),
+    ('1', 'campaign_type', 'PRZEGLĄD', NULL),
+    ('9', 'campaign_status', 'PRZYJĘTY', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -150,11 +150,11 @@ UPDATE config_form_fields AS t
 SET widgetcontrols = v.text::json
 FROM (
 	VALUES
-	('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
-    ('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+	('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('active', 'lot', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('txt_info', 'generic', 'check_project_cm', 'tab_data', '{"vdefault_value": "Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}'),
-    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
+    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+    ('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "Prawda"}')
 ) AS v(columnname, formname, formtype, tabname, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
@@ -328,11 +328,11 @@ UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
     VALUES
-    (203, 'węzłów zduplikowanych ze stanem 1.', 'Nie ma zduplikowanych węzłów ze stanem 1', 'Sprawdź zduplikowane węzły'),
     (200, 'Niektórzy użytkownicy nie mają przypisanego zespołu.', 'Wszyscy użytkownicy mają przypisany zespół.', 'Sprawdź spójność użytkowników'),
     (202, 'Istnieje kilka osieroconych węzłów', 'Nie ma osieroconych węzłów.', 'Sprawdź osierocone węzły'),
     (100, 'wartość null w kolumnie %check_column% %table_name%', 'Kolumna %check_column% w %table_name% ma prawidłowe wartości.', 'Sprawdź spójność zer'),
-    (201, 'zespołów bez przypisanych użytkowników.', 'Wszystkie zespoły mają przypisanych użytkowników.', 'Sprawdź spójność zespołów')
+    (201, 'zespołów bez przypisanych użytkowników.', 'Wszystkie zespoły mają przypisanych użytkowników.', 'Sprawdź spójność zespołów'),
+    (203, 'węzłów zduplikowanych ze stanem 1.', 'Nie ma zduplikowanych węzłów ze stanem 1', 'Sprawdź zduplikowane węzły')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

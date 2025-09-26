@@ -107,42 +107,42 @@ UPDATE sys_typevalue AS t
 SET idval = v.idval, descript = v.descript
 FROM (
     VALUES
-    ('8', 'campaign_status', 'LISTO PARA ACEPTAR', NULL),
-    ('6', 'lot_feature_status', 'CANCELADO', NULL),
-    ('6', 'campaign_status', 'EJECUTADO (Fijar OPERATIVO y Guardar Traza)', NULL),
-    ('3', 'campaign_feature_status', 'VISITADO', NULL),
+    ('8', 'lot_status', 'LISTO PARA ACEPTAR', NULL),
+    ('6', 'campaign_feature_status', 'CANCELADO', NULL),
+    ('2', 'campaign_feature_status', 'NO VISITADO', NULL),
+    ('7', 'lot_status', 'RECHAZADO', NULL),
     ('5', 'campaign_status', 'STAND-BY', NULL),
+    ('3', 'campaign_status', 'ASIGNADO', NULL),
     ('4', 'lot_status', 'EN MARCHA', NULL),
     ('6', 'lot_status', 'EJECUTADO (Fijar OPERATIVO y Guardar Traza)', NULL),
-    ('2', 'campaign_type', 'VISTA', NULL),
-    ('7', 'lot_status', 'RECHAZADO', NULL),
-    ('9', 'lot_status', 'ACEPTADO', NULL),
-    ('9', 'campaign_status', 'ACEPTADO', NULL),
     ('4', 'lot_feature_status', 'VUELVE A VISITAR', NULL),
-    ('4', 'campaign_feature_status', 'VUELVE A VISITAR', NULL),
-    ('2', 'campaign_feature_status', 'NO VISITADO', NULL),
-    ('4', 'campaign_status', 'EN MARCHA', NULL),
-    ('2', 'campaign_status', 'PLANIFICADO', NULL),
-    ('5', 'lot_feature_status', 'ACEPTADO', NULL),
-    ('1', 'lot_feature_status', 'PLANIFICADO', NULL),
-    ('8', 'lot_status', 'LISTO PARA ACEPTAR', NULL),
-    ('10', 'lot_status', 'CANCELADO', NULL),
-    ('6', 'campaign_feature_status', 'CANCELADO', NULL),
-    ('3', 'campaign_status', 'ASIGNADO', NULL),
-    ('3', 'lot_status', 'ASIGNADO', NULL),
-    ('2', 'lot_feature_status', 'NO VISITADO', NULL),
-    ('2', 'lot_status', 'PLANIFICADO', NULL),
-    ('1', 'campaign_type', 'REVISIÓN', NULL),
-    ('7', 'campaign_status', 'RECHAZADO', NULL),
-    ('5', 'campaign_feature_status', 'ACEPTADO', NULL),
-    ('1', 'campaign_feature_status', 'PLANIFICADO', NULL),
-    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
-    ('1', 'lot_status', 'PLANIFICACIÓN', NULL),
-    ('3', 'lot_feature_status', 'VISITADO', NULL),
-    ('10', 'campaign_status', 'CANCELADO', NULL),
-    ('3', 'campaign_type', 'INVENTARIO', NULL),
+    ('6', 'lot_feature_status', 'CANCELADO', NULL),
+    ('2', 'campaign_type', 'VISTA', NULL),
+    ('5', 'lot_status', 'STAND-BY', NULL),
     ('1', 'campaign_status', 'PLANIFICACIÓN', NULL),
-    ('5', 'lot_status', 'STAND-BY', NULL)
+    ('9', 'lot_status', 'ACEPTADO', NULL),
+    ('lyt_buttons', 'layout_name_typevalue', 'lyt_buttons', NULL),
+    ('1', 'lot_feature_status', 'PLANIFICADO', NULL),
+    ('10', 'lot_status', 'CANCELADO', NULL),
+    ('3', 'lot_status', 'ASIGNADO', NULL),
+    ('2', 'lot_status', 'PLANIFICADO', NULL),
+    ('5', 'campaign_feature_status', 'ACEPTADO', NULL),
+    ('3', 'campaign_type', 'INVENTARIO', NULL),
+    ('4', 'campaign_feature_status', 'VUELVE A VISITAR', NULL),
+    ('1', 'campaign_feature_status', 'PLANIFICADO', NULL),
+    ('4', 'campaign_status', 'EN MARCHA', NULL),
+    ('1', 'lot_status', 'PLANIFICACIÓN', NULL),
+    ('2', 'campaign_status', 'PLANIFICADO', NULL),
+    ('7', 'campaign_status', 'RECHAZADO', NULL),
+    ('2', 'lot_feature_status', 'NO VISITADO', NULL),
+    ('5', 'lot_feature_status', 'ACEPTADO', NULL),
+    ('8', 'campaign_status', 'LISTO PARA ACEPTAR', NULL),
+    ('10', 'campaign_status', 'CANCELADO', NULL),
+    ('3', 'lot_feature_status', 'VISITADO', NULL),
+    ('6', 'campaign_status', 'EJECUTADO (Fijar OPERATIVO y Guardar Traza)', NULL),
+    ('3', 'campaign_feature_status', 'VISITADO', NULL),
+    ('1', 'campaign_type', 'REVISIÓN', NULL),
+    ('9', 'campaign_status', 'ACEPTADO', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -150,11 +150,11 @@ UPDATE config_form_fields AS t
 SET widgetcontrols = v.text::json
 FROM (
 	VALUES
-	('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
-    ('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+	('active', 'campaign_visit', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('active', 'lot', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
     ('txt_info', 'generic', 'check_project_cm', 'tab_data', '{"vdefault_value": "Esta función tiene por objetivo pasar el control de calidad de una campaña, pudiendo escoger de forma concreta un lote especifico.<br><br>Se analizan diferentes aspectos siendo lo más destacado que se configura para que los datos esten operativos en el conjunto de una campaña para que el modelo hidraulico funcione."}'),
-    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
+    ('active', 'campaign_inventory', 'form_feature', 'tab_data', '{"vdefault_value": "True"}'),
+    ('active', 'campaign_review', 'form_feature', 'tab_data', '{"vdefault_value": "True"}')
 ) AS v(columnname, formname, formtype, tabname, text)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
@@ -328,11 +328,11 @@ UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
     VALUES
-    (203, 'nodos duplicados con el estado 1.', 'No existen nodos duplicados con el estado 1.', 'Comprobar nodos duplicados'),
     (200, 'Hay algunos usuarios sin equipo asignado.', 'Todos los usuarios tienen un equipo asignado.', 'Comprobar la coherencia de los usuarios'),
     (202, 'Hay algunos nodos huérfanos', 'No hay nodos huérfanos.', 'Comprobar nodos huérfanos'),
     (100, 'valor nulo en la columna %check_column% de %table_name%.', 'Las %check_column% en %table_name% tienen valores correctos.', 'Comprobar la coherencia de los nulos'),
-    (201, 'equipos sin usuarios asignados.', 'Todos los equipos tienen usuarios asignados.', 'Comprobar la coherencia de los equipos')
+    (201, 'equipos sin usuarios asignados.', 'Todos los equipos tienen usuarios asignados.', 'Comprobar la coherencia de los equipos'),
+    (203, 'nodos duplicados con el estado 1.', 'No existen nodos duplicados con el estado 1.', 'Comprobar nodos duplicados')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 
