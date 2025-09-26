@@ -225,3 +225,5 @@ ALTER TABLE plan_netscenario_presszone RENAME COLUMN lastupdate TO updated_at;
 ALTER TABLE plan_netscenario_presszone ALTER COLUMN updated_at TYPE timestamptz USING updated_at::timestamptz;
 ALTER TABLE plan_netscenario_presszone RENAME COLUMN lastupdate_user TO updated_by;
 
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'updateField','top_elev'::text) WHERE parameter = 'admin_raster_dem' and value ilike '%elevation%';
+
