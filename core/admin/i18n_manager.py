@@ -404,8 +404,6 @@ class GwSchemaI18NManager:
                 update_values_str = ", ".join(update_values)
                 query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str})
                                 ON CONFLICT ({pk_columns_str}) DO UPDATE SET {update_values_str};\n"""
-                if "su_feature" in table_i18n:
-                    print(query_insert)
         return query_insert
 
 
@@ -482,7 +480,7 @@ class GwSchemaI18NManager:
             if table_org == "value_state" and self.project_type in ["ud", "ws"]:
                 columns_i18n.append("ob_en_us")
                 columns_org = ["id", "name", "observ"]
-            elif table_org == "sys_label" or self.project_type == "am":
+            elif self.project_type == "am":
                 columns_org = ["id", "idval"]
 
         elif 'su_feature' in table_i18n:
@@ -800,7 +798,9 @@ class GwSchemaI18NManager:
                 WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 've_flwreg')
             ) AS unioned
             ON CONFLICT (feature_type, source_code, project_type, context, formtype, tabname, source)
-            DO NOTHING;
+            DO UPDATE SET
+                lb_en_us = EXCLUDED.lb_en_us,
+                tt_en_us = EXCLUDED.tt_en_us;
 
             delete from {table_org}  where formtype = 'form_feature' and (formname like 've_arc%' or formname in ('ve_arc'));
 
@@ -1464,12 +1464,13 @@ class GwSchemaI18NManager:
     def _update_cat_version(self):
         """ Update the cat_version table """
         for schema in self.schemas:
-            print(schema[0:2].lower())
             if schema[0:2].lower() in ["ws", "ud", "am", "cm"]:
                 table_org = f"{schema}.sys_version"
                 self._update_cat_version_table(table_org)
             else:
                 self._update_cat_version_python(schema)
+        
+            self._update_cat_lastupdate(schema)
 
     def _update_cat_version_table(self, table_org):
         """ Update the cat_version table """
@@ -1510,6 +1511,23 @@ class GwSchemaI18NManager:
             self.cursor_i18n.execute(query)
         except Exception as e:
             tools_qt.manage_exception_db(e, query, pause_on_exception=True)
+        self.conn_i18n.commit()
+
+    def _update_cat_lastupdate(self, schema):
+        """ Update the cat_lastupdate table """
+        query = ""
+        if schema[0:2].lower() in ["ws", "ud", "am", "cm"]:
+            tables_i18n, sutables = self.tables_dic(schema[0:2].lower())
+            if self.check_for_su_tables:
+                tables_i18n.extend(sutables)
+        elif schema.lower() == "dialogs":
+            tables_i18n = ["pydialog", "pytoolbar"]
+        elif schema.lower() == "python":
+            tables_i18n = ["pymessages", "pytoolbar"]
+        for table in tables_i18n:
+            query += f"""UPDATE {self.schema_i18n}.cat_lastupdate SET lastupdate_en_us = now()
+                         WHERE "table" = '{table.lower()}';\n"""
+        self.cursor_i18n.execute(query)
         self.conn_i18n.commit()
 
     # endregion
