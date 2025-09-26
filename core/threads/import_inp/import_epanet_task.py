@@ -390,6 +390,13 @@ class GwImportInpTask(GwTask):
             nodecat_db = [x[0] for x in cat_node_ids]
 
         node_catalogs = ["junctions", "reservoirs", "tanks"]
+        # If VARCs will be transformed to nodes, ensure target node catalogs exist
+        for k, v in self.manage_nodarcs.items():
+            if not v:
+                continue
+            # Append any nodarc key that has feature and catalog definitions
+            if k in self.catalogs and k in self.catalogs.get("features", {}):
+                node_catalogs.append(k)
 
         for node_type in node_catalogs:
             if node_type not in self.catalogs:
