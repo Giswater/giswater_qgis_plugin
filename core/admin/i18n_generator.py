@@ -687,6 +687,10 @@ class GwI18NGenerator:
                     values_str = ",\n    ".join([f"('{row['lb_en_us']}', '{row['feature_class']}', '{row['feature_type']}', {txt[0]}, {txt[1]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET id = v.idval, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(lb_en_us, feature_class, feature_type, idval, descript)\nWHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;\n\n")
 
+                elif "dblabel" in table:
+                    values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
+                    file.write(f"UPDATE {context} AS t\nSET idval = v.idval\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, idval)\nWHERE t.id = v.id;\n\n")
+
                 elif "dbconfig_engine" in table:
                     values_str = ",\n    ".join([f"('{row['parameter']}', '{row['method']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript, placeholder = v.placeholder\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, method, label, descript, placeholder)\nWHERE t.parameter = v.parameter AND t.method = v.method;\n\n")
@@ -789,9 +793,9 @@ class GwI18NGenerator:
                   'General Public License as published by the Free Software Foundation, either version 3 of the '
                   'License, or (at your option) any later version.\n'
                   '*/\n\n\n')
-        if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"]:
-            header += ('SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
-                       "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n")
+        if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"] and "no_tr.sql" not in path.lower():
+            header += 'SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
+            header += "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n"
         elif file_type == "am":
             header += 'SET search_path = am, public;\n'
         elif file_type == "cm":
