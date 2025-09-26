@@ -94,6 +94,10 @@ BEGIN
         SELECT lower(feature_type) FROM cat_feature WHERE child_layer = '||quote_literal(v_tg_table_name)||' OR parent_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
         INTO v_feature_type;
 
+		IF v_feature_type IS NULL THEN
+			v_feature_type := 'element';
+		END IF;
+
 
         EXECUTE '
         SELECT man_table FROM cat_feature_'||v_feature_type||' n

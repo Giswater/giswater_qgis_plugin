@@ -20,15 +20,15 @@ BEGIN
 
 	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		-- get element type
-		SELECT cat_feature.feature_class INTO element_type
-		FROM element
-			JOIN cat_element ON element.elementcat_id = cat_element.id
-			JOIN cat_feature_element ON cat_element.element_type = cat_feature_element.id
-			JOIN cat_feature ON cat_feature_element.id = cat_feature.id
-		WHERE element_id = NEW.element_id;
+	-- get element type
+	SELECT cat_feature.feature_class INTO element_type
+	FROM element
+		JOIN cat_element ON element.elementcat_id = cat_element.id
+		JOIN cat_feature_element ON cat_element.element_type = cat_feature_element.id
+		JOIN cat_feature ON cat_feature_element.id = cat_feature.id
+	WHERE element_id = NEW.element_id;
 
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
 		-- check if element is a frelem
 		IF element_type = 'FRELEM' THEN
@@ -73,14 +73,17 @@ BEGIN
 		END IF;
 	
 	ELSEIF TG_OP = 'DELETE' THEN
-		
-		SELECT epa_type INTO v_epa_type FROM element WHERE element_id = OLD.element_id;
-		IF v_epa_type IS NOT NULL AND v_epa_type != 'UNDEFINED' THEN
-			EXECUTE format('DELETE FROM inp_%s WHERE element_id = %s', v_epa_type, OLD.element_id);
-		END IF;
+		-- check if element is a frelem
+		IF element_type = 'FRELEM' THEN
+			SELECT epa_type INTO v_epa_type FROM element WHERE element_id = OLD.element_id;
+			IF v_epa_type IS NOT NULL AND v_epa_type != 'UNDEFINED' THEN
+				EXECUTE format('DELETE FROM inp_%s WHERE element_id = %s', v_epa_type, OLD.element_id);
+			END IF;
 
-		DELETE FROM element WHERE element_id = OLD.element_id;
-		RETURN OLD;
+			DELETE FROM element WHERE element_id = OLD.element_id;
+		ELSE
+			RETURN OLD;
+		END IF;
 	END IF;
 
 END;
