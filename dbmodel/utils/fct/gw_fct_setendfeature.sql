@@ -115,7 +115,8 @@ BEGIN
 				EXECUTE 'UPDATE connec SET arc_id = NULL WHERE state = 1 AND arc_id = '|| quote_literal(v_feature_id_value)||';';
 
 				--check if arc is involved into psector because of some link
-				EXECUTE 'SELECT count(connec.connec_id)  FROM connec JOIN plan_psector_x_connec p USING (arc_id) JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE'
+				EXECUTE 'SELECT count(connec.connec_id)  FROM connec JOIN plan_psector_x_connec p USING (arc_id) JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE
+						 AND connec.arc_id = '|| quote_literal(v_feature_id_value)||';'
 				INTO v_num_feature;
 
 				IF v_num_feature > 0 THEN
