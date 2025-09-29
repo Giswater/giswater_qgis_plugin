@@ -717,6 +717,24 @@ BEGIN
                        "data":{"message":"3382", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 						END IF;
 
+					IF (SELECT EXISTS (SELECT arc_id FROM plan_psector_x_arc WHERE arc_id = v_arc_id)) IS TRUE THEN -- the divided arc IS involved INTO a psector WITH p_state=0
+						
+							INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, insert_tstamp, insert_user)
+							SELECT rec_aux1.arc_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+						
+							INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, insert_tstamp, insert_user)
+							SELECT rec_aux2.arc_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+
+
+							-- downgrade the features, as the divided arc will be eventually downgraded according to plan_psector_x_arc.status
+							INSERT INTO plan_psector_x_node (node_id, psector_id, state, insert_tstamp, insert_user)
+							SELECT v_node_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+
+							-- remove old arc references from psector
+							DELETE FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
+	
+						END IF;
+
 					ELSIF v_state_node = 2 THEN --is psector
 
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres (it seems that does not recognize the new node inserted)
@@ -989,7 +1007,7 @@ BEGIN
 								UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3408", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
+                       			"data":{"message":"3408", "function":"2114", "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 							END IF;
 
@@ -1120,19 +1138,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	IF (SELECT EXISTS (SELECT arc_id FROM plan_psector_x_arc WHERE arc_id = v_arc_id)) IS TRUE THEN -- the divided arc IS involved INTO a psector WITH p_state=0
-		
-		-- downgrade the features, as the divided arc will be eventually downgraded according to plan_psector_x_arc.status
-		INSERT INTO plan_psector_x_node (node_id, psector_id, state, insert_tstamp, insert_user)
-		SELECT v_node_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
-		
-		INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, insert_tstamp, insert_user)
-		SELECT rec_aux1.arc_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
 	
-		INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, insert_tstamp, insert_user)
-		SELECT rec_aux2.arc_id, psector_id, 0, now(), current_user FROM plan_psector_x_arc WHERE arc_id = v_arc_id;
-
-	END IF;
 
 	-- get results
 	-- info
