@@ -321,6 +321,8 @@ class GwImportInpTask(GwTask):
                 else:
                     if category == "report" and type(value) is bool:
                         value = "YES" if value else "NO"
+                    elif category == "time" and key not in ("pattern_start", "statistic"):
+                        value = f"{value//3600}:{(value%3600)//60:02d}" if value else None
                     prefix = prefix_map.get(category, "inp_options_")
                     param_name = params_map[category].get(key.lower(), key.lower())
                     param_name = f"{prefix}{param_name}"
