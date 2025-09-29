@@ -385,6 +385,18 @@
 			<translation>Importar CSV</translation>
 		</message>
 		<message>
+			<source>Import CSV</source>
+			<translation>Importar CSV</translation>
+		</message>
+		<message>
+			<source>Import</source>
+			<translation>Importar</translation>
+		</message>
+		<message>
+			<source>Export</source>
+			<translation>Exportar</translation>
+		</message>
+		<message>
 			<source>GwVisitButton</source>
 			<translation>Añadir visita</translation>
 		</message>
