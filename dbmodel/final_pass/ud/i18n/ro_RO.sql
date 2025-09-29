@@ -6092,6 +6092,7 @@ FROM (
     (3011, 'CHECK DB DATA'),
     (2030, '------------------------------'),
     (1003, 'ERROR'),
+    (2000, ' '),
     (3003, 'ERORI'),
     (1004, 'ERORI CRITICE'),
     (2022, '----------------------'),
@@ -6101,7 +6102,6 @@ FROM (
     (2008, '--------'),
     (1001, 'INFO'),
     (1007, 'ERROR-403'),
-    (2000, ''),
     (3013, 'Pentru a verifica ERORI CRITICE sau AVERTIZĂRI, executați o interogare FROM anl_table WHERE fid=numărul erorii AND current_user. De exemplu: SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user; Doar erorile cu anl_table alături de număr pot fi verificate în acest fel. Folosind Giswater Toolbox este de asemenea posibil să verificați aceste erori')
 ) AS v(id, idval)
 WHERE t.id = v.id;

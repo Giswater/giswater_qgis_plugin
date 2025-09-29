@@ -6092,6 +6092,7 @@ FROM (
     (3011, 'COMPROBAR DATOS DE BASE DE DATOS'),
     (2030, '------------------------------'),
     (1003, 'ERROR'),
+    (2000, ' '),
     (3003, 'ERRORES'),
     (1004, 'ERRORES CRÍTICOS'),
     (2022, '----------------------'),
@@ -6101,7 +6102,6 @@ FROM (
     (2008, '--------'),
     (1001, 'INFO'),
     (1007, 'ERROR-456'),
-    (2000, ''),
     (3013, 'Para comprobar ERRORES CRÍTICOS o WARNINGS, ejecute una consulta FROM anl_table WHERE fid=número de error AND usuario_actual. Por ejemplo SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=actual_user; Sólo los errores con anl_table junto al número se pueden comprobar de esta manera. Usando Giswater Toolbox también es posible comprobar estos errores')
 ) AS v(id, idval)
 WHERE t.id = v.id;
