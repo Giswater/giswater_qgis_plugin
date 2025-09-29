@@ -89,7 +89,7 @@ def main(project_type: str) -> None:
 
     # Define the final pass directory
     final_pass_dir = f"final_pass/{project_type}/config_form_fields"
-    final_pass_i18n_dir = f"final_pass/{project_type}/i18n/en_US"
+    final_pass_i18n_dir = f"final_pass/{project_type}/i18n"
 
     # Check if the final pass directory exists and process it
     if os.path.isdir(final_pass_dir):
@@ -107,7 +107,7 @@ def main(project_type: str) -> None:
         logger.info(f"Processing root directory: {final_pass_i18n_dir}")
         for root, _, files in os.walk(final_pass_i18n_dir):
             for file in sorted(files):
-                if file.endswith(".sql") and exclude_prefix not in file:
+                if file.endswith(".sql") and exclude_prefix not in file and "en_US" in file:
                     file_path = os.path.join(root, file)
                     execute_sql_file(conn, file_path)
     else:
