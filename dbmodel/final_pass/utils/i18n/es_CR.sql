@@ -8153,7 +8153,7 @@ FROM (
     (2008, '--------'),
     (1001, 'INFO'),
     (1007, 'ERROR-403'),
-    (2000, NULL),
+    (2000, ''),
     (3013, 'Para comprobar ERRORES CRÍTICOS o WARNINGS, ejecute una consulta FROM anl_table WHERE fid=número de error AND usuario_actual. Por ejemplo  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=actual_user;  Sólo los errores con anl_table al lado del número se pueden comprobar de esta manera. Utilizando Giswater Toolbox también es posible comprobar estos errores.'),
     (3013, 'Para verificar los ERRORES CRÍTICOS o los WARNINGS, ejecuta la query a la tabla ''anl_arc'' WHERE fid=error number AND current_user. Por ejemplo:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Sólo los errores acompañados de la tabla ANL con un número pueden verificarse de esta forma. Mediante la Toolbox Giswater, también es posible verificar estos errores')
 ) AS v(id, idval)

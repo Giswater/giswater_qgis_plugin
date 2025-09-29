@@ -8153,7 +8153,7 @@ FROM (
     (2008, '--------'),
     (1001, 'INFO'),
     (1007, 'ERROR-403'),
-    (2000, NULL),
+    (2000, ''),
     (3013, 'Um CRITICAL ERRORS oder WARNINGS zu prüfen, führen Sie eine Abfrage FROM anl_table WHERE fid=error number AND current_user aus. Zum Beispiel:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Nur die Fehler mit anl_table neben der Nummer können auf diese Weise überprüft werden. Mit der Giswater Toolbox ist es auch möglich, diese Fehler zu überprüfen.'),
     (3013, 'Um CRITICAL ERRORS oder WARNINGS zu prüfen, führen Sie eine Abfrage FROM anl_table WHERE fid=error number AND current_user aus. Zum Beispiel: SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user; Nur die Fehler mit anl_table neben der Nummer können auf diese Weise überprüft werden. Mit der Giswater Toolbox ist es auch möglich, diese Fehler zu überprüfen')
 ) AS v(id, idval)
