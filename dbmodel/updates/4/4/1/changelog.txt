@@ -1,0 +1,6 @@
+4.4.1
+*************
+- Update config_form_tableview for nonvisual manager forms (patterns, curves, controls, rules, roughness, timeseries).
+- Fix objectname references from v_edit_* to ve_inp_* for better form integration.
+- Add missing tableview configurations for cat_mat_roughness and ve_inp_timeseries.
+- Update foreign key constraint on plan_psector_x_connec.link_id to include CASCADE and SET NULL options.
