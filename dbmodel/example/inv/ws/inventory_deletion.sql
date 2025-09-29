@@ -25,7 +25,7 @@ DELETE FROM inp_controls;
 DELETE FROM sector WHERE sector_id > 2;
 
 UPDATE sector s SET the_geom = e.the_geom FROM exploitation e WHERE s.sector_id = e.expl_id;
-UPDATE sector SET "name"='sector2-1s' WHERE sector_id=2;
+UPDATE sector SET "name"='sector2-1s', expl_id='{2}', macrosector_id=2 WHERE sector_id=2;
 
 UPDATE inp_valve SET valve_type =NULL, custom_dint=null;
 UPDATE inp_pump SET curve_id = null, status= null, pump_type = null;
