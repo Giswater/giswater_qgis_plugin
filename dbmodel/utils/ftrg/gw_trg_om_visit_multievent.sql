@@ -21,6 +21,12 @@ DECLARE
     v_pluginlot boolean;
     v_unit_id integer;
     v_num_elem_visit text;
+    v_feature_id bigint;
+    v_id_field text;
+    v_uuid_field text;
+    v_link_table text;
+    v_uuid uuid;
+    v_new_json jsonb;
 
 BEGIN
 
@@ -28,6 +34,9 @@ BEGIN
     visit_class:= TG_ARGV[0];
 
     visit_table=(SELECT lower(feature_type) FROM config_visit_class WHERE id=visit_class);
+	v_id_field   := visit_table || '_id';
+    v_uuid_field := visit_table || '_uuid';
+    v_link_table := 'om_visit_x_' || visit_table;
 
     --INFO: v_visit_type=1 (planned) v_visit_type=2(unexpected/incidencia)
     v_visit_type=(SELECT visit_type FROM config_visit_class WHERE id=visit_class);
@@ -101,21 +110,38 @@ BEGIN
                     USING NEW.visit_id, v_parameters.id, v_new_value_param;
             END LOOP;
 
-            IF visit_table = 'arc' THEN
-                INSERT INTO  om_visit_x_arc (visit_id,arc_id) VALUES (NEW.visit_id, NEW.arc_id);
+			-- insert into om_visit_x_* tables. Exception to manage *_uuid field if exists and we need it to insert coming from Qfield
+			-- convert NEW to a jsonb to prove if this field exists
+		    v_new_json := to_jsonb(NEW);
+		
+		    IF v_new_json ? v_uuid_field THEN
+		        -- *_uuid exists in the trigger view
+		        v_uuid := (v_new_json ->> v_uuid_field)::uuid;
+		
+		        IF v_uuid IS NOT NULL THEN
+		            -- uuid value exists in the parent table
+		            EXECUTE format('SELECT %I FROM %I WHERE uuid = $1', v_id_field, visit_table)
+		            INTO v_feature_id
+		            USING v_uuid;
+		        END IF;
+		    END IF;
+		
+		    IF v_feature_id IS NOT NULL THEN
+		        -- insert with uuid
+		        v_sql := format(
+		            'INSERT INTO %I (visit_id, %I, %I) VALUES ($1, $2, $3)',
+		            v_link_table, v_id_field, v_uuid_field
+		        );
+		        EXECUTE v_sql USING NEW.visit_id, v_feature_id, v_uuid;
+		    ELSE
+		        -- insert withoud uuid
+		        v_sql := format(
+		            'INSERT INTO %I (visit_id, %I) VALUES ($1, ($2).%I)',
+		            v_link_table, v_id_field, v_id_field
+		        );
+		        EXECUTE v_sql USING NEW.visit_id, NEW, v_id_field;
+		    END IF;
 
-            ELSIF visit_table = 'node' THEN
-                INSERT INTO  om_visit_x_node (visit_id,node_id) VALUES (NEW.visit_id, NEW.node_id);
-
-            ELSIF visit_table = 'connec' THEN
-                INSERT INTO  om_visit_x_connec (visit_id,connec_id) VALUES (NEW.visit_id, NEW.connec_id);
-
-			ELSIF visit_table = 'link' THEN
-				INSERT INTO  om_visit_x_link (visit_id,link_id) VALUES (NEW.visit_id, NEW.link_id);
-
-            ELSIF visit_table = 'gully' THEN
-                INSERT INTO  om_visit_x_gully (visit_id,gully_id) VALUES (NEW.visit_id, NEW.gully_id);
-            END IF;
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN

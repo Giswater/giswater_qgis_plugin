@@ -1,0 +1,3 @@
+4.5.0
+*************
+- Modify trg_om_visit_multievent to allow insert using uuid
