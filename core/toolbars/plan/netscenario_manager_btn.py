@@ -78,7 +78,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_netscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_netscenario))
         self.dlg_netscenario_manager.btn_update.clicked.connect(partial(self._manage_properties))
-        self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_current_netscenario))
+        self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
@@ -320,18 +320,24 @@ class GwNetscenarioManagerButton(GwAction):
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'copyFrom'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
-    def _execute_current_netscenario(self):
-        """ Executes the current netscenario """
-        self.current_netscenario_id = tools_gw.get_config_value('plan_netscenario_current')
-        if self.current_netscenario_id is None:
-            msg = "No current netscenario"
+    def _execute_selected_netscenario(self):
+        """ Executes the selected netscenario """
+        # Get selected row
+        selected_list = self.tbl_netscenario.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            msg = "Any record selected"
             tools_qgis.show_warning(msg, dialog=self.dlg_netscenario_manager)
             return
 
+        # Get selected netscenario id
+        index = self.tbl_netscenario.selectionModel().currentIndex()
+        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_id')
+        value = index.sibling(index.row(), col_idx).data()
+
         # Execute toolbox function
         dlg_functions = self._open_toolbox_function(3256)
-        # Set netscenario_id in combo copyFrom
-        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{self.current_netscenario_id[0]}", 0)
+        # Set netscenario_id in combo netscenario
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'netscenario', False)
 
     def _delete_selected_netscenario(self):
