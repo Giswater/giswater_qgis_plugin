@@ -320,6 +320,7 @@ class GwImportInpTask(GwTask):
                     process_options(value, category)
                 else:
                     if category == "report" and type(value) is bool:
+                        # TODO: manage "nodes" and "links" options
                         value = "YES" if value else "NO"
                     elif category == "time" and key not in ("pattern_start", "statistic"):
                         value = f"{value//3600}:{(value%3600)//60:02d}" if value else None
