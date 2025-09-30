@@ -335,7 +335,12 @@ class GwNetscenarioManagerButton(GwAction):
         value = index.sibling(index.row(), col_idx).data()
 
         # Execute toolbox function
-        dlg_functions = self._open_toolbox_function(3256)
+        connect = [
+            partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario),
+            partial(self._fill_manager_table),
+            partial(tools_gw.refresh_selectors)
+        ]
+        dlg_functions = self._open_toolbox_function(3256, connect=connect)
         # Set netscenario_id in combo netscenario
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'netscenario', False)
