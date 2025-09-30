@@ -71,7 +71,7 @@ BEGIN
 					st.orderby,
 					(ct.addparam->>'orderBy')::integer as group_order,
 					st.project_template,
-					st.context,
+					ct.idval AS context,
 					st.alias AS "layerName",
 					st.id AS "tableName",
 					COALESCE(c.table_schema, 'SCHEMA_NAME') AS "tableSchema",
@@ -107,7 +107,7 @@ BEGIN
 					st.orderby,
 					999 as group_order, -- CM layers go last
 					st.project_template,
-					st.context,
+					t.idval as context,
 					COALESCE(st.alias, st.id) as "layerName",
 					st.id as "tableName",
 					'cm' AS "tableSchema",
@@ -121,6 +121,7 @@ BEGIN
 						ELSE st.addparam->>'pkey'
 					END AS "tableId"
 				FROM cm.sys_table st
+				JOIN cm.sys_typevalue t ON t.id = st.context
 				LEFT JOIN (
 					SELECT column_name, table_name FROM information_schema.columns
 					WHERE udt_name = 'geometry' AND table_schema = 'cm'
@@ -129,7 +130,7 @@ BEGIN
 					SELECT column_name, table_name FROM information_schema.columns
 					WHERE ordinal_position = 1 AND table_schema = 'cm'
 				) i ON st.id = i.table_name
-				WHERE st.project_template IS NOT NULL
+				WHERE st.project_template IS NOT NULL AND t.typevalue = 'sys_table_context'
 			) as layers
 			ORDER BY
 				CASE "tableSchema"
@@ -148,7 +149,7 @@ BEGIN
 				st.orderby,
 				(ct.addparam->>'orderBy')::integer as group_order,
 				st.project_template,
-				st.context,
+				ct.idval AS context,
 				st.alias AS "layerName",
 				st.id AS "tableName",
 				COALESCE(c.table_schema, 'SCHEMA_NAME') AS "tableSchema",
