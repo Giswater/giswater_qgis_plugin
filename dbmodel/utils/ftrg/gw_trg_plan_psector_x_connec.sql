@@ -60,7 +60,7 @@ BEGIN
 	SELECT link_id INTO v_link_id FROM ve_link WHERE feature_id = NEW.connec_id LIMIT 1;
 
 	IF TG_OP = 'INSERT' THEN
-		IF v_link_id IS NOT NULL THEN
+		IF v_link_id IS NOT NULL AND NEW.state = 0 THEN
 			NEW.link_id = v_link_id;
 		END IF;
 	END IF;
