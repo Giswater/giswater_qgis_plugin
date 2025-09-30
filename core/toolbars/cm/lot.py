@@ -27,13 +27,6 @@ from ...utils.selection_widget import GwSelectionWidget
  
 
 class AddNewLot:
-    """Handles lot creation, management, and database operations"""
-    
-    # Valid feature types for lots
-    VALID_FEATURE_TYPES = ['arc', 'node', 'connec', 'gully', 'link']
-    
-    # Maximum results for typeahead
-    MAX_TYPEAHEAD_RESULTS = 100
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
@@ -1080,69 +1073,62 @@ class AddNewLot:
         # Set up per-keystroke typeahead (prefix, LIMIT 100) against campaign-linked IDs only
         feature_id_lineedit = dlg.findChild(QLineEdit, "feature_id")
         if feature_id_lineedit:
-            self._ensure_lot_completer_infrastructure(dlg, feature_id_lineedit)
-            self._connect_lot_typeahead_handler(dlg, feature_id_lineedit, feature, lot_id)
+            # Reuse one model/completer
+            if not hasattr(self, '_lot_feature_model') or self._lot_feature_model is None:
+                self._lot_feature_model = QStringListModel(dlg)
+            if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
+                self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
+                self._lot_feature_completer.setCaseSensitivity(False)
+                self._lot_feature_completer.setCompletionMode(QCompleter.PopupCompletion)
+                feature_id_lineedit.setCompleter(self._lot_feature_completer)
 
-    def _ensure_lot_completer_infrastructure(self, dlg: QDialog, feature_id_lineedit: QLineEdit):
-        """Ensure lot completer model and completer are properly initialized."""
-        # Reuse one model/completer
-        if not hasattr(self, '_lot_feature_model') or self._lot_feature_model is None:
-            self._lot_feature_model = QStringListModel(dlg)
-        if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
-            self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
-            self._lot_feature_completer.setCaseSensitivity(False)
-            self._lot_feature_completer.setCompletionMode(QCompleter.PopupCompletion)
-            feature_id_lineedit.setCompleter(self._lot_feature_completer)
-
-    def _connect_lot_typeahead_handler(self, dlg: QDialog, feature_id_lineedit: QLineEdit, feature: str, lot_id: int):
-        """Connect the lot typeahead handler to the feature ID line edit."""
-        try:
-            feature_id_lineedit.textEdited.disconnect()
-        except Exception:
-            pass
-        feature_id_lineedit.textEdited.connect(partial(self._lot_feature_typeahead, dlg, feature, lot_id))
+            try:
+                feature_id_lineedit.textEdited.disconnect()
+            except Exception:
+                pass
+            feature_id_lineedit.textEdited.connect(partial(self._lot_feature_typeahead, dlg, feature, lot_id))
 
     def _lot_feature_typeahead(self, dlg: QDialog, feature: str, lot_id: int, text: str = ''):
-        """Typeahead for lot: search only among features attached to the selected campaign."""
-        value_list = []
-        if text and len(text) >= 1:
-            # Get all allowed feature IDs for this lot's campaign
-            allowed_feature_ids = self.get_allowed_features_for_lot(feature, lot_id)
-            
-            if allowed_feature_ids:
-                # Filter by text input from the allowed IDs with case-insensitive matching
-                safe = str(text).replace("'", "''")
-                matching_ids = [fid for fid in allowed_feature_ids if str(fid).lower().startswith(safe.lower())]
-                value_list = matching_ids[:self.MAX_TYPEAHEAD_RESULTS]  # Limit to max results
+        """Typeahead for lot: search only among features attached to the selected campaign.
 
-        # Force our completer to be the one that works
+        SQL uses campaign_id derived from lot and filters by id prefix with LIMIT 100.
+        """
+        if not text or len(text) < 1:
+            # Clear to avoid massive preload
+            if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+                self._lot_feature_model.setStringList([])
+            return
+
+        # Resolve campaign
+        row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
+        campaign_id = row[0] if row else None
+        if not campaign_id:
+            if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+                self._lot_feature_model.setStringList([])
+            return
+
+        id_col = f"{feature}_id"
+        safe = str(text).replace("'", "''")
+        sql = (
+            f"SELECT {id_col}::text AS val "
+            f"FROM cm.om_campaign_x_{feature} "
+            f"WHERE campaign_id = {campaign_id} "
+            f"  AND {id_col}::text ILIKE '{safe}%' "
+            f"ORDER BY {id_col} LIMIT 100"
+        )
+        rows = tools_db.get_rows(sql)
+        values = [r.get('val') for r in (rows or []) if r.get('val')]
         if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
-            self._update_lot_completer_model(dlg, value_list, text)
-
-    def _update_lot_completer_model(self, dlg: QDialog, value_list: List[str], text: str):
-        """Update the lot completer model with filtered data and trigger completion."""
-        # Clear any existing completer and force ours
-        dlg.feature_id.setCompleter(None)
-        
-        # Set our model with the filtered data
-        self._lot_feature_model.setStringList(value_list)
-        
-        # Reattach our completer
-        dlg.feature_id.setCompleter(self._lot_feature_completer)
-        
-        # Only show popup when there is user text and some results
-        if text and value_list:
+            self._lot_feature_model.setStringList(values)
             try:
-                dlg.feature_id.completer().complete()
+                if self.dlg_lot and self.dlg_lot.feature_id and self.dlg_lot.feature_id.completer():
+                    self.dlg_lot.feature_id.completer().complete()
             except Exception:
                 pass
 
-    def get_allowed_features_for_lot(self, feature: str, lot_id: int) -> Optional[List[Any]]:
+    def get_allowed_features_for_lot(self, lot_id: int, feature_type: str) -> Optional[List[Any]]:
         """Return list of allowed feature IDs for the lot's campaign and feature tab."""
-        if not feature or feature not in self.VALID_FEATURE_TYPES:
-            return None
-            
-        if not lot_id or lot_id <= 0:
+        if not feature_type or feature_type not in ['arc', 'node', 'connec', 'gully', 'link']:
             return None
             
         try:
@@ -1152,12 +1138,12 @@ class AddNewLot:
                 return None
                 
             campaign_id = row[0]
-            id_column = f"{feature}_id"
+            id_column = f"{feature_type}_id"
             
             # Get all feature IDs from the campaign for this feature type
             sql = f"""
                 SELECT {id_column}::text AS {id_column}
-                FROM cm.om_campaign_x_{feature}
+                FROM cm.om_campaign_x_{feature_type}
                 WHERE campaign_id = {campaign_id}
                 ORDER BY {id_column}
             """
@@ -1165,7 +1151,6 @@ class AddNewLot:
             result = [row[id_column] for row in (rows or []) if row.get(id_column)]
             return result
         except Exception:
-            # Return None if there's any database error
             return None
 
     def resources_management(self):
