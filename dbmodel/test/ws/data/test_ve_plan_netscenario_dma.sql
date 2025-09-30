@@ -13,7 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-insert into plan_netscenario (netscenario_id) values (-901);
+insert into plan_netscenario (netscenario_id, expl_id) values (-901, 1);
+INSERT INTO selector_expl (cur_user, expl_id) VALUES (current_user, 1) ON CONFLICT (cur_user, expl_id) DO NOTHING;
 
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES ('plan_netscenario_current', '-901', current_user)
 ON CONFLICT ("parameter", cur_user) DO UPDATE SET value = EXCLUDED.value;
