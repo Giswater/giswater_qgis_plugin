@@ -311,26 +311,35 @@ BEGIN
 		SELECT result_id_arg, connec_id, c.the_geom, c.customer_code FROM ve_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
 	ELSE
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
-		SELECT result_id_arg, connec_id, connec.the_geom, customer_code FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;
+		SELECT result_id_arg, connec_id, connec.the_geom, customer_code 
+		FROM connec 
+		JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id 
+		JOIN value_state_type v ON connec.state_type = v.id
+		WHERE result_id=result_id_arg 
+			AND state = 1
+			AND v.is_operative = TRUE;
 	END IF;
 
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
 
 	-- insert hydrometer from connec
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec
-	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id
-	JOIN connec ON om_mincut_connec.connec_id=connec.connec_id
-	JOIN value_state_type v ON state_type = v.id
-	WHERE result_id=result_id_arg AND v.is_operative=TRUE AND rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id;
+	SELECT result_id_arg, rhxc.hydrometer_id 
+	FROM rtc_hydrometer_x_connec rhxc
+	JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
+	JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.id
+	WHERE result_id = result_id_arg 
+		AND rhxc.connec_id = omc.connec_id
+		AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 	-- insert hydrometer from node
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT result_id_arg,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node
-	JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id
-	JOIN node ON om_mincut_node.node_id=node.node_id
-	JOIN value_state_type v ON state_type = v.id
-	WHERE result_id=result_id_arg AND v.is_operative=TRUE AND rtc_hydrometer_x_node.node_id=om_mincut_node.node_id;
+	SELECT result_id_arg, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
+	JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
+	JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.id
+	WHERE result_id = result_id_arg 
+		AND rhxn.node_id = omn.node_id
+		AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
