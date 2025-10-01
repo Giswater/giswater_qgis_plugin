@@ -75,20 +75,11 @@ BEGIN
   END LOOP;
 
   -- RLS: restrict SELECT on cm_audit.log to caller's organization (derived from usernames)
+  -- Uses cm.user_org_id() helper which is SECURITY DEFINER and bypasses RLS on cat_user/cat_team
   EXECUTE 'DROP POLICY IF EXISTS log_sel_by_org ON cm_audit.log';
   EXECUTE $sql$ CREATE POLICY log_sel_by_org ON cm_audit.log
     FOR SELECT USING (
-      (SELECT t.organization_id
-         FROM cm.cat_user u
-         JOIN cm.cat_team t ON t.team_id = u.team_id
-        WHERE u.username = current_user
-        LIMIT 1)
-      =
-      (SELECT t.organization_id
-         FROM cm.cat_user u2
-         JOIN cm.cat_team t ON t.team_id = u2.team_id
-        WHERE u2.username = cm_audit.log.insert_by
-        LIMIT 1)
+      cm.user_org_id(current_user) = cm.user_org_id(cm_audit.log.insert_by)
     ) $sql$;
 
   -- Restore previous search_path before returning

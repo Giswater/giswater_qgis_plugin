@@ -73,6 +73,29 @@ BEGIN
     $b$;
   $f$;
 
+  -- Helper to resolve any user's organization (bypasses RLS for audit purposes)
+  EXECUTE $f$
+    CREATE OR REPLACE FUNCTION cm.user_org_id(p_username text)
+    RETURNS integer
+    LANGUAGE plpgsql
+    STABLE
+    SECURITY DEFINER
+    SET search_path = cm, public
+    AS $b$
+    DECLARE
+      v_org_id integer;
+    BEGIN
+      SELECT t.organization_id
+      INTO v_org_id
+      FROM cm.cat_user u
+      JOIN cm.cat_team t ON t.team_id = u.team_id
+      WHERE u.username = p_username
+      LIMIT 1;
+      RETURN v_org_id;
+    END;
+    $b$;
+  $f$;
+
   -- Helpful indexes
   EXECUTE 'CREATE INDEX IF NOT EXISTS om_campaign_org_idx            ON cm.om_campaign (organization_id)';
   EXECUTE 'CREATE INDEX IF NOT EXISTS om_campaign_lot_campaign_idx   ON cm.om_campaign_lot (campaign_id)';
@@ -161,14 +184,17 @@ BEGIN
   EXECUTE $sql$ CREATE POLICY ct_del ON cm.cat_team
     FOR DELETE USING (cm.current_org_id() IS NULL OR organization_id = cm.current_org_id()); $sql$;
 
-  -- cat_user policies (only users in caller's SAME team)
+  -- cat_user policies (only users in caller's SAME organization)
   EXECUTE 'DROP POLICY IF EXISTS cu_sel ON cm.cat_user';
   EXECUTE 'DROP POLICY IF EXISTS cu_ins ON cm.cat_user';
   EXECUTE 'DROP POLICY IF EXISTS cu_upd ON cm.cat_user';
   EXECUTE 'DROP POLICY IF EXISTS cu_del ON cm.cat_user';
   -- Use helper function to avoid self-reference and recursion
   EXECUTE $sql$ CREATE POLICY cu_sel ON cm.cat_user
-    FOR SELECT USING (cm.current_org_id() IS NULL OR team_id = cm.current_team_id()); $sql$;
+    FOR SELECT USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.cat_team t
+      WHERE t.team_id = cm.cat_user.team_id
+        AND t.organization_id = cm.current_org_id())); $sql$;
   EXECUTE $sql$ CREATE POLICY cu_ins ON cm.cat_user
     FOR INSERT WITH CHECK (cm.current_org_id() IS NULL OR team_id = cm.current_team_id()); $sql$;
   EXECUTE $sql$ CREATE POLICY cu_upd ON cm.cat_user
