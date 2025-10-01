@@ -50,7 +50,7 @@ DECLARE
     v_arc_list TEXT;
 
     v_response JSON;
-
+    v_error_context TEXT;
     v_result_info JSON;
     v_result_point JSON;
     v_result_line JSON;
@@ -69,6 +69,7 @@ DECLARE
     v_pgr_root_vids int[];
     v_cost_field TEXT;
     v_reverse_cost_field TEXT;
+    
 
 BEGIN
 
@@ -709,6 +710,11 @@ BEGIN
         '}' ||
         '}')::json, 2706, NULL, ('{"visible": [' || v_visible_layer || ']}')::json, NULL
     );
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
