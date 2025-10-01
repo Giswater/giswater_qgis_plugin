@@ -163,6 +163,8 @@ BEGIN
                        "data":{"message":"3432", "function":"3068", "parameters":{"v_count":"'||v_count||'", "v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 
 				END IF;
+
+				DELETE FROM plan_psector_x_arc WHERE arc_id = v_feature_id_value;
 			END LOOP;
 
 			-- generic log for arcs
@@ -234,6 +236,8 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3418", "function":"3068", "parameters":{"v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'", "v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 				END IF;
+
+				DELETE FROM plan_psector_x_node WHERE node_id = v_feature_id_value;
 			END LOOP;
 
 			-- generic log for nodes
@@ -272,6 +276,8 @@ BEGIN
                        "data":{"message":"3422", "function":"3068", "parameters":{"v_count":"'||v_count||'", "v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 
 				END IF;
+
+				DELETE FROM plan_psector_x_connec WHERE connec_id = v_feature_id_value;
 			END LOOP;
 
 			-- generic log for connecs
@@ -301,6 +307,8 @@ BEGIN
                        "data":{"message":"3426", "function":"3068", "parameters":{"v_count":"'||v_count||'". "v_feature_id_value":"'||v_feature_id_value||'", "v_element_id":"'||v_element_id||'"}, "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 
 				END IF;
+
+				DELETE FROM plan_psector_x_gully WHERE gully_id = v_feature_id_value;
 			end loop;
 
 			-- generic log for connecs
@@ -326,17 +334,17 @@ BEGIN
 				FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
 	    		LOOP
 					v_count_feature = v_count_feature + 1;
+
+					UPDATE plan_psector_x_connec SET link_id = NULL WHERE link_id = v_feature_id_value;
+					IF v_projecttype = 'UD' THEN
+						UPDATE plan_psector_x_gully SET link_id = NULL WHERE link_id = v_feature_id_value;
+					END IF;
 				END LOOP;
 
 				IF v_count_feature > 0 THEN
-
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	                       "data":{"message":"4322", "function":"3068", "parameters":{"v_count_feature":"'||v_count_feature||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
-
-
             	END IF;
-
-
 			END IF;
 
 		ELSEIF v_feature_type = 'element' THEN
