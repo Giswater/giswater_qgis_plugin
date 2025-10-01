@@ -316,7 +316,7 @@ BEGIN
 		JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id 
 		JOIN value_state_type v ON connec.state_type = v.id
 		WHERE result_id=result_id_arg 
-			AND state = 1
+			AND connec.state = 1
 			AND v.is_operative = TRUE;
 	END IF;
 
