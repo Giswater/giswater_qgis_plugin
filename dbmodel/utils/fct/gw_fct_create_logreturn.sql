@@ -24,12 +24,16 @@ v_result json;
 v_returntype text;
 v_querytext text;
 v_rec record;
+v_project_type text;
 
 BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
+
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+
 
 	-- get input parameters
 	v_returntype := ((p_data->>'data')::json->>'parameters')::json->>'type';
@@ -44,24 +48,50 @@ BEGIN
 		FROM t_audit_check_data;
 
 		DELETE FROM anl_node WHERE fid in (select fid from t_anl_node) and cur_user=current_user;
-		INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, "depth", state_type, sector_id, losses, dma_id, presszone_id, dqa_id, minsector_id, demand, addparam)
-		SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, "depth", state_type, sector_id, losses, dma_id, presszone_id, dqa_id, minsector_id, demand, addparam 
-		FROM t_anl_node;
-
 		DELETE FROM anl_connec WHERE fid in (select fid from t_anl_connec) and cur_user=current_user;
-		INSERT INTO anl_connec (connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam)
-		SELECT connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam 
-		FROM t_anl_connec;
-
 		DELETE FROM anl_arc WHERE fid in (select fid from t_anl_arc) and cur_user=current_user;
-		INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, losses, dma_id, presszone_id, dqa_id, minsector_id, addparam, sector_id)
-		SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, losses, dma_id, presszone_id, dqa_id, minsector_id, addparam, sector_id 
-		FROM t_anl_arc;
-
 		DELETE FROM anl_polygon WHERE fid in (select fid from t_anl_polygon) and cur_user=current_user;
-		INSERT INTO anl_polygon (pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript)
-		SELECT pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript 
-		FROM t_anl_polygon;
+
+		IF v_project_type = 'WS' THEN
+
+			INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, "depth", state_type, sector_id, losses, dma_id, presszone_id, dqa_id, minsector_id, demand, addparam)
+			SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, "depth", state_type, sector_id, losses, dma_id, presszone_id, dqa_id, minsector_id, demand, addparam 
+			FROM t_anl_node;
+
+			INSERT INTO anl_connec (connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam)
+			SELECT connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam 
+			FROM t_anl_connec;
+
+			INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, losses, dma_id, presszone_id, dqa_id, minsector_id, addparam, sector_id)
+			SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, losses, dma_id, presszone_id, dqa_id, minsector_id, addparam, sector_id 
+			FROM t_anl_arc;
+
+			INSERT INTO anl_polygon (pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript)
+			SELECT pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript 
+			FROM t_anl_polygon;
+		ELSEIF v_project_type = 'UD' THEN
+
+			INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, ymax, state_type, sector_id, addparam, drainzone_id, dwfzone_id)
+			SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, ymax, state_type, sector_id, addparam, drainzone_id, dwfzone_id 
+			FROM t_anl_node;
+
+			INSERT INTO anl_connec (connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam, dwfzone_id, drainzone_id)
+			SELECT connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam, dwfzone_id, drainzone_id 
+			FROM t_anl_connec;
+
+			INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, dma_id, addparam, sector_id, drainzone_id, dwfzone_id)
+			SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, dma_id, addparam, sector_id, drainzone_id, dwfzone_id 
+			FROM t_anl_arc;
+
+			INSERT INTO anl_gully (gully_id, gullycat_id, state, gully_id_aux, gratecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam, dwfzone_id, drainzone_id)
+			SELECT gully_id, gullycat_id, state, gully_id_aux, gratecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam, dwfzone_id, drainzone_id 
+			FROM t_anl_gully;
+
+			INSERT INTO anl_polygon (pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript)
+			SELECT pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript 
+			FROM t_anl_polygon;
+
+		END IF;
 
 	ELSIF v_returntype = 'info' THEN
 
