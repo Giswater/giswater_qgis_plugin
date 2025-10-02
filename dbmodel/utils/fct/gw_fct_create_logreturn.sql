@@ -39,19 +39,29 @@ BEGIN
 	IF v_returntype = 'fillExcepTables' THEN -- delete and insert on anl tables
 
 		DELETE FROM audit_check_data WHERE fid in (select fid from t_audit_check_data) and cur_user=current_user;
-		INSERT INTO audit_check_data SELECT * FROM t_audit_check_data;
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled, error_message, tstamp, cur_user, feature_type, feature_id, addparam, fcount) 
+		SELECT fid, result_id, table_id, column_id, criticity, enabled, error_message, tstamp, cur_user, feature_type, feature_id, addparam, fcount 
+		FROM t_audit_check_data;
 
 		DELETE FROM anl_node WHERE fid in (select fid from t_anl_node) and cur_user=current_user;
-		INSERT INTO anl_node SELECT * FROM t_anl_node;
+		INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, "depth", state_type, sector_id, losses, dma_id, presszone_id, dqa_id, minsector_id, demand, addparam)
+		SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, descript, result_id, total_distance, sys_type, code, cat_geom1, top_elev, elev, "depth", state_type, sector_id, losses, dma_id, presszone_id, dqa_id, minsector_id, demand, addparam 
+		FROM t_anl_node;
 
 		DELETE FROM anl_connec WHERE fid in (select fid from t_anl_connec) and cur_user=current_user;
-		INSERT INTO anl_connec SELECT * FROM t_anl_connec;
+		INSERT INTO anl_connec (connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam)
+		SELECT connec_id, conneccat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam 
+		FROM t_anl_connec;
 
 		DELETE FROM anl_arc WHERE fid in (select fid from t_anl_arc) and cur_user=current_user;
-		INSERT INTO anl_arc SELECT * FROM t_anl_arc;
+		INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, losses, dma_id, presszone_id, dqa_id, minsector_id, addparam, sector_id)
+		SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, losses, dma_id, presszone_id, dqa_id, minsector_id, addparam, sector_id 
+		FROM t_anl_arc;
 
 		DELETE FROM anl_polygon WHERE fid in (select fid from t_anl_polygon) and cur_user=current_user;
-		INSERT INTO anl_polygon SELECT * FROM t_anl_polygon;
+		INSERT INTO anl_polygon (pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript)
+		SELECT pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript 
+		FROM t_anl_polygon;
 
 	ELSIF v_returntype = 'info' THEN
 
