@@ -19,3 +19,5 @@ UPDATE config_typevalue c
 SET idval = c.id, id = n.new_id
 FROM numbered n
 WHERE c.id = n.id AND c.typevalue = n.typevalue AND c.typevalue = 'sys_table_context';
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('widgettype_typevalue', 'valuerelation', 'valuerelation', 'valuerelation', NULL);
