@@ -71,3 +71,6 @@ UPDATE config_form_tableview
 UPDATE config_form_tableview
 	SET columnindex=5
 	WHERE objectname='ve_inp_timeseries' AND columnname='expl_id';
+
+INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source",message_type)
+VALUES (4362,'Fusion is not allowed due to inconsistent or opposite arc directions','Please review your arcs and ensure their directions are continuous and logical',2,true,'ud','core','UI');
