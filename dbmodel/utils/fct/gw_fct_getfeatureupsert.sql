@@ -1070,7 +1070,7 @@ BEGIN
 			END IF;
 
 			-- setting values
-			IF (aux_json->>'widgettype')='combo' THEN
+			IF (aux_json->>'widgettype')='combo' OR (aux_json->>'widgettype')='valuerelation' THEN
 
 				-- Set default value if exist when inserting and feild_value is null
 				IF v_tg_op ='INSERT' AND (field_value IS NULL OR field_value = '') THEN
