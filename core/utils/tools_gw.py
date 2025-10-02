@@ -2221,7 +2221,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
                 v = widget.item(i).data(Qt.UserRole)
                 try:
                     v = int(v)
-                except:
+                except ValueError:
                     pass
                 value.append(v)
 
@@ -2686,8 +2686,8 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
 
     return widget
 
-def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
-    
+
+def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):    
     widget = QListWidget()
 
     widget.setObjectName(field['widgetname'])
@@ -2702,7 +2702,6 @@ def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=F
         widget.setProperty('selectedId', None)
     if 'iseditable' in field:
         widget.setEnabled(bool(field['iseditable']))
-
 
     if not ignore_function and 'widgetfunction' in field and field['widgetfunction']:
         widgetfunction = field['widgetfunction']
@@ -2777,6 +2776,7 @@ def fill_valuerelation(widget, field, index_to_show=1, index_to_compare=0):
     # Set size policy for QListWidget - use setSizeAdjustPolicy instead
     widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
     return widget
+
 
 def set_valuerelation_value(listwidget, value, add_new=True):
     """
@@ -6604,6 +6604,7 @@ def _manage_combo(**kwargs):
     widget = add_combo(field, dialog, complet_result, class_info=class_info)
     widget = set_widget_size(widget, field)
     return widget
+
 
 def _manage_valuerelation(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
