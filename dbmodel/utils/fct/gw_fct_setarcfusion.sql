@@ -163,11 +163,11 @@ BEGIN
 				
 			ELSIF v_project_type = 'WS' THEN
 				-- any combination of node_1/node_2 is accepted
-				WITH arcs AS (SELECT * FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) 
+				WITH arcs AS (SELECT * FROM ve_arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) 
 				AND state > 0 ORDER BY arc_id)
 				SELECT * INTO v_record1 FROM arcs LIMIT 1;
 				
-				WITH arcs AS (SELECT * FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) 
+				WITH arcs AS (SELECT * FROM ve_arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) 
 				AND state > 0 ORDER BY arc_id)
 				SELECT * INTO v_record2 FROM arcs OFFSET 1 LIMIT 1;
 			END IF;
