@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -1749,6 +1749,10 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
         elif field['widgettype'] == 'button':
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
+        elif field['widgettype'] == 'valuerelation':
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_valuerelation(**kwargs)
+            widget.itemChanged.connect(partial(get_values, dialog, widget, my_json))
 
         if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
@@ -2208,6 +2212,18 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
         if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.get_calendar_date(dialog, widget)
+    elif isinstance(widget, QListWidget):
+        if not widget.isEnabled() and not ignore_editability:
+            return _json
+        value = []
+        for i in range(widget.count()):
+            if widget.item(i).checkState() == Qt.Checked:
+                v = widget.item(i).data(Qt.UserRole)
+                try:
+                    v = int(v)
+                except:
+                    pass
+                value.append(v)
 
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
     if key == '' or key is None:
@@ -2669,6 +2685,135 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
+
+def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
+    
+    widget = QListWidget()
+
+    widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget = fill_valuerelation(widget, field)
+    if 'selectedId' in field:
+        widget.setProperty('selectedId', field['selectedId'])
+    else:
+        widget.setProperty('selectedId', None)
+    if 'iseditable' in field:
+        widget.setEnabled(bool(field['iseditable']))
+
+
+    if not ignore_function and 'widgetfunction' in field and field['widgetfunction']:
+        widgetfunction = field['widgetfunction']
+        functions = None
+        if isinstance(widgetfunction, list):
+            functions = widgetfunction
+        else:
+            if 'isfilter' in field and field['isfilter']:
+                return widget
+            functions = [widgetfunction]
+        for f in functions:
+            if 'isFilter' in f and f['isFilter']:
+                continue
+            columnname = field['columnname']
+            parameters = f.get('parameters')
+
+            kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
+                      "func_params": parameters, "class": class_info}
+            if 'module' in f:
+                module = globals()[f['module']]
+            else:
+                module = tools_backend_calls
+            function_name = f.get('functionName')
+            if function_name is not None:
+                if function_name:
+                    exist = tools_os.check_python_function(module, function_name)
+                    if not exist:
+                        msg = "widget {0} has associated function {1}, but {2} not exist"
+                        msg_params = (widget.property('widgetname'), function_name, function_name,)
+                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                        return widget
+                else:
+                    msg = "Parameter functionName is null for button"
+                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+            widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
+
+    return widget
+
+
+def fill_valuerelation(widget, field, index_to_show=1, index_to_compare=0):
+    # check if index_to_show is in widgetcontrols, then assign new value
+    if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
+        index_to_show = field.get('widgetcontrols')['index_to_show']
+    # Generate list of items to add into combo
+    widget.blockSignals(True)
+    widget.clear()
+    widget.blockSignals(False)
+    combolist = []
+    combo_ids = field.get('comboIds')
+    combo_names = field.get('comboNames')
+
+    if 'comboIds' in field and 'comboNames' in field:
+        if tools_os.set_boolean(field.get('isNullValue'), False):
+            combolist.append(['', ''])
+        for i in range(0, len(field['comboIds'])):
+            elem = [combo_ids[i], combo_names[i]]
+            combolist.append(elem)
+    else:
+        msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
+        msg_params = (field['widgetname'], field['widgettype'],)
+        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+    # Populate combo
+    for record in combolist:
+        item = QListWidgetItem()
+        item.setText(record[index_to_show])
+        item.setData(Qt.UserRole, record[index_to_compare])
+        item.setFlags(item.flags() | Qt.ItemIsUserCheckable)  # make it checkable
+        item.setCheckState(Qt.Unchecked)  # start unchecked
+        widget.addItem(item)
+    if 'selectedId' in field:
+        set_valuerelation_value(widget, field['selectedId'])
+    # Set size policy for QListWidget - use setSizeAdjustPolicy instead
+    widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    return widget
+
+def set_valuerelation_value(listwidget, value, add_new=True):
+    """
+    Set text to combobox populate with more than 1 item for row
+        :param combo: QComboBox widget to manage
+        :param value: element to show
+        :param index: index to compare
+        :param add_new: if True it will add the value even if it's not in the combo
+    """
+
+    if listwidget is None:
+        return False
+
+    value = json.loads(str(value))
+    for i in range(0, listwidget.count()):
+        elem = listwidget.item(i)
+        for j in range(len(value)):
+            if str(value[j]) == str(elem.data(Qt.UserRole)):
+                listwidget.item(i).setCheckState(Qt.Checked)
+
+    # Add new value if @value not in combo
+    if add_new and value not in ("", None, 'None', 'none', '-1', -1):
+        for val in value:
+            found = False
+            for i in range(listwidget.count()):
+                if str(val) == str(listwidget.item(i).data(Qt.UserRole)):
+                    found = True
+                    break
+                    
+            if not found:
+                item = QListWidgetItem()
+                item.setText(f"({val})")
+                item.setData(Qt.UserRole, val)
+                item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                item.setCheckState(Qt.Checked)
+                listwidget.addItem(item)
+    return False
 
 
 def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
@@ -6458,6 +6603,17 @@ def _manage_combo(**kwargs):
 
     widget = add_combo(field, dialog, complet_result, class_info=class_info)
     widget = set_widget_size(widget, field)
+    return widget
+
+def _manage_valuerelation(**kwargs):
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
+    field = kwargs['field']
+    widget = add_valuerelation(field, dialog, complet_result, class_info=class_info)
     return widget
 
 
