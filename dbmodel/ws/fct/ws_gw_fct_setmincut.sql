@@ -71,7 +71,6 @@ v_sensibility_f float;
 v_sensibility float;
 v_zoomratio float;
 
-v_tiled boolean;
 v_result json;
 v_result_init json;
 v_result_valve json;
@@ -90,7 +89,6 @@ BEGIN
 	-- get input parameters
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	v_device := (p_data ->> 'client')::json ->> 'device';
-	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
 	v_action := (p_data ->>'data')::json->>'action';
 	v_mincut := ((p_data ->>'data')::json->>'mincutId')::integer;
 	v_mincut_class := ((p_data ->>'data')::json->>'mincutClass')::integer;
@@ -436,8 +434,7 @@ BEGIN
 			  '"valve":'||v_result_valve||','||
 			  '"mincutNode":'||v_result_node||','||
 			  '"mincutConnec":'||v_result_connec||','||
-			  '"mincutArc":'||v_result_arc||','||
-			  '"tiled":'||v_tiled|| '
+			  '"mincutArc":'||v_result_arc|| '
 	      }
 	    }
 	}');
