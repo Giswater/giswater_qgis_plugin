@@ -83,10 +83,6 @@ BEGIN
 			SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, dma_id, addparam, sector_id, drainzone_id, dwfzone_id 
 			FROM t_anl_arc;
 
-			INSERT INTO anl_gully (gully_id, gullycat_id, state, gully_id_aux, gratecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam, dwfzone_id, drainzone_id)
-			SELECT gully_id, gullycat_id, state, gully_id_aux, gratecat_id_aux, state_aux, expl_id, fid, cur_user, the_geom, descript, result_id, dma_id, addparam, dwfzone_id, drainzone_id 
-			FROM t_anl_gully;
-
 			INSERT INTO anl_polygon (pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript)
 			SELECT pol_id, pol_type, state, expl_id, fid, cur_user, the_geom, result_id, descript 
 			FROM t_anl_polygon;
