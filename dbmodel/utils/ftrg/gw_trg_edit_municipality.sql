@@ -29,8 +29,8 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 	
-		INSERT INTO ext_municipality(muni_id, "name", the_geom, active)
-		VALUES(NEW.muni_id, NEW.name, NEW.the_geom, NEW.active);
+		INSERT INTO ext_municipality(muni_id, "name", expl_id, the_geom, active)
+		VALUES(NEW.muni_id, NEW.name, NEW.expl_id, NEW.the_geom, NEW.active);
 		
 		INSERT INTO selector_municipality(muni_id, cur_user)
 		VALUES(NEW.muni_id, current_user);
@@ -41,7 +41,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 	    
 		UPDATE ext_municipality
-		SET name= NEW.name, the_geom = NEW.the_geom, active = NEW.active WHERE muni_id=OLD.muni_id;
+		SET name= NEW.name, expl_id = NEW.expl_id, the_geom = NEW.the_geom, active = NEW.active WHERE muni_id=OLD.muni_id;
 
 	RETURN NEW;
 				

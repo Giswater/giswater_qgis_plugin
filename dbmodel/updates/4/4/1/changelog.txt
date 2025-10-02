@@ -6,3 +6,4 @@
 - Update foreign key constraint on plan_psector_x_connec.link_id to include CASCADE and SET NULL options.
 - Fix staticpressure in presszone netscenario
 - Fix minsectory analysis now can handle exceptions correctly
+- Fix trg_edit_municipality to manage expl_id
