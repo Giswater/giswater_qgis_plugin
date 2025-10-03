@@ -2690,7 +2690,7 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
 def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):    
     widget = QListWidget()
 
-    widget.setObjectName(field['widgetname'])
+    widget.setObjectName(field['columnname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
