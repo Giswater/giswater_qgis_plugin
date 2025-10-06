@@ -4108,7 +4108,7 @@ def _campaign_multi_tab_shortcut(class_object, dialog, table_object, selection_m
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
-
+    
     if selection_mode != GwSelectionMode.EXPRESSION:
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -4155,41 +4155,149 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         class_object.rel_list_ids[class_object.rel_feature_type] = table_ids
     elif not class_object.rel_list_ids[class_object.rel_feature_type]:
         class_object.rel_list_ids[class_object.rel_feature_type] = []
-    # Collect selected features from the map
+    # Collect selected features from the map - OPTIMIZED DATABASE APPROACH FOR ALL MODES
     selected_ids = []
     if class_object.rel_layers:
+        # Get selected feature IDs from QGIS (instant - no attribute loading)
+        selected_fids = []
         for layer in class_object.rel_layers[class_object.rel_feature_type]:
             if layer.selectedFeatureCount() > 0:
-                for feature in layer.selectedFeatures():
-                    selected_id = str(feature.attribute(field_id))
-                    if selected_id:
-                        selected_ids.append(selected_id)
-                        if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                selected_fids.extend(layer.selectedFeatureIds())
+        
+        if selected_fids:
+            # Apply filtering logic early to get only allowed features for highlighting
+            # This ensures the map selection only highlights features that can actually be inserted
+            filtered_fids = _filter_ids_by_context(class_object, selection_mode, class_object.rel_feature_type, selected_fids)
+            
+            # Convert filtered string IDs back to QGIS feature IDs for map selection
+            if filtered_fids:
+                # Get the layer to work with
+                layer = class_object.rel_layers[class_object.rel_feature_type][0]
+                
+                # Find QGIS feature IDs that correspond to the filtered database feature IDs
+                field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
+                if field_idx != -1:
+                    # Get all features to find matching QGIS feature IDs
+                    request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+                    matching_qgis_fids = []
+                    
+                    for feature in layer.getFeatures(request):
+                        feature_id = str(feature.attribute(field_idx))
+                        if feature_id in filtered_fids:
+                            matching_qgis_fids.append(feature.id())
+                    
+                    # Clear selection and re-select only the filtered features
+                    layer.removeSelection()
+                    if matching_qgis_fids:
+                        layer.select(matching_qgis_fids)
+            
+            # Use original selected_fids for processing (filtering will be applied in SQL)
+            # Get context-specific filter for SQL
+            where_clause = ""
+            if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+                if hasattr(class_object, 'get_allowed_features_for_campaign'):
+                    try:
+                        allowed = class_object.get_allowed_features_for_campaign(class_object.rel_feature_type)
+                        if isinstance(allowed, list) and allowed:
+                            allowed_str = ','.join(f"'{aid}'" for aid in allowed)
+                            where_clause = f"AND {field_id} IN ({allowed_str})"
+                    except Exception:
+                        pass
+            elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+                try:
+                    lot_id = getattr(class_object, 'lot_id', None) or getattr(class_object, 'lot_id_value', None)
+                except Exception:
+                    lot_id = None
+                if lot_id and hasattr(class_object, 'get_allowed_features_for_lot'):
+                    try:
+                        allowed = class_object.get_allowed_features_for_lot(int(lot_id), class_object.rel_feature_type)
+                        if isinstance(allowed, list) and allowed:
+                            allowed_str = ','.join(f"'{aid}'" for aid in allowed)
+                            where_clause = f"AND {field_id} IN ({allowed_str})"
+                    except Exception:
+                        pass
+            # For all other modes no additional filtering
+            layer = class_object.rel_layers[class_object.rel_feature_type][0]
+            
+            # Get table name and schema using GisWater utilities
+            table_name = tools_qgis.get_layer_source_table_name(layer)
+            schema_name = tools_qgis.get_layer_schema(layer)
+            pk_field = tools_qgis.get_primary_key(layer)
+            
+            # Construct full table name
+            if table_name and schema_name:
+                full_table_name = f"{schema_name}.{table_name}"
+            elif table_name:
+                full_table_name = table_name
+            else:
+                # Fallback to standard naming if extraction fails
+                schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if tools_db.dao_db_credentials.get('schema') else 'ws'
+                full_table_name = f"{schema_name}.v_edit_{class_object.rel_feature_type}"
+            
+            # Use field_id as fallback for primary key
+            if not pk_field:
+                pk_field = field_id
+            
+            # Query database directly - MUCH faster than Python iteration for ALL modes
+            fid_str = ','.join(map(str, selected_fids))
+            sql = f"""
+                SELECT {field_id}::text 
+                FROM {full_table_name} 
+                WHERE {pk_field} IN ({fid_str}) 
+                {where_clause}
+            """
+            
+            try:
+                rows = tools_db.get_rows(sql)
+                if rows:
+                    selected_ids = [row[field_id] for row in rows if row.get(field_id)]
+                    
+                    # Add to class object list
+                    existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
+                    for selected_id in selected_ids:
+                        if selected_id not in existing_ids_set:
                             class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+                            existing_ids_set.add(selected_id)
+            except Exception:
+                # Fallback to original method if database query fails
+                for layer in class_object.rel_layers[class_object.rel_feature_type]:
+                    if layer.selectedFeatureCount() > 0:
+                        field_idx = layer.fields().indexOf(field_id)
+                        if field_idx == -1:
+                            continue
+                        request = QgsFeatureRequest().setFilterFids(layer.selectedFeatureIds()).setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+                        for feature in layer.getFeatures(request):
+                            selected_id = str(feature.attribute(field_idx))
+                            if selected_id:
+                                selected_ids.append(selected_id)
+                                if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                                    class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+    
     # Ensure selections are added even if the table was initially empty
     if not table_ids_original and selected_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = selected_ids
 
-    # Filter current buffers and selection once, centrally.
+    # Skip redundant filtering - already applied in database query
+    # Only apply final filter for non-database contexts (like EXPRESSION mode)
     feature_type = class_object.rel_feature_type
-    class_object.rel_list_ids[feature_type] = _filter_ids_by_context(
-        class_object, selection_mode, feature_type, class_object.rel_list_ids.get(feature_type, []))
-    selected_ids = _filter_ids_by_context(class_object, selection_mode, feature_type, selected_ids)
+    if selection_mode not in (GwSelectionMode.CAMPAIGN, GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
+        class_object.rel_list_ids[feature_type] = _filter_ids_by_context(
+            class_object, selection_mode, feature_type, class_object.rel_list_ids.get(feature_type, []))
+        selected_ids = _filter_ids_by_context(class_object, selection_mode, feature_type, selected_ids)
 
-    # Reflect filtered selection on the map
-    if selected_ids:
-        expr = QgsExpression(f"{field_id} IN ({','.join(f'{i}' for i in selected_ids)})")
-        tools_qgis.select_features_by_ids(feature_type, expr, class_object.rel_layers)
-
-    ids_to_insert = []
-    for id in class_object.rel_list_ids[class_object.rel_feature_type]:
-        if id not in table_ids_original:
-            ids_to_insert.append(id)
+    # Use set for fast membership checking - O(1) instead of O(n)
+    table_ids_set = set(table_ids_original)
+    ids_to_insert = [id for id in class_object.rel_list_ids[class_object.rel_feature_type] if id not in table_ids_set]
 
     do_insert = False
     if ids_to_insert:
-        msg = "Do you want to insert the selected features? {0}"
-        msg_params = (", ".join(ids_to_insert), )
+        # Show confirmation dialog with filtered features
+        if len(ids_to_insert) <= 50:
+            msg = "Do you want to insert the selected features? {0}"
+            msg_params = (", ".join(ids_to_insert), )
+        else:
+            msg = "Do you want to insert {0} selected features? (First 50: {1} ...)"
+            msg_params = (len(ids_to_insert), ", ".join(ids_to_insert[:50]))
         do_insert = tools_qt.show_question(msg, msg_params=msg_params)
     else:
         # No new ids to insert: ensure we clear any selection on canvas
@@ -4202,26 +4310,27 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Prevent UI interference while updating the table
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
     if selection_mode == GwSelectionMode.PSECTOR and do_insert:
-        _insert_feature_psector(dialog, class_object.rel_feature_type, ids=ids_to_insert)
+        psector_id = tools_qt.get_text(dialog, "tab_general_psector_id")
+        _insert_feature(dialog, psector_id, 'psector', class_object.rel_feature_type, ids_to_insert)
         load_tableview_psector(dialog, class_object.rel_feature_type)
         set_model_signals(class_object)
         remove_selection()
     elif selection_mode == GwSelectionMode.PSECTOR and not do_insert:
         remove_selection()
     elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) and do_insert:
-        _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.campaign_id, 'campaign', class_object.rel_feature_type, ids_to_insert)
         load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
     elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT) and do_insert:
-        _insert_feature_lot(dialog, class_object.rel_feature_type, class_object.lot_id, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.lot_id, 'lot', class_object.rel_feature_type, ids_to_insert)
         load_tableview_lot(dialog, class_object.rel_feature_type, class_object.lot_id, class_object.rel_layers)
     elif selection_mode == GwSelectionMode.ELEMENT and do_insert:
-        _insert_feature_elements(dialog, class_object.feature_id, class_object.rel_feature_type, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.feature_id, 'element', class_object.rel_feature_type, ids_to_insert)
         load_tableview_element(dialog, class_object.feature_id, class_object.rel_feature_type)
     elif selection_mode == GwSelectionMode.FEATURE_END and do_insert:
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     elif selection_mode == GwSelectionMode.VISIT and do_insert:
-        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.visit_id.text(), 'visit', class_object.rel_feature_type, ids_to_insert)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
     elif selection_mode == GwSelectionMode.MINCUT_CONNEC and do_insert:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
@@ -4239,15 +4348,21 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     model = table_widget.model()
     selection_model = table_widget.selectionModel()
     if model and selection_model and selected_ids:
-        selection_model.clearSelection()
-
-        for row in range(model.rowCount()):
-            model_index = get_model_index(model, row, field_id)
-            row_value = str(model_index)
-            if row_value in selected_ids:
-                column_index = model.fieldIndex(field_id)
-                index = model.index(row, column_index)
-                selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+        # Skip row selection for very large datasets to avoid performance issues
+        row_count = model.rowCount()
+        if row_count <= 5000:
+            selection_model.clearSelection()
+            
+            # Convert to set for faster lookup
+            selected_ids_set = set(selected_ids)
+            
+            for row in range(row_count):
+                model_index = get_model_index(model, row, field_id)
+                row_value = str(model_index)
+                if row_value in selected_ids_set:
+                    column_index = model.fieldIndex(field_id)
+                    index = model.index(row, column_index)
+                    selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
     # Safely check and call callback if it exists
     if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
@@ -4256,6 +4371,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Safely check highlight method
     if hasattr(class_object, 'highlight_method_active') and class_object.highlight_method_active:
         class_object.highlight_features_method(class_object, dialog, table_object)
+    
 
 
 def _get_enabled_types(dialog) -> list:
@@ -4347,7 +4463,10 @@ def _select_rows_in_tables(dialog, ft, ids_list):
                 sel_model = qtable.selectionModel()
                 sel_model.clearSelection()
                 ids_set = set(map(str, ids_list))
-                for row in range(qtable.model().rowCount()):
+                
+                row_count = qtable.model().rowCount()
+                
+                for row in range(row_count):
                     val = str(qtable.model().index(row, id_col_idx).data())
                     if val in ids_set:
                         index = qtable.model().index(row, id_col_idx)
@@ -4368,17 +4487,19 @@ def _campaign_multi_insert_processing(class_object, dialog, table_object, select
 
         enabled_types = _get_enabled_types(dialog)
         per_type = _collect_ids_to_insert(class_object, dialog, table_object, selection_mode, enabled_types)
+        
         if not per_type:
             remove_selection(layers=class_object.rel_layers)
             return
 
         _highlight_map_for_inserts(class_object, per_type)
+        
         if not _confirm_multi_insert(per_type):
             remove_selection(layers=class_object.rel_layers)
             return
 
         for ft, ids_list in per_type.items():
-            _insert_feature_campaign(dialog, ft, class_object.campaign_id, ids=ids_list)
+            _insert_feature(dialog, class_object.campaign_id, 'campaign', ft, ids_list)
             load_tableview_campaign(dialog, ft, class_object.campaign_id, class_object.rel_layers)
             _select_rows_in_tables(dialog, ft, ids_list)
 
@@ -4562,18 +4683,20 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
     # Reload contents of table 'tbl_xxx_xxx_@feature_type'
     if selection_mode == GwSelectionMode.PSECTOR:
-        _insert_feature_psector(dialog, feature_type, ids=selected_ids)
+        psector_id = tools_qt.get_text(dialog, "tab_general_psector_id")
+        _insert_feature(dialog, psector_id, 'psector', feature_type, selected_ids)
+        load_tableview_psector(dialog, feature_type)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
         set_model_signals(class_object)
     elif selection_mode == GwSelectionMode.CAMPAIGN:
-        _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
+        _insert_feature(dialog, class_object.campaign_id, 'campaign', feature_type, selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
         load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.rel_layers)
 
     elif selection_mode == GwSelectionMode.LOT:
-        _insert_feature_lot(dialog, feature_type, class_object.lot_id, ids=selected_ids)
+        _insert_feature(dialog, class_object.lot_id, 'lot', feature_type, selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
         load_tableview_lot(dialog, feature_type, class_object.lot_id, class_object.rel_layers)
@@ -4581,10 +4704,10 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         load_tableview_feature_end(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     elif selection_mode == GwSelectionMode.ELEMENT:
-        _insert_feature_elements(dialog, class_object.feature_id, feature_type, ids=selected_ids)
+        _insert_feature(dialog, class_object.feature_id, 'element', feature_type, selected_ids)
         load_tableview_element(dialog, class_object.feature_id, feature_type)
     elif selection_mode == GwSelectionMode.VISIT:
-        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
+        _insert_feature(dialog, class_object.visit_id.text(), 'visit', class_object.rel_feature_type, selected_ids)
         load_tableview_visit(dialog, class_object.visit_id.text(), feature_type)
     elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
@@ -6001,90 +6124,64 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
 
 
 # region private functions
-def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
-    """ Insert features_id to table cm.om_campaign_x_<feature_type> """
+def _insert_feature(dialog, relation_id, relation_type, feature_type, ids=None):
+    """ Universal function to insert features into any relation table using generalized function """
+    if not ids:
+        return
 
-    widget = tools_qt.get_widget(dialog, f"tbl_campaign_x_{feature_type}")
-    tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
-    parent_table = f"{lib_vars.schema_name}.{feature_type}"
-    from_clause = f"FROM {parent_table} p"
-
-    if not campaign_id:
-        msg = "Campaign ID is missing."
+    if not relation_id:
+        msg = f"{relation_type.title()} ID is missing."
         tools_qgis.show_warning(msg)
         return
 
-    # Configuration for each feature type to define which columns to add and whether a join is needed.
-    feature_configs = {
-        'node': {'cat_id_col': 'nodecat_id', 'type_col': 'node_type'},
-        'arc': {'cat_id_col': 'arccat_id', 'type_col': 'arc_type'},
-        'gully': {'cat_id_col': 'gullycat_id', 'type_col': 'gully_type'},
-        'connec': {'cat_id_col': 'conneccat_id', 'type_col': None},
-        'link': {'cat_id_col': 'linkcat_id', 'type_col': None}
-    }
-
-    extra_cols = []
-    select_extras = []
-
-    config = feature_configs.get(feature_type)
-    if config:
-        cat_id_col = config['cat_id_col']
-        type_col = config['type_col']
-
-        # All configured features have at least a catalog ID
-        extra_cols.append(cat_id_col)
-        select_extras.append(f"p.{cat_id_col}")
-
-        if type_col:
-            # This feature type requires a JOIN to get its type from the catalog table
-            cat_table = f"{lib_vars.schema_name}.cat_{feature_type}"
-            extra_cols.append(type_col)
-            select_extras.append(f"c.{type_col}")
-            from_clause = (
-                f"FROM {parent_table} p "
-                f"JOIN {cat_table} c ON p.{cat_id_col} = c.id"
-            )
-
-    if feature_type == 'arc':
-        extra_cols.extend(['node_1', 'node_2'])
-        select_extras.extend(['p.node_1', 'p.node_2'])
-
-    # Base columns for the INSERT statement
-    base_insert_cols = ['campaign_id', f'{feature_type}_id', 'status', 'the_geom']
-
-    # Corresponding values/columns for the SELECT statement
-    base_select_cols = [f"{campaign_id}", f'p.{feature_type}_id', "1", 'p.the_geom']
-
-    # Combine base and extra columns for the final query
-    insert_cols = ", ".join(base_insert_cols + extra_cols)
-    select_cols = ", ".join(base_select_cols + select_extras)
-
-    # Temporarily disable CM topocontrol strictly for Campaign > Relations inserts
-    toggled = False
+    # Toggle audit and topocontrol off during bulk insert for performance (only for campaign)
+    audit_toggled = False
+    topocontrol_toggled = False
     try:
-        if tools_db.check_schema('cm') and feature_type in ('arc', 'node'):
-            tools_db.execute_sql(
-                """
-                INSERT INTO cm.config_param_user(parameter, value, cur_user)
-                VALUES ('edit_disable_topocontrol','true', current_user)
-                ON CONFLICT (parameter, cur_user) DO UPDATE SET value='true';
-                """
-            )
-            toggled = True
+        if relation_type == 'campaign':
+            # Check if audit is enabled and temporarily disable it for performance
+            cur_user = tools_db.get_current_user()
+            audit_result = tools_db.get_row(f"SELECT value FROM config_param_user WHERE parameter = 'audit_function' AND cur_user = '{cur_user}'")
+            
+            if audit_result and audit_result[0] == 'true':
+                audit_toggled = True
+                tools_db.execute_sql(
+                    f"""
+                    INSERT INTO config_param_user (parameter, value, cur_user) 
+                    VALUES ('audit_function', 'false', '{cur_user}')
+                    ON CONFLICT (parameter, cur_user) DO UPDATE SET value='false';
+                    """
+                )
+
+            # Toggle topocontrol off during bulk insert for performance (only for arc/node)
+            if tools_db.check_schema('cm') and feature_type in ('arc', 'node'):
+                tools_db.execute_sql(
+                    """
+                    INSERT INTO cm.config_param_user(parameter, value, cur_user)
+                    VALUES ('edit_disable_topocontrol','true', current_user)
+                    ON CONFLICT (parameter, cur_user) DO UPDATE SET value='true';
+                    """
+                )
+                topocontrol_toggled = True
 
         if ids:
-            # Batch insert for better performance with large numbers of features
-            ids_list = "', '".join(str(id) for id in ids)
-            sql = f"""
-                INSERT INTO {tablename} ({insert_cols})
-                SELECT {select_cols}
-                {from_clause}
-                WHERE p.{feature_type}_id IN ('{ids_list}')
-                ON CONFLICT DO NOTHING;
-            """
-            tools_db.execute_sql(sql)
+            ids_array = "ARRAY[" + ",".join(str(id) for id in ids) + "]"
+            sql = f"SELECT {lib_vars.schema_name}.gw_fct_manage_inserts_by_ids({relation_id}, '{relation_type}', '{feature_type}', {ids_array})"
+            tools_db.get_row(sql)
+            
     finally:
-        if toggled:
+        # Re-enable audit if it was disabled
+        if audit_toggled:
+            tools_db.execute_sql(
+                f"""
+                UPDATE config_param_user
+                SET value='true'
+                WHERE parameter='audit_function' AND cur_user='{cur_user}';
+                """
+            )
+        
+        # Re-enable topocontrol if it was disabled
+        if topocontrol_toggled:
             tools_db.execute_sql(
                 """
                 UPDATE cm.config_param_user
@@ -6112,9 +6209,10 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
         expr = f"campaign_id = '{campaign_id}'"
         qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
         tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+        
         message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
 
-        # Get ids from qtable (that will only mark the ones whanted in snapping)
+        # Get ids from qtable (that will only mark the ones wanted in snapping)
         feature_id_column = f"{feature_type}_id"
         feature_ids = get_ids_from_qtable(qtable, feature_id_column)
 
@@ -6124,6 +6222,7 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
 
         if message:
             tools_qgis.show_warning(message)
+            
         set_tablemodel_config(dialog, qtable, tablename)
 
     finally:
@@ -6234,42 +6333,6 @@ def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=N
     tools_db.execute_sql(sql)
 
 
-def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
-    """ Insert features_id to table plan_@feature_type_x_campaign """
-
-    widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
-    tablename = widget.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
-
-    if not lot_id:
-        msg = "Lot ID is missing."
-        tools_qgis.show_warning(msg)
-        return
-
-    if ids:
-        # Special handling for arcs to include node_1 and node_2
-        if feature_type == 'arc':
-            ids_list = "', '".join(str(id) for id in ids)
-            sql = f"""
-                INSERT INTO {tablename} (lot_id, arc_id, status, code, node_1, node_2)
-                SELECT {lot_id}, arc_id, 1, code, node_1, node_2
-                FROM {lib_vars.schema_name}.arc
-                WHERE arc_id IN ('{ids_list}')
-                ON CONFLICT DO NOTHING;
-            """
-            tools_db.execute_sql(sql)
-        else:
-            # Standard insertion for other feature types
-            ids_list = "', '".join(str(id) for id in ids)
-            sql = f"""
-                INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
-                SELECT {lot_id}, {feature_type}_id, 1, code
-                FROM {lib_vars.schema_name}.{feature_type}
-                WHERE {feature_type}_id IN ('{ids_list}')
-                ON CONFLICT DO NOTHING;
-            """
-            tools_db.execute_sql(sql)
-
-
 def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
     """Reload QTableView for campaign_lot_x_<feature_type> safely, avoiding recursive selectionChanged loop."""
 
@@ -6319,43 +6382,6 @@ def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
     if state is not None:
         sql += f""" AND "state" = '{state}'"""
     tools_db.execute_sql(sql)
-
-
-def _insert_feature_psector(dialog, feature_type, ids=None):
-    """ Insert features_id to table plan_@feature_type_x_psector"""
-    if not ids:
-        return
-
-    widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
-    tablename = widget.property('tablename')
-    value = tools_qt.get_text(dialog, "tab_general_psector_id")
-    for i in range(len(ids)):
-        sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
-        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
-        if feature_type in ('connec', 'gully'):
-            sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id, state) "
-            sql += f"VALUES('{ids[i]}', '{value}', 1) ON CONFLICT DO NOTHING;"
-            tools_db.execute_sql(sql)
-        load_tableview_psector(dialog, feature_type)
-
-
-def _insert_feature_elements(dialog, feature_id, rel_feature_type, ids=None):
-    """ Insert features_id to table tbl_element_x_@rel_feature_type """
-
-    for i in range(len(ids)):
-        sql = f"INSERT INTO element_x_{rel_feature_type} (element_id, {rel_feature_type}_id) "
-        sql += f"VALUES('{feature_id}', '{ids[i]}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
-
-
-def _insert_feature_visit(dialog, feature_id, rel_feature_type, ids=None):
-    """ Insert features_id to table tbl_visit_x_@rel_feature_type """
-
-    for i in range(len(ids)):
-        sql = f"INSERT INTO om_visit_x_{rel_feature_type} (visit_id, {rel_feature_type}_id) "
-        sql += f"VALUES('{feature_id}', '{ids[i]}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
 
 
 def delete_feature_visit(dialog, visit_id, rel_feature_type, list_id=None):

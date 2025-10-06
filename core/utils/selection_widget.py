@@ -383,6 +383,14 @@ class GwSelectionWidget(QWidget):
             tools_gw.remove_selection(layers=class_object.rel_layers)
             return
 
+        # Skip highlighting for very large datasets to avoid performance issues
+        row_count = model.rowCount()
+        if row_count > 5000:
+            print(f"Skipping map highlighting for very large dataset ({row_count} features)")
+            return
+        elif row_count > 1000:
+            print(f"Highlighting large dataset ({row_count} features) - this may take a moment...")
+
         # Get feature IDs from table
         id_column_name = f"{feature_type}_id"
         id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
