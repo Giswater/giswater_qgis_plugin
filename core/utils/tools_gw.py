@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -1753,6 +1753,26 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             kwargs = {"dialog": dialog, "field": field}
             widget = add_valuerelation(**kwargs)
             widget.itemChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'valuerelation_filtered':
+            # Create completer for autocomplete functionality
+            completer = QCompleter()
+            
+            # Create and configure the line edit widget
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            widget = set_typeahead(field, dialog, widget, completer)
+            
+            # Create filtered value relation widget
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_valuerelation_filtered(**kwargs)
+            
+            # Connect list widget signals to update values when rows change
+            widget.findChild(QListWidget).model().rowsRemoved.connect(partial(get_values, dialog, widget, my_json))
+            widget.findChild(QListWidget).model().rowsInserted.connect(partial(get_values, dialog, widget, my_json))
+            
+            # Align label to top since this widget can grow vertically
+            label.setAlignment(Qt.AlignTop)
 
         if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
@@ -2224,6 +2244,28 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
                 except ValueError:
                     pass
                 value.append(v)
+    elif isinstance(widget, QWidget):
+        # Handle filtered value relation widgets
+        if widget.objectName() == 'valuerelation_filtered':
+            # Get the list widget child that contains the actual values
+            widget = widget.findChild(QListWidget)
+            
+            # Return early if widget is disabled and we're not ignoring editability
+            if not widget.isEnabled() and not ignore_editability:
+                return _json
+                
+            # Build list of selected values
+            value = []
+            for i in range(widget.count()):
+                # Get the data stored in UserRole for each item
+                v = widget.item(i).data(Qt.UserRole)
+                # Try to convert to integer if possible
+                try:
+                    v = int(v)
+                except ValueError:
+                    pass
+                value.append(v)
+
 
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
     if key == '' or key is None:
@@ -2687,6 +2729,200 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
     return widget
 
 
+def add_valuerelation_filtered(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
+    """Creates a filtered value relation widget with type-ahead search functionality.
+    
+    Args:
+        field (dict): Field configuration containing widget properties
+        dialog (QDialog, optional): Parent dialog. Defaults to None.
+        complet_result (dict, optional): Additional completion data. Defaults to None.
+        ignore_function (bool, optional): Whether to ignore widget functions. Defaults to False.
+        class_info (dict, optional): Class information. Defaults to None.
+        
+    Returns:
+        QWidget: Container widget with search box and filtered list
+    """
+    # Create list widget to show selected values
+    widget = QListWidget()
+    
+    # Setup type-ahead search with completer
+    completer = QCompleter()
+    type_ahead = add_lineedit(field)
+    type_ahead.setPlaceholderText(tools_qt.tr("Type to search..."))
+    
+    # Configure completer with model and connect signals
+    if completer:
+        model = QStandardItemModel()
+        completer.activated.connect(partial(add_item_valuerelation_filtered, completer, widget))
+        make_list_valuerelation_filtered(completer, model, type_ahead, field)
+        type_ahead.textChanged.connect(partial(make_list_valuerelation_filtered, completer, model, type_ahead, field))
+
+    # Set widget properties from field config
+    widget.setObjectName(field['columnname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+        
+    # Fill widget with initial values and connect double-click to delete
+    widget = fill_valuerelation_filtered(widget, field)
+    widget.itemDoubleClicked.connect(partial(delete_item_on_doubleclick, widget))
+    
+    # Set selected ID property
+    if 'selectedId' in field:
+        widget.setProperty('selectedId', field['selectedId'])
+    else:
+        widget.setProperty('selectedId', None)
+        
+    # Configure editability
+    if 'iseditable' in field:
+        widget.setEnabled(bool(field['iseditable']))
+        type_ahead.setEnabled(bool(field['iseditable']))
+
+    # Create layout to hold both widgets
+    layout = QVBoxLayout()
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.setSpacing(2)
+    
+    # Add type_ahead and widget to layout
+    layout.addWidget(type_ahead)
+    layout.addWidget(widget)
+
+    # Create container widget to hold layout
+    container = QWidget()
+    container.setObjectName('valuerelation_filtered')
+    container.setLayout(layout)
+
+    return container
+
+def make_list_valuerelation_filtered(completer, model, widget, field):
+    """ Create a list of ids and populate widget (QLineEdit) 
+    
+    Args:
+        completer (QCompleter): Completer object for auto-completion
+        model (QStandardItemModel): Model to store completion items
+        widget (QLineEdit): The text input widget
+        field (dict): Field configuration containing query info
+        
+    Returns:
+        bool: False if no results found, None otherwise
+    """
+
+    # Initialize variables
+    result = None
+    line_edit = None
+    line_list = []
+    line_list.append(widget)
+
+    if line_list:
+        # Get the text input widget and its current value
+        line_edit = line_list[0]
+        value = line_edit.text()
+        
+        # Return if empty value
+        if str(value) == '':
+            return
+            
+        # Execute query if field has required query parameters
+        if 'queryText' in field and 'queryTextFilter' in field and value is not None:
+            # Build SQL with ILIKE filter for case-insensitive search
+            sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
+            result = tools_db.get_rows(sql)
+            
+        # Return False if no results
+        if not result:
+            return False
+
+    # Build display list from results
+    display_list = []
+    if result:
+        # Extract id and value from each result row
+        for data in result:
+            item = {"id": data[0], "idval": data[1]}
+            display_list.append(item)
+            
+        # Update completer with sorted display list
+        if len(display_list) > 0:
+            tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
+
+
+def add_item_valuerelation_filtered(completer, widget):
+    """Add selected item from completer popup to QListWidget
+    
+    Args:
+        completer (QCompleter): The completer containing selected item
+        widget (QListWidget): The list widget to add item to
+    """
+    # Get currently selected row in completer popup
+    row = completer.popup().currentIndex().row()
+    if row == -1:  # No row selected
+        return
+
+    # Get key and display value from selected completer item
+    _key = completer.completionModel().index(row, 0).data(Qt.ItemDataRole.UserRole)
+    value = completer.completionModel().index(row, 0).data()
+    
+    # Create and configure new list widget item
+    item = QListWidgetItem()
+    item.setText(value)  # Set display text
+    item.setData(Qt.UserRole, _key)  # Store key in user role
+    widget.addItem(item)  # Add item to list widget
+
+
+def fill_valuerelation_filtered(widget, field, index_to_show=1, index_to_compare=0):
+    """Fills a QListWidget with filtered value relation items.
+    
+    Args:
+        widget (QListWidget): The list widget to populate
+        field (dict): Dictionary containing field configuration and data
+        index_to_show (int): Index of value to show in widget (default: 1)
+        index_to_compare (int): Index to use for comparison (default: 0)
+        
+    Returns:
+        QListWidget: The populated widget
+    """
+    # Check if index_to_show is specified in widget controls and update if so
+    if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
+        index_to_show = field.get('widgetcontrols')['index_to_show']
+
+    # Clear widget contents while blocking signals to prevent unwanted triggers
+    widget.blockSignals(True)
+    widget.clear()
+    widget.blockSignals(False)
+
+    # Handle selected values if field has selectedId
+    if 'selectedId' in field:
+        selected_values = []
+        
+        # Process combo IDs and names if both are present
+        if 'comboIds' in field and 'comboNames' in field:
+            combo_ids = field['comboIds']
+            combo_names = field['comboNames']
+            selected_id = field['selectedId']
+            
+            # Parse selected_id from JSON string to handle both single values and lists
+            selected_id = json.loads(selected_id)
+            
+            # Handle list of selected IDs
+            if isinstance(selected_id, list):
+                for sid in selected_id:
+                    if str(sid) in combo_ids:
+                        idx = combo_ids.index(str(sid))
+                        selected_values.append((combo_ids[idx], combo_names[idx]))
+            # Handle single selected ID
+            else:
+                if selected_id in combo_ids:
+                    idx = combo_ids.index(selected_id)
+                    selected_values.append((combo_ids[idx], combo_names[idx]))
+                    
+        # Update widget with selected values
+        set_valuerelation_filtered_value(widget, selected_values)
+
+    # Configure widget size policy to adjust to contents
+    widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    return widget
+
+
 def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):    
     widget = QListWidget()
 
@@ -2776,6 +3012,54 @@ def fill_valuerelation(widget, field, index_to_show=1, index_to_compare=0):
     # Set size policy for QListWidget - use setSizeAdjustPolicy instead
     widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
     return widget
+
+
+def set_valuerelation_filtered_value(listwidget, value):
+    """
+    Sets values in a filtered value relation list widget.
+    
+    Args:
+        listwidget (QListWidget): The list widget to populate
+        value (list): List of tuples containing (id, display_value) pairs to add
+        
+    Returns:
+        bool: Always returns False
+        
+    The function takes a list widget and populates it with items from the value parameter.
+    Each item shows the display value and stores the ID in the UserRole data.
+    """
+    # Return early if either widget or value is None
+    if listwidget is None or value is None:
+        return False
+
+    # Add each value pair as a new item
+    for id, val in value:
+        item = QListWidgetItem()
+        item.setText(val)  # Set display text
+        item.setData(Qt.UserRole, id)  # Store ID in user role
+        
+        listwidget.addItem(item)
+    return False
+
+    
+def delete_item_on_doubleclick(listwidget, item):
+    """
+    Deletes an item from a list widget when double-clicked.
+    
+    Args:
+        listwidget (QListWidget): The list widget containing the item
+        item (QListWidgetItem): The item to delete
+        
+    The function removes the specified item from the list widget if both parameters
+    are valid and the item exists in the widget.
+    """
+    # Only proceed if we have valid widget and item
+    if item is not None and listwidget is not None:
+        row = listwidget.row(item)
+        
+    # Remove item if row is valid
+    if row >= 0:
+        listwidget.takeItem(row)
 
 
 def set_valuerelation_value(listwidget, value, add_new=True):
@@ -6615,6 +6899,17 @@ def _manage_valuerelation(**kwargs):
     class_info = kwargs['class']
     field = kwargs['field']
     widget = add_valuerelation(field, dialog, complet_result, class_info=class_info)
+    return widget
+
+def _manage_valuerelation_filtered(**kwargs):
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
+    field = kwargs['field']
+    widget = add_valuerelation_filtered(field, dialog, complet_result, class_info=class_info)
     return widget
 
 
