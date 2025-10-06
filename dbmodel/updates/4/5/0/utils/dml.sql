@@ -23,3 +23,5 @@ WHERE c.id = n.id AND c.typevalue = n.typevalue AND c.typevalue = 'sys_table_con
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('widgettype_typevalue', 'valuerelation', 'valuerelation', 'valueRelation', NULL);
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('widgettype_typevalue', 'valuerelation_filtered', 'valuerelation_filtered', 'valueRelationFiltered', NULL);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3516, 'gw_fct_manage_inserts_by_ids', 'utils', 'function', 'integer, text, text, integer[]', 'integer', 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.', NULL, NULL, 'core', NULL);

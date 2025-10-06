@@ -173,9 +173,16 @@ BEGIN
         END IF;
         
     ELSIF v_relation_type = 'psector' THEN
-        -- Psector tables: psector_id, feature_id, state, doable
-        v_select_cols := v_relation_id || ', p.' || v_feature_id_col || ', 1, TRUE';
-        v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', state, doable';
+        -- Psector tables: special logic for connec/gully vs other features
+        IF v_feature_type IN ('connec', 'gully') THEN
+            -- Connec/gully: psector_id, feature_id, state (state=1)
+            v_select_cols := v_relation_id || ', p.' || v_feature_id_col || ', 1';
+            v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', state';
+        ELSE
+            -- Other features: psector_id, feature_id only
+            v_select_cols := v_relation_id || ', p.' || v_feature_id_col;
+            v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col;
+        END IF;
         
     ELSE
         -- Other relation types (element, visit): just relation_id, feature_id
