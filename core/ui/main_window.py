@@ -71,7 +71,7 @@ class GwMainWindow(QMainWindow):
             self.stacked_layout.addWidget(main_widget)
         except Exception as e:
             print("Exception in GwMainWindow:", e)
-            self._messageBar = global_vars.iface
+            self._messageBar = global_vars.iface.messageBar()
 
         # Connect the help shortcut
         action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", "shortcut_help", "user", "init", prefix=False)
