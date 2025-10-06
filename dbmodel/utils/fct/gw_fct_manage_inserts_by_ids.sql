@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_manage_inserts_by_ids(
     p_feature_type TEXT,
     p_ids INTEGER[]
 )
-RETURNS INTEGER AS
+RETURNS json AS
 $BODY$
 
 /*
@@ -24,7 +24,7 @@ $BODY$
  * * p_feature_type: Feature type - 'node', 'arc', 'connec', 'gully', 'link' (mandatory)
  * * p_ids: Array of feature IDs to insert (mandatory)
  * 
- * RETURNS: Number of inserted records
+ * RETURNS: JSON object with status and inserted count
  * 
  * EXAMPLE CALLS:
  * * SELECT SCHEMA_NAME.gw_fct_manage_inserts_by_ids(51, 'campaign', 'node', ARRAY[25009, 27022, 27024, 27025, 27026, 27029, 27030]);
@@ -207,8 +207,18 @@ BEGIN
     GET DIAGNOSTICS v_inserted_count = ROW_COUNT;
     RAISE NOTICE 'Inserted % records', v_inserted_count;
 
-    -- Return the number of inserted records
-    RETURN v_inserted_count;
+    -- Return JSON object with status and inserted count
+    RETURN json_build_object(
+        'status', 'Accepted',
+        'message', 'Records inserted successfully',
+        'body', json_build_object(
+            'data', json_build_object(
+                'inserted_count', v_inserted_count,
+                'relation_type', v_relation_type,
+                'feature_type', v_feature_type
+            )
+        )
+    );
 
 EXCEPTION
     WHEN OTHERS THEN
