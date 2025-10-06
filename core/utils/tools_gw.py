@@ -4157,121 +4157,8 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         class_object.rel_list_ids[class_object.rel_feature_type] = []
     # Collect selected features from the map - OPTIMIZED DATABASE APPROACH FOR ALL MODES
     selected_ids = []
-    if class_object.rel_layers:
-        # Get selected feature IDs from QGIS (instant - no attribute loading)
-        selected_fids = []
-        for layer in class_object.rel_layers[class_object.rel_feature_type]:
-            if layer.selectedFeatureCount() > 0:
-                selected_fids.extend(layer.selectedFeatureIds())
-        
-        if selected_fids:
-            # Apply filtering logic early to get only allowed features for highlighting
-            # This ensures the map selection only highlights features that can actually be inserted
-            filtered_fids = _filter_ids_by_context(class_object, selection_mode, class_object.rel_feature_type, selected_fids)
-            
-            # Convert filtered string IDs back to QGIS feature IDs for map selection
-            if filtered_fids:
-                # Get the layer to work with
-                layer = class_object.rel_layers[class_object.rel_feature_type][0]
-                
-                # Find QGIS feature IDs that correspond to the filtered database feature IDs
-                field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
-                if field_idx != -1:
-                    # Get all features to find matching QGIS feature IDs
-                    request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
-                    matching_qgis_fids = []
-                    
-                    for feature in layer.getFeatures(request):
-                        feature_id = str(feature.attribute(field_idx))
-                        if feature_id in filtered_fids:
-                            matching_qgis_fids.append(feature.id())
-                    
-                    # Clear selection and re-select only the filtered features
-                    layer.removeSelection()
-                    if matching_qgis_fids:
-                        layer.select(matching_qgis_fids)
-            
-            # Use original selected_fids for processing (filtering will be applied in SQL)
-            # Get context-specific filter for SQL
-            where_clause = ""
-            if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
-                if hasattr(class_object, 'get_allowed_features_for_campaign'):
-                    try:
-                        allowed = class_object.get_allowed_features_for_campaign(class_object.rel_feature_type)
-                        if isinstance(allowed, list) and allowed:
-                            allowed_str = ','.join(f"'{aid}'" for aid in allowed)
-                            where_clause = f"AND {field_id} IN ({allowed_str})"
-                    except Exception:
-                        pass
-            elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
-                try:
-                    lot_id = getattr(class_object, 'lot_id', None) or getattr(class_object, 'lot_id_value', None)
-                except Exception:
-                    lot_id = None
-                if lot_id and hasattr(class_object, 'get_allowed_features_for_lot'):
-                    try:
-                        allowed = class_object.get_allowed_features_for_lot(int(lot_id), class_object.rel_feature_type)
-                        if isinstance(allowed, list) and allowed:
-                            allowed_str = ','.join(f"'{aid}'" for aid in allowed)
-                            where_clause = f"AND {field_id} IN ({allowed_str})"
-                    except Exception:
-                        pass
-            # For all other modes no additional filtering
-            layer = class_object.rel_layers[class_object.rel_feature_type][0]
-            
-            # Get table name and schema using GisWater utilities
-            table_name = tools_qgis.get_layer_source_table_name(layer)
-            schema_name = tools_qgis.get_layer_schema(layer)
-            pk_field = tools_qgis.get_primary_key(layer)
-            
-            # Construct full table name
-            if table_name and schema_name:
-                full_table_name = f"{schema_name}.{table_name}"
-            elif table_name:
-                full_table_name = table_name
-            else:
-                # Fallback to standard naming if extraction fails
-                schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if tools_db.dao_db_credentials.get('schema') else 'ws'
-                full_table_name = f"{schema_name}.v_edit_{class_object.rel_feature_type}"
-            
-            # Use field_id as fallback for primary key
-            if not pk_field:
-                pk_field = field_id
-            
-            # Query database directly - MUCH faster than Python iteration for ALL modes
-            fid_str = ','.join(map(str, selected_fids))
-            sql = f"""
-                SELECT {field_id}::text 
-                FROM {full_table_name} 
-                WHERE {pk_field} IN ({fid_str}) 
-                {where_clause}
-            """
-            
-            try:
-                rows = tools_db.get_rows(sql)
-                if rows:
-                    selected_ids = [row[field_id] for row in rows if row.get(field_id)]
-                    
-                    # Add to class object list
-                    existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
-                    for selected_id in selected_ids:
-                        if selected_id not in existing_ids_set:
-                            class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
-                            existing_ids_set.add(selected_id)
-            except Exception:
-                # Fallback to original method if database query fails
-                for layer in class_object.rel_layers[class_object.rel_feature_type]:
-                    if layer.selectedFeatureCount() > 0:
-                        field_idx = layer.fields().indexOf(field_id)
-                        if field_idx == -1:
-                            continue
-                        request = QgsFeatureRequest().setFilterFids(layer.selectedFeatureIds()).setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
-                        for feature in layer.getFeatures(request):
-                            selected_id = str(feature.attribute(field_idx))
-                            if selected_id:
-                                selected_ids.append(selected_id)
-                                if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
-                                    class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+    # Process map selection with filtering and database queries
+    selected_ids = _process_map_selection(class_object, selection_mode, field_id)
     
     # Ensure selections are added even if the table was initially empty
     if not table_ids_original and selected_ids:
@@ -4371,7 +4258,132 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Safely check highlight method
     if hasattr(class_object, 'highlight_method_active') and class_object.highlight_method_active:
         class_object.highlight_features_method(class_object, dialog, table_object)
+
+
+def _process_map_selection(class_object, selection_mode, field_id):
+    """Process map selection with filtering logic and database queries"""
+    if not class_object.rel_layers:
+        return []
     
+    # Get selected feature IDs from QGIS (instant - no attribute loading)
+    selected_fids = []
+    for layer in class_object.rel_layers[class_object.rel_feature_type]:
+        if layer.selectedFeatureCount() > 0:
+            selected_fids.extend(layer.selectedFeatureIds())
+    
+    if not selected_fids:
+        return []
+    
+    # Apply filtering logic early to get only allowed features for highlighting
+    # This ensures the map selection only highlights features that can actually be inserted
+    filtered_fids = _filter_ids_by_context(class_object, selection_mode, class_object.rel_feature_type, selected_fids)
+    
+    # Convert filtered string IDs back to QGIS feature IDs for map selection
+    if filtered_fids:
+        # Get the layer to work with
+        layer = class_object.rel_layers[class_object.rel_feature_type][0]
+        
+        # Find QGIS feature IDs that correspond to the filtered database feature IDs
+        field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
+        if field_idx != -1:
+            # Get all features to find matching QGIS feature IDs
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+            matching_qgis_fids = []
+            
+            for feature in layer.getFeatures(request):
+                feature_id = str(feature.attribute(field_idx))
+                if feature_id in filtered_fids:
+                    matching_qgis_fids.append(feature.id())
+            
+            # Clear selection and re-select only the filtered features
+            layer.removeSelection()
+            if matching_qgis_fids:
+                layer.select(matching_qgis_fids)
+    
+    # Use original selected_fids for processing (filtering will be applied in SQL)
+    # Get context-specific filter for SQL
+    where_clause = ""
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+        if hasattr(class_object, 'get_allowed_features_for_campaign'):
+            try:
+                allowed = class_object.get_allowed_features_for_campaign(class_object.rel_feature_type)
+                if isinstance(allowed, list) and allowed:
+                    allowed_str = ','.join(f"'{aid}'" for aid in allowed)
+                    where_clause = f"AND {field_id} IN ({allowed_str})"
+            except Exception:
+                pass
+    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        try:
+            lot_id = getattr(class_object, 'lot_id', None) or getattr(class_object, 'lot_id_value', None)
+        except Exception:
+            lot_id = None
+        if lot_id and hasattr(class_object, 'get_allowed_features_for_lot'):
+            try:
+                allowed = class_object.get_allowed_features_for_lot(int(lot_id), class_object.rel_feature_type)
+                if isinstance(allowed, list) and allowed:
+                    allowed_str = ','.join(f"'{aid}'" for aid in allowed)
+                    where_clause = f"AND {field_id} IN ({allowed_str})"
+            except Exception:
+                pass
+    # For all other modes no additional filtering
+    layer = class_object.rel_layers[class_object.rel_feature_type][0]
+    
+    # Get table name and schema using GisWater utilities
+    table_name = tools_qgis.get_layer_source_table_name(layer)
+    schema_name = tools_qgis.get_layer_schema(layer)
+    pk_field = tools_qgis.get_primary_key(layer)
+    
+    # Construct full table name
+    if table_name and schema_name:
+        full_table_name = f"{schema_name}.{table_name}"
+    elif table_name:
+        full_table_name = table_name
+    else:
+        # Fallback to standard naming if extraction fails
+        schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if tools_db.dao_db_credentials.get('schema') else 'ws'
+        full_table_name = f"{schema_name}.v_edit_{class_object.rel_feature_type}"
+    
+    # Use field_id as fallback for primary key
+    if not pk_field:
+        pk_field = field_id
+    
+    # Query database directly - MUCH faster than Python iteration for ALL modes
+    fid_str = ','.join(map(str, selected_fids))
+    sql = f"""
+        SELECT {field_id}::text 
+        FROM {full_table_name} 
+        WHERE {pk_field} IN ({fid_str}) 
+        {where_clause}
+    """
+    
+    selected_ids = []
+    try:
+        rows = tools_db.get_rows(sql)
+        if rows:
+            selected_ids = [row[field_id] for row in rows if row.get(field_id)]
+            
+            # Add to class object list
+            existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
+            for selected_id in selected_ids:
+                if selected_id not in existing_ids_set:
+                    class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+                    existing_ids_set.add(selected_id)
+    except Exception:
+        # Fallback to original method if database query fails
+        for layer in class_object.rel_layers[class_object.rel_feature_type]:
+            if layer.selectedFeatureCount() > 0:
+                field_idx = layer.fields().indexOf(field_id)
+                if field_idx == -1:
+                    continue
+                request = QgsFeatureRequest().setFilterFids(layer.selectedFeatureIds()).setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+                for feature in layer.getFeatures(request):
+                    selected_id = str(feature.attribute(field_idx))
+                    if selected_id:
+                        selected_ids.append(selected_id)
+                        if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                            class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+    
+    return selected_ids
 
 
 def _get_enabled_types(dialog) -> list:
@@ -6166,8 +6178,8 @@ def _insert_feature(dialog, relation_id, relation_type, feature_type, ids=None):
 
         if ids:
             ids_array = "ARRAY[" + ",".join(str(id) for id in ids) + "]"
-            sql = f"SELECT {lib_vars.schema_name}.gw_fct_manage_inserts_by_ids({relation_id}, '{relation_type}', '{feature_type}', {ids_array})"
-            tools_db.get_row(sql)
+            parameters = f"{relation_id}, '{relation_type}', '{feature_type}', {ids_array}"
+            execute_procedure('gw_fct_manage_inserts_by_ids', parameters)
             
     finally:
         # Re-enable audit if it was disabled
