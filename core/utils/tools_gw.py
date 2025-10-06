@@ -2266,7 +2266,6 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
                     pass
                 value.append(v)
 
-
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
     if key == '' or key is None:
         return _json
@@ -2795,6 +2794,7 @@ def add_valuerelation_filtered(field, dialog=None, complet_result=None, ignore_f
 
     return container
 
+
 def make_list_valuerelation_filtered(completer, model, widget, field):
     """ Create a list of ids and populate widget (QLineEdit) 
     
@@ -2881,9 +2881,6 @@ def fill_valuerelation_filtered(widget, field, index_to_show=1, index_to_compare
     Returns:
         QListWidget: The populated widget
     """
-    # Check if index_to_show is specified in widget controls and update if so
-    if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
-        index_to_show = field.get('widgetcontrols')['index_to_show']
 
     # Clear widget contents while blocking signals to prevent unwanted triggers
     widget.blockSignals(True)
@@ -6900,6 +6897,7 @@ def _manage_valuerelation(**kwargs):
     field = kwargs['field']
     widget = add_valuerelation(field, dialog, complet_result, class_info=class_info)
     return widget
+
 
 def _manage_valuerelation_filtered(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
