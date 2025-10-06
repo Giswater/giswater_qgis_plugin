@@ -32,12 +32,20 @@ DECLARE
     -- parameters
     v_expl_id_array text[];
     v_mapzone_name TEXT;
+    v_node_id integer;
 
     -- extra variables
     v_graph_delimiter TEXT;
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
+
+    v_mincut_version text;
+    
     v_query_text TEXT;
+    v_query_text_connectedcomponents TEXT;
+    v_query_text_components TEXT;
+
+
 BEGIN
 
 	-- Search path
@@ -49,6 +57,8 @@ BEGIN
 	-- Get variables from input JSON
     v_expl_id_array = string_to_array(p_data->'data'->>'expl_id_array', ',');
     v_mapzone_name = p_data->'data'->>'mapzone_name';
+    v_node_id = p_data->'data'->>'node_id';
+    v_mincut_version = p_data->'data'->>'mincut_version';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -72,36 +82,46 @@ BEGIN
     ELSE
         v_graph_delimiter := v_mapzone_name;
     END IF;
+    
+    IF v_expl_id_array IS NOT NULL THEN
+        v_query_text_components := 'AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
+    ELSIF v_node_id IS NOT NULL THEN
+        v_query_text_components := 'AND vtn.node_id = '||v_node_id;
+    ELSE
+        v_query_text_components := '';
+    END IF;
 
-
+    IF v_mapzone_name = 'MINCUT' AND v_mincut_version = '6.1' THEN
+        v_query_text_connectedcomponents := 'SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph';
+    ELSE
+        v_query_text_connectedcomponents := 'SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc';
+    END IF;
 
     v_query_text = '
-    WITH connectedcomponents AS (
-        SELECT * FROM pgr_connectedcomponents($q$
-            SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
-            FROM v_temp_arc
-        $q$)
-    ),
-    components AS (
-        SELECT c.component
+        WITH connectedcomponents AS (
+            SELECT * FROM pgr_connectedcomponents($q$
+                '||v_query_text_connectedcomponents||'
+            $q$)
+        ),
+        components AS (
+            SELECT c.component
+            FROM connectedcomponents c
+            WHERE EXISTS (
+                SELECT 1
+                FROM v_temp_node vtn
+                WHERE c.node = vtn.node_id
+                '||v_query_text_components||'
+            )
+            GROUP BY c.component
+        )
+        INSERT INTO temp_pgr_node (node_id)
+        SELECT c.node
         FROM connectedcomponents c
         WHERE EXISTS (
             SELECT 1
-            FROM v_temp_node vtn
-            WHERE c.node = vtn.node_id
-            AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
-            --AND vtn.node_id = -- node_1 from arc_id selected in mincut algorithm.
-        )
-        GROUP BY c.component
-    )
-    INSERT INTO temp_pgr_node (node_id)
-    SELECT c.node
-    FROM connectedcomponents c
-    WHERE EXISTS (
-        SELECT 1
-        FROM components cc
-        WHERE cc.component = c.component
-    );
+            FROM components cc
+            WHERE cc.component = c.component
+        );
     ';
 
     EXECUTE v_query_text;
