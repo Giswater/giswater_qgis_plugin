@@ -12,13 +12,15 @@ $BODY$
 
 /*EXAMPLE
 
+-- MODE 1: individual
 SELECT gw_fct_setarcreverse($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["331"]},
  "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection", "parameters":{}}}$$);
 
-SELECT gw_fct_setarcreverse($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":[]},
-"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}}}$$);
+-- MODE 2: massive usign pure SQL
+SELECT gw_fct_setarcreverse(concat('{"client":{"device":4, "infoType":1, "lang":"ES"},
+"form":{}, "feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["',arc_id,'"]},
+ "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection", "parameters":{}}}')::json) FROM anl_arc where fid = 250...
 
 -- fid: 357
 */

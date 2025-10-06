@@ -90,7 +90,7 @@ BEGIN
 	END IF;
 
 	FOR rec IN SELECT * FROM temp_arc WHERE result_id = '250' LOOP
-		IF (SELECT the_geom::text FROM arc WHERE arc_id = rec.arc_id) != rec.the_geom::text  THEN
+		IF (SELECT the_geom::text FROM arc WHERE arc_id = rec.arc_id::integer) != rec.the_geom::text  THEN
 
 			INSERT INTO anl_arc (arc_id, arccat_id, state, expl_id, fid, elev1, elev2, the_geom)
 			SELECT  arc_id, arccat_id, state, expl_id, result_id::integer, elevmax1, elevmax2, the_geom
