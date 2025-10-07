@@ -47,7 +47,7 @@ v_mincut_class integer;
 v_node_id integer;
 v_pgr_node_id integer;
 v_arc integer;
-v_usepsectors boolean;
+v_use_plan_psectors boolean;
 v_mincut_version text;
 -- 6.0 - normal mincut
 -- 6.1 - mincut with minsectors
@@ -74,6 +74,18 @@ v_cost_field text;
 v_reverse_cost_field text;
 v_pgr_root_vids int[];
 
+-- mincut details
+v_mincutdetails json;
+v_num_arcs integer;
+v_length double precision;
+v_volume float;
+v_num_connecs integer;
+v_num_hydrometer integer;
+v_num_valve_proposed integer;
+v_num_valve_closed integer;
+v_priority json;
+v_geometry text;
+v_count_unselected_psectors integer;
 v_default_key text;
 v_default_value text;
 
@@ -105,7 +117,7 @@ BEGIN
 	v_mincut := p_data->'data'->>'mincutId';
 	v_mincut_class := p_data->'data'->>'mincutClass';
 	v_arc := p_data->'data'->>'arcId';
-	v_usepsectors := p_data->'data'->>'usePsectors';
+	v_use_plan_psectors := p_data->'data'->>'usePsectors';
 	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
 	v_vdefault := (SELECT value::json FROM config_param_system WHERE parameter = 'om_mincut_vdefault');
 	v_ignore_check_valves := (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreCheckValvesMincut');
@@ -150,7 +162,7 @@ BEGIN
 
 		-- Create temporary tables
 		-- =======================
-		v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_usepsectors ||'"}}';
+		v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_use_plan_psectors ||'"}}';
 		SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
 		IF v_response->>'status' <> 'Accepted' THEN
@@ -180,7 +192,7 @@ BEGIN
 			WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) 
 			AND state=1;
 
-			IF v_arc IS NULL AND v_usepsectors THEN
+			IF v_arc IS NULL AND v_use_plan_psectors THEN
 				SELECT arc_id::integer INTO v_arc 
 				FROM arc a
 				JOIN om_mincut om ON om.anl_feature_id::integer = a.arc_id
@@ -302,13 +314,6 @@ BEGIN
 		JOIN v_temp_connec vtc ON vtc.arc_id = tpa.arc_id
 		WHERE tpa.mapzone_id <> 0;
 
-		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT v_mincut, rtc.hydrometer_id
-		FROM temp_pgr_arc tpa 
-		JOIN v_temp_connec vtc ON vtc.arc_id = tpa.arc_id
-		JOIN rtc_hydrometer_x_connec rtc ON rtc.connec_id = vtc.connec_id
-		WHERE tpa.mapzone_id <> 0;
-
 		INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, proposed, the_geom, to_arc)
 		SELECT v_mincut, COALESCE(tpa.node_1, tpa.node_2) AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.proposed, vtn.the_geom, tpa.to_arc[0]
 		FROM temp_pgr_arc tpa
@@ -327,6 +332,129 @@ BEGIN
 		WHERE tpn.mapzone_id <> 0;
 
 
+		-- insert hydrometer from connec
+		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
+		SELECT result_id_arg, rhxc.hydrometer_id 
+		FROM rtc_hydrometer_x_connec rhxc
+		JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
+		JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.id
+		WHERE result_id = result_id_arg 
+			AND rhxc.connec_id = omc.connec_id
+			AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+
+		-- insert hydrometer from node
+		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
+		SELECT result_id_arg, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
+		JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
+		JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.id
+		WHERE result_id = result_id_arg 
+			AND rhxn.node_id = omn.node_id
+			AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+
+		-- fill connnec & hydrometer details on om_mincut.output
+		-- count arcs
+		SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
+		FROM om_mincut_arc 
+		JOIN arc USING (arc_id) 
+		WHERE result_id = v_mincut 
+		GROUP BY result_id;
+
+		SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
+		FROM om_mincut_arc 
+		JOIN arc USING (arc_id) 
+		JOIN cat_arc ON arccat_id = cat_arc.id
+		WHERE result_id = v_mincut;
+
+		-- count valves
+		SELECT count(node_id) INTO v_num_valve_proposed 
+		FROM om_mincut_valve 
+		WHERE result_id = v_mincut 
+			AND proposed IS TRUE;
+	
+		SELECT count(node_id) INTO v_num_valve_closed 
+		FROM om_mincut_valve 
+		WHERE result_id = v_mincut 
+			AND closed IS TRUE;
+
+		-- count connec
+		SELECT count(connec_id) INTO v_num_connecs 
+		FROM om_mincut_connec 
+		WHERE result_id = v_mincut;
+
+		-- count hydrometers
+		SELECT count(*) INTO v_num_hydrometer 
+		FROM om_mincut_hydrometer 
+		WHERE result_id = v_mincut;
+
+		-- priority hydrometers
+		SELECT v_priority := coalesce(
+			json_agg(
+				json_build_object(
+					'category', hc.observ,
+					'number', count(rhxc.hydrometer_id)
+				) ORDER BY hc.observ
+			), '[]'::json
+		)
+		FROM rtc_hydrometer_x_connec rhxc
+		JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id
+		JOIN v_rtc_hydrometer vrh ON vrh.hydrometer_id = rhxc.hydrometer_id
+		LEFT JOIN ext_hydrometer_category hc ON hc.id::text = vrh.category_id::text
+		JOIN connec c ON c.connec_id = vrh.feature_id 
+		WHERE result_id = v_mincut
+		GROUP BY hc.observ;
+
+		IF v_priority IS NULL THEN v_priority='{}'; END IF;
+		v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
+		
+
+		v_mincut_details = json_build_object(
+			'psectors', json_build_object(
+				'used', v_use_plan_psectors,
+				'unselected', v_count_unselected_psectors
+			),
+			'arcs', json_build_object(
+				'number', v_num_arcs,
+				'length', v_length,
+				'volume', v_volume
+			),
+			'connecs', json_build_object(
+				'number', v_num_connecs,
+				'hydrometers', json_build_object(
+					'total', v_num_hydrometer,
+					'classified', v_priority
+				)
+			),
+			'valve', json_build_object(
+				'proposed', v_num_valve_proposed,
+				'closed', v_num_valve_closed
+			)
+		);
+
+		--update output results
+		UPDATE om_mincut SET output = v_mincut_details WHERE id = v_mincut;
+
+		IF v_debug THEN RAISE NOTICE '13- Boundary calculation ';	END IF;
+
+		-- calculate the boundary of mincut using arcs and valves
+		v_query_text := format(
+			$$
+			SELECT ST_AsText(
+				ST_Envelope(
+					ST_Extent(
+						ST_Buffer(the_geom, 20)
+					)
+				)
+			)
+			FROM (
+				SELECT the_geom FROM om_mincut_arc WHERE result_id = %s
+				UNION
+				SELECT the_geom FROM om_mincut_valve WHERE result_id = %s
+			) a
+			$$,
+			v_mincut, v_mincut
+		);
+		EXECUTE v_query_text INTO v_geometry;
+
 
 
 
@@ -336,7 +464,7 @@ BEGIN
 
 		-- Create temporary tables 
 		-- =======================
-		v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_usepsectors ||'"}}';
+		v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_use_plan_psectors ||'"}}';
 		SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
 		IF v_response->>'status' <> 'Accepted' THEN
@@ -355,11 +483,11 @@ BEGIN
 	ELSIF v_action = 'mincutCancel' THEN
 		v_message = '{"text": "Mincut to cancel not found.", "level": 2}';
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut) IS NOT NULL THEN
-			if (select mincut_state from om_mincut where id = v_mincut) = 4 then
+			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) = 4 THEN
 				DELETE FROM om_mincut WHERE id = v_mincut;
-			else
-				update om_mincut set mincut_state = 3 where id = v_mincut;
-			end if;
+			ELSE
+				UPDATE om_mincut SET mincut_state = 3 WHERE id = v_mincut;
+			END IF;
 			v_message = '{"text": "Mincut cancelled.", "level": 1}';
 		END IF;
 
