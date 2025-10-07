@@ -170,9 +170,9 @@ EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2118", "fid":"116", "cr
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=116;
 
 	IF v_count=0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4026", "function":"2118", "fid":"116", "fcount":"0", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2118", "fid":"116", "fcount":"0", "is_process":true}}$$)';
 	ELSE
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4028", "function":"2118", "parameters":{"v_count":"'||v_count||'"}, "fid":"116", "fcount":"'||v_count||'", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2118", "parameters":{"v_count":"'||v_count||'"}, "fid":"116", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 116,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count
