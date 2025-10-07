@@ -86,23 +86,20 @@ BEGIN
 	CREATE TEMP TABLE IF NOT EXISTS temp_anl_polygon (LIKE SCHEMA_NAME.anl_polygon INCLUDING ALL);
 
 	-- Starting process
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('MINCUT ANALYSIS'));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('------------------------'));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Minimun cut have been checked looking for overlaps against other mincuts'));
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4376", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4378", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 
 	IF v_usepsectors THEN
 
-		INSERT INTO temp_audit_check_data (fid, error_message)
-		VALUES (216, concat ('INFO: Psectors have been used to execute this mincut in order to calculate mincut affectations with planned network.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4380", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 	ELSE
 		IF v_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, error_message)
-			VALUES (216, concat ('WARNING-287: ', v_count,' Psectors have been unselected on current exploitation in order to execute this mincut without planned network.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4382", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"count":"'||v_count||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, error_message)
-			VALUES (216, concat ('INFO: Mincut have been executed without planned network.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4384", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		END IF;
 	END IF;
 
@@ -112,14 +109,11 @@ BEGIN
 	JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE order by state_id) a;
 
 	IF v_count = 0 THEN
-		INSERT INTO temp_audit_check_data (fid, error_message)
-		VALUES (216, concat ('WARNING-216: There are not values selected for hydrometer''s state with is_operative True. As result no hydrometer have been attached to this mincut'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4386", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 	ELSIF v_count = 1 THEN
-		INSERT INTO temp_audit_check_data (fid, error_message)
-		VALUES (216, concat ('INFO: There is one value for hydrometer''s state selected with is_operative True: ',v_selected,'.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4388", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"selected":"'||v_selected||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 	ELSIF v_count > 1 THEN
-		INSERT INTO temp_audit_check_data (fid, error_message)
-		VALUES (216, concat ('INFO: There are more than one hydrometer''s state selected with is_operative True: ', v_selected,'.'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4390", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"selected":"'||v_selected||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 	END IF;
 
 	SELECT m.*, t.virtual INTO v_mincutrec FROM om_mincut m JOIN om_mincut_cat_type t ON mincut_type = t.id WHERE m.id = v_mincutid;
@@ -226,10 +220,9 @@ BEGIN
 						' overlaps with other mincuts and has conflicts at least with one. Additional pipes are involved and there are more connecs affected'
 						,v_conflictmsg,'"');
 
-						-- info
-						INSERT INTO temp_audit_check_data (fid, error_message)
-						VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
-						INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat ('WARNING-216: additional pipes are involved and more connecs are affected ( ',v_addaffconnecs,' units. )'));
+					-- info
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4392", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"conflictmsg":"'||v_conflictmsg||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4394", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"addaffconnecs":"'||v_addaffconnecs||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 
 					ELSE -- there is a overlap (temporal & spatial intersection) with additional network but without connecs affected
@@ -238,11 +231,10 @@ BEGIN
 						' overlaps with other mincuts and has conflicts at least with one. Additional pipes are involved but no more connecs affected'
 						,v_conflictmsg,'"');
 
-						-- info
-						INSERT INTO temp_audit_check_data (fid, error_message)
-						VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation wit:',v_conflictmsg));
-						INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat ('WARNING-216: additional pipes are involved'));
-						INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat ('INFO: No more connecs are affected'));
+					-- info
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4392", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"conflictmsg":"'||v_conflictmsg||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4396", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4398", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 					END IF;
 
@@ -284,10 +276,9 @@ BEGIN
 
 						v_signal = 'Ok';
 
-						--info
-						INSERT INTO temp_audit_check_data (fid, error_message)
-						VALUES (216, concat ('INFO: There is a temporal overlap without spatial intersection on the same macroexploitation with:',v_conflictmsg));
-						INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat ('INFO: No additional pipes are involved and no more connecs are affected'));
+					--info
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4400", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"conflictmsg":"'||v_conflictmsg||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4402", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 					ELSE -- There is a temporal overlap with spatial intersection on the same macroexploitation without additional network affected
 
@@ -297,10 +288,9 @@ BEGIN
 						' overlaps with other mincuts and has conflicts at least with one but no additional pipes are involved and no more connecs are affected.'
 						,v_conflictmsg,'"');
 
-						--info
-						INSERT INTO temp_audit_check_data (fid, error_message)
-						VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
-						INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat ('INFO: No additional pipes are involved and no more connecs are affected'));
+					--info
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4392", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"conflictmsg":"'||v_conflictmsg||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4402", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 						-- line: the oposite mincuts
 						INSERT INTO temp_anl_arc (fid, arc_id, descript, the_geom)
@@ -316,21 +306,22 @@ BEGIN
 				v_signal = 'Ok';
 
 				-- info
-				INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216,
-				'INFO: There are no more mincuts on the same macroexploitation on planned on the same date-time');
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4404", "prefix_id": "1001", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			END IF;
 		END IF;
 
 		-- mincut details
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '--------------');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincutrec.output->>'arcs')::json->>'number'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincutrec.output->>'arcs')::json->>'length', ' mts'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincutrec.output->>'arcs')::json->>'volume', ' m3'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincutrec.output->>'connecs')::json->>'number'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		
+		-- Stats
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||(v_mincutrec.output->'arcs'->>'number')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||(v_mincutrec.output->'arcs'->>'length')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||(v_mincutrec.output->'arcs'->>'volume')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||(v_mincutrec.output->'connecs'->>'number')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||(v_mincutrec.output->'connecs'->'hydrometers'->>'total')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||replace((v_mincutrec.output->'connecs'->'hydrometers'->>'classified'), '"', '\"')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 		-- get results
 		-- info
@@ -479,16 +470,20 @@ BEGIN
 		SELECT * INTO v_mincutrec FROM om_mincut WHERE id=v_mincutid;
 
 		-- creating log
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'WARNING-216: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats (with additional affectations)');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '-----------------------------------------------');
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincutrec.output->>'arcs')::json->>'number'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincutrec.output->>'arcs')::json->>'length', ' mts'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincutrec.output->>'arcs')::json->>'volume', ' m3'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincutrec.output->>'connecs')::json->>'number'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4406", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		
+		-- mincut details
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		
+		-- Stats
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||(v_mincutrec.output->'arcs'->>'number')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||(v_mincutrec.output->'arcs'->>'length')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||(v_mincutrec.output->'arcs'->>'volume')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||(v_mincutrec.output->'connecs'->>'number')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||(v_mincutrec.output->'connecs'->'hydrometers'->>'total')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||replace((v_mincutrec.output->'connecs'->'hydrometers'->>'classified'), '"', '\"')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
 		-- get results
 		-- info

@@ -104,15 +104,20 @@ BEGIN
 	
 	-- mincut details
 	SELECT * INTO v_mincutrec FROM om_mincut WHERE id = v_mincut;
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: 0'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: 0 mts'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total network water volume: 0 m3'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincutrec.output->>'connecs')::json->>'number'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
+	
+	-- mincut details
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+		
+	-- Stats
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"0"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"0"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"0"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||(v_mincutrec.output->'connecs'->>'number')||'"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||(v_mincutrec.output->'connecs'->'hydrometers'->>'total')||'"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||replace((v_mincutrec.output->'connecs'->'hydrometers'->>'classified'), '"', '\"')||'"}, "cur_user":"current_user"}}$$)';
 
 	-- info
 	v_result = null;
