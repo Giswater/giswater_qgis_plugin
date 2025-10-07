@@ -224,7 +224,7 @@ class GwArcDivideButton(GwMaptool):
                     tools_gw.load_settings(self.dlg_info)
                     tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False, True, 1)
                     self.dlg_info.finished.connect(partial(tools_gw.save_settings, self.dlg_info))
-                    tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
+                    tools_gw.open_dialog(self.dlg_info, dlg_name='arc_divide')
         else:
             msg = "Move node: Error updating geometry"
             tools_qgis.show_warning(msg)
