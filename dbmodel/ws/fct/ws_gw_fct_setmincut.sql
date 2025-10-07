@@ -323,7 +323,7 @@ BEGIN
 			(tpa.node_1 IS NULL AND tpa.node_2 IS NOT NULL)
 			OR (tpa.node_2 IS NULL AND tpa.node_1 IS NOT NULL)
 		)
-		AND 'MINSECTOR' = ANY(tpa.graph_delimiter);
+		AND tpa.graph_delimiter = 'MINSECTOR';
 				
 		INSERT INTO om_mincut_polygon (result_id, polygon_id, the_geom)
 		SELECT v_mincut, p.pol_id, p.the_geom
