@@ -295,6 +295,13 @@ BEGIN
 		RAISE NOTICE 'v_data: %', v_data;
 		v_response := gw_fct_mincut_core(v_data);
 
+		DELETE FROM om_mincut_node where result_id=v_mincut;
+		DELETE FROM om_mincut_arc where result_id=v_mincut;
+		DELETE FROM om_mincut_polygon where result_id=v_mincut;
+		DELETE FROM om_mincut_connec where result_id=v_mincut;
+		DELETE FROM om_mincut_hydrometer where result_id=v_mincut;
+		DELETE FROM om_mincut_valve where result_id=v_mincut;
+
 		-- TODO: insert results on om_mincut tables
 		INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
 		SELECT v_mincut, vta.arc_id, vta.the_geom 
