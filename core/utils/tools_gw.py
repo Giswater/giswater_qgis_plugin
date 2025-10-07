@@ -1749,11 +1749,12 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
         elif field['widgettype'] == 'button':
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
-        elif field['widgettype'] == 'valuerelation':
+        elif field['widgettype'] == 'multiple_checkbox':
             kwargs = {"dialog": dialog, "field": field}
-            widget = add_valuerelation(**kwargs)
+            widget = add_multiple_checkbox(**kwargs)
             widget.itemChanged.connect(partial(get_values, dialog, widget, my_json))
-        elif field['widgettype'] == 'valuerelation_filtered':
+            label.setAlignment(Qt.AlignTop)
+        elif field['widgettype'] == 'multiple_option':
             # Create completer for autocomplete functionality
             completer = QCompleter()
             
@@ -1765,7 +1766,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             
             # Create filtered value relation widget
             kwargs = {"dialog": dialog, "field": field}
-            widget = add_valuerelation_filtered(**kwargs)
+            widget = add_multiple_option(**kwargs)
             
             # Connect list widget signals to update values when rows change
             widget.findChild(QListWidget).model().rowsRemoved.connect(partial(get_values, dialog, widget, my_json))
@@ -2246,7 +2247,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
                 value.append(v)
     elif isinstance(widget, QWidget):
         # Handle filtered value relation widgets
-        if widget.objectName() == 'valuerelation_filtered':
+        if widget.objectName() == 'multiple_option':
             # Get the list widget child that contains the actual values
             widget = widget.findChild(QListWidget)
             
@@ -2728,7 +2729,7 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
     return widget
 
 
-def add_valuerelation_filtered(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
+def add_multiple_option(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
     """Creates a filtered value relation widget with type-ahead search functionality.
     
     Args:
@@ -2752,9 +2753,9 @@ def add_valuerelation_filtered(field, dialog=None, complet_result=None, ignore_f
     # Configure completer with model and connect signals
     if completer:
         model = QStandardItemModel()
-        completer.activated.connect(partial(add_item_valuerelation_filtered, completer, widget))
-        make_list_valuerelation_filtered(completer, model, type_ahead, field)
-        type_ahead.textChanged.connect(partial(make_list_valuerelation_filtered, completer, model, type_ahead, field))
+        completer.activated.connect(partial(add_item_multiple_option, completer, widget))
+        make_list_multiple_option(completer, model, type_ahead, field)
+        type_ahead.textChanged.connect(partial(make_list_multiple_option, completer, model, type_ahead, field))
 
     # Set widget properties from field config
     widget.setObjectName(field['columnname'])
@@ -2764,7 +2765,7 @@ def add_valuerelation_filtered(field, dialog=None, complet_result=None, ignore_f
         widget.setProperty('columnname', field['columnname'])
         
     # Fill widget with initial values and connect double-click to delete
-    widget = fill_valuerelation_filtered(widget, field)
+    widget = fill_multiple_option(widget, field)
     widget.itemDoubleClicked.connect(partial(delete_item_on_doubleclick, widget))
     
     # Set selected ID property
@@ -2789,13 +2790,13 @@ def add_valuerelation_filtered(field, dialog=None, complet_result=None, ignore_f
 
     # Create container widget to hold layout
     container = QWidget()
-    container.setObjectName('valuerelation_filtered')
+    container.setObjectName('multiple_option')
     container.setLayout(layout)
 
     return container
 
 
-def make_list_valuerelation_filtered(completer, model, widget, field):
+def make_list_multiple_option(completer, model, widget, field):
     """ Create a list of ids and populate widget (QLineEdit) 
     
     Args:
@@ -2824,9 +2825,12 @@ def make_list_valuerelation_filtered(completer, model, widget, field):
             return
             
         # Execute query if field has required query parameters
-        if 'queryText' in field and 'queryTextFilter' in field and value is not None:
+        if 'queryText' in field and 'queryText' is not None and value is not None:
             # Build SQL with ILIKE filter for case-insensitive search
-            sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
+            if 'queryTextFilter' in field and field['queryTextFilter'] is not None:
+                sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
+            else:
+                sql = f"{field['queryText']};"
             result = tools_db.get_rows(sql)
             
         # Return False if no results
@@ -2846,7 +2850,7 @@ def make_list_valuerelation_filtered(completer, model, widget, field):
             tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
 
 
-def add_item_valuerelation_filtered(completer, widget):
+def add_item_multiple_option(completer, widget):
     """Add selected item from completer popup to QListWidget
     
     Args:
@@ -2869,7 +2873,7 @@ def add_item_valuerelation_filtered(completer, widget):
     widget.addItem(item)  # Add item to list widget
 
 
-def fill_valuerelation_filtered(widget, field, index_to_show=1, index_to_compare=0):
+def fill_multiple_option(widget, field, index_to_show=1, index_to_compare=0):
     """Fills a QListWidget with filtered value relation items.
     
     Args:
@@ -2888,7 +2892,7 @@ def fill_valuerelation_filtered(widget, field, index_to_show=1, index_to_compare
     widget.blockSignals(False)
 
     # Handle selected values if field has selectedId
-    if 'selectedId' in field:
+    if 'selectedId' in field and field['selectedId'] is not None and field['selectedId'] != '':
         selected_values = []
         
         # Process combo IDs and names if both are present
@@ -2913,14 +2917,14 @@ def fill_valuerelation_filtered(widget, field, index_to_show=1, index_to_compare
                     selected_values.append((combo_ids[idx], combo_names[idx]))
                     
         # Update widget with selected values
-        set_valuerelation_filtered_value(widget, selected_values)
+        set_multiple_option_value(widget, selected_values)
 
     # Configure widget size policy to adjust to contents
     widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
     return widget
 
 
-def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):    
+def add_multiple_checkbox(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):    
     widget = QListWidget()
 
     widget.setObjectName(field['columnname'])
@@ -2928,7 +2932,7 @@ def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=F
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
-    widget = fill_valuerelation(widget, field)
+    widget = fill_multiple_checkbox(widget, field)
     if 'selectedId' in field:
         widget.setProperty('selectedId', field['selectedId'])
     else:
@@ -2974,7 +2978,7 @@ def add_valuerelation(field, dialog=None, complet_result=None, ignore_function=F
     return widget
 
 
-def fill_valuerelation(widget, field, index_to_show=1, index_to_compare=0):
+def fill_multiple_checkbox(widget, field, index_to_show=1, index_to_compare=0):
     # check if index_to_show is in widgetcontrols, then assign new value
     if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
         index_to_show = field.get('widgetcontrols')['index_to_show']
@@ -3005,13 +3009,13 @@ def fill_valuerelation(widget, field, index_to_show=1, index_to_compare=0):
         item.setCheckState(Qt.Unchecked)  # start unchecked
         widget.addItem(item)
     if 'selectedId' in field:
-        set_valuerelation_value(widget, field['selectedId'])
+        set_multiple_checkbox_value(widget, field['selectedId'])
     # Set size policy for QListWidget - use setSizeAdjustPolicy instead
     widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
     return widget
 
 
-def set_valuerelation_filtered_value(listwidget, value):
+def set_multiple_option_value(listwidget, value):
     """
     Sets values in a filtered value relation list widget.
     
@@ -3059,7 +3063,7 @@ def delete_item_on_doubleclick(listwidget, item):
         listwidget.takeItem(row)
 
 
-def set_valuerelation_value(listwidget, value, add_new=True):
+def set_multiple_checkbox_value(listwidget, value, add_new=True):
     """
     Set text to combobox populate with more than 1 item for row
         :param combo: QComboBox widget to manage
@@ -3070,8 +3074,10 @@ def set_valuerelation_value(listwidget, value, add_new=True):
 
     if listwidget is None:
         return False
-
-    value = json.loads(str(value))
+    try:
+        value = json.loads(str(value))
+    except Exception:
+        return
     for i in range(0, listwidget.count()):
         elem = listwidget.item(i)
         for j in range(len(value)):
@@ -6925,7 +6931,7 @@ def _manage_combo(**kwargs):
     return widget
 
 
-def _manage_valuerelation(**kwargs):
+def _manage_multiple_checkbox(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
@@ -6933,11 +6939,11 @@ def _manage_valuerelation(**kwargs):
     complet_result = kwargs['complet_result']
     class_info = kwargs['class']
     field = kwargs['field']
-    widget = add_valuerelation(field, dialog, complet_result, class_info=class_info)
+    widget = add_multiple_checkbox(field, dialog, complet_result, class_info=class_info)
     return widget
 
 
-def _manage_valuerelation_filtered(**kwargs):
+def _manage_multiple_option(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
@@ -6945,7 +6951,7 @@ def _manage_valuerelation_filtered(**kwargs):
     complet_result = kwargs['complet_result']
     class_info = kwargs['class']
     field = kwargs['field']
-    widget = add_valuerelation_filtered(field, dialog, complet_result, class_info=class_info)
+    widget = add_multiple_option(field, dialog, complet_result, class_info=class_info)
     return widget
 
 
