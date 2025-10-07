@@ -33,6 +33,14 @@ SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":3, "min
 
 fid = 216
 
+
+mincut states:
+0	Planified
+1	In Progress
+2	Finished
+3	Canceled
+4	On planning
+
 */
 
 DECLARE
@@ -46,7 +54,7 @@ v_mincut integer;
 v_mincut_class integer;
 v_node_id integer;
 v_pgr_node_id integer;
-v_arc integer;
+v_arc_id integer;
 v_use_plan_psectors boolean;
 v_mincut_version text;
 -- 6.0 - normal mincut
@@ -89,6 +97,11 @@ v_count_unselected_psectors integer;
 v_default_key text;
 v_default_value text;
 
+v_mincut_record record;
+v_mincut_group_record record;
+v_arc_count integer;
+v_conflict text; -- Ok, Conflict
+
 v_query_text text;
 v_data json;
 v_result json;
@@ -116,7 +129,7 @@ BEGIN
 	v_action := p_data->'data'->>'action';
 	v_mincut := p_data->'data'->>'mincutId';
 	v_mincut_class := p_data->'data'->>'mincutClass';
-	v_arc := p_data->'data'->>'arcId';
+	v_arc_id := p_data->'data'->>'arcId';
 	v_use_plan_psectors := p_data->'data'->>'usePsectors';
 	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
 	v_vdefault := (SELECT value::json FROM config_param_system WHERE parameter = 'om_mincut_vdefault');
@@ -139,9 +152,9 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT arc_id INTO v_arc FROM ve_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT arc_id INTO v_arc_id FROM ve_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 
-		IF v_arc IS NULL THEN
+		IF v_arc_id IS NULL THEN
 			SELECT connec_id INTO v_connec FROM ve_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		END IF;
 	END IF;
@@ -171,7 +184,7 @@ BEGIN
 
 		-- the logic save the data on om_mincut table with status onPlanning.
 		IF v_device = 5 and v_mincut IS NULL THEN
-			IF v_arc IS NULL AND v_connec IS NULL THEN
+			IF v_arc_id IS NULL AND v_connec IS NULL THEN
 				RETURN ('{"status":"Failed", "message":{"level":2, "text":"No arc or connec found."}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}')::json;
 			END IF;
 
@@ -182,18 +195,20 @@ BEGIN
 			FOR v_default_key, v_default_value IN SELECT * FROM jsonb_each_text(v_vdefault::jsonb) LOOP
 				EXECUTE 'UPDATE om_mincut SET '||v_default_key||' = '||v_default_value||' WHERE id = '||v_mincut||';';
 			END LOOP;
+		ELSE 
+			UPDATE om_mincut SET mincut_state = 4 WHERE id = v_mincut; -- todo: remove this line because python insert it with onPlanning status.
 		END IF;
 
 		--check if arc exists in database or look for a new arc_id in the same location
-		IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc) IS NULL THEN
-			SELECT arc_id::integer INTO v_arc 
+		IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc_id) IS NULL THEN
+			SELECT arc_id::integer INTO v_arc_id 
 			FROM arc a
 			JOIN om_mincut om ON om.anl_feature_id::integer = a.arc_id
 			WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) 
 			AND state=1;
 
-			IF v_arc IS NULL AND v_use_plan_psectors THEN
-				SELECT arc_id::integer INTO v_arc 
+			IF v_arc_id IS NULL AND v_use_plan_psectors THEN
+				SELECT arc_id::integer INTO v_arc_id 
 				FROM arc a
 				JOIN om_mincut om ON om.anl_feature_id::integer = a.arc_id
 				WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) 
@@ -203,9 +218,9 @@ BEGIN
 
 
 		IF v_mincut_version = '6.1' THEN
-			v_node_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc);
+			v_node_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 		ELSE 
-			v_node_id := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc);
+			v_node_id := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
 		END IF;
 
 		-- Initialize process
@@ -267,6 +282,7 @@ BEGIN
 		EXECUTE v_query_text;
 
 		-- prepare mincut 
+		-- TODO: revise if this is needed here.
 		UPDATE temp_pgr_arc 
 		SET mapzone_id = 0 
 		WHERE mapzone_id <> 0;
@@ -275,18 +291,15 @@ BEGIN
 		SET mapzone_id = 0 
 		WHERE mapzone_id <> 0;
 
-		-- mincut
-		SELECT count(*)::int INTO v_pgr_distance 
-		FROM temp_pgr_arc;
-		
 		UPDATE temp_pgr_arc 
 		SET proposed = FALSE 
 		WHERE proposed = TRUE;
 
+		-- mincut
+		SELECT count(*)::int INTO v_pgr_distance 
+		FROM temp_pgr_arc;
 
-		IF v_node_id IS NOT NULL THEN
-			v_pgr_node_id := (SELECT pgr_node_id FROM temp_pgr_node WHERE node_id = v_node_id);
-		END IF;
+		v_pgr_node_id := (SELECT pgr_node_1 FROM temp_pgr_arc WHERE arc_id = v_arc_id);
 
 		-- TODO: revise if this can be passed with other format
 		v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s"}}',
@@ -301,6 +314,9 @@ BEGIN
 		DELETE FROM om_mincut_connec where result_id=v_mincut;
 		DELETE FROM om_mincut_hydrometer where result_id=v_mincut;
 		DELETE FROM om_mincut_valve where result_id=v_mincut;
+
+		-- TODO: revise if this v_mincut exists on the om_mincut_conflict table.
+		-- delete this rows, and for the mincut conflict delete it in the om_mincut table. CASCADE.
 
 		-- TODO: insert results on om_mincut tables
 		INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
@@ -326,12 +342,9 @@ BEGIN
 		FROM temp_pgr_arc tpa
 		JOIN v_temp_node vtn ON vtn.node_id = COALESCE(tpa.node_1, tpa.node_2)
 		WHERE tpa.mapzone_id <> 0
-		AND (
-			(tpa.node_1 IS NULL AND tpa.node_2 IS NOT NULL)
-			OR (tpa.node_2 IS NULL AND tpa.node_1 IS NOT NULL)
-		)
 		AND tpa.graph_delimiter = 'MINSECTOR';
-				
+		
+		-- nodes
 		INSERT INTO om_mincut_polygon (result_id, polygon_id, the_geom)
 		SELECT v_mincut, p.pol_id, p.the_geom
 		FROM temp_pgr_node tpn
@@ -423,10 +436,6 @@ BEGIN
 
 
 		v_mincut_details = json_build_object(
-			'psectors', json_build_object(
-				'used', v_use_plan_psectors,
-				'unselected', v_count_unselected_psectors
-			),
 			'arcs', json_build_object(
 				'number', v_num_arcs,
 				'length', v_length,
@@ -469,6 +478,182 @@ BEGIN
 		);
 		EXECUTE v_query_text INTO v_geometry;
 
+		-- FIRST MINCUT FINISHED
+		-- TODO: check conflict with other mincuts
+		-- TODO: create new om_mincut with status Conflict.
+		-- TODO: insert the conflict results on the om_mincut tables.
+		-- TODO: insert the conflicts on om_mincut_conflict table.
+
+		SELECT * into v_mincut_record FROM om_mincut WHERE id = v_mincut;
+
+		IF v_mincut_record.forecast_start IS NOT NULL AND v_mincut_record.forecast_end IS NOT NULL THEN
+
+			v_query_text := format("
+				WITH mincut_conflicts AS (
+					-- only mincuts that are VIRTUAL = FALSE and have informed forecast_start, forecast_end
+					SELECT o.id, o.anl_feature_type, o.anl_feature_id, o.forecast_start, o.forecast_end, 
+						tsrange(o.forecast_start, o.forecast_end, '[]') AS seg_mincut
+					FROM om_mincut o
+					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
+					WHERE o.mincut_state IN (0, 1)
+						AND o.mincut_class = 1
+						AND c.virtual = FALSE 
+						AND o.forecast_start <= o.forecast_end 
+						-- removing EXISTS for grouping all the conflicts
+						AND EXISTS (
+							SELECT 1 FROM om_mincut oo 
+							WHERE oo.id = %s
+							AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(oo.forecast_start, oo.forecast_end, '[]')
+							AND o.id <> oo.id
+						)
+						AND EXISTS (
+							SELECT 1 FROM temp_pgr_arc tpa
+							WHERE tpa.arc_id = o.anl_feature_id
+						)
+				), 
+				mincut_times AS (
+					-- put togther all the limits of all the intervals for mincuts in conflict
+					SELECT forecast_start AS forecast_date
+					FROM mincut_conflicts
+					UNION 
+					SELECT forecast_end AS forecast_date
+					FROM mincut_conflicts
+				), 
+				mincut_times_before AS (
+					-- generate the previous limit time
+					SELECT 
+						LAG(forecast_date) OVER (ORDER BY forecast_date) AS forecast_date_before, 
+						forecast_date 
+					FROM mincut_times
+				),
+				mincut_segments AS (
+					-- create all the atomic intervals of all the intervals [prev, actual)
+					SELECT  
+						tsrange(forecast_date_before, forecast_date, '()') AS seg
+					FROM mincut_times_before
+					WHERE forecast_date_before IS NOT NULL
+				),
+				mincut_covers AS (
+					-- for every segment, group the ids
+					SELECT *
+					FROM mincut_conflicts m
+					JOIN mincut_segments s ON m.seg_mincut && s.seg
+				),
+				mincut_groups AS (
+					SELECT seg, array_agg(DISTINCT id ORDER BY id) AS mincut_group
+					FROM mincut_covers
+					GROUP BY seg
+				)
+				SELECT g.seg, g.mincut_group
+				FROM mincut_groups g
+				WHERE NOT EXISTS (
+					SELECT 1 FROM mincut_groups g1 
+					WHERE g.mincut_group <@ g1.mincut_group
+					AND g.mincut_group <> g1.mincut_group
+				);
+			", v_mincut);
+
+			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
+
+				-- prepare mincut 
+				UPDATE temp_pgr_arc 
+				SET mapzone_id = 0 
+				WHERE mapzone_id <> 0;
+
+				UPDATE temp_pgr_node 
+				SET mapzone_id = 0 
+				WHERE mapzone_id <> 0;
+
+				UPDATE temp_pgr_arc 
+				SET proposed = FALSE 
+				WHERE proposed = TRUE;
+
+				UPDATE temp_pgr_arc tpa
+				SET proposed = omv.proposed, cost = -1, reverse_cost = -1, old_mapzone_id = omv.result_id
+				FROM om_mincut_valve omv
+				WHERE omv.result_id = ANY(v_mincut_group_record.mincut_group)
+					AND omv.proposed = TRUE
+					AND omv.node_id = COALESCE(tpa.node_1, tpa.node_2);
+
+				UPDATE temp_pgr_arc tpa
+				SET unaccess = omv.unaccess, cost_mincut = 0, reverse_cost_mincut = 0, old_mapzone_id = omv.result_id
+				FROM om_mincut_valve omv
+				WHERE omv.result_id = ANY(v_mincut_group_record.mincut_group)
+					AND omv.unaccess = TRUE
+					AND omv.node_id = COALESCE(tpa.node_1, tpa.node_2);
+
+
+				v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s"}}',
+				v_pgr_distance, array_to_string(ARRAY[v_pgr_node_id], ','), v_ignore_check_valves);
+
+				RAISE NOTICE 'v_data: %', v_data;
+				v_response := gw_fct_mincut_core(v_data);
+
+				IF v_response->>'status' <> 'Accepted' THEN
+					RETURN v_response;
+				END IF;
+
+				SELECT count(*) INTO v_arc_count
+				FROM temp_pgr_arc tpa
+				WHERE tpa.mapzone_id <> 0
+					AND tpa.arc_id IS NOT NULL
+					AND NOT EXISTS (
+						SELECT 1
+						FROM om_mincut_arc oma
+						WHERE oma.result_id = v_mincut
+							AND oma.arc_id = tpa.arc_id
+					);
+
+				IF v_arc_count > 0 THEN
+					v_conflict = 'Conflict';
+
+					TRUNCATE temp_pgr_connectedcomponents;
+					INSERT INTO temp_pgr_connectedcomponents (seq, component, node)
+					SELECT seq, component, node FROM pgr_connectedcomponents(
+						'SELECT tpa.pgr_arc_id AS id, tpa.pgr_node_1 AS source, tpa.pgr_node_2 AS target, 1 as cost
+						FROM temp_pgr_arc tpa
+						WHERE tpa.mapzone_id <> 0
+							AND NOT EXISTS (
+								SELECT 1
+								FROM om_mincut_arc oma
+								WHERE oma.result_id = v_mincut
+									AND oma.arc_id = tpa.arc_id
+							)
+						'
+					);
+
+					-- TODO: FOR to insert all the conflicts.
+
+
+				ELSE
+					v_conflict = 'Ok';
+				END IF;
+
+
+				
+				UPDATE temp_pgr_arc
+				SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+				WHERE proposed = TRUE
+					AND old_mapzone_id <> 0;
+				
+				UPDATE temp_pgr_arc
+				SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1, old_mapzone_id = 0
+				WHERE unaccess = TRUE
+					AND old_mapzone_id <> 0;
+			END LOOP;
+
+
+
+
+
+
+
+
+
+		END IF;
+
+		
+
 
 
 
@@ -488,11 +673,19 @@ BEGIN
 
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 	-- change the valve status
+
+		-- TODO: set cost_mincut and reverse_cost_mincut to 0
+
 	ELSIF v_action IN ('mincutAccept', 'endMincut') THEN
 	-- accept mincut
 
 		-- TODO: when usePsectors is true, we need to delete the minsectors from the om_mincut table.
 		-- TODO: when user accepts mincut the state of the mincut change from onPlanning to Planned.
+
+		IF (SELECT id FROM om_mincut WHERE id = v_mincut) IS NOT NULL THEN
+			UPDATE om_mincut SET mincut_state = 1 WHERE id = v_mincut;
+		END IF;
+
 
 	ELSIF v_action = 'mincutCancel' THEN
 		v_message = '{"text": "Mincut to cancel not found.", "level": 2}';
