@@ -265,6 +265,7 @@ BEGIN
                     node.supplyzone_id,
                     node.muni_id,
                     node.minsector_id,
+                    cn.node_type,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -308,6 +309,7 @@ BEGIN
                 ), connec_selected AS (
                     SELECT DISTINCT ON (connec_id) connec.connec_id,
                         connec.arc_id,
+                        connec.customer_code,
                         connec.expl_id,
                         connec.sector_id,
                         connec.presszone_id,
@@ -457,6 +459,7 @@ BEGIN
                     node.fluid_type,
                     node.muni_id,
                     node.minsector_id,
+                    node.node_type,
                     node.the_geom
                     FROM node_selector
                     JOIN node ON node.node_id::text = node_selector.node_id::text
@@ -498,6 +501,7 @@ BEGIN
                 ), connec_selected AS (
                     SELECT DISTINCT ON (connec_id) connec.connec_id,
                         connec.arc_id,
+                        connec.customer_code,
                         connec.expl_id,
                         connec.sector_id,
                         connec.dwfzone_id,
@@ -709,6 +713,7 @@ BEGIN
                     n.supplyzone_id,
                     n.muni_id,
                     n.minsector_id,
+                    cn.node_type,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -720,6 +725,7 @@ BEGIN
                 SELECT
                     c.connec_id,
                     c.arc_id,
+                    c.customer_code,
                     c.expl_id,
                     c.sector_id,
                     c.presszone_id,
@@ -791,6 +797,7 @@ BEGIN
                     n.fluid_type,
                     n.muni_id,
                     n.minsector_id,
+                    n.node_type,
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
@@ -802,6 +809,7 @@ BEGIN
                 SELECT
                     c.connec_id,
                     c.arc_id,
+                    c.customer_code,
                     c.expl_id,
                     c.sector_id,
                     c.dwfzone_id,

@@ -288,7 +288,43 @@ BEGIN
 		SELECT v_mincut, vta.arc_id, vta.the_geom 
 		FROM temp_pgr_arc tpa
 		JOIN v_temp_arc vta ON vta.arc_id = tpa.arc_id
-		WHERE mapzone_id <> 0;
+		WHERE tpa.mapzone_id <> 0;
+
+		INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
+		SELECT v_mincut, vtn.node_id, vtn.the_geom, vtn.node_type
+		FROM temp_pgr_node tpn
+		JOIN v_temp_node vtn ON vtn.node_id = tpn.node_id
+		WHERE tpn.mapzone_id <> 0;
+
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
+		SELECT v_mincut, vtc.connec_id, vtc.the_geom, vtc.customer_code
+		FROM temp_pgr_arc tpa 
+		JOIN v_temp_connec vtc ON vtc.arc_id = tpa.arc_id
+		WHERE tpa.mapzone_id <> 0;
+
+		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
+		SELECT v_mincut, rtc.hydrometer_id
+		FROM temp_pgr_arc tpa 
+		JOIN v_temp_connec vtc ON vtc.arc_id = tpa.arc_id
+		JOIN rtc_hydrometer_x_connec rtc ON rtc.connec_id = vtc.connec_id
+		WHERE tpa.mapzone_id <> 0;
+
+		INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, proposed, the_geom, to_arc)
+		SELECT v_mincut, COALESCE(tpa.node_1, tpa.node_2) AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.proposed, vtn.the_geom, tpa.to_arc[0]
+		FROM temp_pgr_arc tpa
+		JOIN v_temp_node vtn ON vtn.node_id = COALESCE(tpa.node_1, tpa.node_2)
+		WHERE tpa.mapzone_id <> 0
+		AND (
+			(tpa.node_1 IS NULL AND tpa.node_2 IS NOT NULL)
+			OR (tpa.node_2 IS NULL AND tpa.node_1 IS NOT NULL)
+		);
+				
+		INSERT INTO om_mincut_polygon (result_id, polygon_id, the_geom)
+		SELECT v_mincut, p.pol_id, p.the_geom
+		FROM temp_pgr_node tpn
+		JOIN v_temp_node vtn ON vtn.node_id = tpn.node_id
+		JOIN polygon p ON p.feature_id = vtn.node_id
+		WHERE tpn.mapzone_id <> 0;
 
 
 
