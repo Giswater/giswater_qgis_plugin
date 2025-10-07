@@ -75,7 +75,7 @@ v_reverse_cost_field text;
 v_pgr_root_vids int[];
 
 -- mincut details
-v_mincutdetails json;
+v_mincut_details json;
 v_num_arcs integer;
 v_length double precision;
 v_volume float;
@@ -284,7 +284,7 @@ BEGIN
 		WHERE proposed = TRUE;
 
 
-		IF v_node_id IS NULL THEN
+		IF v_node_id IS NOT NULL THEN
 			v_pgr_node_id := (SELECT pgr_node_id FROM temp_pgr_node WHERE node_id = v_node_id);
 		END IF;
 
@@ -334,20 +334,20 @@ BEGIN
 
 		-- insert hydrometer from connec
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT result_id_arg, rhxc.hydrometer_id 
+		SELECT v_mincut, rhxc.hydrometer_id 
 		FROM rtc_hydrometer_x_connec rhxc
 		JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
 		JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.id
-		WHERE result_id = result_id_arg 
+		WHERE result_id = v_mincut 
 			AND rhxc.connec_id = omc.connec_id
 			AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 		-- insert hydrometer from node
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT result_id_arg, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
+		SELECT v_mincut, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
 		JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
 		JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.id
-		WHERE result_id = result_id_arg 
+		WHERE result_id = v_mincut 
 			AND rhxn.node_id = omn.node_id
 			AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
@@ -387,25 +387,32 @@ BEGIN
 		WHERE result_id = v_mincut;
 
 		-- priority hydrometers
-		SELECT v_priority := coalesce(
-			json_agg(
-				json_build_object(
-					'category', hc.observ,
-					'number', count(rhxc.hydrometer_id)
-				) ORDER BY hc.observ
-			), '[]'::json
-		)
-		FROM rtc_hydrometer_x_connec rhxc
-		JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id
-		JOIN v_rtc_hydrometer vrh ON vrh.hydrometer_id = rhxc.hydrometer_id
-		LEFT JOIN ext_hydrometer_category hc ON hc.id::text = vrh.category_id::text
-		JOIN connec c ON c.connec_id = vrh.feature_id 
-		WHERE result_id = v_mincut
-		GROUP BY hc.observ;
+		v_priority := (
+			SELECT array_to_json(array_agg(b))
+			FROM (
+				SELECT 
+					json_build_object(
+						'category', hc.observ,
+						'number', count(rtc_hydrometer_x_connec.hydrometer_id)
+					) AS b
+				FROM rtc_hydrometer_x_connec
+				JOIN om_mincut_connec 
+					ON rtc_hydrometer_x_connec.connec_id = om_mincut_connec.connec_id
+				JOIN v_rtc_hydrometer 
+					ON v_rtc_hydrometer.hydrometer_id = rtc_hydrometer_x_connec.hydrometer_id
+				LEFT JOIN ext_hydrometer_category hc 
+					ON hc.id::text = v_rtc_hydrometer.category_id::text
+				JOIN connec 
+					ON connec.connec_id = v_rtc_hydrometer.feature_id
+				WHERE result_id = v_mincut
+				GROUP BY hc.observ
+				ORDER BY hc.observ
+			) a
+		);
 
 		IF v_priority IS NULL THEN v_priority='{}'; END IF;
 		v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
-		
+
 
 		v_mincut_details = json_build_object(
 			'psectors', json_build_object(
@@ -433,7 +440,6 @@ BEGIN
 		--update output results
 		UPDATE om_mincut SET output = v_mincut_details WHERE id = v_mincut;
 
-		IF v_debug THEN RAISE NOTICE '13- Boundary calculation ';	END IF;
 
 		-- calculate the boundary of mincut using arcs and valves
 		v_query_text := format(
