@@ -143,7 +143,7 @@ BEGIN
 			field_value := COALESCE(field_value, '');
 
 			-- Update array
-			IF (aux_json->>'widgettype')='combo' OR (aux_json->>'widgettype')='valuerelation' THEN
+			IF (aux_json->>'widgettype')='combo' OR (aux_json->>'widgettype')='multiple_checkbox' THEN
 
 				-- Set default value if exist when inserting and feild_value is null
 				IF p_tg_op ='INSERT' AND (field_value IS NULL OR field_value = '') THEN

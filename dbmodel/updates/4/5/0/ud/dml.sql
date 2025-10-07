@@ -9,3 +9,5 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE sys_function SET function_alias = 'BUILT MISSING NODES USING START/END VERTICES' WHERE function_name = 'gw_fct_setnodefromarc';
+
+DELETE FROM config_form_fields WHERE formname='ve_macrosector' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';

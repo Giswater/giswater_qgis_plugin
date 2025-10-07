@@ -267,7 +267,7 @@ BEGIN
 	END LOOP;
 
 	-- combo no childs
-	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE (a->>'widgettype' = 'combo' OR a->>'widgettype' = 'valuerelation' OR a->>'widgettype' = 'valuerelation_filtered')  AND  a->>'parentId' IS NULL
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE (a->>'widgettype' = 'combo' OR a->>'widgettype' = 'multiple_checkbox' OR a->>'widgettype' = 'multiple_option')  AND  a->>'parentId' IS NULL
 	LOOP
 		v_array := null;
 		-- Define the order by column
@@ -313,7 +313,7 @@ BEGIN
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
 		-- for typeahead widgets
-		IF (aux_json->>'widgettype' = 'typeahead' OR aux_json->>'widgettype' = 'valuerelation_filtered') and (aux_json->>'queryText') IS NOT NULL THEN
+		IF (aux_json->>'widgettype' = 'typeahead' OR aux_json->>'widgettype' = 'multiple_option') and (aux_json->>'queryText') IS NOT NULL THEN
 
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'getDataAction', 'dataset'::text);
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectAction', 'setWidgetValue'::text);
@@ -469,7 +469,7 @@ BEGIN
 	END LOOP;
 
 	-- for the rest of widgets removing not used keys
-	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead', 'valuerelation_filtered')
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead', 'multiple_option')
 	LOOP
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
