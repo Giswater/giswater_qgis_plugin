@@ -115,9 +115,9 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"0"}, "cur_user":"current_user"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"0"}, "cur_user":"current_user"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"0"}, "cur_user":"current_user"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||(v_mincutrec.output->'connecs'->>'number')||'"}, "cur_user":"current_user"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||(v_mincutrec.output->'connecs'->'hydrometers'->>'total')||'"}, "cur_user":"current_user"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||replace((v_mincutrec.output->'connecs'->'hydrometers'->>'classified'), '"', '\"')||'"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincutrec.output->'connecs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincutrec.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "cur_user":"current_user"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"3012", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincutrec.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "cur_user":"current_user"}}$$)';
 
 	-- info
 	v_result = null;
