@@ -8,3 +8,4 @@
 - Fix minsectory analysis now can handle exceptions correctly
 - Fix trg_edit_municipality to manage expl_id
 - Fix fct_setarcfusion to better manage arc directions. Allow any combination on WS and restrict logical directions on UD
+- Fix ve_inp_dwf definition.
