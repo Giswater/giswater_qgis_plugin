@@ -124,15 +124,28 @@ BEGIN
 			WHERE dscenario_id IN (SELECT unnest(v_userscenario)) and dd.demand IS NOT NULL AND dd.demand <> 0;
 
 			-- update those connecs that is other link_id
-			FOR rec in select * from temp_t_demand where feature_id not in (select node_id from temp_t_node)
-			LOOP
-				UPDATE temp_t_demand SET feature_id = f.feature_id
-				FROM
-				(SELECT concat('VN',c2.link_id) as feature_id FROM temp_t_link c1, temp_t_link c2 where st_dwithin(c1.the_geom, c2.the_geom, 100) and c1.link_id <> c2.link_id
-				and concat('VN',c1.link_id) = rec.feature_id and concat('VN',c2.link_id) in (SELECT feature_id FROM temp_t_demand)
-				order by st_distance ( c1.the_geom, c2.the_geom) asc LIMIT 1) f
-				WHERE temp_t_demand.feature_id = rec.feature_id;
-			END LOOP;
+			WITH demands AS (
+				SELECT feature_id
+				FROM temp_t_demand d
+				WHERE NOT EXISTS (
+					SELECT 1 
+					FROM temp_t_node 
+					WHERE node_id = d.feature_id
+				)
+			)
+			UPDATE temp_t_demand d SET feature_id = f.feature_id
+			FROM
+			(
+				SELECT concat('VN',c2.link_id) as feature_id 
+				FROM temp_t_link c1
+				JOIN temp_t_link c2 ON ST_DWithin(c1.the_geom, c2.the_geom, 100) 
+					AND c1.link_id <> c2.link_id
+				JOIN demands d1 ON concat('VN',c1.link_id) = d1.feature_id 
+					AND concat('VN',c2.link_id) = d1.feature_id 
+				ORDER BY ST_Distance(c1.the_geom, c2.the_geom) ASC 
+				LIMIT 1
+			) f;
+
 
 		end if;
 
