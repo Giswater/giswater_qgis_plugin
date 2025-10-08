@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) 
 VALUES('mincut_class', '4', 'Conflict mincut', NULL, NULL);
+
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) 
+VALUES('mincut_state', '5', 'Conflict', NULL, NULL);

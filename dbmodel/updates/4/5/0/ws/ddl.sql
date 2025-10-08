@@ -9,7 +9,10 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TABLE IF NOT EXISTS om_mincut_conflict (
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT gen_random_uuid(),
     mincut_id integer NOT NULL,
+    CONSTRAINT om_mincut_conflict_pkey PRIMARY KEY (id, mincut_id),
     CONSTRAINT om_mincut_conflict_mincut_id_fkey FOREIGN KEY (mincut_id) REFERENCES om_mincut(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS om_mincut_conflict_mincut_id_idx ON om_mincut_conflict (mincut_id);
