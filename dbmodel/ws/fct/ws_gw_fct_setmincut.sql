@@ -793,13 +793,14 @@ BEGIN
 						-- update forecast_start and forecast_end for the affected zone mincut
 						WITH forecast_time AS (
 							SELECT 
-								MAX (forecast_start) AS forecast_start, 
-								MIN (forecast_end) AS forecast_end
+								GREATEST(MAX (forecast_start),v_dialog_forecast_start)  AS forecast_start, 
+								LEAST(MIN (forecast_end), v_dialog_forecast_end) AS forecast_end
 							FROM om_mincut om
 							WHERE EXISTS (
 								SELECT 1 FROM om_mincut_conflict omc
 								WHERE omc.id = v_mincut_conflict_group_id
 								AND omc.mincut_id <> v_mincut_affected_id
+								AND omc.mincut_id <> v_mincut
 								AND omc.mincut_id = om.id
 							)
 						) 
@@ -814,7 +815,12 @@ BEGIN
 						VALUES (v_mincut_affected_id, current_user, 'affected') ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-						SELECT UNNEST(v_mincut_group_record.mincut_group), current_user, 'conflict' ON CONFLICT (result_id, cur_user) DO NOTHING;
+						SELECT omc.mincut_id, current_user, 'conflict' 
+						FROM om_mincut_conflict omc
+						WHERE omc.id = v_mincut_conflict_group_id
+						AND omc.mincut_id <> v_mincut
+						AND omc.mincut_id <> v_mincut_affected_id
+						ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 					END LOOP;
 
