@@ -518,8 +518,6 @@ BEGIN
 			v_query_text := format($fmt$
 				WITH mincut_conflicts AS (
 					SELECT o.id, o.anl_feature_type, o.anl_feature_id, 
-						UPPER(tsrange(o.forecast_start, %L, '[]')) AS forecast_start, 
-						LOWER(tsrange(o.forecast_end, %L, '[]')) AS forecast_end,
 						tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
 					FROM om_mincut o
 					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
@@ -537,10 +535,10 @@ BEGIN
 				), 
 				mincut_times AS (
 					-- put togther all the limits of all the intervals for mincuts in conflict
-					SELECT forecast_start AS forecast_date
+					SELECT LOWER(seg_mincut) AS forecast_date
 					FROM mincut_conflicts
 					UNION 
-					SELECT forecast_end AS forecast_date
+					SELECT UPPER(seg_mincut) AS forecast_date
 					FROM mincut_conflicts
 				), 
 				mincut_times_before AS (
