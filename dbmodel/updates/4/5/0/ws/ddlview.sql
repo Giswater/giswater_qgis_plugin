@@ -192,3 +192,39 @@ SELECT DISTINCT ON (netscenario_id) netscenario_id,
     log
 FROM plan_netscenario
 WHERE EXISTS (SELECT 1 FROM sel_expl WHERE sel_expl.expl_id = expl_id);
+
+CREATE OR REPLACE VIEW v_om_mincut_arc AS
+WITH sel_mincut AS (
+	SELECT result_id, result_type
+	FROM selector_mincut_result
+	WHERE cur_user = CURRENT_USER
+),
+SELECT oma.id,
+    oma.result_id,
+    om.mincut_class,
+    om.work_order,
+    oma.arc_id,
+    sm.result_type
+    oma.the_geom
+FROM om_mincut_arc oma
+JOIN om_mincut om ON oma.result_id = om.id
+JOIN sel_mincut sm ON sm.result_id = oma.result_id
+ORDER BY oma.arc_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_connec
+AS WITH sel_mincut AS (
+	SELECT result_id, result_type
+	FROM selector_mincut_result
+	WHERE cur_user = CURRENT_USER
+)
+SELECT omc.id,
+    omc.result_id,
+    om.work_order,
+    omc.connec_id,
+    omc.customer_code,
+    sm.result_type,
+    omc.the_geom
+FROM om_mincut_connec omc
+JOIN om_mincut om ON omc.result_id = om.id
+JOIN sel_mincut sm ON sm.result_id = omc.result_id
+ORDER BY omc.connec_id;

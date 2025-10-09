@@ -62,6 +62,12 @@ v_mincut_version text;
 v_vdefault json;
 v_ignore_check_valves boolean;
 
+-- dialog parameters
+v_dialog_mincut_type text;
+v_dialog_forecast_start timestamp;
+v_dialog_forecast_end timestamp;
+
+
 v_xcoord double precision;
 v_ycoord double precision;
 v_epsg integer;
@@ -100,7 +106,7 @@ v_default_value text;
 v_mincut_record record;
 v_mincut_group_record record;
 v_mincut_conflict_record record;
-v_mincut_conflict_id integer;
+v_mincut_affected_id integer;
 v_mincut_conflict_group_id uuid;
 v_arc_count integer;
 v_conflict text := 'Ok'; -- Ok, Conflict
@@ -134,6 +140,11 @@ BEGIN
 	v_mincut_class := p_data->'data'->>'mincutClass';
 	v_arc_id := p_data->'data'->>'arcId';
 	v_use_plan_psectors := p_data->'data'->>'usePsectors';
+	-- get dialog parameters (IMPORTANT to execute mincut with dialog data)
+	v_dialog_mincut_type := p_data->'data'->>'dialogMincutType';
+	v_dialog_forecast_start := p_data->'data'->>'dialogForecastStart';
+	v_dialog_forecast_end := p_data->'data'->>'dialogForecastEnd';
+
 	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
 	v_vdefault := (SELECT value::json FROM config_param_system WHERE parameter = 'om_mincut_vdefault');
 	v_ignore_check_valves := (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreCheckValvesMincut');
@@ -167,14 +178,14 @@ BEGIN
 	-- TODO: new apply button to save data on om_mincut table.
 
 
-	IF v_action = 'mincutNetwork' THEN
+	IF v_action IN ('mincutNetwork', 'mincutRefresh') THEN
 	-- create mincut
-
-
-		-- Delete temporary tables
-		-- =======================
-		v_data := '{"data":{"action":"DROP", "fct_name":"MINCUT"}}';
-		SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+		IF v_action = 'mincutNetwork' THEN
+			-- Delete temporary tables
+			-- =======================
+			v_data := '{"data":{"action":"DROP", "fct_name":"MINCUT"}}';
+			SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+		END IF;
 
 		-- Create temporary tables
 		-- =======================
@@ -317,11 +328,12 @@ BEGIN
 		DELETE FROM om_mincut_hydrometer where result_id=v_mincut;
 		DELETE FROM om_mincut_valve where result_id=v_mincut;
 
+		DELETE FROM selector_mincut_result WHERE cur_user = current_user;
 
 		WITH groups_conflict AS (
 			SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut
-		)
-		WITH mincuts_to_delete AS (
+		),
+		mincuts_to_delete AS (
 			SELECT omc.mincut_id 
 			FROM om_mincut_conflict omc
 			JOIN om_mincut om ON om.id = omc.mincut_id
@@ -499,27 +511,25 @@ BEGIN
 
 		-- FIRST MINCUT FINISHED
 
-		SELECT * into v_mincut_record FROM om_mincut WHERE id = v_mincut;
+		--SELECT * into v_mincut_record FROM om_mincut WHERE id = v_mincut;
 
-		IF v_mincut_record.forecast_start IS NOT NULL AND v_mincut_record.forecast_end IS NOT NULL THEN
+		IF v_dialog_forecast_start IS NOT NULL AND v_dialog_forecast_end IS NOT NULL THEN
 
 			v_query_text := format($fmt$
 				WITH mincut_conflicts AS (
-					SELECT o.id, o.anl_feature_type, o.anl_feature_id, o.forecast_start, o.forecast_end, 
-						tsrange(o.forecast_start, o.forecast_end, '[]') AS seg_mincut
+					SELECT o.id, o.anl_feature_type, o.anl_feature_id, 
+						max(o.forecast_start, %L) AS forecast_start, 
+						min(o.forecast_end, %L) AS forecast_end,
+						tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
 					FROM om_mincut o
 					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
 					WHERE o.mincut_state IN (0, 1)
 						AND o.mincut_class = 1
 						AND c.virtual = FALSE 
 						AND o.forecast_start <= o.forecast_end 
+						AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(%L, %L, '[]')
+						AND o.id <> %s
 						-- removing EXISTS for grouping all the conflicts
-						AND EXISTS (
-							SELECT 1 FROM om_mincut oo 
-							WHERE oo.id = %s
-							AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(oo.forecast_start, oo.forecast_end, '[]')
-							AND o.id <> oo.id
-						)
 						AND EXISTS (
 							SELECT 1 FROM temp_pgr_arc tpa
 							WHERE tpa.arc_id::text = o.anl_feature_id
@@ -552,8 +562,6 @@ BEGIN
 					SELECT *
 					FROM mincut_conflicts m
 					JOIN mincut_segments s ON m.seg_mincut && s.seg
-					WHERE seg <@ tsrange(v_mincut_record.forecast_start, v_mincut_record.forecast_end, '[]')
-					AND m.id <> v_mincut
 				),
 				mincut_groups AS (
 					SELECT seg, array_agg(DISTINCT id ORDER BY id) AS mincut_group
@@ -567,7 +575,12 @@ BEGIN
 					WHERE g.mincut_group <@ g1.mincut_group
 					AND g.mincut_group <> g1.mincut_group
 				);
-			$fmt$, v_mincut);
+			$fmt$, 
+			v_dialog_forecast_start, v_dialog_forecast_end, 
+			v_dialog_forecast_start, v_dialog_forecast_end,
+			v_dialog_forecast_start, v_dialog_forecast_end,
+			v_mincut);
+			RAISE NOTICE 'v_query_text: %', v_query_text;
 
 			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
 
@@ -651,12 +664,12 @@ BEGIN
 					
 					FOR v_mincut_conflict_record IN EXECUTE v_query_text LOOP
 						-- create the new mincut virtual: [onPlanning and Conflict]
-						INSERT INTO om_mincut (mincut_state, mincut_class, forecast_start, forecast_end)
-						VALUES (4, 4, lower(v_mincut_group_record.seg), upper(v_mincut_group_record.seg))
-						RETURNING id INTO v_mincut_conflict_id;
+						INSERT INTO om_mincut (mincut_state, mincut_class)
+						VALUES (4, 4)
+						RETURNING id INTO v_mincut_affected_id;
 
 						INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
-						SELECT v_mincut_conflict_id, a.arc_id, the_geom
+						SELECT v_mincut_affected_id, a.arc_id, the_geom
 						FROM temp_pgr_arc a
 						JOIN v_temp_arc va USING (arc_id)
 						WHERE a.mapzone_id <> 0
@@ -664,7 +677,7 @@ BEGIN
 							AND EXISTS (SELECT 1 FROM temp_pgr_connectedcomponents c WHERE c.node = a.pgr_node_2 AND c.component = v_mincut_conflict_record.component); 
 
 						INSERT INTO om_mincut_node (result_id, node_id, node_type, the_geom) 
-						SELECT v_mincut_conflict_id, n.node_id, node_type, the_geom
+						SELECT v_mincut_affected_id, n.node_id, node_type, the_geom
 						FROM temp_pgr_node n
 						JOIN v_temp_node vn USING (node_id)
 						WHERE n.mapzone_id <> 0
@@ -684,7 +697,7 @@ BEGIN
 								);
 
 						INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, proposed) 
-						SELECT v_mincut_conflict_id, COALESCE (node_1, node_2), closed, broken, to_arc[0], unaccess, proposed
+						SELECT v_mincut_affected_id, COALESCE (node_1, node_2), closed, broken, to_arc[0], unaccess, proposed
 						FROM temp_pgr_arc a
 						WHERE a.mapzone_id <> 0 
 							AND graph_delimiter = 'MINSECTOR'
@@ -710,34 +723,34 @@ BEGIN
 								);
 
 						INSERT INTO om_mincut_polygon (result_id, polygon_id, the_geom)
-						SELECT v_mincut_conflict_id, p.pol_id, p.the_geom
+						SELECT v_mincut_affected_id, p.pol_id, p.the_geom
 						FROM om_mincut_node omn
 						JOIN v_temp_node vtn ON vtn.node_id = omn.node_id
 						JOIN polygon p ON p.feature_id = vtn.node_id
-						WHERE omn.result_id = v_mincut_conflict_id;
+						WHERE omn.result_id = v_mincut_affected_id;
 
 						INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
-						SELECT v_mincut_conflict_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
+						SELECT v_mincut_affected_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
 						FROM om_mincut_arc oma 
 						JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
-						WHERE oma.result_id = v_mincut_conflict_id;
+						WHERE oma.result_id = v_mincut_affected_id;
 
 						-- insert hydrometer from connec
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-						SELECT v_mincut_conflict_id, rhxc.hydrometer_id 
+						SELECT v_mincut_affected_id, rhxc.hydrometer_id 
 						FROM rtc_hydrometer_x_connec rhxc
 						JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
 						JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.id
-						WHERE result_id = v_mincut_conflict_id 
+						WHERE result_id = v_mincut_affected_id 
 							AND rhxc.connec_id = omc.connec_id
 							AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 						-- insert hydrometer from node
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-						SELECT v_mincut_conflict_id, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
+						SELECT v_mincut_affected_id, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
 						JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
 						JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.id
-						WHERE result_id = v_mincut_conflict_id 
+						WHERE result_id = v_mincut_affected_id 
 							AND rhxn.node_id = omn.node_id
 							AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
@@ -745,18 +758,38 @@ BEGIN
 
 						v_mincut_conflict_group_id := gen_random_uuid();
 
-						-- insert conflict mincut first
+						-- insert affected zone mincut first
 						INSERT INTO om_mincut_conflict (id, mincut_id)
-						VALUES (v_mincut_conflict_group_id, v_mincut_conflict_id);
+						VALUES (v_mincut_conflict_group_id, v_mincut_affected_id);
 
-						-- insert conflict mincut original
+						-- insert original mincut
 						INSERT INTO om_mincut_conflict (id, mincut_id)
 						VALUES (v_mincut_conflict_group_id, v_mincut);
 
-						-- insert conflict mincut group
+						-- insert conflict mincut
 						INSERT INTO om_mincut_conflict (id, mincut_id)
 						SELECT v_mincut_conflict_group_id, UNNEST(v_mincut_group_record.mincut_group);
 
+						-- calculate new forecast start and end for the conflict mincut
+						WITH mincut_conflicts AS (
+							SELECT o.id, o.anl_feature_type, o.anl_feature_id, 
+								max(o.forecast_start, %L) AS forecast_start, 
+								min(o.forecast_end, %L) AS forecast_end,
+								tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
+							FROM om_mincut o
+							WHERE 
+
+								tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(%L, %L, '[]')
+								AND o.id <> %s
+						), 
+
+
+						-- insert selector mincut result
+						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
+						VALUES (v_mincut_affected_id, current_user, 'affected') ON CONFLICT (result_id, cur_user) DO NOTHING;
+
+						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
+						SELECT UNNEST(v_mincut_group_record.mincut_group), current_user, 'conflict' ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 					END LOOP;
 
@@ -777,16 +810,10 @@ BEGIN
 					AND old_mapzone_id <> 0;
 			END LOOP;
 
-
-
-
-
-
-
-
-
 		END IF;
-
+		-- select current mincut
+		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
+		VALUES (v_mincut, current_user, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;
 		
 
 
