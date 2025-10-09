@@ -789,6 +789,7 @@ BEGIN
 						SELECT v_mincut_conflict_group_id, m.result_id
 						FROM mincuts_conflicts m;
 
+						-- update forecast_start and forecast-end for the affected zone mincut
 						WITH forecast_times AS (
 							SELECT om.id, om.forecast_start, om.forecast_end
 							FROM om_mincut om
