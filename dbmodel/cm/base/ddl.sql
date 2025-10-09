@@ -616,7 +616,7 @@ CREATE TABLE om_campaign_lot_x_node (
 );
 
 CREATE TABLE config_outlayers (
-	feature_type text NOT NULL,
+	feature_type text[] NOT NULL,
 	column_name text NOT NULL,
 	min_value text,
 	max_value text,
@@ -634,7 +634,7 @@ CREATE TABLE config_qindex_rating (
 );
 
 CREATE TABLE config_qindex_keyparam (
-  layer text NOT NULL,
+  layer text[] NOT NULL,
   column_name text NOT NULL,
   active boolean DEFAULT true,
   CONSTRAINT config_qindex_keyparam_pkey PRIMARY KEY (layer, column_name)

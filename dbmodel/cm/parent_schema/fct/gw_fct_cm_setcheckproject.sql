@@ -235,48 +235,50 @@ BEGIN
         v_outlier_rules_checked := 0;
 
         FOR v_rec IN SELECT * FROM cm.config_outlayers
-		LOOP
+	LOOP
+            -- Loop through each feature_type in the array
+            FOR v_feature_type_item IN SELECT unnest(v_rec.feature_type) LOOP
             v_outlier_rules_checked := v_outlier_rules_checked + 1;
-			v_conditions := ARRAY[]::text[];
-			
-			-- Check column data type and build appropriate conditions
-			v_is_numeric := false;
-			v_is_text := false;
-			
-			-- Get a sample value to determine data type (with campaign/lot filtering)
-			IF v_rec.feature_type = 'arc' THEN
+		v_conditions := ARRAY[]::text[];
+		
+		-- Check column data type and build appropriate conditions
+		v_is_numeric := false;
+		v_is_text := false;
+		
+		-- Get a sample value to determine data type (with campaign/lot filtering)
+		IF v_feature_type_item = 'arc' THEN
 				IF v_lot_id IS NOT NULL THEN
 					EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
 						JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
 						WHERE cx.lot_id = %s AND a.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_rec.feature_type, v_lot_id, v_rec.column_name) INTO v_sample_value;
+						v_rec.column_name, v_feature_type_item, v_lot_id, v_rec.column_name) INTO v_sample_value;
 				ELSIF v_campaign_id IS NOT NULL THEN
 					EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
 						JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
 						WHERE cx.campaign_id = %s AND a.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_rec.feature_type, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+						v_rec.column_name, v_feature_type_item, v_campaign_id, v_rec.column_name) INTO v_sample_value;
 				ELSE
 					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_rec.feature_type, v_rec.column_name) INTO v_sample_value;
+						v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
 				END IF;
-			ELSIF v_rec.feature_type = 'node' THEN
+			ELSIF v_feature_type_item = 'node' THEN
 				IF v_lot_id IS NOT NULL THEN
 					EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
 						JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
 						WHERE cx.lot_id = %s AND n.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_rec.feature_type, v_lot_id, v_rec.column_name) INTO v_sample_value;
+						v_rec.column_name, v_feature_type_item, v_lot_id, v_rec.column_name) INTO v_sample_value;
 				ELSIF v_campaign_id IS NOT NULL THEN
 					EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
 						JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
 						WHERE cx.campaign_id = %s AND n.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_rec.feature_type, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+						v_rec.column_name, v_feature_type_item, v_campaign_id, v_rec.column_name) INTO v_sample_value;
 				ELSE
 					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_rec.feature_type, v_rec.column_name) INTO v_sample_value;
+						v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
 				END IF;
 			ELSE
 				EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
-					v_rec.column_name, v_rec.feature_type, v_rec.column_name) INTO v_sample_value;
+					v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
 			END IF;
 			
 			-- Skip this rule if no sample value found (no features of this type in campaign/lot)
@@ -330,65 +332,65 @@ BEGIN
 				END IF;
 			END IF;
 
-			IF array_length(v_conditions, 1) > 0 THEN
-				-- Build query with campaign/lot filtering
-				IF v_rec.feature_type = 'arc' THEN
-					-- For arcs, join with campaign/lot tables
-					IF v_lot_id IS NOT NULL THEN
-						-- Filter by lot
-						v_querytext := format(
-							'SELECT a.%I FROM PARENT_SCHEMA.%I a 
-							 JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
-							 WHERE cx.lot_id = %s AND (%s)',
-							v_rec.column_name, v_rec.feature_type, v_lot_id, array_to_string(v_conditions, ' OR ')
-						);
-					ELSIF v_campaign_id IS NOT NULL THEN
-						-- Filter by campaign
-						v_querytext := format(
-							'SELECT a.%I FROM PARENT_SCHEMA.%I a 
-							 JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
-							 WHERE cx.campaign_id = %s AND (%s)',
-							v_rec.column_name, v_rec.feature_type, v_campaign_id, array_to_string(v_conditions, ' OR ')
-						);
-					ELSE
-						-- No filtering
-						v_querytext := format(
-							'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
-							v_rec.column_name, v_rec.feature_type, array_to_string(v_conditions, ' OR ')
-						);
-					END IF;
-				ELSIF v_rec.feature_type = 'node' THEN
-					-- For nodes, join with campaign/lot tables
-					IF v_lot_id IS NOT NULL THEN
-						-- Filter by lot
-						v_querytext := format(
-							'SELECT n.%I FROM PARENT_SCHEMA.%I n 
-							 JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
-							 WHERE cx.lot_id = %s AND (%s)',
-							v_rec.column_name, v_rec.feature_type, v_lot_id, array_to_string(v_conditions, ' OR ')
-						);
-					ELSIF v_campaign_id IS NOT NULL THEN
-						-- Filter by campaign
-						v_querytext := format(
-							'SELECT n.%I FROM PARENT_SCHEMA.%I n 
-							 JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
-							 WHERE cx.campaign_id = %s AND (%s)',
-							v_rec.column_name, v_rec.feature_type, v_campaign_id, array_to_string(v_conditions, ' OR ')
-						);
-					ELSE
-						-- No filtering
-						v_querytext := format(
-							'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
-							v_rec.column_name, v_rec.feature_type, array_to_string(v_conditions, ' OR ')
-						);
-					END IF;
+		IF array_length(v_conditions, 1) > 0 THEN
+			-- Build query with campaign/lot filtering
+			IF v_feature_type_item = 'arc' THEN
+				-- For arcs, join with campaign/lot tables
+				IF v_lot_id IS NOT NULL THEN
+					-- Filter by lot
+					v_querytext := format(
+						'SELECT a.%I FROM PARENT_SCHEMA.%I a 
+						 JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
+						 WHERE cx.lot_id = %s AND (%s)',
+						v_rec.column_name, v_feature_type_item, v_lot_id, array_to_string(v_conditions, ' OR ')
+					);
+				ELSIF v_campaign_id IS NOT NULL THEN
+					-- Filter by campaign
+					v_querytext := format(
+						'SELECT a.%I FROM PARENT_SCHEMA.%I a 
+						 JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
+						 WHERE cx.campaign_id = %s AND (%s)',
+						v_rec.column_name, v_feature_type_item, v_campaign_id, array_to_string(v_conditions, ' OR ')
+					);
 				ELSE
-					-- For other feature types, no filtering
+					-- No filtering
 					v_querytext := format(
 						'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
-						v_rec.column_name, v_rec.feature_type, array_to_string(v_conditions, ' OR ')
+						v_rec.column_name, v_feature_type_item, array_to_string(v_conditions, ' OR ')
 					);
 				END IF;
+			ELSIF v_feature_type_item = 'node' THEN
+				-- For nodes, join with campaign/lot tables
+				IF v_lot_id IS NOT NULL THEN
+					-- Filter by lot
+					v_querytext := format(
+						'SELECT n.%I FROM PARENT_SCHEMA.%I n 
+						 JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
+						 WHERE cx.lot_id = %s AND (%s)',
+						v_rec.column_name, v_feature_type_item, v_lot_id, array_to_string(v_conditions, ' OR ')
+					);
+				ELSIF v_campaign_id IS NOT NULL THEN
+					-- Filter by campaign
+					v_querytext := format(
+						'SELECT n.%I FROM PARENT_SCHEMA.%I n 
+						 JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
+						 WHERE cx.campaign_id = %s AND (%s)',
+						v_rec.column_name, v_feature_type_item, v_campaign_id, array_to_string(v_conditions, ' OR ')
+					);
+				ELSE
+					-- No filtering
+					v_querytext := format(
+						'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+						v_rec.column_name, v_feature_type_item, array_to_string(v_conditions, ' OR ')
+					);
+				END IF;
+			ELSE
+				-- For other feature types, no filtering
+				v_querytext := format(
+					'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+					v_rec.column_name, v_feature_type_item, array_to_string(v_conditions, ' OR ')
+				);
+			END IF;
 
 				EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
 			ELSE
@@ -408,46 +410,47 @@ BEGIN
 					v_fid,
 					current_user,
 					v_criticity,
-					-- Use the custom message if provided, otherwise a default one with dynamic values
-					COALESCE(
-						-- Replace placeholders in custom message
+			-- Use the custom message if provided, otherwise a default one with dynamic values
+				COALESCE(
+					-- Replace placeholders in custom message
+					REPLACE(
 						REPLACE(
-							REPLACE(
-								REPLACE(v_rec.except_message, '{min_value}', COALESCE(v_rec.min_value, 'N/A')),
-								'{max_value}', COALESCE(v_rec.max_value, 'N/A')
-							),
-							'{count}', v_count::text
+							REPLACE(v_rec.except_message, '{min_value}', COALESCE(v_rec.min_value, 'N/A')),
+							'{max_value}', COALESCE(v_rec.max_value, 'N/A')
 						),
-						-- Dynamic default message with placeholders replaced
+						'{count}', v_count::text
+					),
+					-- Dynamic default message with placeholders replaced
+					REPLACE(
 						REPLACE(
 							REPLACE(
 								REPLACE(
-									REPLACE(
-										REPLACE('Found {count} outlier(s) for field {column_name} in table {feature_type} (range: {min_value} to {max_value}).',
-											'{min_value}', COALESCE(v_rec.min_value, 'N/A')
-										),
-										'{max_value}', COALESCE(v_rec.max_value, 'N/A')
+									REPLACE('Found {count} outlier(s) for field {column_name} in table {feature_type} (range: {min_value} to {max_value}).',
+										'{min_value}', COALESCE(v_rec.min_value, 'N/A')
 									),
-									'{count}', v_count::text
+									'{max_value}', COALESCE(v_rec.max_value, 'N/A')
 								),
-								'{column_name}', v_rec.column_name
+								'{count}', v_count::text
 							),
-							'{feature_type}', v_rec.feature_type
-						)
-					),
-					v_count
-				);
-			ELSE
-				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-				VALUES (
-					v_fid,
-					current_user,
-					1, -- Info level
-					format('INFO: All values for field %I in table %I are within the defined range.', v_rec.column_name, v_rec.feature_type),
-					0
-				);
-			END IF;
-        END LOOP;
+							'{column_name}', v_rec.column_name
+						),
+						'{feature_type}', v_feature_type_item
+					)
+				),
+				v_count
+			);
+		ELSE
+			INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+			VALUES (
+				v_fid,
+				current_user,
+				1, -- Info level
+				format('INFO: All values for field %I in table %I are within the defined range.', v_rec.column_name, v_feature_type_item),
+				0
+			);
+		END IF;
+            END LOOP; -- end feature_type_item loop
+        END LOOP; -- end config_outlayers loop
 
         INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
         VALUES (v_fid, current_user, 1,
@@ -1074,12 +1077,14 @@ BEGIN
             -- Enforce key parameter rules for lot: if any configured key param is NULL/empty/'unknown', force rating to INACEPTABLE
             IF v_lot_id IS NOT NULL THEN
                 FOR v_rec IN SELECT layer, column_name FROM cm.config_qindex_keyparam WHERE active LOOP
+                    -- Loop through each layer in the array
+                    FOR v_layer_item IN SELECT unnest(v_rec.layer) LOOP
                     BEGIN
                         -- Resolve actual lot view name: ve_<parent>_lot_<layer>
                         SELECT table_name INTO v_lot_view_name
                         FROM information_schema.views
                         WHERE table_schema = 'cm'
-                          AND table_name LIKE ('ve_' || '%' || '_lot_' || v_rec.layer)
+                          AND table_name LIKE ('ve_' || '%' || '_lot_' || v_layer_item)
                         LIMIT 1;
                         IF v_lot_view_name IS NULL THEN
                             CONTINUE;
@@ -1118,15 +1123,16 @@ BEGIN
                                 v_fid,
                                 current_user,
                                 3,
-                                format('ERROR: Found %s invalid value(s) for key param %I.%I. Lot rating set to INACEPTABLE.', v_count, v_rec.layer, v_rec.column_name),
+                                format('ERROR: Found %s invalid value(s) for key param %I.%I. Lot rating set to INACEPTABLE.', v_count, v_layer_item, v_rec.column_name),
                                 v_count
                             );
                         END IF;
                     EXCEPTION WHEN OTHERS THEN
                         INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
                         VALUES (v_fid, current_user, 2,
-                                format('WARNING: Key param check failed for %I.%I on lot %s. Error: %s', v_rec.layer, v_rec.column_name, v_lot_id, SQLERRM));
+                                format('WARNING: Key param check failed for %I.%I on lot %s. Error: %s', v_layer_item, v_rec.column_name, v_lot_id, SQLERRM));
                     END;
+                    END LOOP;
                 END LOOP;
             END IF;
 
@@ -1207,12 +1213,14 @@ BEGIN
             -- Enforce key parameter rules for campaign (admin scope)
             IF v_campaign_id IS NOT NULL THEN
                 FOR v_rec IN SELECT layer, column_name FROM cm.config_qindex_keyparam WHERE active LOOP
+                    -- Loop through each layer in the array
+                    FOR v_layer_item IN SELECT unnest(v_rec.layer) LOOP
                     BEGIN
                         -- Resolve view as above
                         SELECT table_name INTO v_lot_view_name
                         FROM information_schema.views
                         WHERE table_schema = 'cm'
-                          AND table_name LIKE ('ve_' || '%' || '_lot_' || v_rec.layer)
+                          AND table_name LIKE ('ve_' || '%' || '_lot_' || v_layer_item)
                         LIMIT 1;
                         IF v_lot_view_name IS NULL THEN
                             CONTINUE;
@@ -1251,15 +1259,16 @@ BEGIN
                                 v_fid,
                                 current_user,
                                 3,
-                                format('ERROR: Found %s invalid value(s) for key param %I.%I. Campaign rating set to INACEPTABLE.', v_count, v_rec.layer, v_rec.column_name),
+                                format('ERROR: Found %s invalid value(s) for key param %I.%I. Campaign rating set to INACEPTABLE.', v_count, v_layer_item, v_rec.column_name),
                                 v_count
                             );
                         END IF;
                     EXCEPTION WHEN OTHERS THEN
                         INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message)
                         VALUES (v_fid, current_user, 2,
-                                format('WARNING: Key param check failed for %I.%I on campaign %s. Error: %s', v_rec.layer, v_rec.column_name, v_campaign_id, SQLERRM));
+                                format('WARNING: Key param check failed for %I.%I on campaign %s. Error: %s', v_layer_item, v_rec.column_name, v_campaign_id, SQLERRM));
                     END;
+                    END LOOP;
                 END LOOP;
             END IF;
 
