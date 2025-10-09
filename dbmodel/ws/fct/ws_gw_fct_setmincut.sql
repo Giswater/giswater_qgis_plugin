@@ -766,7 +766,7 @@ BEGIN
 
 						-- insert conflict mincut
 						WITH mincuts_conflicts AS (
-							SELECT DISTINCT a.result_id
+							SELECT DISTINCT om.result_id
 							FROM temp_pgr_arc a
 							JOIN om_mincut_valve om ON om.node_id = COALESCE(a.node_1, a.node_2)
 								AND om.result_id = ANY(v_mincut_group_record.mincut_group)
