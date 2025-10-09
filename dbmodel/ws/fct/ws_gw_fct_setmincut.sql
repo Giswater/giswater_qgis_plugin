@@ -791,19 +791,7 @@ BEGIN
 						SELECT v_mincut_conflict_group_id, m.result_id
 						FROM mincuts_conflicts m;
 
-						-- calculate new forecast start and end for the conflict mincut
-						WITH mincut_conflicts AS (
-							SELECT o.id, o.anl_feature_type, o.anl_feature_id, 
-								max(o.forecast_start, %L) AS forecast_start, 
-								min(o.forecast_end, %L) AS forecast_end,
-								tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
-							FROM om_mincut o
-							WHERE 
-
-								tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(%L, %L, '[]')
-								AND o.id <> %s
-						), 
-
+						-- TODO: calculate new forecast start and end for the conflict mincut
 
 						-- insert selector mincut result
 						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
