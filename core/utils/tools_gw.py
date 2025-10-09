@@ -2753,9 +2753,9 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
     # Configure completer with model and connect signals
     if completer:
         model = QStandardItemModel()
-        completer.activated.connect(partial(add_item_multiple_option, completer, widget))
-        make_list_multiple_option(completer, model, type_ahead, field)
-        type_ahead.textChanged.connect(partial(make_list_multiple_option, completer, model, type_ahead, field))
+        completer.activated.connect(partial(add_item_multiple_option, completer, widget, type_ahead))
+        make_list_multiple_option(completer, model, type_ahead, field, widget)
+        type_ahead.textChanged.connect(partial(make_list_multiple_option, completer, model, type_ahead, field, widget))
 
     # Set widget properties from field config
     widget.setObjectName(field['columnname'])
@@ -2796,7 +2796,7 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
     return container
 
 
-def make_list_multiple_option(completer, model, widget, field):
+def make_list_multiple_option(completer, model, widget, field, list_widget):
     """ Create a list of ids and populate widget (QLineEdit) 
     
     Args:
@@ -2842,15 +2842,15 @@ def make_list_multiple_option(completer, model, widget, field):
     if result:
         # Extract id and value from each result row
         for data in result:
-            item = {"id": data[0], "idval": data[1]}
-            display_list.append(item)
+            if data[1] not in list_widget.items().text():
+                item = {"id": data[0], "idval": data[1]}
+                display_list.append(item)
             
         # Update completer with sorted display list
-        if len(display_list) > 0:
-            tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
+        tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
 
 
-def add_item_multiple_option(completer, widget):
+def add_item_multiple_option(completer, widget, typeahead):
     """Add selected item from completer popup to QListWidget
     
     Args:
@@ -2869,8 +2869,11 @@ def add_item_multiple_option(completer, widget):
     # Create and configure new list widget item
     item = QListWidgetItem()
     item.setText(value)  # Set display text
-    item.setData(Qt.UserRole, _key)  # Store key in user role
+    if _key:
+        item.setData(Qt.UserRole, _key)  # Store key in user role
     widget.addItem(item)  # Add item to list widget
+
+    typeahead.setText('')
 
 
 def fill_multiple_option(widget, field, index_to_show=1, index_to_compare=0):
