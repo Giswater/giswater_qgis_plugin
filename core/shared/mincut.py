@@ -41,6 +41,8 @@ class GwMincut:
         self.settings = global_vars.giswater_settings
         self.schema_name = lib_vars.schema_name
         self.timer = None
+        self.form_has_changed = False
+        self.original_values = {}
 
         # Create separate class to manage 'actionConfig'
         self.mincut_tools = GwMincutTools(self)
@@ -436,14 +438,18 @@ class GwMincut:
         # Set state name
         if self.states != {}:
             tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
+            print(self.states)
 
-        self.current_state = 0
+        self.current_state = 4 # onPlanning
         self.sql_connec = ""
         self.sql_hydro = ""
 
         self._refresh_tab_hydro()
 
         self._load_widgets_values()
+
+        self._store_original_values()
+        self._connect_change_signals()
 
     def set_id_val(self):
 
@@ -1043,15 +1049,16 @@ class GwMincut:
         self.action_export_hydro_csv.setEnabled(True)
 
     def _update_result_selector(self, result_mincut_id, commit=True):
-        """ Update table 'selector_mincut_result' """
+        print('TODO: remove this function')
+        # """ Update table 'selector_mincut_result' """
 
-        sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
-               f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
-               f" (current_user, {result_mincut_id});")
-        status = tools_db.execute_sql(sql, commit)
-        if not status:
-            message = "Error updating table"
-            tools_qgis.show_warning(message, parameter='selector_mincut_result')
+        # sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
+        #        f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
+        #        f" (current_user, {result_mincut_id});")
+        # status = tools_db.execute_sql(sql, commit)
+        # if not status:
+        #     message = "Error updating table"
+        #     tools_qgis.show_warning(message, parameter='selector_mincut_result')
 
     def _real_end_accept(self):
 
@@ -2027,7 +2034,7 @@ class GwMincut:
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
 
-    def _refresh_mincut(self, triggered=None, action="mincutNetwork", zoom=True):
+    def _refresh_mincut(self, triggered=None, action="mincutRefresh", zoom=True):
         """ B2-125: Refresh current mincut """
 
         # Manage if task is already running
@@ -2205,6 +2212,8 @@ class GwMincut:
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
             if result is not None and result['status'] == 'Accepted' and result['message']:
+                self.form_has_changed = False
+                self.original_values = {}
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
                 tools_qgis.show_message(msg, level)
@@ -2549,4 +2558,29 @@ class GwMincut:
         lbl_time = dialog.findChild(QLabel, 'lbl_time')
         lbl_time.setText(text)
 
+    def _store_original_values(self):
+        """Store original values of widgets"""
+        self.original_values = {
+            'type': tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0),
+            'date_start_predict': self.dlg_mincut.cbx_date_start_predict.date(),
+            'time_start_predict': self.dlg_mincut.cbx_hours_start_predict.time(),
+            'date_end_predict': self.dlg_mincut.cbx_date_end_predict.date(),
+            'time_end_predict': self.dlg_mincut.cbx_hours_end_predict.time(),
+        }
+        self.form_has_changes = False
+
+    def _connect_change_signals(self):
+        """Connect signals to detect changes"""
+        self.dlg_mincut.type.currentIndexChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_date_start_predict.dateChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_hours_start_predict.timeChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_date_end_predict.dateChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_hours_end_predict.timeChanged.connect(self._on_form_changed)
+
+    def _on_form_changed(self):
+        """Mark that the form has changed and block accept"""
+        self.form_has_changes = True
+        self.dlg_mincut.btn_accept.setEnabled(False)
+        # Optional: change visual style to indicate pending changes
+        self.dlg_mincut.btn_accept.setStyleSheet("background-color: #ffcccc;")
     # endregion
