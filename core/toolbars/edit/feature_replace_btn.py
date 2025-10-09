@@ -9,7 +9,7 @@ from datetime import datetime
 from functools import partial
 
 from qgis.PyQt.QtCore import QDate, Qt
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
+from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QComboBox
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi, GwPsectorUi
@@ -410,7 +410,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
-        new_featurecat_id = tools_qt.get_text(dialog, dialog.new_featurecat_id)
+        new_featurecat_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.config.findChild(QComboBox, 'new_featurecat_id'))
         keep_epa_values = tools_qt.is_checked(self.dlg_replace, 'keep_epa_values')
         keep_asset_id = tools_qt.is_checked(self.dlg_replace, 'chk_keep_asset_id')
         description = tools_qt.get_text(self.dlg_replace, 'description')
