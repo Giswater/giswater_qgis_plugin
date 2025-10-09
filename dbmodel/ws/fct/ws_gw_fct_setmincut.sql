@@ -518,8 +518,8 @@ BEGIN
 			v_query_text := format($fmt$
 				WITH mincut_conflicts AS (
 					SELECT o.id, o.anl_feature_type, o.anl_feature_id, 
-						max(o.forecast_start, %L) AS forecast_start, 
-						min(o.forecast_end, %L) AS forecast_end,
+						UPPER(tsrange(o.forecast_start, %L, '[]')) AS forecast_start, 
+						LOWER(tsrange(o.forecast_end, %L, '[]')) AS forecast_end,
 						tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
 					FROM om_mincut o
 					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
