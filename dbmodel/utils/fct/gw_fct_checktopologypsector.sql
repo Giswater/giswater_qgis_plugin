@@ -217,7 +217,7 @@ BEGIN
 	SELECT 355, node_id, nodecat_id, ''duplicated node'', the_geom, expl_id, state1 FROM (
 	SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, 355, t1.the_geom, t1.expl_id, t2.state AS state2
 	FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(0.01)) 
-	WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a 
+	WHERE t1.node_id != t2.node_id AND t1.state = t2.state ORDER BY t1.node_id ) a 
 	where (a.state1 > 0 AND a.state2 > 0) AND a.node_id in (select node_id from plan_psector_x_node where psector_id = '||v_psector||')';
 
 	
