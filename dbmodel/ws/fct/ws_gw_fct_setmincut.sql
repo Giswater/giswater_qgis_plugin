@@ -787,25 +787,27 @@ BEGIN
 									)
 						)
 						INSERT INTO om_mincut_conflict (id, mincut_id)
-						SELECT v_mincut_conflict_group_id, m.result_id
+						SELECT v_mincut_conflict_group_id::uuid, m.result_id
 						FROM mincuts_conflicts m;
 
 						-- update forecast_start and forecast_end for the affected zone mincut
-						WITH forecast_times AS (
-							SELECT om.id, om.forecast_start, om.forecast_end
+						WITH forecast_time AS (
+							SELECT 
+								MAX (forecast_start) AS forecast_start, 
+								MIN (forecast_end) AS forecast_end
 							FROM om_mincut om
 							WHERE EXISTS (
 								SELECT 1 FROM om_mincut_conflict omc
 								WHERE omc.id = v_mincut_conflict_group_id
-								AND omc.result_id <> v_mincut_affected_id
-								AND omc.result_id = om.id
+								AND omc.mincut_id <> v_mincut_affected_id
+								AND omc.mincut_id = om.id
 							)
 						) 
 						UPDATE om_mincut om SET 
-							forecast_start = MAX (ft.forecast_start),
-							forecast_end = MIN (ft.forecast_end)
-						FROM forecast_times ft
-						WHERE om.id = v_mincut_conflict_group_id;
+							forecast_start = ft.forecast_start,
+							forecast_end = ft.forecast_end
+						FROM forecast_time ft
+						WHERE om.id = v_mincut_affected_id;
 
 						-- insert selector mincut result
 						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
