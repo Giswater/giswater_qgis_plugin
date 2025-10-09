@@ -193,6 +193,8 @@ SELECT DISTINCT ON (netscenario_id) netscenario_id,
 FROM plan_netscenario
 WHERE EXISTS (SELECT 1 FROM sel_expl WHERE sel_expl.expl_id = expl_id);
 
+DROP VIEW IF EXISTS v_om_mincut_arc;
+DROP VIEW IF EXISTS v_om_mincut_connec;
 CREATE OR REPLACE VIEW v_om_mincut_arc AS
 WITH sel_mincut AS (
 	SELECT result_id, result_type
