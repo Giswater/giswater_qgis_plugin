@@ -789,7 +789,21 @@ BEGIN
 						SELECT v_mincut_conflict_group_id, m.result_id
 						FROM mincuts_conflicts m;
 
-						-- TODO: calculate new forecast start and end for the conflict mincut
+						WITH forecast_times AS (
+							SELECT om.id, om.forecast_start, om.forecast_end
+							FROM om_mincut om
+							WHERE EXISTS (
+								SELECT 1 FROM om_mincut_conflict omc
+								WHERE omc.id = v_mincut_conflict_group_id
+								AND omc.result_id <> v_mincut_affected_id
+								AND omc.result_id = om.id
+							)
+						) 
+						UPDATE om_mincut om SET 
+							forecast_start = MAX (ft.forecast_start),
+							forecast_end = MIN (ft.forecast_end)
+						FROM forecast_times ft
+						WHERE om.id = v_mincut_conflict_group_id;
 
 						-- insert selector mincut result
 						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
