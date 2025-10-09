@@ -576,8 +576,9 @@ BEGIN
 			$fmt$, 
 			v_dialog_forecast_start, v_dialog_forecast_end, 
 			v_dialog_forecast_start, v_dialog_forecast_end,
-			v_dialog_forecast_start, v_dialog_forecast_end,
-			v_mincut);
+			v_mincut,
+			v_dialog_forecast_start, v_dialog_forecast_end
+			);
 			RAISE NOTICE 'v_query_text: %', v_query_text;
 
 			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
@@ -789,7 +790,7 @@ BEGIN
 						SELECT v_mincut_conflict_group_id, m.result_id
 						FROM mincuts_conflicts m;
 
-						-- update forecast_start and forecast-end for the affected zone mincut
+						-- update forecast_start and forecast_end for the affected zone mincut
 						WITH forecast_times AS (
 							SELECT om.id, om.forecast_start, om.forecast_end
 							FROM om_mincut om
