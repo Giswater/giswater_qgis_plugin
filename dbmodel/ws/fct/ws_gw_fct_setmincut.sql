@@ -767,8 +767,29 @@ BEGIN
 						VALUES (v_mincut_conflict_group_id, v_mincut);
 
 						-- insert conflict mincut
+						WITH mincuts_conflicts AS (
+							SELECT DISTINCT a.result_id
+							FROM temp_pgr_arc a
+							JOIN om_mincut_valve om ON om.node_id = COALESCE(a.node_1, a.node_2)
+								AND om.result_id = ANY(v_mincut_group_record.mincut_group)
+							WHERE a.mapzone_id <> 0 
+								AND graph_delimiter = 'MINSECTOR'
+								AND EXISTS (
+									SELECT 1 
+									FROM temp_pgr_connectedcomponents c 
+									WHERE c.node = a.pgr_node_1 
+										AND c.component = v_mincut_conflict_record.component
+									)
+								AND EXISTS (
+									SELECT 1 
+									FROM temp_pgr_connectedcomponents c 
+									WHERE c.node = a.pgr_node_2 
+										AND c.component = v_mincut_conflict_record.component
+									)
+						)
 						INSERT INTO om_mincut_conflict (id, mincut_id)
-						SELECT v_mincut_conflict_group_id, UNNEST(v_mincut_group_record.mincut_group);
+						SELECT v_mincut_conflict_group_id, m.result_id
+						FROM mincuts_conflicts m;
 
 						-- calculate new forecast start and end for the conflict mincut
 						WITH mincut_conflicts AS (
