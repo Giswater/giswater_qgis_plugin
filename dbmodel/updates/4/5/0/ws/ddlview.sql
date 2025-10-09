@@ -198,13 +198,13 @@ WITH sel_mincut AS (
 	SELECT result_id, result_type
 	FROM selector_mincut_result
 	WHERE cur_user = CURRENT_USER
-),
+)
 SELECT oma.id,
     oma.result_id,
     om.mincut_class,
     om.work_order,
     oma.arc_id,
-    sm.result_type
+    sm.result_type,
     oma.the_geom
 FROM om_mincut_arc oma
 JOIN om_mincut om ON oma.result_id = om.id
