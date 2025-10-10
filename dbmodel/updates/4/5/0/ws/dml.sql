@@ -11,3 +11,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DELETE FROM sys_message WHERE id = 4026;
 DELETE FROM sys_message WHERE id = 4028;
+
+-- 10/10/2025
+UPDATE config_form_fields SET ismandatory=false
+WHERE formname='inp_dscenario_valve' AND formtype='form_feature' AND columnname='minorloss' AND tabname='tab_none';
+
+UPDATE config_form_fields SET ismandatory=false
+WHERE formname='ve_inp_dscenario_valve' AND formtype='form_feature' AND columnname='minorloss' AND tabname='tab_none';
