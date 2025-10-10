@@ -175,8 +175,7 @@ BEGIN
 
 	-- TODO: in python code we need to call manage_temporary function to drop tables when user close the dialog.
 	-- TODO: if new mincut is onPlanning and user close the dialog with the icon X, we need to delete the mincut from the om_mincut table.
-	-- TODO: new apply button to save data on om_mincut table.
-
+	-- and the conflicts if exists.
 
 	IF v_action IN ('mincutNetwork', 'mincutRefresh') THEN
 	-- create mincut
@@ -196,21 +195,8 @@ BEGIN
 			RETURN v_response;
 		END IF;
 
-		-- the logic save the data on om_mincut table with status onPlanning.
-		IF v_device = 5 and v_mincut IS NULL THEN
-			IF v_arc_id IS NULL AND v_connec IS NULL THEN
-				RETURN ('{"status":"Failed", "message":{"level":2, "text":"No arc or connec found."}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}')::json;
-			END IF;
-
-			SELECT setval('om_mincut_seq', COALESCE((SELECT max(id::integer)+1 FROM om_mincut), 1), true) INTO v_mincut;
-			INSERT INTO om_mincut (id, mincut_state) VALUES (v_mincut, 4);
-
-			-- Set default values
-			FOR v_default_key, v_default_value IN SELECT * FROM jsonb_each_text(v_vdefault::jsonb) LOOP
-				EXECUTE 'UPDATE om_mincut SET '||v_default_key||' = '||v_default_value||' WHERE id = '||v_mincut||';';
-			END LOOP;
-		ELSE 
-			UPDATE om_mincut SET mincut_state = 4 WHERE id = v_mincut; -- todo: remove this line because python insert it with onPlanning status.
+		IF (v_action = 'mincutRefresh' AND (SELECT count(*) FROM temp_pgr_arc) = 0) THEN
+			v_action := 'mincutNetwork';
 		END IF;
 
 		--check if arc exists in database or look for a new arc_id in the same location
@@ -237,76 +223,87 @@ BEGIN
 			v_node_id := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
 		END IF;
 
-		-- Initialize process
-		-- =======================
-		v_data := '{"data":{"mapzone_name":"MINCUT", "node_id":"'|| v_node_id ||'", "mincut_version":"'|| v_mincut_version ||'"}}';
-		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+		IF v_action = 'mincutNetwork' THEN
+			-- Initialize process
+			-- =======================
+			v_data := '{"data":{"mapzone_name":"MINCUT", "node_id":"'|| v_node_id ||'", "mincut_version":"'|| v_mincut_version ||'"}}';
+			SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
-		END IF;
+			IF v_response->>'status' <> 'Accepted' THEN
+				RETURN v_response;
+			END IF;
 
-		IF v_mincut_version = '6.1' THEN
-			-- TODO: prepare tables for minsector algorithm
-		END IF;
+			IF v_mincut_version = '6.1' THEN
+				-- TODO: prepare tables for minsector algorithm
+			END IF;
 
-		UPDATE temp_pgr_node t
-		SET modif = TRUE
-		WHERE graph_delimiter = 'MINSECTOR'
-		OR graph_delimiter = 'SECTOR';
+			UPDATE temp_pgr_node t
+			SET modif = TRUE
+			WHERE graph_delimiter = 'MINSECTOR'
+			OR graph_delimiter = 'SECTOR';
 
-		-- Generate new arcs
-		-- =======================
-		v_data := '{"data":{"mapzone_name":"MINCUT"}}';
-		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
+			-- Generate new arcs
+			-- =======================
+			v_data := '{"data":{"mapzone_name":"MINCUT"}}';
+			SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
-		END IF;
+			IF v_response->>'status' <> 'Accepted' THEN
+				RETURN v_response;
+			END IF;
 
-
-		-- the broken valves
-        UPDATE temp_pgr_arc a
-        SET cost = 0, reverse_cost = 0
-        WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE 
-        AND a.to_arc IS NOT NULL
-        AND a.broken = TRUE;
-
-		-- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
-		-- new arcs MINSECTOR AND SECTOR
-		UPDATE temp_pgr_arc a
-		SET cost_mincut = -1, reverse_cost_mincut = -1
-		WHERE graph_delimiter IN ('MINSECTOR', 'SECTOR');
-
-		-- check valves
-		IF v_ignore_check_valves THEN
-			v_cost_field = '0';
-			v_reverse_cost_field = '0';
-		ELSE 
-			v_cost_field = 'cost';
-			v_reverse_cost_field = 'reverse_cost';
-		END IF;
-
-		v_query_text = 'UPDATE temp_pgr_arc a
-			SET cost_mincut = '||v_cost_field||', reverse_cost_mincut = '||v_reverse_cost_field||'
-			WHERE a.graph_delimiter = ''MINSECTOR''
+			-- the broken valves
+			UPDATE temp_pgr_arc a
+			SET cost = 0, reverse_cost = 0
+			WHERE a.graph_delimiter = 'MINSECTOR'
 			AND a.closed = FALSE 
-			AND a.to_arc IS NOT NULL';
-		EXECUTE v_query_text;
+			AND a.to_arc IS NOT NULL
+			AND a.broken = TRUE;
 
-		-- prepare mincut 
-		UPDATE temp_pgr_arc 
-		SET mapzone_id = 0 
-		WHERE mapzone_id <> 0;
+			-- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
+			-- new arcs MINSECTOR AND SECTOR
+			UPDATE temp_pgr_arc a
+			SET cost_mincut = -1, reverse_cost_mincut = -1
+			WHERE graph_delimiter IN ('MINSECTOR', 'SECTOR');
 
-		UPDATE temp_pgr_node 
-		SET mapzone_id = 0 
-		WHERE mapzone_id <> 0;
+			-- check valves
+			IF v_ignore_check_valves THEN
+				v_cost_field = '0';
+				v_reverse_cost_field = '0';
+			ELSE 
+				v_cost_field = 'cost';
+				v_reverse_cost_field = 'reverse_cost';
+			END IF;
 
-		UPDATE temp_pgr_arc 
-		SET proposed = FALSE 
-		WHERE proposed = TRUE;
+			v_query_text = 'UPDATE temp_pgr_arc a
+				SET cost_mincut = '||v_cost_field||', reverse_cost_mincut = '||v_reverse_cost_field||'
+				WHERE a.graph_delimiter = ''MINSECTOR''
+				AND a.closed = FALSE 
+				AND a.to_arc IS NOT NULL';
+			EXECUTE v_query_text;
+		ELSIF v_action = 'mincutRefresh' THEN
+			-- prepare mincut 
+			UPDATE temp_pgr_arc 
+			SET mapzone_id = 0 
+			WHERE mapzone_id <> 0;
+
+			UPDATE temp_pgr_node 
+			SET mapzone_id = 0 
+			WHERE mapzone_id <> 0;
+
+			UPDATE temp_pgr_arc 
+			SET proposed = FALSE 
+			WHERE proposed = TRUE;
+
+			UPDATE temp_pgr_arc
+			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+			WHERE proposed = TRUE
+				AND old_mapzone_id <> 0;
+			
+			UPDATE temp_pgr_arc
+			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1, old_mapzone_id = 0
+			WHERE unaccess = TRUE
+				AND old_mapzone_id <> 0;
+		END IF;
 
 		-- mincut
 		SELECT count(*)::int INTO v_pgr_distance 
@@ -351,7 +348,6 @@ BEGIN
 
 		-- delete this rows, and for the mincut conflict delete it in the om_mincut table. CASCADE.
 
-		-- TODO: insert results on om_mincut tables
 		INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
 		SELECT v_mincut, vta.arc_id, vta.the_geom 
 		FROM temp_pgr_arc tpa
@@ -867,7 +863,30 @@ BEGIN
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 	-- change the valve status
 
-		-- TODO: set cost_mincut and reverse_cost_mincut to 0
+		IF v_node_id IS NOT NULL THEN
+			UPDATE temp_pgr_arc 
+			SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
+			WHERE graph_delimiter = 'MINSECTOR'
+			AND COALESCE(node_1, node_2) = v_node_id;
+
+			v_data := format('{"data":{"action":"mincutRefresh", "mincutId":"%s", "arcId":"%s", "usePsectors":"%s", "dialogMincutType":"%s", "dialogForecastStart":"%s", "dialogForecastEnd":"%s"}}'
+			, v_mincut, v_arc_id, v_use_psectors, v_dialog_mincut_type, v_dialog_forecast_start, v_dialog_forecast_end);
+
+
+			RETURN SELECT gw_fct_setmincut($$||v_data||$$)::json;
+		ELSE
+			v_message = '{"text": "Node not found.", "level": 2}';
+			RETURN v_message;
+		END IF;
+
+
+
+
+
+
+
+
+
 
 	ELSIF v_action IN ('mincutAccept', 'endMincut') THEN
 	-- accept mincut
@@ -878,6 +897,10 @@ BEGIN
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut) IS NOT NULL THEN
 			UPDATE om_mincut SET mincut_state = 0 WHERE id = v_mincut;
 		END IF;
+
+		-- create return with v_result_info
+
+
 
 
 	ELSIF v_action = 'mincutCancel' THEN
