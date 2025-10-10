@@ -89,20 +89,32 @@ BEGIN
             WHERE n.modif = TRUE
             AND n.graph_delimiter = 'MINSECTOR'
             AND n.to_arc IS NULL
-        ), arcs_modif AS (
-            SELECT
-                pgr_arc_id,
-                bool_or(pgr_node_id = pgr_node_1) AS modif1,
-                bool_or( pgr_node_id = pgr_node_2) AS modif2
-            FROM arcs_selected
-            GROUP BY pgr_arc_id
+            ORDER BY n.pgr_node_id, a.pgr_arc_id
         )
         UPDATE temp_pgr_arc t
-        SET
-            modif1 = s.modif1,
-            modif2 = s.modif2
-        FROM arcs_modif s
-        WHERE t.pgr_arc_id = s.pgr_arc_id;
+        SET modif1 = TRUE
+        FROM arcs_selected s
+        WHERE s.pgr_node_id = s.pgr_node_1
+        AND t.pgr_arc_id = s.pgr_arc_id;
+
+        WITH arcs_selected AS (
+            SELECT DISTINCT ON (n.pgr_node_id)
+                a.pgr_arc_id,
+                n.pgr_node_id,
+                a.pgr_node_1,
+                a.pgr_node_2
+            FROM temp_pgr_node n
+            JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+            WHERE n.modif = TRUE
+            AND n.graph_delimiter = 'MINSECTOR'
+            AND n.to_arc IS NULL
+            ORDER BY n.pgr_node_id, a.pgr_arc_id
+        )
+        UPDATE temp_pgr_arc t
+        SET modif2 = TRUE
+        FROM arcs_selected s
+        WHERE s.pgr_node_id = s.pgr_node_2
+        AND t.pgr_arc_id = s.pgr_arc_id;
 
         -- for the valves with to_arc NOT NULL, the arc that is not to_arc is modif = TRUE
         WITH arcs_selected AS (
@@ -114,19 +126,28 @@ BEGIN
 		FROM  temp_pgr_node n
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
 		WHERE n.modif = TRUE AND n.graph_delimiter = 'MINSECTOR' AND n.to_arc IS NOT NULL AND a.arc_id <> ALL(n.to_arc)
-        ), arcs_modif AS (
-            SELECT
-                pgr_arc_id,
-                bool_or(pgr_node_id = pgr_node_1) AS modif1,
-                bool_or( pgr_node_id = pgr_node_2) AS modif2
-            FROM arcs_selected
-            GROUP BY pgr_arc_id
         )
         UPDATE temp_pgr_arc t
-        SET modif1= s.modif1,
-            modif2= s.modif2
-        FROM arcs_modif s
-        WHERE t.pgr_arc_id= s.pgr_arc_id;
+        SET modif1 = TRUE
+        FROM arcs_selected s
+        WHERE s.pgr_node_id = s.pgr_node_1
+        AND t.pgr_arc_id = s.pgr_arc_id;
+
+        WITH arcs_selected AS (
+		SELECT
+			a.pgr_arc_id,
+			n.pgr_node_id,
+			a.pgr_node_1,
+			a.pgr_node_2
+		FROM  temp_pgr_node n
+		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
+		WHERE n.modif = TRUE AND n.graph_delimiter = 'MINSECTOR' AND n.to_arc IS NOT NULL AND a.arc_id <> ALL(n.to_arc)
+        )
+        UPDATE temp_pgr_arc t
+        SET modif2 = TRUE
+        FROM arcs_selected s
+        WHERE s.pgr_node_id = s.pgr_node_2
+        AND t.pgr_arc_id = s.pgr_arc_id;
 
         -- ARCS watersource (SECTOR WHEN v_graph_delimiter <> 'SECTOR'), only the inletArcs
         WITH arcs_selected AS (
@@ -139,19 +160,29 @@ BEGIN
 		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
 		WHERE n.modif = TRUE AND n.graph_delimiter = 'SECTOR' AND n.graph_delimiter <> v_graph_delimiter
         AND n.to_arc IS NOT NULL AND a.arc_id <> ALL(n.to_arc)
-        ), arcs_modif AS (
-            SELECT
-                pgr_arc_id,
-                bool_or(pgr_node_id = pgr_node_1) AS modif1,
-                bool_or( pgr_node_id = pgr_node_2) AS modif2
-            FROM arcs_selected
-            GROUP BY pgr_arc_id
         )
         UPDATE temp_pgr_arc t
-        SET modif1= s.modif1,
-            modif2= s.modif2
-        FROM arcs_modif s
-        WHERE t.pgr_arc_id= s.pgr_arc_id;
+        SET modif1 = TRUE
+        FROM arcs_selected s
+        WHERE s.pgr_node_id = s.pgr_node_1
+        AND t.pgr_arc_id = s.pgr_arc_id;
+
+        WITH arcs_selected AS (
+		SELECT
+			a.pgr_arc_id,
+			n.pgr_node_id,
+			a.pgr_node_1,
+			a.pgr_node_2
+		FROM  temp_pgr_node n
+		JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
+		WHERE n.modif = TRUE AND n.graph_delimiter = 'SECTOR' AND n.graph_delimiter <> v_graph_delimiter
+        AND n.to_arc IS NOT NULL AND a.arc_id <> ALL(n.to_arc)
+        )
+        UPDATE temp_pgr_arc t
+        SET modif2 = TRUE
+        FROM arcs_selected s
+        WHERE s.pgr_node_id = s.pgr_node_2
+        AND t.pgr_arc_id = s.pgr_arc_id;
     END IF;
 
     -- for the nodes with v_graph_delimiter - all the arcs
@@ -164,19 +195,28 @@ BEGIN
     FROM temp_pgr_node n
     JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
     WHERE n.modif = TRUE AND n.graph_delimiter = v_graph_delimiter
-    ), arcs_modif AS (
-        SELECT
-            pgr_arc_id,
-            bool_or(pgr_node_id = pgr_node_1) AS modif1,
-            bool_or( pgr_node_id = pgr_node_2) AS modif2
-        FROM arcs_selected
-        GROUP BY pgr_arc_id
     )
     UPDATE temp_pgr_arc t
-    SET modif1= s.modif1,
-        modif2= s.modif2
-    FROM arcs_modif s
-    WHERE t.pgr_arc_id= s.pgr_arc_id;
+    SET modif1 = TRUE
+    FROM arcs_selected s
+    WHERE s.pgr_node_id = s.pgr_node_1
+    AND t.pgr_arc_id = s.pgr_arc_id;
+
+    WITH arcs_selected AS (
+    SELECT
+        a.pgr_arc_id,
+        n.pgr_node_id,
+        a.pgr_node_1,
+        a.pgr_node_2
+    FROM temp_pgr_node n
+    JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+    WHERE n.modif = TRUE AND n.graph_delimiter = v_graph_delimiter
+    )
+    UPDATE temp_pgr_arc t
+    SET modif2 = TRUE
+    FROM arcs_selected s
+    WHERE s.pgr_node_id = s.pgr_node_2
+    AND t.pgr_arc_id = s.pgr_arc_id;
 
     -- for the nodes with graph_delimiter = 'FORCECLOSED' - all the arcs
     WITH arcs_selected AS (
@@ -188,19 +228,28 @@ BEGIN
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         WHERE n.modif = TRUE AND n.graph_delimiter = 'FORCECLOSED'
-        ), arcs_modif AS (
-            SELECT
-                pgr_arc_id,
-                bool_or(pgr_node_id = pgr_node_1) AS modif1,
-                bool_or( pgr_node_id = pgr_node_2) AS modif2
-            FROM arcs_selected
-            GROUP BY pgr_arc_id
         )
     UPDATE temp_pgr_arc t
-    SET modif1= s.modif1,
-        modif2= s.modif2
-    FROM arcs_modif s
-    WHERE t.pgr_arc_id= s.pgr_arc_id;
+    SET modif2 = TRUE
+    FROM arcs_selected s
+    WHERE s.pgr_node_id = s.pgr_node_2
+    AND t.pgr_arc_id = s.pgr_arc_id;
+
+    WITH arcs_selected AS (
+        SELECT
+            a.pgr_arc_id,
+            n.pgr_node_id,
+            a.pgr_node_1,
+            a.pgr_node_2
+        FROM temp_pgr_node n
+        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+        WHERE n.modif = TRUE AND n.graph_delimiter = 'FORCECLOSED'
+        )
+    UPDATE temp_pgr_arc t
+    SET modif1 = TRUE
+    FROM arcs_selected s
+    WHERE s.pgr_node_id = s.pgr_node_1
+    AND t.pgr_arc_id = s.pgr_arc_id;
 
     -- Disconnect arcs with modif = TRUE at nodes with modif1 = TRUE; a new arc N_new->N_original is created with the v_cost and v_reverse_cost
     FOR v_record IN
