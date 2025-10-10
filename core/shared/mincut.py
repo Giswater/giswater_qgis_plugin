@@ -2206,8 +2206,15 @@ class GwMincut:
 
         use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
+
+        mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
+        forecast_start_predict = self.dlg_mincut.cbx_date_start_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_start_predict.time().toString('HH:mm:ss')
+        forecast_end_predict = self.dlg_mincut.cbx_date_end_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_end_predict.time().toString('HH:mm:ss')
+
         if result_mincut_id != 'null':
-            extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}"'
+            extras = (f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}", '
+                      f'"dialogMincutType":"{mincut_result_type}", "dialogForecastStart":"{forecast_start_predict}", '
+                      f'"dialogForecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
