@@ -130,18 +130,18 @@ BEGIN
         CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
         -- Create temporary tables depending on the project type
         IF v_project_type = 'WS' THEN
-            ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
-            ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
+            ALTER TABLE temp_pgr_node ADD COLUMN IF NOT EXISTS closed BOOL;
+            ALTER TABLE temp_pgr_node ADD COLUMN IF NOT EXISTS broken BOOL;
 
-            ALTER TABLE temp_pgr_arc ADD COLUMN closed BOOL;
-            ALTER TABLE temp_pgr_arc ADD COLUMN broken BOOL;
+            ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS closed BOOL;
+            ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS broken BOOL;
 
             -- for specific functions
             IF v_fct_name = 'MINCUT' OR v_fct_name = 'MINSECTOR' THEN
-                ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
-                ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE;
-                ALTER TABLE temp_pgr_arc ADD COLUMN cost_mincut INT DEFAULT 1;
-                ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mincut INT DEFAULT 1;
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INT DEFAULT 1;
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INT DEFAULT 1;
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
 
@@ -155,13 +155,13 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_mincut (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
             IF v_fct_name = 'DMA' AND v_netscenario IS NOT NULL THEN
-                ALTER TABLE temp_pgr_mapzone ADD COLUMN pattern_id varchar(16);
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN IF NOT EXISTS pattern_id varchar(16);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_om_waterbalance_dma_graph (LIKE SCHEMA_NAME.om_waterbalance_dma_graph INCLUDING ALL);
             END IF;
         ELSE 
             IF v_fct_name = 'DWFZONE' THEN
-                ALTER TABLE temp_pgr_mapzone ADD COLUMN  min_node int4;
-                ALTER TABLE temp_pgr_mapzone ADD COLUMN  drainzone_id INTEGER DEFAULT 0;
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS min_node int4;
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS drainzone_id INTEGER DEFAULT 0;
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath (
                     seq INT8 NOT NULL,
                     "depth" INT8 NULL,
