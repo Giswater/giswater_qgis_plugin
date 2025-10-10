@@ -4318,6 +4318,10 @@
 			<translation>Rpt fehlgeschlagen</translation>
 		</message>
 		<message>
+			<source>RPT file path is required when importing results or executing EPA</source>
+			<translation>RPT file path is required when importing results or executing EPA</translation>
+		</message>
+		<message>
 			<source>\r(This decision will not cancel the other selections, the process will keep running)</source>
 			<translation>\r(Diese Entscheidung hebt die anderen Auswahlen nicht auf, der Prozess läuft weiter)</translation>
 		</message>
