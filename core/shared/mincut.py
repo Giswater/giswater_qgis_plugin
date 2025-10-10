@@ -440,7 +440,7 @@ class GwMincut:
             tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
             print(self.states)
 
-        self.current_state = 4 # onPlanning
+        self.current_state = 4  # onPlanning
         self.sql_connec = ""
         self.sql_hydro = ""
 
@@ -2212,8 +2212,6 @@ class GwMincut:
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
             if result is not None and result['status'] == 'Accepted' and result['message']:
-                self.form_has_changed = False
-                self.original_values = {}
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
                 tools_qgis.show_message(msg, level)
@@ -2581,6 +2579,16 @@ class GwMincut:
         """Mark that the form has changed and block accept"""
         self.form_has_changes = True
         self.dlg_mincut.btn_accept.setEnabled(False)
+        self.dlg_mincut.btn_accept.setToolTip("You need to reexecute the mincut")
+
         # Optional: change visual style to indicate pending changes
         self.dlg_mincut.btn_accept.setStyleSheet("background-color: #ffcccc;")
+
+    def _reset_form_has_changes(self):
+        """Reset form has changes"""
+        self.form_has_changes = False
+        self.dlg_mincut.btn_accept.setEnabled(True)
+        self.dlg_mincut.btn_accept.setStyleSheet("")
+        self.dlg_mincut.btn_accept.setToolTip("Accept")
+
     # endregion

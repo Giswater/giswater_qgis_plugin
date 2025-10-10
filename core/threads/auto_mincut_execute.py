@@ -49,9 +49,7 @@ class GwAutoMincutTask(GwTask):
             tools_qt.set_widget_text(self.mincut_class.dlg_mincut, 'result_mincut_id', real_mincut_id)
             use_planified = tools_qt.is_checked(self.mincut_class.dlg_mincut, 'chk_use_planified')
 
-
             mincut_result_type = tools_qt.get_combo_value(self.mincut_class.dlg_mincut, self.mincut_class.dlg_mincut.type, 0)
-
 
             date_start_predict = self.mincut_class.dlg_mincut.cbx_date_start_predict.date()
             time_start_predict = self.mincut_class.dlg_mincut.cbx_hours_start_predict.time()
@@ -76,6 +74,8 @@ class GwAutoMincutTask(GwTask):
                 return False
             if not self.complet_result or self.complet_result['status'] == 'Failed':
                 return False
+
+            self.mincut_class._reset_form_has_changes()
 
             return True
 
