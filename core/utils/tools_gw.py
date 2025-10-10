@@ -5645,6 +5645,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
         refresh_selectors()
+    tools_qgis.refresh_map_canvas()
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
