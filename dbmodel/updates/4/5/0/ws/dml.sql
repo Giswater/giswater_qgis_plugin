@@ -18,3 +18,12 @@ WHERE formname='inp_dscenario_valve' AND formtype='form_feature' AND columnname=
 
 UPDATE config_form_fields SET ismandatory=false
 WHERE formname='ve_inp_dscenario_valve' AND formtype='form_feature' AND columnname='minorloss' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_isnullvalue=true
+WHERE formname='inp_dscenario_valve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_isnullvalue=true
+WHERE formname='ve_inp_dscenario_valve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_isnullvalue=true
+WHERE formname='inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_isnullvalue=true
+WHERE formname='ve_inp_dscenario_virtualvalve' AND formtype='form_feature' AND columnname='valve_type' AND tabname='tab_none';
