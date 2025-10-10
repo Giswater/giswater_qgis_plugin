@@ -124,6 +124,8 @@ v_response json;
 v_message text;
 v_error_context text;
 
+v_row_count integer;
+
 BEGIN
 
 	-- Search path
@@ -138,6 +140,7 @@ BEGIN
 	v_action := p_data->'data'->>'action';
 	v_mincut := p_data->'data'->>'mincutId';
 	v_mincut_class := p_data->'data'->>'mincutClass';
+	v_node_id := p_data->'data'->>'nodeId';
 	v_arc_id := p_data->'data'->>'arcId';
 	v_use_plan_psectors := p_data->'data'->>'usePsectors';
 	-- get dialog parameters (IMPORTANT to execute mincut with dialog data)
@@ -877,15 +880,29 @@ BEGIN
 
 		IF v_node_id IS NOT NULL THEN
 			UPDATE om_mincut_valve 
-			SET unaccess = CASE WHEN proposed = TRUE THEN TRUE WHEN unaccess = TRUE THEN FALSE ELSE unaccess END
+			SET unaccess = 
+				CASE 
+					WHEN proposed = TRUE THEN TRUE 
+					WHEN proposed = FALSE AND unaccess = TRUE THEN FALSE 
+					ELSE unaccess 
+				END
 			WHERE node_id = v_node_id
-			RETURNING result_id INTO v_row_count;
+			AND result_id = v_mincut;
+
+			GET DIAGNOSTICS v_row_count = ROW_COUNT;
 
 			IF v_row_count > 0 THEN
-				v_data := format('{"data":{"action":"mincutRefresh", "mincutId":"%s", "arcId":"%s", "usePsectors":"%s", "dialogMincutType":"%s", "dialogForecastStart":"%s", "dialogForecastEnd":"%s"}}'
-				, v_mincut, v_arc_id, v_use_psectors, v_dialog_mincut_type, v_dialog_forecast_start, v_dialog_forecast_end);
+				v_data := jsonb_build_object('data', jsonb_build_object(
+					'action', 'mincutRefresh',
+					'mincutId', v_mincut,
+					'arcId', v_arc_id,
+					'usePsectors', v_use_plan_psectors,
+					'dialogMincutType', v_dialog_mincut_type,
+					'dialogForecastStart', v_dialog_forecast_start,
+					'dialogForecastEnd', v_dialog_forecast_end
+				));
 
-				RETURN SELECT gw_fct_setmincut($$||v_data||$$)::json;
+				RETURN gw_fct_setmincut(v_data);
 			END IF;
 		ELSE
 			v_message = '{"text": "Node not found.", "level": 2}';
