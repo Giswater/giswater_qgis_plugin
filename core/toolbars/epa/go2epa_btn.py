@@ -426,7 +426,6 @@ class GwGo2EpaButton(GwAction):
             except RuntimeError:
                 pass
 
-
         # Check if import result is enabled and RPT file exists
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result) or tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
             file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
