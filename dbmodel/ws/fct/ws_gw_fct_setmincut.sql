@@ -867,7 +867,8 @@ BEGIN
 			UPDATE temp_pgr_arc 
 			SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
 			WHERE graph_delimiter = 'MINSECTOR'
-			AND COALESCE(node_1, node_2) = v_node_id;
+			AND COALESCE(node_1, node_2) = v_node_id
+			AND proposed = TRUE;
 
 			v_data := format('{"data":{"action":"mincutRefresh", "mincutId":"%s", "arcId":"%s", "usePsectors":"%s", "dialogMincutType":"%s", "dialogForecastStart":"%s", "dialogForecastEnd":"%s"}}'
 			, v_mincut, v_arc_id, v_use_psectors, v_dialog_mincut_type, v_dialog_forecast_start, v_dialog_forecast_end);
