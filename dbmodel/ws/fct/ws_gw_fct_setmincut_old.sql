@@ -7,8 +7,8 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2980
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setmincut(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setmincut(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setmincut_old(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setmincut_old(p_data json)
 RETURNS json AS
 $BODY$
 
