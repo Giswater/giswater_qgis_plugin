@@ -295,6 +295,10 @@ BEGIN
 			WHERE proposed = TRUE;
 
 			UPDATE temp_pgr_arc
+			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
+			WHERE unaccess = TRUE;
+
+			UPDATE temp_pgr_arc
 			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
 			WHERE proposed = TRUE
 				AND old_mapzone_id <> 0;
@@ -304,6 +308,14 @@ BEGIN
 			WHERE unaccess = TRUE
 				AND old_mapzone_id <> 0;
 		END IF;
+
+		-- update unaccess valves
+		UPDATE temp_pgr_arc tpa
+		SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
+		FROM om_mincut_valve omv
+		WHERE omv.result_id = v_mincut
+		AND omv.unaccess = TRUE
+		AND COALESCE(tpa.node_1, tpa.node_2) = omv.node_id;
 
 		-- mincut
 		SELECT count(*)::int INTO v_pgr_distance 
@@ -864,17 +876,17 @@ BEGIN
 	-- change the valve status
 
 		IF v_node_id IS NOT NULL THEN
-			UPDATE temp_pgr_arc 
-			SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
-			WHERE graph_delimiter = 'MINSECTOR'
-			AND COALESCE(node_1, node_2) = v_node_id
-			AND proposed = TRUE;
+			UPDATE om_mincut_valve 
+			SET unaccess = CASE WHEN proposed = TRUE THEN TRUE WHEN unaccess = TRUE THEN FALSE ELSE unaccess END
+			WHERE node_id = v_node_id
+			RETURNING result_id INTO v_row_count;
 
-			v_data := format('{"data":{"action":"mincutRefresh", "mincutId":"%s", "arcId":"%s", "usePsectors":"%s", "dialogMincutType":"%s", "dialogForecastStart":"%s", "dialogForecastEnd":"%s"}}'
-			, v_mincut, v_arc_id, v_use_psectors, v_dialog_mincut_type, v_dialog_forecast_start, v_dialog_forecast_end);
+			IF v_row_count > 0 THEN
+				v_data := format('{"data":{"action":"mincutRefresh", "mincutId":"%s", "arcId":"%s", "usePsectors":"%s", "dialogMincutType":"%s", "dialogForecastStart":"%s", "dialogForecastEnd":"%s"}}'
+				, v_mincut, v_arc_id, v_use_psectors, v_dialog_mincut_type, v_dialog_forecast_start, v_dialog_forecast_end);
 
-
-			RETURN SELECT gw_fct_setmincut($$||v_data||$$)::json;
+				RETURN SELECT gw_fct_setmincut($$||v_data||$$)::json;
+			END IF;
 		ELSE
 			v_message = '{"text": "Node not found.", "level": 2}';
 			RETURN v_message;
