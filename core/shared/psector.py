@@ -982,7 +982,11 @@ class GwPsector:
             psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
             updates = ""
             for key, value in self.my_json.items():
-                updates += f"{key} = '{value}', "
+                if value in (None, 'null', 'NULL', ''):
+                    updates += f"{key} = NULL, "
+                else:
+                    value = str(value).replace("'", "''")
+                    updates += f"{key} = '{value}', "
             if updates:
                 updates = updates[:-2]
                 sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
@@ -1015,7 +1019,7 @@ class GwPsector:
 
                             if 'tab_general_' in column_name:
                                 column_name = column_name.replace('tab_general_', '')
-                            if value is None or value == 'null':
+                            if value in (None, 'null', 'NULL', ''):
                                 sql += column_name + ", "
                                 values += "null, "
                             else:
@@ -1673,7 +1677,7 @@ class GwPsector:
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.get_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
-        tools_qt.remove_tab(dlg_docman.tabwidget, 'tab_rel')
+        tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
     def master_new_psector(self, psector_id=None):
         """ Button 51: New psector """
