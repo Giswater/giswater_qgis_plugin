@@ -27,7 +27,7 @@ $BODY$
 SELECT gw_fct_graphanalytics_fluid_type($${
 	"data":{
 		"parameters":{
-			"processName":"FLUIDTYPE",
+			"processName":"FLUID_TYPE",
 			"exploitation":"1", -- Specific exploitation
 			"usePlanPsector":"false", -- Not using psectors
 			"commitChanges":"false" -- Not committing changes (This means showing temporal layers as the result)
@@ -38,7 +38,7 @@ SELECT gw_fct_graphanalytics_fluid_type($${
 SELECT gw_fct_graphanalytics_fluid_type($${
 	"data":{
 		"parameters":{
-			"processName":"FLUIDTYPE",
+			"processName":"FLUID_TYPE",
 			"exploitation":"-901", -- Using selected exploitations
 			"usePlanPsector":"true",
 			"commitChanges":"false"
@@ -50,7 +50,7 @@ SELECT gw_fct_graphanalytics_fluid_type($${
 SELECT gw_fct_graphanalytics_fluid_type($${
 	"data":{
 		"parameters":{
-			"processName":"FLUIDTYPE",
+			"processName":"FLUID_TYPE",
 			"exploitation":"-901",
 			"usePlanPsector":"true",
 			"commitChanges":"true" -- THIS CASE IS INCOMPATIBLE, AND IN THE CODE IT IS SET TO FALSE
@@ -61,7 +61,7 @@ SELECT gw_fct_graphanalytics_fluid_type($${
 SELECT gw_fct_graphanalytics_fluid_type($${
 	"data":{
 		"parameters":{
-			"processName":"FLUIDTYPE",
+			"processName":"FLUID_TYPE",
 			"exploitation":"-902", -- Using all exploitations
 			"usePlanPsector":"false",
 			"commitChanges":"true" -- Committing changes (This means updating the real tables)
@@ -190,9 +190,9 @@ BEGIN
 	WITH feature_type AS (
 		SELECT
 			a.arc_id,
-			CASE WHEN a.initoverflowpath = FALSE THEN n.fluid_type
-			WHEN n.fluid_type >= 2 THEN 2
-			ELSE n.fluid_type -- rainwater or Not Informed
+			CASE WHEN a.initoverflowpath = FALSE THEN n.mapzone_id
+			WHEN n.mapzone_id >= 2 THEN 2
+			ELSE n.mapzone_id -- rainwater or Not Informed
 			END AS fluid_type
 		FROM temp_pgr_node n
 		JOIN v_temp_arc a ON a.node_1 = n.node_id
@@ -232,16 +232,16 @@ BEGIN
 		FROM arc_type
 	)
 	UPDATE temp_pgr_arc t
-	SET fluid_type = a.fluid_type
+	SET mapzone_id = a.fluid_type
 	FROM arc_modif a
 	WHERE a.arc_id = t.arc_id
-	AND a.fluid_type <> t.fluid_type;
+	AND a.fluid_type <> t.mapzone_id;
 
 	WITH node_type AS (
 		SELECT
 			node_2 AS node_id,
-			max(fluid_type) AS fluid_type,
-			count(DISTINCT fluid_type) FILTER (WHERE fluid_type > 0) AS nr
+			max(mapzone_id) AS fluid_type,
+			count(DISTINCT mapzone_id) FILTER (WHERE mapzone_id > 0) AS nr
 		FROM temp_pgr_arc
 		GROUP BY node_2
 	), node_modif AS (
@@ -255,18 +255,18 @@ BEGIN
 		FROM node_type
 	)
 	UPDATE temp_pgr_node t
-	SET fluid_type = n.fluid_type
+	SET mapzone_id = n.fluid_type
 	FROM node_modif n
 	WHERE n.node_id = t.node_id
-	AND n.fluid_type <> t.fluid_type;
+	AND n.fluid_type <> t.mapzone_id;
 
 	IF v_commitchanges IS TRUE THEN
 		RAISE NOTICE 'Updating fluid type on real tables';
 
-		v_querytext = 'UPDATE node SET fluid_type = t.fluid_type FROM temp_pgr_node t WHERE t.node_id = node.node_id AND t.fluid_type <> node.fluid_type;';
+		v_querytext = 'UPDATE node SET fluid_type = t.mapzone_id FROM temp_pgr_node t WHERE t.node_id = node.node_id AND t.mapzone_id <> node.fluid_type;';
 		EXECUTE v_querytext;
 
-		v_querytext = 'UPDATE arc SET fluid_type = t.fluid_type FROM temp_pgr_arc t WHERE t.arc_id = arc.arc_id AND t.fluid_type <> arc.fluid_type;';
+		v_querytext = 'UPDATE arc SET fluid_type = t.mapzone_id FROM temp_pgr_arc t WHERE t.arc_id = arc.arc_id AND t.mapzone_id <> arc.fluid_type;';
 		EXECUTE v_querytext;
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with fluid type and geometry';
