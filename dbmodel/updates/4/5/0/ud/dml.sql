@@ -26,3 +26,5 @@ INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderb
 VALUES('dma', 'dma', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT DO NOTHING;
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
 VALUES('om_waterbalance_dma_graph', 'Table to manage graph for dma', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT DO NOTHING;
+
+UPDATE config_form_fields SET dv_isnullvalue=true WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id_plan' AND tabname='tab_general';
