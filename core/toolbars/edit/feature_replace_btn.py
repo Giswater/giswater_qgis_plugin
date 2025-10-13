@@ -74,10 +74,14 @@ class GwFeatureReplaceButton(GwMaptool):
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.set_snapping_layers()
 
-        # Manage last feature type selected
-        last_feature_type = tools_gw.get_config_parser("btn_feature_replace", "last_feature_type", "user", "session")
-        if last_feature_type is None:
-            last_feature_type = "NODE"
+        if global_vars.psignals is not None and global_vars.psignals['psector_active']:
+            # Set active layer to 've_arc'
+            last_feature_type = "ARC"
+        else:
+            # Get last feature type selected
+            last_feature_type = tools_gw.get_config_parser("btn_feature_replace", "last_feature_type", "user", "session")
+            if last_feature_type is None:
+                last_feature_type = "NODE"
 
         # Manage active layer
         self._set_active_layer(last_feature_type)
@@ -160,7 +164,7 @@ class GwFeatureReplaceButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        current_mode = 'plan' if global_vars.psignals and global_vars.psignals['psector_active'] else 'operative'
+        current_mode = 'plan' if global_vars.psignals is not None and global_vars.psignals['psector_active'] else 'operative'
 
         for action_id, action_name, action_modes in self.actions:
             if current_mode not in action_modes:
@@ -280,6 +284,9 @@ class GwFeatureReplaceButton(GwMaptool):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
         tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
+
+        # Fill catalog_id combo box
+        self._edit_change_elem_type_get_value(self.dlg_replace.feature_type_new.currentIndex())
 
         # Get current featurecat_id
         current_featurecat_id = feature.attribute(self.feature_cat_id)
@@ -435,7 +442,7 @@ class GwFeatureReplaceButton(GwMaptool):
         answer = tools_qt.show_question(msg, title)
         if answer:
             # Check if psector is active
-            if global_vars.psignals and global_vars.psignals['psector_active']:
+            if global_vars.psignals is not None and global_vars.psignals['psector_active']:
                 feature = f'"featureType":"ARC", "ids":["{self.feature_id}"]'
                 extras = f'"catalog":"{new_featurecat_id}"'
                 extras += f', "description":"{description}"'
@@ -517,7 +524,7 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_qt.set_autocompleter(self.dlg_replace.new_featurecat_id)
 
     def _manage_plan_widgets(self):
-        if global_vars.psignals and global_vars.psignals['psector_active']:
+        if global_vars.psignals is not None and global_vars.psignals['psector_active']:
             # Hide unused widgets for plan
             self.dlg_replace.grb_end_parameters.setVisible(False)
             self.dlg_replace.lbl_feature_type.setVisible(False)
