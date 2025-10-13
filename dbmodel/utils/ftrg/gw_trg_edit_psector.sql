@@ -34,22 +34,6 @@ BEGIN
 
     v_projectype := (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
-	--get obsolete_planified state_type
-	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
-
-	-- get state_type default values
-	SELECT value::integer INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
-	IF v_statetype_obsolete IS NULL THEN
-	        EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3134", "function":"2446","parameters":null}}$$);';
-	END IF;
-
-	SELECT value::integer INTO v_statetype_onservice FROM config_param_user WHERE parameter='edit_statetype_1_vdefault' AND cur_user=current_user;
-	IF v_statetype_onservice IS NULL THEN
-	        EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3136", "function":"2446","parameters":null}}$$);';
-	END IF;
-
     IF TG_OP = 'INSERT' THEN
 
 		-- Scale_vdefault
@@ -98,6 +82,22 @@ BEGIN
 	    RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+		--get obsolete_planified state_type
+		v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
+
+		-- get state_type default values
+		SELECT value::integer INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+		IF v_statetype_obsolete IS NULL THEN
+				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3134", "function":"2446","parameters":null}}$$);';
+		END IF;
+
+		SELECT value::integer INTO v_statetype_onservice FROM config_param_user WHERE parameter='edit_statetype_1_vdefault' AND cur_user=current_user;
+		IF v_statetype_onservice IS NULL THEN
+				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3136", "function":"2446","parameters":null}}$$);';
+		END IF;
 
 		UPDATE plan_psector
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1,
