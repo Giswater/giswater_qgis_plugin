@@ -828,10 +828,10 @@ BEGIN
 					JOIN v_temp_arc USING (arc_id)
 					GROUP BY mapzone_id
 					UNION
-					SELECT mapzone_id, ST_Collect(ext_plot.the_geom) AS geom FROM temp_pgr_arc ta
+					SELECT mapzone_id, ST_Collect(ep.the_geom) AS geom FROM temp_pgr_arc ta
 					JOIN v_temp_connec vc USING (arc_id)
-					LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code
-					LEFT JOIN ext_plot ON ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
+					LEFT JOIN ext_plot ep ON vc.plot_code = ep.plot_code 
+						AND ST_DWithin(vc.the_geom, ep.the_geom, 0.001)
 					GROUP BY mapzone_id
 				) a
 				GROUP BY mapzone_id
