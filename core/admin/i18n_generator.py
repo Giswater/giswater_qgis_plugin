@@ -822,6 +822,9 @@ class GwI18NGenerator:
             header += 'SET search_path = am, public;\n'
         elif file_type == "cm":
             header += 'SET search_path = cm, public, public;\n'
+        
+        if self.language.lower() == "no_tr":
+            header += "SELECT 1;"
 
         file.write(header)
         file.close()

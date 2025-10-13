@@ -1627,7 +1627,7 @@ class GwSchemaI18NManager:
                 if table_name == "su_feature":
                     tables_org = ["cat_feature"]
                 else:
-                    tables_org = ["value_state", "value_state_type", "sys_label"]
+                    tables_org = ["value_state", "value_state_type"]
         else:
             tables_org = [f"sys_{table_name[2:]}"]  # Prepend "sys_" and get everything after the first two characters
 
