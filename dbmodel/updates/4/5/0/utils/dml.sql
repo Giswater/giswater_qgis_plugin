@@ -38,3 +38,6 @@ WHERE fid=569;
 UPDATE sys_fprocess
 SET isaudit=true,active=true
 WHERE fid=584;
+
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+VALUES('man_vlink', 'Additional information for vlink management', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT DO NOTHING;
