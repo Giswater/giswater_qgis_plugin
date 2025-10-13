@@ -323,7 +323,7 @@ class GwImportInpTask(GwTask):
                         # TODO: manage "nodes" and "links" options
                         value = "YES" if value else "NO"
                     elif category == "time" and key not in ("pattern_start", "statistic"):
-                        value = f"{value//3600}:{(value%3600)//60:02d}" if value else None
+                        value = f"{value // 3600}:{(value % 3600) // 60:02d}" if value else None
                     prefix = prefix_map.get(category, "inp_options_")
                     param_name = params_map[category].get(key.lower(), key.lower())
                     param_name = f"{prefix}{param_name}"
@@ -1177,7 +1177,7 @@ class GwImportInpTask(GwTask):
 
             inp_dict[v_name] = {
                 "valve_type": v.valve_type,
-                "diameter": v.diameter*1000,
+                "diameter": v.diameter * 1000,
                 "setting": v.initial_setting,
                 "curve_id": None,
                 "minorloss": v.minor_loss,
@@ -1296,7 +1296,7 @@ class GwImportInpTask(GwTask):
                 "minorloss": p.minor_loss,
                 "status": p.initial_status.name.upper(),
                 "custom_roughness": p.roughness,
-                "custom_dint": p.diameter*1000,
+                "custom_dint": p.diameter * 1000,
                 "reactionparam": None,
                 "reactionvalue": None,
                 "bulk_coeff": p.bulk_coeff,
