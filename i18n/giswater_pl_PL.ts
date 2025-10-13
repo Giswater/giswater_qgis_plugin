@@ -1162,7 +1162,7 @@
 			<translation>Zmiany na tej stronie są niebezpieczne i mogą uszkodzić wtyczkę Giswater na różne sposoby.</translation>
 		</message>
 		<message>
-			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. \nYou will need to restart QGIS to apply changes. Do you want continue?</source>
+			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. \nYou will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?</source>
 			<translation>Zmiany na tej stronie są niebezpieczne i mogą uszkodzić wtyczkę Giswater na różne sposoby. \Aby zastosować zmiany, konieczne będzie ponowne uruchomienie QGIS. Czy chcesz kontynuować?</translation>
 		</message>
 		<message>

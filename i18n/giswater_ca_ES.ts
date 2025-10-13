@@ -1162,8 +1162,8 @@
 			<translation>Changes on this page are dangerous and can break Giswater plugin in various ways. </translation>
 		</message>
 		<message>
-			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. \nYou will need to restart QGIS to apply changes. Do you want continue?</source>
-			<translation>Changes on this page are dangerous and can break Giswater plugin in various ways. \nYou will need to restart QGIS to apply changes. Do you want continue?</translation>
+			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. \nYou will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?</source>
+			<translation>Els canvis en aquesta pàgina són perillosos i poden trencar el connector Giswater de diverses maneres. \nHaurà de reiniciar el QGIS o tornar a carregar el connector Giswater per aplicar els canvis. Vol continuar?</translation>
 		</message>
 		<message>
 			<source>Check fields from table or view</source>
