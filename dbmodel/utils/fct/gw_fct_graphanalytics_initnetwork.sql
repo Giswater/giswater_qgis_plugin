@@ -32,6 +32,7 @@ DECLARE
     -- parameters
     v_expl_id_array text[];
     v_mapzone_name TEXT;
+    v_mapzone_field text;
 
     -- extra variables
     v_graph_delimiter TEXT;
@@ -73,6 +74,12 @@ BEGIN
         v_graph_delimiter := v_mapzone_name;
     END IF;
 
+    IF v_mapzone_name ILIKE '%TYPE%' THEN 
+        v_mapzone_field = LOWER(v_mapzone_name)
+    ELSIF v_mapzone_name = 'MINCUT' THEN v_mapzone_field = NULL
+    ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
+    END IF;
+
 
 
     v_query_text = '
@@ -106,30 +113,29 @@ BEGIN
 
     EXECUTE v_query_text;
 
-    IF lower(v_mapzone_name) = 'fluidtype' THEN
-        v_query_text = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, fluid_type)
-	         SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, a.fluid_type
-	         FROM v_temp_arc a
-	         JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
-	         JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
+    v_query_text = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+        SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
+        FROM v_temp_arc a
+        JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
+        JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
+    EXECUTE v_query_text;
 
-	    EXECUTE v_query_text;
-    ELSE
-        -- Dynamic column name for old_mapzone_id: %I_id -> dma_id, presszone_id, etc.
-        -- node because we need to inform old mapzone_id for this nodes that is_operative is false.
-        v_query_text = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
-            SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
-            FROM v_temp_arc a
-            JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
-            JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
+    IF v_mapzone_name ILIKE '%TYPE%' THEN
+        v_query_text = 'UPDATE temp_pgr_node n SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || ' 
+            FROM v_temp_node t WHERE n.node_id = t.node_id';
         EXECUTE v_query_text;
-
+        v_query_text = 'UPDATE temp_pgr_arc a SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || '
+             FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
+        EXECUTE v_query_text;
+    ELSE 
         IF v_mapzone_name <> 'MINCUT' THEN
-            v_query_text = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_node t WHERE n.node_id = t.node_id';
+            v_query_text = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_field || ' 
+                FROM v_temp_node t WHERE n.node_id = t.node_id';
             EXECUTE v_query_text;
-            v_query_text = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_name || '_id FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
+            v_query_text = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_field || ' 
+                FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
             EXECUTE v_query_text;
-        END IF;
+        END IF;    
 
         IF v_project_type = 'WS' THEN
             -- VALVES
