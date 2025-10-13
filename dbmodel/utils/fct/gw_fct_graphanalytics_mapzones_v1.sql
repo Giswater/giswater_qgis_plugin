@@ -1832,7 +1832,7 @@ BEGIN
 						WHERE d.drainzone_id >0
 					),
 					geom AS (
-						SELECT drainzone_id, ST_Collect(the_geom) AS the_geom
+						SELECT drainzone_id, ST_Multi(ST_CollectionExtract(ST_Collect(the_geom), 3)) AS the_geom
 						FROM temp_dwfzone
 						GROUP BY drainzone_id
 					),
