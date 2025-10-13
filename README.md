@@ -74,6 +74,10 @@ Compatible with Windows, Mac, and Linux, but EPA models are only supported on Wi
 
 - Install the latest Long-Term Release (LTR) of QGIS.
 - Install SWMM (5.1) and EPANET (2.2). _Note_: EPA SWMM and EPANET may not work on Linux front-end environments.
+- On Linux systems, you may need to install the PostgreSQL Qt driver for database connectivity. On Ubuntu:
+  ```
+  sudo apt install libqt5sql5-psql
+  ```
 
 ## Test
 
