@@ -168,6 +168,16 @@ BEGIN
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 	IF v_cur_user IS NULL THEN v_cur_user = current_user; END IF;
 
+	
+	-- Create temporary tables if not exists
+	-- =======================
+	v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_use_plan_psectors ||'"}}';
+	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+	IF v_response->>'status' <> 'Accepted' THEN
+		RETURN v_response;
+	END IF;
+
 	-- get arc_id from click
 	IF v_xcoord IS NOT NULL THEN
 		v_sensibility_f := (SELECT (value::json->>'web')::float FROM config_param_system WHERE parameter = 'basic_info_sensibility_factor');
@@ -176,44 +186,26 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT arc_id INTO v_arc_id FROM ve_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT arc_id INTO v_arc_id FROM v_temp_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 
+		-- TODO Dani on es fa servir v_connec?
 		IF v_arc_id IS NULL THEN
-			SELECT connec_id INTO v_connec FROM ve_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+			SELECT connec_id INTO v_connec FROM v_temp_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 		END IF;
 	END IF;
 
 	-- CHECK
 	--check if arc exists in database or look for a new arc_id in the same location
-	IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc_id) IS NULL THEN
-		SELECT arc_id::integer INTO v_arc_id 
-		FROM arc a
-		JOIN om_mincut om ON om.anl_feature_id::integer = a.arc_id
-		WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) 
-		AND state=1
-		and om.id = v_mincut_id;
-
-		IF v_arc_id IS NULL AND v_use_plan_psectors THEN
-			SELECT arc_id::integer INTO v_arc_id 
-			FROM arc a
-			JOIN om_mincut om ON om.anl_feature_id::integer = a.arc_id
-			WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) 
-			AND state=2
-			and om.id = v_mincut_id;
-		END IF;
-	END IF;
-
+	-- TODO Dani - no cal actualitzar anl_the_geom, anl_feature_id?; es fa servir 0.1 o v_sensibility?
+	IF (SELECT count(*) FROM v_temp_arc WHERE arc_id = v_arc_id) = 0 THEN
+		SELECT a.arc_id INTO v_arc_id 
+		FROM v_temp_arc a
+		WHERE EXISTS (SELECT 1 FROM om_mincut om WHERE om.id = v_mincut_id AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1))
+		LIMIT 1;
+	END IF
+	-- TODO Dani - aquesta condició ha d'estar aqui? 
 	IF v_action = 'mincutValveUnaccess' AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
-	END IF;
-
-	-- Create temporary tables if not exists
-	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"MINCUT", "use_psector":"'|| v_use_plan_psectors ||'"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
-
-	IF v_response->>'status' <> 'Accepted' THEN
-		RETURN v_response;
 	END IF;
 
 	-- manage actions
@@ -225,29 +217,12 @@ BEGIN
 		IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
-			v_core_mincut := TRUE;
 		ELSE
 			v_init_mincut := FALSE;
 			v_prepare_mincut := TRUE;
-			v_core_mincut := TRUE;
 		END IF;
-	ELSIF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') THEN
-		-- check if the node exists in the cluster:
-			-- true: refresh mincut
-			-- false: init and refresh mincut
-
-		IF (SELECT count(*) FROM temp_pgr_node WHERE node_id = v_valve_node_id) = 0 THEN
-			v_init_mincut := TRUE;
-			v_prepare_mincut := FALSE;
-			v_core_mincut := TRUE;
-		ELSE
-			v_init_mincut := FALSE;
-			v_prepare_mincut := TRUE;
-			v_core_mincut := TRUE;
-		END IF;
-	END IF;
-
-	IF v_action = 'mincutValveUnaccess' THEN
+		v_core_mincut := TRUE;
+	ELSIF v_action = 'mincutValveUnaccess' THEN
 		UPDATE om_mincut_valve 
 		SET unaccess = 
 			CASE 
@@ -262,20 +237,31 @@ BEGIN
 
 		IF v_row_count = 0 THEN
 			-- do nothing because the previous result is exactly the same
-			v_core_mincut := FALSE;
-		END IF;
-	ELSIF v_action = 'mincutChangeValveStatus' THEN
-		IF v_init_mincut THEN
-			-- do nothing because the valve is outside the cluster.
 			v_init_mincut := FALSE;
+			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
-		ELSE
-			UPDATE man_valve SET closed = NOT closed WHERE node_id = v_valve_node_id;
-
-			-- TODO: prepare temp_pgr_node and temp_pgr_arc with the new valve status
+		ELSE 
+			IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
+				v_init_mincut := TRUE;
+				v_prepare_mincut := FALSE;
+			ELSE
+				v_init_mincut := FALSE;
+				v_prepare_mincut := TRUE;
+			END IF;
 		END IF;
+		v_core_mincut := TRUE;
+	ELSIF v_action = 'mincutChangeValveStatus' THEN
+		UPDATE node SET closed = NOT closed WHERE node_id = v_valve_node_id;
+		IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
+			v_init_mincut := TRUE;
+			v_prepare_mincut := FALSE;
+		ELSE
+			-- TODO: prepare temp_pgr_node and temp_pgr_arc with the new valve status
+			v_init_mincut := FALSE;
+			v_prepare_mincut := TRUE;
+		END IF;
+		v_core_mincut := TRUE;
 	END IF;
-
 
 	IF v_init_mincut THEN
 		IF v_mincut_version = '6.1' THEN
@@ -354,7 +340,7 @@ BEGIN
 		UPDATE temp_pgr_arc 
 		SET proposed = FALSE 
 		WHERE proposed = TRUE;
-
+		--TODO parlar amb en Dani, aquesta condició no crec que hauria de ser
 		UPDATE temp_pgr_arc
 		SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
 		WHERE unaccess = TRUE;
