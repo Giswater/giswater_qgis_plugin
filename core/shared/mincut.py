@@ -694,9 +694,36 @@ class GwMincut:
                        f" WHERE id = {result_mincut_id}")
                 row = tools_db.get_row(sql)
                 if row:
+                    # Delete conflicts if this mincut caused conflicts
+                    sql = (
+                        f"WITH groups_conflict AS ("
+                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+                        f"),"
+                        f"mincuts_to_delete AS ("
+                        f"    SELECT omc.mincut_id "
+                        f"    FROM om_mincut_conflict omc "
+                        f"    JOIN om_mincut om ON om.id = omc.mincut_id "
+                        f"    WHERE om.mincut_class = 4 "
+                        f"    AND omc.id IN (SELECT id FROM groups_conflict)"
+                        f") "
+                        f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
+                    )
+                    tools_db.execute_sql(sql)
+
+                    sql = (
+                        f"WITH groups_conflict AS ("
+                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+                        f") "
+                        f"DELETE FROM om_mincut_conflict "
+                        f"WHERE id IN (SELECT id FROM groups_conflict);"
+                    )
+                    tools_db.execute_sql(sql)
+
                     sql = (f"DELETE FROM om_mincut"
                            f" WHERE id = {result_mincut_id}")
                     tools_db.execute_sql(sql)
+
+
                     tools_qgis.show_info("Mincut canceled!")
 
             # Rollback transaction
