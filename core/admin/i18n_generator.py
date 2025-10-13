@@ -507,7 +507,7 @@ class GwI18NGenerator:
         elif table == 'dbjson':
             colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
-            order_by.extend(['source_code', 'project_type', 'context', 'source', 'hint', 'id'])
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'hint'])
 
         elif table == 'dbconfig_form_fields_json':
             colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "hint", "text", "lb_en_us"]
