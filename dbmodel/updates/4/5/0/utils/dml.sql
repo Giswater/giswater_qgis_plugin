@@ -29,3 +29,12 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4408, 'There are no nodes to be repaired.', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4410, '%v_count% nodes have been created to repair topology.', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+-- activate matcat_id and sys_elev null values checks.
+UPDATE sys_fprocess
+SET isaudit=true, active=true
+WHERE fid=569;
+
+UPDATE sys_fprocess
+SET isaudit=true,active=true
+WHERE fid=584;
