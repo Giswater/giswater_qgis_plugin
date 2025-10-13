@@ -327,6 +327,13 @@ class GwMincut:
     def init_mincut_form(self):
         """ Custom form initial configuration """
 
+        # Drop temporary tables when form is initialized
+        extras = '"action":"DROP", "fct_name":"MINCUT"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_graphanalytics_manage_temporary', body)
+        if not result or result['status'] == 'Failed':
+            return
+
         # Setting lists
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
