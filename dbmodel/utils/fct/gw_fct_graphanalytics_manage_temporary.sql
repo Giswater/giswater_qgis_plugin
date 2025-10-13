@@ -66,7 +66,6 @@ BEGIN
             old_node_id int4,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER DEFAULT 0,
-            fluid_type INTEGER DEFAULT 0,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             to_arc _int4,
@@ -86,7 +85,6 @@ BEGIN
             node_2 int4,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER DEFAULT 0,
-            fluid_type INTEGER DEFAULT 0,
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             modif1 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_1
             modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
