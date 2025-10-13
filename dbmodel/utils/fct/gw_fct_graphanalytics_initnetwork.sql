@@ -75,8 +75,8 @@ BEGIN
     END IF;
 
     IF v_mapzone_name ILIKE '%TYPE%' THEN 
-        v_mapzone_field = LOWER(v_mapzone_name)
-    ELSIF v_mapzone_name = 'MINCUT' THEN v_mapzone_field = NULL
+        v_mapzone_field = LOWER(v_mapzone_name);
+    ELSIF v_mapzone_name = 'MINCUT' THEN v_mapzone_field = NULL;
     ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
     END IF;
 
