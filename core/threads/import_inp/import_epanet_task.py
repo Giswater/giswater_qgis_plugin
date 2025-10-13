@@ -164,6 +164,17 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Create catalogs", lerp_progress(70, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new pipe catalogs", True)
         self._create_new_pipe_catalogs()
 
+        # Get man tables
+        self.man_tables: dict[str, str] = {}
+        for k, v in self.catalogs['features'].items():
+            sql = f"SELECT feature_class FROM cat_feature WHERE id = '{v}';"
+            row = get_row(sql, commit=self.force_commit)
+            if not row:
+                self._log_message(f"Feature class not found: {v}")
+                continue
+            feature_class = row[0]
+            self.man_tables[k] = f"man_{feature_class.lower()}"
+
     def _manage_nonvisual(self) -> None:
         if self.network.num_patterns > 0:
             self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
@@ -309,7 +320,10 @@ class GwImportInpTask(GwTask):
                     process_options(value, category)
                 else:
                     if category == "report" and type(value) is bool:
+                        # TODO: manage "nodes" and "links" options
                         value = "YES" if value else "NO"
+                    elif category == "time" and key not in ("pattern_start", "statistic"):
+                        value = f"{value//3600}:{(value%3600)//60:02d}" if value else None
                     prefix = prefix_map.get(category, "inp_options_")
                     param_name = params_map[category].get(key.lower(), key.lower())
                     param_name = f"{prefix}{param_name}"
@@ -379,6 +393,13 @@ class GwImportInpTask(GwTask):
             nodecat_db = [x[0] for x in cat_node_ids]
 
         node_catalogs = ["junctions", "reservoirs", "tanks"]
+        # If VARCs will be transformed to nodes, ensure target node catalogs exist
+        for k, v in self.manage_nodarcs.items():
+            if not v:
+                continue
+            # Append any nodarc key that has feature and catalog definitions
+            if k in self.catalogs and k in self.catalogs.get("features", {}):
+                node_catalogs.append(k)
 
         for node_type in node_catalogs:
             if node_type not in self.catalogs:
@@ -744,7 +765,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_reservoirs(self) -> None:
-        feature_class = self.catalogs['features']['reservoirs'].lower()
+        man_table = self.man_tables['reservoirs']
 
         node_sql = """ 
             INSERT INTO node (
@@ -757,7 +778,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 node_id
             ) VALUES %s
         """
@@ -848,7 +869,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_tanks(self) -> None:
-        feature_class = self.catalogs['features']['tanks'].lower()
+        man_table = self.man_tables['tanks']
 
         node_sql = """ 
             INSERT INTO node (
@@ -861,7 +882,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 node_id
             ) VALUES %s
         """
@@ -964,11 +985,11 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pumps(self) -> None:
-        feature_class = self.catalogs['features']['pumps'].lower()
+        man_table = self.man_tables['pumps']
         arccat_id = self.catalogs["pumps"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_nodarcs["pumps"]:
-            feature_class = "VARC"
+            man_table = "man_varc"
             arccat_id = "VARC"
 
         arc_sql = """ 
@@ -982,7 +1003,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 arc_id
             ) VALUES %s
         """
@@ -1156,7 +1177,7 @@ class GwImportInpTask(GwTask):
 
             inp_dict[v_name] = {
                 "valve_type": v.valve_type,
-                "diameter": v.diameter,
+                "diameter": v.diameter*1000,
                 "setting": v.initial_setting,
                 "curve_id": None,
                 "minorloss": v.minor_loss,
@@ -1204,7 +1225,7 @@ class GwImportInpTask(GwTask):
             )
 
     def _save_pipes(self) -> None:
-        feature_class = self.catalogs['features']['pipes'].lower()
+        man_table = self.man_tables['pipes']
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1217,7 +1238,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 arc_id
             ) VALUES %s
         """
@@ -1275,7 +1296,7 @@ class GwImportInpTask(GwTask):
                 "minorloss": p.minor_loss,
                 "status": p.initial_status.name.upper(),
                 "custom_roughness": p.roughness,
-                "custom_dint": p.diameter,
+                "custom_dint": p.diameter*1000,
                 "reactionparam": None,
                 "reactionvalue": None,
                 "bulk_coeff": p.bulk_coeff,
