@@ -1263,23 +1263,11 @@ class GwAdminButton:
         if self.is_cm_project:
             self.is_cm_project = False
 
+        self._close_dialog_admin(self.dlg_create_gis_project)
+        self._close_dialog_admin(self.dlg_readsql)
+        
         if result:
-            QgsProject.instance().clear()
-            
-            # Ask user if they want to open the generated project
-            msg = tools_qt.tr("Do you want to open the generated project?")
-            title = tools_qt.tr("Open project")
-            answer = tools_qt.show_question(msg, title, force_action=True)
-            
-            self._close_dialog_admin(self.dlg_create_gis_project)
-            self._close_dialog_admin(self.dlg_readsql)
-            
-            if answer:
-                # User wants to open it
-                self._open_project(qgs_path)
-        else:
-            self._close_dialog_admin(self.dlg_create_gis_project)
-            self._close_dialog_admin(self.dlg_readsql)
+            self._open_project(qgs_path)
 
     def _open_project(self, qgs_path):
         """ Open a QGis project """
