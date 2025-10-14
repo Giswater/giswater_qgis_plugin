@@ -573,7 +573,7 @@ BEGIN
         WHERE a.graph_delimiter  = 'MINSECTOR'
         AND a.closed = FALSE
         AND a.to_arc IS NOT NULL
-        AND a.broken = TRUE
+        AND a.broken = FALSE
         AND a.to_arc[1] = v.arc_id;
         
         -- water-source (graph_delimiter  = 'SECTOR')
@@ -589,6 +589,14 @@ BEGIN
         -- establishing the borders of the mincut (calculate cost_mincut/reverse_cost_mincut)
         UPDATE temp_pgr_arc_mincut a
         SET cost_mincut = -1, reverse_cost_mincut = -1;
+
+        -- the broken open valves
+		UPDATE temp_pgr_arc_mincut a
+		SET cost_mincut = 0, reverse_cost_mincut = 0
+		WHERE a.graph_delimiter = 'MINSECTOR'
+		AND a.closed = FALSE 
+		AND a.to_arc IS NULL
+		AND a.broken = TRUE;
 
         -- update cost_mincut/reverse_cost_mincut for check valves
         IF v_ignore_check_valves THEN
