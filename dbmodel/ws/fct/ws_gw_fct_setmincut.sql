@@ -81,7 +81,6 @@ v_sensibility_f float;
 v_sensibility float;
 v_point public.geometry;
 
-v_connec text;
 v_id integer;
 v_version text;
 v_days integer;
@@ -189,21 +188,29 @@ BEGIN
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
 		SELECT arc_id INTO v_arc_id FROM v_temp_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
-
-		-- TODO Dani on es fa servir v_connec?
-		IF v_arc_id IS NULL THEN
-			SELECT connec_id INTO v_connec FROM v_temp_connec WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
-		END IF;
 	END IF;
 
 	-- CHECK
 	--check if arc exists in database or look for a new arc_id in the same location
 	-- TODO Dani - no cal actualitzar anl_the_geom, anl_feature_id?; es fa servir 0.1 o v_sensibility?
+	IF v_arc_id IS NULL THEN
+		SELECT anl_feature_id INTO v_arc_id FROM om_mincut WHERE id = v_mincut_id;
+	END IF;
+
 	IF (SELECT count(*) FROM v_temp_arc WHERE arc_id = v_arc_id) = 0 THEN
 		SELECT a.arc_id INTO v_arc_id 
 		FROM v_temp_arc a
 		WHERE EXISTS (SELECT 1 FROM om_mincut om WHERE om.id = v_mincut_id AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1))
 		LIMIT 1;
+
+		IF v_arc_id IS NULL THEN
+			RETURN ('{"status":"Failed", "message":{"level":2, "text":"Arc not found."}}')::json;
+		ELSE
+			UPDATE om_mincut SET 
+				anl_feature_id = v_arc_id,
+				anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
+			WHERE id = v_mincut_id;
+		END IF;
 	END IF;
 	-- TODO Dani - aquesta condició ha d'estar aqui? 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
@@ -253,7 +260,7 @@ BEGIN
 		END IF;
 		v_core_mincut := TRUE;
 	ELSIF v_action = 'mincutChangeValveStatus' THEN
-		UPDATE node SET closed = NOT closed WHERE node_id = v_valve_node_id;
+		UPDATE man_valve SET closed = NOT closed WHERE node_id = v_valve_node_id;
 		IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
