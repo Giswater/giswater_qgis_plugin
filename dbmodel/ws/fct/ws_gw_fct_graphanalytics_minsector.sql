@@ -581,6 +581,14 @@ BEGIN
 
     IF v_execute_massive_mincut THEN
         -- PREPARE tables for Massive Mincut
+        -- Initialize process
+		-- =======================
+	    v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"MINCUT", "mode":"MINSECTOR"}}';
+		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+
+		IF v_response->>'status' <> 'Accepted' THEN
+			RETURN v_response;
+		END IF;
 
         --ARCS - keep only the new arcs
         

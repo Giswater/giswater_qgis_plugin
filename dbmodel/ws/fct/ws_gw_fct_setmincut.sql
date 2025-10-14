@@ -191,6 +191,11 @@ BEGIN
 	END IF;
 
 	-- CHECK
+	-- check if use psectors is active with minsector version
+	IF v_use_plan_psectors AND v_mincut_version = '6.1' THEN
+		v_mincut_version = '6';
+	END IF;
+
 	--check if arc exists in database or look for a new arc_id in the same location
 	IF v_arc_id IS NULL THEN
 		SELECT anl_feature_id INTO v_arc_id FROM om_mincut WHERE id = v_mincut_id;
@@ -497,12 +502,13 @@ BEGIN
 	IF v_init_mincut THEN
 		IF v_mincut_version = '6.1' THEN
 			v_root_vid := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+			v_mode := 'MINSECTOR';
 		ELSE 
 			v_root_vid := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
 		END IF;
 		-- Initialize process
 		-- =======================
-		v_data := '{"data":{"mapzone_name":"MINCUT", "node_id":"'|| v_root_vid ||'", "mincut_version":"'|| v_mincut_version ||'"}}';
+		v_data := '{"data":{"mapzone_name":"MINCUT", "node_id":"'|| v_root_vid ||'", "mode":"'|| quote_nullable(v_mode) ||'"}}';
 		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
 		IF v_response->>'status' <> 'Accepted' THEN

@@ -40,11 +40,14 @@ DECLARE
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
 
-    v_mincut_version text;
-    
     v_query_text TEXT;
+    v_query_text_aux TEXT;
     v_query_text_connectedcomponents TEXT;
     v_query_text_components TEXT;
+
+    -- temporary tables
+    v_temp_arc_table regclass;
+    v_temp_node_table regclass;
 
 
 BEGIN
@@ -59,7 +62,7 @@ BEGIN
     v_expl_id_array = string_to_array(p_data->'data'->>'expl_id_array', ',');
     v_mapzone_name = p_data->'data'->>'mapzone_name';
     v_node_id = p_data->'data'->>'node_id';
-    v_mincut_version = p_data->'data'->>'mincut_version';
+    v_mode = p_data->'data'->>'mode';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -76,6 +79,14 @@ BEGIN
         );
     END IF;
 
+    IF v_mode = 'MINSECTOR' THEN
+        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
+        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
+    ELSE
+        v_temp_arc_table = 'temp_pgr_arc'::regclass;
+        v_temp_node_table = 'temp_pgr_node'::regclass;
+    END IF;
+
     IF v_project_type = 'UD' THEN v_reverse_cost = -1; END IF;
 
     IF v_mapzone_name IN ('MINSECTOR', 'MINCUT') THEN
@@ -90,18 +101,21 @@ BEGIN
     ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
     END IF;
 
+
+    IF v_mode = 'MINSECTOR' THEN
+        v_query_text_connectedcomponents := 'SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph';
+        v_query_text_aux := 'WHERE c.node = vtn.minsector_id';
+    ELSE
+        v_query_text_connectedcomponents := 'SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc';
+        v_query_text_aux := 'WHERE c.node = vtn.node_id'
+    END IF;
+
     IF v_expl_id_array IS NOT NULL THEN
         v_query_text_components := 'AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
     ELSIF v_node_id IS NOT NULL THEN
         v_query_text_components := 'AND vtn.node_id = '||v_node_id;
     ELSE
         v_query_text_components := '';
-    END IF;
-
-    IF v_mapzone_name = 'MINCUT' AND v_mincut_version = '6.1' THEN
-        v_query_text_connectedcomponents := 'SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph';
-    ELSE
-        v_query_text_connectedcomponents := 'SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc';
     END IF;
 
     v_query_text = '
@@ -116,12 +130,12 @@ BEGIN
             WHERE EXISTS (
                 SELECT 1
                 FROM v_temp_node vtn
-                WHERE c.node = vtn.node_id
+                '||v_query_text_aux||' 
                 '||v_query_text_components||'
             )
             GROUP BY c.component
         )
-        INSERT INTO temp_pgr_node (node_id)
+        INSERT INTO ' || v_temp_node_table || ' (node_id)
         SELECT c.node
         FROM connectedcomponents c
         WHERE EXISTS (
@@ -133,149 +147,178 @@ BEGIN
 
     EXECUTE v_query_text;
 
-    v_query_text = 'INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+    IF v_mode = 'MINSECTOR' THEN
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+        SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
+        FROM minsector_graph a
+        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_1
+        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_2';
+    ELSE
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
         SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
         FROM v_temp_arc a
-        JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
-        JOIN temp_pgr_node n2 ON n2.node_id = a.node_2';
+        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.node_1
+        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.node_2';
+    END IF;
     EXECUTE v_query_text;
 
+
     IF v_mapzone_name ILIKE '%TYPE%' THEN
-        v_query_text = 'UPDATE temp_pgr_node n SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || ' 
+        v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || ' 
             FROM v_temp_node t WHERE n.node_id = t.node_id';
         EXECUTE v_query_text;
-        v_query_text = 'UPDATE temp_pgr_arc a SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || '
+        v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || '
              FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
         EXECUTE v_query_text;
     ELSE 
         IF v_mapzone_name <> 'MINCUT' THEN
-            v_query_text = 'UPDATE temp_pgr_node n SET old_mapzone_id = t.' || v_mapzone_field || ' 
+            v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET old_mapzone_id = t.' || v_mapzone_field || ' 
                 FROM v_temp_node t WHERE n.node_id = t.node_id';
             EXECUTE v_query_text;
-            v_query_text = 'UPDATE temp_pgr_arc a SET old_mapzone_id = t.' || v_mapzone_field || ' 
+            v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET old_mapzone_id = t.' || v_mapzone_field || ' 
                 FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
             EXECUTE v_query_text;
         END IF;    
 
         IF v_project_type = 'WS' THEN
             -- VALVES
-            UPDATE temp_pgr_node t
-            SET
-                graph_delimiter = 'MINSECTOR',
-                closed = v.closed,
-                broken = v.broken,
-                to_arc = v.to_arc
-            FROM (
-                SELECT
-                n.node_id,
-                v.closed,
-                v.broken,
-                CASE
-                    WHEN to_arc IS NULL THEN NULL
-                    ELSE ARRAY[to_arc]
-                END AS to_arc
-                FROM v_temp_node n
-                JOIN man_valve v ON v.node_id = n.node_id
-                WHERE 'MINSECTOR' = ANY(n.graph_delimiter)
-            ) v
-            WHERE t.node_id = v.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET
+                    graph_delimiter = ''MINSECTOR'',
+                    closed = v.closed,
+                    broken = v.broken,
+                    to_arc = v.to_arc
+                FROM (
+                    SELECT
+                    n.node_id,
+                    v.closed,
+                    v.broken,
+                    CASE
+                        WHEN to_arc IS NULL THEN NULL
+                        ELSE ARRAY[to_arc]
+                    END AS to_arc
+                    FROM v_temp_node n
+                    JOIN man_valve v ON v.node_id = n.node_id
+                    WHERE ''MINSECTOR'' = ANY(n.graph_delimiter)
+                ) v
+                WHERE t.node_id = v.node_id;
+            ', v_temp_node_table);
         END IF;
 
         -- MAPZONE graph_delimiter
-        UPDATE temp_pgr_node t
-        SET graph_delimiter = v_graph_delimiter
-        FROM v_temp_node n
-        WHERE t.node_id = n.node_id
-        AND t.graph_delimiter = 'NONE'
-        AND v_graph_delimiter = ANY(n.graph_delimiter);
+        EXECUTE format('
+            UPDATE %I t
+            SET graph_delimiter = v_graph_delimiter
+            FROM v_temp_node n
+            WHERE t.node_id = n.node_id
+            AND t.graph_delimiter = ''NONE''
+            AND v_graph_delimiter = ANY(n.graph_delimiter);
+        ', v_temp_node_table);
 
         -- water source (SECTOR) graph_delimiter
-        UPDATE temp_pgr_node t
-        SET graph_delimiter = 'SECTOR'
-        FROM v_temp_node n
-        WHERE t.node_id = n.node_id
-        AND t.graph_delimiter = 'NONE'
-        AND 'SECTOR' = ANY(n.graph_delimiter);
+        EXECUTE format('
+            UPDATE %I t
+            SET graph_delimiter = ''SECTOR''
+            FROM v_temp_node n
+            WHERE t.node_id = n.node_id
+            AND t.graph_delimiter = ''NONE''
+            AND ''SECTOR'' = ANY(n.graph_delimiter);
+        ', v_temp_node_table);
 
         IF v_project_type = 'WS' THEN
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM  (
-                SELECT m.node_id, array_agg(a.arc_id) AS to_arc
-                FROM man_tank m
-                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
-                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
-                GROUP BY m.node_id
-            ) a
-            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM  (
+                    SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_tank m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                ) a
+                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table);
 
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM
-                (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
-                FROM man_source m
-                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
-                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
-                GROUP BY m.node_id
-                )a
-            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_source m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                    )a
+                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table);
 
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM
-                (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
-                FROM man_waterwell m
-                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
-                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
-                GROUP BY m.node_id
-                )a
-            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_waterwell m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                    )a
+                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table);
 
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM
-                (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
-                FROM man_wtp m
-                JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
-                WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
-                GROUP BY m.node_id
-                )a
-            WHERE t.graph_delimiter IN (v_graph_delimiter, 'SECTOR') AND t.node_id = a.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_wtp m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                    )a
+                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table);
 
             -- SET TO_ARC from METER
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM
-                (SELECT node_id,
-                    CASE WHEN to_arc IS NULL THEN NULL
-                    ELSE ARRAY[to_arc]
-                    END AS to_arc
-                FROM man_meter m
-                ) a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT node_id,
+                        CASE WHEN to_arc IS NULL THEN NULL
+                        ELSE ARRAY[to_arc]
+                        END AS to_arc
+                    FROM man_meter m
+                    ) a
+                WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            ', v_temp_node_table);
 
             -- SET TO_ARC from PUMP
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM
-                (SELECT node_id,
-                    CASE WHEN to_arc IS NULL THEN NULL
-                    ELSE ARRAY[to_arc]
-                    END AS to_arc
-                FROM man_pump m
-                ) a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT node_id,
+                        CASE WHEN to_arc IS NULL THEN NULL
+                        ELSE ARRAY[to_arc]
+                        END AS to_arc
+                    FROM man_pump m
+                    ) a
+                WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
+            ', v_temp_node_table);
         END IF;
 
         IF v_project_type = 'UD' THEN
-            UPDATE temp_pgr_node t
-            SET to_arc = a.to_arc
-            FROM (
-                    SELECT pgr_node_1, array_agg(arc_id) AS to_arc
-                    FROM temp_pgr_arc
-                    GROUP BY pgr_node_1
-                )a
-            WHERE t.graph_delimiter = v_graph_delimiter AND t.pgr_node_id = a.pgr_node_1;
+            EXECUTE format('
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM (
+                        SELECT pgr_node_1, array_agg(arc_id) AS to_arc
+                        FROM %I
+                        GROUP BY pgr_node_1
+                    )a
+                WHERE t.graph_delimiter = v_graph_delimiter AND t.pgr_node_id = a.pgr_node_1;
+            ', v_temp_node_table, v_temp_arc_table);
         END IF;
     END IF;
 
