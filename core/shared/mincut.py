@@ -143,8 +143,6 @@ class GwMincut:
 
         tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
-        # Update table 'selector_mincut_result'
-        self._update_result_selector(result_mincut_id)
         tools_qgis.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
 
@@ -980,7 +978,6 @@ class GwMincut:
         if status:
             message = "Values has been updated"
             tools_qgis.show_info(message)
-            self._update_result_selector(result_mincut_id)
         else:
             message = "Error updating element in table, you need to review data"
             tools_qgis.show_warning(message)
@@ -1081,18 +1078,6 @@ class GwMincut:
         self.action_custom_mincut.setEnabled(False)
         self.action_change_valve_status.setEnabled(False)
         self.action_export_hydro_csv.setEnabled(True)
-
-    def _update_result_selector(self, result_mincut_id, commit=True):
-        print('TODO: remove this function')
-        # """ Update table 'selector_mincut_result' """
-
-        # sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
-        #        f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
-        #        f" (current_user, {result_mincut_id});")
-        # status = tools_db.execute_sql(sql, commit)
-        # if not status:
-        #     message = "Error updating table"
-        #     tools_qgis.show_warning(message, parameter='selector_mincut_result')
 
     def _real_end_accept(self):
 
@@ -2050,9 +2035,6 @@ class GwMincut:
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
-
-            # Update table 'selector_mincut_result'
-            self._update_result_selector(real_mincut_id)
 
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
