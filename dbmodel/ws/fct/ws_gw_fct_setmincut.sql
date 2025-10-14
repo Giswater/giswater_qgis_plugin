@@ -61,7 +61,7 @@ v_mincut_version text;
 -- 6.1 - mincut with minsectors
 v_vdefault json;
 v_ignore_check_valves boolean;
-v_seed_node_id integer;
+v_root_vid integer;
 
 v_action_aux text;
 
@@ -192,7 +192,6 @@ BEGIN
 
 	-- CHECK
 	--check if arc exists in database or look for a new arc_id in the same location
-	-- TODO Dani - no cal actualitzar anl_the_geom, anl_feature_id?; es fa servir 0.1 o v_sensibility?
 	IF v_arc_id IS NULL THEN
 		SELECT anl_feature_id INTO v_arc_id FROM om_mincut WHERE id = v_mincut_id;
 	END IF;
@@ -208,11 +207,12 @@ BEGIN
 		ELSE
 			UPDATE om_mincut SET 
 				anl_feature_id = v_arc_id,
+				anl_feature_type = 'ARC',
 				anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
 			WHERE id = v_mincut_id;
 		END IF;
 	END IF;
-	-- TODO Dani - aquesta condició ha d'estar aqui? 
+
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
 	END IF;
@@ -257,19 +257,58 @@ BEGIN
 				v_init_mincut := FALSE;
 				v_prepare_mincut := TRUE;
 			END IF;
+			v_core_mincut := TRUE;
 		END IF;
-		v_core_mincut := TRUE;
 	ELSIF v_action = 'mincutChangeValveStatus' THEN
-		UPDATE man_valve SET closed = NOT closed WHERE node_id = v_valve_node_id;
-		IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
-			v_init_mincut := TRUE;
-			v_prepare_mincut := FALSE;
-		ELSE
-			-- TODO: prepare temp_pgr_node and temp_pgr_arc with the new valve status
+		UPDATE man_valve SET closed = NOT closed 
+		WHERE node_id = v_valve_node_id
+		AND EXISTS (
+			SELECT 1 FROM v_temp_node 
+			WHERE node_id = v_valve_node_id
+				AND 'MINSECTOR' = ANY(graph_delimiter)
+		)
+		AND to_arc IS NULL;
+
+		GET DIAGNOSTICS v_row_count = ROW_COUNT;
+
+		IF v_row_count = 0 THEN
+			-- do nothing because the previous result is exactly the same
 			v_init_mincut := FALSE;
-			v_prepare_mincut := TRUE;
+			v_prepare_mincut := FALSE;
+			v_core_mincut := FALSE;
+		ELSE 
+			IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
+				v_init_mincut := TRUE;
+				v_prepare_mincut := FALSE;
+			ELSE
+				UPDATE temp_pgr_node 
+				SET closed = NOT closed
+				WHERE COALESCE(node_id, old_node_id) = v_valve_node_id;
+
+				UPDATE temp_pgr_arc 
+				SET closed = NOT closed 
+				WHERE COALESCE(node_1, node_2) = v_valve_node_id
+					AND graph_delimiter = 'MINSECTOR';
+
+				UPDATE temp_pgr_arc a
+				SET cost = -1, 
+					reverse_cost = -1
+				WHERE COALESCE(a.node_1, a.node_2) = v_valve_node_id
+					AND a.graph_delimiter  = 'MINSECTOR'
+					AND a.closed = TRUE;
+				
+				UPDATE temp_pgr_arc a
+				SET cost = 0, 
+					reverse_cost = 0
+				WHERE COALESCE(a.node_1, a.node_2) = v_valve_node_id
+					AND a.graph_delimiter  = 'MINSECTOR'
+					AND a.closed = FALSE;
+
+				v_init_mincut := FALSE;
+				v_prepare_mincut := TRUE;
+			END IF;
+			v_core_mincut := TRUE;
 		END IF;
-		v_core_mincut := TRUE;
 	ELSIF v_action = 'mincutStart' THEN
 		v_message = '{"text": "Start mincut", "level": 3}';
 		IF v_device = 5 THEN
@@ -430,13 +469,13 @@ BEGIN
 	-- CORE MINCUT CODE
 	IF v_init_mincut THEN
 		IF v_mincut_version = '6.1' THEN
-			v_seed_node_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+			v_root_vid := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 		ELSE 
-			v_seed_node_id := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
+			v_root_vid := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
 		END IF;
 		-- Initialize process
 		-- =======================
-		v_data := '{"data":{"mapzone_name":"MINCUT", "node_id":"'|| v_seed_node_id ||'", "mincut_version":"'|| v_mincut_version ||'"}}';
+		v_data := '{"data":{"mapzone_name":"MINCUT", "node_id":"'|| v_root_vid ||'", "mincut_version":"'|| v_mincut_version ||'"}}';
 		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
 		IF v_response->>'status' <> 'Accepted' THEN
@@ -529,7 +568,8 @@ BEGIN
 		FROM om_mincut_valve omv
 		WHERE omv.result_id = v_mincut_id
 		AND omv.unaccess = TRUE
-		AND COALESCE(tpa.node_1, tpa.node_2) = omv.node_id;
+		AND COALESCE(tpa.node_1, tpa.node_2) = omv.node_id
+		AND tpa.graph_delimiter = 'MINSECTOR';
 
 		-- mincut
 		SELECT count(*)::int INTO v_pgr_distance 
@@ -826,14 +866,16 @@ BEGIN
 				FROM om_mincut_valve omv
 				WHERE omv.result_id = ANY(v_mincut_group_record.mincut_group)
 					AND omv.proposed = TRUE
-					AND omv.node_id = COALESCE(tpa.node_1, tpa.node_2);
+					AND omv.node_id = COALESCE(tpa.node_1, tpa.node_2)
+					AND tpa.graph_delimiter = 'MINSECTOR';
 
 				UPDATE temp_pgr_arc tpa
 				SET unaccess = omv.unaccess, cost_mincut = 0, reverse_cost_mincut = 0, old_mapzone_id = omv.result_id
 				FROM om_mincut_valve omv
 				WHERE omv.result_id = ANY(v_mincut_group_record.mincut_group)
 					AND omv.unaccess = TRUE
-					AND omv.node_id = COALESCE(tpa.node_1, tpa.node_2);
+					AND omv.node_id = COALESCE(tpa.node_1, tpa.node_2)
+					AND tpa.graph_delimiter = 'MINSECTOR';
 
 
 				v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s"}}',
