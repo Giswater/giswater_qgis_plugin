@@ -164,70 +164,18 @@ BEGIN
             );
         ';
     END IF;
-
-
-
     EXECUTE v_query_text;
 
     IF v_mode = 'MINSECTOR' THEN
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
-        SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ''MINSECTOR''
-        FROM minsector_graph a
-        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_1
-        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_2';
+        -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
+        INSERT INTO v_temp_node_table (node_id, graph_delimiter)
+        SELECT n.node_id, v_graph_delimiter
+        FROM v_temp_node n 
+        JOIN v_temp_arc a ON COALESCE(a.node_1, a.node_2) = n.node_id
+        WHERE v_graph_delimiter = ANY(n.graph_delimiter)
+        AND EXISTS (SELECT 1 FROM v_temp_node_table vtn WHERE a.minsector_id = vtn.node_id);
     ELSE
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
-        SELECT a.arc_id, a.node_1, a.node_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
-        FROM v_temp_arc a
-        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.node_1
-        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.node_2';
-    END IF;
-    EXECUTE v_query_text;
-
-
-    IF v_mapzone_name ILIKE '%TYPE%' THEN
-        v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || ' 
-            FROM v_temp_node t WHERE n.node_id = t.node_id';
-        EXECUTE v_query_text;
-        v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || '
-             FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
-        EXECUTE v_query_text;
-    ELSE 
-        IF v_mapzone_name <> 'MINCUT' THEN
-            v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET old_mapzone_id = t.' || v_mapzone_field || ' 
-                FROM v_temp_node t WHERE n.node_id = t.node_id';
-            EXECUTE v_query_text;
-            v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET old_mapzone_id = t.' || v_mapzone_field || ' 
-                FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
-            EXECUTE v_query_text;
-        END IF;    
-
-        IF v_project_type = 'WS' AND v_mode <> 'MINSECTOR' THEN
-            -- VALVES
-            EXECUTE format('
-                UPDATE %I t
-                SET
-                    graph_delimiter = ''MINSECTOR'',
-                    closed = v.closed,
-                    broken = v.broken,
-                    to_arc = v.to_arc
-                FROM (
-                    SELECT
-                    n.node_id,
-                    v.closed,
-                    v.broken,
-                    CASE
-                        WHEN to_arc IS NULL THEN NULL
-                        ELSE ARRAY[to_arc]
-                    END AS to_arc
-                    FROM v_temp_node n
-                    JOIN man_valve v ON v.node_id = n.node_id
-                    WHERE ''MINSECTOR'' = ANY(n.graph_delimiter)
-                ) v
-                WHERE t.node_id = v.node_id;
-            ', v_temp_node_table);
-        END IF;
-
+        --TODO apareix v_graph_delimiter; no s'ha de posar amb %?
         -- MAPZONE graph_delimiter
         EXECUTE format('
             UPDATE %I t
@@ -247,6 +195,112 @@ BEGIN
             AND t.graph_delimiter = ''NONE''
             AND ''SECTOR'' = ANY(n.graph_delimiter);
         ', v_temp_node_table);
+    END IF;
+
+    IF v_mode = 'MINSECTOR' THEN
+        -- the arcs are valves
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+        SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
+        FROM minsector_graph a
+        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_1
+        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_2';
+    ELSE
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+        SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
+        FROM v_temp_arc a
+        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.node_1
+        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.node_2';
+    END IF;
+    EXECUTE v_query_text;
+
+    IF v_mode = 'MINSECTOR' THEN
+        -- add arcs that connect the nodes 'SECTOR' with the nodes 'MINSECTOR'
+        -- arcs where node_1 is 'SECTOR'
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+        SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_graph_delimiter || '
+        FROM v_temp_arc a
+        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.node_1
+        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_id
+        WHERE n1.graph_delimiter = ' || v_graph_delimiter;
+        EXECUTE v_query_text;
+
+        -- arcs where node_2 is 'SECTOR'
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+        SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_graph_delimiter || '
+        FROM v_temp_arc a
+        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_id
+        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.node_2
+        WHERE n2.graph_delimiter = ' || v_graph_delimiter;
+        EXECUTE v_query_text;
+    END IF;
+
+    IF v_mapzone_name ILIKE '%TYPE%' THEN
+        v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || ' 
+            FROM v_temp_node t WHERE n.node_id = t.node_id';
+        EXECUTE v_query_text;
+        v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || '
+             FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
+        EXECUTE v_query_text;
+    ELSE 
+        IF v_mapzone_name <> 'MINCUT' THEN
+            v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET old_mapzone_id = t.' || v_mapzone_field || ' 
+                FROM v_temp_node t WHERE n.node_id = t.node_id';
+            EXECUTE v_query_text;
+            v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET old_mapzone_id = t.' || v_mapzone_field || ' 
+                FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
+            EXECUTE v_query_text;
+        END IF;    
+
+        IF v_project_type = 'WS' THEN
+            -- VALVES
+            IF v_mode = 'MINSECTOR' THEN
+                EXECUTE format('
+                    UPDATE %I t
+                    SET
+                        graph_delimiter = ''MINSECTOR'',
+                        closed = v.closed,
+                        broken = v.broken,
+                        to_arc = v.to_arc
+                    FROM (
+                        SELECT
+                        n.node_id,
+                        v.closed,
+                        v.broken,
+                        CASE
+                            WHEN to_arc IS NULL THEN NULL
+                            ELSE ARRAY[to_arc]
+                        END AS to_arc
+                        FROM v_temp_node n
+                        JOIN man_valve v ON v.node_id = n.node_id
+                        WHERE ''MINSECTOR'' = ANY(n.graph_delimiter)
+                    ) v
+                    WHERE t.arc_id = v.node_id; 
+                ', v_temp_arc_table);
+            ELSE 
+                EXECUTE format('
+                    UPDATE %I t
+                    SET
+                        graph_delimiter = ''MINSECTOR'',
+                        closed = v.closed,
+                        broken = v.broken,
+                        to_arc = v.to_arc
+                    FROM (
+                        SELECT
+                        n.node_id,
+                        v.closed,
+                        v.broken,
+                        CASE
+                            WHEN to_arc IS NULL THEN NULL
+                            ELSE ARRAY[to_arc]
+                        END AS to_arc
+                        FROM v_temp_node n
+                        JOIN man_valve v ON v.node_id = n.node_id
+                        WHERE ''MINSECTOR'' = ANY(n.graph_delimiter)
+                    ) v
+                    WHERE t.node_id = v.node_id;
+                ', v_temp_node_table);
+            END IF;
+        END IF;
 
         IF v_project_type = 'WS' THEN
             EXECUTE format('
