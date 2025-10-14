@@ -1154,26 +1154,25 @@ BEGIN
 	v_result_arc := COALESCE(v_result_arc, '{}');
 	v_tiled := COALESCE(v_tiled, 'false');
 
-	v_response := jsonb_build_object(
-		'status', 'Accepted',
-		'message', v_message,
-		'version', v_version,
-		'body', jsonb_build_object(
-			'form', {},
-			'feature', {},
-			'overlapStatus', v_overlap_status,
-			'data', jsonb_build_object(
-				'mincutId', v_mincut_id,
-				'mincutInit', v_result_init,
-				'valve', v_result_valve,
-				'mincutNode', v_result_node,
-				'mincutConnec', v_result_connec,
-				'mincutArc', v_result_arc,
-				'tiled', v_tiled
-			)
-		)
-	);
-
+	v_response = ('{
+	    "status": "Accepted",
+        "message": ' || v_message || ',
+	    "version": "' || v_version || '",
+	    "body": {
+	      "form": {},
+	      "feature": {},
+		  "overlapStatus":"'||v_overlap_status|| '",
+	      "data": {
+	        "mincutId": ' || v_mincut_id ||','||
+			  '"mincutInit":'||v_result_init||','||
+			  '"valve":'||v_result_valve||','||
+			  '"mincutNode":'||v_result_node||','||
+			  '"mincutConnec":'||v_result_connec||','||
+			  '"mincutArc":'||v_result_arc||','||
+			  '"tiled":'||v_tiled|| '
+	      }
+	    }
+	}');
 	return v_response;
 
 	--  Exception handling
