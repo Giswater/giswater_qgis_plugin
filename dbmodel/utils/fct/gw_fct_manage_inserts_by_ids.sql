@@ -12,7 +12,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_manage_inserts_by_ids(
     p_relation_id INTEGER,
     p_relation_type TEXT,
     p_feature_type TEXT,
-    p_ids INTEGER[]
+    p_ids INTEGER[],
+    p_extra_cols JSON DEFAULT NULL
 )
 RETURNS json AS
 $BODY$
@@ -23,16 +24,17 @@ $BODY$
  * * p_relation_type: Relation type - 'campaign', 'lot', 'psector', 'element', 'visit', etc. (mandatory)
  * * p_feature_type: Feature type - 'node', 'arc', 'connec', 'gully', 'link' (mandatory)
  * * p_ids: Array of feature IDs to insert (mandatory)
- * 
+ * * p_extra_cols: JSON object with extra columns to insert (not mandatory)
+ *
  * RETURNS: JSON object with status and inserted count
- * 
+ *
  * EXAMPLE CALLS:
  * * SELECT SCHEMA_NAME.gw_fct_manage_inserts_by_ids(51, 'campaign', 'node', ARRAY[25009, 27022, 27024, 27025, 27026, 27029, 27030]);
  * * SELECT SCHEMA_NAME.gw_fct_manage_inserts_by_ids(101, 'lot', 'connec', ARRAY[5001, 5002]);
  * * SELECT SCHEMA_NAME.gw_fct_manage_inserts_by_ids(201, 'psector', 'node', ARRAY[3001, 3002]);
  * * SELECT SCHEMA_NAME.gw_fct_manage_inserts_by_ids(301, 'element', 'arc', ARRAY[1001, 1002, 1003]);
  * * SELECT SCHEMA_NAME.gw_fct_manage_inserts_by_ids(401, 'visit', 'connec', ARRAY[5001, 5002]);
- * 
+ *
  * TABLE MAPPINGS:
  * * campaign -> cm.om_campaign_x_*
  * * lot -> cm.om_campaign_lot_x_*
@@ -60,6 +62,10 @@ DECLARE
     v_from_clause TEXT;
     v_select_cols TEXT;
     v_insert_cols TEXT;
+    v_extra_cols JSON;
+    v_record_var RECORD;
+    v_conflict_cols TEXT[];
+    v_conflict_clause TEXT;
 
 BEGIN
 
@@ -72,6 +78,10 @@ BEGIN
     v_feature_type := p_feature_type;
     v_ids := p_ids;
     v_schema_name := 'SCHEMA_NAME';
+    -- Get extra columns
+    IF p_extra_cols IS NOT NULL THEN
+        v_extra_cols := p_extra_cols;
+    END IF;
 
     -- Validate inputs
     IF v_relation_id IS NULL THEN
@@ -97,7 +107,7 @@ BEGIN
 
     -- Set table names and column mappings based on feature type and relation type
     v_parent_table := v_schema_name || '.' || v_feature_type;
-    
+
     -- Handle different table naming patterns for each relation type
     IF v_relation_type = 'campaign' THEN
         v_relation_table := 'cm.om_campaign_x_' || v_feature_type;
@@ -112,9 +122,12 @@ BEGIN
     ELSE
         RAISE EXCEPTION 'Unsupported relation type: %', v_relation_type;
     END IF;
-    
+
     v_feature_id_col := v_feature_type || '_id';
     v_relation_id_col := v_relation_type || '_id';
+    v_conflict_cols := ARRAY[]::TEXT[];
+    v_conflict_cols := array_append(v_conflict_cols, v_relation_id_col);
+    v_conflict_cols := array_append(v_conflict_cols, v_feature_id_col);
 
     -- Configure columns based on feature type
     v_cat_id_col := v_feature_type || 'cat_id';
@@ -145,50 +158,58 @@ BEGIN
         ELSE
             v_select_cols := v_select_cols || ', NULL';
         END IF;
-        
+
         -- Add extra columns for arc features
         IF v_feature_type = 'arc' THEN
             v_select_cols := v_select_cols || ', p.node_1, p.node_2';
         END IF;
-        
+
         -- Build INSERT columns for campaign
         v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', status, the_geom, ' || v_cat_id_col || ', ' || COALESCE(v_type_col, 'NULL');
         IF v_feature_type = 'arc' THEN
             v_insert_cols := v_insert_cols || ', node_1, node_2';
         END IF;
-        
+
     ELSIF v_relation_type = 'lot' THEN
         -- Lot tables: relation_id, feature_id, code, status (no the_geom, no cat columns)
         v_select_cols := v_relation_id || ', p.' || v_feature_id_col || ', p.code, 1';
-        
+
         -- Add extra columns for arc features
         IF v_feature_type = 'arc' THEN
             v_select_cols := v_select_cols || ', p.node_1, p.node_2';
         END IF;
-        
+
         -- Build INSERT columns for lot
         v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', code, status';
         IF v_feature_type = 'arc' THEN
             v_insert_cols := v_insert_cols || ', node_1, node_2';
         END IF;
-        
+
     ELSIF v_relation_type = 'psector' THEN
-        -- Psector tables: special logic for connec/gully vs other features
+        -- Psector tables: psector_id, feature_id
+        v_select_cols := v_relation_id || ', p.' || v_feature_id_col;
+        v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col;
+
         IF v_feature_type IN ('connec', 'gully') THEN
-            -- Connec/gully: psector_id, feature_id, state (state=1)
-            v_select_cols := v_relation_id || ', p.' || v_feature_id_col || ', 1';
-            v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', state';
-        ELSE
-            -- Other features: psector_id, feature_id only
-            v_select_cols := v_relation_id || ', p.' || v_feature_id_col;
-            v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col;
+            v_conflict_cols := array_append(v_conflict_cols, 'state');
         END IF;
-        
+
     ELSE
         -- Other relation types (element, visit): just relation_id, feature_id
         v_select_cols := v_relation_id || ', p.' || v_feature_id_col;
         v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col;
     END IF;
+
+    IF v_extra_cols IS NOT NULL THEN
+        -- Add extra columns to insert and select columns
+        FOR v_record_var IN SELECT key, value FROM json_each(v_extra_cols) LOOP
+            v_insert_cols := v_insert_cols || ', ' || v_record_var.key;
+            v_select_cols := v_select_cols || ', ' || v_record_var.value;
+    END LOOP;
+    END IF;
+
+    -- Build conflict columns
+    v_conflict_clause := array_to_string(v_conflict_cols, ', ');
 
     -- Build and execute the insert query
     v_querytext := '
@@ -199,7 +220,7 @@ BEGIN
         SELECT ' || v_select_cols || '
         ' || v_from_clause || '
         WHERE EXISTS (SELECT 1 FROM features WHERE features.id = p.' || v_feature_id_col || ')
-        ON CONFLICT (' || v_relation_id_col || ', ' || v_feature_id_col || ') DO NOTHING';
+        ON CONFLICT (' || v_conflict_clause || ') DO NOTHING';
 
     -- Execute the query and get the count of inserted rows
     RAISE NOTICE 'Executing query for % features', array_length(v_ids, 1);
