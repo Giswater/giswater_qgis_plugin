@@ -174,38 +174,6 @@ BEGIN
         RETURN v_response;
     END IF;
 
-    -- the broken valves
-     IF v_ignore_broken_valves THEN
-        UPDATE temp_pgr_arc a
-        SET cost = 0, reverse_cost = 0
-        WHERE a.graph_delimiter = 'MINSECTOR'
-        AND a.closed = FALSE
-        AND a.to_arc IS NOT NULL
-        AND a.broken = TRUE;
-    END IF;
-
-    -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
-    -- new arcs MINSECTOR AND SECTOR
-    UPDATE temp_pgr_arc a
-    SET cost_mincut = -1, reverse_cost_mincut = -1
-    WHERE graph_delimiter IN ('MINSECTOR', 'SECTOR') ;
-
-    -- check valves
-    IF v_ignore_check_valves THEN
-        v_cost_field = '0';
-        v_reverse_cost_field = '0';
-    ELSE
-        v_cost_field = 'cost';
-        v_reverse_cost_field = 'reverse_cost';
-    END IF;
-
-    v_query_text = 'UPDATE temp_pgr_arc a
-        SET cost_mincut = ' || v_cost_field || ', reverse_cost_mincut = ' || v_reverse_cost_field || '
-        WHERE a.graph_delimiter = ''MINSECTOR''
-        AND a.closed = FALSE 
-        AND a.to_arc IS NOT NULL';
-    EXECUTE v_query_text;
-
     -- Generate the minsectors
     v_query_text :=
     'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
@@ -590,55 +558,53 @@ BEGIN
 			RETURN v_response;
 		END IF;
 
-        --ARCS - keep only the new arcs
+        -- calculate cost/reverse_cost
+        -- closed valves
+        UPDATE temp_pgr_arc_mincut a
+        SET cost = -1, reverse_cost = -1
+        WHERE a.graph_delimiter  = 'MINSECTOR'
+        AND a.closed = TRUE;
+
+        -- checkvalves
+        UPDATE temp_pgr_arc_mincut a
+        SET cost = CASE WHEN v.minsector_id = a.node_2 THEN 1 ELSE -1 END,
+            reverse_cost = CASE WHEN v.minsector_id = a.node_2 THEN -1 ELSE 1 END
+        FROM v_temp_arc v
+        WHERE a.graph_delimiter  = 'MINSECTOR'
+        AND a.closed = FALSE
+        AND a.to_arc IS NOT NULL
+        AND a.broken = TRUE
+        AND a.to_arc[1] = v.arc_id;
         
-        -- arcs that connect nodes with graph_delimiter = 'SECTOR'
-        INSERT INTO temp_pgr_arc_mincut 
-        SELECT * FROM temp_pgr_arc
-        WHERE graph_delimiter = 'SECTOR';
-
-        -- change pgr_node_1 and pgr_node_2 for their minsector value and if not exists (nodes SECTORS) for their original node_id
+        -- water-source (graph_delimiter  = 'SECTOR')
         UPDATE temp_pgr_arc_mincut a
-        SET pgr_node_1 = COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
-        FROM temp_pgr_node n
-        WHERE a.graph_delimiter = 'SECTOR'
-        AND n.graph_delimiter = 'SECTOR'
-        AND n.pgr_node_id = a.pgr_node_1;
+        SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
+            reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
+        FROM temp_pgr_node_mincut n
+        WHERE a.graph_delimiter  = v_graph_delimiter
+        AND n.graph_delimiter  = v_graph_delimiter
+        AND COALESCE (a.node_1, a.node_2) = n.node_id
+        AND a.arc_id <> ALL (n.to_arc);
 
+        -- establishing the borders of the mincut (calculate cost_mincut/reverse_cost_mincut)
         UPDATE temp_pgr_arc_mincut a
-        SET pgr_node_2 =COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
-        FROM temp_pgr_node n
-        WHERE a.graph_delimiter = 'SECTOR'
-        AND n.graph_delimiter = 'SECTOR'
-        AND n.pgr_node_id = a.pgr_node_2;
+        SET cost_mincut = -1, reverse_cost_mincut = -1;
 
-        -- ARCS-VALVE (MINSECTOR)
-        -- only the valves that are minsector borders
-        INSERT INTO temp_pgr_arc_mincut 
-        SELECT * FROM temp_pgr_arc a
-        WHERE graph_delimiter = 'MINSECTOR'
-        AND EXISTS (
-            SELECT 1 FROM temp_pgr_minsector_graph g
-            WHERE g.node_id = COALESCE (a.node_1 , a.node_2)
-        );
+        -- update cost_mincut/reverse_cost_mincut for check valves
+        IF v_ignore_check_valves THEN
+            v_cost_field = '0';
+            v_reverse_cost_field = '0';
+        ELSE
+            v_cost_field = 'cost';
+            v_reverse_cost_field = 'reverse_cost';
+        END IF;
 
-        -- change pgr_node_1 and pgr_node_2 for their minsector value
-        UPDATE temp_pgr_arc_mincut a
-        SET pgr_node_1 = g.minsector_1, pgr_node_2 = g.minsector_2
-        FROM temp_pgr_minsector_graph g
-        WHERE g.node_id = COALESCE (a.node_1 , a.node_2);
-
-        -- NODES
-        -- insert the MINSECTORS as nodes
-        INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
-        SELECT minsector_id, 0, 'MINSECTOR'
-        FROM temp_pgr_minsector m;
-    
-        -- insert the SECTORS nodes that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
-        INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
-        SELECT n.node_id, 0, 'SECTOR'
-        FROM temp_pgr_node n
-        WHERE n.graph_delimiter = 'SECTOR' AND n.node_id is not NULL;
+        v_query_text = 'UPDATE temp_pgr_arc_mincut a
+            SET cost_mincut = ' || v_cost_field || ', reverse_cost_mincut = ' || v_reverse_cost_field || '
+            WHERE a.graph_delimiter = ''MINSECTOR''
+            AND a.closed = FALSE 
+            AND a.to_arc IS NOT NULL';
+        EXECUTE v_query_text;
 
         -- FINISH preparing
 
@@ -668,10 +634,11 @@ BEGIN
 
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
-            SELECT v_record_minsector.minsector_id, n.pgr_node_id
+            SELECT v_record_minsector.minsector_id, n.node_id
             FROM temp_pgr_node_mincut n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
+            --TODO insert proposed valves
         END LOOP;
 
         IF v_commitchanges THEN
