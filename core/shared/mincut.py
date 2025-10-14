@@ -445,7 +445,7 @@ class GwMincut:
             tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
             print(self.states)
 
-        self.current_state = 4  # onPlanning
+        self.current_state = 0
         self.sql_connec = ""
         self.sql_hydro = ""
 
@@ -2551,14 +2551,22 @@ class GwMincut:
                                 'mincut', 'change_valve_status_ep_canvasClicked_custom_mincut_snapping')
 
     def _change_valve_status_execute(self, elem_id):
-        """ Execute function 'gw_fct_setchangevalvestatus' """
+        """ Execute function 'setmincut' """
 
+        use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
+
+        mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
+        forecast_start_predict = self.dlg_mincut.cbx_date_start_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_start_predict.time().toString('HH:mm:ss')
+        forecast_end_predict = self.dlg_mincut.cbx_date_end_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_end_predict.time().toString('HH:mm:ss')
+
         if result_mincut_id != 'null':
-            use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
-            extras = f'"nodeId":{elem_id}, "mincutId":{result_mincut_id}, "usePsectors":"{use_planified}"'
+            extras = (f'"action":"mincutChangeValveStatus", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}", '
+                      f'"dialogMincutType":"{mincut_result_type}", "dialogForecastStart":"{forecast_start_predict}", '
+                      f'"dialogForecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body)
+            result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
