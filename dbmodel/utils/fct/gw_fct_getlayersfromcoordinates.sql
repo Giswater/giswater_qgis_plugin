@@ -224,10 +224,12 @@ BEGIN
                             IF (SELECT feature_class FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
 	                            EXECUTE 'SELECT child_layer FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_valve_tablename;
                                 v_valve_id := v_id;
-                                EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;
-                                IF v_closed_valve IS True THEN
+                                EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''
+								AND EXISTS (SELECT 1 FROM man_valve WHERE node_id = '||v_id||' AND to_arc IS NULL)
+								AND EXISTS (SELECT 1 FROM cat_feature_node WHERE '||v_parenttype||'_type = cat_feature_node.id AND ''MINSECTOR'' = ANY(graph_delimiter))' INTO v_closed_valve;
+                                IF v_closed_valve IS TRUE THEN
                                     v_valve_text := 'Open valve ('||v_id||')';
-                                ELSE
+                                ELSIF v_closed_valve IS FALSE THEN
                                     v_valve_text := 'Close valve ('||v_id||')';
                                 END IF;
 
