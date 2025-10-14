@@ -101,15 +101,6 @@ BEGIN
     ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
     END IF;
 
-
-    IF v_mode = 'MINSECTOR' THEN
-        v_query_text_connectedcomponents := 'SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph';
-        v_query_text_aux := 'WHERE c.node = vtn.minsector_id';
-    ELSE
-        v_query_text_connectedcomponents := 'SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc';
-        v_query_text_aux := 'WHERE c.node = vtn.node_id'
-    END IF;
-
     IF v_expl_id_array IS NOT NULL THEN
         v_query_text_components := 'AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
     ELSIF v_node_id IS NOT NULL THEN
@@ -118,38 +109,69 @@ BEGIN
         v_query_text_components := '';
     END IF;
 
-    v_query_text = '
-        WITH connectedcomponents AS (
-            SELECT * FROM pgr_connectedcomponents($q$
-                '||v_query_text_connectedcomponents||'
-            $q$)
-        ),
-        components AS (
-            SELECT c.component
+    IF v_mode = 'MINSECTOR' THEN
+        v_query_text = '
+            WITH connectedcomponents AS (
+                SELECT * FROM pgr_connectedcomponents($q$
+                    SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph
+                $q$)
+            ),
+            components AS (
+                SELECT c.component
+                FROM connectedcomponents c
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM v_temp_node vtn
+                    WHERE c.node = vtn.minsector_id
+                    '||v_query_text_components||'
+                )
+                GROUP BY c.component
+            )
+            INSERT INTO ' || v_temp_node_table || ' (node_id, graph_delimiter)
+            SELECT c.node, ''MINSECTOR''
             FROM connectedcomponents c
             WHERE EXISTS (
                 SELECT 1
-                FROM v_temp_node vtn
-                '||v_query_text_aux||' 
-                '||v_query_text_components||'
+                FROM components cc
+                WHERE cc.component = c.component
+            );
+        ';
+    ELSE
+        v_query_text = '
+            WITH connectedcomponents AS (
+                SELECT * FROM pgr_connectedcomponents($q$
+                    SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc
+                $q$)
+            ),
+            components AS (
+                SELECT c.component
+                FROM connectedcomponents c
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM v_temp_node vtn
+                    WHERE c.node = vtn.node_id
+                    '||v_query_text_components||'
+                )
+                GROUP BY c.component
             )
-            GROUP BY c.component
-        )
-        INSERT INTO ' || v_temp_node_table || ' (node_id)
-        SELECT c.node
-        FROM connectedcomponents c
-        WHERE EXISTS (
-            SELECT 1
-            FROM components cc
-            WHERE cc.component = c.component
-        );
-    ';
+            INSERT INTO ' || v_temp_node_table || ' (node_id)
+            SELECT c.node
+            FROM connectedcomponents c
+            WHERE EXISTS (
+                SELECT 1
+                FROM components cc
+                WHERE cc.component = c.component
+            );
+        ';
+    END IF;
+
+
 
     EXECUTE v_query_text;
 
     IF v_mode = 'MINSECTOR' THEN
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
-        SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
+        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+        SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ''MINSECTOR''
         FROM minsector_graph a
         JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_1
         JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_2';
@@ -180,7 +202,7 @@ BEGIN
             EXECUTE v_query_text;
         END IF;    
 
-        IF v_project_type = 'WS' THEN
+        IF v_project_type = 'WS' AND v_mode <> 'MINSECTOR' THEN
             -- VALVES
             EXECUTE format('
                 UPDATE %I t
