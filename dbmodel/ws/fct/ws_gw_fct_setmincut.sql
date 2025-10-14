@@ -33,14 +33,6 @@ SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":3, "min
 
 fid = 216
 
-
-mincut states:
-0	Planified
-1	In Progress
-2	Finished
-3	Canceled
-4	On planning
-
 */
 
 DECLARE
@@ -112,7 +104,15 @@ v_mincut_affected_id integer;
 v_mincut_conflict_group_id uuid;
 v_arc_count integer;
 v_overlap_status text := 'Ok'; -- Ok, Conflict
-v_mincut_conflict_class integer := 4; -- Conflict mincut class
+
+v_mincut_plannified_state integer := 0; -- Plannified mincut state
+v_mincut_in_progress_state integer := 1; -- In progress mincut state
+v_mincut_finished_state integer := 2; -- Finished mincut state
+v_mincut_cancel_state integer := 3; -- Cancel mincut state
+v_mincut_on_planning_state integer := 4; -- On planning mincut state
+v_mincut_conflict_state integer := 5; -- Conflict mincut state
+
+v_mincut_network_class integer := 1; -- Network mincut class
 
 v_query_text text;
 v_data json;
@@ -312,7 +312,7 @@ BEGIN
 	ELSIF v_action = 'mincutStart' THEN
 		v_message = '{"text": "Start mincut", "level": 3}';
 		IF v_device = 5 THEN
-			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) IN (0, 4) THEN
+			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) IN (v_mincut_plannified_state, v_mincut_on_planning_state) THEN
 				UPDATE om_mincut SET mincut_state = 1 WHERE id = v_mincut_id;
 			END IF;
 		END IF;
@@ -349,12 +349,12 @@ BEGIN
 			IF v_action = 'mincutAccept' THEN
 				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
 				EXECUTE v_querytext;
-				IF (select mincut_state from om_mincut where id = v_mincut) = 4 THEN
-					UPDATE om_mincut SET mincut_state = 0 WHERE id = v_mincut;
+				IF (select mincut_state from om_mincut where id = v_mincut) = v_mincut_on_planning_state THEN
+					UPDATE om_mincut SET mincut_state = v_mincut_plannified_state WHERE id = v_mincut;
 				END IF;
 			ELSIF v_action = 'endMincut' THEN
 				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) = 1 THEN
-					UPDATE om_mincut SET mincut_state = 2 WHERE id = v_mincut;
+					UPDATE om_mincut SET mincut_state = v_mincut_finished_state WHERE id = v_mincut;
 				END IF;
 			END IF;
 		END IF;
@@ -372,7 +372,7 @@ BEGIN
 		JOIN om_mincut om ON om.id = omc.mincut_id 
 		WHERE omc.id = v_mincut_conflict_group_id
 		AND omc.mincut_id <> v_mincut_id
-		AND om.mincut_class  <> v_mincut_conflict_class
+		AND om.mincut_state  <> v_mincut_conflict_state
 		ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
@@ -381,7 +381,7 @@ BEGIN
 		JOIN om_mincut om ON om.id = omc.mincut_id 
 		WHERE omc.id = v_mincut_conflict_group_id
 		AND omc.mincut_id <> v_mincut_id
-		AND om.mincut_class = v_mincut_conflict_class
+		AND om.mincut_state = v_mincut_conflict_state
 		ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 		IF v_device = 5 THEN
@@ -451,10 +451,28 @@ BEGIN
 	ELSIF v_action = 'mincutCancel' THEN
 		v_message = '{"text": "Mincut to cancel not found.", "level": 2}';
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
-			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = 4 THEN
+			WITH groups_conflict AS (
+				SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id
+			),
+			mincuts_to_delete AS (
+				SELECT omc.mincut_id 
+				FROM om_mincut_conflict omc
+				JOIN om_mincut om ON om.id = omc.mincut_id
+				WHERE om.mincut_state = v_mincut_conflict_state
+				AND omc.id IN (SELECT id FROM groups_conflict)
+			)
+			DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);
+
+			WITH groups_conflict AS (
+				SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id
+			)
+			DELETE FROM om_mincut_conflict
+			WHERE id IN (SELECT id FROM groups_conflict);
+
+			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_on_planning_state THEN
 				DELETE FROM om_mincut WHERE id = v_mincut_id;
 			ELSE
-				UPDATE om_mincut SET mincut_state = 3 WHERE id = v_mincut_id;
+				UPDATE om_mincut SET mincut_state = v_mincut_cancel_state WHERE id = v_mincut_id;
 			END IF;
 			v_message = '{"text": "Mincut cancelled.", "level": 1}';
 		END IF;
@@ -603,7 +621,7 @@ BEGIN
 			SELECT omc.mincut_id 
 			FROM om_mincut_conflict omc
 			JOIN om_mincut om ON om.id = omc.mincut_id
-			WHERE om.mincut_class = 4
+			WHERE om.mincut_state = v_mincut_conflict_state
 			AND omc.id IN (SELECT id FROM groups_conflict)
 		)
 		DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);
@@ -786,8 +804,8 @@ BEGIN
 						tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
 					FROM om_mincut o
 					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
-					WHERE o.mincut_state IN (0, 1)
-						AND o.mincut_class = 1
+					WHERE o.mincut_state IN (v_mincut_plannified_state, v_mincut_in_progress_state)
+						AND o.mincut_class = v_mincut_network_class
 						AND c.virtual = FALSE 
 						AND o.forecast_start <= o.forecast_end 
 						AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(%L, %L, '[]')
@@ -930,8 +948,8 @@ BEGIN
 					
 					FOR v_mincut_conflict_record IN EXECUTE v_query_text LOOP
 						-- create the new mincut virtual: [onPlanning and Conflict]
-						INSERT INTO om_mincut (mincut_state, mincut_class)
-						VALUES (4, 4)
+						INSERT INTO om_mincut (mincut_class, mincut_state)
+						VALUES (v_mincut_network_class, v_mincut_conflict_state)
 						RETURNING id INTO v_mincut_affected_id;
 
 						INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
