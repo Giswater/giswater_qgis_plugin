@@ -202,7 +202,7 @@ BEGIN
 		FROM v_temp_arc a
 		WHERE EXISTS (SELECT 1 FROM om_mincut om WHERE om.id = v_mincut_id AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1))
 		LIMIT 1;
-	END IF
+	END IF;
 	-- TODO Dani - aquesta condició ha d'estar aqui? 
 	IF v_action = 'mincutValveUnaccess' AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
