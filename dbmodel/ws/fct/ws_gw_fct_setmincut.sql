@@ -516,36 +516,68 @@ BEGIN
 		END IF;
 
 		IF v_mincut_version = '6.1' THEN
-			-- TODO: prepare tables for minsector algorithm
+			UPDATE temp_pgr_arc_mincut a
+			SET cost = -1, reverse_cost = -1
+			WHERE a.graph_delimiter  = 'MINSECTOR'
+			AND a.closed = TRUE;
+
+			-- checkvalves
+			UPDATE temp_pgr_arc_mincut a
+			SET cost = CASE WHEN v.minsector_id = a.node_2 THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN v.minsector_id = a.node_2 THEN -1 ELSE 1 END
+			FROM v_temp_arc v
+			WHERE a.graph_delimiter  = 'MINSECTOR'
+			AND a.closed = FALSE
+			AND a.to_arc IS NOT NULL
+			AND a.broken = FALSE
+			AND a.to_arc[1] = v.arc_id;
+			
+			-- water-source (graph_delimiter  = 'SECTOR')
+			UPDATE temp_pgr_arc_mincut a
+			SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
+			FROM temp_pgr_node_mincut n
+			WHERE a.graph_delimiter  = v_graph_delimiter
+			AND n.graph_delimiter  = v_graph_delimiter
+			AND COALESCE (a.node_1, a.node_2) = n.node_id
+			AND a.arc_id <> ALL (n.to_arc);
+		ELSE
+			UPDATE temp_pgr_node_mincut t
+			SET modif = TRUE
+			WHERE graph_delimiter = 'MINSECTOR'
+			OR graph_delimiter = 'SECTOR';
+
+			-- Generate new arcs
+			-- =======================
+			v_data := '{"data":{"mapzone_name":"MINCUT"}}';
+			SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
+
+			IF v_response->>'status' <> 'Accepted' THEN
+				RETURN v_response;
+			END IF;
+			
+			-- the broken valves
+			UPDATE temp_pgr_arc_mincut a
+			SET cost = 0, reverse_cost = 0
+			WHERE a.graph_delimiter = 'MINSECTOR'
+			AND a.closed = FALSE 
+			AND a.to_arc IS NOT NULL
+			AND a.broken = TRUE;
 		END IF;
-
-		UPDATE temp_pgr_node_mincut t
-		SET modif = TRUE
-		WHERE graph_delimiter = 'MINSECTOR'
-		OR graph_delimiter = 'SECTOR';
-
-		-- Generate new arcs
-		-- =======================
-		v_data := '{"data":{"mapzone_name":"MINCUT"}}';
-		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
-
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
-		END IF;
-
-		-- the broken valves
-		UPDATE temp_pgr_arc_mincut a
-		SET cost = 0, reverse_cost = 0
-		WHERE a.graph_delimiter = 'MINSECTOR'
-		AND a.closed = FALSE 
-		AND a.to_arc IS NOT NULL
-		AND a.broken = TRUE;
 
 		-- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
 		-- new arcs MINSECTOR AND SECTOR
 		UPDATE temp_pgr_arc_mincut a
 		SET cost_mincut = -1, reverse_cost_mincut = -1
 		WHERE graph_delimiter IN ('MINSECTOR', 'SECTOR');
+
+		-- the broken open valves
+		UPDATE temp_pgr_arc_mincut a
+		SET cost_mincut = 0, reverse_cost_mincut = 0
+		WHERE a.graph_delimiter = 'MINSECTOR'
+		AND a.closed = FALSE 
+		AND a.to_arc IS NULL
+		AND a.broken = TRUE;
 
 		-- check valves
 		IF v_ignore_check_valves THEN
