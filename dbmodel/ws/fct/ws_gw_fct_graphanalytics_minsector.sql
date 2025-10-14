@@ -593,19 +593,19 @@ BEGIN
         --ARCS - keep only the new arcs
         
         -- arcs that connect nodes with graph_delimiter = 'SECTOR'
-        INSERT INTO temp_pgr_arc_minsector 
+        INSERT INTO temp_pgr_arc_mincut 
         SELECT * FROM temp_pgr_arc
         WHERE graph_delimiter = 'SECTOR';
 
         -- change pgr_node_1 and pgr_node_2 for their minsector value and if not exists (nodes SECTORS) for their original node_id
-        UPDATE temp_pgr_arc_minsector a
+        UPDATE temp_pgr_arc_mincut a
         SET pgr_node_1 = COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
         FROM temp_pgr_node n
         WHERE a.graph_delimiter = 'SECTOR'
         AND n.graph_delimiter = 'SECTOR'
         AND n.pgr_node_id = a.pgr_node_1;
 
-        UPDATE temp_pgr_arc_minsector a
+        UPDATE temp_pgr_arc_mincut a
         SET pgr_node_2 =COALESCE( NULLIF(n.mapzone_id,0), n.node_id)
         FROM temp_pgr_node n
         WHERE a.graph_delimiter = 'SECTOR'
@@ -614,7 +614,7 @@ BEGIN
 
         -- ARCS-VALVE (MINSECTOR)
         -- only the valves that are minsector borders
-        INSERT INTO temp_pgr_arc_minsector 
+        INSERT INTO temp_pgr_arc_mincut 
         SELECT * FROM temp_pgr_arc a
         WHERE graph_delimiter = 'MINSECTOR'
         AND EXISTS (
@@ -623,19 +623,19 @@ BEGIN
         );
 
         -- change pgr_node_1 and pgr_node_2 for their minsector value
-        UPDATE temp_pgr_arc_minsector a
+        UPDATE temp_pgr_arc_mincut a
         SET pgr_node_1 = g.minsector_1, pgr_node_2 = g.minsector_2
         FROM temp_pgr_minsector_graph g
         WHERE g.node_id = COALESCE (a.node_1 , a.node_2);
 
         -- NODES
         -- insert the MINSECTORS as nodes
-        INSERT INTO temp_pgr_node_minsector (pgr_node_id, mapzone_id, graph_delimiter)
+        INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
         SELECT minsector_id, 0, 'MINSECTOR'
         FROM temp_pgr_minsector m;
     
         -- insert the SECTORS nodes that have mapzone_id = 0 (node_id is not NULL); they don't exist in the table temp_pgr_minsector
-        INSERT INTO temp_pgr_node_minsector (pgr_node_id, mapzone_id, graph_delimiter)
+        INSERT INTO temp_pgr_node_mincut (pgr_node_id, mapzone_id, graph_delimiter)
         SELECT n.node_id, 0, 'SECTOR'
         FROM temp_pgr_node n
         WHERE n.graph_delimiter = 'SECTOR' AND n.node_id is not NULL;
@@ -647,16 +647,16 @@ BEGIN
             SELECT minsector_id FROM temp_pgr_minsector
         ';
 
-        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_minsector;
+        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_mincut;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
             v_pgr_root_vids := ARRAY[v_record_minsector.minsector_id];
 
-            UPDATE temp_pgr_arc_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_node_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_arc_minsector SET proposed = FALSE WHERE proposed;
+            UPDATE temp_pgr_arc_mincut SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_node_mincut SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_arc_mincut SET proposed = FALSE WHERE proposed;
 
-            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s", "mode":"MINSECTOR"}}',
+            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s"}}',
             v_pgr_distance, array_to_string(v_pgr_root_vids, ','), v_ignore_check_valves);
 
             RAISE NOTICE 'v_data: %', v_data;
@@ -669,7 +669,7 @@ BEGIN
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT v_record_minsector.minsector_id, n.pgr_node_id
-            FROM temp_pgr_node_minsector n
+            FROM temp_pgr_node_mincut n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
         END LOOP;

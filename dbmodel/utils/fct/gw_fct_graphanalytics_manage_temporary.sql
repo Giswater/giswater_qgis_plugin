@@ -135,15 +135,13 @@ BEGIN
             ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS broken BOOL;
 
             -- for specific functions
-            IF v_fct_name = 'MINCUT' OR v_fct_name = 'MINSECTOR' THEN
+            IF v_fct_name = 'MINCUT' THEN
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_mincut (LIKE temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_mincut (LIKE temp_pgr_arc INCLUDING ALL);
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INT DEFAULT 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INT DEFAULT 1;
-
-                -- used for MASSIVE MINCUT or mincut v6.1 with minsector algorithm
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);

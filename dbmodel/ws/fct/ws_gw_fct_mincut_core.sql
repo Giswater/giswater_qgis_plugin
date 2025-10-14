@@ -83,7 +83,6 @@ v_result_arc jsonb;
 
 
 -- MINCUT VARIABLES
-v_mapzone_name text ='MINSECTOR';
 v_mincut_id INTEGER;
 v_water_source int[];
 
@@ -94,7 +93,6 @@ v_query_text TEXT;
 v_pgr_distance INTEGER;
 v_pgr_root_vids int[];
 v_ignore_check_valves BOOLEAN;
-v_mode varchar;
 
 -- temporary tables for core
 v_temp_arc_table regclass;
@@ -124,15 +122,9 @@ BEGIN
 	v_pgr_distance = p_data->'data'->>'pgrDistance';
 	v_pgr_root_vids = ARRAY(SELECT json_array_elements_text((p_data->'data'->>'pgrRootVids')::json))::int[];
 	v_ignore_check_valves = p_data->'data'->>'ignoreCheckValvesMincut';
-    v_mode = p_data->'data'->>'mode';
 
-    IF v_mode = 'MINSECTOR' THEN
-        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
-        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
-    ELSE
-        v_temp_arc_table = 'temp_pgr_arc'::regclass;
-        v_temp_node_table = 'temp_pgr_node'::regclass;
-    END IF;
+    v_temp_arc_table = 'temp_pgr_arc_mincut'::regclass;
+    v_temp_node_table = 'temp_pgr_node_mincut'::regclass;
 
     -- STEP 1 flood with INVERTED cost_mincut/reverse_cost_mincut for finding the borders
     -- the flood is reversed; the one-way valves that don't stop the water will stay inside the minsector, they cannot be borders because they cannot be closed
