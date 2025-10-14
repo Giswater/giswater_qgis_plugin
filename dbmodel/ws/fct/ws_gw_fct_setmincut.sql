@@ -131,9 +131,9 @@ v_error_context text;
 
 v_row_count integer;
 
-v_init_mincut boolean;
-v_prepare_mincut boolean;
-v_core_mincut boolean;
+v_init_mincut boolean := FALSE;
+v_prepare_mincut boolean := FALSE;
+v_core_mincut boolean := FALSE;
 
 BEGIN
 
@@ -206,7 +206,7 @@ BEGIN
 		LIMIT 1;
 	END IF;
 	-- TODO Dani - aquesta condició ha d'estar aqui? 
-	IF v_action = 'mincutValveUnaccess' AND v_valve_node_id IS NULL THEN
+	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
 	END IF;
 
@@ -263,8 +263,164 @@ BEGIN
 			v_prepare_mincut := TRUE;
 		END IF;
 		v_core_mincut := TRUE;
+	ELSIF v_action = 'mincutStart' THEN
+		v_message = '{"text": "Start mincut", "level": 3}';
+		IF v_device = 5 THEN
+			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) IN (0, 4) THEN
+				UPDATE om_mincut SET mincut_state = 1 WHERE id = v_mincut_id;
+			END IF;
+		END IF;
+
+		IF (SELECT json_extract_path_text(value::json, 'redoOnStart','status')::boolean FROM config_param_system WHERE parameter='om_mincut_settings') is true THEN
+			--reexecuting mincut on clicking start
+			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
+
+			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
+				IF (SELECT count(*) FROM temp_pgr_arc WHERE arc_id = v_arc_id) = 0 THEN
+					v_init_mincut := TRUE;
+					v_prepare_mincut := FALSE;
+				ELSE
+					v_init_mincut := FALSE;
+					v_prepare_mincut := TRUE;
+				END IF;
+				v_core_mincut := TRUE;
+			END IF;
+		ELSE
+			-- do nothing
+			IF v_device = 5 THEN
+				RETURN gw_fct_getmincut(p_data);
+			ELSE
+				v_init_mincut := FALSE;
+				v_prepare_mincut := FALSE;
+				v_core_mincut := FALSE;
+			END IF;
+		END IF;
+	ELSIF v_action IN ('mincutAccept', 'endMincut') THEN
+
+		-- call setfields
+		v_message = '{"text": "Mincut accepted.", "level": 1}';
+		IF v_device = 5 THEN
+			IF v_action = 'mincutAccept' THEN
+				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
+				EXECUTE v_querytext;
+				IF (select mincut_state from om_mincut where id = v_mincut) = 4 THEN
+					UPDATE om_mincut SET mincut_state = 0 WHERE id = v_mincut;
+				END IF;
+			ELSIF v_action = 'endMincut' THEN
+				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) = 1 THEN
+					UPDATE om_mincut SET mincut_state = 2 WHERE id = v_mincut;
+				END IF;
+			END IF;
+		END IF;
+
+		-- Manage the selector
+		DELETE FROM selector_mincut_result WHERE cur_user = v_cur_user;
+		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
+		VALUES (v_mincut_id, current_user, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;
+
+		SELECT id INTO v_mincut_conflict_group_id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id;
+
+		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
+		SELECT omc.mincut_id, current_user, 'conflict' 
+		FROM om_mincut_conflict omc
+		JOIN om_mincut om ON om.id = omc.mincut_id 
+		WHERE omc.id = v_mincut_conflict_group_id
+		AND omc.mincut_id <> v_mincut_id
+		AND om.mincut_class  <> v_mincut_conflict_class
+		ON CONFLICT (result_id, cur_user) DO NOTHING;
+
+		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
+		SELECT omc.mincut_id, current_user, 'affected' 
+		FROM om_mincut_conflict omc
+		JOIN om_mincut om ON om.id = omc.mincut_id 
+		WHERE omc.id = v_mincut_conflict_group_id
+		AND omc.mincut_id <> v_mincut_id
+		AND om.mincut_class = v_mincut_conflict_class
+		ON CONFLICT (result_id, cur_user) DO NOTHING;
+
+		IF v_device = 5 THEN
+			SELECT gw_fct_getmincut(p_data) INTO v_response;
+
+			-- Set the info to the info from v_result body data info
+			v_response = jsonb_set(v_response::jsonb, '{body,data,info}', v_result::jsonb->'body'->'data'->'info');
+			RETURN v_response;
+		END IF;
+
+		SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_id;
+
+		IF v_mincut_conflict_group_id IS NOT NULL THEN
+		-- there are conflicts
+			v_overlap_status = 'Conflict';
+			--TODO: revise this counts for maybe add the affected zone?
+			-- creating log
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'WARNING-216: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats (with additional affectations)');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '-----------------------------------------------');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincut_record.output->>'arcs')::json->>'number'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincut_record.output->>'arcs')::json->>'length', ' mts'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincut_record.output->>'arcs')::json->>'volume', ' m3'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+		ELSE
+		-- there are no conflicts
+			v_overlap_status = 'Ok';
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '--------------');
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincut_record.output->>'arcs')::json->>'number'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincut_record.output->>'arcs')::json->>'length', ' mts'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincut_record.output->>'arcs')::json->>'volume', ' m3'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+		END IF;
+
+		-- get results
+		-- info
+		v_result = null;
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
+		v_result := COALESCE(v_result, '{}');
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- geometry (the boundary of mincut using arcs and valves)
+		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincut_id||
+		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||v_mincut_id||') a'
+		INTO v_geometry;
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}');
+		v_geometry := COALESCE(v_geometry, '{}');
+
+		-- return
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}'||
+			',"overlapStatus":"'||v_overlap_status||'"'||
+			',"data":{ "info":'||v_result_info||','||
+				  '"geometry":"'||v_geometry||'"'||
+			'}}'||
+			'}')::json, 2244,null,null,null);
+	ELSIF v_action = 'mincutCancel' THEN
+		v_message = '{"text": "Mincut to cancel not found.", "level": 2}';
+		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
+			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = 4 THEN
+				DELETE FROM om_mincut WHERE id = v_mincut_id;
+			ELSE
+				UPDATE om_mincut SET mincut_state = 3 WHERE id = v_mincut_id;
+			END IF;
+			v_message = '{"text": "Mincut cancelled.", "level": 1}';
+		END IF;
+	ELSIF v_action = 'mincutDelete' THEN
+		v_message = '{"text": "Mincut to delete not found.", "level": 2}';
+		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
+			DELETE FROM om_mincut WHERE id = v_mincut_id;
+			v_message = '{"text": "Mincut deleted.", "level": 1}';
+		END IF;
 	END IF;
 
+	-- CORE MINCUT CODE
 	IF v_init_mincut THEN
 		IF v_mincut_version = '6.1' THEN
 			v_seed_node_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
@@ -908,159 +1064,89 @@ BEGIN
 		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
 		VALUES (v_mincut_id, current_user, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;
 	END IF;
+	-- END CORE MINCUT CODE
 
 
+	-- build geojson
+	IF v_device = 5 THEN
+		--v_om_mincut
+		SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(anl_the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'anl_the_geom' - 'srid',
+	    'crs',concat('EPSG:',srid)
+	  	) AS feature
+	  	FROM (SELECT id, ST_AsText(anl_the_geom) as anl_the_geom, ST_SRID(anl_the_geom) as srid
+	  	FROM  v_om_mincut) row) features;
 
-
-
-
-	
-
-	-- TODO: in python code we need to call manage_temporary function to drop tables when user close the dialog.
-	-- TODO: if new mincut is onPlanning and user close the dialog with the icon X, we need to delete the mincut from the om_mincut table.
-	-- and the conflicts if exists.
-
-
-
-
-
-
-
-	-- TODO: reorganize this actions
-	IF v_action IN ('mincutAccept', 'endMincut') THEN
-
-		-- call setfields
-		v_message = '{"text": "Mincut accepted.", "level": 1}';
-		IF v_device = 5 THEN
-			IF v_action = 'mincutAccept' THEN
-				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
-				EXECUTE v_querytext;
-				IF (select mincut_state from om_mincut where id = v_mincut) = 4 THEN
-					UPDATE om_mincut SET mincut_state = 0 WHERE id = v_mincut;
-				END IF;
-			ELSIF v_action = 'endMincut' THEN
-				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) = 1 THEN
-					UPDATE om_mincut SET mincut_state = 2 WHERE id = v_mincut;
-				END IF;
-			END IF;
-		END IF;
-
-		-- Manage the selector
-		DELETE FROM selector_mincut_result WHERE cur_user = v_cur_user;
-		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-		VALUES (v_mincut_id, current_user, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;
-
-		SELECT id INTO v_mincut_conflict_group_id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id;
-
-		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-		SELECT omc.mincut_id, current_user, 'conflict' 
-		FROM om_mincut_conflict omc
-		JOIN om_mincut om ON om.id = omc.mincut_id 
-		WHERE omc.id = v_mincut_conflict_group_id
-		AND omc.mincut_id <> v_mincut_id
-		AND om.mincut_class  <> v_mincut_conflict_class
-		ON CONFLICT (result_id, cur_user) DO NOTHING;
-
-		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-		SELECT omc.mincut_id, current_user, 'affected' 
-		FROM om_mincut_conflict omc
-		JOIN om_mincut om ON om.id = omc.mincut_id 
-		WHERE omc.id = v_mincut_conflict_group_id
-		AND omc.mincut_id <> v_mincut_id
-		AND om.mincut_class = v_mincut_conflict_class
-		ON CONFLICT (result_id, cur_user) DO NOTHING;
-
-
-		IF v_device = 5 THEN
-			SELECT gw_fct_getmincut(p_data) INTO v_response;
-
-			-- Set the info to the info from v_result body data info
-			v_response = jsonb_set(v_response::jsonb, '{body,data,info}', v_result::jsonb->'body'->'data'->'info');
-			raise notice 'v_response: %', v_response;
-			RETURN v_response;
-		END IF;
-
-		SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_id;
-
-		IF v_mincut_conflict_group_id IS NOT NULL THEN
-		-- there are conflicts
-			v_overlap_status = 'Conflict';
-			--TODO: revise this counts for maybe add the affected zone?
-			-- creating log
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'WARNING-216: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats (with additional affectations)');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '-----------------------------------------------');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincut_record.output->>'arcs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincut_record.output->>'arcs')::json->>'length', ' mts'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincut_record.output->>'arcs')::json->>'volume', ' m3'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
-		ELSE
-		-- there are no conflicts
-			v_overlap_status = 'Ok';
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '--------------');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincut_record.output->>'arcs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincut_record.output->>'arcs')::json->>'length', ' mts'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincut_record.output->>'arcs')::json->>'volume', ' m3'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
-		END IF;
-
-		-- get results
-		-- info
-		v_result = null;
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_init = concat('{"geometryType":"Point", "features":',v_result, '}');
 
-		-- geometry (the boundary of mincut using arcs and valves)
-		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincut_id||
-		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||v_mincut_id||') a'
-		INTO v_geometry;
+		--v_om_mincut_valve
+		SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom' - 'srid',
+	    'crs',concat('EPSG:',srid)
+	  	) AS feature
+	  	FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+	  	FROM  v_om_mincut_valve) row) features;
 
-		-- Control nulls
-		v_result_info := COALESCE(v_result_info, '{}');
-		v_geometry := COALESCE(v_geometry, '{}');
+		v_result := COALESCE(v_result, '{}');
+		v_result_valve = concat('{"geometryType":"Point", "features":',v_result, '}');
 
-		-- return
-		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-			',"body":{"form":{}'||
-			',"overlapStatus":"'||v_overlap_status||'"'||
-			',"data":{ "info":'||v_result_info||','||
-				  '"geometry":"'||v_geometry||'"'||
-			'}}'||
-			'}')::json, 2244,null,null,null);
+		--v_om_mincut_node
+		SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom' - 'srid',
+	    'crs',concat('EPSG:',srid)
+	  	) AS feature
+	  	FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+	  	FROM  v_om_mincut_node) row) features;
 
-	ELSIF v_action = 'mincutCancel' THEN
-		v_message = '{"text": "Mincut to cancel not found.", "level": 2}';
-		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
-			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = 4 THEN
-				DELETE FROM om_mincut WHERE id = v_mincut_id;
-			ELSE
-				UPDATE om_mincut SET mincut_state = 3 WHERE id = v_mincut_id;
-			END IF;
-			v_message = '{"text": "Mincut cancelled.", "level": 1}';
-		END IF;
+		v_result := COALESCE(v_result, '{}');
+		v_result_node = concat('{"geometryType":"Point", "features":',v_result, '}');
 
-	ELSIF v_action = 'mincutDelete' THEN
-		v_message = '{"text": "Mincut to delete not found.", "level": 2}';
-		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
-			DELETE FROM om_mincut WHERE id = v_mincut_id;
-			v_message = '{"text": "Mincut deleted.", "level": 1}';
-		END IF;
+		--v_om_mincut_connec
+		SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom' - 'srid',
+	    'crs',concat('EPSG:',srid)
+	  	) AS feature
+	  	FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+	  	FROM  v_om_mincut_connec) row) features;
+
+		v_result := COALESCE(v_result, '{}');
+		v_result_connec = concat('{"geometryType":"Point", "features":',v_result, '}');
+
+		--v_om_mincut_arc
+		SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom' - 'srid',
+	    'crs',concat('EPSG:',srid)
+	  	) AS feature
+	  	FROM (SELECT id, arc_id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+	  	FROM  v_om_mincut_arc) row) features;
+
+		v_result := COALESCE(v_result, '{}');
+		v_result_arc = concat('{"geometryType":"LineString", "features":',v_result, '}');
 	END IF;
 
-
-	-- TODO: manage web device
-
+	-- manage null values
 	v_message = COALESCE(v_message, '{}');
-
 	v_result_init := COALESCE(v_result_init, '{}');
 	v_result_valve := COALESCE(v_result_valve, '{}');
 	v_result_node := COALESCE(v_result_node, '{}');
@@ -1068,38 +1154,27 @@ BEGIN
 	v_result_arc := COALESCE(v_result_arc, '{}');
 	v_tiled := COALESCE(v_tiled, 'false');
 
-	v_response = ('{
-	    "status": "Accepted",
-        "message": ' || v_message || ',
-	    "version": "' || v_version || '",
-	    "body": {
-	      "form": {},
-	      "feature": {},
-		  "overlapStatus":"'||v_overlap_status|| '",
-	      "data": {
-	        "mincutId": ' || v_mincut_id ||','||
-			  '"mincutInit":'||v_result_init||','||
-			  '"valve":'||v_result_valve||','||
-			  '"mincutNode":'||v_result_node||','||
-			  '"mincutConnec":'||v_result_connec||','||
-			  '"mincutArc":'||v_result_arc||','||
-			  '"tiled":'||v_tiled|| '
-	      }
-	    }
-	}');
+	v_response := jsonb_build_object(
+		'status', 'Accepted',
+		'message', v_message,
+		'version', v_version,
+		'body', jsonb_build_object(
+			'form', {},
+			'feature', {},
+			'overlapStatus', v_overlap_status,
+			'data', jsonb_build_object(
+				'mincutId', v_mincut_id,
+				'mincutInit', v_result_init,
+				'valve', v_result_valve,
+				'mincutNode', v_result_node,
+				'mincutConnec', v_result_connec,
+				'mincutArc', v_result_arc,
+				'tiled', v_tiled
+			)
+		)
+	);
 
-	RAISE NOTICE 'v_message: %', v_message;
-	RAISE NOTICE 'v_version: %', v_version;
-	RAISE NOTICE 'v_mincut_id: %', v_mincut_id;
-	RAISE NOTICE 'v_result_init: %', v_result_init;
-	RAISE NOTICE 'v_result_valve: %', v_result_valve;
-	RAISE NOTICE 'v_result_node: %', v_result_node;
-	RAISE NOTICE 'v_result_connec: %', v_result_connec;
-	RAISE NOTICE 'v_result_arc: %', v_result_arc;
-	RAISE NOTICE 'v_tiled: %', v_tiled;
-	RAISE NOTICE 'v_response: %', v_response;
-
-	return v_response::json;
+	return v_response;
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
