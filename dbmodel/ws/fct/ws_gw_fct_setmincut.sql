@@ -409,6 +409,15 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
 			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
 			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+
+			--todo: add conflict and affected mincuts
+			-- SELECT array_agg(result_id) INTO xxxxxxxxx FROM selector_mincut_result 
+			-- WHERE cur_user = CURRENT_USER 
+			-- 	AND result_type = 'conflict';
+			-- INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Mincut conflicts: ', xxxxxxxxx));
+
+
+
 		ELSE
 		-- there are no conflicts
 			v_overlap_status = 'Ok';
@@ -1038,6 +1047,91 @@ BEGIN
 							AND rhxn.node_id = omn.node_id
 							AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
+
+						-- fill connnec & hydrometer details on om_mincut.output
+						-- count arcs
+						SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
+						FROM om_mincut_arc 
+						JOIN arc USING (arc_id) 
+						WHERE result_id = v_mincut_affected_id 
+						GROUP BY result_id;
+
+						SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
+						FROM om_mincut_arc 
+						JOIN arc USING (arc_id) 
+						JOIN cat_arc ON arccat_id = cat_arc.id
+						WHERE result_id = v_mincut_affected_id;
+
+						-- count valves
+						SELECT count(node_id) INTO v_num_valve_proposed 
+						FROM om_mincut_valve 
+						WHERE result_id = v_mincut_affected_id 
+							AND proposed IS TRUE;
+
+						SELECT count(node_id) INTO v_num_valve_closed 
+						FROM om_mincut_valve 
+						WHERE result_id = v_mincut_affected_id 
+							AND closed IS TRUE;
+
+						-- count connec
+						SELECT count(connec_id) INTO v_num_connecs 
+						FROM om_mincut_connec 
+						WHERE result_id = v_mincut_affected_id;
+
+						-- count hydrometers
+						SELECT count(*) INTO v_num_hydrometer 
+						FROM om_mincut_hydrometer 
+						WHERE result_id = v_mincut_affected_id;
+
+						-- priority hydrometers
+						v_priority := (
+							SELECT array_to_json(array_agg(b))
+							FROM (
+								SELECT 
+									json_build_object(
+										'category', hc.observ,
+										'number', count(rtc_hydrometer_x_connec.hydrometer_id)
+									) AS b
+								FROM rtc_hydrometer_x_connec
+								JOIN om_mincut_connec 
+									ON rtc_hydrometer_x_connec.connec_id = om_mincut_connec.connec_id
+								JOIN v_rtc_hydrometer 
+									ON v_rtc_hydrometer.hydrometer_id = rtc_hydrometer_x_connec.hydrometer_id
+								LEFT JOIN ext_hydrometer_category hc 
+									ON hc.id::text = v_rtc_hydrometer.category_id::text
+								JOIN connec 
+									ON connec.connec_id = v_rtc_hydrometer.feature_id
+								WHERE result_id = v_mincut_affected_id
+								GROUP BY hc.observ
+								ORDER BY hc.observ
+							) a
+						);
+
+						IF v_priority IS NULL THEN v_priority='{}'; END IF;
+						v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
+
+
+						v_mincut_details = json_build_object(
+							'arcs', json_build_object(
+								'number', v_num_arcs,
+								'length', v_length,
+								'volume', v_volume
+							),
+							'connecs', json_build_object(
+								'number', v_num_connecs,
+								'hydrometers', json_build_object(
+									'total', v_num_hydrometer,
+									'classified', v_priority
+								)
+							),
+							'valve', json_build_object(
+								'proposed', v_num_valve_proposed,
+								'closed', v_num_valve_closed
+							)
+						);
+
+						--update output results
+						UPDATE om_mincut SET output = v_mincut_details WHERE id = v_mincut_affected_id;
 
 
 						v_mincut_conflict_group_id := gen_random_uuid();
