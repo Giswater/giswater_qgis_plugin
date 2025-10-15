@@ -596,8 +596,8 @@ BEGIN
         SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
             reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
         FROM temp_pgr_node_minsector n
-        WHERE a.graph_delimiter  = v_graph_delimiter
-        AND n.graph_delimiter  = v_graph_delimiter
+        WHERE a.graph_delimiter  = 'SECTOR'
+        AND n.graph_delimiter  = 'SECTOR'
         AND COALESCE (a.node_1, a.node_2) = n.node_id
         AND a.arc_id <> ALL (n.to_arc);
 
@@ -633,19 +633,19 @@ BEGIN
 
         -- CORE MASSIVE MINCUT
         v_query_text = '
-            SELECT minsector_id FROM temp_pgr_minsector
+            SELECT node_id, pgr_node_id FROM temp_pgr_node_minsector WHERE graph_delimiter = ''MINSECTOR''
         ';
 
         SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_minsector;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
-            v_pgr_root_vids := ARRAY[v_record_minsector.minsector_id];
+            v_pgr_root_vids := ARRAY[v_record_minsector.pgr_node_id];
 
             UPDATE temp_pgr_arc_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_node_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_arc_minsector SET proposed = FALSE WHERE proposed;
 
-            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s"}}',
+            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s", "mode":"MINSECTOR"}}',
             v_pgr_distance, array_to_string(v_pgr_root_vids, ','), v_ignore_check_valves);
 
             RAISE NOTICE 'v_data: %', v_data;
@@ -657,7 +657,7 @@ BEGIN
 
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
-            SELECT v_record_minsector.minsector_id, n.node_id
+            SELECT v_record_minsector.node_id, n.node_id
             FROM temp_pgr_node_minsector n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;

@@ -78,8 +78,6 @@ v_version text;
 v_days integer;
 v_querytext text;
 v_pgr_distance integer;
-v_cost_field text;
-v_reverse_cost_field text;
 v_pgr_root_vids int[];
 
 -- mincut details
@@ -636,18 +634,22 @@ BEGIN
 
 		-- check valves
 		IF v_ignore_check_valves THEN
-			v_cost_field = '0';
-			v_reverse_cost_field = '0';
+			EXECUTE format('
+				UPDATE %I a
+				SET cost_mincut = 0, reverse_cost_mincut = 0
+				WHERE a.graph_delimiter = ''MINSECTOR''
+				AND a.closed = FALSE 
+				AND a.to_arc IS NOT NULL
+			', v_temp_arc_table);
 		ELSE 
-			v_cost_field = 'cost';
-			v_reverse_cost_field = 'reverse_cost';
+			EXECUTE format('
+				UPDATE %I a
+				SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
+				WHERE a.graph_delimiter = ''MINSECTOR''
+				AND a.closed = FALSE 
+				AND a.to_arc IS NOT NULL
+			', v_temp_arc_table);
 		END IF;
-
-		EXECUTE format('UPDATE %I a
-			SET cost_mincut = %L, reverse_cost_mincut = %L
-			WHERE a.graph_delimiter = ''MINSECTOR''
-			AND a.closed = FALSE 
-			AND a.to_arc IS NOT NULL', v_temp_arc_table, v_cost_field, v_reverse_cost_field);
 	END IF;
 
 	IF v_prepare_mincut THEN

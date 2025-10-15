@@ -170,14 +170,15 @@ BEGIN
 
     IF v_mode = 'MINSECTOR' THEN
         -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
-        INSERT INTO v_temp_node_table (node_id, graph_delimiter)
-        SELECT n.node_id, v_graph_delimiter
+        EXECUTE format('
+        INSERT INTO %I (node_id, graph_delimiter)
+        SELECT n.node_id, %L
         FROM v_temp_node n 
         JOIN v_temp_arc a ON COALESCE(a.node_1, a.node_2) = n.node_id
-        WHERE v_graph_delimiter = ANY(n.graph_delimiter)
-        AND EXISTS (SELECT 1 FROM v_temp_node_table vtn WHERE a.minsector_id = vtn.node_id);
+        WHERE %L = ANY(n.graph_delimiter)
+        AND EXISTS (SELECT 1 FROM %I vtn WHERE a.minsector_id = vtn.node_id);
+        ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
     ELSE
-        --TODO apareix v_graph_delimiter; no s'ha de posar amb %?
         -- MAPZONE graph_delimiter
         EXECUTE format('
             UPDATE %I t
@@ -218,22 +219,24 @@ BEGIN
     IF v_mode = 'MINSECTOR' THEN
         -- add arcs that connect the nodes 'SECTOR' with the nodes 'MINSECTOR'
         -- arcs where node_1 is 'SECTOR'
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
-        SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_graph_delimiter || '
-        FROM v_temp_arc a
-        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.node_1
-        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_id
-        WHERE n1.graph_delimiter = ' || v_graph_delimiter;
-        EXECUTE v_query_text;
+        EXECUTE format('
+            INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+            SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
+            FROM v_temp_arc a
+            JOIN %I n1 ON n1.node_id = a.node_1
+            JOIN %I n2 ON n2.node_id = a.minsector_id
+            WHERE n1.graph_delimiter = %L;
+        ', v_temp_arc_table, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
 
         -- arcs where node_2 is 'SECTOR'
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
-        SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || ', ' || v_graph_delimiter || '
-        FROM v_temp_arc a
-        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_id
-        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.node_2
-        WHERE n2.graph_delimiter = ' || v_graph_delimiter;
-        EXECUTE v_query_text;
+        EXECUTE format('
+            INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+            SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
+            FROM v_temp_arc a
+            JOIN %I n1 ON n1.node_id = a.minsector_id
+            JOIN %I n2 ON n2.node_id = a.node_2
+            WHERE n2.graph_delimiter = %L;
+        ', v_temp_arc_table, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
     END IF;
 
     IF v_mapzone_name ILIKE '%TYPE%' THEN
