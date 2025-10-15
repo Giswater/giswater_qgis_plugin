@@ -39,10 +39,8 @@ DECLARE
     v_target TEXT;
     v_count INTEGER;
     
-    v_seqname TEXT;
     v_temp_arc_table regclass;
     v_temp_node_table regclass;
-
 
 BEGIN
 
@@ -298,13 +296,8 @@ BEGIN
     LOOP
         EXECUTE format('
             INSERT INTO %I (old_node_id, modif, graph_delimiter, to_arc) 
-            VALUES (%L, FALSE, %L, %L);
-        ', v_temp_node_table, v_record.node_id, v_record.n_graph_delimiter, v_record.to_arc);
-
-        SELECT pg_get_serial_sequence(format('pg_temp.%I', v_temp_node_table), 'pgr_node_id')
-        INTO v_seqname;
-
-        EXECUTE format('SELECT last_value FROM %s', v_seqname)
+            VALUES (%L, FALSE, %L, %L) RETURNING pgr_node_id;
+        ', v_temp_node_table, v_record.node_id, v_record.n_graph_delimiter, v_record.to_arc)
         INTO v_pgr_node_id;
 
         EXECUTE format('
@@ -331,13 +324,8 @@ BEGIN
     LOOP
         EXECUTE format('
             INSERT INTO %I (old_node_id, modif, graph_delimiter, to_arc) 
-            VALUES (%L, FALSE, %L, %L);
-        ', v_temp_node_table, v_record.node_id, v_record.n_graph_delimiter, v_record.to_arc);
-
-        SELECT pg_get_serial_sequence(format('pg_temp.%I', v_temp_node_table), 'pgr_node_id')
-        INTO v_seqname;
-
-        EXECUTE format('SELECT last_value FROM %s', v_seqname)
+            VALUES (%L, FALSE, %L, %L) RETURNING pgr_node_id;
+        ', v_temp_node_table, v_record.node_id, v_record.n_graph_delimiter, v_record.to_arc)
         INTO v_pgr_node_id;
 
         EXECUTE format('
