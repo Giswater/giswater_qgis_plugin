@@ -78,6 +78,7 @@ v_epa_table text;
 v_state_type integer;
 v_action_mode integer;
 v_plan_mode boolean;
+v_asset_id text;
 
 rec_addfields record;
 v_sql text;
@@ -115,6 +116,7 @@ BEGIN
 	v_arccat_id = ((p_data ->>'data')::json->>'arccat_id')::text;
 	v_arc_type = ((p_data ->>'data')::json->>'arc_type')::text;
 	v_plan_mode = ((p_data ->>'data')::json->>'plan_mode')::boolean;
+	v_asset_id = ((p_data ->>'data')::json->>'asset_id')::text;
 
 	-- Get state_type from default value if this isn't on input json
 	IF v_state_type IS NULL THEN
@@ -254,6 +256,7 @@ BEGIN
 				v_new_record.node_1 := (SELECT node_id FROM ve_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), ve_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM ve_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), ve_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
+				v_new_record.asset_id = v_asset_id;
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3376", "function":"2112", "parameters":{"arc_id":"'||v_new_record.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 
