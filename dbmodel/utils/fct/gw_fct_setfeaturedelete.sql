@@ -58,6 +58,9 @@ v_related_id text;
 v_feature_childview_name text;
 v_feature_childtable_name text;
 v_schemaname text;
+v_plan_psector_current text;
+v_feature_state integer;
+v_feature_psector_id text;
 
 BEGIN
 
@@ -80,6 +83,31 @@ BEGIN
  	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::integer;
+
+	-- get current plan psector
+	EXECUTE 'SELECT value FROM config_param_user WHERE parameter = ''plan_psector_current'' AND cur_user = ''' || current_user || ''''
+	INTO v_plan_psector_current;
+	-- get feature state
+	EXECUTE 'SELECT state FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
+	INTO v_feature_state;
+
+	-- validate feature state and current mode
+	IF v_feature_state = 2 AND v_plan_psector_current IS NULL THEN
+		-- planified features in operative mode
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4412", "function":"3516", "is_process":true}}$$)';
+	ELSIF v_feature_state = 2 AND v_plan_psector_current IS NOT NULL THEN
+		-- planified features in plan mode
+		-- get feature psector id
+		EXECUTE 'SELECT psector_id FROM plan_psector_x_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
+		INTO v_feature_psector_id;
+		-- validate psector id
+		IF v_feature_psector_id != v_plan_psector_current THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4414", "function":"3516", "is_process":true}}$$)';
+		END IF;
+	ELSEIF v_feature_state != 2 AND v_plan_psector_current IS NOT NULL THEN
+		-- operative features in plan mode
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4416", "function":"3516", "is_process":true}}$$)';
+	END IF;
 
 	EXECUTE 'SELECT '||v_feature_type||'_type FROM ve_'||v_feature_type||' WHERE '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_featurecat;
@@ -350,5 +378,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-

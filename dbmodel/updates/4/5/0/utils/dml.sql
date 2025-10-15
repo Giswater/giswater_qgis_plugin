@@ -39,5 +39,10 @@ UPDATE sys_fprocess
 SET isaudit=true,active=true
 WHERE fid=584;
 
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('man_vlink', 'Additional information for vlink management', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT DO NOTHING;
+
+-- 15/10/2025
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4412, 'It is not allowed to delete planified features in operative mode', 'Switch to plan mode to delete the feature', 1, true, 'utils', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4414, 'It is not allowed to delete features from a different psector than the current one', 'Switch to the correct psector to delete the feature', 1, true, 'utils', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4416, 'It is not allowed to delete operative features in plan mode', 'Switch to operative mode to delete the feature', 1, true, 'utils', 'core', 'UI');
