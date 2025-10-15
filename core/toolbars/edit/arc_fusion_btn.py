@@ -82,8 +82,8 @@ class GwArcFusionButton(GwMaptool):
 
         if asset_arc1 != asset_arc2:
             txt = ("Asset:\n"
-                f"  Arc 1: {"None" if asset_arc1 == "null" else asset_arc1} {'(SELECTED)' if asset_arc1 == asset_id else ''}\n"
-                f"  Arc 2: {"None" if asset_arc2 == "null" else asset_arc2} {'(SELECTED)' if asset_arc2 == asset_id else ''}"
+                f"  Arc 1: {'None' if asset_arc1 == 'null' else asset_arc1} {'(SELECTED)' if asset_arc1 == asset_id else ''}\n"
+                f"  Arc 2: {'None' if asset_arc2 == 'null' else asset_arc2} {'(SELECTED)' if asset_arc2 == asset_id else ''}"
             )
             if asset_arc1 != asset_id and asset_arc2 != asset_id:
                 txt += f"\n  SELECTED: {asset_id}"
