@@ -1099,7 +1099,7 @@
 		</message>
 		<message>
 			<source>Cannot set inactive a current scenario. Please update current first.</source>
-			<translation>Cannot set inactive a current scenario. Please update current first.</translation>
+			<translation>No se puede inactivar un escenario actual. Por favor, actualice primero el actual.</translation>
 		</message>
 		<message>
 			<source>Cannot set the current {0} scenario of an inactive scenario. Please activate it first.</source>
@@ -1391,7 +1391,7 @@
 		</message>
 		<message>
 			<source>Could not determine event point coordinates</source>
-			<translation>Could not determine event point coordinates</translation>
+			<translation>No se han podido determinar las coordenadas del punto de evento</translation>
 		</message>
 		<message>
 			<source>Could not find an ID for the style group '{0}'.</source>
@@ -1411,11 +1411,11 @@
 		</message>
 		<message>
 			<source>Could not get feature ID from snapped point</source>
-			<translation>Could not get feature ID from snapped point</translation>
+			<translation>No se ha podido obtener el ID de característica del punto de encaje</translation>
 		</message>
 		<message>
 			<source>Could not retrieve feature from layer</source>
-			<translation>Could not retrieve feature from layer</translation>
+			<translation>No se ha podido recuperar la característica de la capa</translation>
 		</message>
 		<message>
 			<source>Couldn't add group.</source>
@@ -1539,7 +1539,7 @@
 		</message>
 		<message>
 			<source>Current psector: {1}</source>
-			<translation>Current psector: {1}</translation>
+			<translation>Psector actual: {1}</translation>
 		</message>
 		<message>
 			<source>Current user does not have 'plan_psector_current'. Value of current psector will be inserted.</source>
@@ -1746,8 +1746,12 @@
 			<translation>¿Quieres copiar sus valores en el nodo actual?</translation>
 		</message>
 		<message>
+			<source>Do you want to insert {0} selected features? (First 50: {1} ...)</source>
+			<translation>¿Desea insertar {0} características seleccionadas? (Primeros 50: {1} ...)</translation>
+		</message>
+		<message>
 			<source>Do you want to insert the selected features?</source>
-			<translation>Do you want to insert the selected features?</translation>
+			<translation>¿Desea insertar las características seleccionadas?</translation>
 		</message>
 		<message>
 			<source>Do you want to insert the selected features? {0}</source>
@@ -1951,7 +1955,7 @@
 		</message>
 		<message>
 			<source>Error during point selection: {0}</source>
-			<translation>Error during point selection: {0}</translation>
+			<translation>Error durante la selección de puntos: {0}</translation>
 		</message>
 		<message>
 			<source>Error executing gw_fct_create_dscenario_empty</source>
@@ -1979,7 +1983,7 @@
 		</message>
 		<message>
 			<source>Error fusing arcs</source>
-			<translation>Error fusing arcs</translation>
+			<translation>Error al fusionar arcos</translation>
 		</message>
 		<message>
 			<source>Error getting current psector</source>
@@ -3467,7 +3471,7 @@
 		</message>
 		<message>
 			<source>Node psector: {0}</source>
-			<translation>Node psector: {0}</translation>
+			<translation>Nodo psector: {0}</translation>
 		</message>
 		<message>
 			<source>Node replaced successfully</source>
@@ -3483,7 +3487,7 @@
 		</message>
 		<message>
 			<source>No event provided for point selection</source>
-			<translation>No event provided for point selection</translation>
+			<translation>No se ha previsto ningún evento para la selección de puntos</translation>
 		</message>
 		<message>
 			<source>NO FEATURE TYPE DEFINED</source>
@@ -4555,7 +4559,7 @@
 		</message>
 		<message>
 			<source>Snapped feature is not in a valid layer</source>
-			<translation>Snapped feature is not in a valid layer</translation>
+			<translation>El elemento seleccionado no se encuentra en una capa válida</translation>
 		</message>
 		<message>
 			<source>Some data is missing</source>
@@ -5203,7 +5207,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>The selected node is planified in another psector.</source>
-			<translation>The selected node is planified in another psector.</translation>
+			<translation>El nodo seleccionado se planifica en otro psector.</translation>
 		</message>
 		<message>
 			<source>The selected node should have exactly two linked arcs.</source>
@@ -5811,7 +5815,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>With replacements</source>
-			<translation>With replacements</translation>
+			<translation>Con sustituciones</translation>
 		</message>
 		<message>
 			<source>Workcat created successfully.</source>
@@ -6136,6 +6140,10 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>You should select an output folder!</source>
 			<translation>Debe seleccionar una carpeta de salida.</translation>
+		</message>
+		<message>
+			<source>You will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?</source>
+			<translation>Deberá reiniciar QGIS o recargar el plugin Giswater para aplicar los cambios. ¿Desea continuar?</translation>
 		</message>
 		<message>
 			<source>You will need to restart QGIS to apply changes. Do you want continue?</source>
@@ -8961,7 +8969,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>chk_add_tab_data</source>
-			<translation>Translate tab_data</translation>
+			<translation>Traducir tab_data</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_add_tab_data</source>
@@ -8993,7 +9001,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>grb_parameters</source>
-			<translation>Parameters</translation>
+			<translation>Parámetros</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_parameters</source>

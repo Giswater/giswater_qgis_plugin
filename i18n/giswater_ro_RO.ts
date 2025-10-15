@@ -150,7 +150,7 @@
 		</message>
 		<message>
 			<source>Emitter calibration</source>
-			<translation>Emitter calibration</translation>
+			<translation>Calibrarea emițătorului</translation>
 		</message>
 		<message>
 			<source>EPA multi calls</source>
@@ -302,7 +302,7 @@
 		</message>
 		<message>
 			<source>GwGo2EpaSelectorButton</source>
-			<translation>EPA result selector</translation>
+			<translation>Selector de rezultate EPA</translation>
 		</message>
 		<message>
 			<source>GwInfoButton</source>
@@ -350,7 +350,7 @@
 		</message>
 		<message>
 			<source>GwProfileButton</source>
-			<translation>Profile tool</translation>
+			<translation>Instrument de profil</translation>
 		</message>
 		<message>
 			<source>GwProjectCheckButton</source>
@@ -366,7 +366,7 @@
 		</message>
 		<message>
 			<source>GwResultManagerButton</source>
-			<translation>Result manager</translation>
+			<translation>Manager de rezultate</translation>
 		</message>
 		<message>
 			<source>GwResultSelectorButton</source>
@@ -987,7 +987,7 @@
 		</message>
 		<message>
 			<source>As a result, the material of these pipes will be treated as the configured unknown material, {0}.</source>
-			<translation>As a result, the material of these pipes will be treated as the configured unknown material, {0}.</translation>
+			<translation>Ca urmare, materialul acestor conducte va fi tratat ca materialul necunoscut configurat, {0}.</translation>
 		</message>
 		<message>
 			<source>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</source>
@@ -1099,7 +1099,7 @@
 		</message>
 		<message>
 			<source>Cannot set inactive a current scenario. Please update current first.</source>
-			<translation>Cannot set inactive a current scenario. Please update current first.</translation>
+			<translation>Nu se poate dezactiva un scenariu curent. Vă rugăm să actualizați mai întâi scenariul curent.</translation>
 		</message>
 		<message>
 			<source>Cannot set the current {0} scenario of an inactive scenario. Please activate it first.</source>
@@ -1391,7 +1391,7 @@
 		</message>
 		<message>
 			<source>Could not determine event point coordinates</source>
-			<translation>Could not determine event point coordinates</translation>
+			<translation>Nu s-au putut determina coordonatele punctului evenimentului</translation>
 		</message>
 		<message>
 			<source>Could not find an ID for the style group '{0}'.</source>
@@ -1411,11 +1411,11 @@
 		</message>
 		<message>
 			<source>Could not get feature ID from snapped point</source>
-			<translation>Could not get feature ID from snapped point</translation>
+			<translation>Nu s-a putut obține ID-ul caracteristicii din punctul fixat</translation>
 		</message>
 		<message>
 			<source>Could not retrieve feature from layer</source>
-			<translation>Could not retrieve feature from layer</translation>
+			<translation>Nu s-a putut extrage caracteristica din strat</translation>
 		</message>
 		<message>
 			<source>Couldn't add group.</source>
@@ -1539,7 +1539,7 @@
 		</message>
 		<message>
 			<source>Current psector: {1}</source>
-			<translation>Current psector: {1}</translation>
+			<translation>Psector actual: {1}</translation>
 		</message>
 		<message>
 			<source>Current user does not have 'plan_psector_current'. Value of current psector will be inserted.</source>
@@ -1746,8 +1746,12 @@
 			<translation>Doriți să copiați valorile sale în nodul curent?</translation>
 		</message>
 		<message>
+			<source>Do you want to insert {0} selected features? (First 50: {1} ...)</source>
+			<translation>Doriți să introduceți {0} caracteristici selectate? (Primele 50: {1} ...)</translation>
+		</message>
+		<message>
 			<source>Do you want to insert the selected features?</source>
-			<translation>Do you want to insert the selected features?</translation>
+			<translation>Doriți să introduceți caracteristicile selectate?</translation>
 		</message>
 		<message>
 			<source>Do you want to insert the selected features? {0}</source>
@@ -1951,7 +1955,7 @@
 		</message>
 		<message>
 			<source>Error during point selection: {0}</source>
-			<translation>Error during point selection: {0}</translation>
+			<translation>Eroare în timpul selecției punctului: {0}</translation>
 		</message>
 		<message>
 			<source>Error executing gw_fct_create_dscenario_empty</source>
@@ -1979,7 +1983,7 @@
 		</message>
 		<message>
 			<source>Error fusing arcs</source>
-			<translation>Error fusing arcs</translation>
+			<translation>Eroare de fuzionare a arcurilor</translation>
 		</message>
 		<message>
 			<source>Error getting current psector</source>
@@ -3467,7 +3471,7 @@
 		</message>
 		<message>
 			<source>Node psector: {0}</source>
-			<translation>Node psector: {0}</translation>
+			<translation>Nod psector: {0}</translation>
 		</message>
 		<message>
 			<source>Node replaced successfully</source>
@@ -3483,7 +3487,7 @@
 		</message>
 		<message>
 			<source>No event provided for point selection</source>
-			<translation>No event provided for point selection</translation>
+			<translation>Nu este prevăzut niciun eveniment pentru selectarea punctelor</translation>
 		</message>
 		<message>
 			<source>NO FEATURE TYPE DEFINED</source>
@@ -4319,7 +4323,7 @@
 		</message>
 		<message>
 			<source>RPT file path is required when importing results or executing EPA</source>
-			<translation>RPT file path is required when importing results or executing EPA</translation>
+			<translation>Calea fișierului RPT este necesară la importul rezultatelor sau la execuția EPA</translation>
 		</message>
 		<message>
 			<source>\r(This decision will not cancel the other selections, the process will keep running)</source>
@@ -4555,7 +4559,7 @@
 		</message>
 		<message>
 			<source>Snapped feature is not in a valid layer</source>
-			<translation>Snapped feature is not in a valid layer</translation>
+			<translation>Elementul prins nu se află într-un strat valid</translation>
 		</message>
 		<message>
 			<source>Some data is missing</source>
@@ -5123,7 +5127,7 @@
 		</message>
 		<message>
 			<source>There were velocities >50 in the rpt file. You have activated the option to force the import  </source>
-			<translation>There were velocities >50 in the rpt file. You have activated the option to force the import  </translation>
+			<translation>Au existat viteze >50 în fișierul rpt. Ați activat opțiunea de a forța importul</translation>
 		</message>
 		<message>
 			<source>There were velocities >50 in the rpt file. You have activated the option to force the import so they have been set to 50.</source>
@@ -5171,7 +5175,7 @@
 		</message>
 		<message>
 			<source>The schema version has to be updated to make rename</source>
-			<translation>The schema version has to be updated to make rename</translation>
+			<translation>Versiunea schemei trebuie să fie actualizată pentru a face redenumirea</translation>
 		</message>
 		<message>
 			<source>These are the lists that will be used. Do you want to continue?</source>
@@ -5191,7 +5195,7 @@
 		</message>
 		<message>
 			<source>The selected INP file does not match with a 'UD' project. Please check it before continuing...</source>
-			<translation>The selected INP file does not match with a 'UD' project. Please check it before continuing...</translation>
+			<translation>Fișierul INP selectat nu se potrivește cu un proiect "UD". Vă rugăm să-l verificați înainte de a continua...</translation>
 		</message>
 		<message>
 			<source>The selected INP file does not match with a 'WS' project.n </source>
@@ -5203,7 +5207,7 @@
 		</message>
 		<message>
 			<source>The selected node is planified in another psector.</source>
-			<translation>The selected node is planified in another psector.</translation>
+			<translation>Nodul selectat este planificat în alt psector.</translation>
 		</message>
 		<message>
 			<source>The selected node should have exactly two linked arcs.</source>
@@ -5811,7 +5815,7 @@
 		</message>
 		<message>
 			<source>With replacements</source>
-			<translation>With replacements</translation>
+			<translation>Cu înlocuitori</translation>
 		</message>
 		<message>
 			<source>Workcat created successfully.</source>
@@ -6138,6 +6142,10 @@
 			<translation>Trebuie să selectați un folder de ieșire!</translation>
 		</message>
 		<message>
+			<source>You will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?</source>
+			<translation>Va trebui să reporniți QGIS sau să reîncărcați pluginul Giswater pentru a aplica modificările. Doriți să continuați?</translation>
+		</message>
+		<message>
 			<source>You will need to restart QGIS to apply changes. Do you want continue?</source>
 			<translation>Va trebui să reporniți QGIS pentru a aplica modificările. Doriți să continuați?</translation>
 		</message>
@@ -6152,7 +6160,7 @@
 		<name>nonvisual_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Manager de obiecte nevizuale</translation>
+			<translation>Manager de obiecte non-vizuale</translation>
 		</message>
 		<message>
 			<source>inp_lid</source>
@@ -8961,7 +8969,7 @@
 		</message>
 		<message>
 			<source>chk_add_tab_data</source>
-			<translation>Translate tab_data</translation>
+			<translation>Traducere tab_data</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_add_tab_data</source>
@@ -8993,7 +9001,7 @@
 		</message>
 		<message>
 			<source>grb_parameters</source>
-			<translation>Parameters</translation>
+			<translation>Parametrii</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_parameters</source>
@@ -13476,11 +13484,11 @@
 		<name>arc_divide</name>
 		<message>
 			<source>title</source>
-			<translation>Arc divide</translation>
+			<translation>Arc de divizare</translation>
 		</message>
 		<message>
 			<source>dlg_arc_divide</source>
-			<translation>Arc divide</translation>
+			<translation>Arc de divizare</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_arc_divide</source>
@@ -17794,7 +17802,7 @@
 		<name>nonvisual_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Manager de obiecte nevizuale</translation>
+			<translation>Manager de obiecte non-vizuale</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -17854,7 +17862,7 @@
 		</message>
 		<message>
 			<source>dlg_nonvisual_manager</source>
-			<translation>Manager de obiecte nevizuale</translation>
+			<translation>Manager de obiecte non-vizuale</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_nonvisual_manager</source>
@@ -26032,7 +26040,7 @@
 		<name>nonvisual_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Manager de obiecte nevizuale</translation>
+			<translation>Manager de obiecte non-vizuale</translation>
 		</message>
 		<message>
 			<source>cat_mat_roughness</source>

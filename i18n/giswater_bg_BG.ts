@@ -1746,6 +1746,10 @@
 			<translation>Do you want to copy its values to the current node?</translation>
 		</message>
 		<message>
+			<source>Do you want to insert {0} selected features? (First 50: {1} ...)</source>
+			<translation>Do you want to insert {0} selected features? (First 50: {1} ...)</translation>
+		</message>
+		<message>
 			<source>Do you want to insert the selected features?</source>
 			<translation>Do you want to insert the selected features?</translation>
 		</message>
@@ -6136,6 +6140,10 @@
 		<message>
 			<source>You should select an output folder!</source>
 			<translation>You should select an output folder!</translation>
+		</message>
+		<message>
+			<source>You will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?</source>
+			<translation>You will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?</translation>
 		</message>
 		<message>
 			<source>You will need to restart QGIS to apply changes. Do you want continue?</source>
