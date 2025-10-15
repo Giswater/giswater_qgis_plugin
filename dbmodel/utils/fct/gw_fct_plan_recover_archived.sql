@@ -47,25 +47,17 @@ BEGIN
 	SELECT json_build_object('level', 1, 'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
 
 
-	-- recover data
+	-- recover data (set archived = false for arc/node/connec/gully)
 	FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 ORDER BY 1 DESC -- arc/node/connec/gully
 	LOOP
-	
 		EXECUTE '
-		INSERT INTO plan_psector_x_'||rec_feature||' ('||rec_feature||'_id, psector_id, state, doable, descript, addparam)
-		SELECT '||rec_feature||'_id::INT, psector_id, psector_state, doable, descript, 
-		to_jsonb(t) - ''id'' - ''psector_id'' - ''state'' - ''doable'' - ''descript''
-		FROM archived_psector_'||rec_feature||' t
-		WHERE psector_id = '||v_psector_id||'
+		UPDATE plan_psector_x_'||rec_feature||' 
+		SET archived = false 
+		WHERE psector_id = '||v_psector_id||' AND archived = true
 		';
-	
-		EXECUTE '
-		DELETE FROM archived_psector_'||rec_feature||' WHERE psector_id = '||v_psector_id||'
-		';
-	
 	END LOOP;
 
-	-- set status and inactive
+	-- set status and inactive (archived column doesn't exist in older versions)
 	UPDATE plan_psector SET status = 8, active = false WHERE psector_id = v_psector_id;
 
 
