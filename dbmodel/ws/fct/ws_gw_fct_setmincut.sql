@@ -688,26 +688,21 @@ BEGIN
 		EXECUTE format('
 			UPDATE %I 
 			SET proposed = FALSE 
-			WHERE proposed = TRUE;
+			WHERE proposed = TRUE
+			AND old_mapzone_id = 0;
 		', v_temp_arc_table);
 
 		EXECUTE format('
 			UPDATE %I 
 			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
-			WHERE unaccess = TRUE;
+			WHERE unaccess = TRUE
+			AND old_mapzone_id = 0;
 		', v_temp_arc_table);
 
 		EXECUTE format('
 			UPDATE %I 
 			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
 			WHERE proposed = TRUE
-				AND old_mapzone_id <> 0;
-		', v_temp_arc_table);
-
-		EXECUTE format('
-			UPDATE %I 
-			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1, old_mapzone_id = 0
-			WHERE unaccess = TRUE
 				AND old_mapzone_id <> 0;
 		', v_temp_arc_table);
 
@@ -1077,17 +1072,8 @@ BEGIN
 						AND tpa.graph_delimiter = ''MINSECTOR'';
 				', v_temp_arc_table, v_mincut_group_record.mincut_group, v_query_text);
 
-				EXECUTE format('
-					UPDATE %I tpa
-					SET unaccess = omv.unaccess, cost_mincut = 0, reverse_cost_mincut = 0, old_mapzone_id = omv.result_id
-					FROM om_mincut_valve omv
-					WHERE omv.result_id = ANY(%L)
-						AND omv.unaccess = TRUE
-						AND omv.node_id = %s
-						AND tpa.graph_delimiter = ''MINSECTOR'';
-				', v_temp_arc_table, v_mincut_group_record.mincut_group, v_query_text);
-
-
+				GET DIAGNOSTICS v_row_count = ROW_COUNT;
+				-- TODO execute mincut_core only if v_row_count > 0  
 				v_data := jsonb_build_object(
 					'data', jsonb_build_object(
 						'pgrDistance', v_pgr_distance,
@@ -1096,7 +1082,7 @@ BEGIN
 						'mode', v_mode
 					)
 				)::text;
-
+				
 				v_response := gw_fct_mincut_core(v_data);
 
 				IF v_response->>'status' <> 'Accepted' THEN
