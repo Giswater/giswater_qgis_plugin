@@ -45,59 +45,19 @@ BEGIN
 	FROM ( 	SELECT node_2 as vnode_id, arc_id,  1 as locate, null::numeric as elevation FROM temp_t_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') )z;
 
 	RAISE NOTICE 'vnodetrimarcs 4 - insert real vnode coming from link (arc_id, vnode_id, locate, elevation, depth)';
-	-- First, collect all vnodes with their locations and handle overlapping positions
 	INSERT INTO t_t_go2epa (arc_id, vnode_id, locate, elevation)
-	WITH vnode_raw AS (
-		SELECT
-			a.arc_id,
-			vnode_id as vnode_id_raw,
-			case
-				when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) > 0.9999 then 0.9999
-				when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) < 0.0001 then 0.0001
-				else (st_linelocatepoint (a.the_geom , l.the_geom_endpoint))::numeric(12,4)
-			end as locate,
-			l.exit_topelev as elevation,
-			st_length(a.the_geom) as arc_length,
-			l.link_id
-		FROM temp_t_arc a, temp_link l
-		JOIN connec c ON l.feature_id = c.connec_id::text
-		WHERE st_dwithin ( a.the_geom, l.the_geom_endpoint, 0.01) AND l.state > 0 AND a.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
-		AND c.epa_type = 'JUNCTION' AND l.vnode_type = 'ARC'
-	),
-	vnode_grouped AS (
-		SELECT
-			arc_id,
-			vnode_id_raw,
-			locate,
-			elevation,
-			arc_length,
-			link_id,
-			-- Count how many vnodes share this arc and location (rounded to 4 decimals)
-			count(*) OVER (PARTITION BY arc_id, round(locate::numeric, 4)) as group_count,
-			-- Row number within the group
-			row_number() OVER (PARTITION BY arc_id, round(locate::numeric, 4) ORDER BY link_id) as group_row
-		FROM vnode_raw
-	)
-	SELECT
-		arc_id,
-		-- Make vnode_id unique by appending suffix when multiple vnodes at same location
-		CASE
-			WHEN group_count > 1 THEN concat('VN', vnode_id_raw, '_', group_row)
-			ELSE concat('VN', vnode_id_raw)
-		END as vnode_id,
-		-- If multiple vnodes at same location, spread them 0.1m apart
-		CASE
-			WHEN group_count > 1 THEN
-				-- Calculate offset in locate units (0.1m * position in group / arc_length)
-				CASE
-					WHEN locate + (0.1 * (group_row - 1) / NULLIF(arc_length, 0)) > 0.9999 THEN 0.9999
-					WHEN locate - (0.1 * ((group_count - 1) / 2.0 - (group_row - 1)) / NULLIF(arc_length, 0)) < 0.0001 THEN 0.0001
-					ELSE (locate + (0.1 * ((group_row - 1) - (group_count - 1) / 2.0) / NULLIF(arc_length, 0)))::numeric(12,4)
-				END
-			ELSE locate
-		END as locate,
-		elevation
-	FROM vnode_grouped;
+	SELECT distinct on (vnode_id)
+	a.arc_id,
+	concat('VN',vnode_id) as vnode_id,
+	case
+		when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) > 0.9999 then 0.9999
+		when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) < 0.0001 then 0.0001
+		else (st_linelocatepoint (a.the_geom , l.the_geom_endpoint))::numeric(12,4) end as locate,
+	l.exit_topelev as elevation
+	FROM temp_t_arc a, temp_link l
+	JOIN connec c ON l.feature_id = c.connec_id::text
+	WHERE st_dwithin ( a.the_geom, l.the_geom_endpoint, 0.01) AND l.state > 0 AND a.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
+	AND c.epa_type = 'JUNCTION' AND l.vnode_type = 'ARC';
 
 
 	RAISE NOTICE 'vnodetrimarcs 5 - insert ficticius vnode coming from temp_table (using values created by gw_fct_pg2epa_breakpipes function)';
@@ -115,56 +75,18 @@ BEGIN
 	AND temp_t_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_t_arc.state > 0;
 
 	RAISE NOTICE 'vnodetrimarcs 6 - insert connec over arc';
-	-- Handle connecs on arc with same overlapping position logic
 	INSERT INTO t_t_go2epa (arc_id, vnode_id, locate, elevation)
-	WITH connec_raw AS (
-		SELECT
-			temp_t_arc.arc_id,
-			node_id as node_id_raw,
-			case
-				when st_linelocatepoint (temp_t_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
-				when st_linelocatepoint (temp_t_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
-				else (st_linelocatepoint (temp_t_arc.the_geom , vnode.the_geom))::numeric(12,4)
-			end as locate,
-			vnode.top_elev as elevation,
-			st_length(temp_t_arc.the_geom) as arc_length
-		FROM temp_t_arc, temp_t_node AS vnode
-		WHERE node_type = 'CONNEC' AND st_dwithin ( temp_t_arc.the_geom, vnode.the_geom, 0.01)
-		AND vnode.state > 0 AND temp_t_arc.arc_type NOT IN ('NODE2ARC', 'LINK')
-	),
-	connec_grouped AS (
-		SELECT
-			arc_id,
-			node_id_raw,
-			locate,
-			elevation,
-			arc_length,
-			-- Count how many connecs share this arc and location (rounded to 4 decimals)
-			count(*) OVER (PARTITION BY arc_id, round(locate::numeric, 4)) as group_count,
-			-- Row number within the group
-			row_number() OVER (PARTITION BY arc_id, round(locate::numeric, 4) ORDER BY node_id_raw) as group_row
-		FROM connec_raw
-	)
-	SELECT
-		arc_id,
-		-- Make vnode_id unique by appending suffix when multiple connecs at same location
-		CASE
-			WHEN group_count > 1 THEN concat('VC', node_id_raw, '_', group_row)
-			ELSE concat('VC', node_id_raw)
-		END as vnode_id,
-		-- If multiple connecs at same location, spread them 0.1m apart
-		CASE
-			WHEN group_count > 1 THEN
-				-- Calculate offset in locate units (0.1m * position in group / arc_length)
-				CASE
-					WHEN locate + (0.1 * (group_row - 1) / NULLIF(arc_length, 0)) > 0.9999 THEN 0.9999
-					WHEN locate - (0.1 * ((group_count - 1) / 2.0 - (group_row - 1)) / NULLIF(arc_length, 0)) < 0.0001 THEN 0.0001
-					ELSE (locate + (0.1 * ((group_row - 1) - (group_count - 1) / 2.0) / NULLIF(arc_length, 0)))::numeric(12,4)
-				END
-			ELSE locate
-		END as locate,
-		elevation
-	FROM connec_grouped;
+	SELECT distinct on (node_id)
+	temp_t_arc.arc_id,
+	concat('VC',node_id) as vnode_id,
+	case
+		when st_linelocatepoint (temp_t_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
+		when st_linelocatepoint (temp_t_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
+		else (st_linelocatepoint (temp_t_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate,
+	vnode.top_elev
+	FROM temp_t_arc, temp_t_node AS vnode
+	WHERE node_type = 'CONNEC' AND st_dwithin ( temp_t_arc.the_geom, vnode.the_geom, 0.01)
+	AND vnode.state > 0 AND temp_t_arc.arc_type NOT IN ('NODE2ARC', 'LINK');
 
 
 	RAISE NOTICE 'vnodetrimarcs 7 - insert previous data into data on temp_table';
