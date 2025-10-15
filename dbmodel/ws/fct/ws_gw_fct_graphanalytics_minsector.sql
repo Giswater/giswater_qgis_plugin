@@ -152,7 +152,12 @@ BEGIN
 
     -- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"MINSECTOR"}}';
+    v_data := jsonb_build_object(
+        'data', jsonb_build_object(
+            'expl_id_array', array_to_string(v_expl_id_array, ','),
+            'mapzone_name', 'MINSECTOR'
+        )
+    )::text;
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -167,7 +172,11 @@ BEGIN
     -- Generate new arcs when n.modif = TRUE AND (a.modif1 = TRUE OR a.modif2 = TRUE)
     -- cost i reverse cost for new arcs is 0, arc_id is NULL, old_arc_id = arc_id of the old arc
 	-- =======================
-    v_data := '{"data":{"mapzone_name":"MINSECTOR"}}';
+    v_data := jsonb_build_object(
+        'data', jsonb_build_object(
+            'mapzone_name', 'MINSECTOR'
+        )
+    )::text;
     SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -551,7 +560,13 @@ BEGIN
         -- PREPARE tables for Massive Mincut
         -- Initialize process
 		-- =======================
-	    v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"MINCUT", "mode":"MINSECTOR"}}';
+        v_data := jsonb_build_object(
+            'data', jsonb_build_object(
+                'expl_id_array', array_to_string(v_expl_id_array, ','),
+                'mapzone_name', 'MINCUT',
+                'mode', 'MINSECTOR'
+            )
+        )::text;
 		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
 		IF v_response->>'status' <> 'Accepted' THEN
@@ -560,13 +575,13 @@ BEGIN
 
         -- calculate cost/reverse_cost
         -- closed valves
-        UPDATE temp_pgr_arc_mincut a
+        UPDATE temp_pgr_arc_minsector a
         SET cost = -1, reverse_cost = -1
         WHERE a.graph_delimiter  = 'MINSECTOR'
         AND a.closed = TRUE;
 
         -- checkvalves
-        UPDATE temp_pgr_arc_mincut a
+        UPDATE temp_pgr_arc_minsector a
         SET cost = CASE WHEN v.minsector_id = a.node_2 THEN 1 ELSE -1 END,
             reverse_cost = CASE WHEN v.minsector_id = a.node_2 THEN -1 ELSE 1 END
         FROM v_temp_arc v
@@ -577,21 +592,21 @@ BEGIN
         AND a.to_arc[1] = v.arc_id;
         
         -- water-source (graph_delimiter  = 'SECTOR')
-        UPDATE temp_pgr_arc_mincut a
+        UPDATE temp_pgr_arc_minsector a
         SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
             reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
-        FROM temp_pgr_node_mincut n
+        FROM temp_pgr_node_minsector n
         WHERE a.graph_delimiter  = v_graph_delimiter
         AND n.graph_delimiter  = v_graph_delimiter
         AND COALESCE (a.node_1, a.node_2) = n.node_id
         AND a.arc_id <> ALL (n.to_arc);
 
         -- establishing the borders of the mincut (calculate cost_mincut/reverse_cost_mincut)
-        UPDATE temp_pgr_arc_mincut a
+        UPDATE temp_pgr_arc_minsector a
         SET cost_mincut = -1, reverse_cost_mincut = -1;
 
         -- the broken open valves
-		UPDATE temp_pgr_arc_mincut a
+		UPDATE temp_pgr_arc_minsector a
 		SET cost_mincut = 0, reverse_cost_mincut = 0
 		WHERE a.graph_delimiter = 'MINSECTOR'
 		AND a.closed = FALSE 
@@ -607,7 +622,7 @@ BEGIN
             v_reverse_cost_field = 'reverse_cost';
         END IF;
 
-        v_query_text = 'UPDATE temp_pgr_arc_mincut a
+        v_query_text = 'UPDATE temp_pgr_arc_minsector a
             SET cost_mincut = ' || v_cost_field || ', reverse_cost_mincut = ' || v_reverse_cost_field || '
             WHERE a.graph_delimiter = ''MINSECTOR''
             AND a.closed = FALSE 
@@ -621,14 +636,14 @@ BEGIN
             SELECT minsector_id FROM temp_pgr_minsector
         ';
 
-        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_mincut;
+        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_minsector;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
             v_pgr_root_vids := ARRAY[v_record_minsector.minsector_id];
 
-            UPDATE temp_pgr_arc_mincut SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_node_mincut SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_arc_mincut SET proposed = FALSE WHERE proposed;
+            UPDATE temp_pgr_arc_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_node_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_arc_minsector SET proposed = FALSE WHERE proposed;
 
             v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s"}}',
             v_pgr_distance, array_to_string(v_pgr_root_vids, ','), v_ignore_check_valves);
@@ -643,7 +658,7 @@ BEGIN
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT v_record_minsector.minsector_id, n.node_id
-            FROM temp_pgr_node_mincut n
+            FROM temp_pgr_node_minsector n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
             --TODO insert proposed valves

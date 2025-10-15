@@ -141,8 +141,8 @@ BEGIN
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INT DEFAULT 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INT DEFAULT 1;
 
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_mincut (LIKE temp_pgr_node INCLUDING ALL);
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_mincut (LIKE temp_pgr_arc INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
@@ -961,8 +961,8 @@ BEGIN
 
         -- Drop temporary tables
         DROP TABLE IF EXISTS temp_pgr_mapzone;
-        DROP TABLE IF EXISTS temp_pgr_node_mincut;
-        DROP TABLE IF EXISTS temp_pgr_arc_mincut;
+        DROP TABLE IF EXISTS temp_pgr_node_minsector;
+        DROP TABLE IF EXISTS temp_pgr_arc_minsector;
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_audit_check_data;

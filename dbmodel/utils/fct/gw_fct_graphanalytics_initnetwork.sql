@@ -81,9 +81,9 @@ BEGIN
         );
     END IF;
 
-    IF v_mapzone_name = 'MINCUT' THEN
-        v_temp_arc_table = 'temp_pgr_arc_mincut'::regclass;
-        v_temp_node_table = 'temp_pgr_node_mincut'::regclass;
+    IF v_mode = 'MINSECTOR' THEN
+        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
+        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
     ELSE
         v_temp_arc_table = 'temp_pgr_arc'::regclass;
         v_temp_node_table = 'temp_pgr_node'::regclass;

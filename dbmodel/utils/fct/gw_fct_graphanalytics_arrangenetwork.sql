@@ -38,7 +38,8 @@ DECLARE
     v_source TEXT;
     v_target TEXT;
     v_count INTEGER;
-    
+    v_mode TEXT;
+
     v_temp_arc_table regclass;
     v_temp_node_table regclass;
 
@@ -53,6 +54,7 @@ BEGIN
 	-- Get variables from input JSON
     v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
     v_from_zero = p_data->'data'->>'from_zero';
+    v_mode = p_data->'data'->>'mode';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -69,9 +71,9 @@ BEGIN
         );
     END IF;
 
-    IF v_mapzone_name = 'MINCUT' THEN
-        v_temp_arc_table = 'temp_pgr_arc_mincut'::regclass;
-        v_temp_node_table = 'temp_pgr_node_mincut'::regclass;
+    IF v_mode = 'MINSECTOR' THEN
+        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
+        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
     ELSE
         v_temp_arc_table = 'temp_pgr_arc'::regclass;
         v_temp_node_table = 'temp_pgr_node'::regclass;
