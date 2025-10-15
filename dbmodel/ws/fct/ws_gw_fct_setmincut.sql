@@ -678,12 +678,6 @@ BEGIN
 
 		EXECUTE format('
 			UPDATE %I 
-			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
-			WHERE unaccess = TRUE;
-		', v_temp_arc_table);
-
-		EXECUTE format('
-			UPDATE %I 
 			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
 			WHERE proposed = TRUE
 				AND old_mapzone_id <> 0;
