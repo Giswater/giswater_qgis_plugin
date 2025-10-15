@@ -117,10 +117,18 @@ BEGIN
 		ELSIF v_networkmode = 3 THEN
 
 			-- insertar all connecs
+			-- Use the merged vnode mapping if available, otherwise use the original vnode id
 			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
-			select dscenario_id , concat('VN',link_id), dd.demand, dd.pattern_id, demand_type, source
+			select dscenario_id ,
+				COALESCE(m.merged_vnode_id, concat('VN',link_id)) as feature_id,
+				dd.demand,
+				dd.pattern_id,
+				demand_type,
+				source
 			from inp_dscenario_demand dd
-			join temp_t_link l using (feature_id) join inp_connec on connec_id = l.feature_id
+			join temp_t_link l using (feature_id)
+			join inp_connec on connec_id = l.feature_id
+			LEFT JOIN temp_vnode_mapping m ON m.original_vnode_id = concat('VN',link_id)
 			WHERE dscenario_id IN (SELECT unnest(v_userscenario)) and dd.demand IS NOT NULL AND dd.demand <> 0;
 
 			-- update those connecs that is other link_id
@@ -128,21 +136,21 @@ BEGIN
 				SELECT feature_id
 				FROM temp_t_demand d
 				WHERE NOT EXISTS (
-					SELECT 1 
-					FROM temp_t_node 
+					SELECT 1
+					FROM temp_t_node
 					WHERE node_id = d.feature_id
 				)
 			)
 			UPDATE temp_t_demand d SET feature_id = f.feature_id
 			FROM
 			(
-				SELECT concat('VN',c2.link_id) as feature_id 
+				SELECT concat('VN',c2.link_id) as feature_id
 				FROM temp_t_link c1
-				JOIN temp_t_link c2 ON ST_DWithin(c1.the_geom, c2.the_geom, 100) 
+				JOIN temp_t_link c2 ON ST_DWithin(c1.the_geom, c2.the_geom, 100)
 					AND c1.link_id <> c2.link_id
-				JOIN demands d1 ON concat('VN',c1.link_id) = d1.feature_id 
-					AND concat('VN',c2.link_id) = d1.feature_id 
-				ORDER BY ST_Distance(c1.the_geom, c2.the_geom) ASC 
+				JOIN demands d1 ON concat('VN',c1.link_id) = d1.feature_id
+					AND concat('VN',c2.link_id) = d1.feature_id
+				ORDER BY ST_Distance(c1.the_geom, c2.the_geom) ASC
 				LIMIT 1
 			) f;
 

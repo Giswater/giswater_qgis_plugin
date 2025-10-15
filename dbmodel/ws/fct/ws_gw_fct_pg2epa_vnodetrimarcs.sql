@@ -45,19 +45,80 @@ BEGIN
 	FROM ( 	SELECT node_2 as vnode_id, arc_id,  1 as locate, null::numeric as elevation FROM temp_t_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') )z;
 
 	RAISE NOTICE 'vnodetrimarcs 4 - insert real vnode coming from link (arc_id, vnode_id, locate, elevation, depth)';
+	-- First, create a temp table to store the mapping of duplicate vnodes
+	CREATE TEMP TABLE IF NOT EXISTS temp_vnode_mapping (
+		original_vnode_id text,
+		merged_vnode_id text,
+		arc_id text,
+		locate numeric(12,4)
+	);
+	TRUNCATE temp_vnode_mapping;
+
+	-- Insert all vnodes with their locations, grouping by arc_id and locate to detect duplicates
+	WITH vnode_data AS (
+		SELECT
+			a.arc_id,
+			vnode_id,
+			case
+				when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) > 0.9999 then 0.9999
+				when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) < 0.0001 then 0.0001
+				else (st_linelocatepoint (a.the_geom , l.the_geom_endpoint))::numeric(12,4)
+			end as locate,
+			l.exit_topelev as elevation
+		FROM temp_t_arc a, temp_link l
+		JOIN connec c ON l.feature_id = c.connec_id::text
+		WHERE st_dwithin ( a.the_geom, l.the_geom_endpoint, 0.01) AND l.state > 0
+		AND a.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
+		AND c.epa_type = 'JUNCTION' AND l.vnode_type = 'ARC'
+	),
+	-- For each unique (arc_id, locate) combination, pick the first vnode_id as the "merged" one
+	merged_vnodes AS (
+		SELECT DISTINCT ON (arc_id, locate)
+			arc_id,
+			vnode_id as merged_vnode_id,
+			locate,
+			elevation
+		FROM vnode_data
+		ORDER BY arc_id, locate, vnode_id
+	)
+	-- Insert only the unique vnodes (one per location)
 	INSERT INTO t_t_go2epa (arc_id, vnode_id, locate, elevation)
-	SELECT distinct on (vnode_id)
-	a.arc_id,
-	concat('VN',vnode_id) as vnode_id,
-	case
-		when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) > 0.9999 then 0.9999
-		when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) < 0.0001 then 0.0001
-		else (st_linelocatepoint (a.the_geom , l.the_geom_endpoint))::numeric(12,4) end as locate,
-	l.exit_topelev as elevation
-	FROM temp_t_arc a, temp_link l
-	JOIN connec c ON l.feature_id = c.connec_id::text
-	WHERE st_dwithin ( a.the_geom, l.the_geom_endpoint, 0.01) AND l.state > 0 AND a.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
-	AND c.epa_type = 'JUNCTION' AND l.vnode_type = 'ARC';
+	SELECT arc_id, concat('VN', merged_vnode_id) as vnode_id, locate, elevation
+	FROM merged_vnodes;
+
+	-- Store the mapping for later use in demand assignment
+	WITH vnode_data AS (
+		SELECT DISTINCT ON (vnode_id)
+			a.arc_id,
+			vnode_id,
+			case
+				when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) > 0.9999 then 0.9999
+				when st_linelocatepoint (a.the_geom , l.the_geom_endpoint) < 0.0001 then 0.0001
+				else (st_linelocatepoint (a.the_geom , l.the_geom_endpoint))::numeric(12,4)
+			end as locate
+		FROM temp_t_arc a, temp_link l
+		JOIN connec c ON l.feature_id = c.connec_id::text
+		WHERE st_dwithin ( a.the_geom, l.the_geom_endpoint, 0.01) AND l.state > 0
+		AND a.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
+		AND c.epa_type = 'JUNCTION' AND l.vnode_type = 'ARC'
+		ORDER BY vnode_id
+	),
+	merged_vnodes AS (
+		SELECT DISTINCT ON (arc_id, locate)
+			arc_id,
+			vnode_id as merged_vnode_id,
+			locate
+		FROM vnode_data
+		ORDER BY arc_id, locate, vnode_id
+	)
+	INSERT INTO temp_vnode_mapping (original_vnode_id, merged_vnode_id, arc_id, locate)
+	SELECT
+		concat('VN', v.vnode_id) as original_vnode_id,
+		concat('VN', m.merged_vnode_id) as merged_vnode_id,
+		v.arc_id,
+		v.locate
+	FROM vnode_data v
+	JOIN merged_vnodes m ON v.arc_id = m.arc_id AND v.locate = m.locate;
 
 
 	RAISE NOTICE 'vnodetrimarcs 5 - insert ficticius vnode coming from temp_table (using values created by gw_fct_pg2epa_breakpipes function)';
@@ -213,6 +274,9 @@ BEGIN
 	UPDATE temp_t_node SET epa_type ='TODELETE' FROM (SELECT a.id FROM temp_t_node a, temp_t_node b WHERE a.id < b.id AND a.node_id = b.node_id)a WHERE temp_t_node.id = a.id;
 	-- step 2
 	DELETE FROM temp_t_node WHERE epa_type ='TODELETE';
+
+	RAISE NOTICE '10 - cleanup temp_vnode_mapping table (keep it for demand functions)';
+	-- Note: temp_vnode_mapping is kept as it's a session-level temp table and will be used by demand functions
 
 RETURN 0;
 END;

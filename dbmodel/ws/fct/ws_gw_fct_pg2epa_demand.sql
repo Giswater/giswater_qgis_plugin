@@ -44,7 +44,7 @@ BEGIN
 	-- Reset values
 	UPDATE temp_t_node t SET demand = 0 FROM node n WHERE n.node_id::text = t.node_id AND n.epa_type != 'INLET';
 	UPDATE temp_t_node t SET pattern_id = null FROM node n WHERE n.node_id::text = t.node_id AND n.epa_type != 'INLET';
-	
+
 	IF v_networkmode = 2 OR v_networkmode = 1 OR v_networkmode = 5 THEN-- NETWORK
 
 		-- update patterns for nodes
@@ -71,28 +71,35 @@ BEGIN
 
 	ELSIF v_networkmode = 3 THEN -- TRIMED NETWORK
 
-		INSERT INTO temp_t_link (link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type) 
-		SELECT link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type from ve_link; 
+		INSERT INTO temp_t_link (link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type)
+		SELECT link_id, feature_id, feature_type, state, expl_id, the_geom, linkcat_id, state_type from ve_link;
 
-		
+
 		-- insertar all connecs
+		-- Use the merged vnode mapping if available, otherwise use the original vnode id
 		INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, source)
-		select 0 , concat('VN',link_id), demand, pattern_id, concat('CONNEC ', connec_id) 
-		from temp_t_link l join inp_connec on connec_id = l.feature_id
+		select 0 ,
+			COALESCE(m.merged_vnode_id, concat('VN',link_id)) as feature_id,
+			demand,
+			pattern_id,
+			concat('CONNEC ', connec_id)
+		from temp_t_link l
+		join inp_connec on connec_id = l.feature_id
+		LEFT JOIN temp_vnode_mapping m ON m.original_vnode_id = concat('VN',link_id)
 		WHERE demand IS NOT NULL AND demand <> 0;
-	
+
 		-- update those connecs that is other link_id
 		FOR v_rec in select * from temp_t_demand where feature_id not in (select node_id from temp_t_node)
-		LOOP	
-			UPDATE temp_t_demand SET feature_id = f.feature_id  
-			FROM 
+		LOOP
+			UPDATE temp_t_demand SET feature_id = f.feature_id
+			FROM
 			(SELECT concat('VN',c2.link_id) as feature_id FROM temp_t_link c1, temp_t_link c2 where st_dwithin(c1.the_geom, c2.the_geom, 100) and c1.link_id <> c2.link_id
-			and concat('VN',c1.link_id) = v_rec.feature_id and concat('VN',c2.link_id) in (SELECT feature_id FROM temp_t_demand) 
-			order by st_distance ( c1.the_geom, c2.the_geom) asc LIMIT 1) f 
-			WHERE temp_t_demand.feature_id = v_rec.feature_id;				
+			and concat('VN',c1.link_id) = v_rec.feature_id and concat('VN',c2.link_id) in (SELECT feature_id FROM temp_t_demand)
+			order by st_distance ( c1.the_geom, c2.the_geom) asc LIMIT 1) f
+			WHERE temp_t_demand.feature_id = v_rec.feature_id;
 		END LOOP;
 
-	ELSIF v_networkmode = 4 THEN 
+	ELSIF v_networkmode = 4 THEN
 
 		-- update patterns for connecs with associated link
 		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM ve_inp_connec c WHERE connec_id::text = node_id  AND temp_t_node.epa_type ='JUNCTION';
