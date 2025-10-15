@@ -202,19 +202,22 @@ BEGIN
 
     IF v_mode = 'MINSECTOR' THEN
         -- the arcs are valves
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
-        SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
-        FROM minsector_graph a
-        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.minsector_1
-        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.minsector_2';
+        EXECUTE format('
+            INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+            SELECT a.node_id, a.minsector_1, a.minsector_2, n1.pgr_node_id, n2.pgr_node_id, %L, %L
+            FROM minsector_graph a
+            JOIN %I n1 ON n1.node_id = a.minsector_1
+            JOIN %I n2 ON n2.node_id = a.minsector_2;
+        ', v_temp_arc_table, v_cost, v_reverse_cost, v_temp_node_table, v_temp_node_table);
     ELSE
-        v_query_text = 'INSERT INTO ' || v_temp_arc_table || ' (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
-        SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, ' || v_cost || ', ' || v_reverse_cost || '
-        FROM v_temp_arc a
-        JOIN ' || v_temp_node_table || ' n1 ON n1.node_id = a.node_1
-        JOIN ' || v_temp_node_table || ' n2 ON n2.node_id = a.node_2';
+        EXECUTE format('
+            INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+            SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L
+            FROM v_temp_arc a
+            JOIN %I n1 ON n1.node_id = a.node_1
+            JOIN %I n2 ON n2.node_id = a.node_2;
+        ', v_temp_arc_table, v_cost, v_reverse_cost, v_temp_node_table, v_temp_node_table);
     END IF;
-    EXECUTE v_query_text;
 
     IF v_mode = 'MINSECTOR' THEN
         -- add arcs that connect the nodes 'SECTOR' with the nodes 'MINSECTOR'

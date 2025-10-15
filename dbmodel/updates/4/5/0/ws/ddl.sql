@@ -18,3 +18,7 @@ CREATE TABLE IF NOT EXISTS om_mincut_conflict (
 CREATE INDEX IF NOT EXISTS om_mincut_conflict_mincut_id_idx ON om_mincut_conflict (mincut_id);
 
 ALTER TABLE selector_mincut_result ADD COLUMN IF NOT EXISTS result_type text;
+
+ALTER TABLE minsector_mincut_valve ADD closed bool NULL;
+ALTER TABLE minsector_mincut_valve ADD broken bool NULL;
+ALTER TABLE minsector_mincut_valve ADD to_arc int4 NULL;

@@ -969,9 +969,10 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
         DROP TABLE IF EXISTS temp_pgr_minsector_graph;
         DROP TABLE IF EXISTS temp_pgr_minsector;
+        DROP TABLE IF EXISTS temp_pgr_minsector_mincut;
+        DROP TABLE IF EXISTS temp_pgr_minsector_mincut_valve;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
-        DROP TABLE IF EXISTS temp_pgr_minsector_mincut;
 
         DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
 

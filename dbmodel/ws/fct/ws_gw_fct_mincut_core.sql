@@ -201,7 +201,7 @@ BEGIN
             FROM temp_pgr_drivingdistance d
             JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
             WHERE a.graph_delimiter = ''SECTOR''
-            AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);',
+            AND (d.node = a.pgr_node_1 AND a.reverse_cost > -1 OR d.node = a.pgr_node_2 AND a."cost" > -1);',
             v_temp_arc_table
         ) INTO v_valve_water;
 
@@ -211,7 +211,7 @@ BEGIN
             FROM temp_pgr_drivingdistance d
             JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
             WHERE a.graph_delimiter = ''SECTOR''
-            AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);',
+            AND (d.node = a.pgr_node_1 AND a.reverse_cost > -1 OR d.node = a.pgr_node_2 AND a."cost" > -1);',
             v_temp_arc_table
         ) INTO v_water_source;
 
@@ -341,7 +341,7 @@ BEGIN
                 FROM temp_pgr_drivingdistance d
                 JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
                 WHERE a.graph_delimiter = ''SECTOR''
-                AND (d.node = a.pgr_node_1 AND a.cost = 0 OR d.node = a.pgr_node_2 AND a.reverse_cost = 0);',
+                AND (d.node = a.pgr_node_1 AND a.cost > -1 OR d.node = a.pgr_node_2 AND a.reverse_cost > -1);',
                 v_temp_arc_table
             ) INTO v_valve_water;
 

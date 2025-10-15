@@ -661,15 +661,22 @@ BEGIN
             FROM temp_pgr_node_minsector n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
-            --TODO insert proposed valves
+
+            INSERT INTO temp_pgr_minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, to_arc)
+            SELECT v_record_minsector.node_id, a.arc_id, a.proposed, a.closed, a.broken, a.to_arc[1]
+            FROM temp_pgr_arc_minsector a
+            WHERE a.graph_delimiter = 'MINSECTOR'
+            AND a.mapzone_id <> 0;
         END LOOP;
 
         IF v_commitchanges THEN
-            DELETE FROM minsector_mincut;
-
             INSERT INTO minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT minsector_id, mincut_minsector_id
             FROM temp_pgr_minsector_mincut;
+
+            INSERT INTO minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, to_arc)
+            SELECT minsector_id, node_id, proposed, closed, broken, to_arc
+            FROM temp_pgr_minsector_mincut_valve;
         END IF;
 
     END IF;
