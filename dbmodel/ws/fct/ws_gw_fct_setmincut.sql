@@ -576,11 +576,11 @@ BEGIN
 			SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
 			FROM %I n
-			WHERE a.graph_delimiter  = %L
-			AND n.graph_delimiter  = %L
+			WHERE a.graph_delimiter  = ''SECTOR''
+			AND n.graph_delimiter  = ''SECTOR''
 				AND COALESCE (a.node_1, a.node_2) = n.node_id
 				AND a.arc_id <> ALL (n.to_arc);
-			', v_temp_arc_table, v_temp_node_table, v_graph_delimiter, v_graph_delimiter);
+			', v_temp_arc_table, v_temp_node_table);
 		ELSE
 			EXECUTE format('
 				UPDATE %I t
@@ -710,8 +710,11 @@ BEGIN
 
 		-- mincut
 		EXECUTE format('SELECT count(*)::int FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
-
-		EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L LIMIT 1;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
+		IF v_mincut_version = '6.1' THEN
+			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_pgr_node_id;
+		ELSE 
+			EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
+		END IF;
 
 		-- Use jsonb_build_object for cleaner and safer JSON construction
 		v_data := jsonb_build_object(
