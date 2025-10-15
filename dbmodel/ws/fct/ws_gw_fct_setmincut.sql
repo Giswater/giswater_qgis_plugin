@@ -134,6 +134,8 @@ v_init_mincut boolean := FALSE;
 v_prepare_mincut boolean := FALSE;
 v_core_mincut boolean := FALSE;
 
+v_mode text;
+
 BEGIN
 
 	-- Search path
@@ -640,7 +642,7 @@ BEGIN
 		SELECT count(*)::int INTO v_pgr_distance 
 		FROM temp_pgr_arc_mincut;
 
-		v_pgr_node_id := (SELECT pgr_node_1 FROM temp_pgr_arc_mincut WHERE arc_id = v_arc_id);
+		v_pgr_node_id := (SELECT pgr_node_1 FROM temp_pgr_arc_mincut WHERE arc_id = v_arc_id LIMIT 1);
 
 		-- Use jsonb_build_object for cleaner and safer JSON construction
 		v_data := jsonb_build_object(
@@ -851,8 +853,8 @@ BEGIN
 						tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
 					FROM om_mincut o
 					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
-					WHERE o.mincut_state IN (v_mincut_plannified_state, v_mincut_in_progress_state)
-						AND o.mincut_class = v_mincut_network_class
+					WHERE o.mincut_state IN (%s, %s)
+						AND o.mincut_class = %s
 						AND c.virtual = FALSE 
 						AND o.forecast_start <= o.forecast_end 
 						AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(%L, %L, '[]')
@@ -904,7 +906,9 @@ BEGIN
 					AND g.mincut_group <> g1.mincut_group
 				);
 			$fmt$, 
-			v_dialog_forecast_start, v_dialog_forecast_end, 
+			v_dialog_forecast_start, v_dialog_forecast_end,
+			v_mincut_plannified_state, v_mincut_in_progress_state,
+			v_mincut_network_class,
 			v_dialog_forecast_start, v_dialog_forecast_end,
 			v_mincut_id,
 			v_dialog_forecast_start, v_dialog_forecast_end

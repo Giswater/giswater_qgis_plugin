@@ -49,6 +49,8 @@ DECLARE
     v_temp_arc_table regclass;
     v_temp_node_table regclass;
 
+    v_mode text;
+
 
 BEGIN
 
@@ -79,7 +81,7 @@ BEGIN
         );
     END IF;
 
-    IF v_mapzone_name= 'MINCUT' THEN
+    IF v_mapzone_name = 'MINCUT' THEN
         v_temp_arc_table = 'temp_pgr_arc_mincut'::regclass;
         v_temp_node_table = 'temp_pgr_node_mincut'::regclass;
     ELSE
@@ -179,12 +181,12 @@ BEGIN
         -- MAPZONE graph_delimiter
         EXECUTE format('
             UPDATE %I t
-            SET graph_delimiter = v_graph_delimiter
+            SET graph_delimiter = %L
             FROM v_temp_node n
             WHERE t.node_id = n.node_id
             AND t.graph_delimiter = ''NONE''
-            AND v_graph_delimiter = ANY(n.graph_delimiter);
-        ', v_temp_node_table);
+            AND %L = ANY(n.graph_delimiter);
+        ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter);
 
         -- water source (SECTOR) graph_delimiter
         EXECUTE format('
@@ -313,8 +315,8 @@ BEGIN
                     WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                     GROUP BY m.node_id
                 ) a
-                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
-            ', v_temp_node_table);
+                WHERE t.graph_delimiter IN (%L, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table, v_graph_delimiter);
 
             EXECUTE format('
                 UPDATE %I t
@@ -326,8 +328,8 @@ BEGIN
                     WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                     GROUP BY m.node_id
                     )a
-                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
-            ', v_temp_node_table);
+                WHERE t.graph_delimiter IN (%L, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table, v_graph_delimiter);
 
             EXECUTE format('
                 UPDATE %I t
@@ -339,8 +341,8 @@ BEGIN
                     WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                     GROUP BY m.node_id
                     )a
-                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
-            ', v_temp_node_table);
+                WHERE t.graph_delimiter IN (%L, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table, v_graph_delimiter);
 
             EXECUTE format('
                 UPDATE %I t
@@ -352,8 +354,8 @@ BEGIN
                     WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
                     GROUP BY m.node_id
                     )a
-                WHERE t.graph_delimiter IN (v_graph_delimiter, ''SECTOR'') AND t.node_id = a.node_id;
-            ', v_temp_node_table);
+                WHERE t.graph_delimiter IN (%L, ''SECTOR'') AND t.node_id = a.node_id;
+            ', v_temp_node_table, v_graph_delimiter);
 
             -- SET TO_ARC from METER
             EXECUTE format('
@@ -366,8 +368,8 @@ BEGIN
                         END AS to_arc
                     FROM man_meter m
                     ) a
-                WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
-            ', v_temp_node_table);
+                WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
+            ', v_temp_node_table, v_graph_delimiter);
 
             -- SET TO_ARC from PUMP
             EXECUTE format('
@@ -380,8 +382,8 @@ BEGIN
                         END AS to_arc
                     FROM man_pump m
                     ) a
-                WHERE t.graph_delimiter = v_graph_delimiter AND t.node_id = a.node_id;
-            ', v_temp_node_table);
+                WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
+            ', v_temp_node_table, v_graph_delimiter);
         END IF;
 
         IF v_project_type = 'UD' THEN
@@ -393,8 +395,8 @@ BEGIN
                         FROM %I
                         GROUP BY pgr_node_1
                     )a
-                WHERE t.graph_delimiter = v_graph_delimiter AND t.pgr_node_id = a.pgr_node_1;
-            ', v_temp_node_table, v_temp_arc_table);
+                WHERE t.graph_delimiter = %L AND t.pgr_node_id = a.pgr_node_1;
+            ', v_temp_node_table, v_temp_arc_table, v_graph_delimiter);
         END IF;
     END IF;
 

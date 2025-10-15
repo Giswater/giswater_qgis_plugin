@@ -61,7 +61,7 @@ BEGIN
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node (
-            pgr_node_id SERIAL NOT NULL,
+            pgr_node_id INT GENERATED ALWAYS AS IDENTITY,
             node_id int4,
             old_node_id int4,
             mapzone_id INTEGER DEFAULT 0,
@@ -76,7 +76,7 @@ BEGIN
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc (
-            pgr_arc_id SERIAL NOT NULL,
+            pgr_arc_id INT GENERATED ALWAYS AS IDENTITY,
             arc_id int4,
             old_arc_id int4,
             pgr_node_1 INT,
@@ -135,13 +135,14 @@ BEGIN
             ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS broken BOOL;
 
             -- for specific functions
-            IF v_fct_name = 'MINCUT' THEN
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_mincut (LIKE temp_pgr_node INCLUDING ALL);
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_mincut (LIKE temp_pgr_arc INCLUDING ALL);
+            IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INT DEFAULT 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INT DEFAULT 1;
+
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_mincut (LIKE temp_pgr_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_mincut (LIKE temp_pgr_arc INCLUDING ALL);
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
