@@ -234,6 +234,22 @@ BEGIN
 			WHERE id = v_mincut_id;
 		END IF;
 	END IF;
+	
+	IF v_mincut_version = '6.1' THEN
+		v_root_vid := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+
+		IF v_root_vid IS NULL OR v_root_vid = 0 THEN
+			RETURN jsonb_build_object(
+				'status', 'Failed',
+				'message', jsonb_build_object(
+					'level', 3,
+					'text', 'You MUST execute the minsector analysis before executing the mincut analysis with 6.1 version.'
+				),
+			);
+		END IF;
+	ELSE 
+		v_root_vid := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
+	END IF;
 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
@@ -528,11 +544,6 @@ BEGIN
 
 	-- CORE MINCUT CODE
 	IF v_init_mincut THEN
-		IF v_mincut_version = '6.1' THEN
-			v_root_vid := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
-		ELSE 
-			v_root_vid := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
-		END IF;
 		-- Initialize process
 		-- =======================
 		v_data := jsonb_build_object(
