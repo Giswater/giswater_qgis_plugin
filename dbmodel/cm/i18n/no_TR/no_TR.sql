@@ -5,3 +5,4 @@ The program is free software: you can redistribute it and/or modify it under the
 
 
 SET search_path = cm, public, public;
+SELECT 1;
