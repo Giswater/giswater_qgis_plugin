@@ -151,9 +151,9 @@ BEGIN
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Reconnected node_1 & node_2.');
 
         -- downgrade to obsolete arcs and nodes
-        UPDATE arc SET state=0,state_type=2 WHERE arc_id=v_data.arc_id;
+        UPDATE arc SET state=0,state_type=1 WHERE arc_id=v_data.arc_id;
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded arc.');
-        UPDATE node SET state=0,state_type=2 WHERE node_id IN (v_node1, v_node2);
+        UPDATE node SET state=0,state_type=1 WHERE node_id IN (v_node1, v_node2);
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded old nodes.');
 
         -- update elevation of new node
