@@ -5647,9 +5647,31 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
             "result": result
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
+
+        if enable:
+            last_styles = {}
+            project_layers = global_vars.iface.mapCanvas().layers()
+            for lyr in project_layers:
+                try:
+                    style_manager = lyr.styleManager()
+                    current_style = style_manager.currentStyle()
+                    src_name = tools_qgis.get_layer_source_table_name(lyr)
+                    last_styles[src_name] = current_style
+                except Exception:
+                    continue
+            global_vars.psignals['last_styles'] = last_styles
+            apply_styles_to_layers(110, "GwPlan")
+        else:
+            last_styles = global_vars.psignals['last_styles']
+            for lyr in last_styles:
+                layer = tools_qgis.get_layer_by_tablename(lyr)
+                try:
+                    style_manager = layer.styleManager()
+                    style_manager.setCurrentStyle(last_styles[lyr])
+                except Exception:
+                    continue
         refresh_selectors()
     tools_qgis.refresh_map_canvas()
-
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
     """ Change plan mode buttons """
