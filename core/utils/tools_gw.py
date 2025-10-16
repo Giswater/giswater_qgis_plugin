@@ -4590,14 +4590,12 @@ def set_model_signals(class_object):
     class_object.rubber_band_line.reset()
     class_object.rubber_band_rectangle.reset()
 
-    if hasattr(class_object, 'psector_id') and class_object.psector_id:
-        psector_id = class_object.psector_id
-    else:
-        psector_id = tools_qt.get_text(class_object.dlg_plan_psector, 'tab_general_psector_id')
-
-    filter_ = "psector_id = '" + str(psector_id) + "'"
-    class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
-                    set_edit_triggers=QTableView.DoubleClicked, expr=filter_, feature_type="connec", field_id="connec_id")
+    # Refresh table models to show newly added features
+    try:
+        if class_object.qtbl_connec.model():
+            class_object.qtbl_connec.model().select()
+    except Exception:
+        pass
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
