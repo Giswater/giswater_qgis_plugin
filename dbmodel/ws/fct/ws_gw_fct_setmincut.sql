@@ -1073,7 +1073,11 @@ BEGIN
 				', v_temp_arc_table, v_mincut_group_record.mincut_group, v_query_text);
 
 				GET DIAGNOSTICS v_row_count = ROW_COUNT;
-				-- TODO execute mincut_core only if v_row_count > 0  
+
+				IF v_row_count = 0 THEN
+					continue;
+				END IF;
+
 				v_data := jsonb_build_object(
 					'data', jsonb_build_object(
 						'pgrDistance', v_pgr_distance,
