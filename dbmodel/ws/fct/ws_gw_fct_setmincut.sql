@@ -261,7 +261,11 @@ BEGIN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
-		EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+		IF v_mincut_version = '6.1' THEN
+			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+		ELSE 
+			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+		END IF;
 		IF v_row_count = 0 THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
@@ -289,7 +293,11 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE 
-			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+			IF v_mincut_version = '6.1' THEN
+				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+			ELSE 
+				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+			END IF;
 			IF v_row_count = 0 THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
@@ -317,7 +325,11 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE 
-			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+			IF v_mincut_version = '6.1' THEN
+				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+			ELSE 
+				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+			END IF;
 			IF v_row_count = 0 THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
@@ -378,7 +390,11 @@ BEGIN
 			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
 
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
-				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+				IF v_mincut_version = '6.1' THEN
+					EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+				ELSE 
+					EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+				END IF;				
 				IF v_row_count = 0 THEN
 					v_init_mincut := TRUE;
 					v_prepare_mincut := FALSE;
