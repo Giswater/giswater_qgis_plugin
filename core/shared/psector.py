@@ -2569,7 +2569,14 @@ class GwPsector:
         tab_idx = dialog.tab_feature.currentIndex()
         feature_type = dialog.tab_feature.tabText(tab_idx).lower()
         qtbl_feature = dialog.findChild(QTableView, f"tbl_psector_x_{feature_type}")
-        selected_psector = self.psector_id
+        
+        # Get psector_id from dialog (works for both new and existing psectors)
+        selected_psector = tools_qt.get_text(dialog, 'tab_general_psector_id')
+        if not selected_psector:
+            msg = "Psector ID not found"
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+            
         list_tables = {'arc': self.tablename_psector_x_arc, 'node': self.tablename_psector_x_node,
                        'connec': self.tablename_psector_x_connec, 'gully': self.tablename_psector_x_gully}
 
@@ -2581,11 +2588,29 @@ class GwPsector:
             return
 
         if idx == 0:
+            model = qtbl_feature.model()
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
-                feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
-                state = qtbl_feature.model().record(row).value("state")
-                doable = qtbl_feature.model().record(row).value("doable")
+                
+                # Handle both QSqlTableModel and QStandardItemModel
+                if isinstance(model, QSqlTableModel):
+                    feature_id = model.record(row).value(f"{feature_type}_id")
+                    state = model.record(row).value("state")
+                    doable = model.record(row).value("doable")
+                elif isinstance(model, QStandardItemModel):
+                    feature_id_idx = model.index(row, tools_qt.get_col_index_by_col_name(qtbl_feature, f"{feature_type}_id"))
+                    state_idx = model.index(row, tools_qt.get_col_index_by_col_name(qtbl_feature, "state"))
+                    doable_idx = model.index(row, tools_qt.get_col_index_by_col_name(qtbl_feature, "doable"))
+                    feature_id = model.data(feature_id_idx)
+                    state = model.data(state_idx)
+                    doable = model.data(doable_idx)
+                else:
+                    continue
+                
+                # Skip if we couldn't get required data
+                if feature_id is None or state is None:
+                    continue
+                    
                 if doable:
                     sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector} AND state = '{state}';"
                 else:
@@ -2593,9 +2618,10 @@ class GwPsector:
         else:
             return
 
-        tools_db.execute_sql(sql)
-        tools_gw.load_tableview_psector(dialog, feature_type)
-        tools_gw.set_model_signals(self)
+        if sql:
+            tools_db.execute_sql(sql)
+            tools_gw.load_tableview_psector(dialog, feature_type)
+            tools_gw.set_model_signals(self)
 
     def _manage_features_geom(self, qtable, feature_type, field_id):
         tools_gw.reset_rubberband(self.rubber_band_op)
