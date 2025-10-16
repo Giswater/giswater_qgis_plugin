@@ -143,6 +143,8 @@ class GwMincut:
 
         tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
+        # Update table 'selector_mincut_result'
+        self._update_result_selector(result_mincut_id)
         tools_qgis.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
 
@@ -705,22 +707,14 @@ class GwMincut:
                         f"    AND omc.id IN (SELECT id FROM groups_conflict)"
                         f") "
                         f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
-                    )
-                    tools_db.execute_sql(sql)
-
-                    sql = (
-                        f"WITH groups_conflict AS ("
+                        f"\nWITH groups_conflict AS ("
                         f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
                         f") "
                         f"DELETE FROM om_mincut_conflict "
                         f"WHERE id IN (SELECT id FROM groups_conflict);"
+                        f"\nDELETE FROM om_mincut WHERE id = {result_mincut_id};"
                     )
                     tools_db.execute_sql(sql)
-
-                    sql = (f"DELETE FROM om_mincut"
-                           f" WHERE id = {result_mincut_id}")
-                    tools_db.execute_sql(sql)
-
 
                     tools_qgis.show_info("Mincut canceled!")
 
@@ -978,6 +972,7 @@ class GwMincut:
         if status:
             message = "Values has been updated"
             tools_qgis.show_info(message)
+            self._update_result_selector(result_mincut_id)
         else:
             message = "Error updating element in table, you need to review data"
             tools_qgis.show_warning(message)
@@ -1078,6 +1073,43 @@ class GwMincut:
         self.action_custom_mincut.setEnabled(False)
         self.action_change_valve_status.setEnabled(False)
         self.action_export_hydro_csv.setEnabled(True)
+
+    def _update_result_selector(self, result_mincut_id, commit=True):
+        """ Update table 'selector_mincut_result' """
+
+        conflict_group_id = tools_db.get_row(f"SELECT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}")
+        mincut_conflict_state = 5
+
+        sql = (
+            f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
+            f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type) VALUES"
+            f" (current_user, {result_mincut_id}, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;"
+        )
+        if conflict_group_id:
+            sql += (
+                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
+                f" SELECT omc.mincut_id, current_user, 'conflict' "
+                f" FROM om_mincut_conflict omc"
+                f" JOIN om_mincut om ON om.id = omc.mincut_id"
+                f" WHERE omc.id = {conflict_group_id}"
+                f" AND omc.mincut_id <> {result_mincut_id}"
+                f" AND om.mincut_state <> {mincut_conflict_state}"
+                f" ON CONFLICT (result_id, cur_user) DO NOTHING;"
+                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
+                f" SELECT omc.mincut_id, current_user, 'affected' "
+                f" FROM om_mincut_conflict omc"
+                f" JOIN om_mincut om ON om.id = omc.mincut_id"
+                f" WHERE omc.id = {conflict_group_id}"
+                f" AND omc.mincut_id <> {result_mincut_id}"
+                f" AND om.mincut_state = {mincut_conflict_state}"
+                f" ON CONFLICT (result_id, cur_user) DO NOTHING;"
+            )
+        status = tools_db.execute_sql(sql, commit)
+
+        if not status:
+            message = "Error updating table"
+            tools_qgis.show_warning(message, parameter='selector_mincut_result')
+
 
     def _real_end_accept(self):
 
@@ -2035,6 +2067,9 @@ class GwMincut:
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
+
+            # Update table 'selector_mincut_result'
+            self._update_result_selector(real_mincut_id)
 
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
