@@ -352,8 +352,8 @@ class GwProfileButton(GwAction):
 
         if self.first_node is False and not self.add_points:
             msg = "First node already selected with id: {0}. Select second one."
-            mgs_params = (self.initNode)
-            tools_qgis.show_info(msg, mgs_params=mgs_params)
+            msg_params = (self.initNode)
+            tools_qgis.show_info(msg, msg_params=msg_params)
 
         # Set vertex marker propierties
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
