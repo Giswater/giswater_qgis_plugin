@@ -728,7 +728,6 @@ class GwMincut:
                     self._update_result_selector()
                     tools_qgis.show_info("Mincut canceled!")
 
-
             # Rollback transaction
             else:
                 tools_db.dao.rollback()
@@ -1123,7 +1122,6 @@ class GwMincut:
         if not status:
             message = "Error updating table"
             tools_qgis.show_warning(message, parameter='selector_mincut_result')
-
 
     def _real_end_accept(self):
 
