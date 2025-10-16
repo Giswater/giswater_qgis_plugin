@@ -5673,6 +5673,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         refresh_selectors()
     tools_qgis.refresh_map_canvas()
 
+
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
     """ Change plan mode buttons """
 
