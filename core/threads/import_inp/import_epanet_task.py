@@ -88,7 +88,7 @@ class GwImportInpTask(GwTask):
         self.arccat_db: list[str] = []
         self.db_units = None
         self.exception: str = ""
-        self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode, and put logs into tab_log
+        self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode
 
         self.node_ids: dict[str, str] = {}
 
@@ -346,8 +346,8 @@ class GwImportInpTask(GwTask):
         template = "(%s, %s)"
 
         if self.debug_mode:
-            print("OPTIONS:")
-            print(update_params)
+            self._log_message("DEBUG: OPTIONS:")
+            self._log_message(f"DEBUG: {str(update_params)}")
 
         # Execute batch update
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=self.force_commit)
@@ -496,7 +496,8 @@ class GwImportInpTask(GwTask):
                     INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                     VALUES (%s, %s, %s, %s);
                 """
-                print(catalog, arctype_id, material, pipe_dint)
+                if self.debug_mode:
+                    self._log_message(f"DEBUG: catalog: {catalog}, arctype_id: {arctype_id}, material: {material}, pipe_dint: {pipe_dint}")
                 execute_sql(
                     sql, (catalog, arctype_id, material, pipe_dint), commit=self.force_commit
                 )
@@ -719,7 +720,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(junctions)
+            self._log_message(f"DEBUG: {str(junctions)}")
         if not junctions:
             self._log_message("Junctions couldn't be inserted!")
             return
@@ -836,7 +837,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(reservoirs)
+            self._log_message(f"DEBUG: {str(reservoirs)}")
         if not reservoirs:
             self._log_message("Reservoirs couldn't be inserted!")
             return
@@ -950,7 +951,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(tanks)
+            self._log_message(f"DEBUG: {str(tanks)}")
         if not tanks:
             self._log_message("Tanks couldn't be inserted!")
             return
@@ -1078,7 +1079,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(pumps)
+            self._log_message(f"DEBUG: {str(pumps)}")
         if not pumps:
             self._log_message("Pumps couldn't be inserted!")
             return
@@ -1308,7 +1309,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(pipes)
+            self._log_message(f"DEBUG: {str(pipes)}")
         if not pipes:
             self._log_message("Pipes couldn't be inserted!")
             return
@@ -1330,7 +1331,7 @@ class GwImportInpTask(GwTask):
                  )
             )
             if self.debug_mode:
-                print(inp_params)
+                self._log_message(f"DEBUG: {str(inp_params)}")
 
         # Insert into inp table
         toolsdb_execute_values(
