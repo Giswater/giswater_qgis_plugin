@@ -579,35 +579,20 @@ BEGIN
 			RETURN v_response;
 		END IF;
 
-        -- calculate cost/reverse_cost
-        -- closed valves
-        UPDATE temp_pgr_arc_minsector a
-        SET cost = -1, reverse_cost = -1
-        WHERE a.graph_delimiter  = 'MINSECTOR'
-        AND a.closed = TRUE;
+        --UPDATE to_arc, closed, broken and cost
+        v_data := jsonb_build_object(
+			'data', jsonb_build_object(
+				'mapzone_name', 'MINCUT',
+				'mode', 'MINSECTOR'
+			)
+		)::text;
+		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
-        -- checkvalves
-        UPDATE temp_pgr_arc_minsector a
-        SET cost = CASE WHEN v.minsector_id = a.node_2 THEN 1 ELSE -1 END,
-            reverse_cost = CASE WHEN v.minsector_id = a.node_2 THEN -1 ELSE 1 END
-        FROM v_temp_arc v
-        WHERE a.graph_delimiter  = 'MINSECTOR'
-        AND a.closed = FALSE
-        AND a.to_arc IS NOT NULL
-        AND a.broken = FALSE
-        AND a.to_arc[1] = v.arc_id;
-        
-        -- water-source (graph_delimiter  = 'SECTOR')
-        UPDATE temp_pgr_arc_minsector a
-        SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
-            reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
-        FROM temp_pgr_node_minsector n
-        WHERE a.graph_delimiter  = 'SECTOR'
-        AND n.graph_delimiter  = 'SECTOR'
-        AND COALESCE (a.node_1, a.node_2) = n.node_id
-        AND a.arc_id <> ALL (n.to_arc);
+		IF v_response->>'status' <> 'Accepted' THEN
+			RETURN v_response;
+		END IF;
 
-        -- establishing the borders of the mincut (calculate cost_mincut/reverse_cost_mincut)
+        -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut)
         UPDATE temp_pgr_arc_minsector a
         SET cost_mincut = -1, reverse_cost_mincut = -1;
 
@@ -617,25 +602,23 @@ BEGIN
             SET cost_mincut = 0, reverse_cost_mincut = 0
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.closed = FALSE 
-            AND a.to_arc IS NULL
             AND a.broken = TRUE;
         END IF;         
 
-        -- update cost_mincut/reverse_cost_mincut for check valves
+        -- check valves
         IF v_ignore_check_valves THEN
-            v_cost_field = '0';
-            v_reverse_cost_field = '0';
-        ELSE
-            v_cost_field = 'cost';
-            v_reverse_cost_field = 'reverse_cost';
-        END IF;
-
-        v_query_text = 'UPDATE temp_pgr_arc_minsector a
-            SET cost_mincut = ' || v_cost_field || ', reverse_cost_mincut = ' || v_reverse_cost_field || '
-            WHERE a.graph_delimiter = ''MINSECTOR''
+            UPDATE temp_pgr_arc_minsector a
+            SET cost_mincut = 0, reverse_cost_mincut = 0
+            WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.closed = FALSE 
-            AND a.to_arc IS NOT NULL';
-        EXECUTE v_query_text;
+            AND a.cost <> a.reverse_cost;
+		ELSE 
+            UPDATE temp_pgr_arc_minsector a
+            SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
+            WHERE a.graph_delimiter = 'MINSECTOR'
+            AND a.closed = FALSE 
+            AND a.cost <> a.reverse_cost;
+		END IF;
 
         -- the unaccess valves
         IF v_ignore_unaccess_valves THEN
@@ -648,7 +631,7 @@ BEGIN
 						AND o.mincut_class = %s
 						AND c.virtual = FALSE 
 						AND o.forecast_start <= o.forecast_end 
-						AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(now()::timestamp, (now() + interval ''1 day'')::timestamp, '[]')
+						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(now()::timestamp, (now() + interval ''1 day'')::timestamp, ''[]'')
 				)
                 UPDATE temp_pgr_arc_minsector tpa
                 SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
@@ -657,13 +640,13 @@ BEGIN
                 AND tpa.to_arc IS NULL
                 AND EXISTS (
                     SELECT 1
-                    FROM om_mincut_valves omv
+                    FROM om_mincut_valve omv
                     JOIN today_mincuts tm USING (result_id)
                     WHERE omv.unaccess = TRUE
                     AND omv.node_id = tpa.arc_id
             );',
             v_mincut_plannified_state, v_mincut_in_progress_state, 
-            v_mincut_network_class)
+            v_mincut_network_class);
         END IF;
 
         -- FINISH preparing

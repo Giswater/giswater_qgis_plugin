@@ -583,71 +583,38 @@ BEGIN
 			RETURN v_response;
 		END IF;
 
-		IF v_mincut_version = '6.1' THEN
-			EXECUTE format('
-				UPDATE %I a
-				SET cost = -1, reverse_cost = -1
-				WHERE a.graph_delimiter  = ''MINSECTOR''
-				AND a.closed = TRUE;
-			', v_temp_arc_table);
-
-
-			-- checkvalves
-			EXECUTE format('
-				UPDATE %I a
-			SET cost = CASE WHEN v.minsector_id = a.node_2 THEN 1 ELSE -1 END,
-				reverse_cost = CASE WHEN v.minsector_id = a.node_2 THEN -1 ELSE 1 END
-			FROM v_temp_arc v
-			WHERE a.graph_delimiter  = ''MINSECTOR''
-			AND a.closed = FALSE
-			AND a.to_arc IS NOT NULL
-			AND a.broken = FALSE
-			AND a.to_arc[1] = v.arc_id;
-			', v_temp_arc_table);
-
-			-- water-source (graph_delimiter  = 'SECTOR')
-			EXECUTE format('
-			UPDATE %I a
-			SET cost = CASE WHEN n.node_id = a.node_2 THEN 1 ELSE -1 END,
-				reverse_cost = CASE WHEN n.node_id = a.node_2 THEN -1 ELSE 1 END
-			FROM %I n
-			WHERE a.graph_delimiter  = ''SECTOR''
-			AND n.graph_delimiter  = ''SECTOR''
-				AND COALESCE (a.node_1, a.node_2) = n.node_id
-				AND a.arc_id <> ALL (n.to_arc);
-			', v_temp_arc_table, v_temp_node_table);
-		ELSE
+		-- Generate new arcs and update to_arc, closed, broken and cost
+		-- =======================
+		IF v_mincut_version <> '6.1' THEN
 			EXECUTE format('
 				UPDATE %I t
 				SET modif = TRUE
 				WHERE graph_delimiter = ''MINSECTOR''
 				OR graph_delimiter = ''SECTOR'';
 			', v_temp_node_table);
-
-			-- Generate new arcs
-			-- =======================
-			v_data := jsonb_build_object(
-				'data', jsonb_build_object(
-					'mapzone_name', 'MINCUT',
-					'mode', v_mode
-				)
-			)::text;
-			SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
-
-			IF v_response->>'status' <> 'Accepted' THEN
-				RETURN v_response;
-			END IF;
-			
-			-- the broken valves
-			EXECUTE format('
-				UPDATE %I a
-				SET cost = 0, reverse_cost = 0
-				WHERE a.graph_delimiter = ''MINSECTOR''
-				AND a.closed = FALSE 
-				AND a.to_arc IS NOT NULL
-				AND a.broken = TRUE;
-			', v_temp_arc_table);
 		END IF;
+
+		v_data := jsonb_build_object(
+			'data', jsonb_build_object(
+				'mapzone_name', 'MINCUT',
+				'mode', v_mode
+			)
+		)::text;
+		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
+
+		IF v_response->>'status' <> 'Accepted' THEN
+			RETURN v_response;
+		END IF;
+		
+		-- the broken valves
+		EXECUTE format('
+			UPDATE %I a
+			SET cost = 0, reverse_cost = 0
+			WHERE a.graph_delimiter = ''MINSECTOR''
+			AND a.closed = FALSE 
+			AND a.to_arc IS NOT NULL
+			AND a.broken = TRUE;
+		', v_temp_arc_table);
 
 		-- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
 		-- new arcs MINSECTOR AND SECTOR
@@ -663,7 +630,6 @@ BEGIN
 			SET cost_mincut = 0, reverse_cost_mincut = 0
 			WHERE a.graph_delimiter = ''MINSECTOR''
 			AND a.closed = FALSE 
-			AND a.to_arc IS NULL
 			AND a.broken = TRUE;
 		', v_temp_arc_table);
 
@@ -674,7 +640,7 @@ BEGIN
 				SET cost_mincut = 0, reverse_cost_mincut = 0
 				WHERE a.graph_delimiter = ''MINSECTOR''
 				AND a.closed = FALSE 
-				AND a.to_arc IS NOT NULL
+				AND a.cost <> a.reverse_cost
 			', v_temp_arc_table);
 		ELSE 
 			EXECUTE format('
@@ -682,7 +648,7 @@ BEGIN
 				SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
 				WHERE a.graph_delimiter = ''MINSECTOR''
 				AND a.closed = FALSE 
-				AND a.to_arc IS NOT NULL
+				AND a.cost <> a.reverse_cost
 			', v_temp_arc_table);
 		END IF;
 	END IF;
