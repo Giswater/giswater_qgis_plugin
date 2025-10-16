@@ -19329,11 +19329,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>mincut_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut management</translation>
+			<translation>Gestor de polígonos de corte</translation>
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Mincut management</translation>
+			<translation>Gestor de polígonos de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -26656,7 +26656,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>mincut_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut management</translation>
+			<translation>Gestor de polígonos de corte</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -26668,7 +26668,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>btn_cancel_mincut</source>
-			<translation>Cancelar</translation>
+			<translation>Cancelar corte</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel_mincut</source>
