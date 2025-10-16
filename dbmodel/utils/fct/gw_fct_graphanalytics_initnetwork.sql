@@ -42,7 +42,6 @@ DECLARE
 
     v_query_text TEXT;
     v_query_text_aux TEXT;
-    v_query_text_connectedcomponents TEXT;
     v_query_text_components TEXT;
 
     -- temporary tables
@@ -112,7 +111,7 @@ BEGIN
     END IF;
 
     IF v_mode = 'MINSECTOR' THEN
-        v_query_text = '
+        EXECUTE format('
             WITH connectedcomponents AS (
                 SELECT * FROM pgr_connectedcomponents($q$
                     SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph
@@ -125,11 +124,11 @@ BEGIN
                     SELECT 1
                     FROM v_temp_node vtn
                     WHERE c.node = vtn.minsector_id
-                    '||v_query_text_components||'
+                    %s
                 )
                 GROUP BY c.component
             )
-            INSERT INTO ' || v_temp_node_table || ' (node_id, graph_delimiter)
+            INSERT INTO %I (node_id, graph_delimiter)
             SELECT c.node, ''MINSECTOR''
             FROM connectedcomponents c
             WHERE EXISTS (
@@ -137,9 +136,9 @@ BEGIN
                 FROM components cc
                 WHERE cc.component = c.component
             );
-        ';
+        ', v_query_text_components, v_temp_node_table);
     ELSE
-        v_query_text = '
+        EXECUTE format('
             WITH connectedcomponents AS (
                 SELECT * FROM pgr_connectedcomponents($q$
                     SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc
@@ -152,11 +151,11 @@ BEGIN
                     SELECT 1
                     FROM v_temp_node vtn
                     WHERE c.node = vtn.node_id
-                    '||v_query_text_components||'
+                    %s
                 )
                 GROUP BY c.component
             )
-            INSERT INTO ' || v_temp_node_table || ' (node_id)
+            INSERT INTO %I (node_id)
             SELECT c.node
             FROM connectedcomponents c
             WHERE EXISTS (
@@ -164,9 +163,8 @@ BEGIN
                 FROM components cc
                 WHERE cc.component = c.component
             );
-        ';
+        ', v_query_text_components, v_temp_node_table);
     END IF;
-    EXECUTE v_query_text;
 
     IF v_mode = 'MINSECTOR' THEN
         -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
