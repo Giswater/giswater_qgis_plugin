@@ -41,6 +41,8 @@ class GwMincut:
         self.settings = global_vars.giswater_settings
         self.schema_name = lib_vars.schema_name
         self.timer = None
+        self.form_has_changed = False
+        self.original_values = {}
 
         # Create separate class to manage 'actionConfig'
         self.mincut_tools = GwMincutTools(self)
@@ -325,6 +327,13 @@ class GwMincut:
     def init_mincut_form(self):
         """ Custom form initial configuration """
 
+        # Drop temporary tables when form is initialized
+        extras = '"action":"DROP", "fct_name":"MINCUT"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_graphanalytics_manage_temporary', body)
+        if not result or result['status'] == 'Failed':
+            return
+
         # Setting lists
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
@@ -436,6 +445,7 @@ class GwMincut:
         # Set state name
         if self.states != {}:
             tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
+            print(self.states)
 
         self.current_state = 0
         self.sql_connec = ""
@@ -444,6 +454,9 @@ class GwMincut:
         self._refresh_tab_hydro()
 
         self._load_widgets_values()
+
+        self._store_original_values()
+        self._connect_change_signals()
 
     def set_id_val(self):
 
@@ -681,10 +694,40 @@ class GwMincut:
                        f" WHERE id = {result_mincut_id}")
                 row = tools_db.get_row(sql)
                 if row:
-                    sql = (f"DELETE FROM om_mincut"
-                           f" WHERE id = {result_mincut_id}")
+                    # Delete conflicts if this mincut caused conflicts
+                    mincut_conflict_state = 5
+                    sql = (
+                        f"WITH groups_conflict AS ("
+                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+                        f"),"
+                        f"mincuts_to_delete AS ("
+                        f"    SELECT omc.mincut_id "
+                        f"    FROM om_mincut_conflict omc "
+                        f"    JOIN om_mincut om ON om.id = omc.mincut_id "
+                        f"    WHERE om.mincut_state = {mincut_conflict_state} "
+                        f"    AND omc.id IN (SELECT id FROM groups_conflict)"
+                        f") "
+                        f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
+                    )
                     tools_db.execute_sql(sql)
+                    print('ok delete mincuts_to_delete')
+                    sql = (
+                        f"WITH groups_conflict AS ("
+                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+                        f") "
+                        f"DELETE FROM om_mincut_conflict "
+                        f"WHERE id IN (SELECT id FROM groups_conflict);"
+                    )
+                    tools_db.execute_sql(sql)
+                    print('ok delete groups_conflict')
+                    sql = (
+                        f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
+                    )
+                    tools_db.execute_sql(sql)
+                    print('ok delete mincut')
+                    self._update_result_selector()
                     tools_qgis.show_info("Mincut canceled!")
+
 
             # Rollback transaction
             else:
@@ -1042,16 +1085,45 @@ class GwMincut:
         self.action_change_valve_status.setEnabled(False)
         self.action_export_hydro_csv.setEnabled(True)
 
-    def _update_result_selector(self, result_mincut_id, commit=True):
+    def _update_result_selector(self, result_mincut_id: int = None, commit: bool = True) -> None:
         """ Update table 'selector_mincut_result' """
 
-        sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
-               f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
-               f" (current_user, {result_mincut_id});")
+        mincut_conflict_state = 5
+
+        sql = (
+            "DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
+        )
+        if result_mincut_id:
+            conflict_group_id = tools_db.get_row(f"SELECT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}")
+            sql += (
+                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type) VALUES"
+                f" (current_user, {result_mincut_id}, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;"
+            )
+        if conflict_group_id:
+            sql += (
+                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
+                f" SELECT omc.mincut_id, current_user, 'conflict' "
+                f" FROM om_mincut_conflict omc"
+                f" JOIN om_mincut om ON om.id = omc.mincut_id"
+                f" WHERE omc.id = {conflict_group_id}"
+                f" AND omc.mincut_id <> {result_mincut_id}"
+                f" AND om.mincut_state <> {mincut_conflict_state}"
+                f" ON CONFLICT (result_id, cur_user) DO NOTHING;"
+                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
+                f" SELECT omc.mincut_id, current_user, 'affected' "
+                f" FROM om_mincut_conflict omc"
+                f" JOIN om_mincut om ON om.id = omc.mincut_id"
+                f" WHERE omc.id = {conflict_group_id}"
+                f" AND omc.mincut_id <> {result_mincut_id}"
+                f" AND om.mincut_state = {mincut_conflict_state}"
+                f" ON CONFLICT (result_id, cur_user) DO NOTHING;"
+            )
         status = tools_db.execute_sql(sql, commit)
+
         if not status:
             message = "Error updating table"
             tools_qgis.show_warning(message, parameter='selector_mincut_result')
+
 
     def _real_end_accept(self):
 
@@ -2027,7 +2099,7 @@ class GwMincut:
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
 
-    def _refresh_mincut(self, triggered=None, action="mincutNetwork", zoom=True):
+    def _refresh_mincut(self, triggered=None, action="mincutRefresh", zoom=True):
         """ B2-125: Refresh current mincut """
 
         # Manage if task is already running
@@ -2199,8 +2271,15 @@ class GwMincut:
 
         use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
+
+        mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
+        forecast_start_predict = self.dlg_mincut.cbx_date_start_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_start_predict.time().toString('HH:mm:ss')
+        forecast_end_predict = self.dlg_mincut.cbx_date_end_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_end_predict.time().toString('HH:mm:ss')
+
         if result_mincut_id != 'null':
-            extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}"'
+            extras = (f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}", '
+                      f'"dialogMincutType":"{mincut_result_type}", "dialogForecastStart":"{forecast_start_predict}", '
+                      f'"dialogForecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
@@ -2405,8 +2484,8 @@ class GwMincut:
             self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_change_valve_status.setDisabled(True)
-            self.action_add_connec.setDisabled(False)
-            self.action_add_hydrometer.setDisabled(False)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)
 
         # In Progess
         elif state == '1':
@@ -2521,14 +2600,22 @@ class GwMincut:
                                 'mincut', 'change_valve_status_ep_canvasClicked_custom_mincut_snapping')
 
     def _change_valve_status_execute(self, elem_id):
-        """ Execute function 'gw_fct_setchangevalvestatus' """
+        """ Execute function 'setmincut' """
 
+        use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
+
+        mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
+        forecast_start_predict = self.dlg_mincut.cbx_date_start_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_start_predict.time().toString('HH:mm:ss')
+        forecast_end_predict = self.dlg_mincut.cbx_date_end_predict.date().toString('yyyy-MM-dd') + " " + self.dlg_mincut.cbx_hours_end_predict.time().toString('HH:mm:ss')
+
         if result_mincut_id != 'null':
-            use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
-            extras = f'"nodeId":{elem_id}, "mincutId":{result_mincut_id}, "usePsectors":"{use_planified}"'
+            extras = (f'"action":"mincutChangeValveStatus", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}", '
+                      f'"dialogMincutType":"{mincut_result_type}", "dialogForecastStart":"{forecast_start_predict}", '
+                      f'"dialogForecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body)
+            result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
@@ -2548,5 +2635,40 @@ class GwMincut:
 
         lbl_time = dialog.findChild(QLabel, 'lbl_time')
         lbl_time.setText(text)
+
+    def _store_original_values(self):
+        """Store original values of widgets"""
+        self.original_values = {
+            'type': tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0),
+            'date_start_predict': self.dlg_mincut.cbx_date_start_predict.date(),
+            'time_start_predict': self.dlg_mincut.cbx_hours_start_predict.time(),
+            'date_end_predict': self.dlg_mincut.cbx_date_end_predict.date(),
+            'time_end_predict': self.dlg_mincut.cbx_hours_end_predict.time(),
+        }
+        self.form_has_changes = False
+
+    def _connect_change_signals(self):
+        """Connect signals to detect changes"""
+        self.dlg_mincut.type.currentIndexChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_date_start_predict.dateChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_hours_start_predict.timeChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_date_end_predict.dateChanged.connect(self._on_form_changed)
+        self.dlg_mincut.cbx_hours_end_predict.timeChanged.connect(self._on_form_changed)
+
+    def _on_form_changed(self):
+        """Mark that the form has changed and block accept"""
+        self.form_has_changes = True
+        self.dlg_mincut.btn_accept.setEnabled(False)
+        self.dlg_mincut.btn_accept.setToolTip("You need to reexecute the mincut")
+
+        # Optional: change visual style to indicate pending changes
+        self.dlg_mincut.btn_accept.setStyleSheet("background-color: #ffcccc;")
+
+    def _reset_form_has_changes(self):
+        """Reset form has changes"""
+        self.form_has_changes = False
+        self.dlg_mincut.btn_accept.setEnabled(True)
+        self.dlg_mincut.btn_accept.setStyleSheet("")
+        self.dlg_mincut.btn_accept.setToolTip("Accept")
 
     # endregion
