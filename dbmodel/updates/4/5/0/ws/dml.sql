@@ -1112,6 +1112,6 @@ UPDATE config_toolbox SET inputparams='[
 {"label": "Commit changes:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 3},
 {"label": "Update mapzone geometry method:", "comboIds": [0, 1, 2, 3], "datatype": "integer", "comboNames": ["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "layoutname": "grl_option_parameters", "selectedId": "", "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 4},
 {"label": "Geometry parameter:", "value": "", "datatype": "float", "layoutname": "grl_option_parameters", "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 5, "placeholder": "5-30"},
-{"label": "Execute Massive Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "executeMassiveMincut", "widgettype": "check", "layoutorder": 6}
+{"label": "Execute Massive Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "executeMassiveMincut", "widgettype": "check", "layoutorder": 6},
 {"label": "Ignore Unaccess Valves Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "ignoreUnaccessValvesMincut", "widgettype": "check", "layoutorder": 7}
 ]'::json WHERE id=2706;
