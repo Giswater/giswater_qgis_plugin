@@ -87,8 +87,10 @@ BEGIN
 
     IF v_project_type = 'UD' THEN
         v_reverse_cost = -1;
-    ELSE
-        -- ARCS TO MODIFY - Depending on the nodes with modif = TRUE
+    END IF;
+
+    -- ARCS TO MODIFY - Depending on the nodes with modif = TRUE
+     IF v_project_type = 'WS' THEN
         -- ARCS VALVES
     	-- for the valves with to_arc NULL, one of the arcs that connect to the valve is modif = TRUE
         EXECUTE format('
@@ -342,6 +344,7 @@ BEGIN
         v_record.n_graph_delimiter, v_cost, v_reverse_cost, v_record.to_arc);
     END LOOP;
 
+    -- UPDATE values for the new arcs
     IF v_project_type = 'WS' THEN
         EXECUTE format('
             UPDATE %I t
