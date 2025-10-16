@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_psector_x_node',
     ARRAY[
         'id', 'node_id', 'psector_id', 'state', 'doable', 'descript', 'addparam',
-        'insert_tstamp', 'insert_user'
+        'insert_tstamp', 'insert_user', 'archived'
     ],
     'Table plan_psector_x_node should have the correct columns'
 );
@@ -39,6 +39,7 @@ SELECT col_type_is('plan_psector_x_node', 'descript', 'character varying(254)', 
 SELECT col_type_is('plan_psector_x_node', 'addparam', 'json', 'Column addparam should be json');
 SELECT col_type_is('plan_psector_x_node', 'insert_tstamp', 'timestamp without time zone', 'Column insert_tstamp should be timestamp without time zone');
 SELECT col_type_is('plan_psector_x_node', 'insert_user', 'text', 'Column insert_user should be text');
+SELECT col_type_is('plan_psector_x_node', 'archived', 'boolean', 'Column archived should be boolean');
 
 -- Check default values
 SELECT col_has_default('plan_psector_x_node', 'id', 'Column id should have a default value');
