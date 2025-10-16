@@ -13,4 +13,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE plan_psector_x_gully ADD COLUMN IF NOT EXISTS archived boolean DEFAULT false;
 
 -- Drop old archived_psector_gully table (no longer needed with boolean flag approach)
-DROP TABLE IF EXISTS archived_psector_gully CASCADE;
+ALTER TABLE IF EXISTS archived_psector_gully RENAME TO _archived_psector_gully_;

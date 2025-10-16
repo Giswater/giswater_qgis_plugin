@@ -14,8 +14,8 @@ ALTER TABLE plan_psector_x_arc ADD COLUMN IF NOT EXISTS archived boolean DEFAULT
 ALTER TABLE plan_psector_x_node ADD COLUMN IF NOT EXISTS archived boolean DEFAULT false;
 ALTER TABLE plan_psector_x_connec ADD COLUMN IF NOT EXISTS archived boolean DEFAULT false;
 
--- Drop old archived_psector_* tables (no longer needed with boolean flag approach)
-DROP TABLE IF EXISTS archived_psector_arc CASCADE;
-DROP TABLE IF EXISTS archived_psector_node CASCADE;
-DROP TABLE IF EXISTS archived_psector_connec CASCADE;
-DROP TABLE IF EXISTS archived_psector_link CASCADE;
+-- Rename old archived_psector_* tables (no longer needed with boolean flag approach)
+ALTER TABLE IF EXISTS archived_psector_arc RENAME TO _archived_psector_arc_;
+ALTER TABLE IF EXISTS archived_psector_node RENAME TO _archived_psector_node_;
+ALTER TABLE IF EXISTS archived_psector_connec RENAME TO _archived_psector_connec_;
+ALTER TABLE IF EXISTS archived_psector_link RENAME TO _archived_psector_link_;
