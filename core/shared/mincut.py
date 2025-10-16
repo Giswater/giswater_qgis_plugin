@@ -695,6 +695,7 @@ class GwMincut:
                 row = tools_db.get_row(sql)
                 if row:
                     # Delete conflicts if this mincut caused conflicts
+                    mincut_conflict_state = 5
                     sql = (
                         f"WITH groups_conflict AS ("
                         f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
@@ -703,20 +704,30 @@ class GwMincut:
                         f"    SELECT omc.mincut_id "
                         f"    FROM om_mincut_conflict omc "
                         f"    JOIN om_mincut om ON om.id = omc.mincut_id "
-                        f"    WHERE om.mincut_class = 4 "
+                        f"    WHERE om.mincut_state = {mincut_conflict_state} "
                         f"    AND omc.id IN (SELECT id FROM groups_conflict)"
                         f") "
                         f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
-                        f"\nWITH groups_conflict AS ("
+                    )
+                    tools_db.execute_sql(sql)
+                    print('ok delete mincuts_to_delete')
+                    sql = (
+                        f"WITH groups_conflict AS ("
                         f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
                         f") "
                         f"DELETE FROM om_mincut_conflict "
                         f"WHERE id IN (SELECT id FROM groups_conflict);"
-                        f"\nDELETE FROM om_mincut WHERE id = {result_mincut_id};"
                     )
                     tools_db.execute_sql(sql)
-
+                    print('ok delete groups_conflict')
+                    sql = (
+                        f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
+                    )
+                    tools_db.execute_sql(sql)
+                    print('ok delete mincut')
+                    self._update_result_selector()
                     tools_qgis.show_info("Mincut canceled!")
+
 
             # Rollback transaction
             else:
@@ -1074,17 +1085,20 @@ class GwMincut:
         self.action_change_valve_status.setEnabled(False)
         self.action_export_hydro_csv.setEnabled(True)
 
-    def _update_result_selector(self, result_mincut_id, commit=True):
+    def _update_result_selector(self, result_mincut_id: int = None, commit: bool = True) -> None:
         """ Update table 'selector_mincut_result' """
 
-        conflict_group_id = tools_db.get_row(f"SELECT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}")
         mincut_conflict_state = 5
 
         sql = (
-            f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
-            f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type) VALUES"
-            f" (current_user, {result_mincut_id}, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;"
+            "DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
         )
+        if result_mincut_id:
+            conflict_group_id = tools_db.get_row(f"SELECT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}")
+            sql += (
+                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type) VALUES"
+                f" (current_user, {result_mincut_id}, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;"
+            )
         if conflict_group_id:
             sql += (
                 f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
