@@ -63,6 +63,11 @@ DECLARE
     -- MINCUT VARIABLES
     v_record_minsector RECORD;
     v_execute_massive_mincut BOOLEAN;
+    v_ignore_unaccess_valves BOOLEAN;
+    v_mincut_plannified_state integer := 0; -- Plannified mincut state
+    v_mincut_in_progress_state integer := 1; -- In progress mincut state
+    v_mincut_network_class integer := 1; -- Network mincut class
+
 
     -- parameters
     v_pgr_distance INTEGER;
@@ -88,6 +93,7 @@ BEGIN
     v_ignore_broken_valves = (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreBrokenOnlyMassiveMincut');
     v_ignore_check_valves = (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreCheckValvesMincut');
     v_execute_massive_mincut = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'executeMassiveMincut')::BOOLEAN;
+    v_ignore_unaccess_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreUnaccessValvesMincut')::BOOLEAN;
 
     -- it's not allowed to commit changes when psectors are used
  	IF v_usepsector THEN
@@ -606,12 +612,14 @@ BEGIN
         SET cost_mincut = -1, reverse_cost_mincut = -1;
 
         -- the broken open valves
-		UPDATE temp_pgr_arc_minsector a
-		SET cost_mincut = 0, reverse_cost_mincut = 0
-		WHERE a.graph_delimiter = 'MINSECTOR'
-		AND a.closed = FALSE 
-		AND a.to_arc IS NULL
-		AND a.broken = TRUE;
+        IF v_ignore_broken_valves THEN
+            UPDATE temp_pgr_arc_minsector a
+            SET cost_mincut = 0, reverse_cost_mincut = 0
+            WHERE a.graph_delimiter = 'MINSECTOR'
+            AND a.closed = FALSE 
+            AND a.to_arc IS NULL
+            AND a.broken = TRUE;
+        END IF;         
 
         -- update cost_mincut/reverse_cost_mincut for check valves
         IF v_ignore_check_valves THEN
@@ -628,6 +636,35 @@ BEGIN
             AND a.closed = FALSE 
             AND a.to_arc IS NOT NULL';
         EXECUTE v_query_text;
+
+        -- the unaccess valves
+        IF v_ignore_unaccess_valves THEN
+            EXECUTE format('
+                WITH today_mincuts AS (
+					SELECT o.id AS result_id
+					FROM om_mincut o
+					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
+					WHERE o.mincut_state IN (%s, %s)
+						AND o.mincut_class = %s
+						AND c.virtual = FALSE 
+						AND o.forecast_start <= o.forecast_end 
+						AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(now()::timestamp, (now() + interval ''1 day'')::timestamp, '[]')
+				)
+                UPDATE temp_pgr_arc_minsector tpa
+                SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
+                WHERE tpa.graph_delimiter = ''MINSECTOR''
+                AND tpa.closed = FALSE 
+                AND tpa.to_arc IS NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM om_mincut_valves omv
+                    JOIN today_mincuts tm USING (result_id)
+                    WHERE omv.unaccess = TRUE
+                    AND omv.node_id = tpa.arc_id
+            );',
+            v_mincut_plannified_state, v_mincut_in_progress_state, 
+            v_mincut_network_class)
+        END IF;
 
         -- FINISH preparing
 
@@ -662,8 +699,8 @@ BEGIN
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
 
-            INSERT INTO temp_pgr_minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, to_arc)
-            SELECT v_record_minsector.node_id, a.arc_id, a.proposed, a.closed, a.broken, a.to_arc[1]
+            INSERT INTO temp_pgr_minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc)
+            SELECT v_record_minsector.node_id, a.arc_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc[1]
             FROM temp_pgr_arc_minsector a
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.mapzone_id <> 0;
@@ -674,8 +711,8 @@ BEGIN
             SELECT minsector_id, mincut_minsector_id
             FROM temp_pgr_minsector_mincut;
 
-            INSERT INTO minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, to_arc)
-            SELECT minsector_id, node_id, proposed, closed, broken, to_arc
+            INSERT INTO minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc)
+            SELECT minsector_id, node_id, proposed, closed, broken, unaccess, to_arc
             FROM temp_pgr_minsector_mincut_valve;
         END IF;
 

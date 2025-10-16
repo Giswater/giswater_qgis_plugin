@@ -1054,3 +1054,13 @@ SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 </qgis>
 '
 WHERE layername='v_om_mincut_initpoint' AND styleconfig_id=101;
+
+UPDATE config_toolbox SET inputparams='[
+{"label": "Exploitation:", "tooltip": "Choose exploitation to work with", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": "", "widgetname": "exploitation", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "layoutorder": 1},
+{"label": "Use masterplan psectors:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "usePlanPsector", "widgettype": "check", "layoutorder": 2},
+{"label": "Commit changes:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 3},
+{"label": "Update mapzone geometry method:", "comboIds": [0, 1, 2, 3], "datatype": "integer", "comboNames": ["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "layoutname": "grl_option_parameters", "selectedId": "", "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 4},
+{"label": "Geometry parameter:", "value": "", "datatype": "float", "layoutname": "grl_option_parameters", "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 5, "placeholder": "5-30"},
+{"label": "Execute Massive Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "executeMassiveMincut", "widgettype": "check", "layoutorder": 6}
+{"label": "Ignore Unaccess Valves Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "ignoreUnaccessValvesMincut", "widgettype": "check", "layoutorder": 7}
+]'::json WHERE id=2706;
