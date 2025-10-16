@@ -32,6 +32,7 @@ v_node_id int;
 v_toarc int;
 v_node1 int;
 v_node2 int;
+v_arc_id int;
 v_elevation float;
 v_errcontext text;
 v_msgerr json;
@@ -106,7 +107,7 @@ BEGIN
 
         -- Introducing new node transforming line into point
         INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
-        VALUES (v_node_id, v_nodecat, v_epatype, 0, 0, v_data.expl_id, v_data.muni_id, 1, 2, v_thegeom);
+        VALUES (v_node_id, v_nodecat, v_epatype, 0, 0, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type, v_thegeom);
 
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into node.');
 
@@ -145,16 +146,52 @@ BEGIN
         -- calculate elevation from old nodes
         v_elevation = ((SELECT top_elev FROM node WHERE node_id=v_node1) + (SELECT top_elev FROM node WHERE node_id=v_node2))/2;
 
-        -- reconnect topology
-        UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 OR node_1=v_node2;
-        UPDATE arc SET node_2=v_node_id WHERE node_2=v_node1 OR node_2=v_node2;
-        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Reconnected node_1 & node_2.');
+        -- reconnect topology - handle special nodes (TANK, RESERVOIR, etc.) differently
+        -- Check node_1
+        IF (SELECT epa_type FROM node WHERE node_id=v_node1) = 'JUNCTION' THEN
+            -- Normal junction: reconnect all arcs to new node
+            UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 AND arc_id!=v_data.arc_id;
+            UPDATE arc SET node_2=v_node_id WHERE node_2=v_node1 AND arc_id!=v_data.arc_id;
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Reconnected junction ',v_node1,'.'));
+        ELSE
+            -- Special node (TANK, RESERVOIR, etc.): create virtual arc to connect it to new node
+            INSERT INTO arc (node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
+            SELECT v_node_id, v_node1, 'VIRTUAL', 'PIPE', v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type,
+                ST_MakeLine(v_thegeom, (SELECT the_geom FROM node WHERE node_id=v_node1))
+            RETURNING arc_id INTO v_arc_id;
+
+            INSERT INTO man_varc (arc_id) VALUES (v_arc_id);
+
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Created virtual arc ',v_arc_id,' to keep node ',v_node1,' (',
+                (SELECT epa_type FROM node WHERE node_id=v_node1),').'));
+        END IF;
+
+        -- Check node_2
+        IF (SELECT epa_type FROM node WHERE node_id=v_node2) = 'JUNCTION' THEN
+            -- Normal junction: reconnect all arcs to new node
+            UPDATE arc SET node_1=v_node_id WHERE node_1=v_node2 AND arc_id!=v_data.arc_id;
+            UPDATE arc SET node_2=v_node_id WHERE node_2=v_node2 AND arc_id!=v_data.arc_id;
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Reconnected junction ',v_node2,'.'));
+        ELSE
+            -- Special node (TANK, RESERVOIR, etc.): create virtual arc to connect it to new node
+            INSERT INTO arc (node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
+            SELECT v_node_id, v_node2, 'VIRTUAL', 'PIPE', v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type,
+                ST_MakeLine(v_thegeom, (SELECT the_geom FROM node WHERE node_id=v_node2))
+            RETURNING arc_id INTO v_arc_id;
+
+            INSERT INTO man_varc (arc_id) VALUES (v_arc_id);
+
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Created virtual arc ',v_arc_id,' to keep node ',v_node2,' (',
+                (SELECT epa_type FROM node WHERE node_id=v_node2),'.'));
+        END IF;
 
         -- downgrade to obsolete arcs and nodes
         UPDATE arc SET state=0,state_type=1 WHERE arc_id=v_data.arc_id;
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded arc.');
-        UPDATE node SET state=0,state_type=1 WHERE node_id IN (v_node1, v_node2);
-        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded old nodes.');
+
+        -- Only downgrade nodes that are JUNCTION type
+        UPDATE node SET state=0,state_type=1 WHERE node_id IN (v_node1, v_node2) AND epa_type='JUNCTION';
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded old junction nodes.');
 
         -- update elevation of new node
         UPDATE node SET top_elev = v_elevation, the_geom = the_geom WHERE node_id=v_node_id;
