@@ -963,6 +963,31 @@ class GwPsector:
 
         workcat_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_workcat_id')
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
+        active = tools_qt.get_widget_value(self.dlg_plan_psector, 'tab_general_active')
+        
+        # Prevent deactivating or archiving the last active psector
+        # Only check if THIS psector is currently active
+        if self.update:
+            psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+            sql = f"SELECT active FROM plan_psector WHERE psector_id = {psector_id}"
+            result = tools_db.get_row(sql)
+            current_active = result[0] if result else False
+            
+            # Only validate if this psector is currently active
+            if current_active:
+                trying_to_archive = status_id in ('5', '6', '7', 5, 6, 7)
+                trying_to_deactivate = not active
+                
+                if trying_to_archive or trying_to_deactivate:
+                    sql = "SELECT COUNT(*) FROM plan_psector WHERE active IS TRUE AND status NOT IN ('5', '6', '7')"
+                    result = tools_db.get_row(sql)
+                    active_count = result[0] if result else 0
+                    
+                    if active_count <= 1:
+                        msg = "Cannot deactivate or archive the last active psector. At least one psector must remain active."
+                        tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
+                        return
+        
         # Check if psector status is "Executed" (status_id == 5) and has no workcat_id
         if int(status_id) == 5 and workcat_id in (None, 'null', ''):
             msg = "Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?"
@@ -1413,6 +1438,7 @@ class GwPsector:
         model.select()
 
         # When change some field we need to refresh Qtableview and filter by psector_id
+        # This works for both psector relations AND psector manager table
         model.beforeUpdate.connect(partial(self.manage_update_model_relations, model))
         # model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
@@ -1455,6 +1481,41 @@ class GwPsector:
             if str(widget.model().record(row).value('tab_general_psector_id')) != tools_qt.get_text(dialog, 'tab_general_psector_id'):
                 widget.hideRow(i)
 
+    def validate_psector_status_change(self, model: QSqlTableModel, row: int, record: QSqlRecord) -> bool:
+        """
+        Validate psector changes in manager table
+        Prevents deactivating or archiving the last active psector
+        """
+        table_name = model.tableName()
+        
+        # Only validate for main psector table
+        if 'v_ui_plan_psector' not in str(table_name):
+            return True
+        
+        old_active = model.record(row).value('active')
+        new_active = record.value('active')
+        new_status = record.value('status')
+        
+        trying_to_deactivate = (old_active and not new_active)
+        archived_statuses = ['5', '6', '7', 5, 6, 7, 
+                           'MADE OPERATIONAL (ARCHIVED)', 'COMISSIONED (ARCHIVED)', 'CANCELED (ARCHIVED)']
+        trying_to_archive = (str(new_status) in [str(s) for s in archived_statuses] or new_status in archived_statuses)
+        
+        if trying_to_deactivate or trying_to_archive:
+            sql = "SELECT COUNT(*) FROM plan_psector WHERE active IS TRUE AND status NOT IN ('5', '6', '7')"
+            result = tools_db.get_row(sql)
+            active_count = result[0] if result else 0
+            
+            if active_count <= 1:
+                msg = "Cannot deactivate or archive the last active psector. At least one psector must remain active."
+                dialog = getattr(self, 'dlg_psector_mng', None) or getattr(self, 'dlg_plan_psector', None)
+                tools_qgis.show_warning(msg, dialog=dialog)
+                model.revertAll()
+                model.select()
+                return False
+        
+        return True
+
     def manage_update_model_relations(self, model: QSqlTableModel, row: int, record: QSqlRecord):
         """
         Manage update model relations - INSERT if new, UPDATE if exists
@@ -1466,6 +1527,10 @@ class GwPsector:
         # Get the table name from the model
         table_name = model.tableName()
         if not table_name:
+            return
+        
+        # Validate psector status changes
+        if not self.validate_psector_status_change(model, row, record):
             return
 
         # Build column lists and values for UPSERT operation
@@ -1804,6 +1869,19 @@ class GwPsector:
                 msg_params = (cur_psector[0],)
                 tools_qgis.show_warning(msg, dialog=dialog, msg_params=msg_params)
                 return
+            # Check if trying to deactivate the last active psector
+            if active:
+                # Count total active non-archived psectors
+                sql_check = "SELECT COUNT(*) FROM plan_psector WHERE active IS TRUE"
+                result = tools_db.get_row(sql_check)
+                active_count = result[0] if result else 0
+                
+                # If this is the only active psector, block the change
+                if active_count <= 1:
+                    msg = "Cannot deactivate the last active psector. At least one psector must remain active."
+                    tools_qgis.show_warning(msg, dialog=dialog)
+                    return
+            
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
                 # Remove from selector
@@ -1860,6 +1938,9 @@ class GwPsector:
         json_result = tools_gw.execute_procedure('gw_fct_plan_recover_archived', body)
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
             return
+        
+        # Refresh the table to show updated status
+        self._filter_table(dialog, qtbl_psm, dialog.txt_name, dialog.chk_active, dialog.chk_archived, 'v_ui_plan_psector')
 
     def update_current_psector(self, dialog, qtbl, scenario_type, col_id_name):
         """ Sets the selected psector as current if it is active """

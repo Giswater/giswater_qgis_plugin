@@ -4196,7 +4196,21 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
             msg_params = (len(ids_to_insert), ", ".join(ids_to_insert[:50]))
         do_insert = tools_qt.show_question(msg, msg_params=msg_params)
     else:
-        # No new ids to insert: ensure we clear any selection on canvas
+        # No new ids to insert: show info message and clear selection
+        msg_params = None
+        if selected_ids:
+            # Features were selected but already exist in table
+            msg = "No new features to insert. All selected features already exist in the table."
+        else:
+            # No features of this type were found in the selection
+            # Get the actual tab name for display
+            tab_name = class_object.rel_feature_type
+            if hasattr(dialog, 'tab_feature'):
+                tab_idx = dialog.tab_feature.currentIndex()
+                tab_name = dialog.tab_feature.tabText(tab_idx)
+            msg = "No features found in the selection for {0}."
+            msg_params = (tab_name, )
+        tools_qgis.show_info(msg, dialog=dialog, msg_params=msg_params)
         remove_selection(layers=class_object.rel_layers)
 
     # If user closes/cancels the confirmation, just clear canvas selection
@@ -4513,6 +4527,10 @@ def _campaign_multi_insert_processing(class_object, dialog, table_object, select
         per_type = _collect_ids_to_insert(class_object, dialog, table_object, selection_mode, enabled_types)
 
         if not per_type:
+            # No features found in selection for any enabled tab
+            enabled_types_str = ", ".join(enabled_types) if enabled_types else "any feature type"
+            msg = "No features found in the selection for the enabled tabs ({0})."
+            tools_qgis.show_info(msg, parameter=enabled_types_str, dialog=dialog)
             remove_selection(layers=class_object.rel_layers)
             return
 
