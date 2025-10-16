@@ -344,24 +344,28 @@ BEGIN
         v_record.n_graph_delimiter, v_cost, v_reverse_cost, v_record.to_arc);
     END LOOP;
 
-    -- UPDATE values for the new arcs
     IF v_project_type = 'WS' THEN
+        -- UPDATE values for the NEW arcs and nodes
         EXECUTE format('
             UPDATE %I t
             SET closed = n.closed, broken = n.broken
             FROM %I n
-            WHERE COALESCE(t.node_1, t.node_2) = n.node_id
-            AND t.graph_delimiter = ''MINSECTOR'';
+            WHERE n.modif = TRUE
+            AND t.graph_delimiter = ''MINSECTOR''
+            AND COALESCE(t.node_1, t.node_2) = n.node_id;
         ', v_temp_arc_table, v_temp_node_table);
 
         EXECUTE format('
             UPDATE %I t
             SET closed = n.closed, broken = n.broken
             FROM %I n
-            WHERE t.old_node_id = n.node_id
-            AND t.graph_delimiter = ''MINSECTOR'';
+            WHERE n.modif = TRUE
+            AND t.graph_delimiter = ''MINSECTOR''
+            AND t.old_node_id = n.node_id
+            ;
         ', v_temp_node_table, v_temp_node_table);
 
+        -- UPDATE cost/reverse_cost
         -- closed valves
         EXECUTE format('
             UPDATE %I a
@@ -371,23 +375,44 @@ BEGIN
         ', v_temp_arc_table);
 
         -- checkvalves
-        EXECUTE format('
-            UPDATE %I a
-            SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-                reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-            WHERE a.graph_delimiter  = ''MINSECTOR''
-            AND a.to_arc IS NOT NULL
-            AND a.closed = FALSE;
-        ', v_temp_arc_table);
+        IF v_mode = 'MINSECTOR' THEN
+            EXECUTE format('
+				UPDATE %I a
+                SET cost = CASE WHEN EXISTS (SELECT 1 FROM v_temp_arc v WHERE v.arc_id = a.to_arc[1] AND v.minsector_id = a.node_1) THEN -1 ELSE a.cost END,
+                    reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM v_temp_arc v WHERE v.arc_id = a.to_arc[1] AND v.minsector_id = a.node_2) THEN -1 ELSE a.reverse_cost END
+                WHERE a.graph_delimiter  = ''MINSECTOR''
+                AND a.closed = FALSE
+                AND a.to_arc IS NOT NULL;
+                ', v_temp_arc_table);
+        ELSE 
+            EXECUTE format('
+                UPDATE %I a
+                SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
+                    reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
+                WHERE a.graph_delimiter  = ''MINSECTOR''
+                AND a.to_arc IS NOT NULL
+                AND a.closed = FALSE;
+            ', v_temp_arc_table);
+        END IF;
 
         -- for mapzone graph_delimiter and the watersources (SECTOR) - the inlet arcs behave like checkvalves
-        EXECUTE format('
-            UPDATE %I a
-            SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-                reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-            WHERE a.graph_delimiter IN (%L, ''SECTOR'')
-            AND a.old_arc_id <> ALL (a.to_arc);
-        ', v_temp_arc_table, v_graph_delimiter);
+        IF v_mode = 'MINSECTOR' THEN
+            EXECUTE format('
+				UPDATE %I a
+                SET cost = CASE WHEN EXISTS (SELECT 1 FROM %I n WHERE n.graph_delimiter  = ''SECTOR'' AND a.node_1 = n.node_id) THEN -1 ELSE a.cost END,
+                    reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM %I n WHERE n.graph_delimiter  = ''SECTOR'' AND a.node_2 = n.node_id) THEN -1 ELSE a.reverse_cost END
+                WHERE a.graph_delimiter IN (%L, ''SECTOR'')
+                AND a.arc_id <> ALL (a.to_arc);
+                ', v_temp_arc_table, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
+        ELSE
+            EXECUTE format('
+                UPDATE %I a
+                SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
+                    reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
+                WHERE a.graph_delimiter IN (%L, ''SECTOR'')
+                AND a.old_arc_id <> ALL (a.to_arc);
+            ', v_temp_arc_table, v_graph_delimiter);
+        END IF;
     END IF;
 
     -- FORCECLOSED
