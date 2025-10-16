@@ -303,6 +303,11 @@ BEGIN
 			v_name = 'concat(row_number() over(order by atlas_id::integer), ''-'',name)';
 		END IF;
 
+		-- filter out archived psectors (status 5, 6, 7 = archived)
+		IF v_tab.tabname = 'tab_psector' THEN
+			v_fullfilter = concat(v_fullfilter, ' AND (status NOT IN (''5'', ''6'', ''7'') OR status IS NULL)');
+		END IF;
+
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
 
