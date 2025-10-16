@@ -699,3 +699,114 @@ AS WITH sel_state AS (
     p_state,
     uuid
    FROM connec_selected c;
+
+DROP VIEW IF EXISTS v_om_mincut_arc;
+DROP VIEW IF EXISTS v_om_mincut_connec;
+DROP VIEW IF EXISTS v_om_mincut_node;
+DROP VIEW IF EXISTS v_om_mincut_initpoint;
+CREATE OR REPLACE VIEW v_om_mincut_arc AS
+WITH sel_mincut AS (
+	SELECT result_id, result_type
+	FROM selector_mincut_result
+	WHERE cur_user = CURRENT_USER
+)
+SELECT oma.id,
+    oma.result_id,
+    om.mincut_class,
+    om.work_order,
+    oma.arc_id,
+    sm.result_type,
+    oma.the_geom
+FROM om_mincut_arc oma
+JOIN om_mincut om ON oma.result_id = om.id
+JOIN sel_mincut sm ON sm.result_id = oma.result_id
+ORDER BY oma.arc_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_connec
+AS WITH sel_mincut AS (
+	SELECT result_id, result_type
+	FROM selector_mincut_result
+	WHERE cur_user = CURRENT_USER
+)
+SELECT omc.id,
+    omc.result_id,
+    om.work_order,
+    omc.connec_id,
+    omc.customer_code,
+    sm.result_type,
+    omc.the_geom
+FROM om_mincut_connec omc
+JOIN om_mincut om ON omc.result_id = om.id
+JOIN sel_mincut sm ON sm.result_id = omc.result_id
+ORDER BY omc.connec_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_node
+AS WITH sel_mincut AS (
+	SELECT result_id, result_type
+	FROM selector_mincut_result
+	WHERE cur_user = CURRENT_USER
+)
+SELECT omn.id,
+    omn.result_id,
+    om.work_order,
+    omn.node_id,
+    omn.node_type,
+    sm.result_type,
+    omn.the_geom
+FROM om_mincut_node omn
+JOIN om_mincut om ON omn.result_id = om.id
+JOIN sel_mincut sm ON sm.result_id = omn.result_id
+ORDER BY omn.node_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_initpoint
+AS WITH sel_mincut AS (
+	SELECT result_id, result_type
+	FROM selector_mincut_result
+	WHERE cur_user = CURRENT_USER
+)
+SELECT om.id,
+    om.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om.mincut_type,
+    om.received_date,
+    om.expl_id,
+    exploitation.name AS expl_name,
+    macroexploitation.name AS macroexpl_name,
+    om.macroexpl_id,
+    om.muni_id,
+    ext_municipality.name AS muni_name,
+    om.postcode,
+    om.streetaxis_id,
+    ext_streetaxis.name AS street_name,
+    om.postnumber,
+    c.idval AS anl_cause,
+    om.anl_tstamp,
+    om.anl_user,
+    om.anl_descript,
+    om.anl_feature_id,
+    om.anl_feature_type,
+    om.anl_the_geom,
+    om.forecast_start,
+    om.forecast_end,
+    om.assigned_to,
+    om.exec_start,
+    om.exec_end,
+    om.exec_user,
+    om.exec_descript,
+    om.exec_from_plot,
+    om.exec_depth,
+    om.exec_appropiate,
+    om.notified,
+    om.output,
+    sm.result_type
+FROM om_mincut om
+LEFT JOIN om_typevalue a ON a.id::integer = om.mincut_state AND a.typevalue = 'mincut_state'::text
+LEFT JOIN om_typevalue b ON b.id::integer = om.mincut_class AND b.typevalue = 'mincut_class'::text
+LEFT JOIN om_typevalue c ON c.id::integer = om.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+LEFT JOIN exploitation ON om.expl_id = exploitation.expl_id
+LEFT JOIN ext_streetaxis ON om.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN macroexploitation ON om.macroexpl_id = macroexploitation.macroexpl_id
+LEFT JOIN ext_municipality ON om.muni_id = ext_municipality.muni_id
+JOIN sel_mincut sm ON sm.result_id = om.id
+WHERE om.id > 0;

@@ -83,18 +83,17 @@ v_result_arc jsonb;
 
 
 -- MINCUT VARIABLES
-v_mapzone_name text ='MINSECTOR';
 v_mincut_id INTEGER;
 v_water_source int[];
 
 -- general variables
 v_query_text TEXT;
+v_mode TEXT;
 
 -- parameters
 v_pgr_distance INTEGER;
 v_pgr_root_vids int[];
 v_ignore_check_valves BOOLEAN;
-v_mode varchar;
 
 -- temporary tables for core
 v_temp_arc_table regclass;
@@ -126,14 +125,14 @@ BEGIN
 	v_ignore_check_valves = p_data->'data'->>'ignoreCheckValvesMincut';
     v_mode = p_data->'data'->>'mode';
 
-    -- TEMPORARY TABLES FOR MASSIVE MINCUT
-    if v_mode = 'MASSIVE' then
-        v_temp_arc_table = 'temp_pgr_arc_mincut'::regclass;
-        v_temp_node_table = 'temp_pgr_node_mincut'::regclass;
-    else
+    IF v_mode = 'MINSECTOR' THEN
+        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
+        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
+    ELSE
         v_temp_arc_table = 'temp_pgr_arc'::regclass;
         v_temp_node_table = 'temp_pgr_node'::regclass;
-    end if;
+    END IF;
+
 
     -- STEP 1 flood with INVERTED cost_mincut/reverse_cost_mincut for finding the borders
     -- the flood is reversed; the one-way valves that don't stop the water will stay inside the minsector, they cannot be borders because they cannot be closed
@@ -202,7 +201,7 @@ BEGIN
             FROM temp_pgr_drivingdistance d
             JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
             WHERE a.graph_delimiter = ''SECTOR''
-            AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);',
+            AND (d.node = a.pgr_node_1 AND a.reverse_cost >= 0 OR d.node = a.pgr_node_2 AND a."cost" >= 0);',
             v_temp_arc_table
         ) INTO v_valve_water;
 
@@ -212,7 +211,7 @@ BEGIN
             FROM temp_pgr_drivingdistance d
             JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
             WHERE a.graph_delimiter = ''SECTOR''
-            AND (d.node = a.pgr_node_1 AND a.reverse_cost = 0 OR d.node = a.pgr_node_2 AND a."cost" = 0);',
+            AND (d.node = a.pgr_node_1 AND a.reverse_cost >= 0 OR d.node = a.pgr_node_2 AND a."cost" >= 0);',
             v_temp_arc_table
         ) INTO v_water_source;
 
@@ -342,7 +341,7 @@ BEGIN
                 FROM temp_pgr_drivingdistance d
                 JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
                 WHERE a.graph_delimiter = ''SECTOR''
-                AND (d.node = a.pgr_node_1 AND a.cost = 0 OR d.node = a.pgr_node_2 AND a.reverse_cost = 0);',
+                AND (d.node = a.pgr_node_1 AND a.cost >= 0 OR d.node = a.pgr_node_2 AND a.reverse_cost >= 0);',
                 v_temp_arc_table
             ) INTO v_valve_water;
 
