@@ -36,6 +36,7 @@ v_return json;
 v_addschema text;
 v_expl_x_user boolean;
 v_sectorisexplismuni boolean;
+v_has_usage boolean;
 
 BEGIN
 
@@ -90,6 +91,12 @@ BEGIN
 
 	-- CM extra: if cm schema exists, initialize its user params similarly and ensure edit_disable_topocontrol default
 	IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'cm') THEN
+		-- Require USAGE on cm; avoid error popups
+		SELECT has_schema_privilege(current_user, 'cm', 'USAGE') INTO v_has_usage;
+		IF NOT v_has_usage THEN
+			RETURN;
+		END IF;
+		
 		-- ensure mandatory cm.sys_param_user values exist in cm.config_param_user for current user
 		FOR v_rectable IN SELECT * FROM cm.sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
 		LOOP
