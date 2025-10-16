@@ -683,7 +683,7 @@ BEGIN
 
 		EXECUTE format('
 			UPDATE %I 
-			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+			SET proposed = FALSE, cost = 0, reverse_cost = 0,closed = FALSE, old_mapzone_id = 0
 			WHERE proposed = TRUE
 				AND old_mapzone_id <> 0;
 		', v_temp_arc_table);
@@ -1035,7 +1035,8 @@ BEGIN
 				EXECUTE format('
 					UPDATE %I 
 					SET proposed = FALSE 
-					WHERE proposed = TRUE;
+					WHERE proposed = TRUE
+					AND old_mapzone_id = 0;
 				', v_temp_arc_table);
 
 				IF v_mincut_version = '6.1' THEN
@@ -1046,7 +1047,7 @@ BEGIN
 
 				EXECUTE format('
 					UPDATE %I tpa
-					SET proposed = omv.proposed, cost = -1, reverse_cost = -1, old_mapzone_id = omv.result_id
+					SET proposed = omv.proposed, cost = -1, reverse_cost = -1, closed = TRUE, old_mapzone_id = omv.result_id
 					FROM om_mincut_valve omv
 					WHERE omv.result_id = ANY(%L)
 						AND omv.proposed = TRUE
@@ -1481,15 +1482,8 @@ BEGIN
 
 				EXECUTE format('
 					UPDATE %I
-					SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+					SET proposed = FALSE, cost = 0, reverse_cost = 0, closed = FALSE, old_mapzone_id = 0
 					WHERE proposed = TRUE
-						AND old_mapzone_id <> 0;
-				', v_temp_arc_table);
-
-				EXECUTE format('
-					UPDATE %I
-					SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1, old_mapzone_id = 0
-					WHERE unaccess = TRUE
 						AND old_mapzone_id <> 0;
 				', v_temp_arc_table);
 
