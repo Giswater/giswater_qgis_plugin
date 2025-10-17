@@ -10,14 +10,15 @@ from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils, QgsVectorLayer, QgsEditFormConfig, QgsAttributeEditorContainer, \
                     QgsAttributeEditorField, QgsEditorWidgetSetup
-from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton
+from qgis.PyQt.QtCore import QObject, Qt, QEvent
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton, QMenu, QAction
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
 from .utils import tools_gw
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
+from .shared.psector import GwPsector
 from .. import global_vars
 from ..libs import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
@@ -33,6 +34,8 @@ class GwLoadProject(QObject):
         self.buttons_to_hide = []
         self.buttons = {}
         self.is_role_cm_edit = False
+        self.manage_new_psector = None
+        self.selected_psector_id: int | None = None
 
     def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
@@ -554,20 +557,102 @@ class GwLoadProject(QObject):
             self._enable_toolbar(toolbar_id)
 
     def _create_psector_status_bar(self):
-        """ Create Psector status bar """
+        """Create Psector status bar with play/pause button and psector combobox."""
         statusbar = self.iface.mainWindow().statusBar()
 
+        # Initialize psector manager
+        self.manage_new_psector = GwPsector()
+
+        # Play/pause button
         self.playpause_button = QPushButton()
         tools_gw.add_icon(self.playpause_button, "73", f"toolbars{os.sep}status")
         self.playpause_button.setProperty('psector_active', False)
         self.playpause_button.clicked.connect(self._playpause_btn_clicked)
         statusbar.insertPermanentWidget(0, self.playpause_button)
 
+        # Psector combobox
         self.cmb_psector = QComboBox()
         tools_gw.fill_cmb_psector_id(self.cmb_psector)
+
+        # Overwrite showPopup for upward popup
+        original_show_popup = self.cmb_psector.showPopup
+        def show_popup_upward():
+            original_show_popup()
+            view = self.cmb_psector.view()
+            popup = view.window()
+            rect = self.cmb_psector.rect()
+            global_pos = self.cmb_psector.mapToGlobal(rect.topLeft())
+            item_height = view.sizeHintForRow(0) if self.cmb_psector.count() > 0 else 24
+            count = self.cmb_psector.count()
+            popup_height = min(count * item_height, 200)
+            popup.move(global_pos.x(), global_pos.y() - popup_height)
+        self.cmb_psector.showPopup = show_popup_upward
+
         statusbar.insertPermanentWidget(1, self.cmb_psector)
 
+        # Add right-click context menu to combobox popup
+        self.cmb_psector.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.cmb_psector.customContextMenuRequested.connect(self._cmb_psector_context_menu_closed)
+        self.cmb_psector.view().viewport().installEventFilter(self)
+
+        # Register these widgets globally if needed
         global_vars.psignals['widgets'] = [self.playpause_button, self.cmb_psector]
+
+    def eventFilter(self, obj, event):
+        """Filter events to handle right-click on combo box popup."""
+        if not hasattr(self, 'cmb_psector') or self.cmb_psector is None:
+            return super().eventFilter(obj, event)
+        
+        try:
+            if obj == self.cmb_psector.view().viewport():
+                if event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
+                    view = self.cmb_psector.view()
+                    index = view.indexAt(event.pos())
+                    if index.isValid():
+                        self.selected_psector_id = self.cmb_psector.model().data(index, Qt.UserRole)
+                    global_pos = obj.mapToGlobal(event.pos())
+                    self._cmb_psector_context_menu(global_pos)
+                    return True
+        except RuntimeError:
+            # Object has been deleted
+            return super().eventFilter(obj, event)
+            
+        return super().eventFilter(obj, event)
+
+    def _cmb_psector_context_menu_closed(self, pos):
+        """Context menu for cmb_psector when menu requested (closed popup)."""
+        idx = self.cmb_psector.currentIndex()
+        if idx >= 0:
+            self.selected_psector_id = self.cmb_psector.itemData(idx, Qt.UserRole)
+        self._show_psector_menu(self.cmb_psector.mapToGlobal(pos))
+
+    def _cmb_psector_context_menu(self, pos):
+        """Context menu for cmb_psector when open (from eventFilter)."""
+        self._show_psector_menu(pos)
+
+    def _show_psector_menu(self, global_pos):
+        """Composes and shows the psector context menu at the given global position."""
+        menu = QMenu(self.cmb_psector)
+        act_zoom = QAction("Zoom to psector", self.cmb_psector)
+        act_open = QAction("Open psector", self.cmb_psector)
+        act_zoom.triggered.connect(lambda: self._execute_menu_action("zoom"))
+        act_open.triggered.connect(lambda: self._execute_menu_action("open"))
+        menu.addAction(act_zoom)
+        menu.addAction(act_open)
+        action = menu.exec_(global_pos)
+        if action:
+            self.cmb_psector.hidePopup()
+
+    def _execute_menu_action(self, action_type):
+        """Execute the selected action from the context menu."""
+        self.cmb_psector.hidePopup()
+        psector_id = self.selected_psector_id if not isinstance(self.selected_psector_id, (tuple, list)) else self.selected_psector_id[0]
+        if not psector_id:
+            return
+        if action_type == "zoom":
+            self.manage_new_psector.zoom_to_psector(psector_id)
+        elif action_type == "open":
+            self.manage_new_psector.get_psector(psector_id)
 
     def _playpause_btn_clicked(self):
         """ Manage psector play/pause """
