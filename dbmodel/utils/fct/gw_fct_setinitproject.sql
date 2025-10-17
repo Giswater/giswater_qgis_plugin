@@ -93,29 +93,27 @@ BEGIN
 	IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'cm') THEN
 		-- Require USAGE on cm; avoid error popups
 		SELECT has_schema_privilege(current_user, 'cm', 'USAGE') INTO v_has_usage;
-		IF NOT v_has_usage THEN
-			RETURN;
+		IF v_has_usage THEN
+			-- ensure mandatory cm.sys_param_user values exist in cm.config_param_user for current user
+			FOR v_rectable IN SELECT * FROM cm.sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
+			LOOP
+				IF v_rectable.id NOT IN (SELECT parameter FROM cm.config_param_user WHERE cur_user = current_user) THEN
+					INSERT INTO cm.config_param_user (parameter, value, cur_user)
+					SELECT cm.sys_param_user.id, vdefault, current_user FROM cm.sys_param_user WHERE cm.sys_param_user.id = v_rectable.id;
+
+					v_errortext = concat('Set value for new variable in cm.config_param_user: ', v_rectable.id, '.');
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (101, 4, v_errortext);
+				END IF;
+			END LOOP;
+
+			-- cleanup obsolete cm.config_param_user values not present in cm.sys_param_user
+			DELETE FROM cm.config_param_user WHERE parameter NOT IN (SELECT id FROM cm.sys_param_user) AND cur_user = current_user;
+
+			-- guarantee presence of the toggle used by CM topocontrol
+			INSERT INTO cm.config_param_user (parameter, value, cur_user)
+			VALUES ('edit_disable_topocontrol', 'false', current_user)
+			ON CONFLICT (parameter, cur_user) DO NOTHING;
 		END IF;
-		
-		-- ensure mandatory cm.sys_param_user values exist in cm.config_param_user for current user
-		FOR v_rectable IN SELECT * FROM cm.sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
-		LOOP
-			IF v_rectable.id NOT IN (SELECT parameter FROM cm.config_param_user WHERE cur_user = current_user) THEN
-				INSERT INTO cm.config_param_user (parameter, value, cur_user)
-				SELECT cm.sys_param_user.id, vdefault, current_user FROM cm.sys_param_user WHERE cm.sys_param_user.id = v_rectable.id;
-
-				v_errortext = concat('Set value for new variable in cm.config_param_user: ', v_rectable.id, '.');
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (101, 4, v_errortext);
-			END IF;
-		END LOOP;
-
-		-- cleanup obsolete cm.config_param_user values not present in cm.sys_param_user
-		DELETE FROM cm.config_param_user WHERE parameter NOT IN (SELECT id FROM cm.sys_param_user) AND cur_user = current_user;
-
-		-- guarantee presence of the toggle used by CM topocontrol
-		INSERT INTO cm.config_param_user (parameter, value, cur_user)
-		VALUES ('edit_disable_topocontrol', 'false', current_user)
-		ON CONFLICT (parameter, cur_user) DO NOTHING;
 	END IF;
 
 	-- Force exploitation selector
