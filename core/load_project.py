@@ -576,6 +576,7 @@ class GwLoadProject(QObject):
 
         # Overwrite showPopup for upward popup
         original_show_popup = self.cmb_psector.showPopup
+
         def show_popup_upward():
             original_show_popup()
             view = self.cmb_psector.view()
