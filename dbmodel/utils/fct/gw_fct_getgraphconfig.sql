@@ -35,7 +35,6 @@ v_querytext_add text = '';
 v_querytext_end text = ' ORDER BY 2 ASC';
 v_result text;
 v_result_point json;
-v_result_line json;
 v_project_type text;
 
 
@@ -156,9 +155,7 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 	     ',"body":{"form":{}'||
 		     ',"data":{ "info":{},'||
-				'"point":'||v_result_point||','||
-				'"line":{},'||
-				'"polygon":{}}'||
+				'"point":'||v_result_point||'}'||
 	    '}}')::json, 3302, null, null, null);
 
 	-- Exception handling
