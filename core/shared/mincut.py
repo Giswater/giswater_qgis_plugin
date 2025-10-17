@@ -26,7 +26,7 @@ from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..utils.selection_mode import GwSelectionMode
-from ..ui.ui_manager import GwDialogShowInfoUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
+from ..ui.ui_manager import GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
 from ... import global_vars
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
 
