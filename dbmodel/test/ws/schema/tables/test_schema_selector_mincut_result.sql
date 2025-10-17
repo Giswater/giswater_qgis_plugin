@@ -20,7 +20,7 @@ SELECT has_table('selector_mincut_result'::name, 'Table selector_mincut_result s
 SELECT columns_are(
     'selector_mincut_result',
     ARRAY[
-        'result_id', 'cur_user'
+        'result_id', 'cur_user', 'result_type'
     ],
     'Table selector_mincut_result should have the correct columns'
 );
@@ -31,6 +31,7 @@ SELECT col_is_pk('selector_mincut_result', ARRAY['result_id', 'cur_user'], 'Colu
 -- Check column types
 SELECT col_type_is('selector_mincut_result', 'result_id', 'integer', 'Column result_id should be integer');
 SELECT col_type_is('selector_mincut_result', 'cur_user', 'text', 'Column cur_user should be text');
+SELECT col_type_is('selector_mincut_result', 'result_type', 'text', 'Column result_type should be text');
 
 -- Check default values
 SELECT col_default_is('selector_mincut_result', 'cur_user', '"current_user"()', 'Column cur_user should default to "current_user"()');
