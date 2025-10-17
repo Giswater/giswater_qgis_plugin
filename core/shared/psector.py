@@ -10,6 +10,7 @@ import json
 import os
 import re
 import sys
+from typing import Union
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
@@ -66,9 +67,7 @@ class GwPsector:
         self.qtbl_gully = None
 
         self.previous_map_tool = self.canvas.mapTool()
-
         self.project_type = tools_gw.get_project_type()
-
         # Initialize icon folder and pixmaps lazily when needed
         self.icon_folder = None
         self.psector_with_current = None
@@ -456,6 +455,16 @@ class GwPsector:
 
             dialog.rejected.connect(self.rubber_band_point.reset)
 
+        self.zoom_to_psector(psector_id, list_coord)
+
+        # Force refresh of selector docker to reflect any value changes
+        tools_gw.refresh_selectors()
+
+        if form_opened:
+            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+
+    def zoom_to_psector(self, psector_id: int, list_coord: Union[None, list[float]] = None):
+        """ Zoom to psector """
         if not list_coord:
 
             sql = f"SELECT st_astext(st_envelope(the_geom)) FROM ve_plan_psector WHERE psector_id = {psector_id}"
@@ -487,12 +496,6 @@ class GwPsector:
                 tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
             else:
                 tools_qgis.force_refresh_map_canvas()
-
-        # Force refresh of selector docker to reflect any value changes
-        tools_gw.refresh_selectors()
-
-        if form_opened:
-            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
 
     def psector_name_changed(self):
         """ Enable buttons and tabs when name is changed """
