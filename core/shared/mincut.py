@@ -998,45 +998,18 @@ class GwMincut:
 
         use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"check", '
+        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, '
         extras += f'"mincutId":"{result_mincut_id_text}", "usePsectors":"{use_planified}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setmincut', body)
         if not result or result['status'] == 'Failed':
             return
 
-        if self.mincut_class in (2, 3):
-            self._mincut_ok(result)
-        if self.mincut_class == 1:
-            if result['body']['overlapStatus'] == 'Ok':
-                self._mincut_ok(result)
-            elif result['body']['overlapStatus'] == 'Conflict':
-                self.dlg_info = GwDialogShowInfoUi(self)
-                tools_gw.load_settings(self.dlg_info)
-                self.dlg_info.btn_close.setText('Cancel')
-                self.dlg_info.btn_accept.setText('Continue')
-                self.dlg_info.setWindowTitle('Mincut conflict')
-                self.dlg_info.btn_accept.clicked.connect(partial(self._force_mincut_overlap))
-                self.dlg_info.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
-                self.dlg_info.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
-                tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False, close=False)
-                tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
+        self._mincut_ok(result)
 
         self._save_widgets_values()
         self.iface.actionPan().trigger()
         self._remove_selection()
-
-    def _force_mincut_overlap(self):
-
-        use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
-        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"continue", '
-        extras += f'"mincutId":"{result_mincut_id_text}", "usePsectors":"{use_planified}"'
-        body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setmincut', body)
-        if not result or result['status'] == 'Failed':
-            return
-        self._mincut_ok(result)
 
     def _mincut_ok(self, result):
 
@@ -1093,26 +1066,27 @@ class GwMincut:
             "DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
         )
         if result_mincut_id:
-            conflict_group_id = tools_db.get_row(f"SELECT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}")
+            row = tools_db.get_row(f"SELECT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}")
+            conflict_group_id = row[0] if row is not None else ''
             sql += (
-                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type) VALUES"
-                f" (current_user, {result_mincut_id}, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;"
+                f"\nINSERT INTO selector_mincut_result (result_id, cur_user, result_type) VALUES"
+                f" ({result_mincut_id}, current_user, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;"
             )
         if conflict_group_id:
             sql += (
-                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
+                f"\nINSERT INTO selector_mincut_result (result_id, cur_user, result_type)"
                 f" SELECT omc.mincut_id, current_user, 'conflict' "
                 f" FROM om_mincut_conflict omc"
                 f" JOIN om_mincut om ON om.id = omc.mincut_id"
-                f" WHERE omc.id = {conflict_group_id}"
+                f" WHERE omc.id = '{conflict_group_id}'"
                 f" AND omc.mincut_id <> {result_mincut_id}"
                 f" AND om.mincut_state <> {mincut_conflict_state}"
                 f" ON CONFLICT (result_id, cur_user) DO NOTHING;"
-                f"\nINSERT INTO selector_mincut_result (cur_user, result_id, result_type)"
+                f"\nINSERT INTO selector_mincut_result (result_id, cur_user, result_type)"
                 f" SELECT omc.mincut_id, current_user, 'affected' "
                 f" FROM om_mincut_conflict omc"
                 f" JOIN om_mincut om ON om.id = omc.mincut_id"
-                f" WHERE omc.id = {conflict_group_id}"
+                f" WHERE omc.id = '{conflict_group_id}'"
                 f" AND omc.mincut_id <> {result_mincut_id}"
                 f" AND om.mincut_state = {mincut_conflict_state}"
                 f" ON CONFLICT (result_id, cur_user) DO NOTHING;"
