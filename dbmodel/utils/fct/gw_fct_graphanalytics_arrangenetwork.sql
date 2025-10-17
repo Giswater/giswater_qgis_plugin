@@ -439,8 +439,8 @@ BEGIN
             EXECUTE format('
                 SELECT array_agg(pgr_node_id)::INT[] 
                 FROM %I n
-                JOIN %I v ON v.node_id = n.node_id
-                WHERE %L = ANY(v.graph_delimiter)', v_temp_node_table, v_temp_node_table, v_graph_delimiter
+                JOIN v_temp_node v ON v.node_id = n.node_id
+                WHERE ''SECTOR'' = ANY(v.graph_delimiter)', v_temp_node_table
             ) INTO v_pgr_root_vids;
 
             EXECUTE format('SELECT COUNT(*)::INT FROM %I', v_temp_arc_table) INTO v_pgr_distance;
