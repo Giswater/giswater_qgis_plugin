@@ -362,7 +362,7 @@ BEGIN
 
             IF v_mode = 'MINSECTOR' THEN
                 -- add arcs that connect the nodes 'SECTOR' with the nodes 'MINSECTOR'
-                -        -- arcs where node_1 is 'SECTOR'
+                -- arcs where node_1 is 'SECTOR'
                 EXECUTE format('
                     INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
                     SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
