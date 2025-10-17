@@ -5675,7 +5675,7 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
 
         disable_forced_style = get_config_value('plan_psector_disable_forced_style')
-        if not disable_forced_style:
+        if disable_forced_style is not None and not tools_os.set_boolean(disable_forced_style[0], False):
             if enable:
                 last_styles = {}
                 project_layers = global_vars.iface.mapCanvas().layers()
