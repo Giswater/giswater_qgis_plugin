@@ -116,6 +116,12 @@ BEGIN
             WITH connectedcomponents AS (
                 SELECT * FROM pgr_connectedcomponents($q$
                     SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph
+					UNION
+					SELECT minsector_id as id, minsector_id as source, minsector_id as target, 1 as cost 
+					FROM minsector m
+					WHERE NOT EXISTS (SELECT 1 FROM minsector_graph mg 
+                    WHERE mg.minsector_1 = m.minsector_id OR mg.minsector_2 = m.minsector_id
+					)
                 $q$)
             ),
             components AS (
@@ -173,9 +179,10 @@ BEGIN
         INSERT INTO %I (node_id, graph_delimiter)
         SELECT n.node_id, %L
         FROM v_temp_node n 
-        JOIN v_temp_arc a ON COALESCE(a.node_1, a.node_2) = n.node_id
         WHERE %L = ANY(n.graph_delimiter)
-        AND EXISTS (SELECT 1 FROM %I vtn WHERE a.minsector_id = vtn.node_id);
+        AND EXISTS (SELECT 1 FROM v_temp_arc a 
+        			JOIN %I vtn ON a.minsector_id = vtn.node_id
+       				WHERE n.node_id = a.node_1 OR  n.node_id = a.node_2);
         ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
     ELSE
         -- MAPZONE graph_delimiter
@@ -355,17 +362,25 @@ BEGIN
 
             IF v_mode = 'MINSECTOR' THEN
                 -- add arcs that connect the nodes 'SECTOR' with the nodes 'MINSECTOR'
-                -- arcs where node_1 or node_2 is 'SECTOR'
+                -        -- arcs where node_1 is 'SECTOR'
                 EXECUTE format('
-                    INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, to_arc, cost, reverse_cost, graph_delimiter)
-                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id,
-                    CASE WHEN n1.graph_delimiter = %L THEN n1.to_arc ELSE n2.to_arc END AS to_arc,
-                     %L, %L, %L
+                    INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
                     FROM v_temp_arc a
                     JOIN %I n1 ON n1.node_id = a.node_1
                     JOIN %I n2 ON n2.node_id = a.minsector_id
-                    WHERE (n1.graph_delimiter = %L OR n2.graph_delimiter = %L);
-                ', v_temp_arc_table, v_graph_delimiter, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter, v_graph_delimiter);
+                    WHERE n1.graph_delimiter = %L;
+                ', v_temp_arc_table, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
+
+                -- arcs where node_2 is 'SECTOR'
+                EXECUTE format('
+                    INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
+                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
+                    FROM v_temp_arc a
+                    JOIN %I n1 ON n1.node_id = a.minsector_id
+                    JOIN %I n2 ON n2.node_id = a.node_2
+                    WHERE n2.graph_delimiter = %L;
+                ', v_temp_arc_table, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
             END IF;
         END IF;
 
