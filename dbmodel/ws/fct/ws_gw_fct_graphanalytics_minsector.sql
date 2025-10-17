@@ -557,7 +557,7 @@ BEGIN
         ';
         EXECUTE v_query_text;
 
-        v_visible_layer ='"ve_minsector", "ve_minsector_mincut"';
+        v_visible_layer ='"ve_minsector"';
 
     END IF;
 

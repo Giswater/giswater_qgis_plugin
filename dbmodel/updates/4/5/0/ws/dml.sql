@@ -1115,3 +1115,5 @@ UPDATE config_toolbox SET inputparams='[
 {"label": "Execute Massive Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "executeMassiveMincut", "widgettype": "check", "layoutorder": 6},
 {"label": "Ignore Unaccess Valves Mincut:", "value": "", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "ignoreUnaccessValvesMincut", "widgettype": "check", "layoutorder": 7}
 ]'::json WHERE id=2706;
+
+UPDATE config_function SET layermanager=NULL WHERE id=2706;
