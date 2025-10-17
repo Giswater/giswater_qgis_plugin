@@ -592,7 +592,7 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link", "ve_element"]
     if global_vars.project_type == 'ud':
         list_layers.append("ve_gully")
 
@@ -700,8 +700,8 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
     viewname = f"ve_{feature_type}"
     field_id = feature_type
     if feature_type == "element":
-        viewname = ["ve_man_frelem", "ve_man_genelem"]
-        field_id = ["element", "element"]
+        viewname = ["ve_man_frelem", "ve_man_genelem", "ve_element"]
+        field_id = ["element", "element", "element"]
 
     # Adding auto-completion to a QLineEdit
     if isinstance(feature_id_widget_name, str):
@@ -2825,7 +2825,7 @@ def make_list_multiple_option(completer, model, widget, field, list_widget):
             return
 
         # Execute query if field has required query parameters
-        if 'queryText' in field and 'queryText' is not None and value is not None:
+        if 'queryText' in field and 'queryText' != '' and value is not None:
             # Build SQL with ILIKE filter for case-insensitive search
             if 'queryTextFilter' in field and field['queryTextFilter'] is not None:
                 sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
@@ -4155,7 +4155,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     table_ids_original = table_ids.copy()
 
     # Ensure dictionary and list exist for storing feature IDs per feature type
-    if not hasattr(class_object, "list_ids"):
+    if not hasattr(class_object, "rel_list_ids"):
         class_object.rel_list_ids = {}
     if class_object.rel_feature_type not in class_object.rel_list_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = []
@@ -4352,48 +4352,58 @@ def _process_map_selection(class_object, selection_mode, field_id):
             except Exception:
                 pass
     # For all other modes no additional filtering
-    layer = class_object.rel_layers[class_object.rel_feature_type][0]
-
-    # Get table name and schema using GisWater utilities
-    table_name = tools_qgis.get_layer_source_table_name(layer)
-    schema_name = tools_qgis.get_layer_schema(layer)
-    pk_field = tools_qgis.get_primary_key(layer)
-
-    # Construct full table name
-    if table_name and schema_name:
-        full_table_name = f"{schema_name}.{table_name}"
-    elif table_name:
-        full_table_name = table_name
-    else:
-        # Fallback to standard naming if extraction fails
-        schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if tools_db.dao_db_credentials.get('schema') else 'ws'
-        full_table_name = f"{schema_name}.v_edit_{class_object.rel_feature_type}"
-
-    # Use field_id as fallback for primary key
-    if not pk_field:
-        pk_field = field_id
-
-    # Query database directly - MUCH faster than Python iteration for ALL modes
-    fid_str = ','.join(map(str, selected_fids))
-    sql = f"""
-        SELECT {field_id}::text 
-        FROM {full_table_name} 
-        WHERE {pk_field} IN ({fid_str}) 
-        {where_clause}
-    """
-
+    # Query each layer separately to handle multi-layer feature types (like elements with ve_man_frelem + ve_man_genelem)
     selected_ids = []
+    existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
+    
     try:
-        rows = tools_db.get_rows(sql)
-        if rows:
-            selected_ids = [row[field_id] for row in rows if row.get(field_id)]
+        for layer in class_object.rel_layers[class_object.rel_feature_type]:
+            if layer.selectedFeatureCount() == 0:
+                continue
+                
+            # Get layer-specific selected feature IDs
+            layer_selected_fids = layer.selectedFeatureIds()
+            if not layer_selected_fids:
+                continue
+            
+            # Get table name and schema using GisWater utilities
+            table_name = tools_qgis.get_layer_source_table_name(layer)
+            schema_name = tools_qgis.get_layer_schema(layer)
+            pk_field = tools_qgis.get_primary_key(layer)
 
-            # Add to class object list
-            existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
-            for selected_id in selected_ids:
-                if selected_id not in existing_ids_set:
-                    class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
-                    existing_ids_set.add(selected_id)
+            # Construct full table name
+            if table_name and schema_name:
+                full_table_name = f"{schema_name}.{table_name}"
+            elif table_name:
+                full_table_name = table_name
+            else:
+                # Fallback to standard naming if extraction fails
+                schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if tools_db.dao_db_credentials.get('schema') else 'ws'
+                full_table_name = f"{schema_name}.v_edit_{class_object.rel_feature_type}"
+
+            # Use field_id as fallback for primary key
+            if not pk_field:
+                pk_field = field_id
+
+            # Query database directly for this layer
+            fid_str = ','.join(map(str, layer_selected_fids))
+            sql = f"""
+                SELECT {field_id}::text 
+                FROM {full_table_name} 
+                WHERE {pk_field} IN ({fid_str}) 
+                {where_clause}
+            """
+
+            rows = tools_db.get_rows(sql)
+            if rows:
+                layer_selected_ids = [row[field_id] for row in rows if row.get(field_id)]
+                
+                # Add to selected_ids and class object list
+                for selected_id in layer_selected_ids:
+                    if selected_id not in existing_ids_set:
+                        selected_ids.append(selected_id)
+                        class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+                        existing_ids_set.add(selected_id)
     except Exception:
         # Fallback to original method if database query fails
         for layer in class_object.rel_layers[class_object.rel_feature_type]:

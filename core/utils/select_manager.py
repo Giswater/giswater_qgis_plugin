@@ -532,16 +532,28 @@ class GwSelectManager(QgsMapTool):
             else:
                 layer_groups = self.class_object.rel_layers[self.class_object.rel_feature_type]
 
+            # Block signals during selection to prevent premature processing
             for layer in layer_groups:
-                if selected_rectangle is None:
-                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, geometry)
+                layer.blockSignals(True)
+            
+            try:
+                for layer in layer_groups:
+                    if selected_rectangle is None:
+                        selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, geometry)
 
-                if selection_behavior == GwSelectionBehavior.REMOVE:
-                    layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
-                elif selection_behavior == GwSelectionBehavior.ADD:
-                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
-                else:  # GwSelectionBehavior.REPLACE or DEFAULT
-                    layer.selectByRect(selected_rectangle, layer.SetSelection)
+                    if selection_behavior == GwSelectionBehavior.REMOVE:
+                        layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
+                    elif selection_behavior == GwSelectionBehavior.ADD:
+                        layer.selectByRect(selected_rectangle, layer.AddToSelection)
+                    else:  # GwSelectionBehavior.REPLACE or DEFAULT
+                        layer.selectByRect(selected_rectangle, layer.SetSelection)
+            finally:
+                # Unblock signals after all layers are selected
+                for layer in layer_groups:
+                    layer.blockSignals(False)
+                # Manually trigger selectionChanged after all layers are done
+                if layer_groups:
+                    layer_groups[0].selectionChanged.emit([], [], False)
         elif isinstance(geometry, QgsPointXY) and event:
             # Point selection
             selection_success = self._perform_point_selection(event)
