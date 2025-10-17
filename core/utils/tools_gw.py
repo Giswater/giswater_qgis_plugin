@@ -4248,7 +4248,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     elif selection_mode == GwSelectionMode.MINCUT_CONNEC and do_insert:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-    else:
+    elif do_insert:
         columns_to_show = [f"{class_object.rel_feature_type}_id", "code", "sys_code", f"{class_object.rel_feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
