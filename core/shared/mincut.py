@@ -1061,6 +1061,7 @@ class GwMincut:
         """ Update table 'selector_mincut_result' """
 
         mincut_conflict_state = 5
+        conflict_group_id = None
 
         sql = (
             "DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
