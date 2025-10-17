@@ -1117,3 +1117,20 @@ UPDATE config_toolbox SET inputparams='[
 ]'::json WHERE id=2706;
 
 UPDATE config_function SET layermanager=NULL WHERE id=2706;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
+VALUES(4418, 'Mincut conflicts: [%array%]', '', 0, true, 'ws', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
+VALUES(4420, 'MINCUT AFFECTED STATS', '', 0, true, 'ws', 'core', 'AUDIT');
+
+UPDATE sys_message SET error_message='Mincut have been executed with conflicts. All additional affetations have created a new mincut with state_type = %state_type%' WHERE id=4406;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
+VALUES(4422, 'New affected mincuts have been created: [%array%]', '', 0, true, 'ws', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
+VALUES(4424, 'New affected mincut id: %id%', '', 0, true, 'ws', 'core', 'AUDIT');
+
+insert into sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
+VALUES(4426, 'Conflict Interval: %interval%', '', 0, true, 'ws', 'core', 'AUDIT');

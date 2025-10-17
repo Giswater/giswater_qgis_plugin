@@ -20,10 +20,7 @@ SELECT gw_fct_setmincut('{"data":{"action":"mincutNetwork", "arcId":"2001", "min
 SELECT gw_fct_setmincut('{"data":{"action":"mincutValveUnaccess", "nodeId":1001, "mincutId":"3", "usePsectors":false}}');
 
 -- Button Accept on mincut dialog
-SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":1, "mincutId":"3", "status":"check", "usePsectors":false}}');
-
--- Button Accept on mincut conflict dialog
-SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":1, "mincutId":"3", "status":"continue"}}');
+SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":1, "mincutId":"3", "usePsectors":false}}');
 
 -- Button Accept when is mincutClass = 2
 SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":2, "mincutId":"3"}}');
@@ -90,6 +87,8 @@ v_num_hydrometer integer;
 v_num_valve_proposed integer;
 v_num_valve_closed integer;
 v_priority json;
+v_mincut_conflict_array text;
+v_mincut_conflict_count integer;
 v_geometry text;
 v_count_unselected_psectors integer;
 v_default_key text;
@@ -99,6 +98,7 @@ v_mincut_record record;
 v_mincut_group_record record;
 v_mincut_conflict_record record;
 v_mincut_affected_id integer;
+v_mincut_affected_ids text;
 v_mincut_conflict_group_id uuid;
 v_arc_count integer;
 v_overlap_status text := 'Ok'; -- Ok, Conflict
@@ -467,43 +467,67 @@ BEGIN
 
 		SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_id;
 
+        DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
 		IF v_mincut_conflict_group_id IS NOT NULL THEN
-		-- there are conflicts
 			v_overlap_status = 'Conflict';
-			--TODO: revise this counts for maybe add the affected zone?
+
 			-- creating log
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'WARNING-216: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats (with additional affectations)');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '-----------------------------------------------');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincut_record.output->>'arcs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincut_record.output->>'arcs')::json->>'length', ' mts'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincut_record.output->>'arcs')::json->>'volume', ' m3'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+			SELECT string_agg(result_id::text, ',') INTO v_mincut_affected_ids FROM selector_mincut_result WHERE cur_user = current_user AND result_type = 'affected';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4406", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"state_type":"'||v_mincut_conflict_state||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4422", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "parameters":{"array":"'||v_mincut_affected_ids||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
-			--todo: add conflict and affected mincuts
-			-- SELECT array_agg(result_id) INTO xxxxxxxxx FROM selector_mincut_result 
-			-- WHERE cur_user = CURRENT_USER 
-			-- 	AND result_type = 'conflict';
-			-- INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Mincut conflicts: ', xxxxxxxxx));
+			-- mincut details
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			
+			-- Stats
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||COALESCE((v_mincut_record.output->'arcs'->>'volume'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'connecs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincut_record.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincut_record.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
+			
+			FOR v_mincut_affected_id IN SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user AND result_type = 'affected' LOOP
+				-- mincut extra details
+				SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_affected_id;
+				-- mincut affected details
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4420", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				
+				-- Extra details
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4424", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"id":"'||v_mincut_affected_id||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4418", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"array":"'||COALESCE((v_mincut_record.output->'conflicts'->>'array'), '')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4426", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"interval":"'||COALESCE(v_mincut_record.forecast_start::text, '0')||' - '||COALESCE(v_mincut_record.forecast_end::text, '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2007", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
+				-- Stats
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||COALESCE((v_mincut_record.output->'arcs'->>'volume'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'connecs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincut_record.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincut_record.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			END LOOP;
 
 		ELSE
-		-- there are no conflicts
 			v_overlap_status = 'Ok';
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, '--------------');
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincut_record.output->>'arcs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincut_record.output->>'arcs')::json->>'length', ' mts'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincut_record.output->>'arcs')::json->>'volume', ' m3'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincut_record.output->>'connecs')::json->>'number'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'total'));
-			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincut_record.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
-		END IF;
+
+			-- mincut details
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
+			
+			-- Stats
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||COALESCE((v_mincut_record.output->'arcs'->>'volume'), '0')||'"}, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'connecs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincut_record.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincut_record.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "cur_user":"current_user"}}$$)';
+			END IF;
 
 		-- get results
 		-- info
@@ -1310,93 +1334,6 @@ BEGIN
 							AND rhxn.node_id = omn.node_id
 							AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
-
-						-- fill connnec & hydrometer details on om_mincut.output
-						-- count arcs
-						SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
-						FROM om_mincut_arc 
-						JOIN arc USING (arc_id) 
-						WHERE result_id = v_mincut_affected_id 
-						GROUP BY result_id;
-
-						SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
-						FROM om_mincut_arc 
-						JOIN arc USING (arc_id) 
-						JOIN cat_arc ON arccat_id = cat_arc.id
-						WHERE result_id = v_mincut_affected_id;
-
-						-- count valves
-						SELECT count(node_id) INTO v_num_valve_proposed 
-						FROM om_mincut_valve 
-						WHERE result_id = v_mincut_affected_id 
-							AND proposed IS TRUE;
-
-						SELECT count(node_id) INTO v_num_valve_closed 
-						FROM om_mincut_valve 
-						WHERE result_id = v_mincut_affected_id 
-							AND closed IS TRUE;
-
-						-- count connec
-						SELECT count(connec_id) INTO v_num_connecs 
-						FROM om_mincut_connec 
-						WHERE result_id = v_mincut_affected_id;
-
-						-- count hydrometers
-						SELECT count(*) INTO v_num_hydrometer 
-						FROM om_mincut_hydrometer 
-						WHERE result_id = v_mincut_affected_id;
-
-						-- priority hydrometers
-						v_priority := (
-							SELECT array_to_json(array_agg(b))
-							FROM (
-								SELECT 
-									json_build_object(
-										'category', hc.observ,
-										'number', count(rtc_hydrometer_x_connec.hydrometer_id)
-									) AS b
-								FROM rtc_hydrometer_x_connec
-								JOIN om_mincut_connec 
-									ON rtc_hydrometer_x_connec.connec_id = om_mincut_connec.connec_id
-								JOIN v_rtc_hydrometer 
-									ON v_rtc_hydrometer.hydrometer_id = rtc_hydrometer_x_connec.hydrometer_id
-								LEFT JOIN ext_hydrometer_category hc 
-									ON hc.id::text = v_rtc_hydrometer.category_id::text
-								JOIN connec 
-									ON connec.connec_id = v_rtc_hydrometer.feature_id
-								WHERE result_id = v_mincut_affected_id
-								GROUP BY hc.observ
-								ORDER BY hc.observ
-							) a
-						);
-
-						IF v_priority IS NULL THEN v_priority='{}'; END IF;
-						v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
-
-
-						v_mincut_details = json_build_object(
-							'arcs', json_build_object(
-								'number', v_num_arcs,
-								'length', v_length,
-								'volume', v_volume
-							),
-							'connecs', json_build_object(
-								'number', v_num_connecs,
-								'hydrometers', json_build_object(
-									'total', v_num_hydrometer,
-									'classified', v_priority
-								)
-							),
-							'valve', json_build_object(
-								'proposed', v_num_valve_proposed,
-								'closed', v_num_valve_closed
-							)
-						);
-
-						--update output results
-						UPDATE om_mincut SET output = v_mincut_details WHERE id = v_mincut_affected_id;
-
-
 						v_mincut_conflict_group_id := gen_random_uuid();
 
 						-- insert affected zone mincut first
@@ -1460,6 +1397,100 @@ BEGIN
 							forecast_end = ft.forecast_end
 						FROM forecast_time ft
 						WHERE om.id = v_mincut_affected_id;
+
+						-- fill connnec & hydrometer details on om_mincut.output
+						-- count arcs
+						SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
+						FROM om_mincut_arc 
+						JOIN arc USING (arc_id) 
+						WHERE result_id = v_mincut_affected_id 
+						GROUP BY result_id;
+
+						SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
+						FROM om_mincut_arc 
+						JOIN arc USING (arc_id) 
+						JOIN cat_arc ON arccat_id = cat_arc.id
+						WHERE result_id = v_mincut_affected_id;
+
+						-- count valves
+						SELECT count(node_id) INTO v_num_valve_proposed 
+						FROM om_mincut_valve 
+						WHERE result_id = v_mincut_affected_id 
+							AND proposed IS TRUE;
+
+						SELECT count(node_id) INTO v_num_valve_closed 
+						FROM om_mincut_valve 
+						WHERE result_id = v_mincut_affected_id 
+							AND closed IS TRUE;
+
+						-- count connec
+						SELECT count(connec_id) INTO v_num_connecs 
+						FROM om_mincut_connec 
+						WHERE result_id = v_mincut_affected_id;
+
+						-- count hydrometers
+						SELECT count(*) INTO v_num_hydrometer 
+						FROM om_mincut_hydrometer 
+						WHERE result_id = v_mincut_affected_id;
+
+						-- priority hydrometers
+						v_priority := (
+							SELECT array_to_json(array_agg(b))
+							FROM (
+								SELECT 
+									json_build_object(
+										'category', hc.observ,
+										'number', count(rtc_hydrometer_x_connec.hydrometer_id)
+									) AS b
+								FROM rtc_hydrometer_x_connec
+								JOIN om_mincut_connec 
+									ON rtc_hydrometer_x_connec.connec_id = om_mincut_connec.connec_id
+								JOIN v_rtc_hydrometer 
+									ON v_rtc_hydrometer.hydrometer_id = rtc_hydrometer_x_connec.hydrometer_id
+								LEFT JOIN ext_hydrometer_category hc 
+									ON hc.id::text = v_rtc_hydrometer.category_id::text
+								JOIN connec 
+									ON connec.connec_id = v_rtc_hydrometer.feature_id
+								WHERE result_id = v_mincut_affected_id
+								GROUP BY hc.observ
+								ORDER BY hc.observ
+							) a
+						);
+
+						-- mincut conflict array
+						SELECT count(*), string_agg(omc.mincut_id::text, ',' ORDER BY omc.mincut_id) 
+						INTO v_mincut_conflict_count, v_mincut_conflict_array 
+						FROM om_mincut_conflict omc
+						WHERE omc.id = v_mincut_conflict_group_id
+						AND omc.mincut_id <> v_mincut_id
+						AND omc.mincut_id <> v_mincut_affected_id;
+
+						IF v_priority IS NULL THEN v_priority='{}'; END IF;
+						v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
+
+						v_mincut_details = json_build_object(
+							'arcs', json_build_object(
+								'number', v_num_arcs,
+								'length', v_length,
+								'volume', v_volume
+							),
+							'connecs', json_build_object(
+								'number', v_num_connecs,
+								'hydrometers', json_build_object(
+									'total', v_num_hydrometer,
+									'classified', v_priority
+								)
+							),
+							'valve', json_build_object(
+								'proposed', v_num_valve_proposed,
+								'closed', v_num_valve_closed
+							),
+							'conflicts', json_build_object(
+								'number', v_mincut_conflict_count,
+								'array', v_mincut_conflict_array
+							)
+						);
+						UPDATE om_mincut SET output = v_mincut_details WHERE id = v_mincut_affected_id;
 
 						-- insert selector mincut result
 						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
