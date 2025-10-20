@@ -8,6 +8,14 @@ version=4.5.0
 author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Lia Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez, Nico Pérez, Pablo Marques, Arnau Torret, Namrata Karki, Arnau Urgeles, Oscar Pueyo
 
 Changelog=Version 4.5.0
+    - Added widget to set asset_id in arc_fusion_btn
+    - Added new layers style for psector mode
+    - Added new translations
+    - Added new right-click options in current psector combo
+    - Refactor mincut code for better performance with new algorithm
+    - Improved go2iber: set iber simulation duration
+    - Fixed inserting elements into document
+    - Fixed connect_link when psector mode active 
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
