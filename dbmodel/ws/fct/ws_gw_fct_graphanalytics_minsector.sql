@@ -75,10 +75,7 @@ DECLARE
     -- parameters
     v_pgr_distance INTEGER;
     v_pgr_root_vids int[];
-    v_cost_field TEXT;
-    v_reverse_cost_field TEXT;
     
-
 BEGIN
 
 	-- Search path
@@ -395,16 +392,16 @@ BEGIN
     supplyzone_id = sub.supplyzone_id_arr
     FROM (
         SELECT
-            tn.mapzone_id AS minsector_id,
-            array_agg(DISTINCT vn.expl_id) AS expl_id_arr,
-            array_agg(DISTINCT vn.dma_id) AS dma_id_arr,
-            array_agg(DISTINCT vn.dqa_id) AS dqa_id_arr,
-            array_agg(DISTINCT vn.muni_id) AS muni_id_arr,
-            array_agg(DISTINCT vn.sector_id) AS sector_id_arr,
-            array_agg(DISTINCT vn.supplyzone_id) AS supplyzone_id_arr
-        FROM temp_pgr_node tn
-		JOIN v_temp_node vn USING (node_id)
-        GROUP BY tn.mapzone_id
+            ta.mapzone_id AS minsector_id,
+            array_agg(DISTINCT va.expl_id) AS expl_id_arr,
+            array_agg(DISTINCT va.dma_id) AS dma_id_arr,
+            array_agg(DISTINCT va.dqa_id) AS dqa_id_arr,
+            array_agg(DISTINCT va.muni_id) AS muni_id_arr,
+            array_agg(DISTINCT va.sector_id) AS sector_id_arr,
+            array_agg(DISTINCT va.supplyzone_id) AS supplyzone_id_arr
+        FROM temp_pgr_arc ta
+		JOIN v_temp_arc va USING (arc_id)
+        GROUP BY ta.mapzone_id
     ) sub
     WHERE sub.minsector_id = t.minsector_id;
 
@@ -460,10 +457,7 @@ BEGIN
         v_query_text = '
             WITH arcs AS (
                 SELECT 
-                    arc_id,
-                    CASE WHEN mapzone_id = -1 THEN 0
-                    ELSE mapzone_id
-                    END AS mapzone_id
+                    arc_id, mapzone_id
                 FROM temp_pgr_arc
             )
             UPDATE arc SET minsector_id = arcs.mapzone_id
@@ -475,10 +469,7 @@ BEGIN
         v_query_text = '
             WITH nodes AS (
                 SELECT 
-                    node_id,
-                    CASE WHEN mapzone_id = -1 THEN 0
-                    ELSE mapzone_id
-                    END AS mapzone_id
+                    node_id, mapzone_id
                 FROM temp_pgr_node
             )
             UPDATE node SET minsector_id = nodes.mapzone_id
@@ -490,10 +481,7 @@ BEGIN
         v_query_text = '
             WITH connecs AS (
                 SELECT 
-                    connec_id,
-                    CASE WHEN mapzone_id = -1 THEN 0
-                    ELSE mapzone_id
-                    END AS mapzone_id
+                    connec_id, mapzone_id
                 FROM temp_pgr_arc
                 JOIN v_temp_connec vc USING (arc_id)
             )
@@ -506,10 +494,7 @@ BEGIN
         v_query_text = '
             WITH links AS (
                 SELECT 
-                    link_id,
-                    CASE WHEN mapzone_id = -1 THEN 0
-                    ELSE mapzone_id
-                    END AS mapzone_id
+                    link_id, mapzone_id
                 FROM temp_pgr_arc
                 JOIN v_temp_link_connec vc USING (arc_id)
             )
