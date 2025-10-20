@@ -9,6 +9,7 @@ from .task import GwTask
 from ..utils import tools_gw
 from ...libs import tools_log, tools_qt, tools_db, lib_vars
 from ..shared.psector import GwPsectorUi
+from ... import global_vars
 
 
 class GwConnectLink(GwTask):
@@ -108,6 +109,12 @@ class GwConnectLink(GwTask):
                 arcs_json = ', '.join(arcs_str_list)
                 extras += f', "forcedArcs":[{arcs_json}]'
 
+            # Check if psector mode is active and add psector_id
+            psector_active = global_vars.psignals.get('psector_active', False)
+            psector_id = global_vars.psignals.get('psector_id', None)
+            if psector_active and psector_id:
+                extras += f', "psectorId":"{psector_id}"'
+
             body = tools_gw.create_body(feature=feature_id, extras=extras)
 
             # Execute SQL function for this connec
@@ -150,6 +157,12 @@ class GwConnectLink(GwTask):
             arcs_str_list = [f'"{str(arc)}"' for arc in selected_arcs]
             arcs_json = ', '.join(arcs_str_list)
             extras += f', "forcedArcs":[{arcs_json}]'
+
+        # Check if psector mode is active and add psector_id
+        psector_active = global_vars.psignals.get('psector_active', False)
+        psector_id = global_vars.psignals.get('psector_id', None)
+        if psector_active and psector_id:
+            extras += f', "psectorId":"{psector_id}"'
 
         body = tools_gw.create_body(feature=feature_id, extras=extras)
 
