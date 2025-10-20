@@ -572,6 +572,8 @@ class GwLoadProject(QObject):
 
         # Psector combobox
         self.cmb_psector = QComboBox()
+        self.cmb_psector.setMinimumWidth(200)
+        self.cmb_psector.setMaximumWidth(200)
         tools_gw.fill_cmb_psector_id(self.cmb_psector)
 
         # Overwrite showPopup for upward popup
@@ -603,7 +605,7 @@ class GwLoadProject(QObject):
         """Filter events to handle right-click on combo box popup."""
         if not hasattr(self, 'cmb_psector') or self.cmb_psector is None:
             return super().eventFilter(obj, event)
-        
+
         try:
             if obj == self.cmb_psector.view().viewport():
                 if event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
@@ -617,7 +619,7 @@ class GwLoadProject(QObject):
         except RuntimeError:
             # Object has been deleted
             return super().eventFilter(obj, event)
-            
+
         return super().eventFilter(obj, event)
 
     def _cmb_psector_context_menu_closed(self, pos):
@@ -920,12 +922,12 @@ class GwLoadProject(QObject):
                 pass
 
     # region Campaign form config
-    
+
     def _apply_campaign_form_config(self):
         """
         Applies custom form configurations from the cm_form_config table to project layers.
         """
-        
+
         if not tools_db.check_schema('cm'):
             return
 
@@ -940,7 +942,7 @@ class GwLoadProject(QObject):
         sql = "SELECT campaign_id FROM cm.selector_campaign WHERE cur_user = current_user LIMIT 1"
         rows = tools_db.get_rows(sql, is_thread=True)
         campaign_id = rows[0][0] if rows else None
-        
+
         if not campaign_id:
             return
 
@@ -955,7 +957,7 @@ class GwLoadProject(QObject):
         except Exception:
             # The table might not exist in older versions
             return
-            
+
         if not config_rows:
             return
 
@@ -975,7 +977,7 @@ class GwLoadProject(QObject):
         """
         Applies a given form configuration to a single QgsVectorLayer.
         """
-        
+
         # Build order list: configured first, then the rest
         configured_map = {f["field"]: f for f in cfg_fields}
         configured_order = [f["field"] for f in cfg_fields]
