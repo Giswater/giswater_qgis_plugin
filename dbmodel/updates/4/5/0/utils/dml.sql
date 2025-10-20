@@ -49,3 +49,9 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source") 
 VALUES('plan_psector_disable_forced_style', 'config', 'Variable to disable forced style changes to apply GwPlan', 'role_edit', NULL, 'Style forcing value', NULL, NULL, true, 11, 'utils', NULL, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'false', 'lyt_masterplan', true, NULL, NULL, NULL, NULL, 'core');
+
+-- 20/10/2025
+UPDATE sys_fprocess SET query_text='SELECT * FROM temp_t_node JOIN selector_sector USING (sector_id) WHERE top_elev IS NULL AND cur_user = current_user'
+WHERE fid=164;
+UPDATE sys_fprocess SET query_text='SELECT * FROM temp_t_node JOIN selector_sector USING (sector_id) WHERE top_elev = 0 AND cur_user = current_user'
+WHERE fid=165;
