@@ -59,6 +59,7 @@ v_isforcedarcs boolean; -- Check if forced arcs strategy is being used
 v_ispsector boolean; -- When function is called from psector side (gw_trg_plan_psector_link)
 v_isarcdivide boolean;	-- When function is called for arcdivide procedure (gw_fct_setarcdivide)
 v_link_id integer; -- Id for link
+v_psector_id_param integer; -- Psector ID from Python when psector is active
 
 -- standard variables
 v_projecttype text; -- To store project type (UD / WS)
@@ -74,6 +75,7 @@ v_arc record; -- Record to store the value for the used arc
 v_connect_id  integer; -- id for the used connect
 v_point_aux public.geometry; -- Variable to store the geometry of the end of the link
 v_feature_array integer[]; -- Transforming v_feature_ids on real array
+v_old_arc_id integer; -- Original arc_id for psector state=0 record
 
 v_endfeature_geom public.geometry; -- Variable to store the geometry of the end object, as well as node, connec, gully or arc
 v_pjointtype text; -- Type for the destination feature (ARC, NODE, CONNEC, GULLY)
@@ -126,9 +128,6 @@ BEGIN
 	SELECT value INTO v_dma_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_dma';
 	SELECT value INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
 
-	-- get user variables
-	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user = current_user);
-
 	-- get parameters from input json
 	v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
 	v_feature_ids = ((p_data ->>'feature')::json->>'id'::text);
@@ -141,6 +140,10 @@ BEGIN
 	v_linkcat_id_default = (SELECT value FROM config_param_user WHERE parameter = 'edit_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	v_check_arcdnom = (p_data->>'data')::json->>'pipeDiameter';
 	v_check_maxdistance = (p_data->>'data')::json->>'maxDistance';
+	v_psector_id_param = ((p_data->>'data')::json->>'psectorId')::integer;
+
+	-- get user variables (use psector from Python if provided, otherwise from config)
+	v_psector_current = COALESCE(v_psector_id_param, (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user = current_user));
 
 	--profilactic values
 	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
@@ -232,36 +235,60 @@ BEGIN
 				SELECT * INTO v_connect FROM ve_connec WHERE connec_id = v_connect_id;
 
 				IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_current AND psector_id
-					IN (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
-					v_isoperative_psector = true;
-					v_linkfrompsector = (SELECT link_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id IN
-							    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1 LIMIT 1);
+						IN (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
+						v_isoperative_psector = true;
+						v_linkfrompsector = (SELECT link_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id IN
+									(SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1 LIMIT 1);
+						-- Get old link and arc from base tables (source of truth)
+						v_old_arc_id = (SELECT arc_id FROM connec WHERE connec_id = v_connect.connec_id);
+						v_existing_link = (SELECT link_id FROM link WHERE feature_id = v_connect.connec_id AND feature_type = 'CONNEC' AND exit_id = v_old_arc_id AND exit_type = 'ARC' AND state = 1 ORDER BY link_id ASC LIMIT 1);
+				ELSIF v_psector_id_param IS NOT NULL AND v_connect.state = 1 THEN
+					IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_id_param) IS NULL THEN
+						v_isoperative_psector = true;
+						v_psector_current = v_psector_id_param;
+						-- Get old link and arc from base tables (source of truth)
+						v_old_arc_id = (SELECT arc_id FROM connec WHERE connec_id = v_connect.connec_id);
+						v_existing_link = (SELECT link_id FROM link WHERE feature_id = v_connect.connec_id AND feature_type = 'CONNEC' AND exit_id = v_old_arc_id AND exit_type = 'ARC' AND state = 1 ORDER BY link_id ASC LIMIT 1);
+					END IF;
 				END IF;
 
 			ELSIF v_feature_type ='GULLY' THEN
 				SELECT * INTO v_connect FROM ve_gully WHERE gully_id = v_connect_id;
 
-				IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_current AND psector_id IN
+		IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_current AND psector_id IN
 				   (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
+				v_isoperative_psector = true;
+				v_linkfrompsector = (SELECT link_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id IN
+						    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1 LIMIT 1);
+				-- Get old link and arc from base tables (source of truth)
+				v_old_arc_id = (SELECT arc_id FROM gully WHERE gully_id = v_connect.gully_id);
+				v_existing_link = (SELECT link_id FROM link WHERE feature_id = v_connect.gully_id AND feature_type = 'GULLY' AND exit_id = v_old_arc_id AND exit_type = 'ARC' AND state = 1 ORDER BY link_id ASC LIMIT 1);
+
+			ELSIF v_psector_id_param IS NOT NULL AND v_connect.state = 1 THEN
+				IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_id_param) IS NULL THEN
 					v_isoperative_psector = true;
-					v_linkfrompsector = (SELECT link_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id IN
-							    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1 LIMIT 1);
+					v_psector_current = v_psector_id_param;
+					-- Get old link and arc from base tables (source of truth)
+					v_old_arc_id = (SELECT arc_id FROM gully WHERE gully_id = v_connect.gully_id);
+					v_existing_link = (SELECT link_id FROM link WHERE feature_id = v_connect.gully_id AND feature_type = 'GULLY' AND exit_id = v_old_arc_id AND exit_type = 'ARC' AND state = 1 ORDER BY link_id ASC LIMIT 1);
 				END IF;
 			END IF;
+		END IF;
 
-			-- getting link values
-			IF v_isoperative_psector THEN -- getting values from the operative one
-
-				IF v_linkfrompsector IS NULL THEN
-					SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id and state = 1 limit 1;
-					v_link.link_id = null;
-
-				ELSIF v_linkfrompsector IS NOT NULL THEN
-					SELECT * INTO v_link FROM link WHERE link_id =  v_linkfrompsector;
-				END IF;
+		-- getting link values
+		IF v_isoperative_psector THEN
+			IF v_linkfrompsector IS NULL THEN
+				-- First time: get link structure from existing operative link
+				SELECT * INTO v_link FROM link WHERE link_id = v_existing_link;
 			ELSE
-				SELECT * INTO v_link FROM ve_link WHERE feature_id = v_connect_id limit 1;
+				-- Already in psector: get link structure from psector link
+				SELECT * INTO v_link FROM link WHERE link_id = v_linkfrompsector;
 			END IF;
+			-- Force new link creation
+			v_link.link_id = null;
+		ELSE
+			SELECT * INTO v_link FROM ve_link WHERE feature_id = v_connect_id limit 1;
+		END IF;
 
 			-- exception control. It is not possible to create a link for connec over arc
 			SELECT * INTO v_arc FROM ve_arc WHERE ST_DWithin(v_connect.the_geom, ve_arc.the_geom, 0.001);
@@ -463,10 +490,10 @@ BEGIN
 					v_dma_value = v_arc.dma_id;
 					v_fluidtype_value = v_connect.fluid_type;
 
-					IF v_link.link_id IS NULL THEN
+			IF v_link.link_id IS NULL THEN
 
-						-- creation of link
-						v_link.link_id = (SELECT nextval('urn_id_seq'));
+				-- creation of link
+				v_link.link_id = (SELECT nextval('urn_id_seq'));
 
 						SELECT link_type INTO v_link_type FROM cat_link WHERE id = v_linkcat_id LIMIT 1;
 						IF v_ispsector IS TRUE THEN
@@ -474,23 +501,23 @@ BEGIN
 						ELSE
 							v_state_type = 2;
 						END IF;
-						IF v_projecttype = 'WS' THEN
-							INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, omzone_id,
-							presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id, state_type)
-							VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-							v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.omzone_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
-							v_linkcat_id, v_state_type);
+					IF v_projecttype = 'WS' THEN
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, omzone_id,
+						presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id, state_type)
+						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
+						CASE WHEN v_isoperative_psector THEN 2 ELSE v_connect.state END, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.omzone_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
+						v_linkcat_id, v_state_type);
 
-							EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
+						EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
 
-						ELSIF v_projecttype = 'UD' THEN
-							INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, omzone_id, fluid_type, muni_id, linkcat_id, link_type, state_type)
-							VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-							v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.omzone_id, v_fluidtype_value::INTEGER, v_connect.muni_id, v_linkcat_id, v_link_type, v_state_type);
+					ELSIF v_projecttype = 'UD' THEN
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, omzone_id, fluid_type, muni_id, linkcat_id, link_type, state_type)
+						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
+						CASE WHEN v_isoperative_psector THEN 2 ELSE v_connect.state END, v_arc.expl_id, v_arc.sector_id, v_arc.omzone_id, v_fluidtype_value::INTEGER, v_connect.muni_id, v_linkcat_id, v_link_type, v_state_type);
 
-							EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
+						EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
 
-						END IF;
+					END IF;
 					ELSE
 						IF v_linkcat_id IS NULL THEN
 							IF v_projecttype = 'WS' THEN
@@ -532,34 +559,38 @@ BEGIN
 
 							UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 
-						ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning link & arc_id
+					ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning link & arc_id
 
+							-- Insert state=0 FIRST (before link state changes to 2, so trigger can't overwrite it)
+							IF v_isoperative_psector THEN
+								IF v_feature_type ='CONNEC' THEN
+									INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, link_id, arc_id, doable) 
+									VALUES (v_psector_current, v_connect_id, 0, v_existing_link, v_old_arc_id, true)
+									ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+								ELSIF v_feature_type ='GULLY' THEN
+									INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, link_id, arc_id, doable) 
+									VALUES (v_psector_current, v_connect_id, 0, v_existing_link, v_old_arc_id, true)
+									ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
+								END IF;
+							END IF;
+
+							-- Now insert state=1 and update link state
 							IF v_feature_type ='CONNEC' THEN
-								UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id
-								WHERE psector_id = v_psector_current AND connec_id = v_connect_id AND state = 1;
+								INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, link_id, arc_id, doable)
+								VALUES (v_psector_current, v_connect_id, 1, v_link.link_id, v_arc.arc_id, true)
+								ON CONFLICT (psector_id, connec_id, state) DO UPDATE 
+								SET link_id = v_link.link_id, arc_id = v_arc.arc_id;
 
 							ELSIF v_feature_type ='GULLY' THEN
-								UPDATE plan_psector_x_gully SET link_id = v_link.link_id, arc_id = v_arc.arc_id
-								WHERE psector_id = v_psector_current AND gully_id = v_connect_id  AND state = 1;
+								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, link_id, arc_id, doable)
+								VALUES (v_psector_current, v_connect_id, 1, v_link.link_id, v_arc.arc_id, true)
+								ON CONFLICT (psector_id, gully_id, state) DO UPDATE 
+								SET link_id = v_link.link_id, arc_id = v_arc.arc_id;
 							END IF;
 
 							UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 
-							IF v_isoperative_psector THEN
-
-								SELECT link_id INTO v_existing_link FROM link WHERE feature_id = v_connect_id AND state = 1 LIMIT 1;
-
-								IF v_feature_type ='CONNEC' THEN
-									INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, link_id) VALUES (v_psector_current, v_connect_id, 0, v_existing_link)
-									ON CONFLICT (psector_id, connec_id, state) DO UPDATE set link_id = v_existing_link;
-
-								ELSIF v_feature_type ='GULLY' THEN
-									INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, link_id) VALUES (v_psector_current, v_connect_id, 0, v_existing_link)
-									ON CONFLICT (psector_id, gully_id, state) DO UPDATE set link_id = v_existing_link;
-								END IF;
-							END IF;
-
-						ELSE -- Update connect attributes
+					ELSE -- Update connect attributes
 
 							IF v_feature_type ='CONNEC' THEN
 
@@ -614,13 +645,17 @@ BEGIN
 						END IF;
 					END IF;
 
-					RAISE NOTICE 'LINK:%, %:%, %:%',v_link.link_id, v_link.feature_type, v_link.feature_id, v_link.exit_type, v_link.exit_id;
 					-- reset values
-				end if;
+			end if;
 				v_connect := null;
 				v_link := null;
 				v_arc := null;
 				v_point_aux := null;
+				-- Reset psector-related variables for next iteration
+				v_isoperative_psector := false;
+				v_existing_link := null;
+				v_linkfrompsector := null;
+				v_old_arc_id := null;
 			END IF;
 	    END LOOP;
 	END IF;
