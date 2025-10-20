@@ -57,6 +57,15 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"OMCHECK"}}}$$)';
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"MAPZONES", "subGroup":"ALL"}}}$$)';
 
+		-- insert separators
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2670", "fid":"'||v_fid||'","criticity":"4", "tempTable":"t_", "is_process":true, "message":"4428"}}$$)'; -- title
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2670", "fid":"'||v_fid||'","criticity":"4", "tempTable":"t_", "is_process":true, "separator_id":"2049"}}$$)'; -- separator
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2670", "fid":"'||v_fid||'", "criticity":"3", "tempTable":"t_","is_process":true, "separator_id":"2000"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2670", "fid":"'||v_fid||'","criticity":"3", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"1004", "separator_id":"2022"}}$$)';-- CRITICAL ERRORS
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'", "criticity":"2", "tempTable":"t_","is_process":true, "separator_id":"2000"}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2670", "fid":"'||v_fid||'","criticity":"2", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"3002", "separator_id":"2014"}}$$)';-- WARNINGS
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'", "criticity":"1", "tempTable":"t_", "is_process":true, "separator_id":"2000"}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2670", "fid":"'||v_fid||'","criticity":"1", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"3001", "separator_id":"2007"}}$$)';-- INFO
 	END IF;
 
 	-- getting sys_fprocess to be executed

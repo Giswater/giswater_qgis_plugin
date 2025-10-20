@@ -55,3 +55,6 @@ UPDATE sys_fprocess SET query_text='SELECT * FROM temp_t_node JOIN selector_sect
 WHERE fid=164;
 UPDATE sys_fprocess SET query_text='SELECT * FROM temp_t_node JOIN selector_sector USING (sector_id) WHERE top_elev = 0 AND cur_user = current_user'
 WHERE fid=165;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
+VALUES(4428, 'DATA QUALITY ANALYSIS ACORDING O&M RULES', '', 0, true, 'utils', 'core', 'AUDIT');
