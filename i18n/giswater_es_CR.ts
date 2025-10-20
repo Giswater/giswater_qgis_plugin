@@ -3182,6 +3182,10 @@
 			<translation>Fugas sin tuberías intersectando su buffer: {leaks}.</translation>
 		</message>
 		<message>
+			<source>levels</source>
+			<translation>niveles</translation>
+		</message>
+		<message>
 			<source>LIDS</source>
 			<translation>LIDS</translation>
 		</message>

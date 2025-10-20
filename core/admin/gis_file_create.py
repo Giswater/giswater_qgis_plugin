@@ -89,7 +89,7 @@ class GwGisFileCreate:
                 depth = template.get('levels_to_read')
                 if layer.get('context') is not None:
                     context = json.loads(layer['context'])
-                    levels = context.get('levels')
+                    levels = context.get(tools_qt.tr('levels')) or context.get('levels')
                     if levels is not None:
                         level = root
                         for i in range(0, depth):
