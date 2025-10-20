@@ -64,6 +64,7 @@ DECLARE
     v_record_minsector RECORD;
     v_execute_massive_mincut BOOLEAN;
     v_ignore_unaccess_valves BOOLEAN;
+    v_ignore_changestatus_valves BOOLEAN;
     v_mincut_plannified_state integer := 0; -- Plannified mincut state
     v_mincut_in_progress_state integer := 1; -- In progress mincut state
     v_mincut_network_class integer := 1; -- Network mincut class
@@ -445,10 +446,16 @@ BEGIN
     ELSE
 
         -- Update minsector
-        DELETE FROM minsector WHERE EXISTS (
+        DELETE FROM minsector 
+        WHERE EXISTS (
             SELECT 1 FROM v_temp_pgr_mapzone_old
             WHERE minsector.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
+        )
+        OR EXISTS (
+            SELECT 1 FROM temp_pgr_minsector
+            WHERE minsector.minsector_id = temp_pgr_minsector.minsector_id
         );
+        
         INSERT INTO minsector SELECT * FROM temp_pgr_minsector;
 
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)

@@ -180,7 +180,7 @@ BEGIN
         -- Create temporary views
         CREATE OR REPLACE TEMPORARY VIEW v_temp_pgr_mapzone_old AS
         SELECT DISTINCT t.old_mapzone_id
-        FROM temp_pgr_node t
+        FROM temp_pgr_arc t
         WHERE t.old_mapzone_id > 0;
         IF v_use_psector = 'true' THEN
             -- with psectors
