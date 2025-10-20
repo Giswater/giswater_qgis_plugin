@@ -213,7 +213,7 @@ BEGIN
     UPDATE temp_pgr_node AS n
     SET mapzone_id = agg.min_node
     FROM (
-        SELECT c.component, MIN(n.node_id) AS min_node
+        SELECT c.component, MIN(COALESCE (n.node_id, n.old_node_id)) AS min_node
         FROM temp_pgr_connectedcomponents c
         JOIN temp_pgr_node n on n.pgr_node_id = c.node
         GROUP BY c.component
