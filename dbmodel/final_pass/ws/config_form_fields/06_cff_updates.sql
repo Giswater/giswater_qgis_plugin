@@ -507,17 +507,17 @@ BEGIN
 END $$;
 
 -- 26/08/2025
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_air_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_check_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_fl_contr_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_gen_purp_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_green_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_outfall_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_break_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_reduc_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
-UPDATE config_form_fields SET ismandatory=true WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_air_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_check_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_fl_contr_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_gen_purp_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_green_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_outfall_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_pr_break_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_pr_reduc_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+UPDATE config_form_fields SET ismandatory=false WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
 
 -- 27/08/2025
 UPDATE config_form_fields SET widgetcontrols='{ "minRole": "role_plan"}'::json
