@@ -58,3 +58,8 @@ WHERE fid=165;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, source, message_type) 
 VALUES(4428, 'DATA QUALITY ANALYSIS ACORDING O&M RULES', '', 0, true, 'utils', 'core', 'AUDIT');
+
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_node%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_connec%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_arc%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_gully%' AND formtype = 'form_feature' AND columnname = 'dma_id';

@@ -878,3 +878,9 @@ WHERE formtype = 'form_feature' AND tabname = 'tab_data' AND columnname = 'omzon
 
 -- 19/09/2025
 UPDATE config_form_fields SET widgettype = 'text', iseditable = true WHERE formname = 've_sector' AND columnname = 'sector_id';
+
+-- 20/10/2025
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_node%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_connec%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_arc%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_gully%' AND formtype = 'form_feature' AND columnname = 'dma_id';
