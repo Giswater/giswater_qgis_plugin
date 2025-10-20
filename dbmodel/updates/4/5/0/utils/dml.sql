@@ -63,3 +63,11 @@ UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname L
 UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_connec%' AND formtype = 'form_feature' AND columnname = 'dma_id';
 UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_arc%' AND formtype = 'form_feature' AND columnname = 'dma_id';
 UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_gully%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+
+UPDATE sys_fprocess
+SET except_table='anl_arc'
+WHERE fid=372;
+
+UPDATE sys_fprocess
+SET except_table='anl_node'
+WHERE fid=432;
