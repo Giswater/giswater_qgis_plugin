@@ -20,7 +20,7 @@ SELECT has_table('om_mincut_valve'::name, 'Table om_mincut_valve should exist');
 SELECT columns_are(
     'om_mincut_valve',
     ARRAY[
-        'id', 'result_id', 'node_id', 'closed', 'broken', 'unaccess', 'proposed', 'the_geom', 'flag', 'to_arc'
+        'id', 'result_id', 'node_id', 'closed', 'broken', 'unaccess', 'proposed', 'the_geom', 'flag', 'to_arc', 'changestatus'
     ],
     'Table om_mincut_valve should have the correct columns'
 );
