@@ -692,7 +692,7 @@ BEGIN
 		-- childtable insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
-			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND (feature_type='NODE' OR feature_type='ALL' OR feature_type='CHILD') AND active IS TRUE AND iseditable IS TRUE
 			LOOP
 				EXECUTE 'SELECT $1."' ||v_addfields.param_name||'"'
 					USING NEW
@@ -991,7 +991,7 @@ BEGIN
 		-- childtable update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
-			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND (feature_type='NODE' OR feature_type='ALL' OR feature_type='CHILD') AND active IS TRUE AND iseditable IS TRUE
 			LOOP
 				EXECUTE 'SELECT $1."' || v_addfields.param_name ||'"'
 					USING NEW
