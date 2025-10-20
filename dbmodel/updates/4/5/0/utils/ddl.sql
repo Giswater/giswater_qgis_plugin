@@ -19,3 +19,6 @@ ALTER TABLE IF EXISTS archived_psector_arc RENAME TO _archived_psector_arc_;
 ALTER TABLE IF EXISTS archived_psector_node RENAME TO _archived_psector_node_;
 ALTER TABLE IF EXISTS archived_psector_connec RENAME TO _archived_psector_connec_;
 ALTER TABLE IF EXISTS archived_psector_link RENAME TO _archived_psector_link_;
+
+-- 20/10/2025
+ALTER TABLE audit_check_data ALTER COLUMN tstamp SET DEFAULT CLOCK_TIMESTAMP();
