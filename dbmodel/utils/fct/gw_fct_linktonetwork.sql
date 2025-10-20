@@ -647,6 +647,9 @@ BEGIN
 
 					-- reset values
 			end if;
+			EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "4430","function":"3188","fid": 217,"v_criticity": 4, 
+			"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connec_id":"'||v_connect_id||'", "arc_id":"'||v_arc.arc_id||'"}}}$$);';
+
 				v_connect := null;
 				v_link := null;
 				v_arc := null;
@@ -657,6 +660,9 @@ BEGIN
 				v_linkfrompsector := null;
 				v_old_arc_id := null;
 			END IF;
+
+			
+
 	    END LOOP;
 	END IF;
 

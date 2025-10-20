@@ -71,3 +71,6 @@ WHERE fid=372;
 UPDATE sys_fprocess
 SET except_table='anl_node'
 WHERE fid=432;
+
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4430,'The %feature_type% with id %connec_id% has been successfully connected to arc with id %arc_id%',0,'generic','core','AUDIT');
