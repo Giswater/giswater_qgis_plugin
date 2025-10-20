@@ -138,6 +138,7 @@ BEGIN
             IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INT DEFAULT 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INT DEFAULT 1;
 

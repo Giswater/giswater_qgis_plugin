@@ -19,7 +19,10 @@ CREATE INDEX IF NOT EXISTS om_mincut_conflict_mincut_id_idx ON om_mincut_conflic
 
 ALTER TABLE selector_mincut_result ADD COLUMN IF NOT EXISTS result_type text;
 
-ALTER TABLE minsector_mincut_valve ADD closed bool NULL;
-ALTER TABLE minsector_mincut_valve ADD broken bool NULL;
-ALTER TABLE minsector_mincut_valve ADD unaccess bool NULL;
-ALTER TABLE minsector_mincut_valve ADD to_arc int4 NULL;
+ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS closed bool NULL;
+ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS broken bool NULL;
+ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS unaccess bool NULL;
+ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS to_arc int4 NULL;
+ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS changestatus bool NULL;
+
+ALTER TABLE om_mincut_valve ADD COLUMN IF NOT EXISTS changestatus bool NULL;

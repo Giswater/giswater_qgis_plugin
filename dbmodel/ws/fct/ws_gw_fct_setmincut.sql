@@ -308,6 +308,7 @@ BEGIN
 			v_core_mincut := TRUE;
 		END IF;
 	ELSIF v_action = 'mincutChangeValveStatus' THEN
+		-- TODO: use changestatus column instead of updating real network
 		UPDATE man_valve SET closed = NOT closed 
 		WHERE node_id = v_valve_node_id
 		AND EXISTS (

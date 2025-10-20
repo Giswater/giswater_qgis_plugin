@@ -68,6 +68,9 @@ DECLARE
     v_mincut_in_progress_state integer := 1; -- In progress mincut state
     v_mincut_network_class integer := 1; -- Network mincut class
 
+    v_day_start TIMESTAMP;
+    v_day_end TIMESTAMP;
+
 
     -- parameters
     v_pgr_distance INTEGER;
@@ -85,15 +88,26 @@ BEGIN
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Get variables from input JSON
-	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-    v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector')::BOOLEAN;
-	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges')::BOOLEAN;
-	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
+	v_expl_id = p_data->'data'->'parameters'->>'exploitation';
+    v_usepsector = (p_data->'data'->'parameters'->>'usePlanPsector')::BOOLEAN;
+	v_commitchanges = (p_data->'data'->'parameters'->>'commitChanges')::BOOLEAN;
+	v_updatemapzgeom = p_data->'data'->'parameters'->>'updateMapZone';
+	v_geomparamupdate = p_data->'data'->'parameters'->>'geomParamUpdate';
     v_ignore_broken_valves = (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreBrokenOnlyMassiveMincut');
     v_ignore_check_valves = (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreCheckValvesMincut');
-    v_execute_massive_mincut = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'executeMassiveMincut')::BOOLEAN;
-    v_ignore_unaccess_valves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreUnaccessValvesMincut')::BOOLEAN;
+    v_execute_massive_mincut = (p_data->'data'->'parameters'->>'executeMassiveMincut')::BOOLEAN;
+    v_ignore_unaccess_valves = (p_data->'data'->'parameters'->>'ignoreUnaccessValvesMincut')::BOOLEAN;
+    v_ignore_changestatus_valves = (p_data->'data'->'parameters'->>'ignoreChangeStatusValvesMincut')::BOOLEAN;
+
+    v_day_start = (p_data->'data'->'parameters'->>'dayStart')::TIMESTAMP;
+    v_day_end = (p_data->'data'->'parameters'->>'dayEnd')::TIMESTAMP;
+
+    IF v_day_start IS NULL THEN
+        v_day_start = now()::TIMESTAMP;
+    END IF;
+    IF v_day_end IS NULL THEN
+        v_day_end = (now() + interval '1 day')::TIMESTAMP;
+    END IF;
 
     -- it's not allowed to commit changes when psectors are used
  	IF v_usepsector THEN
@@ -631,7 +645,7 @@ BEGIN
 						AND o.mincut_class = %s
 						AND c.virtual = FALSE 
 						AND o.forecast_start <= o.forecast_end 
-						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(now()::timestamp, (now() + interval ''1 day'')::timestamp, ''[]'')
+						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
 				)
                 UPDATE temp_pgr_arc_minsector tpa
                 SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
@@ -646,7 +660,13 @@ BEGIN
                     AND omv.node_id = tpa.arc_id
             );',
             v_mincut_plannified_state, v_mincut_in_progress_state, 
-            v_mincut_network_class);
+            v_mincut_network_class,
+            v_day_start, v_day_end);
+        END IF;
+
+        -- the changestatus valves
+        IF v_ignore_changestatus_valves THEN
+            -- TODO
         END IF;
 
         -- FINISH preparing
