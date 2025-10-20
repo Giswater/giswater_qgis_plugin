@@ -25,4 +25,9 @@ ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS unaccess bool NULL;
 ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS to_arc int4 NULL;
 ALTER TABLE minsector_mincut_valve ADD COLUMN IF NOT EXISTS changestatus bool NULL;
 
+-- 20/10/2025
 ALTER TABLE om_mincut_valve ADD COLUMN IF NOT EXISTS changestatus bool NULL;
+
+DROP VIEW IF EXISTS v_ui_rpt_cat_result;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"inp_typevalue", "column":"idval", "dataType":"varchar(100)"}}$$);
+

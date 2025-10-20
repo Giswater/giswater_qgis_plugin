@@ -14,3 +14,7 @@ ALTER TABLE plan_psector_x_gully ADD COLUMN IF NOT EXISTS archived boolean DEFAU
 
 -- Drop old archived_psector_gully table (no longer needed with boolean flag approach)
 ALTER TABLE IF EXISTS archived_psector_gully RENAME TO _archived_psector_gully_;
+
+-- 20/10/2025
+DROP VIEW IF EXISTS v_ui_rpt_cat_result;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"inp_typevalue", "column":"idval", "dataType":"varchar(100)"}}$$);

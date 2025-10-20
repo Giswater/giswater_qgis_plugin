@@ -31,7 +31,7 @@ SELECT col_is_pk('inp_typevalue', ARRAY['typevalue', 'id'], 'Columns typevalue, 
 -- Check column types
 SELECT col_type_is('inp_typevalue', 'typevalue', 'varchar(50)', 'Column typevalue should be varchar(50)');
 SELECT col_type_is('inp_typevalue', 'id', 'varchar(30)', 'Column id should be varchar(30)');
-SELECT col_type_is('inp_typevalue', 'idval', 'varchar(30)', 'Column idval should be varchar(30)');
+SELECT col_type_is('inp_typevalue', 'idval', 'varchar(100)', 'Column idval should be varchar(100)');
 SELECT col_type_is('inp_typevalue', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('inp_typevalue', 'addparam', 'json', 'Column addparam should be json');
 
