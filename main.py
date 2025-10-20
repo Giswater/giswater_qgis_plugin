@@ -47,7 +47,6 @@ class Giswater(QObject):
         # Initialize plugin
         if self._init_plugin():
             # Force project read (to work with PluginReloader)
-            QgsProject.instance().readProject.connect(tools_qgis.restore_hidden_nodes)
             self._project_read(False, False)
 
     def unload(self, hide_gw_button=None):
@@ -320,6 +319,11 @@ class Giswater(QObject):
                                     'main', 'projectRead')
         except AttributeError:
             pass
+        try:
+            tools_gw.connect_signal(QgsProject.instance().readProject, tools_qgis.restore_hidden_nodes,
+                                    'main', 'projectRead_restore_hidden_nodes')
+        except AttributeError:
+            pass
 
     def _unset_signals(self, hide_gw_button):
         """ Disconnect iface event signals on Project Read / New Project / Save Project """
@@ -327,6 +331,10 @@ class Giswater(QObject):
         if hide_gw_button is None:
             try:
                 tools_gw.disconnect_signal('main', 'projectRead')
+            except TypeError:
+                pass
+            try:
+                tools_gw.disconnect_signal('main', 'projectRead_restore_hidden_nodes')
             except TypeError:
                 pass
         try:

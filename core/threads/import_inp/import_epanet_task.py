@@ -88,7 +88,7 @@ class GwImportInpTask(GwTask):
         self.arccat_db: list[str] = []
         self.db_units = None
         self.exception: str = ""
-        self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode, and put logs into tab_log
+        self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode
 
         self.node_ids: dict[str, str] = {}
 
@@ -163,6 +163,17 @@ class GwImportInpTask(GwTask):
         self._create_new_varc_catalogs()
         self.progress_changed.emit("Create catalogs", lerp_progress(70, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new pipe catalogs", True)
         self._create_new_pipe_catalogs()
+
+        # Get man tables
+        self.man_tables: dict[str, str] = {}
+        for k, v in self.catalogs['features'].items():
+            sql = f"SELECT feature_class FROM cat_feature WHERE id = '{v}';"
+            row = get_row(sql, commit=self.force_commit)
+            if not row:
+                self._log_message(f"Feature class not found: {v}")
+                continue
+            feature_class = row[0]
+            self.man_tables[k] = f"man_{feature_class.lower()}"
 
     def _manage_nonvisual(self) -> None:
         if self.network.num_patterns > 0:
@@ -309,7 +320,10 @@ class GwImportInpTask(GwTask):
                     process_options(value, category)
                 else:
                     if category == "report" and type(value) is bool:
+                        # TODO: manage "nodes" and "links" options
                         value = "YES" if value else "NO"
+                    elif category == "time" and key not in ("pattern_start", "statistic"):
+                        value = f"{int(value) // 3600}:{(int(value) % 3600) // 60:02d}" if value else None
                     prefix = prefix_map.get(category, "inp_options_")
                     param_name = params_map[category].get(key.lower(), key.lower())
                     param_name = f"{prefix}{param_name}"
@@ -332,8 +346,8 @@ class GwImportInpTask(GwTask):
         template = "(%s, %s)"
 
         if self.debug_mode:
-            print("OPTIONS:")
-            print(update_params)
+            self._log_message("DEBUG: OPTIONS:")
+            self._log_message(f"DEBUG: {str(update_params)}")
 
         # Execute batch update
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=self.force_commit)
@@ -379,6 +393,13 @@ class GwImportInpTask(GwTask):
             nodecat_db = [x[0] for x in cat_node_ids]
 
         node_catalogs = ["junctions", "reservoirs", "tanks"]
+        # If VARCs will be transformed to nodes, ensure target node catalogs exist
+        for k, v in self.manage_nodarcs.items():
+            if not v:
+                continue
+            # Append any nodarc key that has feature and catalog definitions
+            if k in self.catalogs and k in self.catalogs.get("features", {}):
+                node_catalogs.append(k)
 
         for node_type in node_catalogs:
             if node_type not in self.catalogs:
@@ -475,7 +496,8 @@ class GwImportInpTask(GwTask):
                     INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                     VALUES (%s, %s, %s, %s);
                 """
-                print(catalog, arctype_id, material, pipe_dint)
+                if self.debug_mode:
+                    self._log_message(f"DEBUG: catalog: {catalog}, arctype_id: {arctype_id}, material: {material}, pipe_dint: {pipe_dint}")
                 execute_sql(
                     sql, (catalog, arctype_id, material, pipe_dint), commit=self.force_commit
                 )
@@ -698,7 +720,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(junctions)
+            self._log_message(f"DEBUG: {str(junctions)}")
         if not junctions:
             self._log_message("Junctions couldn't be inserted!")
             return
@@ -744,7 +766,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_reservoirs(self) -> None:
-        feature_class = self.catalogs['features']['reservoirs'].lower()
+        man_table = self.man_tables['reservoirs']
 
         node_sql = """ 
             INSERT INTO node (
@@ -757,7 +779,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 node_id
             ) VALUES %s
         """
@@ -815,7 +837,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(reservoirs)
+            self._log_message(f"DEBUG: {str(reservoirs)}")
         if not reservoirs:
             self._log_message("Reservoirs couldn't be inserted!")
             return
@@ -848,7 +870,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_tanks(self) -> None:
-        feature_class = self.catalogs['features']['tanks'].lower()
+        man_table = self.man_tables['tanks']
 
         node_sql = """ 
             INSERT INTO node (
@@ -861,7 +883,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 node_id
             ) VALUES %s
         """
@@ -929,7 +951,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(tanks)
+            self._log_message(f"DEBUG: {str(tanks)}")
         if not tanks:
             self._log_message("Tanks couldn't be inserted!")
             return
@@ -964,11 +986,11 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pumps(self) -> None:
-        feature_class = self.catalogs['features']['pumps'].lower()
+        man_table = self.man_tables['pumps']
         arccat_id = self.catalogs["pumps"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_nodarcs["pumps"]:
-            feature_class = "VARC"
+            man_table = "man_varc"
             arccat_id = "VARC"
 
         arc_sql = """ 
@@ -982,7 +1004,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 arc_id
             ) VALUES %s
         """
@@ -1057,7 +1079,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(pumps)
+            self._log_message(f"DEBUG: {str(pumps)}")
         if not pumps:
             self._log_message("Pumps couldn't be inserted!")
             return
@@ -1156,7 +1178,7 @@ class GwImportInpTask(GwTask):
 
             inp_dict[v_name] = {
                 "valve_type": v.valve_type,
-                "diameter": v.diameter,
+                "diameter": v.diameter * 1000,
                 "setting": v.initial_setting,
                 "curve_id": None,
                 "minorloss": v.minor_loss,
@@ -1204,7 +1226,7 @@ class GwImportInpTask(GwTask):
             )
 
     def _save_pipes(self) -> None:
-        feature_class = self.catalogs['features']['pipes'].lower()
+        man_table = self.man_tables['pipes']
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1217,7 +1239,7 @@ class GwImportInpTask(GwTask):
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO {man_table} (
                 arc_id
             ) VALUES %s
         """
@@ -1275,7 +1297,7 @@ class GwImportInpTask(GwTask):
                 "minorloss": p.minor_loss,
                 "status": p.initial_status.name.upper(),
                 "custom_roughness": p.roughness,
-                "custom_dint": p.diameter,
+                "custom_dint": p.diameter * 1000,
                 "reactionparam": None,
                 "reactionvalue": None,
                 "bulk_coeff": p.bulk_coeff,
@@ -1287,7 +1309,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         if self.debug_mode:
-            print(pipes)
+            self._log_message(f"DEBUG: {str(pipes)}")
         if not pipes:
             self._log_message("Pipes couldn't be inserted!")
             return
@@ -1309,7 +1331,7 @@ class GwImportInpTask(GwTask):
                  )
             )
             if self.debug_mode:
-                print(inp_params)
+                self._log_message(f"DEBUG: {str(inp_params)}")
 
         # Insert into inp table
         toolsdb_execute_values(

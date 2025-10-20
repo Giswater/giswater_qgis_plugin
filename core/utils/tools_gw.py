@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -335,7 +335,7 @@ def open_help_link(context, uiname, dlg=None):
         domain = domain[0]
 
     language = "es_CR"  # TODO: get dynamic language when documentation is ready
-    
+
     # Always use 'latest' to avoid errors when plugin version is diferent than docs
     base_url = f"{domain}/latest/{language}/docs/giswater/for-users"
 
@@ -592,7 +592,7 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
+    list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link", "ve_element"]
     if global_vars.project_type == 'ud':
         list_layers.append("ve_gully")
 
@@ -700,8 +700,8 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
     viewname = f"ve_{feature_type}"
     field_id = feature_type
     if feature_type == "element":
-        viewname = ["ve_man_frelem", "ve_man_genelem"]
-        field_id = ["element", "element"]
+        viewname = ["ve_man_frelem", "ve_man_genelem", "ve_element"]
+        field_id = ["element", "element", "element"]
 
     # Adding auto-completion to a QLineEdit
     if isinstance(feature_id_widget_name, str):
@@ -1749,6 +1749,31 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
         elif field['widgettype'] == 'button':
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
+        elif field['widgettype'] == 'multiple_checkbox':
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_multiple_checkbox(**kwargs)
+            widget.itemChanged.connect(partial(get_values, dialog, widget, my_json))
+            label.setAlignment(Qt.AlignTop)
+        elif field['widgettype'] == 'multiple_option':
+            # Create completer for autocomplete functionality
+            completer = QCompleter()
+
+            # Create and configure the line edit widget
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            widget = set_typeahead(field, dialog, widget, completer)
+
+            # Create filtered value relation widget
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_multiple_option(**kwargs)
+
+            # Connect list widget signals to update values when rows change
+            widget.findChild(QListWidget).model().rowsRemoved.connect(partial(get_values, dialog, widget, my_json))
+            widget.findChild(QListWidget).model().rowsInserted.connect(partial(get_values, dialog, widget, my_json))
+
+            # Align label to top since this widget can grow vertically
+            label.setAlignment(Qt.AlignTop)
 
         if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
@@ -2208,6 +2233,39 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
         if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.get_calendar_date(dialog, widget)
+    elif isinstance(widget, QListWidget):
+        if not widget.isEnabled() and not ignore_editability:
+            return _json
+        value = []
+        for i in range(widget.count()):
+            if widget.item(i).checkState() == Qt.Checked:
+                v = widget.item(i).data(Qt.UserRole)
+                try:
+                    v = int(v)
+                except ValueError:
+                    pass
+                value.append(v)
+    elif isinstance(widget, QWidget):
+        # Handle filtered value relation widgets
+        if widget.objectName() == 'multiple_option':
+            # Get the list widget child that contains the actual values
+            widget = widget.findChild(QListWidget)
+
+            # Return early if widget is disabled and we're not ignoring editability
+            if not widget.isEnabled() and not ignore_editability:
+                return _json
+
+            # Build list of selected values
+            value = []
+            for i in range(widget.count()):
+                # Get the data stored in UserRole for each item
+                v = widget.item(i).data(Qt.UserRole)
+                # Try to convert to integer if possible
+                try:
+                    v = int(v)
+                except ValueError:
+                    pass
+                value.append(v)
 
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
     if key == '' or key is None:
@@ -2669,6 +2727,383 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
+
+
+def add_multiple_option(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
+    """Creates a filtered value relation widget with type-ahead search functionality.
+    
+    Args:
+        field (dict): Field configuration containing widget properties
+        dialog (QDialog, optional): Parent dialog. Defaults to None.
+        complet_result (dict, optional): Additional completion data. Defaults to None.
+        ignore_function (bool, optional): Whether to ignore widget functions. Defaults to False.
+        class_info (dict, optional): Class information. Defaults to None.
+        
+    Returns:
+        QWidget: Container widget with search box and filtered list
+    """
+    # Create list widget to show selected values
+    widget = QListWidget()
+
+    # Setup type-ahead search with completer
+    completer = QCompleter()
+    type_ahead = add_lineedit(field)
+    type_ahead.setPlaceholderText(tools_qt.tr("Type to search..."))
+
+    # Configure completer with model and connect signals
+    if completer:
+        model = QStandardItemModel()
+        completer.activated.connect(partial(add_item_multiple_option, completer, widget, type_ahead))
+        make_list_multiple_option(completer, model, type_ahead, field, widget)
+        type_ahead.textChanged.connect(partial(make_list_multiple_option, completer, model, type_ahead, field, widget))
+
+    # Set widget properties from field config
+    widget.setObjectName(field['columnname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+
+    # Fill widget with initial values and connect double-click to delete
+    widget = fill_multiple_option(widget, field)
+    widget.itemDoubleClicked.connect(partial(delete_item_on_doubleclick, widget))
+
+    # Set selected ID property
+    if 'selectedId' in field:
+        widget.setProperty('selectedId', field['selectedId'])
+    else:
+        widget.setProperty('selectedId', None)
+
+    # Configure editability
+    if 'iseditable' in field:
+        widget.setEnabled(bool(field['iseditable']))
+        type_ahead.setEnabled(bool(field['iseditable']))
+
+    # Create layout to hold both widgets
+    layout = QVBoxLayout()
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.setSpacing(2)
+
+    # Add type_ahead and widget to layout
+    layout.addWidget(type_ahead)
+    layout.addWidget(widget)
+
+    # Create container widget to hold layout
+    container = QWidget()
+    container.setObjectName('multiple_option')
+    container.setLayout(layout)
+
+    return container
+
+
+def make_list_multiple_option(completer, model, widget, field, list_widget):
+    """ Create a list of ids and populate widget (QLineEdit) 
+    
+    Args:
+        completer (QCompleter): Completer object for auto-completion
+        model (QStandardItemModel): Model to store completion items
+        widget (QLineEdit): The text input widget
+        field (dict): Field configuration containing query info
+        
+    Returns:
+        bool: False if no results found, None otherwise
+    """
+
+    # Initialize variables
+    result = None
+    line_edit = None
+    line_list = []
+    line_list.append(widget)
+
+    if line_list:
+        # Get the text input widget and its current value
+        line_edit = line_list[0]
+        value = line_edit.text()
+
+        # Return if empty value
+        if str(value) == '':
+            return
+
+        # Execute query if field has required query parameters
+        if 'queryText' in field and 'queryText' != '' and value is not None:
+            # Build SQL with ILIKE filter for case-insensitive search
+            if 'queryTextFilter' in field and field['queryTextFilter'] is not None:
+                sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
+            else:
+                sql = f"{field['queryText']};"
+            result = tools_db.get_rows(sql)
+
+        # Return False if no results
+        if not result:
+            return False
+
+    # Build display list from results
+    display_list = []
+    if result:
+        # Extract id and value from each result row
+        for data in result:
+            if data[1] not in list_widget.items().text():
+                item = {"id": data[0], "idval": data[1]}
+                display_list.append(item)
+
+        # Update completer with sorted display list
+        tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
+
+
+def add_item_multiple_option(completer, widget, typeahead):
+    """Add selected item from completer popup to QListWidget
+    
+    Args:
+        completer (QCompleter): The completer containing selected item
+        widget (QListWidget): The list widget to add item to
+    """
+    # Get currently selected row in completer popup
+    row = completer.popup().currentIndex().row()
+    if row == -1:  # No row selected
+        return
+
+    # Get key and display value from selected completer item
+    _key = completer.completionModel().index(row, 0).data(Qt.ItemDataRole.UserRole)
+    value = completer.completionModel().index(row, 0).data()
+
+    # Create and configure new list widget item
+    item = QListWidgetItem()
+    item.setText(value)  # Set display text
+    if _key:
+        item.setData(Qt.UserRole, _key)  # Store key in user role
+    widget.addItem(item)  # Add item to list widget
+
+    typeahead.setText('')
+
+
+def fill_multiple_option(widget, field, index_to_show=1, index_to_compare=0):
+    """Fills a QListWidget with filtered value relation items.
+    
+    Args:
+        widget (QListWidget): The list widget to populate
+        field (dict): Dictionary containing field configuration and data
+        index_to_show (int): Index of value to show in widget (default: 1)
+        index_to_compare (int): Index to use for comparison (default: 0)
+        
+    Returns:
+        QListWidget: The populated widget
+    """
+
+    # Clear widget contents while blocking signals to prevent unwanted triggers
+    widget.blockSignals(True)
+    widget.clear()
+    widget.blockSignals(False)
+
+    # Handle selected values if field has selectedId
+    if 'selectedId' in field and field['selectedId'] is not None and field['selectedId'] != '':
+        selected_values = []
+
+        # Process combo IDs and names if both are present
+        if 'comboIds' in field and 'comboNames' in field:
+            combo_ids = field['comboIds']
+            combo_names = field['comboNames']
+            selected_id = field['selectedId']
+
+            # Parse selected_id from JSON string to handle both single values and lists
+            selected_id = json.loads(selected_id)
+
+            # Handle list of selected IDs
+            if isinstance(selected_id, list):
+                for sid in selected_id:
+                    if str(sid) in combo_ids:
+                        idx = combo_ids.index(str(sid))
+                        selected_values.append((combo_ids[idx], combo_names[idx]))
+            # Handle single selected ID
+            else:
+                if selected_id in combo_ids:
+                    idx = combo_ids.index(selected_id)
+                    selected_values.append((combo_ids[idx], combo_names[idx]))
+
+        # Update widget with selected values
+        set_multiple_option_value(widget, selected_values)
+
+    # Configure widget size policy to adjust to contents
+    widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    return widget
+
+
+def add_multiple_checkbox(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
+    widget = QListWidget()
+
+    widget.setObjectName(field['columnname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget = fill_multiple_checkbox(widget, field)
+    if 'selectedId' in field:
+        widget.setProperty('selectedId', field['selectedId'])
+    else:
+        widget.setProperty('selectedId', None)
+    if 'iseditable' in field:
+        widget.setEnabled(bool(field['iseditable']))
+
+    if not ignore_function and 'widgetfunction' in field and field['widgetfunction']:
+        widgetfunction = field['widgetfunction']
+        functions = None
+        if isinstance(widgetfunction, list):
+            functions = widgetfunction
+        else:
+            if 'isfilter' in field and field['isfilter']:
+                return widget
+            functions = [widgetfunction]
+        for f in functions:
+            if 'isFilter' in f and f['isFilter']:
+                continue
+            columnname = field['columnname']
+            parameters = f.get('parameters')
+
+            kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
+                      "func_params": parameters, "class": class_info}
+            if 'module' in f:
+                module = globals()[f['module']]
+            else:
+                module = tools_backend_calls
+            function_name = f.get('functionName')
+            if function_name is not None:
+                if function_name:
+                    exist = tools_os.check_python_function(module, function_name)
+                    if not exist:
+                        msg = "widget {0} has associated function {1}, but {2} not exist"
+                        msg_params = (widget.property('widgetname'), function_name, function_name,)
+                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                        return widget
+                else:
+                    msg = "Parameter functionName is null for button"
+                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+            widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
+
+    return widget
+
+
+def fill_multiple_checkbox(widget, field, index_to_show=1, index_to_compare=0):
+    # check if index_to_show is in widgetcontrols, then assign new value
+    if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
+        index_to_show = field.get('widgetcontrols')['index_to_show']
+    # Generate list of items to add into combo
+    widget.blockSignals(True)
+    widget.clear()
+    widget.blockSignals(False)
+    combolist = []
+    combo_ids = field.get('comboIds')
+    combo_names = field.get('comboNames')
+
+    if 'comboIds' in field and 'comboNames' in field:
+        if tools_os.set_boolean(field.get('isNullValue'), False):
+            combolist.append(['', ''])
+        for i in range(0, len(field['comboIds'])):
+            elem = [combo_ids[i], combo_names[i]]
+            combolist.append(elem)
+    else:
+        msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
+        msg_params = (field['widgetname'], field['widgettype'],)
+        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+    # Populate combo
+    for record in combolist:
+        item = QListWidgetItem()
+        item.setText(record[index_to_show])
+        item.setData(Qt.UserRole, record[index_to_compare])
+        item.setFlags(item.flags() | Qt.ItemIsUserCheckable)  # make it checkable
+        item.setCheckState(Qt.Unchecked)  # start unchecked
+        widget.addItem(item)
+    if 'selectedId' in field:
+        set_multiple_checkbox_value(widget, field['selectedId'])
+    # Set size policy for QListWidget - use setSizeAdjustPolicy instead
+    widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    return widget
+
+
+def set_multiple_option_value(listwidget, value):
+    """
+    Sets values in a filtered value relation list widget.
+    
+    Args:
+        listwidget (QListWidget): The list widget to populate
+        value (list): List of tuples containing (id, display_value) pairs to add
+        
+    Returns:
+        bool: Always returns False
+        
+    The function takes a list widget and populates it with items from the value parameter.
+    Each item shows the display value and stores the ID in the UserRole data.
+    """
+    # Return early if either widget or value is None
+    if listwidget is None or value is None:
+        return False
+
+    # Add each value pair as a new item
+    for id, val in value:
+        item = QListWidgetItem()
+        item.setText(val)  # Set display text
+        item.setData(Qt.UserRole, id)  # Store ID in user role
+
+        listwidget.addItem(item)
+    return False
+
+
+def delete_item_on_doubleclick(listwidget, item):
+    """
+    Deletes an item from a list widget when double-clicked.
+    
+    Args:
+        listwidget (QListWidget): The list widget containing the item
+        item (QListWidgetItem): The item to delete
+        
+    The function removes the specified item from the list widget if both parameters
+    are valid and the item exists in the widget.
+    """
+    # Only proceed if we have valid widget and item
+    if item is not None and listwidget is not None:
+        row = listwidget.row(item)
+
+    # Remove item if row is valid
+    if row >= 0:
+        listwidget.takeItem(row)
+
+
+def set_multiple_checkbox_value(listwidget, value, add_new=True):
+    """
+    Set text to combobox populate with more than 1 item for row
+        :param combo: QComboBox widget to manage
+        :param value: element to show
+        :param index: index to compare
+        :param add_new: if True it will add the value even if it's not in the combo
+    """
+
+    if listwidget is None:
+        return False
+    try:
+        value = json.loads(str(value))
+    except Exception:
+        return
+    for i in range(0, listwidget.count()):
+        elem = listwidget.item(i)
+        for j in range(len(value)):
+            if str(value[j]) == str(elem.data(Qt.UserRole)):
+                listwidget.item(i).setCheckState(Qt.Checked)
+
+    # Add new value if @value not in combo
+    if add_new and value not in ("", None, 'None', 'none', '-1', -1):
+        for val in value:
+            found = False
+            for i in range(listwidget.count()):
+                if str(val) == str(listwidget.item(i).data(Qt.UserRole)):
+                    found = True
+                    break
+
+            if not found:
+                item = QListWidgetItem()
+                item.setText(f"({val})")
+                item.setData(Qt.UserRole, val)
+                item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                item.setCheckState(Qt.Checked)
+                listwidget.addItem(item)
+    return False
 
 
 def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
@@ -3720,7 +4155,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     table_ids_original = table_ids.copy()
 
     # Ensure dictionary and list exist for storing feature IDs per feature type
-    if not hasattr(class_object, "list_ids"):
+    if not hasattr(class_object, "rel_list_ids"):
         class_object.rel_list_ids = {}
     if class_object.rel_feature_type not in class_object.rel_list_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = []
@@ -3729,44 +4164,53 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         class_object.rel_list_ids[class_object.rel_feature_type] = table_ids
     elif not class_object.rel_list_ids[class_object.rel_feature_type]:
         class_object.rel_list_ids[class_object.rel_feature_type] = []
-    # Collect selected features from the map
+    # Collect selected features from the map - OPTIMIZED DATABASE APPROACH FOR ALL MODES
     selected_ids = []
-    if class_object.rel_layers:
-        for layer in class_object.rel_layers[class_object.rel_feature_type]:
-            if layer.selectedFeatureCount() > 0:
-                for feature in layer.selectedFeatures():
-                    selected_id = str(feature.attribute(field_id))
-                    if selected_id:
-                        selected_ids.append(selected_id)
-                        if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
-                            class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+    # Process map selection with filtering and database queries
+    selected_ids = _process_map_selection(class_object, selection_mode, field_id)
+
     # Ensure selections are added even if the table was initially empty
     if not table_ids_original and selected_ids:
         class_object.rel_list_ids[class_object.rel_feature_type] = selected_ids
 
-    # Filter current buffers and selection once, centrally.
+    # Skip redundant filtering - already applied in database query
+    # Only apply final filter for non-database contexts (like EXPRESSION mode)
     feature_type = class_object.rel_feature_type
-    class_object.rel_list_ids[feature_type] = _filter_ids_by_context(
-        class_object, selection_mode, feature_type, class_object.rel_list_ids.get(feature_type, []))
-    selected_ids = _filter_ids_by_context(class_object, selection_mode, feature_type, selected_ids)
+    if selection_mode not in (GwSelectionMode.CAMPAIGN, GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_CAMPAIGN, GwSelectionMode.EXPRESSION_LOT):
+        class_object.rel_list_ids[feature_type] = _filter_ids_by_context(
+            class_object, selection_mode, feature_type, class_object.rel_list_ids.get(feature_type, []))
+        selected_ids = _filter_ids_by_context(class_object, selection_mode, feature_type, selected_ids)
 
-    # Reflect filtered selection on the map
-    if selected_ids:
-        expr = QgsExpression(f"{field_id} IN ({','.join(f'{i}' for i in selected_ids)})")
-        tools_qgis.select_features_by_ids(feature_type, expr, class_object.rel_layers)
-
-    ids_to_insert = []
-    for id in class_object.rel_list_ids[class_object.rel_feature_type]:
-        if id not in table_ids_original:
-            ids_to_insert.append(id)
+    # Use set for fast membership checking - O(1) instead of O(n)
+    table_ids_set = set(table_ids_original)
+    ids_to_insert = [id for id in class_object.rel_list_ids[class_object.rel_feature_type] if id not in table_ids_set]
 
     do_insert = False
     if ids_to_insert:
-        msg = "Do you want to insert the selected features? {0}"
-        msg_params = (", ".join(ids_to_insert), )
+        # Show confirmation dialog with filtered features
+        if len(ids_to_insert) <= 50:
+            msg = "Do you want to insert the selected features? {0}"
+            msg_params = (", ".join(ids_to_insert), )
+        else:
+            msg = "Do you want to insert {0} selected features? (First 50: {1} ...)"
+            msg_params = (len(ids_to_insert), ", ".join(ids_to_insert[:50]))
         do_insert = tools_qt.show_question(msg, msg_params=msg_params)
     else:
-        # No new ids to insert: ensure we clear any selection on canvas
+        # No new ids to insert: show info message and clear selection
+        msg_params = None
+        if selected_ids:
+            # Features were selected but already exist in table
+            msg = "No new features to insert. All selected features already exist in the table."
+        else:
+            # No features of this type were found in the selection
+            # Get the actual tab name for display
+            tab_name = class_object.rel_feature_type
+            if hasattr(dialog, 'tab_feature'):
+                tab_idx = dialog.tab_feature.currentIndex()
+                tab_name = dialog.tab_feature.tabText(tab_idx)
+            msg = "No features found in the selection for {0}."
+            msg_params = (tab_name, )
+        tools_qgis.show_info(msg, dialog=dialog, msg_params=msg_params)
         remove_selection(layers=class_object.rel_layers)
 
     # If user closes/cancels the confirmation, just clear canvas selection
@@ -3776,31 +4220,35 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Prevent UI interference while updating the table
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.rel_list_ids[class_object.rel_feature_type]) + ")"
     if selection_mode == GwSelectionMode.PSECTOR and do_insert:
-        _insert_feature_psector(dialog, class_object.rel_feature_type, ids=ids_to_insert)
+        psector_id = tools_qt.get_text(dialog, "tab_general_psector_id")
+        _insert_feature(dialog, psector_id, 'psector', class_object.rel_feature_type, ids_to_insert)
+        if class_object.rel_feature_type in ('connec', 'gully'):
+            # Insert again with state = 1
+            _insert_feature(dialog, psector_id, 'psector', class_object.rel_feature_type, ids_to_insert, extra_cols='{"state": 1}')
         load_tableview_psector(dialog, class_object.rel_feature_type)
         set_model_signals(class_object)
         remove_selection()
     elif selection_mode == GwSelectionMode.PSECTOR and not do_insert:
         remove_selection()
     elif selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN) and do_insert:
-        _insert_feature_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.campaign_id, 'campaign', class_object.rel_feature_type, ids_to_insert)
         load_tableview_campaign(dialog, class_object.rel_feature_type, class_object.campaign_id, class_object.rel_layers)
     elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT) and do_insert:
-        _insert_feature_lot(dialog, class_object.rel_feature_type, class_object.lot_id, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.lot_id, 'lot', class_object.rel_feature_type, ids_to_insert)
         load_tableview_lot(dialog, class_object.rel_feature_type, class_object.lot_id, class_object.rel_layers)
     elif selection_mode == GwSelectionMode.ELEMENT and do_insert:
-        _insert_feature_elements(dialog, class_object.feature_id, class_object.rel_feature_type, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.feature_id, 'element', class_object.rel_feature_type, ids_to_insert)
         load_tableview_element(dialog, class_object.feature_id, class_object.rel_feature_type)
     elif selection_mode == GwSelectionMode.FEATURE_END and do_insert:
         load_tableview_feature_end(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     elif selection_mode == GwSelectionMode.VISIT and do_insert:
-        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=ids_to_insert)
+        _insert_feature(dialog, class_object.visit_id.text(), 'visit', class_object.rel_feature_type, ids_to_insert)
         load_tableview_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type)
     elif selection_mode == GwSelectionMode.MINCUT_CONNEC and do_insert:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-    else:
+    elif do_insert:
         columns_to_show = [f"{class_object.rel_feature_type}_id", "code", "sys_code", f"{class_object.rel_feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, columns_to_show=columns_to_show)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3813,15 +4261,21 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     model = table_widget.model()
     selection_model = table_widget.selectionModel()
     if model and selection_model and selected_ids:
-        selection_model.clearSelection()
+        # Skip row selection for very large datasets to avoid performance issues
+        row_count = model.rowCount()
+        if row_count <= 5000:
+            selection_model.clearSelection()
 
-        for row in range(model.rowCount()):
-            model_index = get_model_index(model, row, field_id)
-            row_value = str(model_index)
-            if row_value in selected_ids:
-                column_index = model.fieldIndex(field_id)
-                index = model.index(row, column_index)
-                selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+            # Convert to set for faster lookup
+            selected_ids_set = set(selected_ids)
+
+            for row in range(row_count):
+                model_index = get_model_index(model, row, field_id)
+                row_value = str(model_index)
+                if row_value in selected_ids_set:
+                    column_index = model.fieldIndex(field_id)
+                    index = model.index(row, column_index)
+                    selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
 
     # Safely check and call callback if it exists
     if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
@@ -3830,6 +4284,142 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     # Safely check highlight method
     if hasattr(class_object, 'highlight_method_active') and class_object.highlight_method_active:
         class_object.highlight_features_method(class_object, dialog, table_object)
+
+
+def _process_map_selection(class_object, selection_mode, field_id):
+    """Process map selection with filtering logic and database queries"""
+    if not class_object.rel_layers:
+        return []
+
+    # Get selected feature IDs from QGIS (instant - no attribute loading)
+    selected_fids = []
+    for layer in class_object.rel_layers[class_object.rel_feature_type]:
+        if layer.selectedFeatureCount() > 0:
+            selected_fids.extend(layer.selectedFeatureIds())
+
+    if not selected_fids:
+        return []
+
+    # Apply filtering logic early to get only allowed features for highlighting
+    # This ensures the map selection only highlights features that can actually be inserted
+    filtered_fids = _filter_ids_by_context(class_object, selection_mode, class_object.rel_feature_type, selected_fids)
+
+    # Convert filtered string IDs back to QGIS feature IDs for map selection
+    if filtered_fids:
+        # Get the layer to work with
+        layer = class_object.rel_layers[class_object.rel_feature_type][0]
+
+        # Find QGIS feature IDs that correspond to the filtered database feature IDs
+        field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
+        if field_idx != -1:
+            # Get all features to find matching QGIS feature IDs
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+            matching_qgis_fids = []
+
+            for feature in layer.getFeatures(request):
+                feature_id = str(feature.attribute(field_idx))
+                if feature_id in filtered_fids:
+                    matching_qgis_fids.append(feature.id())
+
+            # Clear selection and re-select only the filtered features
+            layer.removeSelection()
+            if matching_qgis_fids:
+                layer.select(matching_qgis_fids)
+
+    # Use original selected_fids for processing (filtering will be applied in SQL)
+    # Get context-specific filter for SQL
+    where_clause = ""
+    if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.EXPRESSION_CAMPAIGN):
+        if hasattr(class_object, 'get_allowed_features_for_campaign'):
+            try:
+                allowed = class_object.get_allowed_features_for_campaign(class_object.rel_feature_type)
+                if isinstance(allowed, list) and allowed:
+                    allowed_str = ','.join(f"'{aid}'" for aid in allowed)
+                    where_clause = f"AND {field_id} IN ({allowed_str})"
+            except Exception:
+                pass
+    elif selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
+        try:
+            lot_id = getattr(class_object, 'lot_id', None) or getattr(class_object, 'lot_id_value', None)
+        except Exception:
+            lot_id = None
+        if lot_id and hasattr(class_object, 'get_allowed_features_for_lot'):
+            try:
+                allowed = class_object.get_allowed_features_for_lot(int(lot_id), class_object.rel_feature_type)
+                if isinstance(allowed, list) and allowed:
+                    allowed_str = ','.join(f"'{aid}'" for aid in allowed)
+                    where_clause = f"AND {field_id} IN ({allowed_str})"
+            except Exception:
+                pass
+    # For all other modes no additional filtering
+    # Query each layer separately to handle multi-layer feature types (like elements with ve_man_frelem + ve_man_genelem)
+    selected_ids = []
+    existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
+    
+    try:
+        for layer in class_object.rel_layers[class_object.rel_feature_type]:
+            if layer.selectedFeatureCount() == 0:
+                continue
+                
+            # Get layer-specific selected feature IDs
+            layer_selected_fids = layer.selectedFeatureIds()
+            if not layer_selected_fids:
+                continue
+            
+            # Get table name and schema using GisWater utilities
+            table_name = tools_qgis.get_layer_source_table_name(layer)
+            schema_name = tools_qgis.get_layer_schema(layer)
+            pk_field = tools_qgis.get_primary_key(layer)
+
+            # Construct full table name
+            if table_name and schema_name:
+                full_table_name = f"{schema_name}.{table_name}"
+            elif table_name:
+                full_table_name = table_name
+            else:
+                # Fallback to standard naming if extraction fails
+                schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if tools_db.dao_db_credentials.get('schema') else 'ws'
+                full_table_name = f"{schema_name}.v_edit_{class_object.rel_feature_type}"
+
+            # Use field_id as fallback for primary key
+            if not pk_field:
+                pk_field = field_id
+
+            # Query database directly for this layer
+            fid_str = ','.join(map(str, layer_selected_fids))
+            sql = f"""
+                SELECT {field_id}::text 
+                FROM {full_table_name} 
+                WHERE {pk_field} IN ({fid_str}) 
+                {where_clause}
+            """
+
+            rows = tools_db.get_rows(sql)
+            if rows:
+                layer_selected_ids = [row[field_id] for row in rows if row.get(field_id)]
+                
+                # Add to selected_ids and class object list
+                for selected_id in layer_selected_ids:
+                    if selected_id not in existing_ids_set:
+                        selected_ids.append(selected_id)
+                        class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+                        existing_ids_set.add(selected_id)
+    except Exception:
+        # Fallback to original method if database query fails
+        for layer in class_object.rel_layers[class_object.rel_feature_type]:
+            if layer.selectedFeatureCount() > 0:
+                field_idx = layer.fields().indexOf(field_id)
+                if field_idx == -1:
+                    continue
+                request = QgsFeatureRequest().setFilterFids(layer.selectedFeatureIds()).setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+                for feature in layer.getFeatures(request):
+                    selected_id = str(feature.attribute(field_idx))
+                    if selected_id:
+                        selected_ids.append(selected_id)
+                        if selected_id not in class_object.rel_list_ids[class_object.rel_feature_type]:
+                            class_object.rel_list_ids[class_object.rel_feature_type].append(selected_id)
+
+    return selected_ids
 
 
 def _get_enabled_types(dialog) -> list:
@@ -3921,7 +4511,10 @@ def _select_rows_in_tables(dialog, ft, ids_list):
                 sel_model = qtable.selectionModel()
                 sel_model.clearSelection()
                 ids_set = set(map(str, ids_list))
-                for row in range(qtable.model().rowCount()):
+
+                row_count = qtable.model().rowCount()
+
+                for row in range(row_count):
                     val = str(qtable.model().index(row, id_col_idx).data())
                     if val in ids_set:
                         index = qtable.model().index(row, id_col_idx)
@@ -3942,17 +4535,23 @@ def _campaign_multi_insert_processing(class_object, dialog, table_object, select
 
         enabled_types = _get_enabled_types(dialog)
         per_type = _collect_ids_to_insert(class_object, dialog, table_object, selection_mode, enabled_types)
+
         if not per_type:
+            # No features found in selection for any enabled tab
+            enabled_types_str = ", ".join(enabled_types) if enabled_types else "any feature type"
+            msg = "No features found in the selection for the enabled tabs ({0})."
+            tools_qgis.show_info(msg, parameter=enabled_types_str, dialog=dialog)
             remove_selection(layers=class_object.rel_layers)
             return
 
         _highlight_map_for_inserts(class_object, per_type)
+
         if not _confirm_multi_insert(per_type):
             remove_selection(layers=class_object.rel_layers)
             return
 
         for ft, ids_list in per_type.items():
-            _insert_feature_campaign(dialog, ft, class_object.campaign_id, ids=ids_list)
+            _insert_feature(dialog, class_object.campaign_id, 'campaign', ft, ids_list)
             load_tableview_campaign(dialog, ft, class_object.campaign_id, class_object.rel_layers)
             _select_rows_in_tables(dialog, ft, ids_list)
 
@@ -4001,14 +4600,12 @@ def set_model_signals(class_object):
     class_object.rubber_band_line.reset()
     class_object.rubber_band_rectangle.reset()
 
-    if hasattr(class_object, 'psector_id') and class_object.psector_id:
-        psector_id = class_object.psector_id
-    else:
-        psector_id = tools_qt.get_text(class_object.dlg_plan_psector, 'tab_general_psector_id')
-
-    filter_ = "psector_id = '" + str(psector_id) + "'"
-    class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
-                    set_edit_triggers=QTableView.DoubleClicked, expr=filter_, feature_type="connec", field_id="connec_id")
+    # Refresh table models to show newly added features
+    try:
+        if class_object.qtbl_connec.model():
+            class_object.qtbl_connec.model().select()
+    except Exception:
+        pass
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
@@ -4136,18 +4733,20 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
     # Reload contents of table 'tbl_xxx_xxx_@feature_type'
     if selection_mode == GwSelectionMode.PSECTOR:
-        _insert_feature_psector(dialog, feature_type, ids=selected_ids)
+        psector_id = tools_qt.get_text(dialog, "tab_general_psector_id")
+        _insert_feature(dialog, psector_id, 'psector', feature_type, selected_ids)
+        load_tableview_psector(dialog, feature_type)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
         set_model_signals(class_object)
     elif selection_mode == GwSelectionMode.CAMPAIGN:
-        _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
+        _insert_feature(dialog, class_object.campaign_id, 'campaign', feature_type, selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
         load_tableview_campaign(dialog, feature_type, class_object.campaign_id, class_object.rel_layers)
 
     elif selection_mode == GwSelectionMode.LOT:
-        _insert_feature_lot(dialog, feature_type, class_object.lot_id, ids=selected_ids)
+        _insert_feature(dialog, class_object.lot_id, 'lot', feature_type, selected_ids)
         layers = remove_selection(True, class_object.rel_layers)
         class_object.rel_layers = layers
         load_tableview_lot(dialog, feature_type, class_object.lot_id, class_object.rel_layers)
@@ -4155,10 +4754,10 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         load_tableview_feature_end(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
     elif selection_mode == GwSelectionMode.ELEMENT:
-        _insert_feature_elements(dialog, class_object.feature_id, feature_type, ids=selected_ids)
+        _insert_feature(dialog, class_object.feature_id, 'element', feature_type, selected_ids)
         load_tableview_element(dialog, class_object.feature_id, feature_type)
     elif selection_mode == GwSelectionMode.VISIT:
-        _insert_feature_visit(dialog, class_object.visit_id.text(), class_object.rel_feature_type, ids=selected_ids)
+        _insert_feature(dialog, class_object.visit_id.text(), 'visit', class_object.rel_feature_type, selected_ids)
         load_tableview_visit(dialog, class_object.visit_id.text(), feature_type)
     elif selection_mode == GwSelectionMode.MINCUT_CONNEC:
         get_rows_by_feature_type(class_object, dialog, table_object, class_object.rel_feature_type, expr_filter=expr_filter, table_separator="_")
@@ -5074,7 +5673,33 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
             "result": result
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
+
+        disable_forced_style = get_config_value('plan_psector_disable_forced_style')
+        if disable_forced_style is not None and not tools_os.set_boolean(disable_forced_style[0], False):
+            if enable:
+                last_styles = {}
+                project_layers = global_vars.iface.mapCanvas().layers()
+                for lyr in project_layers:
+                    try:
+                        style_manager = lyr.styleManager()
+                        current_style = style_manager.currentStyle()
+                        src_name = tools_qgis.get_layer_source_table_name(lyr)
+                        last_styles[src_name] = current_style
+                    except Exception:
+                        continue
+                global_vars.psignals['last_styles'] = last_styles
+                apply_styles_to_layers(110, "GwPlan")
+            else:
+                last_styles = global_vars.psignals['last_styles']
+                for lyr in last_styles:
+                    layer = tools_qgis.get_layer_by_tablename(lyr)
+                    try:
+                        style_manager = layer.styleManager()
+                        style_manager.setCurrentStyle(last_styles[lyr])
+                    except Exception:
+                        continue
         refresh_selectors()
+    tools_qgis.refresh_map_canvas()
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
@@ -5575,90 +6200,66 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
 
 
 # region private functions
-def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
-    """ Insert features_id to table cm.om_campaign_x_<feature_type> """
+def _insert_feature(dialog, relation_id, relation_type, feature_type, ids=None, extra_cols=None):
+    """ Universal function to insert features into any relation table using generalized function """
+    if not ids:
+        return
 
-    widget = tools_qt.get_widget(dialog, f"tbl_campaign_x_{feature_type}")
-    tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
-    parent_table = f"{lib_vars.schema_name}.{feature_type}"
-    from_clause = f"FROM {parent_table} p"
-
-    if not campaign_id:
-        msg = "Campaign ID is missing."
+    if not relation_id:
+        msg = f"{relation_type.title()} ID is missing."
         tools_qgis.show_warning(msg)
         return
 
-    # Configuration for each feature type to define which columns to add and whether a join is needed.
-    feature_configs = {
-        'node': {'cat_id_col': 'nodecat_id', 'type_col': 'node_type'},
-        'arc': {'cat_id_col': 'arccat_id', 'type_col': 'arc_type'},
-        'gully': {'cat_id_col': 'gullycat_id', 'type_col': 'gully_type'},
-        'connec': {'cat_id_col': 'conneccat_id', 'type_col': None},
-        'link': {'cat_id_col': 'linkcat_id', 'type_col': None}
-    }
-
-    extra_cols = []
-    select_extras = []
-
-    config = feature_configs.get(feature_type)
-    if config:
-        cat_id_col = config['cat_id_col']
-        type_col = config['type_col']
-
-        # All configured features have at least a catalog ID
-        extra_cols.append(cat_id_col)
-        select_extras.append(f"p.{cat_id_col}")
-
-        if type_col:
-            # This feature type requires a JOIN to get its type from the catalog table
-            cat_table = f"{lib_vars.schema_name}.cat_{feature_type}"
-            extra_cols.append(type_col)
-            select_extras.append(f"c.{type_col}")
-            from_clause = (
-                f"FROM {parent_table} p "
-                f"JOIN {cat_table} c ON p.{cat_id_col} = c.id"
-            )
-
-    if feature_type == 'arc':
-        extra_cols.extend(['node_1', 'node_2'])
-        select_extras.extend(['p.node_1', 'p.node_2'])
-
-    # Base columns for the INSERT statement
-    base_insert_cols = ['campaign_id', f'{feature_type}_id', 'status', 'the_geom']
-
-    # Corresponding values/columns for the SELECT statement
-    base_select_cols = [f"{campaign_id}", f'p.{feature_type}_id', "1", 'p.the_geom']
-
-    # Combine base and extra columns for the final query
-    insert_cols = ", ".join(base_insert_cols + extra_cols)
-    select_cols = ", ".join(base_select_cols + select_extras)
-
-    # Temporarily disable CM topocontrol strictly for Campaign > Relations inserts
-    toggled = False
+    # Toggle audit and topocontrol off during bulk insert for performance (only for campaign)
+    audit_toggled = False
+    topocontrol_toggled = False
     try:
-        if tools_db.check_schema('cm') and feature_type in ('arc', 'node'):
-            tools_db.execute_sql(
-                """
-                INSERT INTO cm.config_param_user(parameter, value, cur_user)
-                VALUES ('edit_disable_topocontrol','true', current_user)
-                ON CONFLICT (parameter, cur_user) DO UPDATE SET value='true';
-                """
-            )
-            toggled = True
+        if relation_type == 'campaign':
+            # Check if audit is enabled and temporarily disable it for performance
+            cur_user = tools_db.get_current_user()
+            audit_result = tools_db.get_row(f"SELECT value FROM config_param_user WHERE parameter = 'audit_function' AND cur_user = '{cur_user}'")
+
+            if audit_result and audit_result[0] == 'true':
+                audit_toggled = True
+                tools_db.execute_sql(
+                    f"""
+                    INSERT INTO config_param_user (parameter, value, cur_user) 
+                    VALUES ('audit_function', 'false', '{cur_user}')
+                    ON CONFLICT (parameter, cur_user) DO UPDATE SET value='false';
+                    """
+                )
+
+            # Toggle topocontrol off during bulk insert for performance (only for arc/node)
+            if tools_db.check_schema('cm') and feature_type in ('arc', 'node'):
+                tools_db.execute_sql(
+                    """
+                    INSERT INTO cm.config_param_user(parameter, value, cur_user)
+                    VALUES ('edit_disable_topocontrol','true', current_user)
+                    ON CONFLICT (parameter, cur_user) DO UPDATE SET value='true';
+                    """
+                )
+                topocontrol_toggled = True
 
         if ids:
-            # Batch insert for better performance with large numbers of features
-            ids_list = "', '".join(str(id) for id in ids)
-            sql = f"""
-                INSERT INTO {tablename} ({insert_cols})
-                SELECT {select_cols}
-                {from_clause}
-                WHERE p.{feature_type}_id IN ('{ids_list}')
-                ON CONFLICT DO NOTHING;
-            """
-            tools_db.execute_sql(sql)
+            ids_array = "ARRAY[" + ",".join(str(id) for id in ids) + "]"
+            parameters = f"{relation_id}, '{relation_type}', '{feature_type}', {ids_array}"
+            if extra_cols:
+                parameters += f", '{extra_cols}'"
+            execute_procedure('gw_fct_manage_inserts_by_ids', parameters)
+
     finally:
-        if toggled:
+        # Re-enable audit if it was disabled
+        if audit_toggled:
+            tools_db.execute_sql(
+                f"""
+                UPDATE config_param_user
+                SET value='true'
+                WHERE parameter='audit_function' AND cur_user='{cur_user}';
+                """
+            )
+
+        # Re-enable topocontrol if it was disabled
+        if topocontrol_toggled:
             tools_db.execute_sql(
                 """
                 UPDATE cm.config_param_user
@@ -5686,9 +6287,10 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
         expr = f"campaign_id = '{campaign_id}'"
         qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
         tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+
         message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
 
-        # Get ids from qtable (that will only mark the ones whanted in snapping)
+        # Get ids from qtable (that will only mark the ones wanted in snapping)
         feature_id_column = f"{feature_type}_id"
         feature_ids = get_ids_from_qtable(qtable, feature_id_column)
 
@@ -5698,6 +6300,7 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
 
         if message:
             tools_qgis.show_warning(message)
+
         set_tablemodel_config(dialog, qtable, tablename)
 
     finally:
@@ -5808,42 +6411,6 @@ def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=N
     tools_db.execute_sql(sql)
 
 
-def _insert_feature_lot(dialog, feature_type, lot_id, ids=None):
-    """ Insert features_id to table plan_@feature_type_x_campaign """
-
-    widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
-    tablename = widget.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
-
-    if not lot_id:
-        msg = "Lot ID is missing."
-        tools_qgis.show_warning(msg)
-        return
-
-    if ids:
-        # Special handling for arcs to include node_1 and node_2
-        if feature_type == 'arc':
-            ids_list = "', '".join(str(id) for id in ids)
-            sql = f"""
-                INSERT INTO {tablename} (lot_id, arc_id, status, code, node_1, node_2)
-                SELECT {lot_id}, arc_id, 1, code, node_1, node_2
-                FROM {lib_vars.schema_name}.arc
-                WHERE arc_id IN ('{ids_list}')
-                ON CONFLICT DO NOTHING;
-            """
-            tools_db.execute_sql(sql)
-        else:
-            # Standard insertion for other feature types
-            ids_list = "', '".join(str(id) for id in ids)
-            sql = f"""
-                INSERT INTO {tablename} (lot_id, {feature_type}_id, status, code)
-                SELECT {lot_id}, {feature_type}_id, 1, code
-                FROM {lib_vars.schema_name}.{feature_type}
-                WHERE {feature_type}_id IN ('{ids_list}')
-                ON CONFLICT DO NOTHING;
-            """
-            tools_db.execute_sql(sql)
-
-
 def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
     """Reload QTableView for campaign_lot_x_<feature_type> safely, avoiding recursive selectionChanged loop."""
 
@@ -5893,43 +6460,6 @@ def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
     if state is not None:
         sql += f""" AND "state" = '{state}'"""
     tools_db.execute_sql(sql)
-
-
-def _insert_feature_psector(dialog, feature_type, ids=None):
-    """ Insert features_id to table plan_@feature_type_x_psector"""
-    if not ids:
-        return
-
-    widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
-    tablename = widget.property('tablename')
-    value = tools_qt.get_text(dialog, "tab_general_psector_id")
-    for i in range(len(ids)):
-        sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
-        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
-        if feature_type in ('connec', 'gully'):
-            sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id, state) "
-            sql += f"VALUES('{ids[i]}', '{value}', 1) ON CONFLICT DO NOTHING;"
-            tools_db.execute_sql(sql)
-        load_tableview_psector(dialog, feature_type)
-
-
-def _insert_feature_elements(dialog, feature_id, rel_feature_type, ids=None):
-    """ Insert features_id to table tbl_element_x_@rel_feature_type """
-
-    for i in range(len(ids)):
-        sql = f"INSERT INTO element_x_{rel_feature_type} (element_id, {rel_feature_type}_id) "
-        sql += f"VALUES('{feature_id}', '{ids[i]}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
-
-
-def _insert_feature_visit(dialog, feature_id, rel_feature_type, ids=None):
-    """ Insert features_id to table tbl_visit_x_@rel_feature_type """
-
-    for i in range(len(ids)):
-        sql = f"INSERT INTO om_visit_x_{rel_feature_type} (visit_id, {rel_feature_type}_id) "
-        sql += f"VALUES('{feature_id}', '{ids[i]}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
 
 
 def delete_feature_visit(dialog, visit_id, rel_feature_type, list_id=None):
@@ -6458,6 +6988,30 @@ def _manage_combo(**kwargs):
 
     widget = add_combo(field, dialog, complet_result, class_info=class_info)
     widget = set_widget_size(widget, field)
+    return widget
+
+
+def _manage_multiple_checkbox(**kwargs):
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
+    field = kwargs['field']
+    widget = add_multiple_checkbox(field, dialog, complet_result, class_info=class_info)
+    return widget
+
+
+def _manage_multiple_option(**kwargs):
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
+    field = kwargs['field']
+    widget = add_multiple_option(field, dialog, complet_result, class_info=class_info)
     return widget
 
 

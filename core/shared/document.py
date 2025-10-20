@@ -75,6 +75,13 @@ class GwDocument(QObject):
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.rel_layers['element'] = tools_gw.get_layers_from_feature_type('element')
+        
+        # Add manager element layers (ve_man_frelem, ve_man_genelem) if they exist
+        for layer_name in ['ve_man_frelem', 've_man_genelem']:
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+            if layer and layer not in self.rel_layers['element']:
+                self.rel_layers['element'].append(layer)
+        
         if self.project_type == 'ud':
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
@@ -171,8 +178,9 @@ class GwDocument(QObject):
 
         # Set signals
         self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_gully",
-                                "ve_man_genelem", "ve_link"]
+                                "ve_man_genelem", "ve_link", "ve_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
+        
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -198,8 +206,7 @@ class GwDocument(QObject):
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, False)
         )
         # Tab relations
-        self.dlg_add_doc.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
+        self.dlg_add_doc.tab_feature.currentChanged.connect(self._on_tab_changed)
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
@@ -207,7 +214,7 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
         self.dlg_add_doc.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object, None)
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT)
         )
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
@@ -220,7 +227,8 @@ class GwDocument(QObject):
                                                                  self.dlg_add_doc.tbl_doc_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                  self.dlg_add_doc.tbl_doc_x_link, "ve_link", "link_id", self.rubber_band, 10))
-
+        self.dlg_add_doc.tbl_doc_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                 self.dlg_add_doc.tbl_doc_x_element, "ve_element", "element_id", self.rubber_band, 10))
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
                 partial(self._fill_table_doc, self.dlg_add_doc, feature_type, feature[feature_type + "_id"]))
@@ -234,6 +242,11 @@ class GwDocument(QObject):
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
 
         return self.dlg_add_doc
+
+    def _on_tab_changed(self):
+        """ Update rel_feature_type when tab changes """
+        # Get current tab's feature type
+        self.rel_feature_type = tools_gw.get_signal_change_tab(self.dlg_add_doc, self.excluded_layers)
 
     def _fill_table_doc_workcat(self):
         expr_filter = f"name = '{self.doc_name}'"

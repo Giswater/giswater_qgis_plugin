@@ -438,7 +438,7 @@ class GwEpaFileManager(GwTask):
         for field in json_result['body']['data']['fields']:
             if field['context'] is not None:
                 context = json.loads(field['context'])
-                levels = context['levels']
+                levels = context.get(tools_qt.tr('levels')) or context.get('levels')
 
                 # Check if this is an EPA RESULTS layer
                 if len(levels) > 1 and levels[0] == 'EPA' and levels[1] == 'RESULTS':

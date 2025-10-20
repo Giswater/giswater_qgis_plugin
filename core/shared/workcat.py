@@ -134,7 +134,7 @@ class GwWorkcat:
 
         dialog.messageBar().hide()
 
-        dialog.show()
+        tools_gw.open_dialog(dialog, dlg_name='info_workcat')
 
     def _save_new_workcat(self, dialog):
         workid = dialog.cat_work_id.text()

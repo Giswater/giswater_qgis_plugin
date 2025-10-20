@@ -579,11 +579,6 @@ class GwInfo(QObject):
         # Actions
         self._get_actions()
 
-        if self.new_feature_id is not None:
-            self._enable_action(self.dlg_cf, "actionCentered", False)
-            self._enable_action(self.dlg_cf, "actionSetToArc", False)
-        self._show_actions(self.dlg_cf, 'tab_data')
-
         try:
             is_enabled = complet_result['body']['feature']['permissions']['isEditable']
             self.action_edit.setEnabled(is_enabled)
@@ -606,6 +601,11 @@ class GwInfo(QObject):
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
+
+        self._show_actions(self.dlg_cf, 'tab_data')
+        if self.new_feature_id is not None:
+            self._enable_action(self.dlg_cf, "actionCentered", False)
+            self._enable_action(self.dlg_cf, "actionSetToArc", False)
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
@@ -1565,9 +1565,8 @@ class GwInfo(QObject):
             widgets = dialog.findChildren(QWidget)
             for widget in widgets:
                 if widget.hasFocus():
-                    value = tools_qt.get_text(dialog, widget)
-                    if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                        self.my_json[str(widget.property('columnname'))] = str(value)
+                    # Use get_values for proper combo handling (gets ID instead of text)
+                    tools_gw.get_values(dialog, widget, self.my_json, ignore_editability=True)
                     widget.clearFocus()
         else:
             try:
@@ -1583,18 +1582,16 @@ class GwInfo(QObject):
                 widgets.extend(other_widgets)
                 for widget in widgets:
                     if widget.hasFocus():
-                        value = tools_qt.get_text(dialog, widget)
-                        if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                            self.my_json[str(widget.property('columnname'))] = str(value)
+                        # Use get_values for proper combo handling (gets ID instead of text)
+                        tools_gw.get_values(dialog, widget, self.my_json, ignore_editability=True)
                         widget.clearFocus()
                 # Widgets in tab_epa
                 widgets = dialog.tab_epa.findChildren(QWidget)
                 widgets.extend(other_widgets)
                 for widget in widgets:
                     if widget.hasFocus():
-                        value = tools_qt.get_text(dialog, widget)
-                        if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                            self.my_json_epa[str(widget.property('columnname'))] = str(value)
+                        # Use get_values for proper combo handling (gets ID instead of text)
+                        tools_gw.get_values(dialog, widget, self.my_json_epa, ignore_editability=True)
                         widget.clearFocus()
             except RuntimeError:
                 pass

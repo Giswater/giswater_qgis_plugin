@@ -32,16 +32,15 @@ from .... import global_vars
 class GwToolBoxButton(GwAction):
     """ Button 63: Toolbox """
 
-    TRV_PROCESSES = tools_qt.tr('trv_processes', 'toolbox', default="Processes")
-    TRV_REPORTS = tools_qt.tr('trv_reports', 'toolbox', default="Raports")
-
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         if icon_path is not None:
             super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
-        self.no_clickable_items = [self.TRV_PROCESSES, self.TRV_REPORTS]
+        self.TRV_PROCESSES = tools_qt.tr('trv_processes', 'toolbox', default="Processes")
+        self.TRV_REPORTS = tools_qt.tr('trv_reports', 'toolbox', default="Raports")
+        
         self.ignore_widgets = ['qt_spinbox_lineedit', 'qt_calendar_yearedit']
         self.temp_layers_added = []
         self.add_columns = {}
@@ -176,7 +175,7 @@ class GwToolBoxButton(GwAction):
         self.dlg_toolbox = GwToolboxUi(self, 'toolbox')
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
-
+        self.no_clickable_items = [self.TRV_PROCESSES, self.TRV_REPORTS]
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)

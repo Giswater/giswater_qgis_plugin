@@ -1265,6 +1265,7 @@ class GwAdminButton:
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
+        
         if result:
             self._open_project(qgs_path)
 

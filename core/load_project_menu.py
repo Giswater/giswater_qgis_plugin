@@ -164,7 +164,7 @@ class GwMenuLoad(QObject):
         tools_qgis.restore_cursor()
 
         msg = ("Changes on this page are dangerous and can break Giswater plugin in various ways. \n"
-                  "You will need to restart QGIS to apply changes. Do you want continue?")
+                  "You will need to restart QGIS or reload Giswater plugin to apply changes. Do you want continue?")
         title = "Advanced Menu"
         answer = tools_qt.show_question(msg, title)
         if not answer:

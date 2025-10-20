@@ -12,11 +12,13 @@ import json
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QTextEdit
 from qgis.core import QgsVectorLayer
+from qgis.PyQt.QtCore import QDate
 
 from .epa_file_manager import GwEpaFileManager
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_log, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_log, tools_qt, tools_qgis, tools_db
 from .task import GwTask
+from datetime import datetime
 
 
 class GwGo2IberTask(GwTask):
@@ -98,7 +100,9 @@ class GwGo2IberTask(GwTask):
             "do_run": True,
             "do_import": True,
             "do_write_inlets": False,
-            "pinlet_layer": pgully_layer,  # TODO: Generate pinlet layer from pgully
+            "pinlet_layer": pgully_layer,
+            "iber_tmax": self._get_tmax_from_options(),
+            "generate_results_gpkg": False
         }
         self.ig_feedback = self.ig_feedback_class.Feedback()
         self.ig_execute_model = self.ig_execute_model.DrExecuteModel("Execute IberGIS Model", params, self.ig_feedback)
@@ -157,7 +161,7 @@ class GwGo2IberTask(GwTask):
         self.dlg_go2iber.btn_accept.setEnabled(True)
 
         if not self.isCanceled() and result:
-            self.ig_execute_model._create_results_folder()
+            self.ig_execute_model._import_results()
             self.ig_execute_model._delete_raster_results()
 
         if self.timer:
@@ -198,3 +202,63 @@ class GwGo2IberTask(GwTask):
         tools_qgis.show_info(msg, msg_params=msg_params)
         self._close_file()
         super().cancel()
+
+    def _get_tmax_from_options(self) -> int:
+        """ Update the tmax field based on SWMM options """
+
+        # Get values
+        sql = "SELECT value FROM config_param_user WHERE parameter in ('inp_options_start_time', 'inp_options_end_time', 'inp_options_start_date', 'inp_options_end_date') ORDER BY parameter"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            end_date_str = rows[0]['value']
+            end_time_str = rows[1]['value']
+            start_date_str = rows[2]['value']
+            start_time_str = rows[3]['value']
+
+        # Parse time strings (HH:MM:SS, HH:MM)
+        def parse_time(time_str: str) -> tuple[int, int, int]:
+            """Parse time string and return (hours, minutes, seconds)"""
+            if not time_str or time_str.strip() == "":
+                return 0, 0, 0
+
+            time_parts = time_str.strip().split(':')
+            if len(time_parts) == 2:
+                # Format: HH:MM
+                hours = int(time_parts[0])
+                minutes = int(time_parts[1])
+                seconds = 0
+            elif len(time_parts) == 3:
+                # Format: HH:MM:SS
+                hours = int(time_parts[0])
+                minutes = int(time_parts[1])
+                seconds = int(time_parts[2])
+            else:
+                return 0, 0, 0
+
+            return hours, minutes, seconds
+
+        # Parse dates and times
+        if start_date_str and end_date_str:
+            # Parse date strings (dd/MM/yyyy) into QDate objects
+            start_date_obj = QDate.fromString(start_date_str, 'dd/MM/yyyy')
+            end_date_obj = QDate.fromString(end_date_str, 'dd/MM/yyyy')
+
+            if start_date_obj.isValid() and end_date_obj.isValid():
+                start_h, start_m, start_s = parse_time(start_time_str)
+                end_h, end_m, end_s = parse_time(end_time_str)
+
+                # Create datetime objects
+                start_datetime = datetime.combine(start_date_obj.toPyDate(), datetime.min.time().replace(
+                    hour=start_h, minute=start_m, second=start_s
+                ))
+                end_datetime = datetime.combine(end_date_obj.toPyDate(), datetime.min.time().replace(
+                    hour=end_h, minute=end_m, second=end_s
+                ))
+
+                # Calculate time difference
+                time_diff = end_datetime - start_datetime
+                seconds = int(time_diff.total_seconds())
+
+                return seconds
+
+        return 0

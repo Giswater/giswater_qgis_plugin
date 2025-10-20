@@ -56,6 +56,7 @@ psignals = {                            # A dictionary of all the psector status
     'widgets': [],
     'psector_active': False,
     'psector_id': None,
+    'last_styles': {},
 }
 # endregion
 

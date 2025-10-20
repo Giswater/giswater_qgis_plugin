@@ -132,6 +132,12 @@ class GwDscenarioManagerButton(GwAction):
         # Checkbox show inactive
         self.chk_active = self.dlg_hydrology_manager.chk_active
 
+        # Set default scenario name
+        name_value = tools_gw.get_config_value('inp_options_hydrology_current')
+        if name_value[0]:
+            name_value = tools_db.get_row(f'SELECT "name" FROM ve_cat_hydrology WHERE hydrology_id = {name_value[0]}')
+            tools_qt.set_widget_text(self.dlg_hydrology_manager, 'lbl_vdefault_dscenario', name_value[0])
+
         # Fill table
         self.tbl_dscenario = self.dlg_hydrology_manager.findChild(QTableView, 'tbl_dscenario')
         self._fill_manager_table('ve_cat_hydrology', dialog=self.dlg_hydrology_manager, scenario_type="hydrology")
@@ -195,6 +201,12 @@ class GwDscenarioManagerButton(GwAction):
 
         # Checkbox show inactive
         self.chk_active = self.dlg_dwf_manager.chk_active
+
+        # Set default scenario name
+        name_value = tools_gw.get_config_value('inp_options_dwfscenario_current')
+        if name_value[0]:
+            name_value = tools_db.get_row(f'SELECT idval FROM ve_cat_dwf WHERE id = {name_value[0]}')
+            tools_qt.set_widget_text(self.dlg_dwf_manager, 'lbl_vdefault_dscenario', name_value[0])
 
         # Fill table
         self.tbl_dscenario = self.dlg_dwf_manager.findChild(QTableView, 'tbl_dscenario')

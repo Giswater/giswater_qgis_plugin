@@ -58,17 +58,55 @@ class GwArcFusionButton(GwMaptool):
 
     def _fusion_arc(self):
 
+        catalog = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.cmb_new_cat)
+        if catalog in (None, 'null'):
+            msg = "Mandatory field is missing. Please, set a value for field"
+            tools_qgis.show_warning(msg, parameter="'Catalog id'", dialog=self.dlg_fusion)
+            return
+        asset_id = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.txt_new_asset)
+
+        # Build diff fields warning message
+        catalog_arc1 = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.txt_arc1cat)
+        catalog_arc2 = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.txt_arc2cat)
+        asset_arc1 = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.txt_arc1asset)
+        asset_arc2 = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.txt_arc2asset)
+        diff_fields = []
+        if catalog_arc1 != catalog_arc2:
+            txt = ("Catalog:\n"
+                f"  Arc 1: {catalog_arc1} {'(SELECTED)' if catalog_arc1 == catalog else ''}\n"
+                f"  Arc 2: {catalog_arc2} {'(SELECTED)' if catalog_arc2 == catalog else ''}"
+            )
+            if catalog_arc1 != catalog and catalog_arc2 != catalog:
+                txt += f"\n  SELECTED: {catalog}"
+            diff_fields.append(txt)
+
+        if asset_arc1 != asset_arc2:
+            txt = ("Asset:\n"
+                f"  Arc 1: {'None' if asset_arc1 == 'null' else asset_arc1} {'(SELECTED)' if asset_arc1 == asset_id else ''}\n"
+                f"  Arc 2: {'None' if asset_arc2 == 'null' else asset_arc2} {'(SELECTED)' if asset_arc2 == asset_id else ''}"
+            )
+            if asset_arc1 != asset_id and asset_arc2 != asset_id:
+                txt += f"\n  SELECTED: {asset_id}"
+            diff_fields.append(txt)
+
+        if diff_fields:
+            msg = (
+                "The following fields differ between the selected arcs. "
+                "You are about to merge them using the selected values.\n\n"
+                "{0}\n\nDo you want to continue?"
+            )
+            msg_params = ('\n\n'.join(diff_fields),)
+            answer = tools_qt.show_question(msg, title="Arc Fusion", msg_params=msg_params)
+            if not answer:
+                return
+
+        # Build SQL function input parameters
         state_type = tools_qt.get_combo_value(self.dlg_fusion, "cmb_statetype")
         action_mode = self.dlg_fusion.cmb_nodeaction.currentIndex()
         plan_mode = global_vars.psignals['psector_active']
         if plan_mode:
             action_mode = 1
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
-        catalog = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.cmb_new_cat)
-        if catalog in (None, 'null'):
-            msg = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(msg, parameter="'Catalog id'", dialog=self.dlg_fusion)
-            return
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
         feature_id = f'"id":["{self.node_id}"]'
@@ -87,6 +125,8 @@ class GwArcFusionButton(GwMaptool):
                     extras += ', "state_type": null'
         if catalog not in (None, 'null', ''):
             extras += f', "arccat_id":"{catalog}"'
+        if asset_id not in (None, 'null', ''):
+            extras += f', "asset_id":"{asset_id}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         complet_result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
@@ -214,8 +254,12 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.workcat_id_end.setEnabled(False)
             self.dlg_fusion.cmb_statetype.setEnabled(False)
 
-        # Build catalog widgets
-        if not self._build_catalog_widgets():
+        # Set read only to some widgets
+        self.dlg_fusion.txt_arc1asset.setReadOnly(True)
+        self.dlg_fusion.txt_arc2asset.setReadOnly(True)
+
+        # Build catalog and asset widgets
+        if not self._build_catalog_asset_widgets():
             return
 
         # Manage plan widgets
@@ -232,15 +276,15 @@ class GwArcFusionButton(GwMaptool):
 
         tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
-    def _build_catalog_widgets(self):
-        """ Build catalog widgets """
+    def _build_catalog_asset_widgets(self):
+        """ Build catalog and asset widgets """
 
         # Get arc catalogs
         sql = "SELECT id, id as idval FROM cat_arc"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_fusion.cmb_new_cat, rows)
         tools_qt.set_autocompleter(self.dlg_fusion.cmb_new_cat)
-        
+
         sql = f"""
             SELECT arccat_id::text 
             FROM ve_arc 
@@ -254,7 +298,7 @@ class GwArcFusionButton(GwMaptool):
             tools_qt.set_selected_item(self.dlg_fusion, self.dlg_fusion.cmb_new_cat, row[0])
 
         # Get linked arcs to the selected node
-        sql = f"SELECT arc_id, arccat_id FROM ve_arc WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}"
+        sql = f"SELECT arc_id, arccat_id, asset_id FROM ve_arc WHERE node_1 = {self.node_id} OR node_2 = {self.node_id}"
         rows = tools_db.get_rows(sql)
         if not rows or len(rows) != 2:
             msg = "The selected node should have exactly two linked arcs."
@@ -263,6 +307,10 @@ class GwArcFusionButton(GwMaptool):
         else:
             tools_qt.set_widget_text(self.dlg_fusion, "txt_arc1cat", rows[0][1])
             tools_qt.set_widget_text(self.dlg_fusion, "txt_arc2cat", rows[1][1])
+            tools_qt.set_widget_text(self.dlg_fusion, "txt_arc1asset", rows[0][2])
+            tools_qt.set_widget_text(self.dlg_fusion, "txt_arc2asset", rows[1][2])
+            tools_qt.set_stylesheet(self.dlg_fusion.txt_arc1asset, style="background: rgb(242, 242, 242); color: rgb(110, 110, 110)")
+            tools_qt.set_stylesheet(self.dlg_fusion.txt_arc2asset, style="background: rgb(242, 242, 242); color: rgb(110, 110, 110)")
         return True
 
     def _manage_nodeaction(self, index):

@@ -202,24 +202,24 @@ class GwI18NGenerator:
 
         # Get python toolbars and buttons values
         if self.lower_lang == 'en_us':
-            sql = "SELECT source, ms_en_us FROM i18n.pymessage;"  # ADD new columns
+            sql = "SELECT source, ms_en_us FROM i18n.pymessage ORDER BY source_code, source, id;"  # ADD new columns
             py_messages = self._get_rows(sql)
-            sql = "SELECT source, lb_en_us FROM i18n.pytoolbar;"
+            sql = "SELECT source, lb_en_us FROM i18n.pytoolbar ORDER BY source_code, source, id;"
             py_toolbars = self._get_rows(sql)
             # Get python dialog values
             sql = ("SELECT dialog_name, source, lb_en_us, tt_en_us"
                 " FROM i18n.pydialog"
-                " ORDER BY dialog_name;")
+                " ORDER BY source_code, project_type, toolbar_name, dialog_name, source, id;")
             py_dialogs = self._get_rows(sql)
         else:
-            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage;"  # ADD new columns
+            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage ORDER BY source_code, source, id;"  # ADD new columns
             py_messages = self._get_rows(sql)
-            sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar;"
+            sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar ORDER BY source_code, source, id;"
             py_toolbars = self._get_rows(sql)
             # Get python dialog values
             sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}, tt_en_us, {key_tooltip}, auto_{key_tooltip}"
                 f" FROM i18n.pydialog"
-                f" ORDER BY dialog_name;")
+                f" ORDER BY source_code, project_type, toolbar_name, dialog_name, source, id;")
             py_dialogs = self._get_rows(sql)
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
@@ -437,90 +437,112 @@ class GwI18NGenerator:
         QApplication.processEvents()
         colums = []
         lang_colums = []
+        order_by = []   
 
         if table == 'dbconfig_form_fields':
             colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbparam_user':
             colums = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbconfig_param_system':
             colums = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_typevalue':
             colums = ["source", "formname", "project_type", "context", "source_code", "tt_en_us"]
             lang_colums = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbmessage':
             colums = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
             lang_colums = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'log_level', 'id'])
 
         elif table == 'dbfprocess':
             colums = ["project_type", "context", "source", "ex_en_us", "in_en_us", "na_en_us"]
             lang_colums = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_csv':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_form_tabs':
             colums = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbconfig_report':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_toolbox':
             colums = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbfunction':
             colums = ["source", "project_type", "context", "ds_en_us"]
             lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbtypevalue':
             colums = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
             lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'typevalue', 'source', 'id'])
 
         elif table == 'dbconfig_form_tableview':
             colums = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'columnname', 'location_type', 'source', 'id'])
 
         elif table == 'dbjson':
             colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'hint'])
 
-        if table == 'dbconfig_form_fields_json':
+        elif table == 'dbconfig_form_fields_json':
             colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "hint", "text", "lb_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbconfig_form_fields_feat':
             colums = ["feature_type","source", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbtable':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dblabel':
             colums = ["source", "project_type", "context", "vl_en_us"]
             lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'su_basic_tables':
             colums = ["source", "project_type", "context", "na_en_us", "ob_en_us"]
             lang_colums = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'su_feature':
             colums = ["project_type", "context", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'feature_class', 'feature_type', 'lb_en_us', 'id'])
 
         elif table == 'dbconfig_engine':
             colums = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'parameter', 'method', 'id'])
 
         # Make the query
         sql=""
@@ -528,11 +550,11 @@ class GwI18NGenerator:
             if self.lower_lang == 'en_us':
                 sql = (f"SELECT {', '.join(colums)} "
                 f"FROM {self.schema_i18n}.{table} "
-                f"ORDER BY context;")
+                f"ORDER BY {', '.join(order_by)};")
             else:
                 sql = (f"SELECT {', '.join(colums)}, {', '.join(lang_colums)} "
                 f"FROM {self.schema_i18n}.{table} "
-                f"ORDER BY context;")
+                f"ORDER BY {', '.join(order_by)};")
             rows = self._get_rows(sql, self.cursor_i18n)
         except Exception as e:
             msg = "Error getting table values: {0}"
@@ -687,6 +709,10 @@ class GwI18NGenerator:
                     values_str = ",\n    ".join([f"('{row['lb_en_us']}', '{row['feature_class']}', '{row['feature_type']}', {txt[0]}, {txt[1]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET id = v.idval, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(lb_en_us, feature_class, feature_type, idval, descript)\nWHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;\n\n")
 
+                elif "dblabel" in table:
+                    values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
+                    file.write(f"UPDATE {context} AS t\nSET idval = v.idval\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, idval)\nWHERE t.id = v.id;\n\n")
+
                 elif "dbconfig_engine" in table:
                     values_str = ",\n    ".join([f"('{row['parameter']}', '{row['method']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript, placeholder = v.placeholder\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, method, label, descript, placeholder)\nWHERE t.parameter = v.parameter AND t.method = v.method;\n\n")
@@ -789,13 +815,16 @@ class GwI18NGenerator:
                   'General Public License as published by the Free Software Foundation, either version 3 of the '
                   'License, or (at your option) any later version.\n'
                   '*/\n\n\n')
-        if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"]:
-            header += ('SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
-                       "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n")
+        if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"] and "no_tr.sql" not in path.lower():
+            header += 'SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
+            header += "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n"
         elif file_type == "am":
             header += 'SET search_path = am, public;\n'
         elif file_type == "cm":
             header += 'SET search_path = cm, public, public;\n'
+        
+        if self.language.lower() == "no_tr":
+            header += "SELECT 1;"
 
         file.write(header)
         file.close()

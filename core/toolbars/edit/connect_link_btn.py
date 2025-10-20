@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import QRect, Qt, QPoint
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication, QActionGroup, QWidget, QAction, QMenu
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsFeatureRequest
-from qgis.gui import QgsMapToolEmitPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 from ...utils import tools_gw
@@ -39,8 +39,15 @@ class GwConnectLinkButton(GwMaptool):
         self.snapper_manager = None
         self.layer_arc = None
         
-        # Initialize rubber bands like in psector
+        # Initialize rubber bands
         self.rubber_band_line = tools_gw.create_rubberband(self.canvas)
+        
+        # Initialize user click marker (separate from snapping vertex_marker)
+        self.user_click_marker = QgsVertexMarker(self.canvas)
+        self.user_click_marker.setColor(QColor(255, 0, 0))
+        self.user_click_marker.setIconSize(15)
+        self.user_click_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.user_click_marker.setPenWidth(3)
 
         # Check project type
         if self.project_type != 'ws':
@@ -197,6 +204,10 @@ class GwConnectLinkButton(GwMaptool):
         # Clear vertex markers
         if hasattr(self, 'vertex_marker') and self.vertex_marker and hasattr(self.vertex_marker, 'hide'):
             self.vertex_marker.hide()
+        
+        # Clear user click marker
+        if hasattr(self, 'user_click_marker') and self.user_click_marker:
+            self.user_click_marker.hide()
         
         # Clear any user click point
         if hasattr(self, 'user_click_point'):
@@ -559,12 +570,14 @@ class GwConnectLinkButton(GwMaptool):
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 self.arc_id = snapped_feat.attribute('arc_id')
 
-                # Set highlight like in psector
+                # Set highlight like in psector (without zoom)
                 feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
                 try:
                     geometry = feature.geometry()
                     if hasattr(self, 'rubber_band_line'):
-                        self.rubber_band_line.setToGeometry(geometry, None)
+                        # Reset first, then add geometry (avoids zoom that setToGeometry causes)
+                        tools_gw.reset_rubberband(self.rubber_band_line)
+                        self.rubber_band_line.addGeometry(geometry, None)
                         self.rubber_band_line.setColor(QColor(255, 0, 0, 100))
                         self.rubber_band_line.setWidth(5)
                         self.rubber_band_line.show()
@@ -614,18 +627,27 @@ class GwConnectLinkButton(GwMaptool):
         elif idx == 1:  # "Set user click (single)"
             # Clear multiple selection for single mode  
             self.selected_arcs = [self.arc_id]
-            # Store the clicked point in class variable for later use in accept()
-            self.user_click_point = point
+            
+            # Get the snapped point (where connection will actually be made)
+            snapped_point = self.snapper_manager.get_snapped_point(result)
+            
+            # Store the snapped point in class variable for later use in accept()
+            self.user_click_point = snapped_point
+            
+            # Add a cross marker at the snapped point (same location as pink vertex marker)
+            if hasattr(self, 'user_click_marker') and self.user_click_marker:
+                self.user_click_marker.setCenter(snapped_point)
+                self.user_click_marker.show()
             
             # Set single arc id in field
             txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
             if txt_arc_id and hasattr(txt_arc_id, 'setText'):
                 txt_arc_id.setText(str(self.arc_id))
 
-        # Disconnect and restore snapping (only for single mode)
+        # Disconnect and restore snapping (only for single mode, without panning)
         tools_gw.disconnect_signal('connect_link', 'set_to_arc_ep_canvasClicked_set_arc_id')
         tools_gw.disconnect_signal('connect_link', 'set_to_arc_xyCoordinates_mouse_move_arc')
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
     # endregion
 

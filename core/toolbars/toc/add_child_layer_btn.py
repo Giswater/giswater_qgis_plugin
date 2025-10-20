@@ -58,7 +58,7 @@ class GwAddChildLayerButton(GwAction):
         for field in json_result['body']['data']['fields']:
             if field['context'] is not None:
                 context = json.loads(field['context'])
-                levels = context['levels']
+                levels = context.get(tools_qt.tr('levels')) or context.get('levels')
                 if len(levels) > 0 and levels[0] and levels[0] not in dict_menu:
                     menu_level_1 = main_menu.addMenu(f"{levels[0]}")
                     dict_menu[levels[0]] = menu_level_1

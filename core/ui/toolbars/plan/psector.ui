@@ -33,7 +33,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_general">
       <attribute name="title">
@@ -374,7 +374,7 @@
             <x>0</x>
             <y>0</y>
             <width>98</width>
-            <height>68</height>
+            <height>61</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">

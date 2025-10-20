@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>334</height>
+    <height>407</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,20 +64,20 @@
        <string>Arc fusion</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="txt_arc1cat">
-         <property name="enabled">
-          <bool>false</bool>
+       <item row="6" column="1">
+        <widget class="QComboBox" name="cmb_new_cat">
+         <property name="editable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="cmb_nodeaction">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item row="6" column="0">
+        <widget class="QLabel" name="lbl_new_cat">
+         <property name="text">
+          <string>New catalog:</string>
+         </property>
+         <property name="margin">
+          <number>3</number>
          </property>
         </widget>
        </item>
@@ -118,6 +118,73 @@
          </property>
         </widget>
        </item>
+       <item row="10" column="0" colspan="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cmb_nodeaction">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_nodeaction">
+         <property name="text">
+          <string>Node action:</string>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="txt_arc2cat">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="lbl_arc2asset">
+         <property name="text">
+          <string>Arc 2 asset:</string>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="lbl_arc2cat">
+         <property name="text">
+          <string>Arc 2 catalog:</string>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="txt_arc1cat">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
         <widget class="QComboBox" name="cmb_statetype">
          <property name="sizePolicy">
@@ -128,10 +195,13 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="txt_arc2cat">
-         <property name="enabled">
-          <bool>false</bool>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lbl_statetype">
+         <property name="text">
+          <string>State type:</string>
+         </property>
+         <property name="margin">
+          <number>3</number>
          </property>
         </widget>
        </item>
@@ -151,40 +221,19 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lbl_nodeaction">
-         <property name="text">
-          <string>Node action:</string>
+       <item row="1" column="1">
+        <widget class="QDateEdit" name="enddate">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="margin">
-          <number>3</number>
+         <property name="displayFormat">
+          <string>dd/MM/yyyy</string>
          </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="lbl_arc2cat">
-         <property name="text">
-          <string>Arc 2 catalog:</string>
-         </property>
-         <property name="margin">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QComboBox" name="cmb_new_cat">
-         <property name="editable">
+         <property name="calendarPopup">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="lbl_new_cat">
-         <property name="text">
-          <string>New catalog:</string>
-         </property>
-         <property name="margin">
-          <number>3</number>
          </property>
         </widget>
        </item>
@@ -215,44 +264,34 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QDateEdit" name="enddate">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="displayFormat">
-          <string>dd/MM/yyyy</string>
-         </property>
-         <property name="calendarPopup">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="lbl_statetype">
+       <item row="7" column="0">
+        <widget class="QLabel" name="lbl_arc1asset">
          <property name="text">
-          <string>State type:</string>
+          <string>Arc 1 asset:</string>
          </property>
          <property name="margin">
           <number>3</number>
          </property>
         </widget>
        </item>
-       <item row="7" column="0" colspan="2">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="9" column="0">
+        <widget class="QLabel" name="lbl_new_asset">
+         <property name="text">
+          <string>New asset:</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="margin">
+          <number>3</number>
          </property>
-        </spacer>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="txt_arc1asset"/>
+       </item>
+       <item row="8" column="1">
+        <widget class="QLineEdit" name="txt_arc2asset"/>
+       </item>
+       <item row="9" column="1">
+        <widget class="QLineEdit" name="txt_new_asset"/>
        </item>
       </layout>
      </widget>

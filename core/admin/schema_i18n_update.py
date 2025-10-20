@@ -17,7 +17,8 @@ from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qt, tools_db, tools_log, tools_qgis
 from ... import global_vars
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QListWidget, QCompleter, QLineEdit, QVBoxLayout, QWidget, QLabel, QCheckBox
+from PyQt5.QtGui import QStandardItemModel
 
 class GwSchemaI18NUpdate:
 
@@ -42,7 +43,8 @@ class GwSchemaI18NUpdate:
         self.dlg_qm.cmb_projecttype.clear()
         for shcema_type in self.dbtables_dic:
             self.dlg_qm.cmb_projecttype.addItem(shcema_type)
-
+        self.check_box_use_selected_tables()
+        self.type_ahead()
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_update_translation')
 
     # region private functions
@@ -159,6 +161,8 @@ class GwSchemaI18NUpdate:
         # Run the updater of db_files and look at the result
         status_cfg_msg, errors = self._copy_db_files()
         msg = f'''{tools_qt.tr('In schema')} {self.project_type}:'''
+        if self.dlg_qm.findChild(QCheckBox, 'chk_use_selected_tables').isChecked():
+            msg += f" {tools_qt.tr('(Using selected tables) ')}"
         if status_cfg_msg is True:
             msg += f'''{tools_qt.tr('Database translation successful to')} {self.lower_lang}.\n'''
             self._commit_dest()
@@ -195,7 +199,7 @@ class GwSchemaI18NUpdate:
             self.cursor_dest.execute(sql_1)
             self._commit_dest
 
-        dbtables = self.dbtables_dic[self.project_type]['dbtables']
+        dbtables = self.dbtables_dic[self.project_type]['dbtables'] if not self.dlg_qm.findChild(QCheckBox, 'chk_use_selected_tables').isChecked() else self.selected_dbtables_dic[self.project_type]['dbtables']
         schema_i18n = "i18n"
         for dbtable in dbtables:
             dbtable = f"{schema_i18n}.{dbtable}"
@@ -842,3 +846,104 @@ class GwSchemaI18NUpdate:
         }
 
     # endregion
+
+    def type_ahead(self):
+        widget = QListWidget()
+        widget.setObjectName('list_widget')
+    
+        # Setup type-ahead search with completer
+        completer = QCompleter()
+        type_ahead = QLineEdit()
+        type_ahead.setPlaceholderText(tools_qt.tr("Type to search..."))
+        
+        # Configure completer with model and connect signals
+        model = QStandardItemModel()
+        completer.activated.connect(partial(tools_gw.add_item_multiple_option, completer, widget, type_ahead))
+        self.make_list_multiple_option(completer, model, type_ahead, widget)
+        type_ahead.textChanged.connect(partial(self.make_list_multiple_option, completer, model, type_ahead, widget))
+        
+
+        widget.itemDoubleClicked.connect(partial(tools_gw.delete_item_on_doubleclick, widget))
+        widget.model().rowsInserted.connect(partial(self.update_selected_table_dic))
+        #widget.model().modelReset.connect(partial(self.update_selected_table_dic))
+        self.dlg_qm.cmb_projecttype.currentTextChanged.connect(widget.clear)
+
+        # Create layout to hold both widgets
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
+        
+        # Add type_ahead and widget to layout
+        layout.addWidget(type_ahead)
+        layout.addWidget(widget)
+
+        # Create container widget to hold layout
+        container = QWidget()
+        container.setObjectName('multiple_option')
+        container.setLayout(layout)
+        label = QLabel()
+        label.setText(tools_qt.tr("Tables to update:"))
+        label.setObjectName('lbl_tables')
+        self.dlg_qm.verticalLayout.addWidget(label)
+        self.dlg_qm.verticalLayout.addWidget(container)
+
+
+    def make_list_multiple_option(self, completer, model, widget, list_widget):
+        if widget is None:
+            widget = self.dlg_qm.findChild(QListWidget, 'list_widget')
+        
+        if widget:
+            # Get the text input widget and its current value
+            value = widget.text()
+                
+            # Execute query if field has required query parameters
+            display_list = []
+            if self.dbtables_dic:
+                if str(value) != '':
+                    for table in self.dbtables_dic[self.dlg_qm.cmb_projecttype.currentText()]['dbtables']:
+                        if value in table and table not in [list_widget.item(i).text() for i in range(list_widget.count())]:
+                            item = {"id": table, "idval": table}
+                            display_list.append(item)
+                else:
+                    for table in self.dbtables_dic[self.dlg_qm.cmb_projecttype.currentText()]['dbtables']:
+                        if table not in [list_widget.item(i).text() for i in range(list_widget.count())]:
+                            item = {"id": table, "idval": table}
+                            display_list.append(item)
+
+            # Update completer with sorted display list
+            tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
+
+
+    def update_selected_table_dic(self):
+        if not hasattr(self, 'dlg_qm'):
+            return
+        list_widget = self.dlg_qm.findChild(QListWidget, 'list_widget')
+        if list_widget:
+            self.selected_tables = [list_widget.item(i).text() for i in range(list_widget.count())]
+            self.selected_dbtables_dic = {
+                "ws": {
+                    "dbtables": self.selected_tables,
+                    "project_type": ["ws", "utils"]
+                },
+                "ud": {
+                    "dbtables": self.selected_tables,
+                    "project_type": ["ud", "utils"]
+                },
+                "am": {
+                    "dbtables": self.selected_tables,
+                    "project_type": ["am"]
+                },
+                "cm": {
+                    "dbtables": self.selected_tables,
+                    "project_type": ["cm"]
+                },
+            }
+
+
+    def check_box_use_selected_tables(self):
+        # Create checkbox for using selected tables
+        checkbox = QCheckBox()
+        checkbox.setText(tools_qt.tr("Use selected tables"))
+        checkbox.setChecked(False)
+        checkbox.setObjectName('chk_use_selected_tables')
+        self.dlg_qm.verticalLayout.addWidget(checkbox)

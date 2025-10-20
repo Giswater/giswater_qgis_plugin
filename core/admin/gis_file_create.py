@@ -10,7 +10,7 @@ import json
 # TODO: Check this - do not delete this import for the moment
 from ..utils import tools_gw  # noqa: F401
 from ... import global_vars
-from ...libs import tools_log, tools_qt, tools_db, tools_qgis
+from ...libs import tools_log, tools_qt, tools_db, tools_qgis, lib_vars
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem, QgsLayerTreeLayer, QgsLayerTreeGroup
 
 
@@ -71,6 +71,9 @@ class GwGisFileCreate:
         root = project.layerTreeRoot()
         auth_id = self._replace_spatial_parameters(self.layer_source['srid'])
 
+        # Set lib_vars.project_vars['store_credentials'] BEFORE creating layers
+        lib_vars.project_vars['store_credentials'] = f"{export_passwd}"
+
         # Get project layers
         extras = f'"project_type":"{layer_project_type}", "is_cm":{str(is_cm).lower()}'
         body = tools_gw.create_body(extras=extras)
@@ -86,7 +89,7 @@ class GwGisFileCreate:
                 depth = template.get('levels_to_read')
                 if layer.get('context') is not None:
                     context = json.loads(layer['context'])
-                    levels = context.get('levels')
+                    levels = context.get(tools_qt.tr('levels')) or context.get('levels')
                     if levels is not None:
                         level = root
                         for i in range(0, depth):
@@ -99,7 +102,7 @@ class GwGisFileCreate:
                     # Add project layer
                     tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
                                                  sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
-                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd is True else None, create_project=True, force_create_group=False,
+                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd else None, create_project=True, force_create_group=False,
                                                  properties=properties)
 
         # Hide hidden group
