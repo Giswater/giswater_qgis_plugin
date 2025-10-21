@@ -95,8 +95,8 @@ INSERT INTO sys_typevalue VALUES ('lot_feature_status', 4, 'VISIT AGAIN', NULL, 
 INSERT INTO sys_typevalue VALUES ('lot_feature_status', 5, 'ACCEPTED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO sys_typevalue VALUES ('lot_feature_status', 6, 'CANCELED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO sys_typevalue VALUES ('sys_table_context', 0, '{"levels": ["CM", "CAMPAIGN"]}', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO sys_typevalue VALUES ('sys_table_context', 1, '{"levels": ["CM", "LOT"]}', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_typevalue VALUES ('sys_table_context', 0, '["CM", "CAMPAIGN"]', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_typevalue VALUES ('sys_table_context', 1, '["CM", "LOT"]', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_review', 'form_feature', 'tab_data', 'campaign_id', 'lyt_data_1', 1, 'integer', 'text', 'Campaign Id:', 'Id', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_review', 'form_feature', 'tab_data', 'name', 'lyt_data_1', 2, 'string', 'text', 'Name:', 'Name', NULL, true, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
