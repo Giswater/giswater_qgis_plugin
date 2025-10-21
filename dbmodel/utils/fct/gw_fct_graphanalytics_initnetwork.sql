@@ -365,22 +365,22 @@ BEGIN
                 -- arcs where node_1 is 'SECTOR'
                 EXECUTE format('
                     INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
-                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
+                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, ''SECTOR''
                     FROM v_temp_arc a
                     JOIN %I n1 ON n1.node_id = a.node_1
                     JOIN %I n2 ON n2.node_id = a.minsector_id
-                    WHERE n1.graph_delimiter = %L;
-                ', v_temp_arc_table, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
+                    WHERE n1.graph_delimiter = ''SECTOR'';
+                ', v_temp_arc_table, v_cost, v_reverse_cost, v_temp_node_table, v_temp_node_table);
 
                 -- arcs where node_2 is 'SECTOR'
                 EXECUTE format('
                     INSERT INTO %I (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost, graph_delimiter)
-                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, %L
+                    SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L, ''SECTOR''
                     FROM v_temp_arc a
                     JOIN %I n1 ON n1.node_id = a.minsector_id
                     JOIN %I n2 ON n2.node_id = a.node_2
-                    WHERE n2.graph_delimiter = %L;
-                ', v_temp_arc_table, v_cost, v_reverse_cost, v_graph_delimiter, v_temp_node_table, v_temp_node_table, v_graph_delimiter);
+                    WHERE n2.graph_delimiter =  ''SECTOR'';
+                ', v_temp_arc_table, v_cost, v_reverse_cost, v_temp_node_table, v_temp_node_table);
             END IF;
         END IF;
 
