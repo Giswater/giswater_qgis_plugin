@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE sys_message SET error_message = 'The %feature_type% with id %connec_id% has been successfully connected to the arc with id %arc_id%'
 WHERE id = 4430;
+
+DELETE FROM config_form_fields WHERE formname='generic' AND formtype='psector' AND columnname='chk_enable_all' AND tabname='tab_general';
