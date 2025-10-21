@@ -240,13 +240,24 @@ BEGIN
 		v_root_vid := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
 		IF v_root_vid IS NULL OR v_root_vid = 0 THEN
-			RETURN jsonb_build_object(
-				'status', 'Failed',
-				'message', jsonb_build_object(
-					'level', 3,
-					'text', 'You MUST execute the minsector analysis before executing the mincut analysis with 6.1 version.'
-				)
-			);
+			IF EXISTS (
+				SELECT 1 FROM v_temp_arc a 
+				JOIN v_temp_node n1 ON a.node_1 = n1.node_id
+				JOIN v_temp_node n2 ON a.node_2 = n2.node_id
+				WHERE arc_id = v_arc_id
+				AND n1.graph_delimiter = 'SECTOR'
+				AND n2.graph_delimiter = 'SECTOR'
+				) THEN
+				-- TODO Dani: insert into om_mincut_arc the v_arc_id i en om_mincut_node els 2 nodes
+			ELSE
+				RETURN jsonb_build_object(
+					'status', 'Failed',
+					'message', jsonb_build_object(
+						'level', 3,
+						'text', 'You MUST execute the minsector analysis before executing the mincut analysis with 6.1 version.'
+					)
+				);
+			END IF;
 		END IF;
 	ELSE 
 		v_root_vid := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
@@ -746,7 +757,6 @@ BEGIN
 			'data', jsonb_build_object(
 				'pgrDistance', v_pgr_distance,
 				'pgrRootVids', ARRAY[v_pgr_node_id],
-				'ignoreCheckValvesMincut', v_ignore_check_valves,
 				'mode', v_mode
 			)
 		)::text;
