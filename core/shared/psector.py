@@ -125,8 +125,6 @@ class GwPsector:
 
         self.rel_feature_type = "arc"
 
-        self.all_layers_checked = self._check_for_layers()
-
         # Remove all previous selections
         self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
 
@@ -388,8 +386,6 @@ class GwPsector:
             elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif type(widget) is QCheckBox:
-                if widget.objectName() == 'tab_general_chk_enable_all':
-                    continue
                 widget.stateChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif type(widget) is QTextEdit:
                 widget.textChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
@@ -398,10 +394,6 @@ class GwPsector:
 
         if psector_id is None:
             tools_qt.set_widget_text(self.dlg_plan_psector, 'tab_general_active', True)
-
-        # Set checked enable all layers
-        if self.all_layers_checked:
-            tools_qt.set_checked(self.dlg_plan_psector, "tab_general_chk_enable_all", True)
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
 
@@ -2530,20 +2522,6 @@ class GwPsector:
         if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
             tools_qgis.set_layer_visible(layer, True, True)
 
-    def _check_for_layers(self):
-        """ Return if ALL this layers in the list are checked or not """
-
-        all_checked = True
-        layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
-                  'v_plan_psector_node']
-        for layer_name in layers:
-            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully':
-                continue
-            layer = tools_qgis.get_layer_by_tablename(layer_name)
-            if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
-                all_checked = False
-        return all_checked
-
     def _manage_tab_feature_buttons(self):
         return
 
@@ -2872,29 +2850,6 @@ def close_dlg(**kwargs):
         tools_gw.close_dialog(class_obj.dlg_plan_psector)
     except RuntimeError:
         pass
-
-
-def enable(**kwargs):
-    """ Manage checkbox state and act accordingly with the layers """
-    class_obj = kwargs["class"]
-    is_cheked = kwargs['widget'].isChecked()
-
-    layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
-                'v_plan_psector_node']
-
-    if not is_cheked:  # user unckeck it
-        for layer_name in layers:
-            layer = tools_qgis.get_layer_by_tablename(layer_name)
-            if layer:
-                tools_qgis.set_layer_visible(layer, False, False)
-
-    else:  # user check it
-        class_obj._check_layers_visible('v_plan_psector_arc', 'the_geom', 'arc_id')
-        class_obj._check_layers_visible('v_plan_psector_connec', 'the_geom', 'connec_id')
-        class_obj._check_layers_visible('v_plan_psector_link', 'the_geom', 'link_id')
-        class_obj._check_layers_visible('v_plan_psector_node', 'the_geom', 'node_id')
-        if class_obj.project_type == 'ud':
-            class_obj._check_layers_visible('v_plan_psector_gully', 'the_geom', 'gully_id')
 
 
 def accept(**kwargs):
