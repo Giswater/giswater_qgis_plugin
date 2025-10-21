@@ -5315,7 +5315,13 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     if selection_mode == GwSelectionMode.PSECTOR:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            class_object.rel_ids.append(widget.model().record(x).value(f"{feature_type}_id"))
+            if hasattr(full_list, 'record'):
+                class_object.rel_ids.append(full_list.record(x).value(f"{feature_type}_id"))
+            else:
+                # QStandardItemModel
+                id_col = tools_qt.get_col_index_by_col_name(widget, f"{feature_type}_id")
+                if id_col != -1:
+                    class_object.rel_ids.append(full_list.data(full_list.index(x, id_col)))
     else:
         class_object.rel_ids = class_object.rel_list_ids[feature_type]
 
@@ -5410,7 +5416,19 @@ def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
     else:
         for item in selected_list:
             row = item.row()
-            id_feature = model.record(row).value(field_id)
+            if hasattr(model, 'record'):
+                id_feature = model.record(row).value(field_id)
+            else:
+                # QStandardItemModel - find column by name
+                col_index = -1
+                for c in range(model.columnCount()):
+                    if model.headerData(c, Qt.Horizontal) == field_id:
+                        col_index = c
+                        break
+                if col_index != -1:
+                    id_feature = model.data(model.index(row, col_index))
+                else:
+                    continue
             del_id.append(id_feature)
 
     if not del_id:
@@ -5428,7 +5446,14 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
     if selection_mode == GwSelectionMode.PSECTOR:
         state = None
         if extra_field is not None and len(selected_list) == 1:
-            state = widget.model().record(selected_list[0].row()).value(extra_field)
+            model = widget.model()
+            if hasattr(model, 'record'):
+                state = model.record(selected_list[0].row()).value(extra_field)
+            else:
+                # QStandardItemModel
+                col_index = tools_qt.get_col_index_by_col_name(widget, extra_field)
+                if col_index != -1:
+                    state = model.data(model.index(selected_list[0].row(), col_index))
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
         set_model_signals(class_object)

@@ -2545,7 +2545,9 @@ class GwPsector:
         return all_checked
 
     def _manage_tab_feature_buttons(self):
-        return
+        """ Update rel_feature_type when tab changes to ensure buttons work on all tabs """
+        feature_type = tools_gw.get_signal_change_tab(self.dlg_plan_psector, self.excluded_layers)
+        self.rel_feature_type = feature_type
 
     def _reset_snapping(self):
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
