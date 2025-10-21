@@ -7,7 +7,3 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
-
-UPDATE config_typevalue
-SET idval = substring(idval FROM 12 FOR length(idval) - 12)
-WHERE typevalue = 'sys_table_context' and idval like '{"levels":%';
