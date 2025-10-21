@@ -75,7 +75,6 @@ DECLARE
 
     -- parameters
     v_pgr_distance INTEGER;
-    v_pgr_root_vids int[];
     
 BEGIN
 
@@ -672,16 +671,19 @@ BEGIN
         SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_minsector;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
-            v_pgr_root_vids := ARRAY[v_record_minsector.pgr_node_id];
 
             UPDATE temp_pgr_arc_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_node_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_arc_minsector SET proposed = FALSE WHERE proposed;
 
-            v_data := format('{"data":{"pgrDistance":%s, "pgrRootVids":["%s"], "ignoreCheckValvesMincut":"%s", "mode":"MINSECTOR"}}',
-            v_pgr_distance, array_to_string(v_pgr_root_vids, ','), v_ignore_check_valves);
+            v_data := jsonb_build_object(
+                'data', jsonb_build_object(
+                    'pgrDistance', v_pgr_distance,
+                    'pgrRootVids', ARRAY[v_pgr_node_id],
+                    'mode', 'MINSECTOR'
+                )
+            )::text;
 
-            RAISE NOTICE 'v_data: %', v_data;
             v_response := gw_fct_mincut_core(v_data);
 
             IF v_response->>'status' <> 'Accepted' THEN
