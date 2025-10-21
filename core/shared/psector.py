@@ -2029,7 +2029,14 @@ class GwPsector:
         Toggles the filter on or off based on checkbox state.
         Saves visibility state, connects/disconnects filter, and updates the table.
         """
-        if self.dlg_psector_mng.chk_filter_canvas.isChecked():
+        try:
+            is_checked = self.dlg_psector_mng.chk_filter_canvas.isChecked()
+        except RuntimeError:
+            msg = tools_qt.tr("Please close all 'Psector manager' dialogs and try again")
+            tools_qgis.show_warning(msg)
+            return
+        
+        if is_checked:
             # Save initial visibility of target layer
             self._save_visibility_state('ve_plan_psector')
 
