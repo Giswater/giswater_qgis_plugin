@@ -967,7 +967,7 @@ class GwPsector:
         workcat_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_workcat_id')
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
         active = tools_qt.get_widget_value(self.dlg_plan_psector, 'tab_general_active')
-        
+
         # Prevent deactivating or archiving the last active psector
         # Only check if THIS psector is currently active
         if self.update:
@@ -975,22 +975,22 @@ class GwPsector:
             sql = f"SELECT active FROM plan_psector WHERE psector_id = {psector_id}"
             result = tools_db.get_row(sql)
             current_active = result[0] if result else False
-            
+
             # Only validate if this psector is currently active
             if current_active:
                 trying_to_archive = status_id in ('5', '6', '7', 5, 6, 7)
                 trying_to_deactivate = not active
-                
+
                 if trying_to_archive or trying_to_deactivate:
                     sql = "SELECT COUNT(*) FROM plan_psector WHERE active IS TRUE AND status NOT IN ('5', '6', '7')"
                     result = tools_db.get_row(sql)
                     active_count = result[0] if result else 0
-                    
+
                     if active_count <= 1:
                         msg = "Cannot deactivate or archive the last active psector. At least one psector must remain active."
                         tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
                         return
-        
+
         # Check if psector status is "Executed" (status_id == 5) and has no workcat_id
         if int(status_id) == 5 and workcat_id in (None, 'null', ''):
             msg = "Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?"
@@ -1490,25 +1490,25 @@ class GwPsector:
         Prevents deactivating or archiving the last active psector
         """
         table_name = model.tableName()
-        
+
         # Only validate for main psector table
         if 'v_ui_plan_psector' not in str(table_name):
             return True
-        
+
         old_active = model.record(row).value('active')
         new_active = record.value('active')
         new_status = record.value('status')
-        
+
         trying_to_deactivate = (old_active and not new_active)
-        archived_statuses = ['5', '6', '7', 5, 6, 7, 
+        archived_statuses = ['5', '6', '7', 5, 6, 7,
                            'MADE OPERATIONAL (ARCHIVED)', 'COMISSIONED (ARCHIVED)', 'CANCELED (ARCHIVED)']
         trying_to_archive = (str(new_status) in [str(s) for s in archived_statuses] or new_status in archived_statuses)
-        
+
         if trying_to_deactivate or trying_to_archive:
             sql = "SELECT COUNT(*) FROM plan_psector WHERE active IS TRUE AND status NOT IN ('5', '6', '7')"
             result = tools_db.get_row(sql)
             active_count = result[0] if result else 0
-            
+
             if active_count <= 1:
                 msg = "Cannot deactivate or archive the last active psector. At least one psector must remain active."
                 dialog = getattr(self, 'dlg_psector_mng', None) or getattr(self, 'dlg_plan_psector', None)
@@ -1516,7 +1516,7 @@ class GwPsector:
                 model.revertAll()
                 model.select()
                 return False
-        
+
         return True
 
     def manage_update_model_relations(self, model: QSqlTableModel, row: int, record: QSqlRecord):
@@ -1531,7 +1531,7 @@ class GwPsector:
         table_name = model.tableName()
         if not table_name:
             return
-        
+
         # Validate psector status changes
         if not self.validate_psector_status_change(model, row, record):
             return
@@ -1878,13 +1878,13 @@ class GwPsector:
                 sql_check = "SELECT COUNT(*) FROM plan_psector WHERE active IS TRUE"
                 result = tools_db.get_row(sql_check)
                 active_count = result[0] if result else 0
-                
+
                 # If this is the only active psector, block the change
                 if active_count <= 1:
                     msg = "Cannot deactivate the last active psector. At least one psector must remain active."
                     tools_qgis.show_warning(msg, dialog=dialog)
                     return
-            
+
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
                 # Remove from selector
@@ -1941,7 +1941,7 @@ class GwPsector:
         json_result = tools_gw.execute_procedure('gw_fct_plan_recover_archived', body)
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
             return
-        
+
         # Refresh the table to show updated status
         self._filter_table(dialog, qtbl_psm, dialog.txt_name, dialog.chk_active, dialog.chk_archived, 'v_ui_plan_psector')
 
@@ -2572,14 +2572,14 @@ class GwPsector:
         tab_idx = dialog.tab_feature.currentIndex()
         feature_type = dialog.tab_feature.tabText(tab_idx).lower()
         qtbl_feature = dialog.findChild(QTableView, f"tbl_psector_x_{feature_type}")
-        
+
         # Get psector_id from dialog (works for both new and existing psectors)
         selected_psector = tools_qt.get_text(dialog, 'tab_general_psector_id')
         if not selected_psector:
             msg = "Psector ID not found"
             tools_qgis.show_warning(msg, dialog=dialog)
             return
-            
+
         list_tables = {'arc': self.tablename_psector_x_arc, 'node': self.tablename_psector_x_node,
                        'connec': self.tablename_psector_x_connec, 'gully': self.tablename_psector_x_gully}
 
@@ -2594,7 +2594,7 @@ class GwPsector:
             model = qtbl_feature.model()
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
-                
+
                 # Handle both QSqlTableModel and QStandardItemModel
                 if isinstance(model, QSqlTableModel):
                     feature_id = model.record(row).value(f"{feature_type}_id")
@@ -2609,11 +2609,11 @@ class GwPsector:
                     doable = model.data(doable_idx)
                 else:
                     continue
-                
+
                 # Skip if we couldn't get required data
                 if feature_id is None or state is None:
                     continue
-                    
+
                 if doable:
                     sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector} AND state = '{state}';"
                 else:
