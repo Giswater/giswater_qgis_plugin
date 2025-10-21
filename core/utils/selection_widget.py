@@ -11,7 +11,7 @@ from typing import Any, Callable, Union  # Literal, Dict, Optional,
 from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
 from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, \
-                    QPushButton, QGridLayout, QAbstractItemView
+                    QPushButton, QGridLayout
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel, QItemSelection
 
 from . import tools_gw
