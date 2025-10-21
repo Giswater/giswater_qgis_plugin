@@ -21866,7 +21866,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>btn_update_psector</source>
-			<translation>Alterar actual</translation>
+			<translation>Alternar actual</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_psector</source>
@@ -21882,7 +21882,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>chk_archived</source>
-			<translation>Filtrar por mapa</translation>
+			<translation>Mostrar archivados</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_archived</source>
