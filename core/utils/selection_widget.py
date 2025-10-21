@@ -11,7 +11,7 @@ from typing import Any, Callable, Union  # Literal, Dict, Optional,
 from qgis.PyQt.QtGui import QIcon, QStandardItem, QStandardItemModel
 from qgis.core import QgsExpression
 from qgis.PyQt.QtWidgets import QActionGroup, QAction, QToolButton, QMenu, QTabWidget, QDialog, QWidget, \
-                    QPushButton, QGridLayout
+                    QPushButton, QGridLayout, QAbstractItemView
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel, QItemSelection
 
 from . import tools_gw
@@ -583,85 +583,29 @@ class GwSelectionWidget(QWidget):
             callback_later: Optional callback to execute after selection
         """
         # Create button
-        self.btn_selection_on_top = QPushButton(self)  # Store as instance variable
-        tools_gw.add_icon(self.btn_selection_on_top, "175")
-        self.btn_selection_on_top.setToolTip("Show selection on top")
-        self.btn_selection_on_top.setCheckable(True)
-        self.btn_selection_on_top.setChecked(False)
-        self.lyt_selection.addWidget(self.btn_selection_on_top, 0, self.number_buttons)
+        btn_selection_on_top = QPushButton(self)
+        tools_gw.add_icon(btn_selection_on_top, "175")
+        btn_selection_on_top.setToolTip("Show selection on top")
+        btn_selection_on_top.clicked.connect(partial(self.show_selection_on_top_action, class_object, dialog, table_object, callback_later))
+        self.lyt_selection.addWidget(btn_selection_on_top, 0, self.number_buttons)
         self.number_buttons += 1
-        self.previous_selected_ids = None
 
-        # Connect signals
-        self.btn_selection_on_top.clicked.connect(partial(self.toggle_selection_on_top, class_object, dialog, table_object, callback_later))
-
-    def toggle_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str, callback_later: Callable = None):
+    def show_selection_on_top_action(self, class_object: Any, dialog: QDialog, table_object: str, callback_later: Callable = None):
         """
-        Toggle between showing selection on top or restoring original order
+        Move selected rows to top - simple action like other buttons
         """
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
         if not widget_table or not widget_table.model():
             return
 
-        self.update_default_model(widget_table, class_object, dialog, table_object)
-
-        if not widget_table.selectionModel():
+        selection_model = widget_table.selectionModel()
+        if not selection_model or not selection_model.hasSelection():
+            tools_qgis.show_warning("Please select a row first", dialog=dialog)
             return
 
-        checked = self.btn_selection_on_top.isChecked()
-        selected_ids = self.get_selected_ids(widget_table, class_object, dialog, table_object)
-            
-        if checked or self.previous_selected_ids != selected_ids:
-            if widget_table.selectionModel():
-                self.previous_selected_ids = selected_ids
-            self.show_selection_on_top(widget_table, class_object, dialog, table_object)
-            self.btn_selection_on_top.setChecked(True)  # Update button state
-        else:
-            # Get the current and original models
-            current_model = widget_table.model()
-            default_model = self.default_model
-            if default_model and current_model:
-                # Get the feature type and find ID column
-                _, feature_type = self.get_expected_table(class_object, dialog, table_object)
-                if not feature_type:
-                    return
-
-                # Create a mapping of IDs to their current data
-                current_data = {}
-                id_column_name = f"{feature_type}_id"
-                id_col = tools_qt.get_col_index_by_col_name(widget_table, id_column_name)
-                if id_col == -1:
-                    return
-
-                for row in range(current_model.rowCount()):
-                    row_id = str(current_model.data(current_model.index(row, id_col)))
-                    row_data = {}
-                    for col in range(current_model.columnCount()):
-                        source_index = current_model.index(row, col)
-                        item = QStandardItem()
-                        row_data[col] = self.copy_item_data(current_model, source_index, item)
-                    current_data[row_id] = row_data
-
-                # Update original model with current data
-                for row in range(default_model.rowCount()):
-                    row_id = str(default_model.data(default_model.index(row, id_col)))
-                    if row_id in current_data:
-                        for col in range(default_model.columnCount()):
-                            target_index = default_model.index(row, col)
-                            current_item = current_data[row_id][col]
-                            # Copy all roles from current item to original model
-                            for role in range(Qt.UserRole + 100):  # Copy all possible roles
-                                data = current_item.data(role)
-                                if data is not None:
-                                    default_model.setData(target_index, data, role)
-                
-                # Set the default model back to the table to restore original order
-                widget_table.setModel(default_model)
-                # Restore the previous selection using the correct method
-                if self.previous_selected_ids:
-                    self.restore_selection(widget_table, self.previous_selected_ids, class_object, dialog, table_object)
-                self.btn_selection_on_top.setChecked(False)
-            
+        # Move selection to top using QStandardItemModel
+        self.show_selection_on_top(widget_table, class_object, dialog, table_object)
+        
         self.highlight_features_method(class_object, dialog, table_object)
 
         if callback_later:
