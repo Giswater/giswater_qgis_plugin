@@ -495,12 +495,18 @@ BEGIN
 				-- creation of link
 				v_link.link_id = (SELECT nextval('urn_id_seq'));
 
-						SELECT link_type INTO v_link_type FROM cat_link WHERE id = v_linkcat_id LIMIT 1;
-						IF v_ispsector IS TRUE THEN
-							v_state_type = 3;
+						IF v_psector_current IS NOT NULL THEN
+							v_state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user = current_user);
+							IF v_state_type IS NULL THEN
+								RAISE EXCEPTION 'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)';
+							END IF;
 						ELSE
-							v_state_type = 2;
+							v_state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_1_vdefault' AND cur_user = current_user);
+							IF v_state_type IS NULL THEN
+								RAISE EXCEPTION 'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)';
+							END IF;
 						END IF;
+					
 					IF v_projecttype = 'WS' THEN
 						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, omzone_id,
 						presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id, state_type)
