@@ -216,6 +216,7 @@ BEGIN
         SELECT c.component, MIN(COALESCE (n.node_id, n.old_node_id)) AS min_node
         FROM temp_pgr_connectedcomponents c
         JOIN temp_pgr_node n on n.pgr_node_id = c.node
+        WHERE n.graph_delimiter <> 'SECTOR'
         GROUP BY c.component
     ) AS agg
     JOIN temp_pgr_connectedcomponents AS c ON c.component = agg.component
