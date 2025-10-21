@@ -884,3 +884,98 @@ UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname L
 UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_connec%' AND formtype = 'form_feature' AND columnname = 'dma_id';
 UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_arc%' AND formtype = 'form_feature' AND columnname = 'dma_id';
 UPDATE config_form_fields SET label = 'Dma', tooltip = 'dma_id' WHERE formname LIKE '%_gully%' AND formtype = 'form_feature' AND columnname = 'dma_id';
+
+-- 21/10/2025
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
+WHERE columnname = 'function_type'
+AND formname ILIKE 've_arc%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
+WHERE columnname = 'function_type'
+AND formname ILIKE 've_node%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
+WHERE columnname = 'function_type'
+AND formname ILIKE 've_connec%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
+WHERE columnname = 'function_type'
+AND formname ILIKE 've_element%';
+
+--
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
+WHERE columnname = 'location_type'
+AND formname ILIKE 've_arc%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
+WHERE columnname = 'location_type'
+AND formname ILIKE 've_node%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
+WHERE columnname = 'location_type'
+AND formname ILIKE 've_connec%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
+WHERE columnname = 'location_type'
+AND formname ILIKE 've_element%';
+
+-- 
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
+WHERE columnname = 'category_type'
+AND formname ILIKE 've_arc%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
+WHERE columnname = 'category_type'
+AND formname ILIKE 've_node%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
+WHERE columnname = 'category_type'
+AND formname ILIKE 've_connec%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
+WHERE columnname = 'category_type'
+AND formname ILIKE 've_element%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''GULLY''', '''GULLY''=ANY(feature_type)')
+WHERE columnname = 'function_type'
+AND formname ILIKE 've_gully%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''GULLY''', '''GULLY''=ANY(feature_type)')
+WHERE columnname = 'category_type'
+AND formname ILIKE 've_gully%';
+
+UPDATE config_form_fields
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''GULLY''', '''GULLY''=ANY(feature_type)')
+WHERE columnname = 'location_type'
+AND formname ILIKE 've_gully%';
+
+
+UPDATE config_form_fields
+SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+WHERE formname='ve_link' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+WHERE formname='ve_link' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+WHERE formname='ve_link_pipelink' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+WHERE formname='ve_link_vlink' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';

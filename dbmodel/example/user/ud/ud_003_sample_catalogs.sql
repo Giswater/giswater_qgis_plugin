@@ -132,29 +132,17 @@ INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, act
 -----------------------------
 -- Records of man_type_category
 -- ----------------------------
-INSERT INTO man_type_category VALUES (1, 'St. Category', 'NODE', NULL, NULL, true);
-INSERT INTO man_type_category VALUES (2, 'St. Category', 'ARC', NULL, NULL, true);
-INSERT INTO man_type_category VALUES (3, 'St. Category', 'CONNEC', NULL, NULL, true);
-INSERT INTO man_type_category VALUES (4, 'St. Category', 'ELEMENT', NULL, NULL, true);
-INSERT INTO man_type_category VALUES (5, 'St. Category', 'GULLY', NULL, NULL, true);
+INSERT INTO man_type_category VALUES (1, 'St. Category', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
 
 -- ----------------------------
 -- Records of man_type_location
 -- ----------------------------
-INSERT INTO man_type_location VALUES (1, 'St. Location', 'NODE', NULL, NULL, true);
-INSERT INTO man_type_location VALUES (2, 'St. Location', 'ARC', NULL, NULL, true);
-INSERT INTO man_type_location VALUES (3, 'St. Location', 'CONNEC', NULL, NULL, true);
-INSERT INTO man_type_location VALUES (4, 'St. Location', 'ELEMENT', NULL, NULL, true);
-INSERT INTO man_type_location VALUES (5, 'St. Location', 'GULLY', NULL, NULL, true);
+INSERT INTO man_type_location VALUES (1, 'St. Location', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
 
 -- ----------------------------
 -- Records of man_type_function
 -- ----------------------------
-INSERT INTO man_type_function VALUES (1, 'St. Function', 'NODE', NULL, NULL, true);
-INSERT INTO man_type_function VALUES (2, 'St. Function', 'ARC', NULL, NULL, true);
-INSERT INTO man_type_function VALUES (3, 'St. Function', 'CONNEC', NULL, NULL, true);
-INSERT INTO man_type_function VALUES (4, 'St. Function', 'ELEMENT', NULL, NULL, true);
-INSERT INTO man_type_function VALUES (5, 'St. Function', 'GULLY', NULL, NULL, true);
+INSERT INTO man_type_function VALUES (1, 'St. Function', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
 
 -- ----------------------------
 -- Update shortcuts

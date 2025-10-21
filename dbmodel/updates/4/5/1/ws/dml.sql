@@ -8,21 +8,12 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE sys_message SET error_message = 'The %feature_type% with id %connec_id% has been successfully connected to the arc with id %arc_id%'
-WHERE id = 4430;
-
-DELETE FROM config_form_fields WHERE formname='generic' AND formtype='psector' AND columnname='chk_enable_all' AND tabname='tab_general';
-
-UPDATE config_typevalue
-SET idval = substring(idval FROM 12 FOR length(idval) - 12)
-WHERE typevalue = 'sys_table_context' and idval like '{"levels":%';
-
 DO $$
 DECLARE
     rec text;
     v_table text;
     v_column text;
-    arr text[] := ARRAY['category', 'function', 'location'];
+    arr text[] := ARRAY['fluid'];
 BEGIN
     FOREACH rec IN ARRAY arr LOOP
         v_table := 'man_type_' || rec;
@@ -70,65 +61,22 @@ BEGIN
     END LOOP;
 END $$;
 
-
 UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
-WHERE columnname = 'function_type'
+WHERE columnname = 'fluid_type'
 AND formname ILIKE 've_arc%';
 
 UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
-WHERE columnname = 'function_type'
+WHERE columnname = 'fluid_type'
 AND formname ILIKE 've_node%';
 
 UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
-WHERE columnname = 'function_type'
+WHERE columnname = 'fluid_type'
 AND formname ILIKE 've_connec%';
 
 UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
-WHERE columnname = 'function_type'
-AND formname ILIKE 've_element%';
-
---
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
-WHERE columnname = 'location_type'
-AND formname ILIKE 've_arc%';
-
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
-WHERE columnname = 'location_type'
-AND formname ILIKE 've_node%';
-
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
-WHERE columnname = 'location_type'
-AND formname ILIKE 've_connec%';
-
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
-WHERE columnname = 'location_type'
-AND formname ILIKE 've_element%';
-
--- 
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
-WHERE columnname = 'category_type'
-AND formname ILIKE 've_arc%';
-
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
-WHERE columnname = 'category_type'
-AND formname ILIKE 've_node%';
-
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
-WHERE columnname = 'category_type'
-AND formname ILIKE 've_connec%';
-
-UPDATE config_form_fields
-SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
-WHERE columnname = 'category_type'
+WHERE columnname = 'fluid_type'
 AND formname ILIKE 've_element%';

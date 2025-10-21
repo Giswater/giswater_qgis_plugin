@@ -95,20 +95,20 @@ UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;
 
 UPDATE arc SET muni_id = 1, streetaxis_id  ='1-9150C' WHERE arc_id = '179';
 
-INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction1','NODE','{JUNCTION}');
-INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction2','NODE','{JUNCTION}');
-INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_manhole1','NODE','{CIRC_MANHOLE}');
-INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_manhole2','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction1','{NODE}','{JUNCTION}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction2','{NODE}','{JUNCTION}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_manhole1','{NODE}','{CIRC_MANHOLE}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_manhole2','{NODE}','{CIRC_MANHOLE}');
 
-INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction1','NODE','{JUNCTION}');
-INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction2','NODE','{JUNCTION}');
-INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_manhole1','NODE','{CIRC_MANHOLE}');
-INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_manhole2','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction1','{NODE}','{JUNCTION}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction2','{NODE}','{JUNCTION}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_manhole1','{NODE}','{CIRC_MANHOLE}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_manhole2','{NODE}','{CIRC_MANHOLE}');
 
-INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction1','NODE','{JUNCTION}');
-INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction2','NODE','{JUNCTION}');
-INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_manhole1','NODE','{CIRC_MANHOLE}');
-INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_manhole2','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction1','{NODE}','{JUNCTION}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction2','{NODE}','{JUNCTION}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_manhole1','{NODE}','{CIRC_MANHOLE}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_manhole2','{NODE}','{CIRC_MANHOLE}');
 
 UPDATE node SET category_type = 'category_junction1' where nodecat_id like 'JUNCT%';
 UPDATE node SET location_type = 'location_junction1' where nodecat_id like 'JUNCT%';

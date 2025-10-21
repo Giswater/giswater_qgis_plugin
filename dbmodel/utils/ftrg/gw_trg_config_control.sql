@@ -28,13 +28,13 @@ BEGIN
 
 	SELECT UPPER(project_type), giswater INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	v_configtable:= TG_ARGV[0];	 -- not used yet. Ready to enhance this trigger control
+	v_configtable:= TG_ARGV[0];
 
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter='admin_config_control_trigger') IS TRUE THEN
 
 		IF v_configtable = 'sys_param_user' THEN
 
-		ELSIF v_configtable IN ('cat_material') THEN
+		ELSIF v_configtable IN ('cat_material', 'man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location') THEN
 			v_querytext='SELECT * FROM '||v_configtable||';';
 			--check if all feature_type are present on table sys_feature_type
 			IF NEW.feature_type IS NOT NULL THEN
@@ -72,7 +72,7 @@ BEGIN
 				END IF;
 			END IF;
 
-		ELSIF v_configtable IN ('man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location', 'cat_brand', 'cat_brand_model') THEN
+		ELSIF v_configtable IN ('cat_brand', 'cat_brand_model') THEN
 			v_querytext='SELECT * FROM '||v_configtable||';';
 
 			--check if all featurecat are present on table cat_feature
