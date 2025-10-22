@@ -27,3 +27,139 @@ UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
 WHERE columnname = 'fluid_type'
 AND formname ILIKE 've_element%';
+
+UPDATE sys_fprocess
+SET query_text='
+SELECT ''ARC'', arc_id, category_type 
+FROM t_arc t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_category mt
+	WHERE mt.category_type = t.category_type
+	AND ''ARC'' = ANY(mt.feature_type)
+)
+AND category_type IS NOT NULL
+UNION
+SELECT ''NODE'', node_id, category_type 
+FROM t_node t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_category mt
+	WHERE mt.category_type = t.category_type
+	AND ''NODE'' = ANY(mt.feature_type)
+)
+AND category_type IS NOT NULL
+UNION
+SELECT ''CONNEC'', connec_id, category_type 
+FROM t_connec t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_category mt
+	WHERE mt.category_type = t.category_type
+	AND ''CONNEC'' = ANY(mt.feature_type)
+)
+AND category_type IS NOT NULL
+'
+WHERE fid=421;
+
+UPDATE sys_fprocess
+SET query_text='
+SELECT ''ARC'', arc_id, function_type 
+FROM t_arc t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_function mt
+	WHERE mt.function_type = t.function_type
+	AND ''ARC'' = ANY(mt.feature_type)
+)
+AND function_type IS NOT NULL
+UNION
+SELECT ''NODE'', node_id, function_type 
+FROM t_node t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_function mt
+	WHERE mt.function_type = t.function_type
+	AND ''NODE'' = ANY(mt.feature_type)
+)
+AND function_type IS NOT NULL
+UNION
+SELECT ''CONNEC'', connec_id, function_type 
+FROM t_connec t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_function mt
+	WHERE mt.function_type = t.function_type
+	AND ''CONNEC'' = ANY(mt.feature_type)
+)
+AND function_type IS NOT NULL
+'
+WHERE fid=422;
+
+UPDATE sys_fprocess
+SET query_text='
+SELECT ''ARC'', arc_id, fluid_type 
+FROM t_arc t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_fluid mt
+	WHERE mt.fluid_type = t.fluid_type
+	AND ''ARC'' = ANY(mt.feature_type)
+)
+AND fluid_type IS NOT NULL
+UNION
+SELECT ''NODE'', node_id, fluid_type 
+FROM t_node t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_fluid mt
+	WHERE mt.fluid_type = t.fluid_type
+	AND ''NODE'' = ANY(mt.feature_type)
+)
+AND fluid_type IS NOT NULL
+UNION
+SELECT ''CONNEC'', connec_id, fluid_type 
+FROM t_connec t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_fluid mt
+	WHERE mt.fluid_type = t.fluid_type
+	AND ''CONNEC'' = ANY(mt.feature_type)
+)
+AND fluid_type IS NOT NULL
+'
+WHERE fid=423;
+
+UPDATE sys_fprocess
+SET query_text='
+SELECT ''ARC'', arc_id, location_type 
+FROM t_arc t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_location mt
+	WHERE mt.location_type = t.location_type
+	AND ''ARC'' = ANY(mt.feature_type)
+)
+AND location_type IS NOT NULL
+UNION
+SELECT ''NODE'', node_id, location_type 
+FROM t_node t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_location mt
+	WHERE mt.location_type = t.location_type
+	AND ''NODE'' = ANY(mt.feature_type)
+)
+AND location_type IS NOT NULL
+UNION
+SELECT ''CONNEC'', connec_id, location_type 
+FROM t_connec t
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM man_type_location mt
+	WHERE mt.location_type = t.location_type
+	AND ''CONNEC'' = ANY(mt.feature_type)
+)
+AND function_type IS NOT NULL
+'
+WHERE fid=424;
