@@ -1991,11 +1991,11 @@ class GwPsector:
 
         cur_psector = tools_gw.get_config_value('plan_psector_current')
         sql = f"DELETE FROM selector_psector WHERE psector_id = {scenario_id} AND cur_user = current_user; "
-        if parent_id is not None:
+        if parent_id and parent_id is not None:
             sql += f"DELETE FROM selector_psector WHERE psector_id = {parent_id} AND cur_user = current_user; "
         if cur_psector and cur_psector[0] is not None:
             sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({scenario_id}, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;"
-            if parent_id is not None:
+            if parent_id and parent_id is not None:
                 sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({parent_id}, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;"
         tools_db.execute_sql(sql)
 
