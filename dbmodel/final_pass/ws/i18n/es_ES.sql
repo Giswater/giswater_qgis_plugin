@@ -4587,6 +4587,7 @@ FROM (
     (4414, 'No está permitido eliminar entidades de un psector diferente al actual', 'Cambia al psector correcto para eliminar la entidad'),
     (4416, 'No está permitido eliminar entidades operativas en modo planificación', 'Cambia al modo operativo para eliminar la entidad'),
     (4430, 'El %feature_type% con id %connec_id% ha sido correctamente conectado al arco con id %arc_id%', NULL),
+    (4432, 'Por favor, establezca algún valor para el state_type de objetos planificados (Diálogo de configuración)', NULL),
     (50, 'actualizado con éxito', NULL),
     (5000, 'There is ', NULL),
     (5002, 'There are ', NULL),
