@@ -1961,11 +1961,12 @@ class GwPsector:
         model = qtbl.model()
         col_id = tools_qt.get_col_index_by_col_name(qtbl, col_id_name)
         col_active = tools_qt.get_col_index_by_col_name(qtbl, 'active')
+        col_parent_id = tools_qt.get_col_index_by_col_name(qtbl, 'parent_id')
 
         # Access the data using the model's index method
         scenario_id = model.index(row, col_id).data()
         active = model.index(row, col_active).data()
-
+        parent_id = model.index(row, col_parent_id).data()
         # Verify that the selected psector is active
         if not active:
             msg = f"Cannot set psector {scenario_id} as current. It is inactive. Please activate it first."
@@ -1990,8 +1991,12 @@ class GwPsector:
 
         cur_psector = tools_gw.get_config_value('plan_psector_current')
         sql = f"DELETE FROM selector_psector WHERE psector_id = {scenario_id} AND cur_user = current_user; "
+        if parent_id is not None:
+            sql += f"DELETE FROM selector_psector WHERE psector_id = {parent_id} AND cur_user = current_user; "
         if cur_psector and cur_psector[0] is not None:
-            sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({scenario_id}, current_user);"
+            sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({scenario_id}, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;"
+            if parent_id is not None:
+                sql += f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({parent_id}, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;"
         tools_db.execute_sql(sql)
 
         # Load existing psector
