@@ -164,7 +164,7 @@ BEGIN
 
 						IF v_ischild='child' THEN
 							-- get its parent_id
-							SELECT arc_id::integer INTO v_parent_id FROM audit_arc_traceability WHERE (arc_id1=rec.id) or (arc_id2=rec.id);
+							SELECT arc_id::integer INTO v_parent_id FROM audit_arc_traceability WHERE (arc_id1=rec.id::text) or (arc_id2=rec.id::text);
 
 							--insert related documents to child arc
 							INSERT INTO doc_x_arc(doc_id, arc_id)
