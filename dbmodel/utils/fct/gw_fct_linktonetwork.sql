@@ -218,13 +218,26 @@ BEGIN
 				v_forcedarcs= '';
 			END IF;
 
-			IF v_projecttype = 'WS' THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1107","function":"3188","fid": 217,"v_criticity": 4, 
-				"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "check_arcdnom":"'||v_check_arcdnom||'", 
-				"max_distance":"'||v_check_maxdistance||'"}}}$$);';
-				ELSIF v_projecttype = 'UD' THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1109","function":"3188","fid": 217,"v_criticity": 4, 
-				"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "max_distance":"'||v_check_maxdistance||'"}}}$$);';
+			IF v_projecttype = 'WS' OR v_projecttype = 'UD' THEN
+				-- Different messages for different parameters passed
+				IF v_check_arcdnom = 9999 THEN
+					IF v_check_maxdistance = 9999 THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "4434","function":"3188","fid": 217,"v_criticity": 4, 
+						"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'"}}}$$);';
+					ELSE
+						EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "4436","function":"3188","fid": 217,"v_criticity": 4, 
+						"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "max_distance":"'||v_check_maxdistance||'"}}}$$);';
+					END IF;
+				ELSE
+					IF v_check_maxdistance = 9999 THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "4438","function":"3188","fid": 217,"v_criticity": 4, 
+						"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "check_arcdnom":"'||v_check_arcdnom||'"}}}$$);';
+					ELSE
+						EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "4440","function":"3188","fid": 217,"v_criticity": 4, 
+						"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'", "check_arcdnom":"'||v_check_arcdnom||'", 
+						"max_distance":"'||v_check_maxdistance||'"}}}$$);';
+					END IF;
+				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data": {"message": "1111","function":"3188","fid": 217,"v_criticity": 4, 
 				"parameters":{"feature_type":"'||lower(v_feature_type)||'", "connect_id":"'||v_connect_id||'"}}}$$);';
