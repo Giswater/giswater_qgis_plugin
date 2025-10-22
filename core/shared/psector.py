@@ -1946,7 +1946,6 @@ class GwPsector:
         row = selected_list[0].row()
         model = qtbl.model()
         col_id = tools_qt.get_col_index_by_col_name(qtbl, col_id_name)
-        col_active = tools_qt.get_col_index_by_col_name(qtbl, 'active')
         col_parent_id = tools_qt.get_col_index_by_col_name(qtbl, 'parent_id')
 
         # Access the data using the model's index method
