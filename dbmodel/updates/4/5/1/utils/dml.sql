@@ -135,3 +135,12 @@ AND formname ILIKE 've_element%';
 
 INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
 	VALUES (4432,'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)',0,true,'utils','core','UI');
+
+UPDATE plan_typevalue SET descript='The Psector is being planned.' WHERE typevalue='psector_status' AND id='1';
+UPDATE plan_typevalue SET descript='The Psector is planned and ready to work with.' WHERE typevalue='psector_status' AND id='2';
+UPDATE plan_typevalue SET descript='The Psector is being executed on the network.' WHERE typevalue='psector_status' AND id='3';
+UPDATE plan_typevalue SET descript='The Psector has been executed.' WHERE typevalue='psector_status' AND id='4';
+UPDATE plan_typevalue SET descript='The Psector has been executed, and the objects defined during the planning phase (additions and removals) have been automatically implemented.' WHERE typevalue='psector_status' AND id='5';
+UPDATE plan_typevalue SET descript='The Psector has been executed and is now archived.' WHERE typevalue='psector_status' AND id='6';
+UPDATE plan_typevalue SET descript='The Psector has been cancelled because it was not executed and archived at the same time.' WHERE typevalue='psector_status' AND id='7';
+UPDATE plan_typevalue SET descript='The Psector was archived but has been restored.' WHERE typevalue='psector_status' AND id='8';
