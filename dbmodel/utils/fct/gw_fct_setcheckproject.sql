@@ -137,8 +137,8 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4112", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"logfoldervolume":"'||v_logfoldervolume||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4114", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
-		"parameters":{"gwprojecttype":"'||quote_nullable(v_qgis_project_type)||'", "gwinfotype":"'||quote_nullable(v_infotype)||'", "gwprojectrole":"'||quote_nullable(v_projectrole)||'", 
-		"gwmainschema":"'||quote_nullable(v_mainschema)||'", "gwaddschema":"'||quote_nullable(v_addschema)||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
+		"parameters":{"v_qgis_project_type":"'||quote_nullable(v_qgis_project_type)||'", "v_infotype":"'||quote_nullable(v_infotype)||'", "v_projectrole":"'||quote_nullable(v_projectrole)||'", 
+		"v_mainschema":"'||quote_nullable(v_mainschema)||'", "v_addschema":"'||quote_nullable(v_addschema)||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4116", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"current_user":"'||current_user||'", "now":"'||now()||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 
