@@ -1856,7 +1856,6 @@ class GwPsector:
             msg = "Any record selected"
             tools_qgis.show_warning(msg, dialog=dialog)
             return
-        cur_psector = tools_gw.get_config_value('plan_psector_current')
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             psector_id = qtbl_psm.model().record(row).value("psector_id")
@@ -1866,11 +1865,6 @@ class GwPsector:
             if archived is True:
                 msg = f"Cannot set the active state of archived psector {psector_id}. Please unarchive it first."
                 tools_qgis.show_warning(msg, dialog=dialog)
-                return
-            if cur_psector and cur_psector[0] is not None and psector_id == int(cur_psector[0]):
-                msg = "The active state of the current psector cannot be changed. Current psector: {0}"
-                msg_params = (cur_psector[0],)
-                tools_qgis.show_warning(msg, dialog=dialog, msg_params=msg_params)
                 return
             # Check if trying to deactivate the last active psector
             if active:
@@ -1889,7 +1883,7 @@ class GwPsector:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
                 # Remove from selector
                 sql += f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;"
-                msg = f"Psector {psector_id} removed from selector"
+                msg = f"Psector {psector_id} deactivated from selector"
                 tools_qgis.show_info(msg, dialog=dialog)
                 selector_updated = True
             else:
@@ -1965,13 +1959,7 @@ class GwPsector:
 
         # Access the data using the model's index method
         scenario_id = model.index(row, col_id).data()
-        active = model.index(row, col_active).data()
         parent_id = model.index(row, col_parent_id).data()
-        # Verify that the selected psector is active
-        if not active:
-            msg = f"Cannot set psector {scenario_id} as current. It is inactive. Please activate it first."
-            tools_qgis.show_warning(msg, dialog=dialog)
-            return
 
         # Prepare the JSON body for gw_fct_set_toggle_current
         extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
