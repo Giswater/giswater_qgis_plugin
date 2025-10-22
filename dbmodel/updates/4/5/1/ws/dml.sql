@@ -97,7 +97,11 @@ AND function_type IS NOT NULL
 WHERE fid=422;
 
 UPDATE sys_fprocess
-SET query_text='
+SET 
+fprocess_name='Check fluid_type values exists on man_ table',
+except_msg='features with fluid_type does not exists on man_type_fluid table.',
+info_msg='All features has fluid_type informed on man_type_fluid table',
+query_text='
 SELECT ''ARC'', arc_id, fluid_type 
 FROM t_arc t
 WHERE NOT EXISTS (

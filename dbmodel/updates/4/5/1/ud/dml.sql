@@ -23,6 +23,11 @@ SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''GULLY''', '''GULLY''=AN
 WHERE columnname = 'location_type'
 AND formname ILIKE 've_gully%';
 
+UPDATE sys_param_user
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''GULLY''', '''GULLY''=ANY(feature_type)')
+WHERE id ILIKE 'edit_gully_%'
+AND dv_querytext ILIKE '%man_type%';
+
 UPDATE sys_fprocess
 SET query_text='
 SELECT ''ARC'', arc_id, category_type 

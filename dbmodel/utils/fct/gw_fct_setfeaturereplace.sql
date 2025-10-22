@@ -193,24 +193,24 @@ BEGIN
 	EXECUTE 'SELECT inventory FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_inventory;
 	EXECUTE 'SELECT n.category_type FROM '||v_feature_layer||' n JOIN man_type_category m ON n.category_type=m.category_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	WHERE m.feature_type IS NULL OR'''||upper(v_feature_type)||''' = ANY(m.feature_type) AND 
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_category;
 	EXECUTE 'SELECT n.function_type FROM '||v_feature_layer||' n JOIN man_type_function m ON n.function_type=m.function_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	WHERE m.feature_type IS NULL OR'''||upper(v_feature_type)||''' = ANY(m.feature_type) AND 
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_function;
 
 	IF v_project_type = 'WS' THEN
 		EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
-		WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+		WHERE m.feature_type IS NULL OR'''||upper(v_feature_type)||''' = ANY(m.feature_type) AND 
 		(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 		INTO v_fluid;
 	END IF;
 
 
 	EXECUTE 'SELECT n.location_type FROM '||v_feature_layer||' n JOIN man_type_location m ON n.location_type=m.location_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	WHERE m.feature_type IS NULL OR'''||upper(v_feature_type)||''' = ANY(m.feature_type) AND 
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_location;
 

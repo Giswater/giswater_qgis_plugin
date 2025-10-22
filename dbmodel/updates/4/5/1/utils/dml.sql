@@ -82,6 +82,22 @@ SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMEN
 WHERE columnname = 'category_type'
 AND formname ILIKE 've_element%';
 
+UPDATE sys_param_user
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')
+WHERE id ILIKE 'edit_arc_%'
+AND dv_querytext ILIKE '%man_type%';
+
+UPDATE sys_param_user
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''NODE''', '''NODE''=ANY(feature_type)')
+WHERE id ILIKE 'edit_node_%'
+AND dv_querytext ILIKE '%man_type%';
+
+UPDATE sys_param_user
+SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''CONNEC''', '''CONNEC''=ANY(feature_type)')
+WHERE id ILIKE 'edit_connec_%'
+AND dv_querytext ILIKE '%man_type%';
+
+
 INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
 	VALUES (4432,'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)',0,true,'utils','core','UI');
 
