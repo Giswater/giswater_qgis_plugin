@@ -132,3 +132,6 @@ UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type = ''ELEMENT''', '''ELEMENT''=ANY(feature_type)')
 WHERE columnname = 'category_type'
 AND formname ILIKE 've_element%';
+
+INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
+	VALUES (4432,'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)',0,true,'utils','core','UI');
