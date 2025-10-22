@@ -182,13 +182,13 @@ INSERT INTO cat_work VALUES ('work2', 'Description work2', NULL, NULL, NULL, '20
 INSERT INTO cat_work VALUES ('work3', 'Description work3', NULL, NULL, NULL, '2017-12-11', NULL, true);
 INSERT INTO cat_work VALUES ('work4', 'Description work4', NULL, NULL, NULL, '2017-12-22', NULL, true);
 
-INSERT INTO man_type_category VALUES (1, 'St. Category', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
+INSERT INTO man_type_category VALUES ('St. Category', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
 
-INSERT INTO man_type_fluid VALUES (1, 'St. Fluid', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
+INSERT INTO man_type_fluid VALUES ('St. Fluid', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
 
-INSERT INTO man_type_function VALUES (1, 'St. Function', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
+INSERT INTO man_type_function VALUES ('St. Function', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
 
-INSERT INTO man_type_location VALUES (1, 'St. Location', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
+INSERT INTO man_type_location VALUES ('St. Location', '{NODE, ARC, CONNEC, ELEMENT}', NULL, NULL, true);
 
 
 INSERT INTO cat_link (id, link_type, descript) VALUES('VIRTUAL', 'VLINK', 'Virtual link')

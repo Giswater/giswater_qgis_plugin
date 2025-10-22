@@ -17,59 +17,8 @@ UPDATE config_typevalue
 SET idval = substring(idval FROM 12 FOR length(idval) - 12)
 WHERE typevalue = 'sys_table_context' and idval like '{"levels":%';
 
-DO $$
-DECLARE
-    rec text;
-    v_table text;
-    v_column text;
-    arr text[] := ARRAY['category', 'function', 'location'];
-BEGIN
-    FOREACH rec IN ARRAY arr LOOP
-        v_table := 'man_type_' || rec;
-        v_column := rec || '_type';
-        EXECUTE format('
-            UPDATE %I t
-            SET 
-            feature_type = merged.merged_array_col3,
-            featurecat_id = merged.merged_array_col4
-            FROM (
-                SELECT 
-                %I,
-                array_agg(DISTINCT elem3) AS merged_array_col3,
-                array_agg(DISTINCT elem4) AS merged_array_col4
-            FROM %I
-                    LEFT JOIN LATERAL unnest(feature_type) AS elem3 ON TRUE
-                    LEFT JOIN LATERAL unnest(featurecat_id) AS elem4 ON TRUE
-            GROUP BY %I
-            ) AS merged
-            WHERE t.%I = merged.%I;
-        ', v_table, v_column, v_table, v_column, v_column, v_column);
-
-
-        EXECUTE format('
-            DELETE FROM %I t
-            USING (
-                SELECT id
-                    FROM (
-                        SELECT id,
-                                ROW_NUMBER() OVER (PARTITION BY %I, feature_type, featurecat_id ORDER BY id) AS rn
-                        FROM %I
-                    ) sub
-                WHERE rn > 1
-            ) dup
-            WHERE t.id = dup.id;
-        ', v_table, v_column, v_table);
-    END LOOP;
-
-    FOREACH rec IN ARRAY arr LOOP
-        v_table := 'man_type_' || rec;
-        v_column := rec || '_type';
-        EXECUTE format('
-            ALTER TABLE %I ADD CONSTRAINT %I_unique UNIQUE (%I, feature_type);
-        ', v_table, v_table, v_column);
-    END LOOP;
-END $$;
-
+DELETE FROM sys_function WHERE id = 3346; -- gw_trg_mantypevalue_fk
+DROP FUNCTION gw_trg_mantypevalue_fk() CASCADE;
 
 UPDATE config_form_fields
 SET dv_querytext = REPLACE(dv_querytext, 'feature_type=''ARC''', '''ARC''=ANY(feature_type)')

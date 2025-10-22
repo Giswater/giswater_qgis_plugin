@@ -194,8 +194,6 @@ SELECT has_trigger('connec', 'gw_trg_connec_proximity_update', 'Table should hav
 SELECT has_trigger('connec', 'gw_trg_connect_update', 'Table should have trigger gw_trg_connect_update');
 SELECT has_trigger('connec', 'gw_trg_edit_controls', 'Table should have trigger gw_trg_edit_controls');
 SELECT has_trigger('connec', 'gw_trg_link_data', 'Table should have trigger gw_trg_link_data');
-SELECT has_trigger('connec', 'gw_trg_mantypevalue_fk_insert', 'Table should have trigger gw_trg_mantypevalue_fk_insert');
-SELECT has_trigger('connec', 'gw_trg_mantypevalue_fk_update', 'Table should have trigger gw_trg_mantypevalue_fk_update');
 SELECT has_trigger('connec', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('connec', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
 SELECT has_trigger('connec', 'gw_trg_unique_field', 'Table should have trigger gw_trg_unique_field');

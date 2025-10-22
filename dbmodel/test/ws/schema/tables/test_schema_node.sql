@@ -65,8 +65,6 @@ SELECT fk_ok('node', 'state_type', 'value_state_type', 'id', 'FK state_type shou
 SELECT fk_ok('node', 'omzone_id', 'omzone', 'omzone_id', 'FK omzone_id should reference omzone.omzone_id');
 
 -- Check triggers
-SELECT has_trigger('node', 'gw_trg_mantypevalue_fk_insert', 'Table should have gw_trg_mantypevalue_fk_insert trigger');
-SELECT has_trigger('node', 'gw_trg_mantypevalue_fk_update', 'Table should have gw_trg_mantypevalue_fk_update trigger');
 SELECT has_trigger('node', 'gw_trg_node_arc_divide', 'Table should have gw_trg_node_arc_divide trigger');
 SELECT has_trigger('node', 'gw_trg_node_rotation_update', 'Table should have gw_trg_node_rotation_update trigger');
 SELECT has_trigger('node', 'gw_trg_node_statecontrol', 'Table should have gw_trg_node_statecontrol trigger');

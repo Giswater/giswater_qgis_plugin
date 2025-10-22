@@ -10,4 +10,3 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP TRIGGER IF EXISTS gw_trg_config_control ON man_type_fluid;
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF feature_type, featurecat_id ON man_type_fluid FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('man_type_fluid');
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF fluid_type ON man_type_fluid FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('man_type_fluid', 'fluid_type');

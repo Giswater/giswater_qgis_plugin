@@ -118,8 +118,6 @@ SELECT has_index('element', 'element_sys_code_idx', 'Table element should have i
 
 --check trigger 
 SELECT has_trigger('element', 'gw_trg_edit_controls', 'Table element should have trigger gw_trg_edit_controls');
-SELECT has_trigger('element', 'gw_trg_mantypevalue_fk_insert', 'Table element should have trigger gw_trg_mantypevalue_fk_insert');
-SELECT has_trigger('element', 'gw_trg_mantypevalue_fk_update', 'Table element should have trigger gw_trg_mantypevalue_fk_update');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_insert', 'Table element should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_update', 'Table element should have trigger gw_trg_typevalue_fk_update');
 

@@ -169,8 +169,6 @@ SELECT has_trigger('arc', 'gw_trg_arc_link_update', 'Table should have trigger g
 SELECT has_trigger('arc', 'gw_trg_arc_node_values', 'Table should have trigger gw_trg_arc_node_values');
 SELECT has_trigger('arc', 'gw_trg_arc_noderotation_update', 'Table should have trigger gw_trg_arc_noderotation_update');
 SELECT has_trigger('arc', 'gw_trg_edit_controls', 'Table should have trigger gw_trg_edit_controls');
-SELECT has_trigger('arc', 'gw_trg_mantypevalue_fk_insert', 'Table should have trigger gw_trg_mantypevalue_fk_insert');
-SELECT has_trigger('arc', 'gw_trg_mantypevalue_fk_update', 'Table should have trigger gw_trg_mantypevalue_fk_update');
 SELECT has_trigger('arc', 'gw_trg_topocontrol_arc', 'Table should have trigger gw_trg_topocontrol_arc');
 SELECT has_trigger('arc', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
 SELECT has_trigger('arc', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');

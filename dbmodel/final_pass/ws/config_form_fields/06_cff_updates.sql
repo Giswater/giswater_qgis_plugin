@@ -1180,14 +1180,14 @@ UPDATE config_form_fields
 SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
 UPDATE config_form_fields
-SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+SET dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields
-SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+SET dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link_link' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields
-SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+SET dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link_pipelink' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields
-SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
+SET dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link_vlink' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';

@@ -34,7 +34,3 @@ DROP TRIGGER IF EXISTS gw_trg_config_control ON man_type_location;
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF feature_type, featurecat_id ON man_type_category FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('man_type_category');
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF feature_type, featurecat_id ON man_type_function FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('man_type_function');
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF feature_type, featurecat_id ON man_type_location FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('man_type_location');
-
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF category_type ON man_type_category FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('man_type_category', 'category_type');
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type ON man_type_function FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('man_type_function', 'function_type');
-CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF location_type ON man_type_location FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('man_type_location', 'location_type');

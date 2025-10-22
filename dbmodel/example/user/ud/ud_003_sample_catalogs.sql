@@ -132,17 +132,17 @@ INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, act
 -----------------------------
 -- Records of man_type_category
 -- ----------------------------
-INSERT INTO man_type_category VALUES (1, 'St. Category', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
+INSERT INTO man_type_category VALUES ('St. Category', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
 
 -- ----------------------------
 -- Records of man_type_location
 -- ----------------------------
-INSERT INTO man_type_location VALUES (1, 'St. Location', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
+INSERT INTO man_type_location VALUES ('St. Location', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
 
 -- ----------------------------
 -- Records of man_type_function
 -- ----------------------------
-INSERT INTO man_type_function VALUES (1, 'St. Function', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
+INSERT INTO man_type_function VALUES ('St. Function', '{NODE, ARC, CONNEC, ELEMENT, GULLY}', NULL, NULL, true);
 
 -- ----------------------------
 -- Update shortcuts
