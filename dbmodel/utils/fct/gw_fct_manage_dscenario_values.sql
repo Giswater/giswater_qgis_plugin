@@ -93,7 +93,7 @@ BEGIN
                        "data":{"message":"3756", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "is_process":true}}$$)';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3724", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+                       "data":{"message":"3724", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
 
 	ELSE
 
@@ -101,7 +101,7 @@ BEGIN
 		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 			IF (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_copyfrom) != (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_target) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3732", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1006", "is_process":true}}$$)';
+                       "data":{"message":"3732", "function":"3042", "fid":"403", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"2", "prefix_id":"1002", "is_process":true}}$$)';
 
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

@@ -71,7 +71,7 @@ BEGIN
 
 		IF v_array ='()' THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3562", "function":"3008", "fid":"357", "prefix_id":"1008", "is_process":true}}$$)';
+                       "data":{"message":"3562", "function":"3008", "fid":"357", "prefix_id":"1003", "is_process":true}}$$)';
 		ELSE
 			-- execute
 			EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 

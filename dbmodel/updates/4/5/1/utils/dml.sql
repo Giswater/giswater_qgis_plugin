@@ -109,3 +109,13 @@ UPDATE plan_typevalue SET descript='The Psector has been executed, and the objec
 UPDATE plan_typevalue SET descript='The Psector has been executed and is now archived.' WHERE typevalue='psector_status' AND id='6';
 UPDATE plan_typevalue SET descript='The Psector has been cancelled because it was not executed and archived at the same time.' WHERE typevalue='psector_status' AND id='7';
 UPDATE plan_typevalue SET descript='The Psector was archived but has been restored.' WHERE typevalue='psector_status' AND id='8';
+
+
+DELETE FROM sys_label WHERE id=1006;
+DELETE FROM sys_label WHERE id=1007;
+DELETE FROM sys_label WHERE id=1008;
+DELETE FROM sys_label WHERE id = 3013;
+
+INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
+VALUES(4442, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user. For example:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Only the errors with anl_table next to the number can be checked this way. Using Giswater Toolbox it''s also posible to check these errors.',
+0,true,'utils','core','AUDIT');

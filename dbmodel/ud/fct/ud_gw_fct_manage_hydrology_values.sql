@@ -105,7 +105,7 @@ BEGIN
                        "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "is_process":true}}$$)';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4040", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+                       "data":{"message":"4040", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
 
 	ELSIF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 
@@ -113,7 +113,7 @@ BEGIN
                        "data":{"message":"3754", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "is_process":true}}$$)';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3724", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+                       "data":{"message":"3724", "function":"3100", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_sector)||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
 	ELSE
 		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 

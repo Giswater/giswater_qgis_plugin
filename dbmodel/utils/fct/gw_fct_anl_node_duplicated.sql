@@ -106,7 +106,7 @@ BEGIN
 
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3600", "function":"2108", "parameters":{"v_count":"'||v_count||'"}, "fid":"106", "fcount":"'||v_count||'", "prefix_id":"1008", "is_process":true}}$$)';
+                       "data":{"message":"3600", "function":"2108", "parameters":{"v_count":"'||v_count||'"}, "fid":"106", "fcount":"'||v_count||'", "prefix_id":"1003", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 106,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count

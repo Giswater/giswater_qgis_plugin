@@ -108,7 +108,7 @@ BEGIN
                        "data":{"message":"3754", "function":"3102", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "is_process":true}}$$)';
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3724", "function":"3102", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "prefix_id":"1007", "is_process":true}}$$)';
+                       "data":{"message":"3724", "function":"3102", "fid":"'||v_fid||'", "result_id":"'||quote_nullable(v_result_id)||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
 
 	else
 
