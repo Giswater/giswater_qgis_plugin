@@ -280,8 +280,8 @@ BEGIN
 
 			IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
 				INSERT INTO sys_table (id, descript, sys_role,context, alias, orderby)
-				SELECT v_viewname, 'Editable view that saves visits', 'role_om', '{"levels": ["OM","VISIT"]}', v_class_name, max(orderby)+1
-				FROM sys_table WHERE context ='{"levels": ["OM","VISIT"]}';
+				SELECT v_viewname, 'Editable view that saves visits', 'role_om', '["OM","VISIT"]', v_class_name, max(orderby)+1
+				FROM sys_table WHERE context = '["OM","VISIT"]';
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (219, null, 4, concat('Insert view name into sys_table.'));
@@ -464,8 +464,8 @@ raise notice 'classID,%',v_class_id;
 
 				IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
 					INSERT INTO sys_table (id, descript, sys_role,context, alias, orderby)
-					SELECT v_viewname, 'Editable view that saves visits', 'role_om', '{"levels": ["OM","VISIT"]}', v_class_name, max(orderby)+1
-					FROM sys_table WHERE context ='{"levels": ["OM","VISIT"]}';
+					SELECT v_viewname, 'Editable view that saves visits', 'role_om', '["OM","VISIT"]', v_class_name, max(orderby)+1
+					FROM sys_table WHERE context = '["OM","VISIT"]';
 					raise notice 'multi -  sys_table';
 				END IF;
 

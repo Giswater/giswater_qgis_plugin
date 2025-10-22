@@ -65,7 +65,7 @@ BEGIN
         IF v_version >'3.5.020' OR v_version IS NULL THEN
 			UPDATE sys_table st SET context = c.id, alias = initcap(cf.id)
 			FROM cat_feature cf, config_typevalue c WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id
-			AND c.idval = concat('{"levels": ["INVENTORY", "NETWORK", "',feature_type,'"]}');
+			AND c.idval = concat('["INVENTORY", "NETWORK", "',feature_type,'"]');
         END IF;
 
 	    PERFORM gw_fct_admin_role_permissions();
