@@ -226,12 +226,29 @@ BEGIN
     WHERE a.pgr_node_1 = n.pgr_node_id
     AND a.arc_id IS NOT NULL;
 
+    -- if an arc is between 2 water sources nodes, minsector_id = arc_id
+    UPDATE temp_pgr_arc a SET mapzone_id = a.arc_id
+    FROM v_temp_arc va 
+    WHERE a.arc_id IS NOT NULL
+    AND a.mapzone_id = 0
+    AND a.arc_id = va.arc_id
+    AND EXISTS (
+        SELECT 1 FROM v_temp_node n 
+        WHERE 'SECTOR' = ANY (n.graph_delimiter)
+        AND va.node_1 = n.node_id 
+    )
+    AND EXISTS (
+        SELECT 1 FROM v_temp_node n 
+        WHERE 'SECTOR' = ANY (n.graph_delimiter) 
+        AND va.node_2 = n.node_id 
+    );
+
     INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
     SELECT COALESCE(n1.node_id, n2.node_id), n1.mapzone_id, n2.mapzone_id
     FROM temp_pgr_arc a
     JOIN temp_pgr_node n1 ON a.pgr_node_1 = n1.pgr_node_id
     JOIN temp_pgr_node n2 ON a.pgr_node_2 = n2.pgr_node_id
-    WHERE a.arc_id IS NULL
+    WHERE a.arc_id IS NULL AND a.graph_delimiter = 'MINSECTOR'
     AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
     AND n1.mapzone_id <> n2.mapzone_id;
 
