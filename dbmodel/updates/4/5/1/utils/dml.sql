@@ -119,3 +119,10 @@ DELETE FROM sys_label WHERE id = 3013;
 INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
 VALUES(4442, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user. For example:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Only the errors with anl_table next to the number can be checked this way. Using Giswater Toolbox it''s also posible to check these errors.',
 0,true,'utils','core','AUDIT');
+
+
+INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4444, 'It is not allowed to change the exploitation because your current psector does not belong to the exploitation you have selected. Click on the Play button to exit psector mode and then, change the exploitation.', 0, true, 'utils', 'core', 'UI');
+
+INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4446, 'It is not allowed to change the sector because your current psector does not belong to the sector you have selected. Click on the Play button to exit psector mode and then, change the sector.', 0, true, 'utils', 'core', 'UI');

@@ -227,13 +227,13 @@ BEGIN
 				v_id::int IN (SELECT s.sector_id FROM plan_psector pp JOIN sector s ON pp.expl_id = ANY (s.expl_id) WHERE psector_id = v_cur_psector)
 				)
 		THEN
-			
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		    "data":{"message":"4358", "function":"3142", "parameters":{}}}$$)';
-		   
-			SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message 
-			FROM sys_message
-			WHERE id = 4358;
+			IF v_tabname = 'tab_exploitation' THEN
+				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4444;
+			ELSIF v_tabname = 'tab_sector' THEN
+				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4446;
+			ELSE
+				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4358;
+			END IF;
 		
 			v_geometry := COALESCE(v_geometry, '{}');
 			v_uservalues := COALESCE(v_uservalues, '{}');
