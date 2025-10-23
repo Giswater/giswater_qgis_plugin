@@ -1806,11 +1806,6 @@ class GwPsector:
 
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
-                # Remove from selector
-                sql += f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;"
-                msg = f"Psector {psector_id} deactivated from selector"
-                tools_qgis.show_info(msg, dialog=dialog)
-                selector_updated = True
             else:
                 sql = ("UPDATE config_param_user "
                         "SET value = True "
