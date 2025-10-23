@@ -404,6 +404,11 @@ BEGIN
 		IF NEW.visitability IS NULL THEN
 			NEW.visitability = (SELECT visitability_vdef FROM cat_arc WHERE id = NEW.arccat_id);
 		END IF;
+		
+		-- uuid random
+		IF NEW.uuid is null then
+			NEW.uuid = gen_random_uuid();
+		END IF;
 
 		-- FEATURE INSERT
 		IF v_matfromcat THEN

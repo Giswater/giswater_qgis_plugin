@@ -488,7 +488,7 @@ BEGIN
 		AND (NEW.top_elev IS NULL) AND
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
-				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1) LIMIT 1);
 		END IF;
 
 		--set rotation field
@@ -576,7 +576,7 @@ BEGIN
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value, brand_id, model_id,
 				updated_at, updated_by, asset_id, epa_type, units_placement, groove_height, groove_length, expl_visibility, adate, adescript,
-				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width, drainzone_outfall, dwfzone_outfall, omunit_id, dma_id)
+				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width, drainzone_outfall, dwfzone_outfall, omunit_id, dma_id, uuid)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
@@ -586,7 +586,7 @@ BEGIN
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.units_placement,
 				NEW.groove_height, NEW.groove_length, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.siphon_type, NEW.odorflap,
-				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id);
+				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id, NEW.uuid);
 		ELSE
 
 			INSERT INTO gully (gully_id, code, sys_code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
@@ -595,7 +595,7 @@ BEGIN
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value, brand_id, model_id,
 				updated_at, updated_by, asset_id, connec_matcat_id, epa_type, units_placement, groove_height, groove_length, expl_visibility, adate, adescript,
-				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width, drainzone_outfall, dwfzone_outfall, omunit_id, dma_id)
+				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width, drainzone_outfall, dwfzone_outfall, omunit_id, dma_id, uuid)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
@@ -605,7 +605,7 @@ BEGIN
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.connec_matcat_id,
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.expl_visibility, NEW.adate, NEW.adescript,
-				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id);
+				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id, NEW.uuid);
 
 		END IF;
 
@@ -694,7 +694,7 @@ BEGIN
 			 AND (NEW.top_elev = OLD.top_elev) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
-							(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+							(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1) LIMIT 1);
 			END IF;
 
 			--update associated geometry of element (if exists) and trace_featuregeom is true

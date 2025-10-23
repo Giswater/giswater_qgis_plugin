@@ -400,6 +400,11 @@ BEGIN
 		IF NEW.pavcat_id IS NULL THEN
 			NEW.pavcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_pavementcat_vdefault' AND cur_user = current_user);
 		END IF;
+		
+		-- uuid random
+		IF NEW.uuid is null then
+			NEW.uuid = gen_random_uuid();
+		END IF;
 
 		-- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, sys_code, datasource, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, dqa_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
