@@ -840,7 +840,7 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[r_name] = {
                 "pattern_id": r.head_pattern_name,
-                "head": r.head,
+                "head": r.base_head,
                 "init_quality": r.initial_quality,
                 "source_type": None,
                 "source_quality": None,
