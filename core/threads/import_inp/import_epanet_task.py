@@ -705,7 +705,7 @@ class GwImportInpTask(GwTask):
                 )
             )
             inp_dict[j_name] = {
-                "demand": j.base_demand,
+                "demand": j.base_demand * 1000,
                 "pattern_id": None,
                 "peak_factor": None,
                 "emitter_coeff": j.emitter_coefficient,
@@ -724,7 +724,7 @@ class GwImportInpTask(GwTask):
                             (
                                 self.dscenario_id,
                                 j_name,
-                                d.base_value,
+                                d.base_value * 1000,
                                 d.pattern_name,
                                 d.category,
                             )
