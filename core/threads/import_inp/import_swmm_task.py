@@ -85,6 +85,7 @@ class GwImportInpTask(GwTask):
     PROGRESS_CATALOGS = 30
     PROGRESS_NONVISUAL = 50
     PROGRESS_VISUAL = 90
+    PROGRESS_MUNICIPALITY = 95
     PROGRESS_SOURCES = 97
     PROGRESS_END = 100
 
@@ -160,7 +161,9 @@ class GwImportInpTask(GwTask):
             self._manage_visual()
 
             if self.update_municipality:
+                self.progress_changed.emit("Municipality", self.PROGRESS_VISUAL, "Updating municipality...", False)
                 self._update_municipality()
+                self.progress_changed.emit("Municipality", self.PROGRESS_MUNICIPALITY, "done!", True)
 
             self._manage_others()
 
@@ -522,6 +525,18 @@ class GwImportInpTask(GwTask):
                 continue
 
             if self.manage_flwreg.get(varc_type):
+                # Create the 'VARC' if it doesn't exist
+                execute_sql("""
+                    INSERT INTO cat_feature (
+                        id, feature_class, feature_type, shortcut_key, parent_layer,
+                        child_layer, descript, link_path, code_autofill, active,
+                        addparam, inventory_vdefault
+                    ) VALUES (
+                        'VARC', 'VARC', 'ARC', NULL, 've_arc',
+                        've_arc_varc', 'Virtual Arc', NULL, true, true,
+                        NULL, NULL
+                    ) ON CONFLICT DO NOTHING;
+                """, commit=self.force_commit)
                 # Just create the 'VARC' catalog to temporarly insert them as varcs
                 execute_sql("""
                     INSERT INTO cat_arc (id, arc_type, shape, geom1)
@@ -2109,9 +2124,16 @@ class GwImportInpTask(GwTask):
     def _update_municipality(self):
         """ Update the muni_id of all features getting the spatial intersection with the municipality """
 
-        sql = """
-            UPDATE node n SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) WHERE EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom));
-            UPDATE arc a SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom) LIMIT 1) WHERE EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
+        sql = f"""
+            UPDATE node n 
+            SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) 
+            WHERE workcat_id = '{self.workcat}' AND sector_id = {self.sector}
+            AND EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom));
+
+            UPDATE arc a 
+            SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom) LIMIT 1) 
+            WHERE workcat_id = '{self.workcat}' AND sector_id = {self.sector}
+            AND EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
         """
         execute_sql(sql, commit=self.force_commit)
 

@@ -4355,17 +4355,17 @@ def _process_map_selection(class_object, selection_mode, field_id):
     # Query each layer separately to handle multi-layer feature types (like elements with ve_man_frelem + ve_man_genelem)
     selected_ids = []
     existing_ids_set = set(class_object.rel_list_ids[class_object.rel_feature_type])
-    
+
     try:
         for layer in class_object.rel_layers[class_object.rel_feature_type]:
             if layer.selectedFeatureCount() == 0:
                 continue
-                
+
             # Get layer-specific selected feature IDs
             layer_selected_fids = layer.selectedFeatureIds()
             if not layer_selected_fids:
                 continue
-            
+
             # Get table name and schema using GisWater utilities
             table_name = tools_qgis.get_layer_source_table_name(layer)
             schema_name = tools_qgis.get_layer_schema(layer)
@@ -4397,7 +4397,7 @@ def _process_map_selection(class_object, selection_mode, field_id):
             rows = tools_db.get_rows(sql)
             if rows:
                 layer_selected_ids = [row[field_id] for row in rows if row.get(field_id)]
-                
+
                 # Add to selected_ids and class object list
                 for selected_id in layer_selected_ids:
                     if selected_id not in existing_ids_set:
@@ -5315,7 +5315,13 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     if selection_mode == GwSelectionMode.PSECTOR:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            class_object.rel_ids.append(widget.model().record(x).value(f"{feature_type}_id"))
+            if hasattr(full_list, 'record'):
+                class_object.rel_ids.append(full_list.record(x).value(f"{feature_type}_id"))
+            else:
+                # QStandardItemModel
+                id_col = tools_qt.get_col_index_by_col_name(widget, f"{feature_type}_id")
+                if id_col != -1:
+                    class_object.rel_ids.append(full_list.data(full_list.index(x, id_col)))
     else:
         class_object.rel_ids = class_object.rel_list_ids[feature_type]
 
@@ -5410,7 +5416,19 @@ def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
     else:
         for item in selected_list:
             row = item.row()
-            id_feature = model.record(row).value(field_id)
+            if hasattr(model, 'record'):
+                id_feature = model.record(row).value(field_id)
+            else:
+                # QStandardItemModel - find column by name
+                col_index = -1
+                for c in range(model.columnCount()):
+                    if model.headerData(c, Qt.Horizontal) == field_id:
+                        col_index = c
+                        break
+                if col_index != -1:
+                    id_feature = model.data(model.index(row, col_index))
+                else:
+                    continue
             del_id.append(id_feature)
 
     if not del_id:
@@ -5428,7 +5446,14 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
     if selection_mode == GwSelectionMode.PSECTOR:
         state = None
         if extra_field is not None and len(selected_list) == 1:
-            state = widget.model().record(selected_list[0].row()).value(extra_field)
+            model = widget.model()
+            if hasattr(model, 'record'):
+                state = model.record(selected_list[0].row()).value(extra_field)
+            else:
+                # QStandardItemModel
+                col_index = tools_qt.get_col_index_by_col_name(widget, extra_field)
+                if col_index != -1:
+                    state = model.data(model.index(selected_list[0].row(), col_index))
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
         set_model_signals(class_object)
@@ -5628,9 +5653,10 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
     # Manage play/pause button
     psignals_widgets = global_vars.psignals['widgets']
     btn_psector_playpause = psignals_widgets[0]
-    if enable is None and btn_psector_playpause is not None:
+    if btn_psector_playpause is not None:
         active = btn_psector_playpause.property('psector_active')
-        enable = not active
+        if enable is None:
+            enable = not active
 
     # Manage psector combo box
     cmb_changed = psector_id is not None
@@ -5655,51 +5681,70 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         body = create_body(extras=extras)
 
         # Execute the stored procedure
-        result = execute_procedure("gw_fct_set_toggle_current", body)
+        result_selector = execute_procedure("gw_fct_set_toggle_current", body)
         global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
 
         # Set selectors
         extras = f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":"{psector_id}", "isAlone":"False", "value":"True", "addSchema":"NULL"'
         body = create_body(extras=extras)
-        result = execute_procedure("gw_fct_setselectors", body)
+        execute_procedure("gw_fct_setselectors", body)
 
         # Refresh selectors
         extras = '"selectorType":"selector_basic", "filterText":""'
         body = create_body(extras=extras)
-        result = execute_procedure("gw_fct_getselectors", body)
+        execute_procedure("gw_fct_getselectors", body)
 
+        # Set label for current psector
         kwargs = {
             "dialog": "__self__.dlg_psector_mng",
-            "result": result
+            "result": result_selector
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
 
-        disable_forced_style = get_config_value('plan_psector_disable_forced_style')
-        if disable_forced_style is not None and not tools_os.set_boolean(disable_forced_style[0], False):
-            if enable:
-                last_styles = {}
-                project_layers = global_vars.iface.mapCanvas().layers()
-                for lyr in project_layers:
-                    try:
-                        style_manager = lyr.styleManager()
-                        current_style = style_manager.currentStyle()
-                        src_name = tools_qgis.get_layer_source_table_name(lyr)
-                        last_styles[src_name] = current_style
-                    except Exception:
-                        continue
-                global_vars.psignals['last_styles'] = last_styles
-                apply_styles_to_layers(110, "GwPlan")
-            else:
-                last_styles = global_vars.psignals['last_styles']
-                for lyr in last_styles:
-                    layer = tools_qgis.get_layer_by_tablename(lyr)
-                    try:
-                        style_manager = layer.styleManager()
-                        style_manager.setCurrentStyle(last_styles[lyr])
-                    except Exception:
-                        continue
         refresh_selectors()
+
+    # Apply psector styles only when pressing the play/pause button
+    if not cmb_changed or (force_change and enable != active):
+        _manage_psector_layer_styles(enable)
+
+    # Refresh map canvas
     tools_qgis.refresh_map_canvas()
+
+
+def _manage_psector_layer_styles(enable: bool) -> None:
+    """
+    Manage layer styles when psector mode is toggled.
+    
+    Args:
+        enable (bool): If True, saves current styles and applies psector styles. 
+            If False, restores previously saved styles.
+    """
+
+    disable_forced_style = get_config_value('plan_psector_disable_forced_style')
+    # Only do this if the config value is set and is not disabled
+    if disable_forced_style is not None and not tools_os.set_boolean(disable_forced_style[0], False):
+        if enable:
+            last_styles = {}
+            project_layers = global_vars.iface.mapCanvas().layers()
+            for lyr in project_layers:
+                try:
+                    style_manager = lyr.styleManager()
+                    current_style = style_manager.currentStyle()
+                    src_name = tools_qgis.get_layer_source_table_name(lyr)
+                    last_styles[src_name] = current_style
+                except Exception:
+                    continue
+            global_vars.psignals['last_styles'] = last_styles
+            apply_styles_to_layers(110, "GwPlan")
+        else:
+            last_styles = global_vars.psignals['last_styles']
+            for lyr in last_styles:
+                layer = tools_qgis.get_layer_by_tablename(lyr)
+                try:
+                    style_manager = layer.styleManager()
+                    style_manager.setCurrentStyle(last_styles[lyr])
+                except Exception:
+                    continue
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
