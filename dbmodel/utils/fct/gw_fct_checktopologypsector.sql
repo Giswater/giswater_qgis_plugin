@@ -215,9 +215,9 @@ BEGIN
 	-- duplicated nodes
 	v_query = '
 	WITH mec AS ( -- operative nodes that ARE NOT inside the psector
-	SELECT node_id, state, nodecat_id, expl_id, the_geom FROM node WHERE state=1 AND node_id NOT IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = '||v_psector_id||' AND state=2)
+	SELECT node_id, state, nodecat_id, expl_id, the_geom FROM node WHERE state=1 AND node_id NOT IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = '||v_psector||' AND state=2)
 	), moc AS ( -- new planified nodes inside the psector 
-	SELECT a.node_id, b.state, b.nodecat_id, b.expl_id, b.the_geom FROM plan_psector_x_node a JOIN node b USING (node_id) WHERE a.psector_id = '||v_psector_id||' AND a.state=1 
+	SELECT a.node_id, b.state, b.nodecat_id, b.expl_id, b.the_geom FROM plan_psector_x_node a JOIN node b USING (node_id) WHERE a.psector_id = '||v_psector||' AND a.state=1 
 	)
 	SELECT 355 as fid, a.node_id, a.nodecat_id, ''duplicated nodes'' as descript, a.the_Geom, a.expl_id, a.state FROM mec a JOIN moc b ON st_dwithin (a.the_geom, b.the_geom, 0.01)';
 
