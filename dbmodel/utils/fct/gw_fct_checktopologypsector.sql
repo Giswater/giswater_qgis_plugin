@@ -214,11 +214,12 @@ BEGIN
 		
 	-- duplicated nodes
 	v_query = '
-	SELECT 355, node_id, nodecat_id, ''duplicated node'', the_geom, expl_id, state1 FROM (
-	SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, 355, t1.the_geom, t1.expl_id, t2.state AS state2
-	FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(0.01)) 
-	WHERE t1.node_id != t2.node_id AND t1.state = t2.state ORDER BY t1.node_id ) a 
-	where (a.state1 > 0 AND a.state2 > 0) AND a.node_id in (select node_id from plan_psector_x_node where psector_id = '||v_psector||')';
+	WITH mec AS ( -- operative nodes that ARE NOT inside the psector
+	SELECT node_id, state, nodecat_id, expl_id, the_geom FROM node WHERE state=1 AND node_id NOT IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = '||v_psector_id||' AND state=2)
+	), moc AS ( -- new planified nodes inside the psector 
+	SELECT a.node_id, b.state, b.nodecat_id, b.expl_id, b.the_geom FROM plan_psector_x_node a JOIN node b USING (node_id) WHERE a.psector_id = '||v_psector_id||' AND a.state=1 
+	)
+	SELECT 355 as fid, a.node_id, a.nodecat_id, ''duplicated nodes'' as descript, a.the_Geom, a.expl_id, a.state FROM mec a JOIN moc b ON st_dwithin (a.the_geom, b.the_geom, 0.01)';
 
 	
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
