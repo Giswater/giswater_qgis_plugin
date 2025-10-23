@@ -448,6 +448,18 @@ class GwImportInpTask(GwTask):
                 continue
 
             if self.manage_nodarcs.get(varc_type):
+                # Create the 'VARC' if it doesn't exist
+                execute_sql("""
+                    INSERT INTO cat_feature (
+                        id, feature_class, feature_type, shortcut_key, parent_layer,
+                        child_layer, descript, link_path, code_autofill, active,
+                        addparam, inventory_vdefault
+                    ) VALUES (
+                        'VARC', 'VARC', 'ARC', NULL, 've_arc',
+                        've_arc_varc', 'Virtual Arc', NULL, true, true,
+                        NULL, NULL
+                    ) ON CONFLICT DO NOTHING;
+                """, commit=self.force_commit)
                 # Just create the 'VARC' catalog to temporarly insert them as varcs
                 execute_sql("""
                     INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
