@@ -10,6 +10,8 @@ author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, J
 Changelog=Version 4.5.1
     - fix: apply GwPlan when a psector is current
     - remove: chk_enable_all funcionality
+    - fix: psignals on psector_manager and play/pause button
+    - remove: delete from selector_psector when psector is set to inactive
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
