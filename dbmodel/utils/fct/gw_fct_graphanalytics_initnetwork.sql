@@ -103,24 +103,37 @@ BEGIN
     ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
     END IF;
 
-    IF v_node_id IS NOT NULL AND v_mode = 'MINSECTOR' THEN 
-        -- mincut using minsectors
+    IF v_expl_id_array IS NOT NULL THEN
+        v_query_text_components := 'AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
+    ELSIF v_node_id IS NOT NULL THEN
+        v_query_text_components := 'AND vtn.node_id = '||v_node_id;
+    ELSE
+        v_query_text_components := '';
+    END IF;
+
+    IF v_mode = 'MINSECTOR' THEN
         EXECUTE format('
             WITH connectedcomponents AS (
                 SELECT * FROM pgr_connectedcomponents($q$
                     SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph
-                    UNION ALL
-                    SELECT minsector_id as id, minsector_id as source, minsector_id as target, 1 as cost 
-                    FROM minsector m
-                    WHERE NOT EXISTS (SELECT 1 FROM minsector_graph mg 
+					UNION
+					SELECT minsector_id as id, minsector_id as source, minsector_id as target, 1 as cost 
+					FROM minsector m
+					WHERE NOT EXISTS (SELECT 1 FROM minsector_graph mg 
                     WHERE mg.minsector_1 = m.minsector_id OR mg.minsector_2 = m.minsector_id
-                    )
+					)
                 $q$)
             ),
             components AS (
                 SELECT c.component
                 FROM connectedcomponents c
-                WHERE c.node = %s
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM v_temp_node vtn
+                    WHERE c.node = vtn.minsector_id
+                    %s
+                )
+                GROUP BY c.component
             )
             INSERT INTO %I (node_id, graph_delimiter)
             SELECT c.node, ''MINSECTOR''
@@ -130,18 +143,8 @@ BEGIN
                 FROM components cc
                 WHERE cc.component = c.component
             );
-        ', v_node_id, v_temp_node_table);
+        ', v_query_text_components, v_temp_node_table);
     ELSE
-        IF v_node_id IS NOT NULL THEN
-            -- normal mincut 
-            v_query_text_components := 'AND vtn.node_id = '||v_node_id;
-        ELSIF v_expl_id_array IS NOT NULL THEN
-            -- mapzones for selected explotations
-            v_query_text_components := 'AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
-        ELSE
-            -- mapzones for all explotations
-            v_query_text_components := '';
-        END IF;
         EXECUTE format('
             WITH connectedcomponents AS (
                 SELECT * FROM pgr_connectedcomponents($q$
