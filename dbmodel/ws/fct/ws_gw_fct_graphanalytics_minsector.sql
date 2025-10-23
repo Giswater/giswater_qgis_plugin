@@ -696,7 +696,7 @@ BEGIN
             v_data := jsonb_build_object(
                 'data', jsonb_build_object(
                     'pgrDistance', v_pgr_distance,
-                    'pgrRootVids', ARRAY[v_pgr_node_id],
+                    'pgrRootVids', ARRAY[v_record_minsector.pgr_node_id],
                     'mode', 'MINSECTOR'
                 )
             )::text;
