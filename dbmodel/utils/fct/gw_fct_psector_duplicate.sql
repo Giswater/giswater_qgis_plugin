@@ -117,6 +117,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, error_message)
 	VALUES (153, v_result_id, concat('Set source psector (',v_old_psector_id,') as current psector.' ));
 
+	DELETE FROM selector_psector WHERE psector_id=v_old_psector_id AND cur_user=current_user;
 	-- set old psector in selector
 	--INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_old_psector_id, current_user) ON CONFLICT DO NOTHING;
 
