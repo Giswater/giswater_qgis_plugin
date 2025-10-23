@@ -85,9 +85,6 @@ BEGIN
 		UPDATE temp_t_csv SET source ='rpt_flowrouting_cont' WHERE source ='rpt_runoff_quant ' and id > v_count1;
 	END IF;
 
-	DROP TABLE IF EXISTS t;
-	CREATE TABLE t AS SELECT * FROM temp_t_csv;
-
 	-- delete trash rows
 	DELETE FROM temp_t_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
 
