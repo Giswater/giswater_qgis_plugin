@@ -3294,6 +3294,10 @@
 			<translation>Med. Longevidad</translation>
 		</message>
 		<message>
+			<source>Merge requires at least 2 psectors to be selected</source>
+			<translation>La fusión necesita por lo menos tener 2 sectores seleccionados</translation>
+		</message>
+		<message>
 			<source>Message</source>
 			<translation>Mensaje</translation>
 		</message>
