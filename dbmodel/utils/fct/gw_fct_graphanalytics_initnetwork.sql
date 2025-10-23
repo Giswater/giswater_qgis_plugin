@@ -104,9 +104,13 @@ BEGIN
     END IF;
 
     IF v_expl_id_array IS NOT NULL THEN
-        v_query_text_components := 'AND vtn.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
+        v_query_text_components := 'AND v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
     ELSIF v_node_id IS NOT NULL THEN
-        v_query_text_components := 'AND vtn.node_id = '||v_node_id;
+        IF v_mode = 'MINSECTOR' THEN
+            v_query_text_components := 'AND v.minsector_id = '||v_node_id;
+        ELSE
+            v_query_text_components := 'AND v.node_1 = '||v_node_id;
+        END IF;
     ELSE
         v_query_text_components := '';
     END IF;
@@ -116,7 +120,7 @@ BEGIN
             WITH connectedcomponents AS (
                 SELECT * FROM pgr_connectedcomponents($q$
                     SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph
-					UNION
+					UNION ALL
 					SELECT minsector_id as id, minsector_id as source, minsector_id as target, 1 as cost 
 					FROM minsector m
 					WHERE NOT EXISTS (SELECT 1 FROM minsector_graph mg 
@@ -129,8 +133,8 @@ BEGIN
                 FROM connectedcomponents c
                 WHERE EXISTS (
                     SELECT 1
-                    FROM v_temp_node vtn
-                    WHERE c.node = vtn.minsector_id
+                    FROM v_temp_arc v
+                    WHERE c.node = v.minsector_id
                     %s
                 )
                 GROUP BY c.component
@@ -156,8 +160,8 @@ BEGIN
                 FROM connectedcomponents c
                 WHERE EXISTS (
                     SELECT 1
-                    FROM v_temp_node vtn
-                    WHERE c.node = vtn.node_id
+                    FROM v_temp_arc v
+                    WHERE c.node = v.node_1
                     %s
                 )
                 GROUP BY c.component
