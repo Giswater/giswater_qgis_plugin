@@ -17,6 +17,7 @@ v_stateaux smallint;
 v_explaux smallint;
 v_psector_expl smallint;
 v_link_id integer;
+v_arc_id integer;
 
 BEGIN
 
@@ -59,9 +60,15 @@ BEGIN
 
 	SELECT link_id INTO v_link_id FROM ve_link WHERE feature_id = NEW.connec_id LIMIT 1;
 
+	SELECT arc_id INTO v_arc_id FROM ve_connec WHERE connec_id = NEW.connec_id LIMIT 1;
+
 	IF TG_OP = 'INSERT' THEN
 		IF v_link_id IS NOT NULL AND NEW.state = 0 THEN
 			NEW.link_id = v_link_id;
+		END IF;
+
+		IF v_arc_id IS NOT NULL AND NEW.state = 0 THEN
+			NEW.arc_id = v_arc_id;
 		END IF;
 	END IF;
 
