@@ -5681,23 +5681,23 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         body = create_body(extras=extras)
 
         # Execute the stored procedure
-        result = execute_procedure("gw_fct_set_toggle_current", body)
+        result_selector = execute_procedure("gw_fct_set_toggle_current", body)
         global_vars.psignals['psector_id'] = psector_id if enable or cmb_changed else None
 
         # Set selectors
         extras = f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":"{psector_id}", "isAlone":"False", "value":"True", "addSchema":"NULL"'
         body = create_body(extras=extras)
-        result = execute_procedure("gw_fct_setselectors", body)
+        execute_procedure("gw_fct_setselectors", body)
 
         # Refresh selectors
         extras = '"selectorType":"selector_basic", "filterText":""'
         body = create_body(extras=extras)
-        result = execute_procedure("gw_fct_getselectors", body)
+        execute_procedure("gw_fct_getselectors", body)
 
         # Set label for current psector
         kwargs = {
             "dialog": "__self__.dlg_psector_mng",
-            "result": result
+            "result": result_selector
         }
         execute_class_function(GwPsectorManagerUi, "set_label_current_psector", kwargs)
 
