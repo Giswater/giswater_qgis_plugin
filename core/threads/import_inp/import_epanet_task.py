@@ -596,15 +596,16 @@ class GwImportInpTask(GwTask):
                     commit=self.force_commit,
                 )
 
-    def _replace_codes_with_ids(self, text: str) -> str:
+    def _replace_codes_with_ids(self, text: str, req: tuple) -> str:
         """Replace INP codes (node/arc names) with database IDs in control/rule text."""
+
         result = text
-        # Replace node codes with node_ids
-        for code, node_id in self.node_ids.items():
-            result = result.replace(code, node_id)
-        # Replace arc codes with arc_ids
-        for code, arc_id in self.arc_ids.items():
-            result = result.replace(code, arc_id)
+        for obj in req:
+            code = obj.name
+            if code in self.node_ids:
+                result = result.replace(str(code), str(self.node_ids[code]))
+            elif code in self.arc_ids:
+                result = result.replace(str(code), str(self.arc_ids[code]))
         return result
 
     def _save_controls_and_rules(self) -> None:
@@ -623,12 +624,13 @@ class GwImportInpTask(GwTask):
         for control_name, control in self.network.controls():
             control_dict = control.to_dict()
             condition = str(control.condition)
+            req = control.requires()
             then_actions = control_dict.get("then_actions")
             else_actions = control_dict.get("else_actions")
             priority = control.priority
             if type(control) is Control:
                 text = f"IF {condition} THEN {' AND '.join(then_actions)} PRIORITY {priority}"
-                text = self._replace_codes_with_ids(text)
+                text = self._replace_codes_with_ids(text, req)
                 if text in controls_db:
                     msg = f"The control '{control_name}' is already on database. Skipping..."
                     self._log_message(msg)
@@ -642,7 +644,7 @@ class GwImportInpTask(GwTask):
                 if else_actions:
                     text += f"\nELSE {else_actions}"
                 text += f"\nPRIORITY {priority}"
-                text = self._replace_codes_with_ids(text)
+                text = self._replace_codes_with_ids(text, req)
                 if text in rules_db:
                     msg = f"The rule '{control_name}' is already on database. Skipping..."
                     self._log_message(msg)
