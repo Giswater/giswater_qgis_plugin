@@ -103,81 +103,78 @@ BEGIN
     ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
     END IF;
 
+    -- prepare query used for connectedComponents
+    IF v_mode = 'MINSECTOR' THEN
+        v_query_text := '
+            SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost 
+            FROM minsector_graph
+            UNION ALL
+            SELECT minsector_id as id, minsector_id as source, minsector_id as target, 1 as cost 
+            FROM minsector m
+            WHERE NOT EXISTS (
+                SELECT 1 FROM minsector_graph mg 
+                WHERE mg.minsector_1 = m.minsector_id OR mg.minsector_2 = m.minsector_id
+            )
+        ';
+    ELSE
+        v_query_text := '
+            SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc
+        ';
+    END IF;
+
+    -- condition for filtering connected clusters
     IF v_expl_id_array IS NOT NULL THEN
-        v_query_text_components := 'AND v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])';
-    ELSIF v_node_id IS NOT NULL THEN
         IF v_mode = 'MINSECTOR' THEN
-            v_query_text_components := 'AND v.minsector_id = '||v_node_id;
+            v_query_text_components := '
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM v_temp_arc v
+                    WHERE v.minsector_id = c.node
+                    AND v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
+                )
+            ';
         ELSE
-            v_query_text_components := 'AND v.node_1 = '||v_node_id;
+            v_query_text_components := '
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM v_temp_arc v
+                    WHERE v.node_1 = c.node
+                    AND v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
+                )
+            ';
         END IF;
+    ELSIF v_node_id IS NOT NULL THEN
+        v_query_text_components := 'WHERE c.node = '||v_node_id;
     ELSE
         v_query_text_components := '';
     END IF;
 
-    IF v_mode = 'MINSECTOR' THEN
-        EXECUTE format('
-            WITH connectedcomponents AS (
-                SELECT * FROM pgr_connectedcomponents($q$
-                    SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost FROM minsector_graph
-					UNION ALL
-					SELECT minsector_id as id, minsector_id as source, minsector_id as target, 1 as cost 
-					FROM minsector m
-					WHERE NOT EXISTS (SELECT 1 FROM minsector_graph mg 
-                    WHERE mg.minsector_1 = m.minsector_id OR mg.minsector_2 = m.minsector_id
-					)
-                $q$)
-            ),
-            components AS (
-                SELECT c.component
-                FROM connectedcomponents c
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM v_temp_arc v
-                    WHERE c.node = v.minsector_id
-                    %s
-                )
-                GROUP BY c.component
-            )
-            INSERT INTO %I (node_id, graph_delimiter)
-            SELECT c.node, ''MINSECTOR''
+    EXECUTE format('
+        WITH connectedcomponents AS (
+            SELECT * FROM pgr_connectedcomponents($q$ %s $q$)
+        ),
+        components AS (
+            SELECT c.component
             FROM connectedcomponents c
-            WHERE EXISTS (
-                SELECT 1
-                FROM components cc
-                WHERE cc.component = c.component
-            );
-        ', v_query_text_components, v_temp_node_table);
-    ELSE
-        EXECUTE format('
-            WITH connectedcomponents AS (
-                SELECT * FROM pgr_connectedcomponents($q$
-                    SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc
-                $q$)
-            ),
-            components AS (
-                SELECT c.component
-                FROM connectedcomponents c
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM v_temp_arc v
-                    WHERE c.node = v.node_1
-                    %s
-                )
-                GROUP BY c.component
-            )
-            INSERT INTO %I (node_id)
-            SELECT c.node
-            FROM connectedcomponents c
-            WHERE EXISTS (
-                SELECT 1
-                FROM components cc
-                WHERE cc.component = c.component
-            );
-        ', v_query_text_components, v_temp_node_table);
-    END IF;
+            %s
+            GROUP BY c.component
+        )
+        INSERT INTO %I (node_id)
+        SELECT c.node
+        FROM connectedcomponents c
+        WHERE EXISTS (
+            SELECT 1
+            FROM components cc
+            WHERE cc.component = c.component
+        );
+    ', v_query_text, v_query_text_components, v_temp_node_table);
 
     IF v_mode = 'MINSECTOR' THEN
+        -- update graph_delimiter for all nodes (they are MINSECTOR)
+        EXECUTE format('
+        UPDATE %I SET graph_delimiter = ''MINSECTOR'';
+        ', v_temp_node_table);
+
         -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
         EXECUTE format('
         INSERT INTO %I (node_id, graph_delimiter)
@@ -247,7 +244,7 @@ BEGIN
         END IF;    
 
         IF v_project_type = 'WS' THEN
-            -- update to_arc, closed, broken for VALVES (valves are arcs for version 6.1, nodes if not)
+            -- update to_arc, closed, broken, graph_delimiter for VALVES (valves are arcs for version 6.1, nodes if not)
             IF v_mode = 'MINSECTOR' THEN
                 v_temp_table = v_temp_arc_table;
                 v_query_text = 'arc_id';
