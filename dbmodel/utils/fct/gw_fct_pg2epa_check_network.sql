@@ -75,8 +75,8 @@ BEGIN
 	DROP TABLE IF EXISTS temp_t_pgr_go2epa_node; CREATE TEMP TABLE temp_t_pgr_go2epa_node AS SELECT * FROM temp_t_node;
 
 	IF v_project_type = 'WS' THEN
-		UPDATE temp_t_pgr_go2epa_node n SET dma_id = 0;
-		UPDATE temp_t_pgr_go2epa_arc SET dma_id = 0;
+		UPDATE temp_t_pgr_go2epa_node n SET dma_id = -1;
+		UPDATE temp_t_pgr_go2epa_arc SET dma_id = -1;
 	END IF;
 
 	UPDATE temp_t_pgr_go2epa_node n SET sector_id = 0, omzone_id=0;
@@ -117,7 +117,7 @@ BEGIN
 	    WHERE n.id::int = c.node;
 
 		-- setting those node with dma_id without inlet to dma_id = 0
-		UPDATE temp_t_pgr_go2epa_node SET dma_id = 0 WHERE dma_id NOT IN
+		UPDATE temp_t_pgr_go2epa_node SET dma_id = -1 WHERE dma_id NOT IN
 		(SELECT DISTINCT dma_id FROM (SELECT DISTINCT dma_id, epa_type FROM temp_t_pgr_go2epa_node WHERE epa_type IN ('INLET', 'RESERVOIR', 'TANK'))a);
 
 		-- update arc graph
@@ -146,8 +146,8 @@ BEGIN
 	-- remove disconnected network
 	IF v_deldisconnetwork THEN
 
-		UPDATE temp_t_arc a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_arc t WHERE t.sector_id = 0 AND t.id = a.id;
-		UPDATE temp_t_node a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_node t WHERE t.sector_id = 0 AND t.id = a.id;
+		UPDATE temp_t_arc a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_arc t WHERE t.sector_id = 0 AND t.arc_id = a.arc_id;
+		UPDATE temp_t_node a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_node t WHERE t.sector_id = 0 AND t.node_id = a.node_id;
 		DELETE FROM temp_t_arc WHERE sector_id = 0;
 		DELETE FROM temp_t_node WHERE sector_id = 0;
 		GET DIAGNOSTICS v_count = row_count;
@@ -166,10 +166,10 @@ BEGIN
 	-- remove dry network
 	IF v_deldrynetwork THEN
 
-		UPDATE temp_t_arc a SET dma_id = dma_id FROM temp_t_pgr_go2epa_arc t WHERE t.dma_id = 0 AND t.arc_id = a.arc_id;
-		UPDATE temp_t_node a SET dma_id = dma_id FROM temp_t_pgr_go2epa_node t WHERE t.dma_id = 0 AND t.arc_id = a.arc_id;
-		DELETE FROM temp_t_arc WHERE dma_id = 0;
-		DELETE FROM temp_t_node WHERE dma_id = 0;
+		UPDATE temp_t_arc a SET dma_id = t.dma_id FROM temp_t_pgr_go2epa_arc t WHERE t.dma_id = -1 AND t.arc_id = a.arc_id;
+		UPDATE temp_t_node a SET dma_id = t.dma_id FROM temp_t_pgr_go2epa_node t WHERE t.dma_id = -1 AND t.node_id = a.node_id;
+		DELETE FROM temp_t_arc WHERE dma_id = -1;
+		DELETE FROM temp_t_node WHERE dma_id = -1;
 		GET DIAGNOSTICS v_count = row_count;
 
 		IF v_count > 0 THEN
@@ -186,7 +186,7 @@ BEGIN
 	-- remove dry demands
 	IF v_removedemands THEN
 		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(a.addparam::json, 'removedDemand'::text, true::boolean)
-		FROM temp_t_pgr_go2epa_node a WHERE a.node_id = n.node_id AND a.dma_id = 0;
+		FROM temp_t_pgr_go2epa_node a WHERE a.node_id = n.node_id AND a.dma_id = -1;
 		GET DIAGNOSTICS v_count = row_count;
 
 		IF v_count > 0 THEN
