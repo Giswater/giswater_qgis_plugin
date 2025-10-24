@@ -1053,7 +1053,7 @@ class GwPsector:
             tools_gw.refresh_selectors()
             tools_gw.close_dialog(self.dlg_plan_psector)
 
-    def check_topology_psector(self, psector_id=None, psector_name=None):
+    def check_topology_psector(self, psector_id=None, psector_name=None, from_toggle=False):
 
         if psector_id in (None, "null"):
             return False
@@ -1065,10 +1065,14 @@ class GwPsector:
             return False
 
         if json_result['message']['level'] == 1:
-            text = "There are some topological inconsistences on psector '{0}'. Would you like to see the log?"
-            text_params = (psector_name,)
+            if from_toggle:
+                msg = tools_qt.tr('Unable to activate psector. ')
+            msg += tools_qt.tr("There are some topological inconsistences on psector '{0}'. Would you like to see the log?")
+            msg_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
-            tools_qgis.show_message_function(text, function, message_level=1, duration=0, text_params=text_params)
+            tools_qgis.show_message_function(msg, function, message_level=1, duration=0, text_params=msg_params)
+            if from_toggle:
+                return False
 
         return json_result
 
@@ -1806,10 +1810,13 @@ class GwPsector:
                         "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
                 tools_db.execute_sql(sql)
 
+                # Check topology
+                result = self.check_topology_psector(psector_id, psector_name, from_toggle=True)
+                if result is False:
+                    return
+
                 sql = f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
                 tools_db.execute_sql(sql)
-                # Check topology
-                self.check_topology_psector(psector_id, psector_name)
 
                 sql = ("UPDATE config_param_user "
                         "SET value = False "
@@ -1847,7 +1854,7 @@ class GwPsector:
         extras = f'"psectorId": "{psector_id}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_plan_recover_archived', body)
-        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body'] or json_result.get('status') == 'Failed':
             return
 
         # Refresh the table to show updated status
