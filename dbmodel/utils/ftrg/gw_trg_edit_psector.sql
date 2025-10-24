@@ -12,22 +12,17 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_psector()
 $BODY$
 
 DECLARE
-v_sql varchar;
-v_projectype text;
-rec_type record;
-rec record;
-v_statetype_obsolete integer;
-v_statetype_onservice integer;
-v_auto_downgrade_link boolean;
-v_ischild text;
-v_parent_id integer;
-v_state_obsolete_planified integer;
-v_affectrow integer;
-v_psector_geom geometry;
-v_action text;
-v_plan_psector_force_delete text;
-v_feature_id integer;
-
+	v_sql varchar;
+	v_projectype text;
+	rec_type record;
+	rec record;
+	v_statetype_obsolete integer;
+	v_statetype_onservice integer;
+	v_auto_downgrade_link boolean;
+	v_ischild text;
+	v_parent_id integer;
+	v_state_obsolete_planified integer;
+	v_psector_geom geometry;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -105,20 +100,9 @@ BEGIN
 		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status,
 		text3=NEW.text3, text4=NEW.text4, text5=NEW.text5, text6=NEW.text6, num_value=NEW.num_value, workcat_id=new.workcat_id, workcat_id_plan=new.workcat_id_plan, parent_id=new.parent_id, updated_at=now(), updated_by=current_user
 		WHERE psector_id=OLD.psector_id;
-	
-		--set v_action when status Executed or Canceled
-			IF NEW.status IN (3, 4) THEN
-				v_action='Execute psector';
-			ELSIF NEW.status IN (5, 6) THEN
-				v_action='Archived psector';
-			ELSIF NEW.status = 7 THEN
-				v_action='Cancel psector';		
-			ELSE
-				v_action = coalesce(v_action, 'PLANNED'); -- planned
-			END IF;
 
 		-- update psector status to EXECUTED (On Service)
-		IF (OLD.status != NEW.status) AND (NEW.status IN (3, 4)) THEN
+		IF (OLD.status != NEW.status) AND (NEW.status = 4) THEN
 
 			-- get workcat id
 			IF NEW.workcat_id IS NULL THEN
@@ -255,7 +239,7 @@ BEGIN
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 
 		-- update psector status to EXECUTED (Traceability) or CANCELED (Traceability)
-		ELSIF (OLD.status != NEW.status) AND (NEW.status = 5 OR NEW.status = 6 OR NEW.status = 7) THEN
+		ELSIF (OLD.status != NEW.status) AND (NEW.status IN (5,6,7)) THEN
 
 			-- get psector geometry
 			v_psector_geom = (SELECT the_geom FROM plan_psector WHERE psector_id=NEW.psector_id);
@@ -277,9 +261,7 @@ BEGIN
 		
 		ELSIF OLD.status IN (5,6,7) AND NEW.status IN (1,2) THEN -- change the status of the psector in order to restore it
 		
-			EXECUTE '
-			SELECT gw_fct_plan_recover_archived($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"psectorId":"'||NEW.psector_id||'"}}$$)
-			';
+			EXECUTE 'SELECT gw_fct_plan_recover_archived($${"data":{"psectorId":"'||NEW.psector_id||'"}}$$)';
 	
 		END IF;
 
