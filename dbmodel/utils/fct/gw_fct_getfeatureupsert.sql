@@ -145,6 +145,7 @@ label_value text;
 v_seq_name text;
 v_seq_code text;
 v_sql text;
+v_current_psector text;
 
 v_streetname varchar;
 v_postnumber varchar;
@@ -557,6 +558,12 @@ BEGIN
 			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' and cur_user = current_user;
 			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' and cur_user = current_user;
 
+		END IF;
+
+		-- If we are in a psector, all features must be inserted in a specific explotation
+		SELECT value INTO v_current_psector FROM config_param_user WHERE parameter = 'plan_psector_current' and cur_user = current_user;
+		IF v_current_psector IS NOT NULL THEN
+			SELECT expl_id INTO v_expl_id FROM plan_psector WHERE psector_id::text = v_current_psector;
 		END IF;
 
 		-- Presszone
