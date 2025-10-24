@@ -37,6 +37,8 @@ v_exists bool;
 
 -- return
 v_message JSON;
+v_topology_result json;
+v_topology_level integer;
 
 BEGIN 
 	
@@ -46,8 +48,7 @@ BEGIN
 	SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version LIMIT 1;
 	SELECT json_build_object('level', 1, 'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
 
-
-	-- recover data (set archived = false for arc/node/connec/gully)
+	-- First, recover data temporarily to check topology (set archived = false for arc/node/connec/gully)
 	FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 ORDER BY 1 DESC -- arc/node/connec/gully
 	LOOP
 		EXECUTE '
@@ -56,6 +57,31 @@ BEGIN
 		WHERE psector_id = '||v_psector_id||' AND archived = true
 		';
 	END LOOP;
+
+	-- Check topology before allowing the restore
+	EXECUTE 'SELECT gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+		"feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"'||v_psector_id||'"}}$$)' 
+	INTO v_topology_result;
+
+	-- Get topology check level
+	v_topology_level := ((v_topology_result->>'message')::json->>'level')::integer;
+
+	-- If there are topology errors, rollback the archived changes and return error
+	IF v_topology_level = 1 THEN
+		-- Revert the archived changes
+		FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 ORDER BY 1 DESC
+		LOOP
+			EXECUTE '
+			UPDATE plan_psector_x_'||rec_feature||' 
+			SET archived = true 
+			WHERE psector_id = '||v_psector_id||' AND archived = false
+			';
+		END LOOP;
+
+		-- Return error message
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":5010, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"5010", "function":"3512","parameters":null}}$$);';
+	END IF;
 
 	-- set status and inactive (archived column doesn't exist in older versions)
 	UPDATE plan_psector SET status = 8, active = false WHERE psector_id = v_psector_id;
