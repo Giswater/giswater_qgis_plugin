@@ -92,6 +92,7 @@ class GwImportInpTask(GwTask):
         self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode
 
         self.node_ids: dict[str, str] = {}
+        self.arc_ids: dict[str, str] = {}
 
     def run(self) -> bool:
         super().run()
@@ -187,10 +188,6 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
             self._save_curves()
 
-        if self.network.num_controls > 0:
-            self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
-            self._save_controls_and_rules()
-
     def _manage_visual(self) -> None:
         if self.network.num_junctions > 0:
             self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
@@ -215,6 +212,10 @@ class GwImportInpTask(GwTask):
         if self.network.num_pipes > 0:
             self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
             self._save_pipes()
+
+        if self.network.num_controls > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(90, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing controls and rules", True)
+            self._save_controls_and_rules()
 
     def _enable_triggers(self, enable: bool, plan_trigger: bool = False, geometry_trigger: bool = False) -> None:
         op = "ENABLE" if enable else "DISABLE"
@@ -595,6 +596,17 @@ class GwImportInpTask(GwTask):
                     commit=self.force_commit,
                 )
 
+    def _replace_codes_with_ids(self, text: str) -> str:
+        """Replace INP codes (node/arc names) with database IDs in control/rule text."""
+        result = text
+        # Replace node codes with node_ids
+        for code, node_id in self.node_ids.items():
+            result = result.replace(code, node_id)
+        # Replace arc codes with arc_ids
+        for code, arc_id in self.arc_ids.items():
+            result = result.replace(code, arc_id)
+        return result
+
     def _save_controls_and_rules(self) -> None:
         from wntr.network.controls import Control, Rule
 
@@ -610,12 +622,13 @@ class GwImportInpTask(GwTask):
 
         for control_name, control in self.network.controls():
             control_dict = control.to_dict()
-            condition = control.condition
+            condition = str(control.condition)
             then_actions = control_dict.get("then_actions")
             else_actions = control_dict.get("else_actions")
             priority = control.priority
             if type(control) is Control:
                 text = f"IF {condition} THEN {' AND '.join(then_actions)} PRIORITY {priority}"
+                text = self._replace_codes_with_ids(text)
                 if text in controls_db:
                     msg = f"The control '{control_name}' is already on database. Skipping..."
                     self._log_message(msg)
@@ -629,6 +642,7 @@ class GwImportInpTask(GwTask):
                 if else_actions:
                     text += f"\nELSE {else_actions}"
                 text += f"\nPRIORITY {priority}"
+                text = self._replace_codes_with_ids(text)
                 if text in rules_db:
                     msg = f"The rule '{control_name}' is already on database. Skipping..."
                     self._log_message(msg)
@@ -1105,6 +1119,9 @@ class GwImportInpTask(GwTask):
         for p in pumps:
             arc_id = p[0]
             code = p[1]
+
+            self.arc_ids[code] = arc_id
+
             man_params.append(
                 (arc_id,)
             )
@@ -1216,6 +1233,9 @@ class GwImportInpTask(GwTask):
         for v in valves:
             arc_id = v[0]
             code = v[1]
+
+            self.arc_ids[code] = arc_id
+
             feature_class = inp_dict[code]["feature_class"]
 
             if feature_class not in man_params:
@@ -1335,6 +1355,9 @@ class GwImportInpTask(GwTask):
         for p in pipes:
             arc_id = p[0]
             code = p[1]
+
+            self.arc_ids[code] = arc_id
+
             man_params.append(
                 (arc_id,)
             )
