@@ -1690,6 +1690,8 @@ class GwPsector:
         table_name = "v_ui_plan_psector"
         column_id = "psector_id"
         self._original_visibility_state = {}
+        self._original_active_layer = None
+        self._layer_was_loaded_by_filter = False
 
         # Tables
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
@@ -2012,6 +2014,7 @@ class GwPsector:
             self._load_layer_to_project('ve_plan_psector', "the_geom", "psector_id")
             # Reload reference after adding
             plan_layer = tools_qgis.get_layer_by_tablename('ve_plan_psector')
+            self._layer_was_loaded_by_filter = True
         if plan_layer:
             self._activate_layer(plan_layer)
 
@@ -2035,26 +2038,54 @@ class GwPsector:
             self.iface.setActiveLayer(layer)  # Set as active layer in QGIS
 
     def _save_visibility_state(self, tablename):
-        """Saves visibility of the layer and its parent groups."""
+        """Saves visibility of the layer and its parent groups, and the currently active layer."""
 
+        # Save currently active layer
+        self._original_active_layer = self.iface.activeLayer()
+        
         layer = tools_qgis.get_layer_by_tablename(tablename)
         if layer:
-            layer_node = self.iface.layerTreeCanvasBridge().rootGroup().findLayer(layer.id())
-            while layer_node:
+            root = self.iface.layerTreeCanvasBridge().rootGroup()
+            layer_node = root.findLayer(layer.id())
+            if layer_node:
+                # If layer was not visible, treat it like it was loaded by filter
+                if not layer_node.isVisible():
+                    self._layer_was_loaded_by_filter = True
+                    return
                 # Store visibility state
-                self._original_visibility_state[layer_node.name()] = layer_node.isVisible()
-                # Move up to parent node
-                layer_node = layer_node.parent()
+                while layer_node:
+                    self._original_visibility_state[layer_node.name()] = layer_node.isVisible()
+                    layer_node = layer_node.parent()
 
     def _restore_visibility_state(self):
-        """Restores saved visibility state of layers and groups."""
+        """Restores saved visibility state of layers and groups, and the previously active layer."""
 
-        root = self.iface.layerTreeCanvasBridge().rootGroup()
-        # Iterate saved visibility states and apply them to nodes
-        for name, is_visible in self._original_visibility_state.items():
-            node = root.findGroup(name) or root.findLayer(name)  # Find by group name or layer ID
-            if node:
-                node.setItemVisibilityChecked(is_visible)  # Restore saved visibility
+        plan_layer = tools_qgis.get_layer_by_tablename('ve_plan_psector')
+        was_loaded_by_filter = self._layer_was_loaded_by_filter
+        
+        # If layer was loaded by filter, hide it instead of restoring
+        if was_loaded_by_filter:
+            if plan_layer:
+                root = self.iface.layerTreeCanvasBridge().rootGroup()
+                layer_node = root.findLayer(plan_layer.id())
+                if layer_node:
+                    layer_node.setItemVisibilityChecked(False)
+            self._layer_was_loaded_by_filter = False
+        else:
+            # Restore saved visibility states
+            root = self.iface.layerTreeCanvasBridge().rootGroup()
+            for name, is_visible in self._original_visibility_state.items():
+                node = root.findGroup(name) or root.findLayer(name)
+                if node:
+                    node.setItemVisibilityChecked(is_visible)
+        
+        # Restore previously active layer (but not if it was ve_plan_psector and we just hid it)
+        if self._original_active_layer:
+            if plan_layer and self._original_active_layer == plan_layer and was_loaded_by_filter:
+                # Don't restore ve_plan_psector as active if we just hid it
+                pass
+            else:
+                self.iface.setActiveLayer(self._original_active_layer)
 
     def _handle_dialog_close(self):
         """
