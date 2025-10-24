@@ -1389,6 +1389,7 @@ class GwImportInpTask(GwTask):
         """ Transform pumps and valves into nodes """
 
         extras = ""
+        extras += f'"workcatId": "{self.workcat}",'
         for k, v in self.manage_nodarcs.items():
             if not v:
                 continue
