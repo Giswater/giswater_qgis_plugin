@@ -20,6 +20,7 @@ v_version text;
 v_data record;
 v_json_aux json;
 v_feature_class text;
+v_workcat_id text;
 v_nodecat text;
 v_epatype text;
 v_mantablename text;
@@ -47,6 +48,9 @@ BEGIN
     -- get system parameters
     SELECT giswater, epsg INTO v_version, v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
 
+    -- get function parameters
+    v_workcat_id = ((p_data ->>'data')::json->>'workcatId')::text;
+
     -- Starting process
     PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid": '||v_fid||', "project_type": "WS", "action": "CREATE", "group": "LOG"}}}')::json);
 
@@ -64,6 +68,7 @@ BEGIN
             SELECT *, COUNT(*) OVER (PARTITION BY node_1, node_2) AS cnt
             FROM arc
             WHERE epa_type IN ('VIRTUALVALVE', 'VIRTUALPUMP')
+            AND workcat_id = v_workcat_id
         ) subquery
         WHERE cnt = 1
     LOOP
@@ -107,7 +112,7 @@ BEGIN
 
         -- Introducing new node transforming line into point
         INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
-        VALUES (v_node_id, v_nodecat, v_epatype, 0, 0, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type, v_thegeom);
+        VALUES (v_node_id, v_nodecat, v_epatype, v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type, v_thegeom);
 
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into node.');
 
@@ -148,16 +153,26 @@ BEGIN
 
         -- reconnect topology - handle special nodes (TANK, RESERVOIR, etc.) differently
         -- Check node_1
-        IF (SELECT epa_type FROM node WHERE node_id=v_node1) = 'JUNCTION' THEN
+        IF (SELECT epa_type FROM node WHERE node_id=v_node1) = 'JUNCTION'
+            AND (SELECT count(*) FROM arc WHERE node_1=v_node1 OR node_2=v_node1) < 3 THEN
             -- Normal junction: reconnect all arcs to new node
             UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 AND arc_id!=v_data.arc_id;
+			-- Update geometry
+			UPDATE arc
+			SET the_geom = ST_SetPoint(the_geom, 0, v_thegeom)
+			WHERE node_1=v_node_id AND arc_id!=v_data.arc_id;
+
             UPDATE arc SET node_2=v_node_id WHERE node_2=v_node1 AND arc_id!=v_data.arc_id;
+			-- Update geometry
+			UPDATE arc
+			SET the_geom = ST_SetPoint(the_geom, ST_NumPoints(the_geom) - 1, v_thegeom)
+			WHERE node_2=v_node_id AND arc_id!=v_data.arc_id;
             INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Reconnected junction ',v_node1,'.'));
         ELSE
             -- Special node (TANK, RESERVOIR, etc.): create virtual arc to connect it to new node
             INSERT INTO arc (node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
-            SELECT v_node_id, v_node1, 'VIRTUAL', 'PIPE', v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type,
-                ST_MakeLine(v_thegeom, (SELECT the_geom FROM node WHERE node_id=v_node1))
+            VALUES (v_node_id, v_node1, 'VARC', 'PIPE', v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type,
+                ST_MakeLine(v_thegeom, (SELECT the_geom FROM node WHERE node_id=v_node1)))
             RETURNING arc_id INTO v_arc_id;
 
             INSERT INTO man_varc (arc_id) VALUES (v_arc_id);
@@ -167,16 +182,26 @@ BEGIN
         END IF;
 
         -- Check node_2
-        IF (SELECT epa_type FROM node WHERE node_id=v_node2) = 'JUNCTION' THEN
+        IF (SELECT epa_type FROM node WHERE node_id=v_node2) = 'JUNCTION'
+            AND (SELECT count(*) FROM arc WHERE node_1=v_node2 OR node_2=v_node2) < 3 THEN
             -- Normal junction: reconnect all arcs to new node
             UPDATE arc SET node_1=v_node_id WHERE node_1=v_node2 AND arc_id!=v_data.arc_id;
+			-- Update geometry
+			UPDATE arc
+			SET the_geom = ST_SetPoint(the_geom, 0, v_thegeom)
+			WHERE node_1=v_node_id AND arc_id!=v_data.arc_id;
+
             UPDATE arc SET node_2=v_node_id WHERE node_2=v_node2 AND arc_id!=v_data.arc_id;
+			UPDATE arc
+			SET the_geom = ST_SetPoint(the_geom, ST_NumPoints(the_geom) - 1, v_thegeom)
+			WHERE node_2=v_node_id AND arc_id!=v_data.arc_id;
+
             INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Reconnected junction ',v_node2,'.'));
         ELSE
             -- Special node (TANK, RESERVOIR, etc.): create virtual arc to connect it to new node
             INSERT INTO arc (node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
-            SELECT v_node_id, v_node2, 'VIRTUAL', 'PIPE', v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type,
-                ST_MakeLine(v_thegeom, (SELECT the_geom FROM node WHERE node_id=v_node2))
+            VALUES (v_node_id, v_node2, 'VARC', 'PIPE', v_data.sector_id, v_data.dma_id, v_data.expl_id, v_data.muni_id, v_data.state, v_data.state_type,
+                ST_MakeLine(v_thegeom, (SELECT the_geom FROM node WHERE node_id=v_node2)))
             RETURNING arc_id INTO v_arc_id;
 
             INSERT INTO man_varc (arc_id) VALUES (v_arc_id);
@@ -223,6 +248,20 @@ BEGIN
     -- delete objects;
     --    DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_'; -- pumps/valves don't get inserted into inp_pipe...
 
+    -- update man_valve status and to_arc
+    UPDATE man_valve mv
+        SET closed = CASE
+            WHEN v.status = 'CLOSED' THEN TRUE
+            WHEN v.status IN ('OPEN', 'ACTIVE') THEN FALSE
+            END,
+        to_arc = CASE
+            WHEN v.status IN ('ACTIVE', 'CLOSED') THEN mv.to_arc
+            ELSE NULL
+            END
+        FROM inp_virtualvalve v
+        join arc a on v.arc_id = a.arc_id
+    WHERE mv.node_id = v.arc_id
+    and a.workcat_id = v_workcat_id and a.state = 0;
 
     -- set node topocontrol=true
     UPDATE config_param_system SET value='{"activated":true,"value":0.1}' WHERE "parameter"='edit_node_proximity';
