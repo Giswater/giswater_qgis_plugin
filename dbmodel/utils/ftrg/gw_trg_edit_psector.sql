@@ -104,14 +104,15 @@ BEGIN
 		-- update psector status to EXECUTED (On Service)
 		IF (OLD.status != NEW.status) AND (NEW.status = 4) THEN
 
-			-- get workcat id
-			IF NEW.workcat_id IS NULL THEN
-				NEW.workcat_id = (SELECT value FROM config_param_user WHERE parameter= 'edit_workcat_vdefault' AND cur_user=current_user);
+		-- get workcat id
+		IF NEW.workcat_id IS NULL THEN
+			NEW.workcat_id = (SELECT value FROM config_param_user WHERE parameter= 'edit_workcat_vdefault' AND cur_user=current_user);
 
-				IF NEW.workcat_id IS NULL THEN
-					RAISE EXCEPTION 'YOU NEED TO SET SOME WORKCATID TO EXECUTE PSECTOR';
-				END IF;
+			IF NEW.workcat_id IS NULL THEN
+				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"5008", "function":"2446","parameters":null}}$$);';
 			END IF;
+		END IF;
 
 
 			-- get psector geometry
@@ -238,7 +239,10 @@ BEGIN
 			--reset topology control
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 
-		-- update psector status to EXECUTED (Traceability) or CANCELED (Traceability)
+	-- update psector status to EXECUTED (Traceability) or CANCELED (Traceability)
+	ELSIF OLD.status != 4 AND NEW.status = 5 THEN
+		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"5006", "function":"2446","parameters":null}}$$);';
 		ELSIF (OLD.status != NEW.status) AND (NEW.status IN (5,6,7)) THEN
 
 			-- get psector geometry
