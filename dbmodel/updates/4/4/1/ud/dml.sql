@@ -59,9 +59,9 @@ DELETE FROM config_form_tableview
 DELETE FROM config_form_tableview
 	WHERE objectname='ve_inp_timeseries' AND columnname='log';
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ud','ve_inp_timeseries','active',6,true,'active');
+	VALUES ('nonvisual manager','ud','ve_inp_timeseries','active',6,true,'active') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ud','ve_inp_timeseries','addparam',7,true,'addparam');
+	VALUES ('nonvisual manager','ud','ve_inp_timeseries','addparam',7,true,'addparam') ON CONFLICT DO NOTHING;
 UPDATE config_form_tableview
 	SET columnindex=3
 	WHERE objectname='ve_inp_timeseries' AND columnname='descript';

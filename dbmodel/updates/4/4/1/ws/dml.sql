@@ -33,7 +33,7 @@ DELETE FROM config_form_tableview
 	WHERE objectname='ve_inp_pattern' AND columnname='tsparameters';
 
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','ve_inp_pattern','pattern_type',3,true,'pattern_type');
+	VALUES ('nonvisual manager','ws','ve_inp_pattern','pattern_type',3,true,'pattern_type') ON CONFLICT DO NOTHING;
 UPDATE config_form_tableview
 	SET columnindex=2
 	WHERE objectname='ve_inp_pattern' AND columnname='expl_id';
@@ -44,21 +44,21 @@ UPDATE config_form_tableview
 
 
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','id',0,true,'id');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','id',0,true,'id') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','matcat_id',1,true,'matcat_id');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','matcat_id',1,true,'matcat_id') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','period_id',2,true,'period_id');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','period_id',2,true,'period_id') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','init_age',3,true,'init_age');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','init_age',3,true,'init_age') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','end_age',4,true,'end_age');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','end_age',4,true,'end_age') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','roughness',5,true,'rougness');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','roughness',5,true,'rougness') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','descript',6,true,'descript');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','descript',6,true,'descript') ON CONFLICT DO NOTHING;
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
-	VALUES ('nonvisual manager','ws','cat_mat_roughness','active',7,true,'active');
+	VALUES ('nonvisual manager','ws','cat_mat_roughness','active',7,true,'active') ON CONFLICT DO NOTHING;
 
 UPDATE config_form_tableview
 	SET objectname='ve_inp_rules'

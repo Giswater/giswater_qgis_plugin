@@ -33,4 +33,4 @@ DROP RULE IF EXISTS supplyzone_del_conflict ON supplyzone;
 DROP RULE IF EXISTS supplyzone_del_undefined ON supplyzone;
 DROP RULE IF EXISTS supplyzone_undefined ON supplyzone;     
 
-ALTER TABLE inp_dscenario_frvalve DROP CONSTRAINT inp_dscenario_frvalve_check_status;
+ALTER TABLE inp_dscenario_frvalve DROP CONSTRAINT IF EXISTS inp_dscenario_frvalve_check_status;
