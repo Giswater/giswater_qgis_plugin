@@ -1083,7 +1083,7 @@ class GwImportInpTask(GwTask):
                 "pump_type": None,
             }
             if p.pump_type == "POWER":
-                inp_dict[p_name]["power"] = p.power
+                inp_dict[p_name]["power"] = p.power / 1000
                 inp_dict[p_name]["pump_type"] = "POWERPUMP"
             elif p.pump_type == "HEAD":
                 inp_dict[p_name]["curve_id"] = p.pump_curve_name
