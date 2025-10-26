@@ -1107,10 +1107,10 @@ BEGIN
 							SELECT 1
 							FROM om_mincut_arc oma
 							JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
-							WHERE oma.result_id = %L
+							WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
 								AND vta.minsector_id = tpn.node_id
 						);
-					', v_temp_node_table, v_mincut_id) INTO v_arc_count;
+					', v_temp_node_table, v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
 				ELSE
 					EXECUTE format('
 						SELECT count(*)
@@ -1120,10 +1120,10 @@ BEGIN
 							AND NOT EXISTS (
 								SELECT 1
 								FROM om_mincut_arc oma
-								WHERE oma.result_id = %L
+								WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
 									AND oma.arc_id = tpa.arc_id
 							);
-					', v_temp_arc_table, v_mincut_id) INTO v_arc_count;
+					', v_temp_arc_table, v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
 				END IF;
 
 				IF v_arc_count > 0 THEN
