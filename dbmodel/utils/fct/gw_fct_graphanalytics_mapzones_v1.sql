@@ -787,19 +787,20 @@ BEGIN
 			UPDATE temp_pgr_mapzone m SET the_geom = ST_Multi(a.the_geom)
 			FROM (
 				WITH polygon AS (
-					SELECT ST_Collect(the_geom) AS g, mapzone_id
+					SELECT ST_Collect(va.the_geom) AS g, m.mapzone_id
 					FROM temp_pgr_arc a
-					JOIN v_temp_arc USING (arc_id)
-					GROUP BY mapzone_id
+					JOIN v_temp_arc va USING (arc_id)
+					JOIN temp_pgr_mapzone m ON m.component = a.mapzone_id
+					GROUP BY m.mapzone_id
 				)
-			SELECT mapzone_id,
-			CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concave_hull||')) = ''ST_Polygon''::text THEN
-				ST_Buffer(ST_ConcaveHull(g, '||v_concave_hull||'), 2)::geometry(Polygon,'||(v_srid)||')
-				ELSE ST_Expand(ST_Buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||')
-				END AS the_geom
-			FROM polygon
-			)a
-			WHERE a.mapzone_id = m.component
+				SELECT mapzone_id,
+				CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concave_hull||')) = ''ST_Polygon''::text THEN
+					ST_Buffer(ST_ConcaveHull(g, '||v_concave_hull||'), 2)::geometry(Polygon,'||(v_srid)||')
+					ELSE ST_Expand(ST_Buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||')
+					END AS the_geom
+				FROM polygon
+				)a
+			WHERE a.mapzone_id = m.mapzone_id
 			AND CARDINALITY(m.mapzone_id) = 1';
 		EXECUTE v_query_text;
 
@@ -809,12 +810,13 @@ BEGIN
 		v_query_text := '
 			UPDATE temp_pgr_mapzone m SET the_geom = geom
 			FROM (
-				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(the_geom),'||v_geom_param_update||')) AS geom
+				SELECT m.mapzone_id, ST_Multi(ST_Buffer(ST_Collect(va.the_geom),'||v_geom_param_update||')) AS geom
 				FROM temp_pgr_arc a
-				JOIN v_temp_arc USING (arc_id)
-				GROUP BY mapzone_id
+				JOIN v_temp_arc va USING (arc_id)
+				JOIN temp_pgr_mapzone m ON m.component = a.mapzone_id
+				GROUP BY m.mapzone_id
 			) a
-			WHERE a.mapzone_id = m.component
+			WHERE a.mapzone_id = m.mapzone_id
 			AND CARDINALITY(m.mapzone_id) = 1';
 		EXECUTE v_query_text;
 
@@ -824,19 +826,23 @@ BEGIN
 		v_query_text := '
 			UPDATE temp_pgr_mapzone m SET the_geom = geom FROM (
 				SELECT mapzone_id, ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom FROM (
-					SELECT mapzone_id, ST_Buffer(ST_Collect(the_geom), '||v_geom_param_update||') AS geom FROM temp_pgr_arc a
-					JOIN v_temp_arc USING (arc_id)
-					GROUP BY mapzone_id
+					SELECT m.mapzone_id, ST_Buffer(ST_Collect(va.the_geom), '||v_geom_param_update||') AS geom 
+					FROM temp_pgr_arc a
+					JOIN v_temp_arc va USING (arc_id)
+					JOIN temp_pgr_mapzone m ON m.component = a.mapzone_id
+					GROUP BY m.mapzone_id
 					UNION
-					SELECT mapzone_id, ST_Collect(ep.the_geom) AS geom FROM temp_pgr_arc ta
+					SELECT m.mapzone_id, ST_Collect(ep.the_geom) AS geom 
+					FROM temp_pgr_arc ta
 					JOIN v_temp_connec vc USING (arc_id)
+					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id
 					LEFT JOIN ext_plot ep ON vc.plot_code = ep.plot_code 
 						AND ST_DWithin(vc.the_geom, ep.the_geom, 0.001)
-					GROUP BY mapzone_id
+					GROUP BY m.mapzone_id
 				) a
 				GROUP BY mapzone_id
 			) b
-			WHERE b.mapzone_id= m.component
+			WHERE b.mapzone_id= m.mapzone_id
 			AND CARDINALITY(m.mapzone_id) = 1';
 		EXECUTE v_query_text;
 
@@ -847,10 +853,11 @@ BEGIN
 		IF v_project_type = 'UD' THEN
 			v_query_text_aux := '
 				UNION
-				SELECT ta.mapzone_id, (ST_Buffer(ST_Collect(vlg.the_geom),'||v_geom_param_update_divide||',''endcap=flat join=round'')) AS geom
+				SELECT m.mapzone_id, (ST_Buffer(ST_Collect(vlg.the_geom),'||v_geom_param_update_divide||',''endcap=flat join=round'')) AS geom
 				FROM temp_pgr_arc ta
 				JOIN v_temp_link_gully vlg ON ta.arc_id = vlg.arc_id
-				GROUP BY ta.mapzone_id
+				JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id
+				GROUP BY m.mapzone_id
 			';
 		ELSE
 			v_query_text_aux = '';
@@ -860,15 +867,17 @@ BEGIN
 		v_query_text := '
 			UPDATE temp_pgr_mapzone m SET the_geom = b.geom FROM (
 				SELECT c.mapzone_id, ST_Multi(ST_Buffer(ST_Collect(c.geom),0.01)) AS geom FROM (
-					SELECT a.mapzone_id, ST_Buffer(ST_Collect(va.the_geom), '||v_geom_param_update||') AS geom
+					SELECT m.mapzone_id, ST_Buffer(ST_Collect(va.the_geom), '||v_geom_param_update||') AS geom
 					FROM temp_pgr_arc a
 					JOIN v_temp_arc va ON a.arc_id = va.arc_id
-					GROUP BY a.mapzone_id
+					JOIN temp_pgr_mapzone m ON m.component = a.mapzone_id
+					GROUP BY m.mapzone_id
 					UNION
-					SELECT ta.mapzone_id, (ST_Buffer(ST_Collect(vlc.the_geom),'||v_geom_param_update_divide||',''endcap=flat join=round'')) AS geom
+					SELECT m.mapzone_id, (ST_Buffer(ST_Collect(vlc.the_geom),'||v_geom_param_update_divide||',''endcap=flat join=round'')) AS geom
 					FROM temp_pgr_arc ta
 					JOIN v_temp_link_connec vlc ON ta.arc_id = vlc.arc_id
-					GROUP BY ta.mapzone_id
+					JOIN temp_pgr_mapzone m ON m.component = ta.mapzone_id
+					GROUP BY m.mapzone_id
 					'||v_query_text_aux||'
 				) c
 				GROUP BY c.mapzone_id
@@ -1293,16 +1302,19 @@ BEGIN
 
 			ELSE
 				v_query_text := '
-					UPDATE '||v_table_name||' m SET the_geom = CASE
-						WHEN CARDINALITY(tm.mapzone_id) = 1 THEN tm.the_geom
-						ELSE NULL
-					END
-					FROM temp_pgr_mapzone tm
-					WHERE (
-						CARDINALITY (tm.mapzone_id) = 1 AND tm.mapzone_id[1] = m.'||v_mapzone_field||'
-					) OR (
-						CARDINALITY (tm.mapzone_id) > 1 AND m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)
-					)';
+					WITH 
+						mapzone AS (
+							SELECT
+								mapzone_id, 
+								CASE WHEN CARDINALITY(mapzone_id) = 1 THEN the_geom
+								ELSE NULL
+								END AS the_geom
+							FROM temp_pgr_mapzone
+							GROUP BY mapzone_id, the_geom
+						)
+					UPDATE '||v_table_name||' m SET the_geom = tm.the_geom
+					FROM mapzone tm
+					WHERE m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)';
 				EXECUTE v_query_text;
 			END IF;
 
