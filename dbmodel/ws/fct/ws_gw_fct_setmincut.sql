@@ -50,7 +50,7 @@ v_mincut_version text;
 -- 6.1 - mincut with minsectors
 v_vdefault json;
 v_ignore_check_valves boolean;
-v_root_vid integer;
+v_minsector_id integer;
 
 v_action_aux text;
 
@@ -237,9 +237,9 @@ BEGIN
 	END IF;
 	
 	IF v_mincut_version = '6.1' THEN
-		v_root_vid := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+		v_minsector_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
-		IF v_root_vid IS NULL OR v_root_vid = 0 THEN
+		IF v_minsector_id IS NULL OR v_minsector_id = 0 THEN
 			RETURN jsonb_build_object(
 				'status', 'Failed',
 				'message', jsonb_build_object(
@@ -248,8 +248,6 @@ BEGIN
 				)
 			);
 		END IF;
-	ELSE 
-		v_root_vid := (SELECT node_1 FROM v_temp_arc WHERE arc_id = v_arc_id);
 	END IF;
 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
@@ -262,7 +260,7 @@ BEGIN
 			-- true: refresh mincut
 			-- false: init and refresh mincut
 		IF v_mincut_version = '6.1' THEN
-			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 		ELSE 
 			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 		END IF;
@@ -294,7 +292,7 @@ BEGIN
 			v_core_mincut := FALSE;
 		ELSE 
 			IF v_mincut_version = '6.1' THEN
-				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 			ELSE 
 				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 			END IF;
@@ -327,7 +325,7 @@ BEGIN
 			v_core_mincut := FALSE;
 		ELSE 
 			IF v_mincut_version = '6.1' THEN
-				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 			ELSE 
 				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 			END IF;
@@ -392,7 +390,7 @@ BEGIN
 
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
 				IF v_mincut_version = '6.1' THEN
-					EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_row_count;
+					EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 				ELSE 
 					EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 				END IF;				
@@ -598,7 +596,7 @@ BEGIN
 		v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'mapzone_name', 'MINCUT',
-				'node_id', v_root_vid,
+				'arc_id', v_arc_id,
 				'mode', v_mode
 			)
 		)::text;
@@ -736,7 +734,7 @@ BEGIN
 		-- mincut
 		EXECUTE format('SELECT count(*)::int FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
 		IF v_mincut_version = '6.1' THEN
-			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_root_vid) INTO v_pgr_node_id;
+			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_pgr_node_id;
 		ELSE 
 			EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
 		END IF;

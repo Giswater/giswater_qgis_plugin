@@ -33,7 +33,8 @@ DECLARE
     v_expl_id_array text[];
     v_mapzone_name TEXT;
     v_mapzone_field text;
-    v_node_id integer;
+    v_mode text;
+    v_arc_id integer;
 
     -- extra variables
     v_graph_delimiter TEXT;
@@ -41,16 +42,13 @@ DECLARE
     v_reverse_cost INTEGER = 1;
 
     v_query_text TEXT;
-    v_query_text_aux TEXT;
     v_query_text_components TEXT;
+    v_node integer;
 
     -- temporary tables
     v_temp_arc_table regclass;
     v_temp_node_table regclass;
     v_temp_table regclass;
-
-    v_mode text;
-
 
 BEGIN
 
@@ -63,7 +61,7 @@ BEGIN
 	-- Get variables from input JSON
     v_expl_id_array = string_to_array(p_data->'data'->>'expl_id_array', ',');
     v_mapzone_name = p_data->'data'->>'mapzone_name';
-    v_node_id = p_data->'data'->>'node_id';
+    v_arc_id = p_data->'data'->>'arc_id';
     v_mode = p_data->'data'->>'mode';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
@@ -117,9 +115,27 @@ BEGIN
             )
         ';
     ELSE
-        v_query_text := '
-            SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc
-        ';
+        IF v_mapzone_name = 'MINCUT' THEN
+            -- the connected cluster for mincut will stop at the water source node
+             v_query_text := '
+                SELECT a.arc_id AS id, a.node_1 AS source, a.node_2 AS target, 1 AS cost 
+                FROM v_temp_arc a
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM v_temp_node n 
+                    WHERE ''' || v_graph_delimiter ||''' = ANY (n.graph_delimiter)
+                    AND a.node_1 = n.node_id
+                )
+                AND NOT EXISTS (
+                    SELECT 1 FROM v_temp_node n 
+                    WHERE '''|| v_graph_delimiter ||''' = ANY (n.graph_delimiter)
+                    AND a.node_2 = n.node_id
+                )
+            ';
+        ELSE
+            v_query_text := '
+                SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost FROM v_temp_arc
+            ';
+        END IF;
     END IF;
 
     -- condition for filtering connected clusters
@@ -129,8 +145,8 @@ BEGIN
                 WHERE EXISTS (
                     SELECT 1
                     FROM v_temp_arc v
-                    WHERE v.minsector_id = c.node
-                    AND v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
+                    WHERE v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||']) 
+                    AND v.minsector_id = c.node
                 )
             ';
         ELSE
@@ -138,13 +154,32 @@ BEGIN
                 WHERE EXISTS (
                     SELECT 1
                     FROM v_temp_arc v
-                    WHERE v.node_1 = c.node
-                    AND v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||'])
+                    WHERE v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||']) 
+                    AND v.node_1 = c.node
                 )
             ';
         END IF;
-    ELSIF v_node_id IS NOT NULL THEN
-        v_query_text_components := 'WHERE c.node = '||v_node_id;
+    ELSIF v_arc_id IS NOT NULL THEN
+        IF v_mode = 'MINSECTOR' THEN
+            EXECUTE format('
+                SELECT minsector_id FROM v_temp_arc WHERE arc_id = %L;
+            ',v_arc_id)
+            INTO v_node;
+        ELSE
+            -- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 0 if both of the nodes are water source
+            EXECUTE format('
+                SELECT COALESCE(
+                    (SELECT node_id
+                    FROM v_temp_node n
+                    JOIN v_temp_arc a ON n.node_id IN (a.node_1, node_2)
+                    WHERE a.arc_id = %L
+                    AND %L <> ALL(n.graph_delimiter)
+                    LIMIT 1
+                ), 0);
+            ', v_arc_id, v_graph_delimiter)
+            INTO v_node;
+        END IF;
+        v_query_text_components := 'WHERE c.node = '||v_node;
     ELSE
         v_query_text_components := '';
     END IF;
@@ -169,31 +204,52 @@ BEGIN
         );
     ', v_query_text, v_query_text_components, v_temp_node_table);
 
-    IF v_mode = 'MINSECTOR' THEN
-        -- update graph_delimiter for all nodes (they are MINSECTOR)
-        EXECUTE format('
-        UPDATE %I SET graph_delimiter = ''MINSECTOR'';
-        ', v_temp_node_table);
+    IF v_mapzone_name = 'MINCUT' THEN
+        IF v_mode = 'MINSECTOR' THEN
+            -- update graph_delimiter for all nodes (they are MINSECTOR)
+            EXECUTE format('
+            UPDATE %I SET graph_delimiter = ''MINSECTOR'';
+            ', v_temp_node_table);
 
-        -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
-        EXECUTE format('
-        INSERT INTO %I (node_id, graph_delimiter)
-        SELECT n.node_id, %L
-        FROM v_temp_node n 
-        WHERE %L = ANY(n.graph_delimiter)
-        AND EXISTS (SELECT 1 FROM v_temp_arc a 
-        			JOIN %I vtn ON a.minsector_id = vtn.node_id
-       				WHERE n.node_id = a.node_1 OR  n.node_id = a.node_2);
-        ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
+            -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
+            EXECUTE format('
+                INSERT INTO %I (node_id, graph_delimiter)
+                SELECT n.node_id, %L
+                FROM v_temp_node n
+                JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2) 
+                WHERE %L = ANY(n.graph_delimiter)
+                AND EXISTS (SELECT 1 FROM %I vtn WHERE a.minsector_id = vtn.node_id);
+            ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
+        ELSE
+            IF v_node = 0 THEN
+                -- the arc is between 2 water source nodes, v_temp_node_table has no nodes, insert them
+                EXECUTE format('
+                INSERT INTO %I (node_id, graph_delimiter)
+                SELECT n.node_id, %L
+                FROM v_temp_node n
+                JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+                WHERE a.arc_id = %L
+            ', v_temp_node_table, v_graph_delimiter, v_arc_id);
+            ELSE 
+                -- insert nodes that are graph_delimiter = 'SECTOR' (water source) and the other node is in v_temp_node_table
+                EXECUTE format('
+                    INSERT INTO %I (node_id, graph_delimiter)
+                    SELECT n.node_id, %L
+                    FROM v_temp_node n
+                    JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2) 
+                    WHERE %L = ANY(n.graph_delimiter)
+                    AND EXISTS (SELECT 1 FROM %I vtn WHERE vtn.node_id IN (a.node_1, a.node_2));
+                ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
+            END IF;    
+        END IF;
     ELSE
         -- MAPZONE graph_delimiter
         EXECUTE format('
             UPDATE %I t
             SET graph_delimiter = %L
             FROM v_temp_node n
-            WHERE t.node_id = n.node_id
-            AND t.graph_delimiter = ''NONE''
-            AND %L = ANY(n.graph_delimiter);
+            WHERE %L = ANY(n.graph_delimiter)
+            AND t.node_id = n.node_id;
         ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter);
 
         -- water source (SECTOR) graph_delimiter
