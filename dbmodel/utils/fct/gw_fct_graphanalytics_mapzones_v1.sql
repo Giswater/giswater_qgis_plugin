@@ -1721,12 +1721,21 @@ BEGIN
 				FROM n as n_node 
 				JOIN n AS n_dma ON n_node.node_id = n_dma.old_node_id;
  
+				WITH 
+				dma AS (
+					SELECT DISTINCT dma_id FROM temp_pgr_om_waterbalance_dma_graph
+					UNION
+					SELECT DISTINCT old_mapzone_id AS dma_id FROM v_temp_pgr_mapzone_old
+				)
 				DELETE FROM om_waterbalance_dma_graph o
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_om_waterbalance_dma_graph t WHERE o.dma_id = t.dma_id)
-				OR EXISTS (SELECT 1 FROM v_temp_pgr_mapzone_old t WHERE o.dma_id = t.old_mapzone_id);
+				WHERE EXISTS (SELECT 1 FROM dma d WHERE o.dma_id =d.dma_id);
 
+				WITH 
+					node AS (
+						SELECT DISTINCT node_id FROM temp_pgr_om_waterbalance_dma_graph
+					)
 				DELETE FROM om_waterbalance_dma_graph o
-				WHERE EXISTS (SELECT 1 FROM temp_pgr_om_waterbalance_dma_graph t WHERE o.node_id = t.node_id) ;
+				WHERE EXISTS (SELECT 1 FROM node n WHERE o.node_id = n.node_id);
 
 				INSERT INTO om_waterbalance_dma_graph 
 				SELECT * FROM temp_pgr_om_waterbalance_dma_graph 
