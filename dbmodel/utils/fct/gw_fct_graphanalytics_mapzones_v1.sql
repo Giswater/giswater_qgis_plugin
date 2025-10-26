@@ -1698,32 +1698,39 @@ BEGIN
 			ELSIF v_class = 'DMA' THEN
 				RAISE NOTICE 'Filling temp_pgr_om_waterbalance_dma_graph ';
 
-				v_query_text = 'INSERT INTO temp_pgr_om_waterbalance_dma_graph (node_id, '||quote_ident(v_mapzone_field)||', flow_sign)
-				(
-					SELECT DISTINCT n.node_id, va.'||quote_ident(v_mapzone_field)||',
+				WITH 
+					n AS (
+						SELECT 
+							n.node_id, 
+							n.old_node_id, 
+							m.mapzone_id[1] AS mapzone_id
+						FROM temp_pgr_node n
+						JOIN temp_pgr_mapzone m ON n.mapzone_id = m.component
+						WHERE n.graph_delimiter = 'DMA'
+						AND CARDINALITY(m.mapzone_id) = 1
+						GROUP BY n.node_id, n.old_node_id, m.mapzone_id
+					)
+				INSERT INTO temp_pgr_om_waterbalance_dma_graph (node_id, dma_id, flow_sign)
+				SELECT 
+					n_node.node_id, 
+					n_dma.mapzone_id,
 					CASE 
-						WHEN vn.'||quote_ident(v_mapzone_field)||' = va.'||quote_ident(v_mapzone_field)||' THEN 1
+						WHEN n_dma.mapzone_id = n_node.mapzone_id THEN 1
 						ELSE -1
 					END AS flow_sign
-					FROM temp_pgr_node n
-					JOIN v_temp_node vn ON vn.node_id = n.node_id
-					JOIN temp_pgr_arc a  ON a.node_1 = n.node_id or a.node_2 = n.node_id 
-					JOIN v_temp_arc va ON va.arc_id = a.arc_id
-					WHERE n.node_id IN
-					(
-						SELECT (json_array_elements(graphconfig->''use'')->>''nodeParent'')::integer AS nodeparent
-						FROM '||quote_ident(v_table_name)||' WHERE active = true
-					)
-					AND va.'||quote_ident(v_mapzone_field)||' IN
-					(
-						SELECT '||quote_ident(v_mapzone_field)||'
-						FROM '||quote_ident(v_table_name)||' WHERE active = true
-					)
-				) ON CONFLICT (node_id, dma_id) DO NOTHING';
-				EXECUTE v_query_text;
+				FROM n as n_node 
+				JOIN n AS n_dma ON n_node.node_id = n_dma.old_node_id;
+ 
+				DELETE FROM om_waterbalance_dma_graph o
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_om_waterbalance_dma_graph t WHERE o.dma_id = t.dma_id)
+				OR EXISTS (SELECT 1 FROM v_temp_pgr_mapzone_old t WHERE o.dma_id = t.old_mapzone_id);
 
-				DELETE FROM om_waterbalance_dma_graph WHERE dma_id IN (SELECT DISTINCT dma_id FROM temp_pgr_om_waterbalance_dma_graph);
-				INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_pgr_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
+				DELETE FROM om_waterbalance_dma_graph o
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_om_waterbalance_dma_graph t WHERE o.node_id = t.node_id) ;
+
+				INSERT INTO om_waterbalance_dma_graph 
+				SELECT * FROM temp_pgr_om_waterbalance_dma_graph 
+				ON CONFLICT (dma_id, node_id) DO NOTHING;
 
 			ELSIF v_mapzone_name = 'DWFZONE' THEN
 				-- update dwfzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.dwfzone_outfall = NULL)
