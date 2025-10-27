@@ -35,6 +35,7 @@ v_message text;
 v_return json;
 v_addschema text;
 v_expl_x_user boolean;
+v_expl_id integer;
 v_sectorisexplismuni boolean;
 v_has_usage boolean;
 
@@ -46,7 +47,7 @@ BEGIN
 
 	-- get system parameters
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
-	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
+	v_expl_x_user = (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	v_sectorisexplismuni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
 
 
@@ -139,16 +140,29 @@ BEGIN
 		-- Force exploitation selector in case of null values
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN
 
-			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS NOT TRUE THEN
+			IF (v_expl_x_user) IS NOT TRUE THEN
+				SELECT expl_id INTO v_expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 LIMIT 1;
+			ELSE
+				SELECT expl_id INTO v_expl_id FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 LIMIT 1;
+			END IF;
 
-				INSERT INTO selector_expl (expl_id, cur_user)
-				SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
-				v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
+			IF v_expl_id IS NOT NULL THEN
+				EXECUTE '
+					SELECT gw_fct_setselectors($${
+						"data":{
+							"selectorType":"selector_basic", 
+							"tabName":"tab_exploitation", 
+							"id":"'||v_expl_id||'", 
+							"isAlone":"True", 
+							"disableParent":"False", 
+							"value":"True", 
+						}
+					}$$)
+				';
+				v_errortext=concat('Set visible exploitation for user ',(v_expl_id));
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 			ELSE
-				INSERT INTO selector_expl (expl_id, cur_user)
-				SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 limit 1;
-				v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 limit 1));
+				v_errortext=concat('No exploitation found for user ', current_user);
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 			END IF;
 		END IF;
