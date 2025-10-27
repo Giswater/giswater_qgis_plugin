@@ -58,30 +58,30 @@ BEGIN
 		';
 	END LOOP;
 
-	-- Check topology before allowing the restore
-	EXECUTE 'SELECT gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-		"feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"'||v_psector_id||'"}}$$)' 
-	INTO v_topology_result;
+	-- -- Check topology before allowing the restore
+	-- EXECUTE 'SELECT gw_fct_checktopologypsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+	-- 	"feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"'||v_psector_id||'"}}$$)' 
+	-- INTO v_topology_result;
 
-	-- Get topology check level
-	v_topology_level := ((v_topology_result->>'message')::json->>'level')::integer;
+	-- -- Get topology check level
+	-- v_topology_level := ((v_topology_result->>'message')::json->>'level')::integer;
 
-	-- If there are topology errors, rollback the archived changes and return error
-	IF v_topology_level = 1 THEN
-		-- Revert the archived changes
-		FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 ORDER BY 1 DESC
-		LOOP
-			EXECUTE '
-			UPDATE plan_psector_x_'||rec_feature||' 
-			SET archived = true 
-			WHERE psector_id = '||v_psector_id||' AND archived = false
-			';
-		END LOOP;
+	-- -- If there are topology errors, rollback the archived changes and return error
+	-- IF v_topology_level = 1 THEN
+	-- 	-- Revert the archived changes
+	-- 	FOR rec_feature IN SELECT lower(id) FROM sys_feature_type WHERE classlevel < 3 ORDER BY 1 DESC
+	-- 	LOOP
+	-- 		EXECUTE '
+	-- 		UPDATE plan_psector_x_'||rec_feature||' 
+	-- 		SET archived = true 
+	-- 		WHERE psector_id = '||v_psector_id||' AND archived = false
+	-- 		';
+	-- 	END LOOP;
 
-		-- Return error message
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":5010, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"5010", "function":"3512","parameters":null}}$$);';
-	END IF;
+	-- 	-- Return error message
+	-- 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":5010, "infoType":1, "lang":"ES"},"feature":{},
+	-- 	"data":{"message":"5010", "function":"3512","parameters":null}}$$);';
+	-- END IF;
 
 	-- set status and inactive (archived column doesn't exist in older versions)
 	UPDATE plan_psector SET status = 8, active = false WHERE psector_id = v_psector_id;
