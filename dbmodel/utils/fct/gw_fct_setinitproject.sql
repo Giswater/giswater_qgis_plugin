@@ -147,18 +147,19 @@ BEGIN
 			END IF;
 
 			IF v_expl_id IS NOT NULL THEN
-				EXECUTE '
-					SELECT gw_fct_setselectors($${
+				EXECUTE format(
+					$$SELECT gw_fct_setselectors('{
 						"data":{
-							"selectorType":"selector_basic", 
-							"tabName":"tab_exploitation", 
-							"id":"'||v_expl_id||'", 
-							"isAlone":"True", 
-							"disableParent":"False", 
-							"value":"True", 
+							"selectorType":"selector_basic",
+							"tabName":"tab_exploitation",
+							"id": %s,
+							"isAlone":"True",
+							"disableParent":"False",
+							"value":"True"
 						}
-					}$$)
-				';
+					}')$$,
+					v_expl_id
+				);
 				v_errortext=concat('Set visible exploitation for user ',(v_expl_id));
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 			ELSE

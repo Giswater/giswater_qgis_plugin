@@ -254,9 +254,9 @@ BEGIN
 
 	-- force state vdefault in function of psector mode)
 	IF (SELECT value FROM config_param_user WHERE "parameter" = 'plan_psector_current' AND cur_user=current_user AND value::integer in (select psector_id from plan_psector)) IS NOT NULL THEN
-		UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault';
+		UPDATE config_param_user SET value = 2 WHERE PARAMETER = 'edit_state_vdefault' AND cur_user=current_user;
 	ELSE
-		UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault';
+		UPDATE config_param_user SET value = 1 WHERE PARAMETER = 'edit_state_vdefault' AND cur_user=current_user;
 	END IF;
 
 	--  get feature propierties
