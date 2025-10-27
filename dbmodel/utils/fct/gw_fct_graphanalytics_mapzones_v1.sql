@@ -215,7 +215,7 @@ BEGIN
 		AND expl_id && ARRAY['||array_to_string(v_expl_id_array, ',')||']';
 		RAISE NOTICE 'v_query_text: %', v_query_text;
 		EXECUTE v_query_text INTO v_mapzone_count;
-		IF v_mapzone_count > 0 THEN
+		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_mapzone_name ||'"}, "is_process":true}}$$)';
 		END IF;
@@ -540,8 +540,17 @@ BEGIN
 
 	-- Update mapzone_id
 	IF v_from_zero = TRUE THEN
-		EXECUTE 'SELECT max( ' || v_mapzone_field || ') FROM '|| v_table_name
-		INTO v_mapzone_id;
+		IF v_project_type = 'WS' AND v_class IN ('DMA', 'PRESSZONE') THEN
+			EXECUTE 
+				'SELECT GREATEST(
+					(SELECT max(' || v_mapzone_field || ') FROM '|| v_mapzone_name || '),
+					(SELECT max(' || v_mapzone_field || ') FROM plan_netscenario_'|| v_mapzone_name || ')
+				)'
+			INTO v_mapzone_id;
+		ELSE
+			EXECUTE 'SELECT max(' || v_mapzone_field || ') FROM '|| v_table_name
+			INTO v_mapzone_id;
+		END IF;
 		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_mapzone_name), (v_mapzone_id + m.id));
 	ELSE
 		IF v_netscenario IS NOT NULL THEN
