@@ -4351,6 +4351,8 @@ def _process_map_selection(class_object, selection_mode, field_id):
                     where_clause = f"AND {field_id} IN ({allowed_str})"
             except Exception:
                 pass
+    elif selection_mode == GwSelectionMode.PSECTOR:
+        where_clause = "AND state <> 0"
     # For all other modes no additional filtering
     # Query each layer separately to handle multi-layer feature types (like elements with ve_man_frelem + ve_man_genelem)
     selected_ids = []
