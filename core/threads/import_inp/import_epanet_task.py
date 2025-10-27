@@ -609,7 +609,44 @@ class GwImportInpTask(GwTask):
         return result
 
     def _save_controls_and_rules(self) -> None:
-        from wntr.network.controls import Control, Rule
+        from wntr.network.controls import Control, Rule, SimTimeCondition, TimeOfDayCondition, ValueCondition
+        from wntr.network.model import Valve, Tank, Junction, Link
+        from wntr.network.base import LinkStatus
+        import numpy as np
+        try:
+            from wntr.network.controls import Comparison
+        except ImportError:
+            Comparison = None
+
+        def get_setting(control_action, control_name: str):
+            """Get the properly formatted setting value for a control action."""
+            value = control_action._value
+            attribute = control_action._attribute.lower()
+
+            if attribute == 'status':
+                setting = LinkStatus(value).name
+            elif attribute == 'base_speed':
+                setting = str(value)
+            elif attribute == 'setting' and isinstance(control_action._target_obj, Valve):
+                valve = control_action._target_obj
+                valve_type = valve.valve_type
+                if valve_type in ('PRV', 'PSV', 'PBV'):
+                    setting = str(from_si(FlowUnits[self.db_units], value, HydParam.Pressure))
+                elif valve_type == 'FCV':
+                    setting = str(from_si(FlowUnits[self.db_units], value, HydParam.Flow))
+                elif valve_type == 'TCV':
+                    setting = str(value)
+                elif valve_type == 'GPV':
+                    setting = value
+                else:
+                    raise ValueError(f'Valve type not recognized: {valve_type}')
+            elif attribute == 'setting':
+                setting = value
+            else:
+                setting = None
+                self._log_message(f'Could not write control {control_name} - skipping')
+
+            return setting
 
         controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit)
         controls_db: set[str] = set()
@@ -623,14 +660,67 @@ class GwImportInpTask(GwTask):
 
         for control_name, control in self.network.controls():
             control_dict = control.to_dict()
-            condition = str(control.condition)
-            req = control.requires()
-            then_actions = control_dict.get("then_actions")
-            else_actions = control_dict.get("else_actions")
             priority = control.priority
+
             if type(control) is Control:
-                text = f"IF {condition} THEN {' AND '.join(then_actions)} PRIORITY {priority}"
-                text = self._replace_codes_with_ids(text, req)
+                then_actions = control_dict.get("then_actions", [])
+                else_actions = control_dict.get("else_actions", [])
+
+                if len(then_actions) != 1 or len(else_actions) != 0:
+                    self._log_message(f'Too many actions on CONTROL "{control_name}"')
+                    continue
+
+                control_action = control._then_actions[0]
+
+                # Skip if target is not a Link
+                if not isinstance(control_action.target()[0], Link):
+                    continue
+
+                # Get setting value
+                setting = get_setting(control_action, control_name)
+                if setting is None:
+                    continue
+
+                link_obj = control_action._target_obj
+                link_type = link_obj.link_type
+                link_name = link_obj.name
+                link_id = self.arc_ids.get(link_name, link_name)
+                # Add _n2a because in go2epa valves/pumps are transformed to nodes
+                link_id = f"{link_id}_n2a"
+
+                # Format based on condition type
+                if isinstance(control._condition, (SimTimeCondition, TimeOfDayCondition)):
+                    threshold_time = control._condition._threshold / 3600.0
+                    compare = 'CLOCKTIME' if isinstance(control._condition, TimeOfDayCondition) else 'TIME'
+                    text = f"{link_type} {link_id} {setting} AT {compare} {threshold_time:g}"
+
+                elif isinstance(control._condition, ValueCondition):
+                    source_obj = control._condition._source_obj
+                    node_type = source_obj.node_type
+                    node_name = source_obj.name
+                    node_id = self.node_ids.get(node_name, node_name)
+
+                    # Determine comparison direction
+                    relation = control._condition._relation
+                    if Comparison:
+                        is_below = relation in [np.less, np.less_equal, Comparison.le, Comparison.lt]
+                    else:
+                        is_below = relation in [np.less, np.less_equal]
+                    compare = 'BELOW' if is_below else 'ABOVE'
+
+                    # Convert threshold based on node type
+                    threshold = control._condition._threshold
+                    if isinstance(source_obj, Tank):
+                        thresh_value = from_si(FlowUnits[self.db_units], threshold, HydParam.HydraulicHead)
+                    elif isinstance(source_obj, Junction):
+                        thresh_value = from_si(FlowUnits[self.db_units], threshold, HydParam.Pressure)
+                    else:
+                        raise RuntimeError(f'Unknown control for EPANET INP files: {type(control)}')
+
+                    text = f"{link_type} {link_id} {setting} IF {node_type} {node_id} {compare} {thresh_value}"
+                else:
+                    raise RuntimeError(f'Unknown control for EPANET INP files: {type(control)}')
+
                 if text in controls_db:
                     msg = f"The control '{control_name}' is already on database. Skipping..."
                     self._log_message(msg)
@@ -639,7 +729,13 @@ class GwImportInpTask(GwTask):
                 sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
                 execute_sql(sql, params, commit=self.force_commit)
+
             elif type(control) is Rule:
+                condition = str(control.condition)
+                req = control.requires()
+                then_actions = control_dict.get("then_actions")
+                else_actions = control_dict.get("else_actions")
+
                 text = f"RULE {control.name}" + "\n" + f"IF {condition}" + "\n" + f"THEN {' AND '.join(then_actions)}"
                 if else_actions:
                     text += f"\nELSE {else_actions}"
