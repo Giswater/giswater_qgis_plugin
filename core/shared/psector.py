@@ -985,10 +985,11 @@ class GwPsector:
             except ValueError:
                 msg += tools_qt.tr("Parent ID must be an integer.")
 
-        try:
-            parent_id_exists = tools_db.get_rows(f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived")
-        except Exception:
-            parent_id_exists = None
+        if parent_id is not None and parent_id != "":
+            try:
+                parent_id_exists = tools_db.get_rows(f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived")
+            except Exception:
+                parent_id_exists = None
 
         if parent_id_exists is None or len(parent_id_exists) == 0:
             msg += tools_qt.tr("Parent ID does not exist.")
