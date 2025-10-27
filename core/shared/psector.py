@@ -14,6 +14,7 @@ from typing import Union
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
+import numbers
 
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QPixmap
@@ -967,6 +968,25 @@ class GwPsector:
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_rotation", 0)
+        
+        msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
+        scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
+        atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
+        try:
+            float(rotation)
+        except ValueError:
+            msg += tools_qt.tr("Scale must be a number.")
+        try:
+            float(scale)
+        except ValueError:
+            msg += tools_qt.tr("Scale must be a number.")
+        try:
+            int(atlas_id)
+        except ValueError:
+            msg += tools_qt.tr("Atlas ID must be an integer.")
+        if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
+            return False
 
         name_exist = self.check_name(psector_name)
 
@@ -1842,9 +1862,9 @@ class GwPsector:
                 tools_db.execute_sql(sql)
 
                 # Check topology
-                result = self.check_topology_psector(psector_id, psector_name, from_toggle=True)
-                if result is False:
-                    return
+                # result = self.check_topology_psector(psector_id, psector_name, from_toggle=True)
+                # if result is False:
+                    # return
 
                 sql = f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
                 tools_db.execute_sql(sql)
