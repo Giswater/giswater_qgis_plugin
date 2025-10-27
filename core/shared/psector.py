@@ -971,6 +971,7 @@ class GwPsector:
         msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
         scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
         atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
+        parent_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_parent_id", return_string_null=False)
         if rotation != "":
             try:
                 float(rotation)
@@ -986,6 +987,11 @@ class GwPsector:
                 int(atlas_id)
             except ValueError:
                 msg += tools_qt.tr("Atlas ID must be an integer.")
+        if parent_id != "":
+            try:
+                int(parent_id)
+            except ValueError:
+                msg += tools_qt.tr("Parent ID must be an integer.")
         if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return False
