@@ -459,6 +459,18 @@ class GwGo2EpaButton(GwAction):
                 msg = "You need to select some sector"
                 tools_qt.show_info_box(msg)
                 return
+                
+        if self.export_inp and self.file_inp == "null":
+            message = "You have to set this parameter: INP file"
+            tools_qgis.show_warning(message, dialog=self.dlg_go2epa)
+            return
+
+        if self.exec_epa and self.file_rpt == "null":
+            message = "You have to set this parameter"
+            self.error_msg = "{0}: RPT file"
+            self.error_msg_params = (message,)
+            tools_qgis.show_warning(message, dialog=self.dlg_go2epa)
+            return
 
         self.dlg_go2epa.btn_accept.setEnabled(False)
         self.dlg_go2epa.btn_cancel.setEnabled(True)

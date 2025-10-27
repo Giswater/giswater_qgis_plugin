@@ -295,10 +295,6 @@ class GwEpaFileManager(GwTask):
         if 'file' not in self.complet_result['body']:
             return False
 
-        if self.file_inp == "null":
-            self.error_msg = "You have to set this parameter: INP file"
-            return False
-
         msg = "Task 'Go2Epa' execute function '{0}'"
         msg_params = ("_fill_inp_file",)
         tools_log.log_info(msg, msg_params=msg_params)
@@ -381,12 +377,6 @@ class GwEpaFileManager(GwTask):
         msg = "Execute EPA software"
         tools_log.log_info(msg)
         self.step_completed.emit({"message": {"level": 1, "text": "Execute EPA software......"}}, "")
-
-        if self.file_rpt == "null":
-            message = "You have to set this parameter"
-            self.error_msg = "{0}: RPT file"
-            self.error_msg_params = (message,)
-            return False
 
         msg = "INP file not found"
         if self.file_inp is not None:
