@@ -1944,3 +1944,4 @@ class GwSchemaI18NManager:
         message = "Rotation must be a number."
         message = "Atlas ID must be an integer."
         message = "Parent ID must be an integer."
+        message = "Parent ID does not exist."
