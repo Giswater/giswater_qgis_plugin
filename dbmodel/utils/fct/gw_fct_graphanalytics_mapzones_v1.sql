@@ -1078,16 +1078,19 @@ BEGIN
 	IF v_commit_changes IS TRUE THEN
 		IF v_netscenario IS NOT NULL THEN
 			v_query_text := '
-					UPDATE '||v_table_name||' m SET the_geom = CASE
-						WHEN CARDINALITY(tm.mapzone_id) = 1 THEN tm.the_geom
-						ELSE NULL
-					END
-					FROM temp_pgr_mapzone tm
-					WHERE (
-						CARDINALITY (tm.mapzone_id) = 1 AND tm.mapzone_id[1] = m.'||v_mapzone_field||'
-					) OR (
-						CARDINALITY (tm.mapzone_id) > 1 AND m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)
-					)';
+				WITH 
+					mapzone AS (
+						SELECT
+							mapzone_id, 
+							CASE WHEN CARDINALITY(mapzone_id) = 1 THEN the_geom
+							ELSE NULL
+							END AS the_geom
+						FROM temp_pgr_mapzone
+						GROUP BY mapzone_id, the_geom
+					)
+				UPDATE '||v_table_name||' m SET the_geom = tm.the_geom
+				FROM mapzone tm
+				WHERE m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)';
 			EXECUTE v_query_text;
 
 			DELETE FROM plan_netscenario_arc WHERE netscenario_id = v_netscenario::integer;
