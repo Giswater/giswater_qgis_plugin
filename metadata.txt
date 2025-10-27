@@ -8,7 +8,8 @@ version=4.5.2
 author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Lia Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez, Nico Pérez, Pablo Marques, Arnau Torret, Namrata Karki, Arnau Urgeles, Oscar Pueyo
 
 Changelog=Version 4.5.2
-
+    - Improved psector topology validation and error handling
+    - Enhanced widget type compatibility and checking across UI
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
