@@ -959,7 +959,7 @@ class GwPsector:
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_rotation", 0)
-        
+
         msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
         scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
         atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
@@ -991,8 +991,8 @@ class GwPsector:
             except Exception:
                 parent_id_exists = None
 
-        if parent_id_exists is None or len(parent_id_exists) == 0:
-            msg += tools_qt.tr("Parent ID does not exist.")
+            if parent_id_exists is None or len(parent_id_exists) == 0:
+                msg += tools_qt.tr("Parent ID does not exist.")
 
         if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
@@ -2020,7 +2020,7 @@ class GwPsector:
             msg = tools_qt.tr("Please close all 'Psector manager' dialogs and try again")
             tools_qgis.show_warning(msg)
             return
-        
+
         if is_checked:
             # Save initial visibility of target layer
             self._save_visibility_state('ve_plan_psector')
@@ -2113,7 +2113,7 @@ class GwPsector:
 
         # Save currently active layer
         self._original_active_layer = self.iface.activeLayer()
-        
+
         layer = tools_qgis.get_layer_by_tablename(tablename)
         if layer:
             root = self.iface.layerTreeCanvasBridge().rootGroup()
@@ -2133,7 +2133,7 @@ class GwPsector:
 
         plan_layer = tools_qgis.get_layer_by_tablename('ve_plan_psector')
         was_loaded_by_filter = self._layer_was_loaded_by_filter
-        
+
         # If layer was loaded by filter, hide it instead of restoring
         if was_loaded_by_filter:
             if plan_layer:
@@ -2149,7 +2149,7 @@ class GwPsector:
                 node = root.findGroup(name) or root.findLayer(name)
                 if node:
                     node.setItemVisibilityChecked(is_visible)
-        
+
         # Restore previously active layer (but not if it was ve_plan_psector and we just hid it)
         if self._original_active_layer:
             if plan_layer and self._original_active_layer == plan_layer and was_loaded_by_filter:
