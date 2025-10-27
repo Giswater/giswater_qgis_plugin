@@ -639,20 +639,25 @@ class GwPsector:
 
         txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
         tools_gw.set_config_parser('btn_psector', 'psector_rapport_path', txt_path)
-        chk_composer = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', chk_composer)
-        chk_csv_detail = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', chk_csv_detail)
-        chk_csv = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', chk_csv)
+        chk_composer = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', f"{chk_composer}")
+        chk_csv_detail = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', f"{chk_csv_detail}")
+        chk_csv = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', f"{chk_csv}")
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             tools_qt.get_folder_path(self.dlg_psector_rapport.txt_path)
             folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
+        if chk_csv is False and chk_csv_detail is False:
+            msg = "You must choose at least one action"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_rapport)
+            return
+
         # Generate Composer
-        if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
+        if chk_composer:
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 msg = "File name is required"
