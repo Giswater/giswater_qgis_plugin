@@ -1701,6 +1701,9 @@ class GwPsector:
         self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
 
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
+
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
