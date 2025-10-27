@@ -3794,6 +3794,14 @@
 			<translation>No se encontró la función de widget de parámetro para el tipo de componente hipervínculo</translation>
 		</message>
 		<message>
+			<source>Parent ID does not exist.</source>
+			<translation>El ID del psector principal no existe.</translation>
+		</message>
+		<message>
+			<source>Parent ID must be an integer.</source>
+			<translation>El ID del psector principal debe ser un número entero.</translation>
+		</message>
+		<message>
 			<source>Parsing error fixed</source>
 			<translation>Error de análisis sintáctico corregido</translation>
 		</message>
