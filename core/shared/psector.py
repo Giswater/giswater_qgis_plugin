@@ -2399,7 +2399,7 @@ class GwPsector:
         self.duplicate_psector = GwPsectorDuplicate()
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
-        self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
+        # self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
         self.duplicate_psector.is_duplicated.connect(partial(self.load_psector, self.duplicate_psector, psector_id))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
@@ -2838,7 +2838,7 @@ def close_dlg(**kwargs):
         if active:
             psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
             psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
-            class_obj.check_topology_psector(psector_id, psector_name)
+            # class_obj.check_topology_psector(psector_id, psector_name)
 
         tools_gw.reset_rubberband(class_obj.rubber_band_point)
         tools_gw.reset_rubberband(class_obj.rubber_band_line)
