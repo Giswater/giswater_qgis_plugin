@@ -1096,14 +1096,12 @@ class GwImportInpTask(GwTask):
                 "effic_curve_id": p.efficiency.name if p.efficiency else None,
                 "energy_price": p.energy_price,
                 "energy_pattern_id": p.energy_pattern,
-                "pump_type": None,
+                "pump_type": "POWERPUMP",
             }
             if p.pump_type == "POWER":
                 inp_dict[p_name]["power"] = p.power / 1000
-                inp_dict[p_name]["pump_type"] = "POWERPUMP"
             elif p.pump_type == "HEAD":
                 inp_dict[p_name]["curve_id"] = p.pump_curve_name
-                inp_dict[p_name]["pump_type"] = "HEADPUMP"
 
         # Insert into parent table
         pumps = toolsdb_execute_values(
