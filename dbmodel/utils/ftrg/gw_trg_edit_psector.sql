@@ -101,8 +101,8 @@ BEGIN
 		text3=NEW.text3, text4=NEW.text4, text5=NEW.text5, text6=NEW.text6, num_value=NEW.num_value, workcat_id=new.workcat_id, workcat_id_plan=new.workcat_id_plan, parent_id=new.parent_id, updated_at=now(), updated_by=current_user
 		WHERE psector_id=OLD.psector_id;
 
-		-- update psector status to EXECUTED (On Service)
-		IF (OLD.status != NEW.status) AND (NEW.status = 4) THEN
+		-- update psector status to MADE OPERATIONAL (Archived)
+		IF (OLD.status != NEW.status) AND (NEW.status = 5) THEN
 
 		-- get workcat id
 		IF NEW.workcat_id IS NULL THEN
@@ -238,11 +238,6 @@ BEGIN
 
 			--reset topology control
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
-
-		-- update psector status to EXECUTED (Traceability) or CANCELED (Traceability)
-		ELSIF OLD.status != 4 AND NEW.status = 5 THEN
-			EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"5006", "function":"2446","parameters":null}}$$);';
 
 		ELSIF (OLD.status != NEW.status) AND (NEW.status IN (5,6,7)) THEN
 
