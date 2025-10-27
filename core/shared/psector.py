@@ -956,7 +956,7 @@ class GwPsector:
             return False
         return True
 
-    def insert_or_update_new_psector(self, from_tab_change=False):
+    def insert_or_update_new_psector(self, from_tab_change=False): # noqa: C901
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name", return_string_null=False)
         if psector_name == "":
