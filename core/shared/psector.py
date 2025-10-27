@@ -397,6 +397,23 @@ class GwPsector:
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
 
+        # Set psector editability based on current and archived status
+        if psector_id is not None:
+            sql = f"SELECT archived FROM v_ui_plan_psector WHERE psector_id = {psector_id}"
+            row = tools_db.get_row(sql)
+            archived = row[0] if row else False
+            cur_psector = tools_gw.get_config_value('plan_psector_current')
+            is_current = cur_psector and cur_psector[0] is not None and int(cur_psector[0]) == psector_id
+            if archived is True:
+                self.psector_editable = False
+            elif is_current:
+                self.psector_editable = True
+            else:
+                self.psector_editable = False
+        else:
+            # New psector, always editable
+            self.psector_editable = True
+
         # Manage psector editability
         self._manage_psector_editability(psector_id)
 
@@ -2122,26 +2139,33 @@ class GwPsector:
         row = selected_list[0].row()
         active = qtbl_psm.model().record(row).value("active")
         psector_id = qtbl_psm.model().record(row).value("psector_id")
+        archived = qtbl_psm.model().record(row).value("archived")
         cur_psector = tools_gw.get_config_value('plan_psector_current')
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             self._handle_dialog_close()
+
+        # Only current psectors are editable, archived psectors are never editable
+        is_current = cur_psector and cur_psector[0] is not None and int(cur_psector[0]) == psector_id
+        if archived is True:
+            self.psector_editable = False
+        elif is_current:
+            self.psector_editable = True
+        else:
+            # Ask user if they want to set this psector as current
+            msg = "Do you want to set this psector as current?"
+            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
+            if result:
+                self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
+                self.psector_editable = True
+            else:
+                self.psector_editable = False
 
         if active is True:
             # put psector on selector_psector
             sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
                 f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
             tools_db.execute_sql(sql)
-            self.psector_editable = True if tools_gw.get_config_value('plan_psector_current') is not None else False
-            if not cur_psector or (cur_psector and (cur_psector[0] is None or psector_id != int(cur_psector[0]))):
-                # Ask user if they want to set this psector as current
-                msg = "Do you want to set this psector as current?"
-                result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
-                if result:
-                    self.psector_editable = True
-                    self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
-                else:
-                    self.psector_editable = False
         # Open form
         self.master_new_psector(psector_id)
 
