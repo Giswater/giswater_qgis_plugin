@@ -46,6 +46,7 @@ v_link record;
 v_link_id integer;
 v_connec record;
 v_gully record;
+v_statetypeplan integer;
 
 BEGIN
 
@@ -63,6 +64,8 @@ BEGIN
 
 	-- get user values
 	v_currentpsector  = (SELECT value FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user=current_user);
+	v_statetypeplan  = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user=current_user);
+
 
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
@@ -181,11 +184,17 @@ BEGIN
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, presszone_id,
 						linkcat_id, state_type, dma_id, dqa_id, minsector_id, fluid_type)
 						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id,	presszone_id,
-						linkcat_id, state_type, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+						linkcat_id, v_statetypeplan, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+					
+						INSERT INTO man_pipelink VALUES (v_link_id);
+
 					ELSE
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, state_type, link_type)
-						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, state_type, link_type
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, v_statetypeplan, link_type
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+					
+						INSERT INTO man_pipelink VALUES (v_link_id);
+
 					END IF;
 
 					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
@@ -223,9 +232,11 @@ BEGIN
 						VALUES (v_currentpsector, v_link.feature_id, rec.arc_id, 0, false, v_link.link_id)
 						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
 
-						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type, link_type, linkcat_id)
-						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, fluid_type, link_type, linkcat_id
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type, link_type, linkcat_id, state_type)
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, fluid_type, link_type, linkcat_id, v_statetypeplan
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+
+						INSERT INTO man_conduitlink VALUES (v_link_id);
 
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
 						VALUES (v_currentpsector, v_link.feature_id, v_arc, 1, false, v_link_id)
@@ -287,6 +298,7 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
