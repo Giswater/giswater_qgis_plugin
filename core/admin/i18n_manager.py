@@ -1939,3 +1939,7 @@ class GwSchemaI18NManager:
         message = "Dscenario manager"
         message = "Hydrology scenario manager"
         message = "DWF scenario manager"
+        message = "Psector could not be updated because of the following errors: "
+        message = "Scale must be a number."
+        message = "Rotation must be a number."
+        message = "Atlas ID must be an integer."
