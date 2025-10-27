@@ -966,3 +966,7 @@ AND formname ILIKE 've_gully%';
 UPDATE config_form_fields
 SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+
+UPDATE config_form_fields
+	SET dv_isnullvalue=true
+	WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id_plan' AND tabname='tab_general';
