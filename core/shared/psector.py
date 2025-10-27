@@ -2367,7 +2367,7 @@ class GwPsector:
 
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
-        psector_name = self.qtbl_psm.model().record(row).value("name")
+        # psector_name = self.qtbl_psm.model().record(row).value("name")
         archived = self.qtbl_psm.model().record(row).value("archived")
         if archived is True:
             msg = f"Cannot duplicate archived psector {psector_id}. Please unarchive it first."
@@ -2824,12 +2824,12 @@ def close_dlg(**kwargs):
     """ Close dialog and disconnect snapping """
     class_obj = kwargs["class"]
     try:
-        # Only check topology if psector is active and has an id
-        active = tools_qt.get_widget_value(class_obj.dlg_plan_psector, "tab_general_active")
-        if active:
-            psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
-            psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
-            # class_obj.check_topology_psector(psector_id, psector_name)
+        # # Only check topology if psector is active and has an id
+        # active = tools_qt.get_widget_value(class_obj.dlg_plan_psector, "tab_general_active")
+        # if active:
+        #     psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
+        #     psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
+        #     class_obj.check_topology_psector(psector_id, psector_name)
 
         tools_gw.reset_rubberband(class_obj.rubber_band_point)
         tools_gw.reset_rubberband(class_obj.rubber_band_line)
