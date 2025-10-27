@@ -14,6 +14,7 @@ from typing import Union
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
+import numbers
 
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QPixmap
@@ -289,7 +290,7 @@ class GwPsector:
         self.dlg_plan_psector.other.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.tbl_document, 'doc_x_psector'))
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.tbl_document, 'doc_x_psector', 'doc_id'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
 
@@ -404,6 +405,23 @@ class GwPsector:
             tools_qt.set_checked(self.dlg_plan_psector, "tab_general_chk_enable_all", True)
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
+
+        # Set psector editability based on current and archived status
+        if psector_id is not None:
+            sql = f"SELECT archived FROM v_ui_plan_psector WHERE psector_id = {psector_id}"
+            row = tools_db.get_row(sql)
+            archived = row[0] if row else False
+            cur_psector = tools_gw.get_config_value('plan_psector_current')
+            is_current = cur_psector and cur_psector[0] is not None and int(cur_psector[0]) == psector_id
+            if archived is True:
+                self.psector_editable = False
+            elif is_current:
+                self.psector_editable = True
+            else:
+                self.psector_editable = False
+        else:
+            # New psector, always editable
+            self.psector_editable = True
 
         # Manage psector editability
         self._manage_psector_editability(psector_id)
@@ -630,20 +648,25 @@ class GwPsector:
 
         txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
         tools_gw.set_config_parser('btn_psector', 'psector_rapport_path', txt_path)
-        chk_composer = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', chk_composer)
-        chk_csv_detail = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', chk_csv_detail)
-        chk_csv = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', chk_csv)
+        chk_composer = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', f"{chk_composer}")
+        chk_csv_detail = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', f"{chk_csv_detail}")
+        chk_csv = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', f"{chk_csv}")
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             tools_qt.get_folder_path(self.dlg_psector_rapport.txt_path)
             folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
+        if chk_csv is False and chk_csv_detail is False:
+            msg = "You must choose at least one action"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_rapport)
+            return
+
         # Generate Composer
-        if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
+        if chk_composer:
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 msg = "File name is required"
@@ -945,6 +968,25 @@ class GwPsector:
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_rotation", 0)
+        
+        msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
+        scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
+        atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
+        try:
+            float(rotation)
+        except ValueError:
+            msg += tools_qt.tr("Scale must be a number.")
+        try:
+            float(scale)
+        except ValueError:
+            msg += tools_qt.tr("Scale must be a number.")
+        try:
+            int(atlas_id)
+        except ValueError:
+            msg += tools_qt.tr("Atlas ID must be an integer.")
+        if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
+            return False
 
         name_exist = self.check_name(psector_name)
 
@@ -1680,6 +1722,9 @@ class GwPsector:
         self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
 
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
+
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
@@ -1818,9 +1863,9 @@ class GwPsector:
                 tools_db.execute_sql(sql)
 
                 # Check topology
-                result = self.check_topology_psector(psector_id, psector_name, from_toggle=True)
-                if result is False:
-                    return
+                # result = self.check_topology_psector(psector_id, psector_name, from_toggle=True)
+                # if result is False:
+                    # return
 
                 sql = f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
                 tools_db.execute_sql(sql)
@@ -2099,26 +2144,33 @@ class GwPsector:
         row = selected_list[0].row()
         active = qtbl_psm.model().record(row).value("active")
         psector_id = qtbl_psm.model().record(row).value("psector_id")
+        archived = qtbl_psm.model().record(row).value("archived")
         cur_psector = tools_gw.get_config_value('plan_psector_current')
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             self._handle_dialog_close()
+
+        # Only current psectors are editable, archived psectors are never editable
+        is_current = cur_psector and cur_psector[0] is not None and int(cur_psector[0]) == psector_id
+        if archived is True:
+            self.psector_editable = False
+        elif is_current:
+            self.psector_editable = True
+        else:
+            # Ask user if they want to set this psector as current
+            msg = "Do you want to set this psector as current?"
+            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
+            if result:
+                self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
+                self.psector_editable = True
+            else:
+                self.psector_editable = False
 
         if active is True:
             # put psector on selector_psector
             sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
                 f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
             tools_db.execute_sql(sql)
-            self.psector_editable = True if tools_gw.get_config_value('plan_psector_current') is not None else False
-            if not cur_psector or (cur_psector and (cur_psector[0] is None or psector_id != int(cur_psector[0]))):
-                # Ask user if they want to set this psector as current
-                msg = "Do you want to set this psector as current?"
-                result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
-                if result:
-                    self.psector_editable = True
-                    self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
-                else:
-                    self.psector_editable = False
         # Open form
         self.master_new_psector(psector_id)
 
