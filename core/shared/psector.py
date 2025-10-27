@@ -1849,7 +1849,7 @@ class GwPsector:
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             psector_id = qtbl_psm.model().record(row).value("psector_id")
-            psector_name = qtbl_psm.model().record(row).value("name")
+            # psector_name = qtbl_psm.model().record(row).value("name")
             active = qtbl_psm.model().record(row).value("active")
             archived = qtbl_psm.model().record(row).value("archived")
             if archived is True:
