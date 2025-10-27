@@ -289,7 +289,7 @@ class GwPsector:
         self.dlg_plan_psector.other.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.tbl_document, 'doc_x_psector'))
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.tbl_document, 'doc_x_psector', 'doc_id'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
 
@@ -404,6 +404,23 @@ class GwPsector:
             tools_qt.set_checked(self.dlg_plan_psector, "tab_general_chk_enable_all", True)
 
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
+
+        # Set psector editability based on current and archived status
+        if psector_id is not None:
+            sql = f"SELECT archived FROM v_ui_plan_psector WHERE psector_id = {psector_id}"
+            row = tools_db.get_row(sql)
+            archived = row[0] if row else False
+            cur_psector = tools_gw.get_config_value('plan_psector_current')
+            is_current = cur_psector and cur_psector[0] is not None and int(cur_psector[0]) == psector_id
+            if archived is True:
+                self.psector_editable = False
+            elif is_current:
+                self.psector_editable = True
+            else:
+                self.psector_editable = False
+        else:
+            # New psector, always editable
+            self.psector_editable = True
 
         # Manage psector editability
         self._manage_psector_editability(psector_id)
@@ -630,20 +647,25 @@ class GwPsector:
 
         txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
         tools_gw.set_config_parser('btn_psector', 'psector_rapport_path', txt_path)
-        chk_composer = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', chk_composer)
-        chk_csv_detail = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', chk_csv_detail)
-        chk_csv = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}"
-        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', chk_csv)
+        chk_composer = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', f"{chk_composer}")
+        chk_csv_detail = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', f"{chk_csv_detail}")
+        chk_csv = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', f"{chk_csv}")
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             tools_qt.get_folder_path(self.dlg_psector_rapport.txt_path)
             folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
+        if chk_csv is False and chk_csv_detail is False:
+            msg = "You must choose at least one action"
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_rapport)
+            return
+
         # Generate Composer
-        if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
+        if chk_composer:
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 msg = "File name is required"
@@ -934,7 +956,7 @@ class GwPsector:
             return False
         return True
 
-    def insert_or_update_new_psector(self, from_tab_change=False):
+    def insert_or_update_new_psector(self, from_tab_change=False):  # noqa: C901
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name", return_string_null=False)
         if psector_name == "":
@@ -945,6 +967,43 @@ class GwPsector:
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_rotation", 0)
+        
+        msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
+        scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
+        atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
+        parent_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_parent_id", return_string_null=False)
+        if rotation != "":
+            try:
+                float(rotation)
+            except ValueError:
+                msg += tools_qt.tr("Rotation must be a number.")
+        if scale != "":
+            try:
+                float(scale)
+            except ValueError:
+                msg += tools_qt.tr("Scale must be a number.")
+        if atlas_id != "":
+            try:
+                int(atlas_id)
+            except ValueError:
+                msg += tools_qt.tr("Atlas ID must be an integer.")
+        if parent_id != "":
+            try:
+                int(parent_id)
+            except ValueError:
+                msg += tools_qt.tr("Parent ID must be an integer.")
+
+        try:
+            parent_id_exists = tools_db.get_rows(f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived")
+        except Exception:
+            parent_id_exists = None
+
+        if parent_id_exists is None or len(parent_id_exists) == 0:
+            msg += tools_qt.tr("Parent ID does not exist.")
+
+        if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
+            tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
+            return False
 
         name_exist = self.check_name(psector_name)
 
@@ -1061,7 +1120,7 @@ class GwPsector:
             tools_gw.refresh_selectors()
             tools_gw.close_dialog(self.dlg_plan_psector)
 
-    def check_topology_psector(self, psector_id=None, psector_name=None):
+    def check_topology_psector(self, psector_id=None, psector_name=None, from_toggle=False):
 
         if psector_id in (None, "null"):
             return False
@@ -1072,11 +1131,16 @@ class GwPsector:
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
             return False
 
+        msg = ""
         if json_result['message']['level'] == 1:
-            text = "There are some topological inconsistences on psector '{0}'. Would you like to see the log?"
-            text_params = (psector_name,)
+            if from_toggle:
+                msg += tools_qt.tr('Unable to activate psector. ')
+            msg += tools_qt.tr("There are some topological inconsistences on psector '{0}'. Would you like to see the log?")
+            msg_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
-            tools_qgis.show_message_function(text, function, message_level=1, duration=0, text_params=text_params)
+            tools_qgis.show_message_function(msg, function, message_level=1, duration=0, text_params=msg_params)
+            if from_toggle:
+                return False
 
         return json_result
 
@@ -1675,6 +1739,9 @@ class GwPsector:
         self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
 
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
+
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
@@ -1796,7 +1863,7 @@ class GwPsector:
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             psector_id = qtbl_psm.model().record(row).value("psector_id")
-            psector_name = qtbl_psm.model().record(row).value("name")
+            # psector_name = qtbl_psm.model().record(row).value("name")
             active = qtbl_psm.model().record(row).value("active")
             archived = qtbl_psm.model().record(row).value("archived")
             if archived is True:
@@ -1812,10 +1879,13 @@ class GwPsector:
                         "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
                 tools_db.execute_sql(sql)
 
+                # Check topology
+                # result = self.check_topology_psector(psector_id, psector_name, from_toggle=True)
+                # if result is False:
+                    # return
+
                 sql = f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
                 tools_db.execute_sql(sql)
-                # Check topology
-                self.check_topology_psector(psector_id, psector_name)
 
                 sql = ("UPDATE config_param_user "
                         "SET value = False "
@@ -1853,7 +1923,7 @@ class GwPsector:
         extras = f'"psectorId": "{psector_id}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_plan_recover_archived', body)
-        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body'] or json_result.get('status') == 'Failed':
             return
 
         # Refresh the table to show updated status
@@ -2091,26 +2161,33 @@ class GwPsector:
         row = selected_list[0].row()
         active = qtbl_psm.model().record(row).value("active")
         psector_id = qtbl_psm.model().record(row).value("psector_id")
+        archived = qtbl_psm.model().record(row).value("archived")
         cur_psector = tools_gw.get_config_value('plan_psector_current')
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             self._handle_dialog_close()
+
+        # Only current psectors are editable, archived psectors are never editable
+        is_current = cur_psector and cur_psector[0] is not None and int(cur_psector[0]) == psector_id
+        if archived is True:
+            self.psector_editable = False
+        elif is_current:
+            self.psector_editable = True
+        else:
+            # Ask user if they want to set this psector as current
+            msg = "Do you want to set this psector as current?"
+            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
+            if result:
+                self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
+                self.psector_editable = True
+            else:
+                self.psector_editable = False
 
         if active is True:
             # put psector on selector_psector
             sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
                 f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
             tools_db.execute_sql(sql)
-            self.psector_editable = True if tools_gw.get_config_value('plan_psector_current') is not None else False
-            if not cur_psector or (cur_psector and (cur_psector[0] is None or psector_id != int(cur_psector[0]))):
-                # Ask user if they want to set this psector as current
-                msg = "Do you want to set this psector as current?"
-                result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
-                if result:
-                    self.psector_editable = True
-                    self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
-                else:
-                    self.psector_editable = False
         # Open form
         self.master_new_psector(psector_id)
 
@@ -2305,7 +2382,7 @@ class GwPsector:
 
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
-        psector_name = self.qtbl_psm.model().record(row).value("name")
+        # psector_name = self.qtbl_psm.model().record(row).value("name")
         archived = self.qtbl_psm.model().record(row).value("archived")
         if archived is True:
             msg = f"Cannot duplicate archived psector {psector_id}. Please unarchive it first."
@@ -2314,7 +2391,7 @@ class GwPsector:
         self.duplicate_psector = GwPsectorDuplicate()
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
-        self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
+        # self.duplicate_psector.is_duplicated.connect(partial(self.check_topology_psector, psector_id, psector_name))
         self.duplicate_psector.is_duplicated.connect(partial(self.load_psector, self.duplicate_psector, psector_id))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
@@ -2762,12 +2839,12 @@ def close_dlg(**kwargs):
     """ Close dialog and disconnect snapping """
     class_obj = kwargs["class"]
     try:
-        # Only check topology if psector is active and has an id
-        active = tools_qt.get_widget_value(class_obj.dlg_plan_psector, "tab_general_active")
-        if active:
-            psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
-            psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
-            class_obj.check_topology_psector(psector_id, psector_name)
+        # # Only check topology if psector is active and has an id
+        # active = tools_qt.get_widget_value(class_obj.dlg_plan_psector, "tab_general_active")
+        # if active:
+        #     psector_id = tools_qt.get_text(class_obj.dlg_plan_psector, 'tab_general_psector_id')
+        #     psector_name = tools_qt.get_text(class_obj.dlg_plan_psector, "tab_general_name", return_string_null=False)
+        #     class_obj.check_topology_psector(psector_id, psector_name)
 
         tools_gw.reset_rubberband(class_obj.rubber_band_point)
         tools_gw.reset_rubberband(class_obj.rubber_band_line)
