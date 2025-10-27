@@ -134,7 +134,7 @@ BEGIN
 		SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_current' and cur_user=current_user;
 
 		IF v_psector_vdefault IS NULL THEN
-			INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_current', v_new_psector_id, current_user);
+			INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_current', v_new_psector_id, current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
 		ELSE
 			UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_current' and cur_user=current_user;
 		END IF;
