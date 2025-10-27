@@ -1002,6 +1002,10 @@
 			<translation>Ya existe un estilo para la capa '{0}' en el grupo de estilos seleccionado.</translation>
 		</message>
 		<message>
+			<source>Atlas ID must be an integer.</source>
+			<translation>El ID de Atlas debe ser un número entero.</translation>
+		</message>
+		<message>
 			<source>    author = {Boeing, Geoff},</source>
 			<translation>    autor = {Boeing, Geoff},</translation>
 		</message>
@@ -1740,6 +1744,10 @@
 		<message>
 			<source>Do you want change it and continue?</source>
 			<translation>¿Quieres cambiarlo y continuar?</translation>
+		</message>
+		<message>
+			<source>Do you want to continue?</source>
+			<translation>¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>Do you want to copy its values to the current node?</source>
@@ -3498,6 +3506,14 @@
 			<translation>No se ha previsto ningún evento para la selección de puntos</translation>
 		</message>
 		<message>
+			<source>No features found in the selection for {0}.</source>
+			<translation>No se han encontrado características en la selección para {0}.</translation>
+		</message>
+		<message>
+			<source>No features found in the selection for the enabled tabs ({0}).</source>
+			<translation>No se han encontrado características en la selección para las pestañas habilitadas ({0}).</translation>
+		</message>
+		<message>
 			<source>NO FEATURE TYPE DEFINED</source>
 			<translation>NO SE HA DEFINIDO NINGÚN TIPO DE CARACTERÍSTICA</translation>
 		</message>
@@ -3528,6 +3544,10 @@
 		<message>
 			<source>No municipalities selected</source>
 			<translation>Ningún municipio seleccionado</translation>
+		</message>
+		<message>
+			<source>No new features to insert. All selected features already exist in the table.</source>
+			<translation>No hay nuevas características que insertar. Todas las características seleccionadas ya existen en la tabla.</translation>
 		</message>
 		<message>
 			<source>No node ID found at the snapped location.</source>
@@ -4154,8 +4174,16 @@
 			<translation>Psector '{0}' no tiene valor workcat_id establecido. ¿Desea continuar con el valor por defecto?</translation>
 		</message>
 		<message>
+			<source>Psector could not be updated because of the following errors: </source>
+			<translation>No se ha podido actualizar el psector debido a los siguientes errores:</translation>
+		</message>
+		<message>
 			<source>Psector features loaded successfully on the map.</source>
 			<translation>Las características del psector se han cargado correctamente en el mapa.</translation>
+		</message>
+		<message>
+			<source>Psector ID not found</source>
+			<translation>Psector ID no encontrado</translation>
 		</message>
 		<message>
 			<source>Psector is not archived</source>
@@ -4318,6 +4346,10 @@
 			<translation>rio-vrt debe instalarse como dependencia opcional para construir VRTs.</translation>
 		</message>
 		<message>
+			<source>Rotation must be a number.</source>
+			<translation>La rotación debe ser un número.</translation>
+		</message>
+		<message>
 			<source>`route_colors` and `route_linewidths` must have same lengths as `routes`.</source>
 			<translation>`route_colors` y `route_linewidths` deben tener la misma longitud que `routes`.</translation>
 		</message>
@@ -4348,6 +4380,10 @@
 		<message>
 			<source>Saving results to DB</source>
 			<translation>Guardar resultados en la BD</translation>
+		</message>
+		<message>
+			<source>Scale must be a number.</source>
+			<translation>La escala debe ser un número.</translation>
 		</message>
 		<message>
 			<source>Schema audit not found, please create it first</source>
@@ -4916,6 +4952,10 @@
 		<message>
 			<source>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</source>
 			<translation>La primera pestaña es la pestaña "Básica", donde puede seleccionar la explotación, el sector, el municipio y otra información básica.</translation>
+		</message>
+		<message>
+			<source>The following fields differ between the selected arcs. You are about to merge them using the selected values.</source>
+			<translation>Los siguientes campos difieren entre los arcos seleccionados. Va a fusionarlos utilizando los valores seleccionados.</translation>
 		</message>
 		<message>
 			<source>The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.</source>
@@ -6008,6 +6048,18 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>You have to set this parameter</source>
 			<translation>Tiene que configurar este parámetro.</translation>
+		</message>
+		<message>
+			<source>You have to set this parameter: INP file</source>
+			<translation>Debe configurar este parámetro: archivo INP</translation>
+		</message>
+		<message>
+			<source>You have to set this parameter: RPT file</source>
+			<translation>Debe configurar este parámetro: archivo RPT.</translation>
+		</message>
+		<message>
+			<source>You must choose at least one action</source>
+			<translation>Debes elegir al menos una acción</translation>
 		</message>
 		<message>
 			<source>You must pass at least 1 route.</source>
@@ -21050,7 +21102,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>label_6</source>
-			<translation>ID Workcat:</translation>
+			<translation>Expediente de alta:</translation>
 		</message>
 		<message>
 			<source>tooltip_label_6</source>
@@ -21274,7 +21326,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
-			<translation>ID Workcat:</translation>
+			<translation>Expediente de alta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
@@ -21854,7 +21906,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>btn_show</source>
-			<translation>Abrir</translation>
+			<translation>Mostrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_show</source>
