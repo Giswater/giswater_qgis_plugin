@@ -1064,9 +1064,10 @@ class GwPsector:
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
             return False
 
+        msg = ""
         if json_result['message']['level'] == 1:
             if from_toggle:
-                msg = tools_qt.tr('Unable to activate psector. ')
+                msg += tools_qt.tr('Unable to activate psector. ')
             msg += tools_qt.tr("There are some topological inconsistences on psector '{0}'. Would you like to see the log?")
             msg_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
