@@ -1429,7 +1429,7 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[p_name] = {
                 "minorloss": p.minor_loss,
-                "status": p.initial_status.name.upper(),
+                "status": "CV" if p.check_valve else p.initial_status.name.upper(),
                 "custom_roughness": p.roughness,
                 "custom_dint": p.diameter * 1000,
                 "reactionparam": None,
