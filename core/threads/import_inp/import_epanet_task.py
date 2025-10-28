@@ -327,7 +327,9 @@ class GwImportInpTask(GwTask):
                         # TODO: manage "nodes" and "links" options
                         value = "YES" if value else "NO"
                     elif category == "time" and key not in ("pattern_start", "statistic"):
-                        value = f"{int(value) // 3600}:{(int(value) % 3600) // 60:02d}" if value else None
+                        value = f"{int(value) // 3600}:{(int(value) % 3600) // 60:02d}" if value is not None else None
+                    if value is None:
+                        value = ""
                     prefix = prefix_map.get(category, "inp_options_")
                     param_name = params_map[category].get(key.lower(), key.lower())
                     param_name = f"{prefix}{param_name}"
