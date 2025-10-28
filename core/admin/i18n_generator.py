@@ -693,6 +693,10 @@ class GwI18NGenerator:
                         values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
                         file.write(f"UPDATE {context} AS t\nSET name = v.name, observ = v.observ\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, name, observ)\nWHERE t.id = v.id;\n\n")
 
+                    elif context == "config_param_system":
+                        values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
+                        file.write(f"UPDATE {context} AS t\nSET value = v.value\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, value)\nWHERE t.parameter = v.parameter;\n\n")
+                    
                 elif "dbfunction" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript)\nWHERE t.id = v.id;\n\n")

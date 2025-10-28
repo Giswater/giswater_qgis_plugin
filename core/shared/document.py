@@ -75,13 +75,13 @@ class GwDocument(QObject):
         self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.rel_layers['element'] = tools_gw.get_layers_from_feature_type('element')
-        
+
         # Add manager element layers (ve_man_frelem, ve_man_genelem) if they exist
         for layer_name in ['ve_man_frelem', 've_man_genelem']:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer and layer not in self.rel_layers['element']:
                 self.rel_layers['element'].append(layer)
-        
+
         if self.project_type == 'ud':
             self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
@@ -180,7 +180,7 @@ class GwDocument(QObject):
         self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_gully",
                                 "ve_man_genelem", "ve_link", "ve_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
-        
+
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -723,6 +723,8 @@ class GwDocument(QObject):
                    f" VALUES('{doc_id}', '{item_id}')")
             tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
+            if tablename == 'psector':
+                expr = f"""psector_name = (SELECT name FROM "{lib_vars.schema_name}".plan_psector WHERE psector_id = '{item_id}')"""
             message = tools_qt.fill_table(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
                 tools_qgis.show_warning(message)
