@@ -5167,7 +5167,7 @@ FROM (
     (3518, 'Elements connected with the feature: %v_element%', NULL),
     (3520, 'Visits connected with the feature: %v_visit%', NULL),
     (3522, 'Documents connected with the feature: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectors connected with the feature: %v_psector%', NULL),
     (3526, 'IMPORTANT: Activate psector before deleting features.', NULL),
     (3528, 'Repaired arcs: arc_id --> %arc_ids%', NULL),
     (3562, 'No arcs have been selected', NULL),
@@ -5369,6 +5369,9 @@ FROM (
     (50, 'actualizado con éxito', NULL),
     (5000, 'There is ', NULL),
     (5002, 'There are ', NULL),
+    (5006, 'A sector cannot go directly to OPERATIONAL; it must first be EXECUTED.', NULL),
+    (5008, 'YOU NEED TO SET SOME WORKCAT ID TO EXECUTE PSECTOR', NULL),
+    (5010, 'Cannot restore archived psector due to topology errors', 'Please fix the topology errors before restoring the psector. Check the log for details.'),
     (60, 'Se ha cambiado la clase de visita. Se han eliminado los datos anteriores', NULL),
     (70, 'Se ha inicializado el administrador de visitas', NULL),
     (80, 'Se ha finalizado el administrador de visitas', NULL),
@@ -6526,7 +6529,7 @@ FROM (
     ('1', 'psector_type', 'PLANIFICADO ', NULL),
     ('1', 'value_priority', 'HIGH_PRIORITY', NULL),
     ('2', 'value_priority', 'NORMAL_PRIORITY', NULL),
-    ('3', 'value_priority', 'LOW_PRIORITY', NULL)
+    ('3', 'value_priority', 'LOW PRIORITY', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -8479,7 +8482,7 @@ FROM (
 ('descript', '%_gully%', 'form_feature', 'tab_data', 'Descript:', 'descript - Field to store additional information about the feature.'),
 ('diagonal', '%_connec%', 'form_feature', 'tab_data', 'Diagonal:', 'diagonal'),
 ('district_id', '%_gully%', 'form_feature', 'tab_data', 'District:', 'district_id - Identifier of the neighborhood with which the element is linked. To choose from those available in the drop-down (it is filtered according to the selected municipality)'),
-('dma_id', '%_gully%', 'form_feature', 'tab_data', 'Omzone:', 'omzone_id'),
+('dma_id', '%_gully%', 'form_feature', 'tab_data', 'Dma ID:', 'dma_id'),
 ('dwfzone_id', '%_gully%', 'form_feature', 'tab_data', 'Dwfzone', 'dwfzone_id'),
 ('dwfzone_id', '%_connec%', 'form_feature', 'tab_data', 'Dwfzone', 'dwfzone_id'),
 ('dwfzone_id', '%_node%', 'form_feature', 'tab_data', 'Dwfzone', 'dwfzone_id'),
@@ -8715,9 +8718,9 @@ FROM (
 ('district_id', '%_arc%', 'form_feature', 'tab_data', 'District:', 'district_id - Identifier of the neighborhood with which the element is linked. To choose from those available in the drop-down (it is filtered according to the selected municipality)'),
 ('district_id', '%_node%', 'form_feature', 'tab_data', 'District:', 'district_id'),
 ('district_id', '%_connec%', 'form_feature', 'tab_data', 'District:', 'district_id - Identifier of the neighborhood with which the element is linked. To choose from those available in the drop-down (it is filtered according to the selected municipality)'),
-('dma_id', '%_arc%', 'form_feature', 'tab_data', 'Omzone:', 'omzone_id'),
-('dma_id', '%_node%', 'form_feature', 'tab_data', 'Dma ID:', 'omzone_id - ID of the management area related to the arc (District Meter Area)'),
-('dma_id', '%_connec%', 'form_feature', 'tab_data', 'Omzone:', 'omzone_id'),
+('dma_id', '%_arc%', 'form_feature', 'tab_data', 'Dma ID:', 'dma_id'),
+('dma_id', '%_node%', 'form_feature', 'tab_data', 'Dma ID:', 'dma_id'),
+('dma_id', '%_connec%', 'form_feature', 'tab_data', 'Dma ID:', 'dma_id'),
 ('dma_name', '%_link%', 'form_feature', 'tab_data', 'Dma name:', 'dma_name'),
 ('dqa_id', '%_link%', 'form_feature', 'tab_data', 'Dqa id:', 'dqa_id'),
 ('dqa_name', '%_link%', 'form_feature', 'tab_data', 'Dqa name:', 'dqa_name'),

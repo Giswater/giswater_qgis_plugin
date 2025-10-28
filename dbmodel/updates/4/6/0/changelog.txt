@@ -1,0 +1,5 @@
+4.6.0
+*************
+- refactor(netscenario): rename expl_id2 to expl_id and convert to _int4 array
+- feat(netscenario): add muni_id and sector_id columns as _int4 arrays
+- feat(netscenario): add commitChanges and fromZero widgets to the dialog
