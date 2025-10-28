@@ -688,7 +688,8 @@ class GwImportInpTask(GwTask):
                 link_name = link_obj.name
                 link_id = self.arc_ids.get(link_name, link_name)
                 # Add _n2a because in go2epa valves/pumps are transformed to nodes
-                link_id = f"{link_id}_n2a"
+                if link_type.lower() in ['valve', 'pump']:
+                    link_id = f"{link_id}_n2a"
 
                 # Format based on condition type
                 if isinstance(control._condition, (SimTimeCondition, TimeOfDayCondition)):
