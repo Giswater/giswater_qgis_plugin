@@ -1816,7 +1816,6 @@ class GwPsector:
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
 
-
         if tools_gw.get_config_parser('btn_psector_manager', 'active_filter', 'user', 'session') == 'True':
             self.dlg_psector_mng.chk_active.setChecked(True)
         if tools_gw.get_config_parser('btn_psector_manager', 'archived_filter', 'user', 'session') == 'True':
