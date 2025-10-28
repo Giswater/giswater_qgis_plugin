@@ -218,7 +218,19 @@ BEGIN
 	
 	IF v_cur_psector IS NOT NULL AND v_tabname IN ('tab_psector', 'tab_exploitation', 'tab_sector') THEN  -- mode psector ON
 		--unselect psector in different ways
-		IF (v_cur_psector = v_id::integer AND v_value = 'False')
+		v_geometry := COALESCE(v_geometry, '{}');
+		v_uservalues := COALESCE(v_uservalues, '{}');
+		v_action := COALESCE(v_action, 'null');
+
+		IF v_tabname = 'tab_psector' AND v_checkall IS FALSE THEN
+		
+			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND ' || v_columnname || ' != ' || v_cur_psector;
+
+			SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4358;
+		
+			v_message := COALESCE(v_message, '{}');
+		
+		ELSIF (v_cur_psector = v_id::integer AND v_value = 'False')
 			OR v_checkall IS FALSE
 			OR (v_cur_psector != v_id::integer AND v_isalone)
 			OR (v_tabname = 'tab_exploitation' AND v_id::int IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
@@ -235,17 +247,14 @@ BEGIN
 				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4358;
 			END IF;
 		
-			v_geometry := COALESCE(v_geometry, '{}');
-			v_uservalues := COALESCE(v_uservalues, '{}');
-			v_action := COALESCE(v_action, 'null');
 			v_message := COALESCE(v_message, '{}');
-		
-			v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
-			"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
-	
-			RETURN gw_fct_getselectors(v_return);
 	
 		END IF;
+
+		v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
+		"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
+		
+		RETURN gw_fct_getselectors(v_return);
 	
 	END IF;
 
