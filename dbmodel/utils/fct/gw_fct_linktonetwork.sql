@@ -513,13 +513,13 @@ BEGIN
 							v_state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user = current_user);
 							IF v_state_type IS NULL THEN
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-								"data":{"message":"4432", "function":"3188","fid": 217, "parameters":{"parameter":"edit_statetype_2_vdefault"}, "is_process":true}}$$);';
+								"data":{"message":"4432", "function":"3188","fid": 217, "is_process":true}}$$);';
 							END IF;
 						ELSE
 							v_state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_1_vdefault' AND cur_user = current_user);
 							IF v_state_type IS NULL THEN
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-								"data":{"message":"4432", "function":"3188","fid": 217, "parameters":{"parameter":"edit_statetype_1_vdefault"}, "is_process":true}}$$);';
+								"data":{"message":"4432", "function":"3188","fid": 217, "is_process":true}}$$);';
 							END IF;
 						END IF;
 					
