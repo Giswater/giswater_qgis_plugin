@@ -1805,6 +1805,12 @@ class GwPsector:
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
 
+
+        if tools_gw.get_config_parser('btn_psector_manager', 'active_filter', 'user', 'session') == 'True':
+            self.dlg_psector_mng.chk_active.setChecked(True)
+        if tools_gw.get_config_parser('btn_psector_manager', 'archived_filter', 'user', 'session') == 'True':
+            self.dlg_psector_mng.chk_archived.setChecked(True)
+
         # Open form
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
         self.dlg_psector_mng.btn_create.clicked.connect(partial(self.open_psector_dlg))
@@ -2164,6 +2170,9 @@ class GwPsector:
         and the filter is disabled if it was still active.
         """
         try:
+            tools_gw.set_config_parser('btn_psector_manager', 'active_filter', self.dlg_psector_mng.chk_active.isChecked())
+            tools_gw.set_config_parser('btn_psector_manager', 'archived_filter', self.dlg_psector_mng.chk_archived.isChecked())
+
             if self.dlg_psector_mng.chk_filter_canvas.isChecked():
                 # Uncheck the checkbox and disable the filter
                 self.dlg_psector_mng.chk_filter_canvas.setChecked(False)
