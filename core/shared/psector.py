@@ -691,6 +691,11 @@ class GwPsector:
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname)
 
+        # Show success message
+        msg = "Reports generated successfully"
+        tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
+
+        # Close dialog  
         tools_gw.close_dialog(self.dlg_psector_rapport)
 
     def generate_composer(self, path):
