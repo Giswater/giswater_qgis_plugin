@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_netscenario_presszone',
     ARRAY[
         'netscenario_id', 'presszone_id', 'presszone_name', 'head', 'graphconfig', 'the_geom',
-        'active', 'updated_at', 'updated_by', 'presszone_type', 'stylesheet', 'expl_id2'
+        'active', 'updated_at', 'updated_by', 'presszone_type', 'stylesheet', 'expl_id', 'muni_id', 'sector_id'
     ],
     'Table plan_netscenario_presszone should have the correct columns'
 );
@@ -41,7 +41,9 @@ SELECT col_type_is('plan_netscenario_presszone', 'updated_at', 'timestamp with t
 SELECT col_type_is('plan_netscenario_presszone', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
 SELECT col_type_is('plan_netscenario_presszone', 'presszone_type', 'text', 'Column presszone_type should be text');
 SELECT col_type_is('plan_netscenario_presszone', 'stylesheet', 'json', 'Column stylesheet should be json');
-SELECT col_type_is('plan_netscenario_presszone', 'expl_id2', 'integer', 'Column expl_id2 should be integer');
+SELECT col_type_is('plan_netscenario_presszone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
+SELECT col_type_is('plan_netscenario_presszone', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
+SELECT col_type_is('plan_netscenario_presszone', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
 
 -- Check default values
 SELECT col_default_is('plan_netscenario_presszone', 'active', 'true', 'Default value for active should be true');

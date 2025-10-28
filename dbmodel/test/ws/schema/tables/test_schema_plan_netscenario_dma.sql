@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_netscenario_dma',
     ARRAY[
         'netscenario_id', 'dma_id', 'dma_name', 'pattern_id', 'graphconfig', 'the_geom',
-        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id2'
+        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id', 'muni_id', 'sector_id'
     ],
     'Table plan_netscenario_dma should have the correct columns'
 );
@@ -40,7 +40,9 @@ SELECT col_type_is('plan_netscenario_dma', 'active', 'boolean', 'Column active s
 SELECT col_type_is('plan_netscenario_dma', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
 SELECT col_type_is('plan_netscenario_dma', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
 SELECT col_type_is('plan_netscenario_dma', 'stylesheet', 'json', 'Column stylesheet should be json');
-SELECT col_type_is('plan_netscenario_dma', 'expl_id2', 'integer', 'Column expl_id2 should be integer');
+SELECT col_type_is('plan_netscenario_dma', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
+SELECT col_type_is('plan_netscenario_dma', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
+SELECT col_type_is('plan_netscenario_dma', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
 
 -- Check default values
 SELECT col_default_is('plan_netscenario_dma', 'active', 'true', 'Default value for active should be true');
