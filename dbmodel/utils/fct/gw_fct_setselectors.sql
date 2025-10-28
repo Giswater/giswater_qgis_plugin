@@ -251,10 +251,10 @@ BEGIN
 
 	-- manage check all
 	IF v_checkall THEN
-		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
+		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations and not archived
 
 			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
+			' WHERE status NOT IN (5,6,7) AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
 
 		ELSIF v_tabname in ('tab_hydro_state', 'tab_mincut') THEN
 			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
