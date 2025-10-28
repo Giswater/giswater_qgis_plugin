@@ -2,3 +2,5 @@
 *************
 - Fix `cat_arc` `area` translation on es_CR
 - translate(config_param_system) `admin_currency`
+- Fix `config_fprocess` add rpt_arc_stats and rpt_node_stats entries
+- Fix `gw_fct_pg2epa_check_network` use -2 as dma_id to not use Undefined value
