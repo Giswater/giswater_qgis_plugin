@@ -324,8 +324,9 @@ class GwImportInpTask(GwTask):
                     process_options(value, category)
                 else:
                     if category == "report" and type(value) is bool:
-                        # TODO: manage "nodes" and "links" options
                         value = "YES" if value else "NO"
+                        if key in ("nodes", "links"):
+                            value = "ALL" if value else "NONE"
                     elif category == "time" and key not in ("pattern_start", "statistic"):
                         value = f"{int(value) // 3600}:{(int(value) % 3600) // 60:02d}" if value is not None else None
                     prefix = prefix_map.get(category, "inp_options_")
