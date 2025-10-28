@@ -1754,7 +1754,7 @@ class GwInfo(QObject):
         tools_gw.load_settings(dlg_sections)
 
         # Set dialog not resizable
-        dlg_sections.setFixedSize(dlg_sections.size())
+        dlg_sections.setFixedSize(757, 462)
 
         feature = '"id":"' + self.feature_id + '"'
         body = tools_gw.create_body(feature=feature)
@@ -1776,6 +1776,14 @@ class GwInfo(QObject):
 
         img = json_result['body']['data']['shapepng']
         tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
+
+        # Hide conduit and trench calculation fields
+        widgets_to_hide = ['lbl_cost_bulk', 'bulk', 'lbl_cost_area', 'area', 'lbl_cost_excav', 'm3mlexc',
+                          'lbl_cost_fill', 'm3mlfill', 'lbl_cost_exc', 'm3mlexcess', 'lbl_cost_trench', 'm2mltrenchl']
+        for widget_name in widgets_to_hide:
+            widget = dlg_sections.findChild(QWidget, widget_name)
+            if widget:
+                widget.setVisible(False)
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
         """
