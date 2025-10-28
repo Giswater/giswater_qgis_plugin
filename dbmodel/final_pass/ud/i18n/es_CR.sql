@@ -8994,7 +8994,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    (admin_currency, '{"id":"CRC", "descript":"COLONOS", "symbol":"₡"}')
+    ('admin_currency', '{"id":"CRC", "descript":"COLONOS", "symbol":"₡"}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 
