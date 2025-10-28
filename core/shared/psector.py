@@ -1933,6 +1933,7 @@ class GwPsector:
 
         # Refresh the table to show updated status
         self._filter_table(dialog, qtbl_psm, dialog.txt_name, dialog.chk_active, dialog.chk_archived, 'v_ui_plan_psector')
+        tools_gw.refresh_selectors()
 
     def update_current_psector(self, dialog, qtbl, scenario_type, col_id_name):
         """ Sets the selected psector as current if it is active """
