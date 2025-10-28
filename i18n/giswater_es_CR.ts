@@ -4310,6 +4310,10 @@
 			<translation>Sustitución del texto de la plantilla</translation>
 		</message>
 		<message>
+			<source>Reports generated successfully</source>
+			<translation>Reportes generados exitosamente</translation>
+		</message>
+		<message>
 			<source>Required fields are missing</source>
 			<translation>Faltan campos obligatorios</translation>
 		</message>
