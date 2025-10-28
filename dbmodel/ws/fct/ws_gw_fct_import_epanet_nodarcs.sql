@@ -61,7 +61,6 @@ BEGIN
     INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Disabled node trigger ''gw_trg_node_arc_divide''.');
 
     -- loop all arcs that need to be nodes
-    -- TODO: add where to only transform those on the current import inp
     FOR v_data IN
         SELECT *
         FROM (
@@ -210,13 +209,13 @@ BEGIN
                 (SELECT epa_type FROM node WHERE node_id=v_node2),'.'));
         END IF;
 
-        -- downgrade to obsolete arcs and nodes
-        UPDATE arc SET state=0,state_type=1 WHERE arc_id=v_data.arc_id;
-        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded arc.');
+        -- Delete old arc
+        DELETE FROM arc WHERE arc_id=v_data.arc_id;
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Deleted old arc.');
 
-        -- Only downgrade nodes that are JUNCTION type
-        UPDATE node SET state=0,state_type=1 WHERE node_id IN (v_node1, v_node2) AND epa_type='JUNCTION';
-        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded old junction nodes.');
+        -- Delete old junctions
+        DELETE FROM node WHERE node_id IN (v_node1, v_node2) AND epa_type='JUNCTION';
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Deleted old junctions.');
 
         -- update elevation of new node
         UPDATE node SET top_elev = v_elevation, the_geom = the_geom WHERE node_id=v_node_id;
