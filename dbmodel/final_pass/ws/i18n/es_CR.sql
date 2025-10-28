@@ -8055,6 +8055,14 @@ FROM (
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
+UPDATE config_param_system AS t
+SET value = v.value
+FROM (
+    VALUES
+    (admin_currency, '{"id":"CRC", "descript":"COLONOS", "symbol":"₡"}')
+) AS v(parameter, value)
+WHERE t.parameter = v.parameter;
+
 UPDATE value_state AS t
 SET name = v.name, observ = v.observ
 FROM (
