@@ -432,7 +432,7 @@ class GwEpaFileManager(GwTask):
 
                 # Check if this is an EPA RESULTS layer
                 
-                context =tools_db.get_row("SELECT idval FROM config_typevalue WHERE id = (SELECT context FROM sys_table WHERE id = 'v_rpt_arc');")
+                context = tools_db.get_row("SELECT idval FROM config_typevalue WHERE id = (SELECT context FROM sys_table WHERE id = 'v_rpt_arc');")
                 context = json.loads(context[0])
                 if len(levels) > 1 and levels[0] == context[0] and levels[1] == context[1]:
                     tablename = field['tableName']
