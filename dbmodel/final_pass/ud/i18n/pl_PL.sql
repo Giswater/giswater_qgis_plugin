@@ -248,7 +248,6 @@ FROM (
     ('om_visit_startdate_vdefault', 'Data rozpoczęcia wizyty:', 'Domyślna wartość daty rozpoczęcia wizyty'),
     ('om_visit_status_vdefault', 'Status wizyty:', 'Domyślna wartość statusu wizyty'),
     ('plan_psector_current', 'Sektor (alternatywny):', 'Domyślna wartość parametru psector'),
-    ('plan_psector_disable_forced_style', 'Style forcing value', 'Variable to disable forced style changes to apply GwPlan'),
     ('plan_psector_force_delete', 'Wymuś usunięcie zaplanowanej funkcji:', 'Zezwalaj na automatyczne usuwanie zaplanowanych funkcji, gdy sektor jest usuwany, a funkcja ta nie jest obecna w innym sektorze.'),
     ('plan_psector_gexpenses_vdefault', 'Wydatki sektora:', 'Domyślna wartość parametru psector general expenses'),
     ('plan_psector_measurement_vdefault', 'Pomiar sektorowy:', 'Wartość domyślna parametru pomiaru psector'),
@@ -607,9 +606,9 @@ FROM (
     ('btn_accept', 'generic', 'form_visit', 'tab_data', ':', ':'),
     ('btn_apply', 'generic', 'form_visit', 'tab_file', ':', ':'),
     ('btn_cancel', 'generic', 'form_visit', 'tab_file', ':', ':'),
-    ('btn_accept', 'generic', 'link_to_gully', 'tab_none', ':', 'Akceptuj'),
+    ('btn_accept', 'generic', 'link_to_gully', 'tab_none', NULL, 'Akceptuj'),
     ('btn_add', 'generic', 'link_to_gully', 'tab_none', NULL, 'Dodaj'),
-    ('btn_close', 'generic', 'link_to_gully', 'tab_none', ':', 'Zamknij'),
+    ('btn_close', 'generic', 'link_to_gully', 'tab_none', NULL, 'Zamknij'),
     ('btn_filter_expression', 'generic', 'link_to_gully', 'tab_none', NULL, 'Filtruj według wyrażenia'),
     ('btn_remove', 'generic', 'link_to_gully', 'tab_none', NULL, 'Usunąć'),
     ('btn_snapping', 'generic', 'link_to_gully', 'tab_none', NULL, 'Wybierz na płótnie'),
@@ -3018,9 +3017,9 @@ FROM (
     ('spacer', 'generic', 'form_featuretype_change', 'tab_none', NULL, NULL),
     ('visit_id', 'generic', 'form_visit', 'tab_data', 'Identyfikator wizyty:', 'Identyfikator wizyty:'),
     ('arc_id', 'generic', 'link_to_connec', 'tab_none', 'Podłącz do łuku:', 'Arc Id'),
-    ('btn_accept', 'generic', 'link_to_connec', 'tab_none', ':', 'Akceptuj'),
+    ('btn_accept', 'generic', 'link_to_connec', 'tab_none', NULL, 'Akceptuj'),
     ('btn_add', 'generic', 'link_to_connec', 'tab_none', NULL, 'Dodaj'),
-    ('btn_close', 'generic', 'link_to_connec', 'tab_none', ':', 'Zamknij'),
+    ('btn_close', 'generic', 'link_to_connec', 'tab_none', NULL, 'Zamknij'),
     ('btn_expr_arc', 'generic', 'link_to_connec', 'tab_none', NULL, 'Wybierz według wyrażenia - Ustaw najbliższy punkt'),
     ('btn_filter_expression', 'generic', 'link_to_connec', 'tab_none', NULL, 'Filtruj według wyrażenia'),
     ('btn_remove', 'generic', 'link_to_connec', 'tab_none', NULL, 'Usunąć'),
@@ -4115,7 +4114,6 @@ FROM (
     ('25', 'sys_table_context', '["MASTERPLAN", "PSECTOR"]'),
     ('26', 'sys_table_context', '["MASTERPLAN", "TRACEABILITY"]'),
     ('3', 'sys_table_context', '["EPA", "COMPARE"]'),
-    ('33', 'sys_table_context', '["MASTERPLAN", "REPOSITION VALUE"]'),
     ('4', 'sys_table_context', '["EPA", "DSCENARIO"]'),
     ('5', 'sys_table_context', '["EPA", "FLOWREG"]'),
     ('6', 'sys_table_context', '["EPA", "HYDRAULICS"]'),
@@ -4226,7 +4224,6 @@ FROM (
     (401, NULL, NULL, 'Y0 wyższe niż ymax na węzłach)'),
     (416, NULL, NULL, 'Wpust bez pjoint_id lub pjoint_type'),
     (418, 'łącza o nieprawidłowej topologii. Punkt początkowy nie pasuje do połączenia.', 'Wszystkie połączenia mają połączenie z punktem początkowym', 'Linki bez wpustu w punkcie początkowym'),
-    (423, 'cechy o typie fluid_type nie istnieją w domenie om_typevalue.', 'Wszystkie funkcje mają poinformowany typ fluid_type', 'Import wizyt na łuku'),
     (427, NULL, NULL, 'Sprawdź, czy długość regulatora przepływu pasuje do łuku docelowego'),
     (455, NULL, NULL, 'Sprawdź arc_id null dla wpustu'),
     (456, NULL, NULL, 'Sprawdzanie wpustów z wartościami null na (custom)top_elev'),
@@ -4548,6 +4545,7 @@ FROM (
     (420, 'features bez wartości w polu "code_autofill" z cat_feature.', 'Wszystkie funkcje mają wartość w polu "code_autofill".', 'Sprawdź nodarcs'),
     (421, 'cechy z category_type nie istnieją w tabeli man_type_category.', 'Wszystkie funkcje mają kategorię category_type opartą na tabeli man_type_category', 'Import tabeli cat_connec'),
     (422, 'funkcja o typie function_type nie istnieje w tabeli man_type_function.', 'Wszystkie funkcje mają typ funkcji poinformowany w tabeli man_type_function', 'Proces Mincut'),
+    (423, 'cechy o typie fluid_type nie istnieją w domenie om_typevalue.', 'Wszystkie funkcje mają poinformowany typ fluid_type', 'Import wizyt na łuku'),
     (424, 'cechy o typie location_type nie istnieją w tabeli man_type_location.', 'Wszystkie funkcje mają typ lokalizacji określony w tabeli man_type_location', 'Funkcje testowe'),
     (426, 'wierszy z nieprawidłową konfiguracją eksploatacji w tabeli config_graph_mincut. Przed kontynuowaniem sprawdź swoje dane.', 'Wygląda na to, że tabela config_graph_mincut jest dobrze skonfigurowana. Przynajmniej tabela jest wypełniona węzłami ze wszystkich exploitów. Wszystkie zbiorniki są zdefiniowane w config_graph_mincut.', 'Sprawdź planowaną funkcję ze stanem=0 w tabelach psector'),
     (428, 'bez geometrii. Przechwytywanie wartości z DEM jest włączone, ale nie powiedzie się przy wykorzystaniu: '',string_agg(name,'', '')', 'Przechwytywanie wartości z DEM jest włączone i będzie działać poprawnie, ponieważ wszystkie exploity mają geometrię.', 'Sprawdź, czy expl.geom nie ma wartości null, gdy włączony jest rastrowy DEM'),
@@ -5169,7 +5167,7 @@ FROM (
     (3518, 'Elementy powiązane z funkcją: %v_element%', NULL),
     (3520, 'Wizyty związane z funkcją: %v_visit%', NULL),
     (3522, 'Dokumenty związane z funkcją: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psektory połączone z cechą: %,v_psector%', NULL),
     (3526, 'WAŻNE: Aktywuj psector przed usunięciem funkcji.', NULL),
     (3528, 'Naprawione łuki: arc_id --> %arc_ids%', NULL),
     (3562, 'Nie wybrano żadnych łuków', NULL),
@@ -5359,7 +5357,6 @@ FROM (
     (4412, 'It is not allowed to delete planified features in operative mode', 'Switch to plan mode to delete the feature'),
     (4414, 'It is not allowed to delete features from a different psector than the current one', 'Switch to the correct psector to delete the feature'),
     (4416, 'It is not allowed to delete operative features in plan mode', 'Switch to operative mode to delete the feature'),
-    (4428, 'DATA QUALITY ANALYSIS ACORDING O&M RULES', NULL),
     (4430, 'The %feature_type% with id %connec_id% has been successfully connected to the arc with id %arc_id%', NULL),
     (4432, 'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)', NULL),
     (4434, 'Trying to connect %feature_type% with id %connect_id% to the closest arc.', NULL),
@@ -6532,7 +6529,7 @@ FROM (
     ('1', 'psector_type', 'PLANOWANE', NULL),
     ('1', 'value_priority', 'WYSOKI_PRIORYTET', NULL),
     ('2', 'value_priority', 'NORMAL_PRIORITY', NULL),
-    ('3', 'value_priority', 'LOW_PRIORITY', NULL)
+    ('3', 'value_priority', 'NISKI PRIORYTET', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -8345,10 +8342,10 @@ FROM (
     ('v_link_connec', NULL, 'Filtrowany widok połączeń typu link'),
     ('v_node', NULL, 'Wyświetla dane węzła.'),
     ('v_om_visit', NULL, 'Pokazuje wszystkie wykonane wizyty".'),
-    ('v_plan_arc', 'Arc reposition value', 'Wyświetl tylko najważniejsze informacje o koszcie łuku'),
+    ('v_plan_arc', NULL, 'Wyświetl tylko najważniejsze informacje o koszcie łuku'),
     ('v_plan_aux_arc_pavement', NULL, 'Warstwa odnosząca chodniki do łuku'),
     ('v_plan_current_psector', 'Zaplanuj bieżący sektor', 'Widok przedstawiający aktualnie zaplanowany sektor'),
-    ('v_plan_node', 'Node reposition value', 'Wyświetl tylko najważniejsze informacje o koszcie węzła'),
+    ('v_plan_node', NULL, 'Wyświetl tylko najważniejsze informacje o koszcie węzła'),
     ('v_plan_psector_all', NULL, 'Niefiltrowany widok, który pokazuje zaplanowane sektory'),
     ('v_plan_psector_arc', 'Łuk sektora planu', 'Widok pokazujący łuki powiązane z psektorami. Przydatne do pokazywania łuków, które będą przestarzałe w psektorach'),
     ('v_plan_psector_budget', NULL, 'Pokazuje ogólny budżet bieżącego sektora'),
@@ -8456,7 +8453,6 @@ FROM (
 ('brand_id', '%_connec%', 'form_feature', 'tab_data', 'Brand id:', 'brand_id'),
 ('builtdate', '%_gully%', 'form_feature', 'tab_data', 'Data budowy:', 'builtdate - identyfikator daty budowy związanej z wpustem.'),
 ('category_type', '%_gully%', 'form_feature', 'tab_data', 'Typ kategorii:', 'category_type'),
-('category_type', '%_node%', 'form_feature', 'tab_data', 'Category type:', 'Category type'),
 ('cat_geom1', '%_arc%', 'form_feature', 'tab_data', 'Cat geom1:', 'cat_geom1'),
 ('cat_geom2', '%_arc%', 'form_feature', 'tab_data', 'Poziomy pomiar wewnętrzny:', 'Poziomy pomiar wewnętrzny'),
 ('cat_grate_matcat', '%_gully%', 'form_feature', 'tab_data', 'Materiał:', 'Materiał'),
@@ -8497,7 +8493,6 @@ FROM (
 ('elev2', '%_arc%', 'form_feature', 'tab_data', 'Elev2:', 'elev2'),
 ('enddate', '%_gully%', 'form_feature', 'tab_data', 'Data zakończenia:', 'Data zakończenia'),
 ('epa_type', '%_gully%', 'form_feature', 'tab_data', 'Typ Epa:', 'epa_type - Typ węzła do użycia w modelu hydraulicznym. Nie trzeba go wprowadzać, jest ustawiany automatycznie w zależności od typu węzła.'),
-('epa_type', '%_node%', 'form_feature', 'tab_data', 'Epa type:', 'epa_type - Type of node to use for the hydraulic model. It is not necessary to enter it, it is automatic depending on the node type.'),
 ('expl_id', '%_gully%', 'form_feature', 'tab_data', 'Działanie:', 'expl_id'),
 ('expl_id2', '%_gully%', 'form_feature', 'tab_data', 'Operacja 2:', 'expl_id - Eksploatacja, do której należy element. Jeśli konfiguracja nie zostanie zmieniona, program automatycznie wybierze ją na podstawie geometrii.'),
 ('featurecat_id', '%_gully%', 'form_feature', 'tab_data', 'Identyfikator Featurecat:', 'featurecat_id'),
@@ -8528,7 +8523,6 @@ FROM (
 ('label_quadrant', '%_gully%', 'form_feature', 'tab_data', 'Etykieta kwadrantu:', 'label_quadrant'),
 ('label_rotation', '%_gully%', 'form_feature', 'tab_data', 'Rotacja etykiet:', 'label_rotation'),
 ('label_x', '%_gully%', 'form_feature', 'tab_data', 'Etykieta x:', 'label_x - współrzędna X lokalizacji etykiety'),
-('label_x', '%_node%', 'form_feature', 'tab_data', 'Label x:', 'label_x - X coordinate of the label''s location'),
 ('label_y', '%_gully%', 'form_feature', 'tab_data', 'Etykieta y:', 'label_y - współrzędna Y lokalizacji etykiety'),
 ('lastupdate', '%_gully%', 'form_feature', 'tab_data', 'Ostatnia aktualizacja:', 'lastupdate - Ostatnia aktualizacja tego elementu'),
 ('lastupdate_user', '%_gully%', 'form_feature', 'tab_data', 'Użytkownik ostatniej aktualizacji:', 'lastupdate_user'),
@@ -8549,7 +8543,7 @@ FROM (
 ('model_id', '%_gully%', 'form_feature', 'tab_data', 'Identyfikator modelu:', 'model_id'),
 ('model_id', '%_connec%', 'form_feature', 'tab_data', 'Model id:', 'model_id'),
 ('muni_id', '%_gully%', 'form_feature', 'tab_data', 'Identyfikator gminy:', 'muni_id - Gmina, do której należy element. Jeśli konfiguracja nie zostanie zmodyfikowana, program automatycznie wybierze ją na podstawie geometrii.'),
-('muni_id', '%_element%', 'form_feature', 'tab_data', 'Municipality id:', 'muni_id - Identifier of the municipality'),
+('muni_id', '%_element%', 'form_feature', 'tab_data', 'Municipality:', 'muni_id'),
 ('name', '%_arc%', 'form_feature', 'tab_data', 'Imię i nazwisko:', 'name - Nazwa elementu'),
 ('negative_offset', '%_arc%', 'form_feature', 'tab_data', 'Ujemny offset:', 'ujemny offset'),
 ('num_value', '%_gully%', 'form_feature', 'tab_data', 'Wartość liczbowa:', 'Wartość liczbowa'),
@@ -8626,6 +8620,7 @@ FROM (
 ('sys_y2', '%_arc%', 'form_feature', 'tab_data', 'Sys y2:', 'sys_y2'),
 ('sys_ymax', '%_node%', 'form_feature', 'tab_data', 'Sys ymax:', 'sys_ymax'),
 ('top_elev', '%_gully%', 'form_feature', 'tab_data', 'Górna elewacja:', 'top_elev - wysokość wpustu w stopach lub metrach.'),
+('top_elev', '%_node%', 'form_feature', 'tab_data', 'Top elevation:', 'top_elev - Elevation of the gully in ft or m.'),
 ('treatment_type', '%_node%', 'form_feature', 'tab_data', 'Rodzaj leczenia:', 'treatment_type'),
 ('tstamp', '%_gully%', 'form_feature', 'tab_data', 'Wstaw tstamp:', 'tstamp - Data wstawienia elementu do bazy danych'),
 ('uncertain', '%_arc%', 'form_feature', 'tab_data', 'Niepewne:', 'niepewny'),
@@ -8661,8 +8656,7 @@ FROM (
 ('z1', '%_arc%', 'form_feature', 'tab_data', 'Z1:', 'z1'),
 ('z2', '%_arc%', 'form_feature', 'tab_data', 'Z2:', 'z2'),
 ('date_from', '%_link%', 'form_feature', 'tab_documents', 'Date from:', 'Date from:'),
-('doc_name', '%_link%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
-('doc_type', '%_link%', 'form_feature', 'tab_documents', 'Doc type:', 'Doc type:'),
+('date_to', '%_link%', 'form_feature', 'tab_documents', 'Date to:', 'Date to:'),
 ('accessibility', '%_node%', 'form_feature', 'tab_data', 'Dostępność:', 'Dostępność:'),
 ('accessibility', '%_connec%', 'form_feature', 'tab_data', 'Dostępność:', 'dostępność - dostęp do elementu'),
 ('access_type', '%_node%', 'form_feature', 'tab_data', 'Typ dostępu:', 'access_type'),
@@ -8695,6 +8689,7 @@ FROM (
 ('cat_dr', '%_arc%', 'form_feature', 'tab_data', 'Cat dr:', 'cat_dr'),
 ('category_type', '%_element%', 'form_feature', 'tab_data', 'Typ kategorii:', 'Typ kategorii'),
 ('category_type', '%_arc%', 'form_feature', 'tab_data', 'Typ kategorii:', 'category_type'),
+('category_type', '%_node%', 'form_feature', 'tab_data', 'Typ kategorii:', 'category_type - identyfikator typu kategorii powiązanego z węzłem.'),
 ('category_type', '%_connec%', 'form_feature', 'tab_data', 'Typ kategorii:', 'category_type'),
 ('code', '%_element%', 'form_feature', 'tab_data', 'Kod:', 'Kod:'),
 ('code', '%_node%', 'form_feature', 'tab_data', 'Kod:', 'kod'),
@@ -8739,6 +8734,7 @@ FROM (
 ('enddate', '%_arc%', 'form_feature', 'tab_data', 'Data zakończenia:', 'enddate - Data zakończenia elementu. Zostanie wypełniona tylko wtedy, gdy element jest w stanie wyrejestrowania.'),
 ('epa_type', '%_arc%', 'form_feature', 'tab_data', 'Typ Epa:', 'epa_type'),
 ('epa_type', '%_element%', 'form_feature', 'tab_data', 'Typ EPA:', 'Typ EPA'),
+('epa_type', '%_node%', 'form_feature', 'tab_data', 'Typ Epa:', 'epa_type - Typ węzła do użycia w modelu hydraulicznym. Nie trzeba go wprowadzać, jest ustawiany automatycznie w zależności od typu węzła.'),
 ('exit_id', '%_link%', 'form_feature', 'tab_data', 'Exit ID:', 'Identyfikator wyjścia'),
 ('exit_type', '%_link%', 'form_feature', 'tab_data', 'Typ wyjścia:', 'Typ wyjścia'),
 ('expl_id', '%_element%', 'form_feature', 'tab_data', 'Działanie:', 'Działanie'),
@@ -8781,6 +8777,7 @@ FROM (
 ('label_rotation', '%_arc%', 'form_feature', 'tab_data', 'Rotacja etykiet:', 'label_rotation - kąt obrotu etykiety'),
 ('label_rotation', '%_connec%', 'form_feature', 'tab_data', 'Rotacja etykiet:', 'label_rotation - kąt obrotu etykiety'),
 ('label_x', '%_arc%', 'form_feature', 'tab_data', 'Etykieta x:', 'label_x - współrzędna X lokalizacji etykiety'),
+('label_x', '%_node%', 'form_feature', 'tab_data', 'Label x:', 'label_x - X coordinate of the label''s location'),
 ('label_x', '%_connec%', 'form_feature', 'tab_data', 'Etykieta x:', 'label_x'),
 ('label_y', '%_node%', 'form_feature', 'tab_data', 'Etykieta y:', 'label_y'),
 ('label_y', '%_connec%', 'form_feature', 'tab_data', 'Etykieta y:', 'label_y'),
@@ -8915,7 +8912,6 @@ FROM (
 ('to_arc', '%_element%', 'form_feature', 'tab_data', 'Do łuku:', 'to_arc'),
 ('top_elev', '%_element%', 'form_feature', 'tab_data', 'Górna elewacja:', 'top_elev - wysokość węzła w stopach lub metrach.'),
 ('top_elev', '%_connec%', 'form_feature', 'tab_data', 'Górna elewacja:', 'top_elev - wysokość połączenia w ft lub m.'),
-('top_elev', '%_node%', 'form_feature', 'tab_data', 'Top elev:', 'top_elev'),
 ('top_elev1', '%_link%', 'form_feature', 'tab_data', 'Najlepszy uczeń 1:', 'top_elev1'),
 ('top_elev2', '%_link%', 'form_feature', 'tab_data', 'Najlepszy uczeń 2:', 'top_elev2'),
 ('tstamp', '%_connec%', 'form_feature', 'tab_data', 'Wstaw tstamp:', 'tstamp - Data wstawienia elementu do bazy danych'),
@@ -8947,8 +8943,9 @@ FROM (
 ('btn_doc_new', '%_element%', 'form_feature', 'tab_documents', NULL, 'Nowy dokument'),
 ('date_from', '%_element%', 'form_feature', 'tab_documents', 'Data od:', 'Data od:'),
 ('date_to', '%_element%', 'form_feature', 'tab_documents', 'Data do:', 'Data do:'),
-('date_to', '%_link%', 'form_feature', 'tab_documents', 'Date to:', 'Date to:'),
+('doc_name', '%_link%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
 ('doc_name', '%_element%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
+('doc_type', '%_link%', 'form_feature', 'tab_documents', 'Typ dokumentu:', 'Doc type:'),
 ('doc_type', '%_element%', 'form_feature', 'tab_documents', 'Typ dokumentu:', 'Typ dokumentu:'),
 ('hspacer_document_1', '%_element%', 'form_feature', 'tab_documents', NULL, NULL),
 ('hspacer_document_1', '%_link%', 'form_feature', 'tab_documents', NULL, NULL),
@@ -8992,14 +8989,6 @@ FROM (
 ('visit_class', '%_link%', 'form_feature', 'tab_visit', 'Visit class:', 'Visit class:')
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
-
-UPDATE config_param_system AS t
-SET value = v.value
-FROM (
-    VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
-) AS v(parameter, value)
-WHERE t.parameter = v.parameter;
 
 UPDATE value_state AS t
 SET name = v.name, observ = v.observ

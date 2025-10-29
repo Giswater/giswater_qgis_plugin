@@ -86,7 +86,6 @@ FROM (
     ('om_visit_startdate_vdefault', 'Data începerii vizitei:', 'Valoarea implicită a datei de începere a vizitei'),
     ('om_visit_status_vdefault', 'Statutul vizitei:', 'Valoarea implicită a statutului vizitei'),
     ('plan_psector_current', 'Psector (Alternativă):', 'Valoarea implicită a parametrului psector'),
-    ('plan_psector_disable_forced_style', 'Style forcing value', 'Variable to disable forced style changes to apply GwPlan'),
     ('plan_psector_force_delete', 'Forțați ștergerea caracteristicii planificate:', 'Permiteți ștergerea automată a caracteristicilor planificate atunci când un psector este șters și această caracteristică nu este prezentă în alt psector'),
     ('plan_psector_gexpenses_vdefault', 'Cheltuieli sectoriale:', 'Valoarea implicită a parametrului psector cheltuieli generale'),
     ('plan_psector_measurement_vdefault', 'Măsurarea psectorială:', 'Valoarea implicită a parametrului de măsurare psector'),
@@ -879,9 +878,9 @@ FROM (
     ('spacer', 'generic', 'form_featuretype_change', 'tab_none', NULL, NULL),
     ('visit_id', 'generic', 'form_visit', 'tab_data', 'Vizitați id:', 'Vizitați id:'),
     ('arc_id', 'generic', 'link_to_connec', 'tab_none', 'Conectați-vă la arc:', 'Arc Id'),
-    ('btn_accept', 'generic', 'link_to_connec', 'tab_none', ':', 'Acceptați'),
+    ('btn_accept', 'generic', 'link_to_connec', 'tab_none', NULL, 'Acceptați'),
     ('btn_add', 'generic', 'link_to_connec', 'tab_none', NULL, 'Adaugă'),
-    ('btn_close', 'generic', 'link_to_connec', 'tab_none', ':', 'Închidere'),
+    ('btn_close', 'generic', 'link_to_connec', 'tab_none', NULL, 'Închidere'),
     ('btn_expr_arc', 'generic', 'link_to_connec', 'tab_none', NULL, 'Selectați prin expresie - Setați cel mai apropiat punct'),
     ('btn_filter_expression', 'generic', 'link_to_connec', 'tab_none', NULL, 'Filtrați după expresie'),
     ('btn_remove', 'generic', 'link_to_connec', 'tab_none', NULL, 'Eliminați'),
@@ -3374,7 +3373,6 @@ FROM (
     ('25', 'sys_table_context', '["MASTERPLAN", "PSECTOR"]'),
     ('26', 'sys_table_context', '["MASTERPLAN", "TRASABILITATE"]'),
     ('3', 'sys_table_context', '["EPA", "COMPARE"]'),
-    ('33', 'sys_table_context', '["MASTERPLAN", "REPOSITION VALUE"]'),
     ('4', 'sys_table_context', '["EPA", "DSCENARIO"]'),
     ('5', 'sys_table_context', '["EPA", "FLOWREG"]'),
     ('6', 'sys_table_context', '["EPA", "HYDRAULICS"]'),
@@ -3820,6 +3818,7 @@ FROM (
     (420, 'caracteristici fără valoare pe câmpul "code_autofill" din cat_feature.', 'Toate caracteristicile au valoare pe câmpul "code_autofill"', 'Verificați nodarcs'),
     (421, 'caracteristicile cu category_type nu există în tabelul man_type_category.', 'Toate caracteristicile au categoria_type informată în tabelul man_type_category', 'Import tabel cat_connec'),
     (422, 'funcțiile cu tipul_funcției nu există în tabelul man_type_function.', 'Toate caracteristicile au tipul_funcției informat în tabelul man_type_function', 'Procesul Mincut'),
+    (423, 'caracteristicile cu fluid_type nu există pe domeniul om_typevalue.', 'Toate caracteristicile au fluid_type informed', 'Import arc vizite'),
     (424, 'caracteristicile cu location_type nu există în tabelul man_type_location.', 'Toate caracteristicile au location_type informat pe man_type_location tabel', 'Funcții de testare'),
     (426, 'rânduri cu exploatare greșită configurate în tabelul config_graph_mincut. Vă rugăm să vă verificați datele înainte de a continua.', 'Se pare că tabelul config_graph_mincut este bine configurat. Cel puțin, tabelul este umplut cu noduri din toate exploatările. Toate rezervoarele sunt definite în config_graph_mincut.', 'Verificarea caracteristicii planificate cu starea = 0 pe tabelele psector'),
     (428, 'exploatări fără geometrie. Captarea valorilor din DEM este activată, dar va eșua la exploatare: '',string_agg(name,'', '')', 'Captarea valorilor din DEM este activată și va funcționa corect, deoarece toate exploatările au geometrie.', 'Verificați dacă expl.geom nu este nul atunci când DEM raster este activat'),
@@ -3978,7 +3977,6 @@ FROM (
     (412, 'nodarcs shortpipe peste alte noduri EPA.', 'Toate nodurile cu țevi scurte nu se află pe aceeași poziție cu celelalte noduri EPA.', 'Configurați zonele hărții'),
     (413, 'Conexiuni EPA peste noduri EPA', 'Nu au fost detectate conexiuni EPA peste nodul EPA.', 'Conectarea EPA la nodul EPA (goe2pa)'),
     (414, 'Catalog Connec fără material definit', 'Toate registrele catalogului de conectare au materiale definite', 'Verificați materialul de pe catalogul de conectare'),
-    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_ table'),
     (425, 'valoarea minlength este prost configurată (mai mult decât proximitatea nodului sau mai puțin de 0,01).', 'Valoarea lungimii minime ('',v_minlength,'') este bine configurată.', 'Arc invers'),
     (441, 'noduri dublate cu starea 1.', 'Nu există noduri duplicate cu starea 1', 'Calculul echilibrului de apă'),
     (460, 'noduri orfane gata de export', 'Nu s-au găsit noduri orfane', 'EPA vnodes trim arcs'),
@@ -4398,7 +4396,7 @@ FROM (
     (3518, 'Elemente legate de caracteristică: %v_element%', NULL),
     (3520, 'Vizite legate de caracteristică: %v_visit%', NULL),
     (3522, 'Documente legate de caracteristică: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectoare conectate cu caracteristica: %,v_psector%', NULL),
     (3526, 'IMPORTANT: Activați psector înainte de a șterge caracteristicile.', NULL),
     (3528, 'Arcuri reparate: arc_id --> %arc_ids%', NULL),
     (3562, 'Nu au fost selectate arce', NULL),
@@ -4588,7 +4586,6 @@ FROM (
     (4412, 'It is not allowed to delete planified features in operative mode', 'Switch to plan mode to delete the feature'),
     (4414, 'It is not allowed to delete features from a different psector than the current one', 'Switch to the correct psector to delete the feature'),
     (4416, 'It is not allowed to delete operative features in plan mode', 'Switch to operative mode to delete the feature'),
-    (4428, 'DATA QUALITY ANALYSIS ACORDING O&M RULES', NULL),
     (4430, 'The %feature_type% with id %connec_id% has been successfully connected to the arc with id %arc_id%', NULL),
     (4432, 'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)', NULL),
     (4434, 'Trying to connect %feature_type% with id %connect_id% to the closest arc.', NULL),
@@ -4694,9 +4691,7 @@ FROM (
     (4372, 'Numărul total de hidrometre afectate: %total%', NULL),
     (4374, 'Clasificarea hidrometrelor: %clasificat%', NULL),
     (4376, 'ANALIZA MINCUT', NULL),
-    (4378, 'Minimun cut have been checked looking for overlaps against other mincuts', NULL),
     (4378, 'Tăieturile minime au fost verificate pentru a se căuta suprapuneri cu alte tăieturi minime', NULL),
-    (4380, 'Psectors have been used to execute this mincut in order to calculate mincut affectations with planned network.', NULL),
     (4380, 'Psectorii au fost utilizați pentru a executa această tăiere minimă în scopul de a calcula afectarea tăierii minime cu rețeaua planificată.', NULL),
     (4382, '%count% Psectorii au fost deselectați în cadrul exploatării curente pentru a executa această tăiere minimă fără rețea planificată.', NULL),
     (4384, 'Mincut au fost executate fără rețea planificată.', NULL),
@@ -4710,12 +4705,7 @@ FROM (
     (4400, 'Există o suprapunere temporală fără intersecție spațială pe aceeași macroexploatare cu: %conflictmsg%', NULL),
     (4402, 'Nu sunt implicate conducte suplimentare și nu sunt afectate alte conexiuni', NULL),
     (4404, 'Nu există mai multe mincuts pe aceeași macroexploatare pe planificate la aceeași dată-timp', NULL),
-    (4406, 'Mincut au fost executate cu conflicte. Toate afinitățile suplimentare au fost unite pentru a prezenta mincut', NULL),
-    (4418, 'Mincut conflicts: [%array%]', NULL),
-    (4420, 'MINCUT AFFECTED STATS', NULL),
-    (4422, 'New affected mincuts have been created: [%array%]', NULL),
-    (4424, 'New affected mincut id: %id%', NULL),
-    (4426, 'Conflict Interval: %interval%', NULL)
+    (4406, 'Mincut au fost executate cu conflicte. Toate afinitățile suplimentare au fost unite pentru a prezenta mincut', NULL)
 ) AS v(id, error_message, hint_message)
 WHERE t.id = v.id;
 
@@ -5785,7 +5775,6 @@ FROM (
     ('2', 'mincut_state', 'Terminat', NULL),
     ('3', 'mincut_state', 'Anulat', NULL),
     ('4', 'mincut_state', 'Cu privire la planificare', NULL),
-    ('5', 'mincut_state', 'Conflict', NULL),
     ('4', 'visit_defect', 'Fără defecte', NULL),
     ('1', 'visit_leak', 'Nu există scurgeri', NULL),
     ('2', 'visit_leak', 'Scurgere minoră', NULL),
@@ -5819,7 +5808,7 @@ FROM (
     ('1', 'psector_type', 'PLANIFICAT', NULL),
     ('1', 'value_priority', 'ÎNALTĂ PRIORITATE (HIGH_PRIORITY)', NULL),
     ('2', 'value_priority', 'NORMAL_PRIORITY', NULL),
-    ('3', 'value_priority', 'LOW_PRIORITY', NULL),
+    ('3', 'value_priority', 'PRIORITATE SCĂZUTĂ', NULL),
     ('DMA', 'netscenario_type', 'DMA', NULL),
     ('PRESSZONE', 'netscenario_type', 'ZONA DE PRESĂ', NULL)
 ) AS v(id, typevalue, idval, descript)
@@ -7016,10 +7005,10 @@ FROM (
     ('v_link_connec', NULL, 'Vizualizare filtrată a legăturilor de tip conectare'),
     ('v_node', NULL, 'Afișează datele nodului.'),
     ('v_om_visit', NULL, 'Afișează toate vizitele executate."'),
-    ('v_plan_arc', 'Arc reposition value', 'Vizualizați numai cu cele mai importante informații despre costul arcului'),
+    ('v_plan_arc', NULL, 'Vizualizați numai cu cele mai importante informații despre costul arcului'),
     ('v_plan_aux_arc_pavement', NULL, 'Strat pentru corelarea pavajelor cu arcul'),
     ('v_plan_current_psector', 'Plan psector actual', 'Vizualizare pentru a arăta sectorul planificat actual'),
-    ('v_plan_node', 'Node reposition value', 'Vizualizare numai cu cele mai importante informații despre costul nodului'),
+    ('v_plan_node', NULL, 'Vizualizare numai cu cele mai importante informații despre costul nodului'),
     ('v_plan_psector_all', NULL, 'Vedere nefiltrată care arată sectoarele planificate'),
     ('v_plan_psector_arc', 'Plan psector arc', 'Vizualizare pentru a arăta arcele legate de psectoare. Utilă pentru a afișa arcele care vor fi depășite în psectoare'),
     ('v_plan_psector_budget', NULL, 'Prezintă bugetul general al sectorului curent'),
@@ -7520,6 +7509,7 @@ FROM (
 ('cat_dr', '%_arc%', 'form_feature', 'tab_data', 'Cat dr:', 'cat_dr'),
 ('category_type', '%_element%', 'form_feature', 'tab_data', 'Tip de categorie:', 'Tip de categorie'),
 ('category_type', '%_arc%', 'form_feature', 'tab_data', 'Tip de categorie:', 'tip_categorie'),
+('category_type', '%_node%', 'form_feature', 'tab_data', 'Tip de categorie:', 'category_type - ID al tipului de categorie aferent nodului.'),
 ('category_type', '%_connec%', 'form_feature', 'tab_data', 'Tip de categorie:', 'tip_categorie'),
 ('code', '%_element%', 'form_feature', 'tab_data', 'Cod:', 'Cod:'),
 ('code', '%_node%', 'form_feature', 'tab_data', 'Cod:', 'cod'),
@@ -7564,6 +7554,7 @@ FROM (
 ('enddate', '%_arc%', 'form_feature', 'tab_data', 'Data limită:', 'enddate - Data de încheiere a elementului. Aceasta va fi completată numai în cazul în care elementul se află în stare de dezînregistrare.'),
 ('epa_type', '%_arc%', 'form_feature', 'tab_data', 'Tip Epa:', 'epa_type'),
 ('epa_type', '%_element%', 'form_feature', 'tab_data', 'Tip EPA:', 'Tip EPA'),
+('epa_type', '%_node%', 'form_feature', 'tab_data', 'Tip Epa:', 'epa_type - Tipul de nod care urmează să fie utilizat pentru modelul hidraulic. Nu este necesar să îl introduceți, este automat în funcție de tipul de nod.'),
 ('exit_id', '%_link%', 'form_feature', 'tab_data', 'ID ieșire:', 'ID ieșire'),
 ('exit_type', '%_link%', 'form_feature', 'tab_data', 'Tip ieșire:', 'Tip ieșire'),
 ('expl_id', '%_element%', 'form_feature', 'tab_data', 'Funcționare:', 'Funcționare'),
@@ -7606,6 +7597,7 @@ FROM (
 ('label_rotation', '%_arc%', 'form_feature', 'tab_data', 'Rotirea etichetei:', 'label_rotation - Unghiul de rotație al etichetei'),
 ('label_rotation', '%_connec%', 'form_feature', 'tab_data', 'Rotirea etichetei:', 'label_rotation - Unghiul de rotație al etichetei'),
 ('label_x', '%_arc%', 'form_feature', 'tab_data', 'Etichetă x:', 'label_x - Coordonata X a locației etichetei'),
+('label_x', '%_node%', 'form_feature', 'tab_data', 'Etichetă x:', 'label_x - Coordonata X a locației etichetei'),
 ('label_x', '%_connec%', 'form_feature', 'tab_data', 'Etichetă x:', 'etichetă_x'),
 ('label_y', '%_node%', 'form_feature', 'tab_data', 'Etichetă y:', 'Etichetă_y'),
 ('label_y', '%_connec%', 'form_feature', 'tab_data', 'Etichetă y:', 'Etichetă_y'),
@@ -7740,7 +7732,6 @@ FROM (
 ('to_arc', '%_element%', 'form_feature', 'tab_data', 'Pentru arc:', 'to_arc'),
 ('top_elev', '%_element%', 'form_feature', 'tab_data', 'Supraînălțare:', 'top_elev - Înălțimea nodului în ft sau m.'),
 ('top_elev', '%_connec%', 'form_feature', 'tab_data', 'Supraînălțare:', 'top_elev - Altitudinea conexiunii în ft sau m.'),
-('top_elev', '%_node%', 'form_feature', 'tab_data', 'Elev de top:', 'top_elev'),
 ('top_elev1', '%_link%', 'form_feature', 'tab_data', 'Elev de top 1:', 'top_elev1'),
 ('top_elev2', '%_link%', 'form_feature', 'tab_data', 'Elev de top 2:', 'top_elev2'),
 ('tstamp', '%_connec%', 'form_feature', 'tab_data', 'Introduceți tstamp:', 'tstamp - Data introducerii elementului în baza de date'),
@@ -7772,8 +7763,9 @@ FROM (
 ('btn_doc_new', '%_element%', 'form_feature', 'tab_documents', NULL, 'Document nou'),
 ('date_from', '%_element%', 'form_feature', 'tab_documents', 'Data de la:', 'Data de la:'),
 ('date_to', '%_element%', 'form_feature', 'tab_documents', 'Data până la:', 'Data până la:'),
-('date_to', '%_link%', 'form_feature', 'tab_documents', 'Data până la:', 'Data până la:'),
+('doc_name', '%_link%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
 ('doc_name', '%_element%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
+('doc_type', '%_link%', 'form_feature', 'tab_documents', 'Tip doc:', 'Doc type:'),
 ('doc_type', '%_element%', 'form_feature', 'tab_documents', 'Tip doc:', 'Tip doc:'),
 ('hspacer_document_1', '%_element%', 'form_feature', 'tab_documents', NULL, NULL),
 ('hspacer_document_1', '%_link%', 'form_feature', 'tab_documents', NULL, NULL),
@@ -7840,7 +7832,6 @@ FROM (
 ('cat_dnom', '%_node%', 'form_feature', 'tab_data', 'Fund de pisică:', 'cat_dnom'),
 ('cat_dnom', '%_connec%', 'form_feature', 'tab_data', 'Fund de pisică:', 'cat_dnom'),
 ('cat_dnom', '%_arc%', 'form_feature', 'tab_data', 'Diametru nominal:', 'cat_dnom - Diametrul nominal al elementului în mm. Acesta nu poate fi reumplut. Se utilizează cel cu câmpul dnom din catalogul corespunzător'),
-('category_type', '%_node%', 'form_feature', 'tab_data', 'Category type:', 'category_type - ID of the category type related to node.'),
 ('cat_matcat_id', '%_node%', 'form_feature', 'tab_data', 'Cat matcat id:', 'cat_matcat_id'),
 ('cat_matcat_id', '%_arc%', 'form_feature', 'tab_data', 'Cat matcat id:', 'cat_matcat_id'),
 ('cat_matcat_id', '%_connec%', 'form_feature', 'tab_data', 'Cat matcat id:', 'cat_matcat_id'),
@@ -7907,7 +7898,6 @@ FROM (
 ('elev_height', '%_node%', 'form_feature', 'tab_data', 'Înălțimea elevației:', 'Înălțimea elevației'),
 ('engine_type', '%_node%', 'form_feature', 'tab_data', 'Tip motor:', 'Tipul motorului'),
 ('epa_type', '%_connec%', 'form_feature', 'tab_data', 'Tip Epa:', 'Tip Epa'),
-('epa_type', '%_node%', 'form_feature', 'tab_data', 'Epa type:', 'Epa type'),
 ('exit_code', '%_node%', 'form_feature', 'tab_data', 'Cod de ieșire:', 'cod_de_ieșire'),
 ('exit_type', '%_node%', 'form_feature', 'tab_data', 'Tip ieșire:', 'tip_ieșire'),
 ('fence_length', '%_node%', 'form_feature', 'tab_data', 'Lungimea gardului:', 'lungimea gardului'),
@@ -7937,7 +7927,6 @@ FROM (
 ('is_scadamap', '%_arc%', 'form_feature', 'tab_data', 'Este scadamap:', 'is_scadamap'),
 ('is_scadamap', '%_node%', 'form_feature', 'tab_data', 'Este scadamap:', 'is_scadamap'),
 ('lab_code', '%_node%', 'form_feature', 'tab_data', 'Cod laborator:', 'Cod laborator'),
-('label_x', '%_node%', 'form_feature', 'tab_data', 'Label x:', 'label_x'),
 ('linked_connec', '%_connec%', 'form_feature', 'tab_data', 'Conectare legată:', 'Conectare legată'),
 ('lin_meters', '%_node%', 'form_feature', 'tab_data', 'Lin metri:', 'lin_metri'),
 ('lock_level', '%_arc%', 'form_feature', 'tab_data', 'Nivelul de blocare:', 'nivel_blocare'),
@@ -8044,6 +8033,7 @@ FROM (
 ('tank_param_1', '%_node%', 'form_feature', 'tab_data', 'Rezervor param 1:', 'Rezervor param_1'),
 ('tank_param_2', '%_node%', 'form_feature', 'tab_data', 'Rezervor param 2:', 'Rezervor param_2'),
 ('to_arc', '%_node%', 'form_feature', 'tab_data', 'Pentru arc:', 'to_arc'),
+('top_elev', '%_node%', 'form_feature', 'tab_data', 'Elev de top:', 'top_elev'),
 ('top_floor', '%_connec%', 'form_feature', 'tab_data', 'Etaj superior:', 'Etaj superior'),
 ('top_floor', '%_node%', 'form_feature', 'tab_data', 'Etaj superior:', 'Etaj superior'),
 ('valve', '%_node%', 'form_feature', 'tab_data', 'Valve:', 'supapă - Tip supapă'),
@@ -8061,18 +8051,9 @@ FROM (
 ('wjoin_type', '%_node%', 'form_feature', 'tab_data', 'Tipul Wjoin:', 'wjoin_type'),
 ('wtp_id', '%_node%', 'form_feature', 'tab_data', 'Wtp id:', 'wtp_id'),
 ('date_from', '%_link%', 'form_feature', 'tab_documents', 'Data de la:', 'Data de la:'),
-('doc_name', '%_link%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
-('doc_type', '%_link%', 'form_feature', 'tab_documents', 'Doc type:', 'Doc type:')
+('date_to', '%_link%', 'form_feature', 'tab_documents', 'Data până la:', 'Data până la:')
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
-
-UPDATE config_param_system AS t
-SET value = v.value
-FROM (
-    VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
-) AS v(parameter, value)
-WHERE t.parameter = v.parameter;
 
 UPDATE value_state AS t
 SET name = v.name, observ = v.observ
@@ -8152,8 +8133,7 @@ FROM (
     (3158, '[{"label": "Numele scenariului:", "value": null, "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "name", "widgettype": "text", "layoutorder": 1}, {"label": "Descrierea scenariului:", "value": null, "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "descript", "widgettype": "text", "layoutorder": 2}, {"label": "Mincut:", "value": null, "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "mincutId", "widgettype": "combo", "dvQueryText": "SELECT id as id, id as idval FROM om_mincut", "layoutorder": 3}]'),
     (3160, '[{"label": "Gama de furtunuri de incendiu:", "value": null, "datatype": "float", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "distance", "widgettype": "text", "layoutorder": "1"}, {"label": "Modul de procesare:", "value": null, "comboIds": ["0", "1"], "datatype": "text", "comboNames": ["Zona de influență", "Propunere hidrant"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "mode", "widgettype": "combo", "layoutorder": "2"}, {"label": "Utilizați hidranții propuși:", "value": null, "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "useProposal", "widgettype": "check", "layoutorder": "3"}, {"label": "Utilizați psectoare selectate:", "value": null, "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "usePsector", "widgettype": "check", "layoutorder": "4"}]'),
     (3236, '[{"label": "Funcționare:", "value": null, "tooltip": "Funcționare", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "explId", "widgettype": "combo", "dvQueryText": "select expl_id as id, name as idval from exploitation where active is not false order by name", "layoutorder": 2}]'),
-    (3256, '[{"label": "Creați mapzones pentru netscenario:", "value": null, "tooltip": "Crearea unei zone de hartă pentru un scenariu de rețea selectat", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "netscenario", "widgettype": "combo", "dvQueryText": "select netscenario_id as id, name as idval from plan_netscenario  order by name", "isNullValue": "true", "layoutorder": 1}, {"label": "Funcționare:", "value": null, "tooltip": "Alegeți exploatarea cu care să lucrați", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "exploitation", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "layoutorder": 2}, {"label": "Forțați nodurile deschise: (*)", "value": null, "tooltip": "Identificarea nodului (nodurilor) opțional(e) pentru deschiderea temporară a nodului (nodurilor) închis(e) pentru a forța algoritmul să continue acolo", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceOpen", "widgettype": "linetext", "isMandatory": false, "layoutorder": 3, "placeholder": "1015,2231,3123"}, {"label": "Noduri închise cu forță: (*)", "value": null, "tooltip": "Identificarea nodului (nodurilor) opțional(e) pentru închiderea temporară a nodului (nodurilor) deschis(e) pentru a forța algoritmul să se oprească acolo", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceClosed", "widgettype": "text", "isMandatory": false, "layoutorder": 4, "placeholder": "1015,2231,3123"}, {"label": "Utilizați psectoare selectate:", "value": null, "tooltip": "Dacă este true, utilizează psectoarele selectate. Dacă este fals, ignoră psectoarele selectate și funcționează numai cu rețeaua în funcțiune", "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "usePlanPsector", "widgettype": "check", "layoutorder": 5}, {"label": "Metoda constructorului Mapzone:", "value": null, "comboIds": [0, 1, 2, 3, 4], "datatype": "integer", "comboNames": ["NICIUNUL", "POLIGON CONCAV", "TAMPON DE CONDUCTE", "PARCELĂ ȘI TAMPON DE CONDUCTE", "LEGĂTURĂ ȘI TAMPON DE CONDUCTE"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 6}, {"label": "Tampon de țeavă", "value": null, "tooltip": "Buffer din arcuri pentru a crea geometria zonei de hartă folosind opțiunile [PIPE BUFFER]. Valorile normale pot fi cuprinse între 3-20 mts.", "datatype": "float", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 7, "placeholder": "5-30"}]'),
-    (3256, '[{"label": "Create mapzones for netscenario:", "value": null, "tooltip": "Create mapzone for a selected netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "netscenario", "widgettype": "combo", "dvQueryText": "select netscenario_id as id, name as idval from plan_netscenario  order by name", "isNullValue": "true", "layoutorder": 1}, {"label": "Exploitation:", "value": null, "tooltip": "Choose exploitation to work with", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "exploitation", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "layoutorder": 2}, {"label": "Force open nodes: (*)", "value": null, "tooltip": "Optative node id(s) to temporary open closed node(s) in order to force algorithm to continue there", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceOpen", "widgettype": "linetext", "isMandatory": false, "layoutorder": 5, "placeholder": "1015,2231,3123"}, {"label": "Force closed nodes: (*)", "value": null, "tooltip": "Optative node id(s) to temporary close open node(s) to force algorithm to stop there", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceClosed", "widgettype": "text", "isMandatory": false, "layoutorder": 6, "placeholder": "1015,2231,3123"}, {"label": "Use selected psectors:", "value": null, "tooltip": "Buffer din arcuri pentru a crea geometria zonei de hartă folosind opțiunile [PIPE BUFFER]. Valorile normale pot fi cuprinse între 3-20 mts.", "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "usePlanPsector", "widgettype": "check", "layoutorder": 8}, {"label": "Mapzone constructor method:", "value": null, "comboIds": [0, 1, 2, 3, 4], "datatype": "integer", "comboNames": ["NICIUNUL", "POLIGON CONCAV", "TAMPON DE CONDUCTE", "PARCELĂ ȘI TAMPON DE CONDUCTE", "LEGĂTURĂ ȘI TAMPON DE CONDUCTE"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 9}, {"label": "Pipe buffer", "value": null, "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "datatype": "float", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 10, "placeholder": "5-30"}, {"label": "Commit changes:", "value": null, "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 11}, {"label": "Mapzones from zero:", "value": null, "tooltip": "If true, mapzones are calculated automatically from zero", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "fromZero", "widgettype": "check", "layoutorder": 12}]'),
+    (3256, '[{"label": "Creați mapzones pentru netscenario:", "value": null, "tooltip": "Crearea unei zone de hartă pentru un scenariu de rețea selectat", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "netscenario", "widgettype": "combo", "dvQueryText": "select netscenario_id as id, name as idval from plan_netscenario  order by name", "isNullValue": "true", "layoutorder": 1}, {"label": "Funcționare:", "value": null, "tooltip": "Alegeți exploatarea cu care să lucrați", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "exploitation", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "layoutorder": 2}, {"label": "Forțați nodurile deschise: (*)", "value": null, "tooltip": "Identificarea nodului (nodurilor) opțional(e) pentru deschiderea temporară a nodului (nodurilor) închis(e) pentru a forța algoritmul să continue acolo", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceOpen", "widgettype": "linetext", "isMandatory": false, "layoutorder": 5, "placeholder": "1015,2231,3123"}, {"label": "Noduri închise cu forță: (*)", "value": null, "tooltip": "Identificarea nodului (nodurilor) opțional(e) pentru închiderea temporară a nodului (nodurilor) deschis(e) pentru a forța algoritmul să se oprească acolo", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceClosed", "widgettype": "text", "isMandatory": false, "layoutorder": 6, "placeholder": "1015,2231,3123"}, {"label": "Utilizați psectoare selectate:", "value": null, "tooltip": "Dacă este true, utilizează psectoarele selectate. Dacă este fals, ignoră psectoarele selectate și funcționează numai cu rețeaua în funcțiune", "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "usePlanPsector", "widgettype": "check", "layoutorder": 8}, {"label": "Metoda constructorului Mapzone:", "value": null, "comboIds": [0, 1, 2, 3, 4], "datatype": "integer", "comboNames": ["NICIUNUL", "POLIGON CONCAV", "TAMPON DE CONDUCTE", "PARCELĂ ȘI TAMPON DE CONDUCTE", "LEGĂTURĂ ȘI TAMPON DE CONDUCTE"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 9}, {"label": "Tampon de țeavă", "value": null, "tooltip": "Buffer din arcuri pentru a crea geometria zonei de hartă folosind opțiunile [PIPE BUFFER]. Valorile normale pot fi cuprinse între 3-20 mts.", "datatype": "float", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 10, "placeholder": "5-30"}, {"label": "Commit changes:", "value": null, "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 11}, {"label": "Mapzones from zero:", "value": null, "tooltip": "If true, mapzones are calculated automatically from zero", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "fromZero", "widgettype": "check", "layoutorder": 12}]'),
     (3258, '[{"label": "Sursa netscenario:", "value": null, "tooltip": "Selectați zona hărții dscenario din care datele vor fi copiate în zona cererii dscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "netscenario", "widgettype": "combo", "dvQueryText": "select netscenario_id as id, name as idval from plan_netscenario where netscenario_type =''DMA'' order by name", "isNullValue": "true", "layoutorder": 1}, {"label": "Scenariu țintă cerere:", "value": null, "tooltip": "Selectați scenariul cererii în care vor fi inserate datele", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "dscenario_demand", "widgettype": "combo", "dvQueryText": "select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''DEMAND'' order by name", "isNullValue": "true", "layoutorder": 3}]'),
     (3260, '[{"label": "Nume: (*)", "value": null, "tooltip": "Nume pentru netscenario (obligatoriu)", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "name", "widgettype": "linetext", "isMandatory": true, "layoutorder": 1, "placeholder": ""}, {"label": "Descript:", "value": null, "tooltip": "Descript pentru netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "descript", "widgettype": "linetext", "isMandatory": false, "layoutorder": 2, "placeholder": ""}, {"label": "Tip:", "value": null, "tooltip": "tip netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "type", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''", "isMandatory": true, "layoutorder": 4}, {"label": "Activ:", "value": null, "tooltip": "Dacă este adevărat, activ", "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "active", "widgettype": "check", "layoutorder": 5}, {"label": "Funcționare:", "value": null, "tooltip": "tip netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "expl", "widgettype": "combo", "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation", "isMandatory": true, "layoutorder": 6}]'),
     (3262, '[{"label": "Nume: (*)", "value": null, "tooltip": "Nume pentru netscenario (obligatoriu)", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "name", "widgettype": "linetext", "isMandatory": true, "layoutorder": 1, "placeholder": ""}, {"label": "Descript:", "value": null, "tooltip": "Descript pentru netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "descript", "widgettype": "linetext", "isMandatory": false, "layoutorder": 2, "placeholder": ""}, {"label": "Tip:", "value": null, "tooltip": "tip netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "type", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''", "isMandatory": true, "layoutorder": 4}, {"label": "Activ:", "value": null, "tooltip": "Dacă este adevărat, activ", "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "active", "widgettype": "check", "layoutorder": 5}, {"label": "Funcționare:", "value": null, "tooltip": "tip netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "expl", "widgettype": "combo", "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation", "isMandatory": true, "layoutorder": 6}]'),

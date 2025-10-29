@@ -19,12 +19,5 @@ UPDATE config_form_fields
 SET dv_querytext='SELECT r.result_id AS id, r.result_id AS idval FROM rpt_cat_result r JOIN v_ui_rpt_cat_result vr ON vr.result_id = r.result_id WHERE r.status = 2'
 WHERE formname='generic' AND formtype='epa_selector' AND columnname='result_name_show' AND tabname='tab_result';
 
-INSERT INTO config_typevalue (typevalue,id,idval,addparam)
-VALUES ('sys_table_context','33','["MASTERPLAN", "REPOSITION VALUE"]','{"orderBy":33}'::json);
-
-UPDATE sys_table SET context = '33' WHERE id = 'v_plan_arc' OR id = 'v_plan_node';
-UPDATE sys_table SET alias = 'Arc reposition value' WHERE id = 'v_plan_arc';
-UPDATE sys_table SET alias = 'Node reposition value' WHERE id = 'v_plan_node';
-
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
 VALUES(3518, 'gw_fct_getfeatureproperties', 'utils', 'function', 'json', 'json', 'Function to get the properties of a feature.', NULL, NULL, 'core', NULL);

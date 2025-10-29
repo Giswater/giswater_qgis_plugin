@@ -248,7 +248,6 @@ FROM (
     ('om_visit_startdate_vdefault', 'Data începerii vizitei:', 'Valoarea implicită a datei de începere a vizitei'),
     ('om_visit_status_vdefault', 'Statutul vizitei:', 'Valoarea implicită a statutului vizitei'),
     ('plan_psector_current', 'Psector (Alternativă):', 'Valoarea implicită a parametrului psector'),
-    ('plan_psector_disable_forced_style', 'Style forcing value', 'Variable to disable forced style changes to apply GwPlan'),
     ('plan_psector_force_delete', 'Forțați ștergerea caracteristicii planificate:', 'Permiteți ștergerea automată a caracteristicilor planificate atunci când un psector este șters și această caracteristică nu este prezentă în alt psector'),
     ('plan_psector_gexpenses_vdefault', 'Cheltuieli sectoriale:', 'Valoarea implicită a parametrului psector cheltuieli generale'),
     ('plan_psector_measurement_vdefault', 'Măsurarea psectorială:', 'Valoarea implicită a parametrului de măsurare psector'),
@@ -607,9 +606,9 @@ FROM (
     ('btn_accept', 'generic', 'form_visit', 'tab_data', ':', ':'),
     ('btn_apply', 'generic', 'form_visit', 'tab_file', ':', ':'),
     ('btn_cancel', 'generic', 'form_visit', 'tab_file', ':', ':'),
-    ('btn_accept', 'generic', 'link_to_gully', 'tab_none', ':', 'Acceptați'),
+    ('btn_accept', 'generic', 'link_to_gully', 'tab_none', NULL, 'Acceptați'),
     ('btn_add', 'generic', 'link_to_gully', 'tab_none', NULL, 'Adaugă'),
-    ('btn_close', 'generic', 'link_to_gully', 'tab_none', ':', 'Închidere'),
+    ('btn_close', 'generic', 'link_to_gully', 'tab_none', NULL, 'Închidere'),
     ('btn_filter_expression', 'generic', 'link_to_gully', 'tab_none', NULL, 'Filtrați după expresie'),
     ('btn_remove', 'generic', 'link_to_gully', 'tab_none', NULL, 'Eliminați'),
     ('btn_snapping', 'generic', 'link_to_gully', 'tab_none', NULL, 'Selectați pe pânză'),
@@ -3018,9 +3017,9 @@ FROM (
     ('spacer', 'generic', 'form_featuretype_change', 'tab_none', NULL, NULL),
     ('visit_id', 'generic', 'form_visit', 'tab_data', 'Vizitați id:', 'Vizitați id:'),
     ('arc_id', 'generic', 'link_to_connec', 'tab_none', 'Conectați-vă la arc:', 'Arc Id'),
-    ('btn_accept', 'generic', 'link_to_connec', 'tab_none', ':', 'Acceptați'),
+    ('btn_accept', 'generic', 'link_to_connec', 'tab_none', NULL, 'Acceptați'),
     ('btn_add', 'generic', 'link_to_connec', 'tab_none', NULL, 'Adaugă'),
-    ('btn_close', 'generic', 'link_to_connec', 'tab_none', ':', 'Închidere'),
+    ('btn_close', 'generic', 'link_to_connec', 'tab_none', NULL, 'Închidere'),
     ('btn_expr_arc', 'generic', 'link_to_connec', 'tab_none', NULL, 'Selectați prin expresie - Setați cel mai apropiat punct'),
     ('btn_filter_expression', 'generic', 'link_to_connec', 'tab_none', NULL, 'Filtrați după expresie'),
     ('btn_remove', 'generic', 'link_to_connec', 'tab_none', NULL, 'Eliminați'),
@@ -4115,7 +4114,6 @@ FROM (
     ('25', 'sys_table_context', '["MASTERPLAN", "PSECTOR"]'),
     ('26', 'sys_table_context', '["MASTERPLAN", "TRASABILITATE"]'),
     ('3', 'sys_table_context', '["EPA", "COMPARE"]'),
-    ('33', 'sys_table_context', '["MASTERPLAN", "REPOSITION VALUE"]'),
     ('4', 'sys_table_context', '["EPA", "DSCENARIO"]'),
     ('5', 'sys_table_context', '["EPA", "FLOWREG"]'),
     ('6', 'sys_table_context', '["EPA", "HYDRAULICS"]'),
@@ -4226,7 +4224,6 @@ FROM (
     (401, NULL, NULL, 'Y0 mai mare decât ymax pe noduri)'),
     (416, NULL, NULL, 'Defileu fără pjoint_id sau pjoint_type'),
     (418, 'legături cu topologie greșită. Punctul de pornire nu se potrivește cu conexiunea.', 'Toate legăturile de conectare au conexiune la punctul de plecare', 'Legături fără rigole la punctul de plecare'),
-    (423, 'caracteristicile cu fluid_type nu există pe domeniul om_typevalue.', 'Toate caracteristicile au fluid_type informed', 'Import arc vizite'),
     (427, NULL, NULL, 'Verificați dacă lungimea regulatorului de debit se potrivește pe arcul țintă'),
     (455, NULL, NULL, 'Verificați arc_id null pentru râpă'),
     (456, NULL, NULL, 'Verificarea rigolelor cu valori nule pe (personalizat)top_elev'),
@@ -4548,6 +4545,7 @@ FROM (
     (420, 'caracteristici fără valoare pe câmpul "code_autofill" din cat_feature.', 'Toate caracteristicile au valoare pe câmpul "code_autofill"', 'Verificați nodarcs'),
     (421, 'caracteristicile cu category_type nu există în tabelul man_type_category.', 'Toate caracteristicile au categoria_type informată în tabelul man_type_category', 'Import tabel cat_connec'),
     (422, 'funcțiile cu tipul_funcției nu există în tabelul man_type_function.', 'Toate caracteristicile au tipul_funcției informat în tabelul man_type_function', 'Procesul Mincut'),
+    (423, 'caracteristicile cu fluid_type nu există pe domeniul om_typevalue.', 'Toate caracteristicile au fluid_type informed', 'Import arc vizite'),
     (424, 'caracteristicile cu location_type nu există în tabelul man_type_location.', 'Toate caracteristicile au location_type informat pe man_type_location tabel', 'Funcții de testare'),
     (426, 'rânduri cu exploatare greșită configurate în tabelul config_graph_mincut. Vă rugăm să vă verificați datele înainte de a continua.', 'Se pare că tabelul config_graph_mincut este bine configurat. Cel puțin, tabelul este umplut cu noduri din toate exploatările. Toate rezervoarele sunt definite în config_graph_mincut.', 'Verificarea caracteristicii planificate cu starea = 0 pe tabelele psector'),
     (428, 'exploatări fără geometrie. Captarea valorilor din DEM este activată, dar va eșua la exploatare: '',string_agg(name,'', '')', 'Captarea valorilor din DEM este activată și va funcționa corect, deoarece toate exploatările au geometrie.', 'Verificați dacă expl.geom nu este nul atunci când DEM raster este activat'),
@@ -5169,7 +5167,7 @@ FROM (
     (3518, 'Elemente legate de caracteristică: %v_element%', NULL),
     (3520, 'Vizite legate de caracteristică: %v_visit%', NULL),
     (3522, 'Documente legate de caracteristică: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectoare conectate cu caracteristica: %,v_psector%', NULL),
     (3526, 'IMPORTANT: Activați psector înainte de a șterge caracteristicile.', NULL),
     (3528, 'Arcuri reparate: arc_id --> %arc_ids%', NULL),
     (3562, 'Nu au fost selectate arce', NULL),
@@ -5359,7 +5357,6 @@ FROM (
     (4412, 'It is not allowed to delete planified features in operative mode', 'Switch to plan mode to delete the feature'),
     (4414, 'It is not allowed to delete features from a different psector than the current one', 'Switch to the correct psector to delete the feature'),
     (4416, 'It is not allowed to delete operative features in plan mode', 'Switch to operative mode to delete the feature'),
-    (4428, 'DATA QUALITY ANALYSIS ACORDING O&M RULES', NULL),
     (4430, 'The %feature_type% with id %connec_id% has been successfully connected to the arc with id %arc_id%', NULL),
     (4432, 'PLEASE, SET SOME VALUE FOR STATE_TYPE FOR PLANIFIED OBJECTS (CONFIG DIALOG)', NULL),
     (4434, 'Trying to connect %feature_type% with id %connect_id% to the closest arc.', NULL),
@@ -6532,7 +6529,7 @@ FROM (
     ('1', 'psector_type', 'PLANIFICAT', NULL),
     ('1', 'value_priority', 'ÎNALTĂ PRIORITATE (HIGH_PRIORITY)', NULL),
     ('2', 'value_priority', 'NORMAL_PRIORITY', NULL),
-    ('3', 'value_priority', 'LOW_PRIORITY', NULL)
+    ('3', 'value_priority', 'PRIORITATE SCĂZUTĂ', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
@@ -8345,10 +8342,10 @@ FROM (
     ('v_link_connec', NULL, 'Vizualizare filtrată a legăturilor de tip conectare'),
     ('v_node', NULL, 'Afișează datele nodului.'),
     ('v_om_visit', NULL, 'Afișează toate vizitele executate."'),
-    ('v_plan_arc', 'Arc reposition value', 'Vizualizați numai cu cele mai importante informații despre costul arcului'),
+    ('v_plan_arc', NULL, 'Vizualizați numai cu cele mai importante informații despre costul arcului'),
     ('v_plan_aux_arc_pavement', NULL, 'Strat pentru corelarea pavajelor cu arcul'),
     ('v_plan_current_psector', 'Plan psector actual', 'Vizualizare pentru a arăta sectorul planificat actual'),
-    ('v_plan_node', 'Node reposition value', 'Vizualizare numai cu cele mai importante informații despre costul nodului'),
+    ('v_plan_node', NULL, 'Vizualizare numai cu cele mai importante informații despre costul nodului'),
     ('v_plan_psector_all', NULL, 'Vedere nefiltrată care arată sectoarele planificate'),
     ('v_plan_psector_arc', 'Plan psector arc', 'Vizualizare pentru a arăta arcele legate de psectoare. Utilă pentru a afișa arcele care vor fi depășite în psectoare'),
     ('v_plan_psector_budget', NULL, 'Prezintă bugetul general al sectorului curent'),
@@ -8456,7 +8453,6 @@ FROM (
 ('brand_id', '%_connec%', 'form_feature', 'tab_data', 'Marca id:', 'brand_id'),
 ('builtdate', '%_gully%', 'form_feature', 'tab_data', 'Data construirii:', 'builtdate - ID al datei de construcție referitoare la rigole.'),
 ('category_type', '%_gully%', 'form_feature', 'tab_data', 'Tip de categorie:', 'tip_categorie'),
-('category_type', '%_node%', 'form_feature', 'tab_data', 'Category type:', 'Category type'),
 ('cat_geom1', '%_arc%', 'form_feature', 'tab_data', 'Cat geom1:', 'cat_geom1'),
 ('cat_geom2', '%_arc%', 'form_feature', 'tab_data', 'Măsurare interioară orizontală:', 'Măsurare interioară orizontală'),
 ('cat_grate_matcat', '%_gully%', 'form_feature', 'tab_data', 'Material:', 'Material'),
@@ -8497,7 +8493,6 @@ FROM (
 ('elev2', '%_arc%', 'form_feature', 'tab_data', 'Elev2:', 'elev2'),
 ('enddate', '%_gully%', 'form_feature', 'tab_data', 'Data limită:', 'Data de încheiere'),
 ('epa_type', '%_gully%', 'form_feature', 'tab_data', 'Tip Epa:', 'epa_type - Tipul de nod care urmează să fie utilizat pentru modelul hidraulic. Nu este necesar să îl introduceți, este automat în funcție de tipul de nod.'),
-('epa_type', '%_node%', 'form_feature', 'tab_data', 'Epa type:', 'epa_type - Type of node to use for the hydraulic model. It is not necessary to enter it, it is automatic depending on the node type.'),
 ('expl_id', '%_gully%', 'form_feature', 'tab_data', 'Funcționare:', 'expl_id'),
 ('expl_id2', '%_gully%', 'form_feature', 'tab_data', 'Operațiunea 2:', 'expl_id - Exploatarea căreia îi aparține elementul. Dacă configurația nu este modificată, programul o selectează automat pe baza geometriei'),
 ('featurecat_id', '%_gully%', 'form_feature', 'tab_data', 'Featurecat id:', 'featurecat_id'),
@@ -8528,7 +8523,6 @@ FROM (
 ('label_quadrant', '%_gully%', 'form_feature', 'tab_data', 'Etichetați cadranul:', 'label_quadrant'),
 ('label_rotation', '%_gully%', 'form_feature', 'tab_data', 'Rotirea etichetei:', 'etichetă_rotație'),
 ('label_x', '%_gully%', 'form_feature', 'tab_data', 'Etichetă x:', 'label_x - Coordonata X a locației etichetei'),
-('label_x', '%_node%', 'form_feature', 'tab_data', 'Label x:', 'label_x - X coordinate of the label''s location'),
 ('label_y', '%_gully%', 'form_feature', 'tab_data', 'Etichetă y:', 'label_y - Coordonata Y a locației etichetei'),
 ('lastupdate', '%_gully%', 'form_feature', 'tab_data', 'Ultima actualizare:', 'lastupdate - Ultima dată când acest element a fost actualizat'),
 ('lastupdate_user', '%_gully%', 'form_feature', 'tab_data', 'Ultima actualizare utilizator:', 'ultima actualizare_utilizator'),
@@ -8626,6 +8620,7 @@ FROM (
 ('sys_y2', '%_arc%', 'form_feature', 'tab_data', 'Sys y2:', 'sys_y2'),
 ('sys_ymax', '%_node%', 'form_feature', 'tab_data', 'Sys ymax:', 'sys_ymax'),
 ('top_elev', '%_gully%', 'form_feature', 'tab_data', 'Supraînălțare:', 'top_elev - Înălțimea râpei în ft sau m.'),
+('top_elev', '%_node%', 'form_feature', 'tab_data', 'Supraînălțare:', 'top_elev - Înălțimea râpei în ft sau m.'),
 ('treatment_type', '%_node%', 'form_feature', 'tab_data', 'Tip de tratament:', 'tip_tratament'),
 ('tstamp', '%_gully%', 'form_feature', 'tab_data', 'Introduceți tstamp:', 'tstamp - Data introducerii elementului în baza de date'),
 ('uncertain', '%_arc%', 'form_feature', 'tab_data', 'Incert:', 'nesigur'),
@@ -8661,8 +8656,7 @@ FROM (
 ('z1', '%_arc%', 'form_feature', 'tab_data', 'Z1:', 'z1'),
 ('z2', '%_arc%', 'form_feature', 'tab_data', 'Z2:', 'z2'),
 ('date_from', '%_link%', 'form_feature', 'tab_documents', 'Data de la:', 'Date from:'),
-('doc_name', '%_link%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
-('doc_type', '%_link%', 'form_feature', 'tab_documents', 'Doc type:', 'Doc type:'),
+('date_to', '%_link%', 'form_feature', 'tab_documents', 'Data până la:', 'Date to:'),
 ('accessibility', '%_node%', 'form_feature', 'tab_data', 'Accesibilitate:', 'Accesibilitate:'),
 ('accessibility', '%_connec%', 'form_feature', 'tab_data', 'Accesibilitate:', 'accesibilitate - Accesul la element'),
 ('access_type', '%_node%', 'form_feature', 'tab_data', 'Tipul de acces:', 'tip_de_acces'),
@@ -8695,6 +8689,7 @@ FROM (
 ('cat_dr', '%_arc%', 'form_feature', 'tab_data', 'Cat dr:', 'cat_dr'),
 ('category_type', '%_element%', 'form_feature', 'tab_data', 'Tip de categorie:', 'Tip de categorie'),
 ('category_type', '%_arc%', 'form_feature', 'tab_data', 'Tip de categorie:', 'tip_categorie'),
+('category_type', '%_node%', 'form_feature', 'tab_data', 'Tip de categorie:', 'category_type - ID al tipului de categorie aferent nodului.'),
 ('category_type', '%_connec%', 'form_feature', 'tab_data', 'Tip de categorie:', 'tip_categorie'),
 ('code', '%_element%', 'form_feature', 'tab_data', 'Cod:', 'Cod:'),
 ('code', '%_node%', 'form_feature', 'tab_data', 'Cod:', 'cod'),
@@ -8739,6 +8734,7 @@ FROM (
 ('enddate', '%_arc%', 'form_feature', 'tab_data', 'Data limită:', 'enddate - Data de încheiere a elementului. Aceasta va fi completată numai în cazul în care elementul se află în stare de dezînregistrare.'),
 ('epa_type', '%_arc%', 'form_feature', 'tab_data', 'Tip Epa:', 'epa_type'),
 ('epa_type', '%_element%', 'form_feature', 'tab_data', 'Tip EPA:', 'Tip EPA'),
+('epa_type', '%_node%', 'form_feature', 'tab_data', 'Tip Epa:', 'epa_type - Tipul de nod care urmează să fie utilizat pentru modelul hidraulic. Nu este necesar să îl introduceți, este automat în funcție de tipul de nod.'),
 ('exit_id', '%_link%', 'form_feature', 'tab_data', 'ID ieșire:', 'ID ieșire'),
 ('exit_type', '%_link%', 'form_feature', 'tab_data', 'Tip ieșire:', 'Tip ieșire'),
 ('expl_id', '%_element%', 'form_feature', 'tab_data', 'Funcționare:', 'Funcționare'),
@@ -8781,6 +8777,7 @@ FROM (
 ('label_rotation', '%_arc%', 'form_feature', 'tab_data', 'Rotirea etichetei:', 'label_rotation - Unghiul de rotație al etichetei'),
 ('label_rotation', '%_connec%', 'form_feature', 'tab_data', 'Rotirea etichetei:', 'label_rotation - Unghiul de rotație al etichetei'),
 ('label_x', '%_arc%', 'form_feature', 'tab_data', 'Etichetă x:', 'label_x - Coordonata X a locației etichetei'),
+('label_x', '%_node%', 'form_feature', 'tab_data', 'Etichetă x:', 'label_x - Coordonata X a locației etichetei'),
 ('label_x', '%_connec%', 'form_feature', 'tab_data', 'Etichetă x:', 'etichetă_x'),
 ('label_y', '%_node%', 'form_feature', 'tab_data', 'Etichetă y:', 'Etichetă_y'),
 ('label_y', '%_connec%', 'form_feature', 'tab_data', 'Etichetă y:', 'Etichetă_y'),
@@ -8915,7 +8912,6 @@ FROM (
 ('to_arc', '%_element%', 'form_feature', 'tab_data', 'Pentru arc:', 'to_arc'),
 ('top_elev', '%_element%', 'form_feature', 'tab_data', 'Supraînălțare:', 'top_elev - Înălțimea nodului în ft sau m.'),
 ('top_elev', '%_connec%', 'form_feature', 'tab_data', 'Supraînălțare:', 'top_elev - Altitudinea conexiunii în ft sau m.'),
-('top_elev', '%_node%', 'form_feature', 'tab_data', 'Elev de top:', 'top_elev'),
 ('top_elev1', '%_link%', 'form_feature', 'tab_data', 'Elev de top 1:', 'top_elev1'),
 ('top_elev2', '%_link%', 'form_feature', 'tab_data', 'Elev de top 2:', 'top_elev2'),
 ('tstamp', '%_connec%', 'form_feature', 'tab_data', 'Introduceți tstamp:', 'tstamp - Data introducerii elementului în baza de date'),
@@ -8947,8 +8943,9 @@ FROM (
 ('btn_doc_new', '%_element%', 'form_feature', 'tab_documents', NULL, 'Document nou'),
 ('date_from', '%_element%', 'form_feature', 'tab_documents', 'Data de la:', 'Data de la:'),
 ('date_to', '%_element%', 'form_feature', 'tab_documents', 'Data până la:', 'Data până la:'),
-('date_to', '%_link%', 'form_feature', 'tab_documents', 'Data până la:', 'Data până la:'),
+('doc_name', '%_link%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
 ('doc_name', '%_element%', 'form_feature', 'tab_documents', 'Doc id:', 'Doc id:'),
+('doc_type', '%_link%', 'form_feature', 'tab_documents', 'Tip doc:', 'Doc type:'),
 ('doc_type', '%_element%', 'form_feature', 'tab_documents', 'Tip doc:', 'Tip doc:'),
 ('hspacer_document_1', '%_element%', 'form_feature', 'tab_documents', NULL, NULL),
 ('hspacer_document_1', '%_link%', 'form_feature', 'tab_documents', NULL, NULL),
@@ -8992,14 +8989,6 @@ FROM (
 ('visit_class', '%_link%', 'form_feature', 'tab_visit', 'Vizitați clasa:', 'Vizitați clasa:')
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
-
-UPDATE config_param_system AS t
-SET value = v.value
-FROM (
-    VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
-) AS v(parameter, value)
-WHERE t.parameter = v.parameter;
 
 UPDATE value_state AS t
 SET name = v.name, observ = v.observ
