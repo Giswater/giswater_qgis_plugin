@@ -282,6 +282,17 @@ BEGIN
 				EXECUTE 'UPDATE om_mincut SET '||v_default_key||' = '||v_default_value||' WHERE id = '||v_mincut_id||';';
 			END LOOP;
 			p_data = jsonb_set(p_data::jsonb, '{data,mincutId}', to_jsonb(v_mincut_id))::json;
+
+			v_query_text := format(
+				'UPDATE om_mincut SET mincut_class = %s, anl_the_geom = %L, anl_user = %L, anl_feature_type = %L, anl_feature_id = %s WHERE id = %s',
+				v_mincut_network_class,
+				ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg),
+				v_cur_user,
+				'ARC',
+				v_arc_id,
+				v_mincut_id
+			);
+			EXECUTE v_query_text;
 		END IF;
 
 	ELSIF v_action = 'mincutValveUnaccess' THEN
@@ -433,12 +444,12 @@ BEGIN
 			IF v_action = 'mincutAccept' THEN
 				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
 				EXECUTE v_querytext;
-				IF (select mincut_state from om_mincut where id = v_mincut) = v_mincut_on_planning_state THEN
-					UPDATE om_mincut SET mincut_state = v_mincut_plannified_state WHERE id = v_mincut;
+				IF (select mincut_state from om_mincut where id = v_mincut_id) = v_mincut_on_planning_state THEN
+					UPDATE om_mincut SET mincut_state = v_mincut_plannified_state WHERE id = v_mincut_id;
 				END IF;
 			ELSIF v_action = 'endMincut' THEN
-				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) = 1 THEN
-					UPDATE om_mincut SET mincut_state = v_mincut_finished_state WHERE id = v_mincut;
+				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_in_progress_state THEN
+					UPDATE om_mincut SET mincut_state = v_mincut_finished_state WHERE id = v_mincut_id;
 				END IF;
 			END IF;
 		END IF;
@@ -469,11 +480,7 @@ BEGIN
 		ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 		IF v_device = 5 THEN
-			SELECT gw_fct_getmincut(p_data) INTO v_response;
-
-			-- Set the info to the info from v_result body data info
-			v_response = jsonb_set(v_response::jsonb, '{body,data,info}', v_result::jsonb->'body'->'data'->'info');
-			RETURN v_response;
+			RETURN gw_fct_getmincut(p_data);
 		END IF;
 
 		SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_id;
