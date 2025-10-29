@@ -742,8 +742,8 @@ class GwMincut:
 
     def _real_start(self):
 
-        # Run fct like 'Refresh mincut' but with action="startMincut"
-        self._refresh_mincut(action="startMincut")
+        # Run fct like 'Refresh mincut' but with action="mincutStart"
+        self._refresh_mincut(action="mincutStart")
 
         date_start = QDate.currentDate()
         time_start = QTime.currentTime()
