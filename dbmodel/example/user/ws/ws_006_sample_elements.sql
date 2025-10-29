@@ -7564,6 +7564,7 @@ INSERT INTO man_junction VALUES ('1021');
 INSERT INTO man_junction VALUES ('1022');
 INSERT INTO man_junction VALUES ('1023');
 INSERT INTO man_junction VALUES ('1024');
+INSERT INTO man_junction VALUES ('1025');
 INSERT INTO man_junction VALUES ('1026');
 INSERT INTO man_junction VALUES ('1027');
 INSERT INTO man_junction VALUES ('1028');
@@ -7699,8 +7700,6 @@ INSERT INTO man_junction VALUES ('114133');
 INSERT INTO man_junction VALUES ('113985');
 INSERT INTO man_junction VALUES ('114452');
 INSERT INTO man_junction VALUES ('114453');
-
-INSERT INTO man_manhole VALUES ('1025', NULL);
 
 INSERT INTO man_meter VALUES ('1080', NULL, NULL, NULL);
 INSERT INTO man_meter VALUES ('1084', NULL, NULL, NULL);
