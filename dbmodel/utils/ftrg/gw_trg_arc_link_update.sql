@@ -45,20 +45,20 @@ BEGIN
 		END IF;
 
 		-- Redraw endpoint of link
-		FOR v_link IN SELECT link.* FROM ve_connec JOIN link ON link.feature_id=connec_id
+		FOR v_link IN SELECT link.* FROM connec JOIN link ON link.feature_id=connec_id
 		WHERE exit_type='ARC' AND arc_id=NEW.arc_id
 		LOOP
 			SELECT St_closestpoint(a.the_geom, St_endpoint(v_link.the_geom)) INTO v_closest_point FROM arc a WHERE arc_id = NEW.arc_id AND a.state > 0;
-			EXECUTE 'UPDATE ve_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
+			EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
 			USING v_link.the_geom, v_closest_point;
 		END LOOP;
 
 		IF v_projecttype = 'UD' THEN
-			FOR v_link IN SELECT link.* FROM ve_gully JOIN link ON link.feature_id=gully_id
+			FOR v_link IN SELECT link.* FROM gully JOIN link ON link.feature_id=gully_id
 			WHERE exit_type='ARC' AND arc_id=NEW.arc_id
 			LOOP
 				SELECT St_closestpoint(a.the_geom, St_endpoint(v_link.the_geom)) INTO v_closest_point FROM arc a WHERE arc_id = NEW.arc_id AND a.state > 0;
-				EXECUTE 'UPDATE ve_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
 				USING v_link.the_geom, v_closest_point;
 			END LOOP;
 		END IF;
