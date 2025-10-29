@@ -436,8 +436,11 @@ class GwFeatureReplaceButton(GwMaptool):
             return
 
         # Ask question before executing
-        msg = ("Are you sure you want to replace selected feature with a new one?\n "
-                  "If you have different addfields in your feature, they will be deleted.")
+        if global_vars.psignals is not None and global_vars.psignals.get('psector_active'):
+            msg = ("Are you sure you want to replace selected feature with a new one?")
+        else:
+            msg = ("Are you sure you want to replace selected feature with a new one?\n "
+                    "If you have different addfields in your feature, they will be deleted.")
         title = "Replace feature"
         answer = tools_qt.show_question(msg, title)
         if answer:
