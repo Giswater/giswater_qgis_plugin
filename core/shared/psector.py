@@ -2214,7 +2214,8 @@ class GwPsector:
         else:
             # Ask user if they want to set this psector as current
             msg = "Do you want to set this psector as current?"
-            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True)
+            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True, 
+                                           buttons=["Yes", "No"])
             if result:
                 self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
                 self.psector_editable = True
