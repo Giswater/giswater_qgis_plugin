@@ -73,15 +73,10 @@ BEGIN
 	-- Get variables from input JSON
 	v_feature_id := p_data->'data'->'parameters'->>'featureId';
 	v_feature_type := p_data->'data'->'parameters'->>'featureType';
-	v_feature_class := p_data->'data'->'parameters'->>'featureClass';
 
 	-- CHECKS
 	IF v_feature_type NOT IN (SELECT id FROM sys_feature_type) THEN
 		RAISE EXCEPTION 'Invalid feature type';
-	END IF;
-
-	IF v_feature_class NOT IN (SELECT id FROM sys_feature_class) THEN
-		RAISE EXCEPTION 'Invalid feature class';
 	END IF;
 
 	IF v_feature_id IS NULL THEN
