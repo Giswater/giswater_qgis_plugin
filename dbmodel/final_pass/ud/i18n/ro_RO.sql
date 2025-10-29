@@ -4114,6 +4114,7 @@ FROM (
     ('25', 'sys_table_context', '["MASTERPLAN", "PSECTOR"]'),
     ('26', 'sys_table_context', '["MASTERPLAN", "TRASABILITATE"]'),
     ('3', 'sys_table_context', '["EPA", "COMPARE"]'),
+    ('33', 'sys_table_context', '["MASTERPLAN", "REPOSITION VALUE"]'),
     ('4', 'sys_table_context', '["EPA", "DSCENARIO"]'),
     ('5', 'sys_table_context', '["EPA", "FLOWREG"]'),
     ('6', 'sys_table_context', '["EPA", "HYDRAULICS"]'),

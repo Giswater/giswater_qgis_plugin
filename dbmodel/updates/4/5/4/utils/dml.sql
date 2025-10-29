@@ -21,3 +21,10 @@ WHERE formname='generic' AND formtype='epa_selector' AND columnname='result_name
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
 VALUES(3518, 'gw_fct_getfeatureproperties', 'utils', 'function', 'json', 'json', 'Function to get the properties of a feature.', NULL, NULL, 'core', NULL);
+
+INSERT INTO config_typevalue (typevalue,id,idval,addparam)
+VALUES ('sys_table_context','33','["MASTERPLAN", "REPOSITION VALUE"]','{"orderBy":33}'::json);
+
+UPDATE sys_table SET context = '33' WHERE id = 'v_plan_arc' OR id = 'v_plan_node';
+UPDATE sys_table SET alias = 'Arc reposition value' WHERE id = 'v_plan_arc';
+UPDATE sys_table SET alias = 'Node reposition value' WHERE id = 'v_plan_node';
