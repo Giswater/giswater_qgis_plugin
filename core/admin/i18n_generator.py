@@ -543,6 +543,11 @@ class GwI18NGenerator:
             colums = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
             order_by.extend(['source_code', 'project_type', 'context', 'parameter', 'method', 'id'])
+        
+        elif table == 'dbplan_price':
+            colums = ["source", "project_type", "context", "ds_en_us", "tx_en_us", "pr_en_us"]
+            lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"tx_{self.lower_lang}", f"auto_tx_{self.lower_lang}", f"va_auto_tx_{self.lower_lang}", f"pr_{self.lower_lang}", f"auto_pr_{self.lower_lang}", f"va_auto_pr_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source'])
 
         # Make the query
         sql=""
@@ -694,7 +699,7 @@ class GwI18NGenerator:
                         file.write(f"UPDATE {context} AS t\nSET name = v.name, observ = v.observ\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, name, observ)\nWHERE t.id = v.id;\n\n")
 
                     elif context == "config_param_system":
-                        values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
+                        values_str = ",\n    ".join([f"('{row['source']}', {txt[0]})" for row, txt in data])
                         file.write(f"UPDATE {context} AS t\nSET value = v.value\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, value)\nWHERE t.parameter = v.parameter;\n\n")
                     
                 elif "dbfunction" in table:
@@ -721,6 +726,9 @@ class GwI18NGenerator:
                     values_str = ",\n    ".join([f"('{row['parameter']}', '{row['method']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript, placeholder = v.placeholder\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, method, label, descript, placeholder)\nWHERE t.parameter = v.parameter AND t.method = v.method;\n\n")
 
+                elif "dbplan_price" in table:
+                    values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
+                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")
         del file
 
     # endregion
@@ -989,7 +997,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
@@ -1000,7 +1008,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "i18n_utils": {
@@ -1011,7 +1019,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "su_basic_tables", "su_feature", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "am": {

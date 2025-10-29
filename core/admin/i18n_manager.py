@@ -473,6 +473,10 @@ class GwSchemaI18NManager:
             columns_i18n = ["source", "ds_en_us", "al_en_us"]
             columns_org = ["id", "descript", "alias"]
 
+        elif 'dbplan_price' in table_i18n:
+            columns_i18n = ["source", "ds_en_us", "tx_en_us", "pr_en_us"]
+            columns_org = ["id", "descript", "text", "price"]
+
         # Update the su_basic_tables table (It has a different format, more than one table_org)
         elif 'su_basic_tables' in table_i18n:
             columns_i18n = ["source", "na_en_us"]
@@ -1614,6 +1618,8 @@ class GwSchemaI18NManager:
                 tables_org = ["edit_typevalue", "plan_typevalue", "om_typevalue", "inp_typevalue"]
         elif "dbjson" in table_i18n:
             tables_org = ["config_report", "config_toolbox"]
+        elif "dbplan_price" in table_i18n:
+            tables_org = ["plan_price"]
         elif "dbconfig_form_fields_json" in table_i18n or "dbconfig_form_fields_feat" in table_i18n:
             tables_org = ["config_form_fields"]
         elif "dbconfig_engine" in table_i18n:
@@ -1789,16 +1795,18 @@ class GwSchemaI18NManager:
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
+                "dbtables": ["dbplan_price"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
+                "dbtables": ["dbplan_price"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
