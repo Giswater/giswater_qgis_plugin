@@ -574,7 +574,11 @@ class GwLoadProject(QObject):
         self.cmb_psector = QComboBox()
         self.cmb_psector.setMinimumWidth(200)
         self.cmb_psector.setMaximumWidth(200)
+        self.cmb_psector.setMaxVisibleItems(15)
         tools_gw.fill_cmb_psector_id(self.cmb_psector)
+
+        # Configure scroll bar to always show when needed
+        self.cmb_psector.view().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         # Overwrite showPopup for upward popup
         original_show_popup = self.cmb_psector.showPopup
@@ -585,10 +589,16 @@ class GwLoadProject(QObject):
             popup = view.window()
             rect = self.cmb_psector.rect()
             global_pos = self.cmb_psector.mapToGlobal(rect.topLeft())
+            
+            # Calculate popup height based on maxVisibleItems
             item_height = view.sizeHintForRow(0) if self.cmb_psector.count() > 0 else 24
-            count = self.cmb_psector.count()
-            popup_height = min(count * item_height, 200)
+            max_visible = self.cmb_psector.maxVisibleItems()
+            visible_count = min(self.cmb_psector.count(), max_visible)
+            popup_height = visible_count * item_height + 4  # +4 for border
+            
+            # Position popup above the combo box
             popup.move(global_pos.x(), global_pos.y() - popup_height)
+            popup.resize(self.cmb_psector.width(), popup_height)
         self.cmb_psector.showPopup = show_popup_upward
 
         statusbar.insertPermanentWidget(1, self.cmb_psector)
