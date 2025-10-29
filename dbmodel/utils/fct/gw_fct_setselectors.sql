@@ -229,6 +229,11 @@ BEGIN
 			SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4358;
 		
 			v_message := COALESCE(v_message, '{}');
+
+			v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
+			"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
+			
+			RETURN gw_fct_getselectors(v_return);
 		
 		ELSIF (v_cur_psector = v_id::integer AND v_value = 'False')
 			OR v_checkall IS FALSE
@@ -248,13 +253,13 @@ BEGIN
 			END IF;
 		
 			v_message := COALESCE(v_message, '{}');
+
+			v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
+			"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
+			
+			RETURN gw_fct_getselectors(v_return);
 	
 		END IF;
-
-		v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
-		"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
-		
-		RETURN gw_fct_getselectors(v_return);
 	
 	END IF;
 
