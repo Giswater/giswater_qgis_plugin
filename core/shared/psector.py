@@ -905,7 +905,7 @@ class GwPsector:
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.tbl_document, "v_ui_doc_x_psector")
             if message:
-                tools_qgis.show_warning(message)
+                tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
 
         if psector_id is None or psector_id == 'null':
             return
@@ -1061,7 +1061,7 @@ class GwPsector:
                 sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
                 if tools_db.execute_sql(sql):
                     msg = "Psector values updated successfully"
-                    tools_qgis.show_info(msg)
+                    tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
             self.my_json = {}
         else:
             values = "VALUES("
@@ -1144,7 +1144,7 @@ class GwPsector:
             msg += tools_qt.tr("There are some topological inconsistences on psector '{0}'. Would you like to see the log?")
             msg_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
-            tools_qgis.show_message_function(msg, function, message_level=1, duration=0, text_params=msg_params)
+            tools_qgis.show_message_function(msg, function, message_level=1, duration=0, text_params=msg_params, dialog=self.dlg_plan_psector)
             if from_toggle:
                 return False
 
@@ -2035,7 +2035,7 @@ class GwPsector:
             is_checked = self.dlg_psector_mng.chk_filter_canvas.isChecked()
         except RuntimeError:
             msg = tools_qt.tr("Please close all 'Psector manager' dialogs and try again")
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=self.dlg_psector_mng)
             return
 
         if is_checked:
