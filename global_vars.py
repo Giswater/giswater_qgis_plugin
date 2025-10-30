@@ -91,7 +91,8 @@ def init_giswater_settings(setting_file):
 
     global giswater_settings
     giswater_settings = QSettings(setting_file, QSettings.Format.IniFormat)
-    giswater_settings.setIniCodec(sys.getfilesystemencoding())
+    if hasattr(giswater_settings, "setIniCodec"):
+        giswater_settings.setIniCodec(sys.getfilesystemencoding())
 
 
 def init_qgis_settings(p_plugin_name):

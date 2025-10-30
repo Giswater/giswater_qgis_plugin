@@ -881,6 +881,8 @@ class GwAdminButton:
         # Create dialog object
         self.dlg_readsql = GwAdminUi(self)
         tools_gw.load_settings(self.dlg_readsql)
+        for widget in self.dlg_readsql.findChildren(QWidget):
+            print(widget.objectName())
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
@@ -2737,7 +2739,8 @@ class GwAdminButton:
 
             # Set plugin settings
             self.dev_settings = QSettings(setting_file, QSettings.Format.IniFormat)
-            self.dev_settings.setIniCodec(sys.getfilesystemencoding())
+            if hasattr(self.dev_settings, "setIniCodec"):
+                self.dev_settings.setIniCodec(sys.getfilesystemencoding())
 
             # Get values
             self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False,

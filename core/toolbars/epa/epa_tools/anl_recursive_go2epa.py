@@ -81,7 +81,8 @@ class RecursiveEpa():
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
         settings = QSettings(setting_file, QSettings.Format.IniFormat)
-        settings.setIniCodec(sys.getfilesystemencoding())
+        if hasattr(settings, "setIniCodec"):
+            settings.setIniCodec(sys.getfilesystemencoding())
         list1 = settings.value("list1/list1")
         list2 = settings.value("list2/list1")
         list3 = settings.value("list3/list1")
@@ -128,4 +129,3 @@ class RecursiveEpa():
     def _set_remaining_time(self, time):
         lbl_time = self.dlg_epa.findChild(QLabel, 'lbl_time')
         lbl_time.setText(time)
-

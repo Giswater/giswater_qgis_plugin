@@ -47,11 +47,13 @@ class GwTest(QObject):
 
         # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.Format.IniFormat)
-        self.settings.setIniCodec(sys.getfilesystemencoding())
+        if hasattr(self.settings, "setIniCodec"):
+            self.settings.setIniCodec(sys.getfilesystemencoding())
 
         # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)
         self.qgis_settings = QSettings()
-        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
+        if hasattr(self.qgis_settings, "setIniCodec"):
+            self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
         self.global_vars = global_vars
 
@@ -91,4 +93,3 @@ class GwTest(QObject):
             value = default_value
         finally:
             return value
-
