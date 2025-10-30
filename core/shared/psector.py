@@ -575,7 +575,7 @@ class GwPsector:
         tools_gw.load_settings(self.dlg_psector_rapport)
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
-        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " prices detail.csv")
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + " prices.csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
@@ -669,10 +669,10 @@ class GwPsector:
 
         # Generate csv detail
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
-            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
+            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
             viewname = "v_plan_psector_budget_detail"
             if file_name is None or file_name == 'null':
-                msg = "Price list csv file name is required"
+                msg = "Price list detail csv file name is required"
                 tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
@@ -681,7 +681,7 @@ class GwPsector:
 
         # Generate csv
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
-            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
+            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
             viewname = "v_plan_psector_budget"
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
