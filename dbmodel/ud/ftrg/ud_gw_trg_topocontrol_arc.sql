@@ -384,7 +384,17 @@ BEGIN
                         y_aux := NEW.sys_elev1;
                         NEW.sys_elev1 := NEW.sys_elev2;
                         NEW.sys_elev2 := y_aux;
+						
+						-- Node sys values
+						NEW.nodetype_1 := nodeRecord2.node_type;
+						NEW.nodetype_2 := nodeRecord1.node_type;
+						
+						NEW.node_sys_top_elev_1 := nodeRecord2.sys_top_elev;
+						NEW.node_sys_top_elev_2 := nodeRecord1.sys_top_elev;
 
+						NEW.node_sys_elev_1 := nodeRecord2.sys_elev;
+						NEW.node_sys_elev_2 := nodeRecord1.sys_elev;
+	
                     END IF;
 
                 END IF;
