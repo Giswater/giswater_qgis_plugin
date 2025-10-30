@@ -108,21 +108,16 @@ BEGIN
     		loop
 				v_count_feature = v_count_feature + 1;
 
-				--remove links related to arc
-				EXECUTE 'DELETE FROM link
-				WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.state = 1 AND c.arc_id = '|| quote_literal(v_feature_id_value)||')';
-
-				EXECUTE 'UPDATE connec SET arc_id = NULL WHERE state = 1 AND arc_id = '|| quote_literal(v_feature_id_value)||';';
 
 				--check if arc is involved into psector because of some link
-				EXECUTE 'SELECT count(connec.connec_id)  FROM connec JOIN plan_psector_x_connec p USING (arc_id) JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE
-						 AND connec.arc_id = '|| quote_literal(v_feature_id_value)||';'
+				EXECUTE 'SELECT count(connec.connec_id)  FROM connec JOIN plan_psector_x_connec p USING (connec_id) JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE
+						 AND p.arc_id = '|| quote_literal(v_feature_id_value)||';'
 				INTO v_num_feature;
 
 				IF v_num_feature > 0 THEN
 
-					EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
-					FROM plan_psector_x_connec p JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE'
+					SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
+					FROM plan_psector_x_connec p JOIN plan_psector USING (psector_id) WHERE p.state = 1 AND active IS TRUE
 					INTO v_psector_list, v_psector_id;
 
 					IF v_psector_id IS NOT NULL THEN
@@ -130,6 +125,15 @@ BEGIN
 						"data":{"message":"3142", "function":"3068","parameters":{"psector_list":"'||v_psector_list||'"}}}$$);' INTO v_audit_result;
 					END IF;
 				END IF;
+
+				--remove links related to arc
+				DELETE FROM link
+				WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.state = 1 AND c.arc_id = v_feature_id_value);
+
+				UPDATE connec SET arc_id = NULL WHERE state = 1 AND arc_id = v_feature_id_value;
+
+				UPDATE plan_psector_x_connec SET arc_id = NULL WHERE arc_id = v_feature_id_value;
+
 
 				IF v_projecttype = 'UD' THEN
 					--remove links related to arc
