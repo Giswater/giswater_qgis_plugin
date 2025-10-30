@@ -13,8 +13,17 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_featurechanges(p_data json)
 AS $function$
 
 /*EXAMPLE
+-- Individual feature types
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "NODE"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "ARC"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "CONNEC"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "GULLY"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+-- All features combined
 SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+-- Elements
 SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+-- Update examples
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "NODE"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
 SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
 SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VALUE}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
 **/
@@ -22,111 +31,114 @@ SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":5, "epsg":SRID_VAL
 DECLARE
 
 v_version text;
+v_project_type text;
 v_featuretype text;
-v_feature text;
 v_action text;
 v_lastfeeding date;
 v_fields json;
 v_fields_array json[];
-v_tablename text;
-v_select_node text;
-v_select_connec text;
-v_select_element_node text;
-v_select_element_connec text;
-v_id_list_node int[];
-v_id_list_connec int[];
+v_query text;
+v_union_queries text[] := '{}';
+v_feature_list text[];
+v_feat text;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
+	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting parameters
 	v_featuretype = (p_data->>'feature')::json->>'feature_type';
 	v_action = (p_data->>'data')::json->>'action';
 	v_lastfeeding = (p_data->>'data')::json->>'lastFeeding';
 
-	CASE v_action
-		WHEN 'INSERT' THEN
-			-- Dynamic query construction based on the feature type
-			CASE v_featuretype
-			    WHEN 'FEATURE' THEN
-					-- NODE
-					v_feature = 'node';
-			        v_select_node = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
-			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
+	-- Determine which features to process
+	IF v_featuretype = 'FEATURE' THEN
+		IF v_project_type = 'UD' THEN
+			v_feature_list := ARRAY['node', 'arc', 'connec', 'gully'];
+		ELSE
+			v_feature_list := ARRAY['node', 'arc', 'connec'];
+		END IF;
+	ELSIF v_featuretype IN ('NODE', 'ARC', 'CONNEC') THEN
+		v_feature_list := ARRAY[lower(v_featuretype)];
+	ELSIF v_featuretype = 'GULLY' THEN
+		IF v_project_type = 'UD' THEN
+			v_feature_list := ARRAY['gully'];
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"4140", "function":"3374","parameters":{"feature_type":"GULLY not available in '||v_project_type||' project"}}}$$);';
+		END IF;
+	ELSIF v_featuretype = 'ELEMENT' THEN
+		-- Handle ELEMENT separately
+		IF v_action = 'INSERT' THEN
+			v_union_queries := ARRAY[
+				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+				'node_id as "nodeId", serial_number as "serialNumber", brand_id as brand, ' ||
+				'model_id as model, descript as descript, comment as "aresepId" ' ||
+				'FROM v_element_x_node WHERE updated_at >= '''||v_lastfeeding||'''',
 
-					-- CONNEC
-					v_feature = 'connec';
-					v_select_connec = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
-					-- Combine the query parts and execute it
-			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
-					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
-					               v_select_node, v_select_connec)
-					INTO v_fields_array;
+				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+				'connec_id as "connecId", serial_number as "serialNumber", brand_id as brand, ' ||
+				'model_id as model, descript as descript, comment as "aresepId" ' ||
+				'FROM v_element_x_connec WHERE updated_at >= '''||v_lastfeeding||''''
+			];
+		ELSIF v_action = 'UPDATE' THEN
+			v_union_queries := ARRAY[
+				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+				'node_id as "nodeId", serial_number as "serialNumber", brand_id as brand, ' ||
+				'model_id as model, descript as descript, comment as "aresepId" ' ||
+				'FROM v_element_x_node WHERE updated_at >= '''||v_lastfeeding||''' AND element_id IN ' ||
+				'(SELECT (newdata->>''node_id'')::int FROM audit.log WHERE EXISTS ' ||
+				'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key ' ||
+				'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL ' ||
+				'AND table_name ILIKE ''%_node%'' AND schema = ''SCHEMA_NAME''))',
 
-			    WHEN 'ELEMENT' THEN
-					-- NODE
-					v_feature = 'node';
-			        v_select_element_node = 'SELECT element_id as "elementId", '||
-			                          'elementcat_id as "featureClass", node_id as "nodeId", serial_number as "serialNumber", '||
-			                          'brand_id as brand, model_id as model, descript as descript, comment as "aresepId" FROM v_element_x_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
+				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+				'connec_id as "connecId", serial_number as "serialNumber", brand_id as brand, ' ||
+				'model_id as model, descript as descript, comment as "aresepId" ' ||
+				'FROM v_element_x_connec WHERE updated_at >= '''||v_lastfeeding||''' AND element_id IN ' ||
+				'(SELECT (newdata->>''connec_id'')::int FROM audit.log WHERE EXISTS ' ||
+				'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''conneccat_id'', ''asset_id'']) AS key ' ||
+				'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL ' ||
+				'AND table_name ILIKE ''%_connec%'' AND schema = ''SCHEMA_NAME''))'
+			];
+		END IF;
+		EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s) a', array_to_string(v_union_queries, ' UNION ALL '))
+		INTO v_fields_array;
+	ELSE
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"4140", "function":"3374","parameters":{"feature_type":"'||v_featuretype::text||'"}}}$$);';
+	END IF;
 
-					-- CONNEC
-					v_feature = 'connec';
-			        v_select_element_connec = 'SELECT element_id as "elementId", '||
-			                          'elementcat_id as "featureClass", connec_id as "connecId", serial_number as "serialNumber", '||
-					-- Combine the query parts and execute it
-			                          'brand_id as brand, model_id as model, descript as descript, comment as "aresepId" FROM v_element_x_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''';
-					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
-					               v_select_element_node, v_select_element_connec)
-					INTO v_fields_array;
+	-- Process features if not ELEMENT
+	IF v_featuretype != 'ELEMENT' AND v_feature_list IS NOT NULL THEN
+		FOREACH v_feat IN ARRAY v_feature_list
+		LOOP
+			-- Build query based on action
+			IF v_action = 'INSERT' THEN
+				v_query := concat(
+					'SELECT ', v_feat, '_id as "', v_feat, 'Id", ',
+					v_feat, 'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state, created_at as "createdAt", updated_at as "updatedAt"',
+					'FROM ve_', v_feat, ' WHERE created_at >= ''', v_lastfeeding, ''''
+				);
+			ELSIF v_action = 'UPDATE' THEN
+				v_query := concat(
+					'SELECT ', v_feat, '_id as "', v_feat, 'Id", ',
+					v_feat, 'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state, created_at as "createdAt", updated_at as "updatedAt"',
+					'FROM ve_', v_feat, ' WHERE updated_at >= ''', v_lastfeeding, ''' AND ', v_feat, '_id IN ',
+					'(SELECT (newdata->>''', v_feat, '_id'')::int FROM audit.log WHERE EXISTS ',
+					'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''', v_feat, 'cat_id'', ''asset_id'']) AS key ',
+					'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL AND table_name ILIKE ''%_', v_feat, '%'' AND schema = ''SCHEMA_NAME''))'
+				);
+			END IF;
 
-			    ELSE
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"4140", "function":"3374","parameters":{"feature_type":"'||v_featuretype::text||'"}}}$$);';
-			END CASE;
-		WHEN 'UPDATE' THEN
-			CASE v_featuretype
-				WHEN 'FEATURE' THEN
-					-- NODE
-					v_feature = 'node';
-					v_select_node = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
-				    				lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''node_id''::int as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
-					-- CONNEC
-					v_feature = 'connec';
-					v_select_connec = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
-					-- Combine the query parts and execute it
-		                   			lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state FROM ve_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''connec_id''::int as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
+			v_union_queries := array_append(v_union_queries, v_query);
+		END LOOP;
 
-					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
-					               v_select_node, v_select_connec)
-					INTO v_fields_array;
-				WHEN 'ELEMENT' THEN
-					-- NODE
-					v_feature = 'node';
-			        v_select_element_node = 'SELECT element_id as "elementId", '||
-			                          'elementcat_id as "featureClass", node_id as "nodeId", serial_number as "serialNumber", '||
-			                          'brand_id as brand, model_id as model, descript as descript, comment as "aresepId" FROM v_element_x_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''and element_id IN (SELECT newdata->>''node_id''::int as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_'||v_feature||'%'' AND schema = ''SCHEMA_NAME''))';
-
-					-- CONNEC
-					v_feature = 'connec';
-			        v_select_element_connec = 'SELECT element_id as "elementId", '||
-			                          'elementcat_id as "featureClass", connec_id as "connecId", serial_number as "serialNumber", '||
-					-- Combine the query parts and execute it
-			                          'brand_id as brand, model_id as model, descript as descript, comment as "aresepId" FROM v_element_x_'||v_feature|| ' WHERE updated_at >= '''||v_lastfeeding||'''and element_id IN (SELECT newdata->>''connec_id''::int as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_'||v_feature||'%'' AND schema = ''SCHEMA_NAME''))';
-
-					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
-					               v_select_element_node, v_select_element_connec)
-					INTO v_fields_array;
-
-			    ELSE
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"4140", "function":"3374","parameters":{"feature_type":"'||v_featuretype::text||'"}}}$$);';
-			END CASE;
-	END CASE;
+		-- Execute combined query
+		EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s) a', array_to_string(v_union_queries, ' UNION ALL '))
+		INTO v_fields_array;
+	END IF;
 
 	v_fields := array_to_json(v_fields_array);
 
