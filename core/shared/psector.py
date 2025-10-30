@@ -10,7 +10,7 @@ import json
 import os
 import re
 import sys
-from typing import Union
+from typing import Union, Optional
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
@@ -961,8 +961,9 @@ class GwPsector:
             return False
         return True
 
-    def insert_or_update_new_psector(self, from_tab_change=False):  # noqa: C901
-
+    def insert_or_update_new_psector(self, from_tab_change=False):
+        """Main function to insert or update psector"""
+        
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name", return_string_null=False)
         if psector_name == "":
             msg = "Mandatory field is missing. Please, set a value"
@@ -973,25 +974,59 @@ class GwPsector:
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_rotation", 0)
 
+        if not self._validate_psector_fields():
+            return False
+
+        if not self._check_psector_name_availability(psector_name):
+            return
+
+        columns = self._get_psector_columns()
+        if columns is None:
+            return
+
+        if not self._check_workcat_for_executed_status(psector_name):
+            return
+
+        self._toggle_topology_trigger(enable=True)
+        
+        if self.update:
+            self._update_psector()
+        else:
+            self._insert_psector(columns)
+
+        self._toggle_topology_trigger(enable=False)
+        
+        if from_tab_change is False:
+            tools_gw.refresh_selectors()
+            tools_gw.close_dialog(self.dlg_plan_psector)
+
+    def _validate_psector_fields(self) -> bool:
+        """Validate numeric fields and parent_id"""
+        
         msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
         scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
         atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
         parent_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_parent_id", return_string_null=False)
+        rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
+
         if rotation != "":
             try:
                 float(rotation)
             except ValueError:
                 msg += tools_qt.tr("Rotation must be a number.")
+        
         if scale != "":
             try:
                 float(scale)
             except ValueError:
                 msg += tools_qt.tr("Scale must be a number.")
+        
         if atlas_id != "":
             try:
                 int(atlas_id)
             except ValueError:
                 msg += tools_qt.tr("Atlas ID must be an integer.")
+        
         if parent_id != "":
             try:
                 int(parent_id)
@@ -999,132 +1034,180 @@ class GwPsector:
                 msg += tools_qt.tr("Parent ID must be an integer.")
 
         if parent_id is not None and parent_id != "":
-            try:
-                parent_id_exists = tools_db.get_rows(f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived")
-            except Exception:
-                parent_id_exists = None
-
-            if parent_id_exists is None or len(parent_id_exists) == 0:
+            if not self._validate_parent_id(parent_id):
                 msg += tools_qt.tr("Parent ID does not exist.")
 
         if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return False
+        
+        return True
 
+    def _validate_parent_id(self, parent_id: str) -> bool:
+        """Check if parent_id exists in ve_plan_psector"""
+        
+        try:
+            parent_id_exists = tools_db.get_rows(
+                f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived"
+            )
+        except Exception:
+            return False
+
+        return parent_id_exists is not None and len(parent_id_exists) > 0
+
+    def _check_psector_name_availability(self, psector_name: str) -> bool:
+        """Check if psector name is available for new psector"""
+        
         name_exist = self.check_name(psector_name)
-
         if name_exist and not self.update:
             msg = "The name is current in use"
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
-            return
+            return False
+        return True
 
+    def _get_psector_columns(self) -> Optional[list]:
+        """Get columns from ve_plan_psector view"""
+        
         viewname = "'ve_plan_psector'"
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
                "ORDER BY ordinal_position;")
         rows = tools_db.get_rows(sql)
+        
         if not rows or rows is None or rows == '':
             msg = "Check fields from table or view"
             tools_qgis.show_warning(msg, parameter=viewname, dialog=self.dlg_plan_psector)
-            return
+            return None
 
+        columns = []
+        for row in rows:
+            columns.append(str(row[0]))
+        return columns
+
+    def _check_workcat_for_executed_status(self, psector_name: str) -> bool:
+        """Check if workcat_id is set when psector status is Executed"""
+        
         workcat_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_workcat_id')
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
 
-        # Check if psector status is "Executed" (status_id == 5) and has no workcat_id
         if int(status_id) == 5 and workcat_id in (None, 'null', ''):
             msg = "Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?"
             msg_params = (psector_name,)
             answer = tools_qt.show_question(msg, title='Psector', msg_params=msg_params)
             if answer is False:
-                return
+                return False
+        return True
 
-        sql = ("UPDATE config_param_user "
-                "SET value = True "
-                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+    def _toggle_topology_trigger(self, enable: bool) -> None:
+        """Enable or disable topology trigger"""
+        
+        value = 'True' if enable else 'False'
+        sql = (f"UPDATE config_param_user "
+               f"SET value = {value} "
+               f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
-        columns = []
-        for row in rows:
-            columns.append(str(row[0]))
-        if self.update:
-            psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
-            updates = ""
-            for key, value in self.my_json.items():
-                if value in (None, 'null', 'NULL', ''):
-                    updates += f"{key} = NULL, "
-                else:
-                    value = str(value).replace("'", "''")
-                    updates += f"{key} = '{value}', "
-            if updates:
-                updates = updates[:-2]
-                sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
-                if tools_db.execute_sql(sql):
-                    msg = "Psector values updated successfully"
-                    tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
-            self.my_json = {}
+
+    def _update_psector(self) -> None:
+        """Update existing psector"""
+        
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+        updates = ""
+        
+        for key, value in self.my_json.items():
+            if value in (None, 'null', 'NULL', ''):
+                updates += f"{key} = NULL, "
+            else:
+                value = str(value).replace("'", "''")
+                updates += f"{key} = '{value}', "
+        
+        if updates:
+            updates = updates[:-2]
+            sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
+            if tools_db.execute_sql(sql):
+                msg = "Psector values updated successfully"
+                tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
+        
+        self.my_json = {}
+
+    def _insert_psector(self, columns: list) -> None:
+        """Insert new psector"""
+        
+        if not columns:
+            return
+
+        sql = "INSERT INTO ve_plan_psector ("
+        values = "VALUES("
+
+        for column_name in columns:
+            widget_name = f"tab_general_{column_name}"
+            if tools_qt.get_widget(self.dlg_plan_psector, widget_name) is None:
+                widget_name = column_name
+
+            if widget_name == 'tab_general_psector_id':
+                continue
+
+            widget_value = self._get_widget_value_for_insert(widget_name)
+            if widget_value is not None:
+                sql += column_name + ", "
+                values += widget_value + ", "
+
+        sql = sql[:-2] + ") "
+        values = values[:-2] + ")"
+        sql += f"{values} RETURNING psector_id;"
+        
+        new_psector_id = tools_db.execute_returning(sql)
+        if new_psector_id:
+            self._configure_new_psector(new_psector_id[0])
+
+    def _get_widget_value_for_insert(self, widget_name: str) -> Optional[str]:
+        """Get widget value formatted for SQL INSERT"""
+        
+        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, widget_name)
+        if widget_type is None:
+            return None
+
+        value = None
+        if widget_type is QCheckBox:
+            value = str(tools_qt.is_checked(self.dlg_plan_psector, widget_name)).upper()
+        elif widget_type is QDateEdit:
+            date = self.dlg_plan_psector.findChild(QDateEdit, str(widget_name))
+            return f"'{date.dateTime().toString('yyyy-MM-dd HH:mm:ss')}'"
+        elif isinstance(widget_type, QComboBox) or widget_type is tools_gw.CustomQComboBox:
+            combo = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
+            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
         else:
-            values = "VALUES("
-            if columns:
-                sql = "INSERT INTO ve_plan_psector ("
-                for column_name in columns:
-                    if tools_qt.get_widget(self.dlg_plan_psector, f"tab_general_{column_name}") is not None:
-                        column_name = "tab_general_" + column_name
+            value = tools_qt.get_text(self.dlg_plan_psector, widget_name)
 
-                    if column_name != 'tab_general_psector_id':
-                        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, column_name)
-                        if widget_type is not None:
-                            value = None
-                            if widget_type is QCheckBox:
-                                value = str(tools_qt.is_checked(self.dlg_plan_psector, column_name)).upper()
-                            elif widget_type is QDateEdit:
-                                date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
-                                values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif isinstance(widget_type, QComboBox) or widget_type is tools_gw.CustomQComboBox:
-                                combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
-                                value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
-                            else:
-                                value = tools_qt.get_text(self.dlg_plan_psector, column_name)
+        if value in (None, 'null', 'NULL', ''):
+            return "null"
+        else:
+            return f"$${value}$$"
 
-                            if 'tab_general_' in column_name:
-                                column_name = column_name.replace('tab_general_', '')
-                            if value in (None, 'null', 'NULL', ''):
-                                sql += column_name + ", "
-                                values += "null, "
-                            else:
-                                values += f"$${value}$$, "
-                                sql += column_name + ", "
-
-                sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 2] + ")"
-                sql += f"{values} RETURNING psector_id;"
-                new_psector_id = tools_db.execute_returning(sql)
-                if new_psector_id:
-                    self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").setEnabled(False)
-                    tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
-                    cur_psector = tools_gw.get_config_value('plan_psector_current')
-                    if cur_psector is not None:
-                        sql = ("UPDATE config_param_user "
-                            f" SET value = '{new_psector_id[0]}' "
-                            " WHERE parameter = 'plan_psector_current'"
-                            " AND cur_user=current_user; ")
-                    else:
-                        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                            f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
-                    tools_db.execute_sql(sql)
-                    self.update = True
-                    self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
-                    if getattr(self, 'dlg_psector_mng', None) is not None:
-                        self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
-                    tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id[0], do_call_fct=False, force_change=True)
-
-        sql = ("UPDATE config_param_user "
-                "SET value = False "
-                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+    def _configure_new_psector(self, new_psector_id: int) -> None:
+        """Configure dialog and settings after creating new psector"""
+        
+        self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").setEnabled(False)
+        tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id))
+        
+        cur_psector = tools_gw.get_config_value('plan_psector_current')
+        if cur_psector is not None:
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{new_psector_id}' "
+                   f"WHERE parameter = 'plan_psector_current' "
+                   f"AND cur_user=current_user;")
+        else:
+            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+                   f"VALUES ('plan_psector_current', '{new_psector_id}', current_user);")
+        
         tools_db.execute_sql(sql)
-        if from_tab_change is False:
-            tools_gw.refresh_selectors()
-            tools_gw.close_dialog(self.dlg_plan_psector)
+        self.update = True
+        self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
+        
+        if getattr(self, 'dlg_psector_mng', None) is not None:
+            self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
+        
+        tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id, do_call_fct=False, force_change=True)
 
     def check_topology_psector(self, psector_id=None, psector_name=None, from_toggle=False):
 
