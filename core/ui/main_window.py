@@ -57,7 +57,7 @@ class GwMainWindow(QMainWindow):
             # Create a stacked layout to overlay the message bar
             self.stacked_layout = QStackedLayout(self)
             self.setLayout(self.stacked_layout)
-            self.stacked_layout.setStackingMode(1)
+            self.stacked_layout.setStackingMode(QStackedLayout.StackingMode.StackAll)
 
             # Create the message bar
             self._messageBar = QgsMessageBar()
