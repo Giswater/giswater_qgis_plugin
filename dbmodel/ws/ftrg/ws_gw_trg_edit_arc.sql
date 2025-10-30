@@ -77,7 +77,7 @@ BEGIN
 
 			-- get vdefault values using config user values
 			IF v_customfeature IS NOT NULL THEN
-				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat('feat_',v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			ELSE
 				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
