@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
     QGridLayout, QTabWidget, QDialog
-from qgis.core import QgsProject, QgsApplication, QgsMessageLog
+from qgis.core import QgsProject, QgsApplication, QgsMessageLog, Qgis
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
@@ -444,7 +444,7 @@ class GwAdminButton:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
             message_log.setVisible(True)
-            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", 0)
+            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", Qgis.Info)
 
             # Manage Log Messages in tab log
             main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
