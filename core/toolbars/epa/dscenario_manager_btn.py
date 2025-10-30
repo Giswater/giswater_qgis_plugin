@@ -10,7 +10,7 @@ from qgis.PyQt.sip import isdeleted
 import json
 
 from qgis.core import QgsProject
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeySequence
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor, QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
@@ -127,7 +127,7 @@ class GwDscenarioManagerButton(GwAction):
         # Apply filter validator
         self.filter_name = self.dlg_hydrology_manager.findChild(QLineEdit, 'txt_name')
         reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Checkbox show inactive
         self.chk_active = self.dlg_hydrology_manager.chk_active
@@ -197,7 +197,7 @@ class GwDscenarioManagerButton(GwAction):
         # Apply filter validator
         self.filter_name = self.dlg_dwf_manager.findChild(QLineEdit, 'txt_name')
         reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Checkbox show inactive
         self.chk_active = self.dlg_dwf_manager.chk_active
@@ -268,7 +268,7 @@ class GwDscenarioManagerButton(GwAction):
         # Apply filter validator
         self.filter_name = self.dlg_dscenario_manager.findChild(QLineEdit, 'txt_name')
         reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Checkbox show inactive
         self.chk_active = self.dlg_dscenario_manager.chk_active

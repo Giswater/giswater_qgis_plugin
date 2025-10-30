@@ -27,7 +27,7 @@ from datetime import datetime
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, \
     QItemSelectionModel, QTimer
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
-    QIntValidator, QDoubleValidator, QRegExpValidator
+    QIntValidator, QDoubleValidator, QRegularExpressionValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
@@ -7002,7 +7002,7 @@ def _set_reg_exp(widget, field):
         if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
             if field['widgetcontrols']['regexpControl'] is not None:
                 reg_exp = QRegularExpression(str(field['widgetcontrols']['regexpControl']))
-                widget.setValidator(QRegExpValidator(reg_exp))
+                widget.setValidator(QRegularExpressionValidator(reg_exp))
 
     return widget
 

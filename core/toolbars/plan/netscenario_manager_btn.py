@@ -10,7 +10,7 @@ from qgis.PyQt.sip import isdeleted
 import json
 
 from qgis.core import QgsProject
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QPushButton
@@ -62,7 +62,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Apply filter validator
         self.filter_name = self.dlg_netscenario_manager.findChild(QLineEdit, 'txt_name')
         reg_exp = QRegularExpression(r'([^"\'\\\\$]|\\$(?!\\$))*')  # Don't allow " or ' or \ or $$ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Fill table
         self.tbl_netscenario = self.dlg_netscenario_manager.findChild(QTableView, 'tbl_netscenario')

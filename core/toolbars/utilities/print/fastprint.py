@@ -9,7 +9,7 @@ import json
 import re
 from functools import partial
 
-from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtGui import QRegularExpressionValidator
 from qgis.PyQt.QtCore import QRegularExpression
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
@@ -78,7 +78,7 @@ class GwFastprint:
         if w_scale:
             w_scale.editingFinished.connect(partial(self._set_scale, w_scale))
             reg_exp = QRegularExpression(r"\d{0,8}[\r]?")
-            w_scale.setValidator(QRegExpValidator(reg_exp))
+            w_scale.setValidator(QRegularExpressionValidator(reg_exp))
             tools_qt.set_widget_text(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
         self.my_json['scale'] = scale

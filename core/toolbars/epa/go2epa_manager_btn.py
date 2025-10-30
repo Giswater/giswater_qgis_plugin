@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QRegularExpression
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu, QPushButton
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
@@ -41,7 +41,7 @@ class GwGo2EpaManagerButton(GwAction):
 
         # Manage widgets
         reg_exp = QRegularExpression(r"^[A-Za-z0-9_]{1,16}$")
-        self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
+        self.dlg_manager.txt_result_id.setValidator(QRegularExpressionValidator(reg_exp))
         self.dlg_manager.tab_log_txt_infolog.setReadOnly(True)
         self.dlg_manager.btn_toggle_corporate.setEnabled(False)
         self.dlg_manager.btn_archive.setEnabled(False)

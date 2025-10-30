@@ -8,7 +8,7 @@ or (at your option) any later version.
 import json
 from functools import partial
 
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegularExpression, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
 
@@ -41,7 +41,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         self.filter_name = self.dlg_workspace_manager.findChild(QLineEdit, 'txt_name')
         reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Fill table
         self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, 'tbl_wrkspcm')
