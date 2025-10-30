@@ -28,3 +28,5 @@ VALUES ('sys_table_context','33','["MASTERPLAN", "REPOSITION VALUE"]','{"orderBy
 UPDATE sys_table SET context = '33' WHERE id = 'v_plan_arc' OR id = 'v_plan_node';
 UPDATE sys_table SET alias = 'Arc reposition value' WHERE id = 'v_plan_arc';
 UPDATE sys_table SET alias = 'Node reposition value' WHERE id = 'v_plan_node';
+
+UPDATE sys_param_user SET feature_field_id = 'pavcat_id' WHERE id = 'edit_pavementcat_vdefault';
