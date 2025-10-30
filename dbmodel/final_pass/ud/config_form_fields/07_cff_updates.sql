@@ -970,3 +970,29 @@ WHERE formname='ve_link' AND formtype='form_feature' AND columnname='location_ty
 UPDATE config_form_fields
 	SET dv_isnullvalue=true
 	WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id_plan' AND tabname='tab_general';
+
+UPDATE config_form_fields cff SET web_layoutorder = t.new_web_layoutorder FROM ( 
+	SELECT formname, formtype, tabname, columnname, layoutname, layoutorder,
+	ROW_number() OVER(
+		PARTITION BY formname
+		ORDER BY 
+		CASE 
+			WHEN layoutname = 'lyt_top_1' THEN 1 
+			WHEN layoutname = 'lyt_top_2' THEN 2 
+			WHEN layoutname = 'lyt_top_3' THEN 3
+			WHEN layoutname = 'lyt_bot_1' THEN 4 
+			WHEN layoutname = 'lyt_bot_2' THEN 5 
+			WHEN layoutname = 'lyt_bot_3' THEN 6 
+			WHEN layoutname = 'lyt_data_1' THEN 7
+			WHEN layoutname = 'lyt_data_2' THEN 8 
+			WHEN layoutname = 'lyt_data_3' THEN 9
+			WHEN layoutname = 'lyt_data_4' THEN 10
+		END, layoutorder
+	) AS new_web_layoutorder
+	FROM config_form_fields cff
+	WHERE tabname = 'tab_data'
+) t
+WHERE cff.formname = t.formname 
+	AND cff.formtype = t.formtype 
+	AND cff.tabname = t.tabname 
+	AND cff.columnname = t.columnname;
