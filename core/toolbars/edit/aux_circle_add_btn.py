@@ -159,7 +159,7 @@ class GwAuxCircleAddButton(GwMaptool):
         tools_gw.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 9999999.00, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
+        validator.setNotation(QDoubleValidator.Notation.StandardNotation)
         self.dlg_create_circle.radius.setValidator(validator)
 
         self.dlg_create_circle.radius.textChanged.connect(partial(self._preview_circle, point))

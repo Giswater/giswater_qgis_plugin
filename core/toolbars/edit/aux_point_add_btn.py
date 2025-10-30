@@ -186,10 +186,10 @@ class GwAuxPointAddButton(GwMaptool):
         tools_gw.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 9999999.00, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
+        validator.setNotation(QDoubleValidator.Notation.StandardNotation)
         self.dlg_create_point.dist_x.setValidator(validator)
         validator = QDoubleValidator(-99999.99, 9999999.00, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
+        validator.setNotation(QDoubleValidator.Notation.StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
         self.dlg_create_point.dist_x.textChanged.connect(partial(self._preview_point, self.dlg_create_point, point_1, point_2))
         self.dlg_create_point.dist_y.textChanged.connect(partial(self._preview_point, self.dlg_create_point, point_1, point_2))
