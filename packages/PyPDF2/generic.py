@@ -340,27 +340,27 @@ def readStringFromStream(stream):
                 break
         elif tok == b_("\\"):
             tok = stream.read(1)
-            ESCAPE_DICT = {b_("n") : b_("\n"),
-                           b_("r") : b_("\r"),
-                           b_("t") : b_("\t"),
-                           b_("b") : b_("\b"),
-                           b_("f") : b_("\f"),
-                           b_("c") : b_("\c"),
-                           b_("(") : b_("("),
-                           b_(")") : b_(")"),
-                           b_("/") : b_("/"),
-                           b_("\\") : b_("\\"),
-                           b_(" ") : b_(" "),
-                           b_("/") : b_("/"),
-                           b_("%") : b_("%"),
-                           b_("<") : b_("<"),
-                           b_(">") : b_(">"),
-                           b_("[") : b_("["), 
-                           b_("]") : b_("]"),
-                           b_("#") : b_("#"),
-                           b_("_") : b_("_"),
-                           b_("&") : b_("&"),
-                           b_('$') : b_('$'),
+            ESCAPE_DICT = {b_(r"n") : b_(r"\n"),
+                           b_(r"r") : b_(r"\r"),
+                           b_(r"t") : b_(r"\t"),
+                           b_(r"b") : b_(r"\b"),
+                           b_(r"f") : b_(r"\f"),
+                           b_(r"c") : b_(r"\c"),
+                           b_(r"(") : b_(r"("),
+                           b_(r")") : b_(r")"),
+                           b_(r"/") : b_(r"/"),
+                           b_(r"\\") : b_(r"\\"),
+                           b_(r" ") : b_(r" "),
+                           b_(r"/") : b_(r"/"),
+                           b_(r"%") : b_(r"%"),
+                           b_(r"<") : b_(r"<"),
+                           b_(r">") : b_(r">"),
+                           b_(r"[") : b_(r"["),
+                           b_(r"]") : b_(r"]"),
+                           b_(r"#") : b_(r"#"),
+                           b_(r"_") : b_(r"_"),
+                           b_(r"&") : b_(r"&"),
+                           b_(r'$') : b_(r'$'),
                            }
             try:
                 tok = ESCAPE_DICT[tok]
@@ -479,7 +479,7 @@ class NameObject(str, PdfObject):
         name = stream.read(1)
         if name != NameObject.surfix:
             raise utils.PdfReadError("name read error")
-        name += utils.readUntilRegex(stream, NameObject.delimiterPattern, 
+        name += utils.readUntilRegex(stream, NameObject.delimiterPattern,
             ignore_eof=True)
         if debug: print(name)
         try:

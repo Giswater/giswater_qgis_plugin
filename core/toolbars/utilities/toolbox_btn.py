@@ -173,7 +173,7 @@ class GwToolBoxButton(GwAction):
             return
 
         self.dlg_toolbox = GwToolboxUi(self, 'toolbox')
-        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
         self.no_clickable_items = [self.TRV_PROCESSES, self.TRV_REPORTS]
         extras = '"isToolbox":true'
@@ -384,7 +384,7 @@ class GwToolBoxButton(GwAction):
                         # Create a QTableWidgetItem and then set the data so the sorting works properly
                         # with Strings, Integers and any other type
                         qtable_item = QTableWidgetItem()
-                        qtable_item.setData(Qt.DisplayRole, value)
+                        qtable_item.setData(Qt.ItemDataRole.DisplayRole, value)
                         self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
 
                 continue
@@ -492,7 +492,7 @@ class GwToolBoxButton(GwAction):
                         # Create a QTableWidgetItem and then set the data so the sorting works properly
                         # with Strings, Integers and any other type
                         qtable_item = QTableWidgetItem()
-                        qtable_item.setData(Qt.DisplayRole, item)
+                        qtable_item.setData(Qt.ItemDataRole.DisplayRole, item)
                         self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
@@ -850,7 +850,7 @@ class GwToolBoxButton(GwAction):
         all_rows = []
         headers = []
         for i in range(0, model.columnCount()):
-            headers.append(str(model.headerData(i, Qt.Horizontal)))
+            headers.append(str(model.headerData(i, Qt.Orientation.Horizontal)))
         all_rows.append(headers)
         for rows in range(0, model.rowCount()):
             row = []

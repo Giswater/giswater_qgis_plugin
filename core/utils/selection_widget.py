@@ -209,7 +209,7 @@ class GwSelectionWidget(QWidget):
             menu.addActions(ag.actions())
 
             # Configure QToolButton as split button
-            self.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)  # left = default, arrow = menu
+            self.btn_snapping.setPopupMode(QToolButton.ToolButtonPopupMode.MenuButtonPopup)  # left = default, arrow = menu
             self.btn_snapping.setMenu(menu)
 
             # Set initial default action
@@ -454,7 +454,7 @@ class GwSelectionWidget(QWidget):
         )
         
         # Toggle the selection state using XOR operation
-        selection_model.select(all_rows, QItemSelectionModel.Toggle | QItemSelectionModel.Rows)
+        selection_model.select(all_rows, QItemSelectionModel.SelectionFlag.Toggle | QItemSelectionModel.SelectionFlag.Rows)
 
     # endregion invert selection
 
@@ -551,7 +551,7 @@ class GwSelectionWidget(QWidget):
         id_col_name = f'{feature_type}_id'
 
         for i in range(model.columnCount()):
-            if model.headerData(i, Qt.Horizontal) == id_col_name:
+            if model.headerData(i, Qt.Orientation.Horizontal) == id_col_name:
                 id_column_index = i
                 break
 
@@ -634,7 +634,7 @@ class GwSelectionWidget(QWidget):
             # Create a deep copy of the current model as the default
             self.default_model = QStandardItemModel()
             self.default_model.setHorizontalHeaderLabels([
-                current_model.headerData(i, Qt.Horizontal) 
+                current_model.headerData(i, Qt.Orientation.Horizontal) 
                 for i in range(current_model.columnCount())
             ])
             
@@ -680,7 +680,7 @@ class GwSelectionWidget(QWidget):
         # Create new updated model
         updated_model = QStandardItemModel()
         updated_model.setHorizontalHeaderLabels([
-            current_model.headerData(i, Qt.Horizontal) 
+            current_model.headerData(i, Qt.Orientation.Horizontal) 
             for i in range(current_model.columnCount())
         ])
 
@@ -791,7 +791,7 @@ class GwSelectionWidget(QWidget):
             row_id = str(model.data(model.index(row, id_column_index)))
             if row_id in selected_ids:
                 index = model.index(row, 0)
-                selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+                selection_model.select(index, QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
 
     def show_selection_on_top(self, widget_table, class_object=None, dialog=None, table_object=None):
         """
@@ -816,7 +816,7 @@ class GwSelectionWidget(QWidget):
 
         # Create a new model
         temp_model = QStandardItemModel()
-        temp_model.setHorizontalHeaderLabels([model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())])
+        temp_model.setHorizontalHeaderLabels([model.headerData(i, Qt.Orientation.Horizontal) for i in range(model.columnCount())])
 
         # Copy all item delegates from the original model
         for col in range(model.columnCount()):
@@ -856,10 +856,10 @@ class GwSelectionWidget(QWidget):
     def copy_item_data(self, model, source_index, target_item):
             # List of common Qt roles to preserve
             roles = [
-                Qt.DisplayRole, Qt.EditRole, Qt.DecorationRole, Qt.ToolTipRole,
-                Qt.StatusTipRole, Qt.WhatsThisRole, Qt.FontRole, Qt.TextAlignmentRole,
-                Qt.BackgroundRole, Qt.ForegroundRole, Qt.CheckStateRole, Qt.InitialSortOrderRole,
-                Qt.UserRole
+                Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole, Qt.ItemDataRole.DecorationRole, Qt.ItemDataRole.ToolTipRole,
+                Qt.ItemDataRole.StatusTipRole, Qt.ItemDataRole.WhatsThisRole, Qt.ItemDataRole.FontRole, Qt.ItemDataRole.TextAlignmentRole,
+                Qt.ItemDataRole.BackgroundRole, Qt.ItemDataRole.ForegroundRole, Qt.ItemDataRole.CheckStateRole, Qt.ItemDataRole.InitialSortOrderRole,
+                Qt.ItemDataRole.UserRole
             ]
 
             # Copy data for all roles
@@ -869,7 +869,7 @@ class GwSelectionWidget(QWidget):
                     target_item.setData(data, role)
 
             # Copy any custom user roles (above Qt.UserRole)
-            for role in range(Qt.UserRole + 1, Qt.UserRole + 100):
+            for role in range(Qt.ItemDataRole.UserRole + 1, Qt.ItemDataRole.UserRole + 100):
                 data = model.data(source_index, role)
                 if data is not None:
                     target_item.setData(data, role)

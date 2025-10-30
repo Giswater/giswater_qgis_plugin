@@ -10,7 +10,7 @@ import re
 from functools import partial
 
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtCore import QRegularExpression
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
@@ -77,7 +77,7 @@ class GwFastprint:
         w_scale = self.dlg_composer.findChild(QLineEdit, "tab_none_scale")
         if w_scale:
             w_scale.editingFinished.connect(partial(self._set_scale, w_scale))
-            reg_exp = QRegExp("\d{0,8}[\r]?")
+            reg_exp = QRegularExpression(r"\d{0,8}[\r]?")
             w_scale.setValidator(QRegExpValidator(reg_exp))
             tools_qt.set_widget_text(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
@@ -131,7 +131,7 @@ class GwFastprint:
             return
 
         printdialog = QPrintDialog(self.printer)
-        if printdialog.exec_() != QDialog.Accepted:
+        if printdialog.exec() != QDialog.DialogCode.Accepted:
             return
 
         actual_printer = QgsLayoutExporter(selected_com)
@@ -339,7 +339,7 @@ class GwFastprint:
         if result['geometry'] is None:
             return
 
-        list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
+        list_coord = re.search(r'\((.*)\)', str(result['geometry']['st_astext']))
         points = tools_qgis.get_geometry_vertex(list_coord)
         tools_qgis.draw_polyline(points, rubber_band)
 

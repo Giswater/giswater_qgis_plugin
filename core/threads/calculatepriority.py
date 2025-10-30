@@ -87,7 +87,7 @@ class GwCalculatePriority(GwTask):
         config_material,
         config_engine,
     ):
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.result_type = result_type
         self.result_name = result_name
         self.result_description = result_description

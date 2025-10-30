@@ -46,7 +46,7 @@ class GwConnectLinkButton(GwMaptool):
         self.user_click_marker = QgsVertexMarker(self.canvas)
         self.user_click_marker.setColor(QColor(255, 0, 0))
         self.user_click_marker.setIconSize(15)
-        self.user_click_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.user_click_marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
         self.user_click_marker.setPenWidth(3)
 
         # Check project type
@@ -304,7 +304,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasMoveEvent(self, event):
         """ With left click the digitizing is finished """
 
-        if event.buttons() == Qt.LeftButton:
+        if event.buttons() == Qt.MouseButton.LeftButton:
 
             if not self.dragging:
                 self.dragging = True
@@ -331,7 +331,7 @@ class GwConnectLinkButton(GwMaptool):
             except RuntimeError:
                 pass
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
 
             # Set valid values for rectangle's width and height
             if self.select_rect.width() == 1:
@@ -408,7 +408,7 @@ class GwConnectLinkButton(GwMaptool):
         key = QApplication.keyboardModifiers()
 
         # Set behaviour depending of the pressed keys on keyboard
-        behaviour = QgsVectorLayer.RemoveFromSelection if key == (Qt.ControlModifier | Qt.ShiftModifier) else QgsVectorLayer.AddToSelection
+        behaviour = QgsVectorLayer.SelectBehavior.RemoveFromSelection if key == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) else QgsVectorLayer.SelectBehavior.AddToSelection
 
         # Get current feature layer (connec/gully)
         layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
@@ -593,7 +593,7 @@ class GwConnectLinkButton(GwMaptool):
             self.user_click_point = None
             
             # Check for Alt+click to unselect
-            alt_pressed = QApplication.keyboardModifiers() & Qt.AltModifier
+            alt_pressed = QApplication.keyboardModifiers() & Qt.KeyboardModifier.AltModifier
             
             if alt_pressed:
                 # Alt+click only works on already selected arcs

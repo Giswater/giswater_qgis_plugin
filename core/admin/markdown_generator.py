@@ -19,7 +19,7 @@ from ..ui.ui_manager import GwAdminMarkdownGeneratorUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
 
-from PyQt5.QtWidgets import QApplication, QFileDialog
+from qgis.PyQt.QtWidgets import QApplication, QFileDialog
 
 class GwAdminMarkdownGenerator:
 

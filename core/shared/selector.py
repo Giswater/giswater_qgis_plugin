@@ -184,7 +184,7 @@ class GwSelector:
             scroll_area.setProperty('selector_type', form_tab['selectorType'])
             scroll_area.viewport().setStyleSheet("background-color: white;")
             tab_widget = QWidget()
-            tab_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
+            tab_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
             if filter:
                 main_tab.removeTab(index)
                 main_tab.insertTab(index, scroll_area, form_tab['tabLabel'])
@@ -212,10 +212,10 @@ class GwSelector:
                 if tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name)) is None:
                     widget = QLineEdit()
                     widget.setObjectName('txt_filter_' + str(tab_name))
-                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                     widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
                                                        widget=widget, current_tab=current_tab))
-                    widget.setLayoutDirection(Qt.RightToLeft)
+                    widget.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
                 else:
                     widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name))
@@ -238,7 +238,7 @@ class GwSelector:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(tab_name))
                     widget.toggled.connect(partial(self._manage_all, dialog, widget))
-                    widget.setLayoutDirection(Qt.LeftToRight)
+                    widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
                     chk_all_tooltip = tools_qt.tr("Shift+Click to uncheck all")
                     widget.setToolTip(chk_all_tooltip)
                 else:
@@ -260,7 +260,7 @@ class GwSelector:
                     widget = tools_gw.add_checkbox(**kwargs)
                     widget.setText(field['label'])
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
-                    widget.setLayoutDirection(Qt.LeftToRight)
+                    widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
                     style = ""
                     if field.get('stylesheet') is not None:
@@ -280,7 +280,7 @@ class GwSelector:
                     msg_params = (field['columnname'], field['widgetname'],)
                     tools_qgis.show_message(msg, 2, msg_params=msg_params)
 
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
         # Add help button
@@ -354,11 +354,11 @@ class GwSelector:
         disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
 
-        if key_modifier == Qt.ShiftModifier:
+        if key_modifier == Qt.KeyboardModifier.ShiftModifier:
             disable_parent = True
 
         if selection_mode == 'removePrevious' or \
-                (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
+                (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.KeyboardModifier.ShiftModifier):
             is_alone = True
             if widget_all is not None:
                 widget_all.blockSignals(True)
@@ -493,7 +493,7 @@ class GwSelector:
         key_modifier = QApplication.keyboardModifiers()
         override = None
 
-        if key_modifier == Qt.ShiftModifier:
+        if key_modifier == Qt.KeyboardModifier.ShiftModifier:
             status = False
             override = False
 

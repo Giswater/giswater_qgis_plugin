@@ -209,7 +209,7 @@ class GwConfigButton(GwAction):
                     lbl.setObjectName('lbl' + field['widgetname'])
                     lbl.setText(field['label'])
                     lbl.setMinimumSize(160, 0)
-                    lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                    lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
                     lbl.setToolTip(field['tooltip'])
 
                     if self.tab == 'user':
@@ -219,13 +219,13 @@ class GwConfigButton(GwAction):
                             self.chk.setChecked(True)
                         elif field['checked'] in ('false', 'False', 'FALSE', False):
                             self.chk.setChecked(False)
-                        self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                        self.chk.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
                     if field['widgettype'] in ('text', 'linetext', 'typeahead'):
                         widget = QLineEdit()
                         widget.setText(field['value'])
                         widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                         if field['widgettype'] == 'typeahead':
                             completer = QCompleter()
                             if field.get('dv_querytext'):
@@ -238,13 +238,13 @@ class GwConfigButton(GwAction):
                         widget = QTextEdit()
                         widget.setText(field['value'])
                         widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
                     elif field['widgettype'] == 'combo':
                         widget = QComboBox()
                         self._fill_combo(widget, field)
                         widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
                     elif field['widgettype'] == 'check':
                         self.chk = QCheckBox()
@@ -257,7 +257,7 @@ class GwConfigButton(GwAction):
                             self.chk.setChecked(True)
                         elif field['value'] in ('false', 'False', 'FALSE', False):
                             self.chk.setChecked(False)
-                        self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                        self.chk.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                         self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, self.chk, self.tab, self.chk))
 
                     elif field['widgettype'] == 'datetime':
@@ -276,7 +276,7 @@ class GwConfigButton(GwAction):
                             widget.clear()
 
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
                     elif field['widgettype'] == 'spinbox':
                         widget = QDoubleSpinBox()
@@ -284,7 +284,7 @@ class GwConfigButton(GwAction):
                             value = float(str(field['value']))
                             widget.setValue(value)
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
                     if widget:
                         widget.setObjectName(field['widgetname'])

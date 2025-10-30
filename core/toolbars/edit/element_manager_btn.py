@@ -117,7 +117,7 @@ class GwElementManagerButton(GwAction):
 
             if isinstance(widget, QTableView):
                 # Populate custom context menu
-                widget.setContextMenuPolicy(Qt.CustomContextMenu)
+                widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
                 widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, dialog))
 
     def load_tableviews(self, complet_result):

@@ -32,7 +32,7 @@ class GwAssignation(GwTask):
         diameter_range=None,
         builtdate_range=None,
     ):
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.buffer = buffer
         self.years = years
         self.max_distance = max_distance

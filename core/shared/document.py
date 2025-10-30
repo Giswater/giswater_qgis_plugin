@@ -462,7 +462,7 @@ class GwDocument(QObject):
         tools_gw.set_completer_object(self.dlg_man, table_object, field_id="name")
 
         # Populate custom context menu
-        self.dlg_man.tbl_document.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_man.tbl_document.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_man.tbl_document.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_document))
 
         status = self._fill_table()
@@ -571,7 +571,7 @@ class GwDocument(QObject):
     def _fill_table_doc(self, dialog, feature_type, feature_id):
         widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        widget.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget

@@ -129,7 +129,7 @@ class GwAddChildLayerButton(GwAction):
                     partial(self._check_action_ischecked, layer_name, the_geom, geom_field, group, sub_group,
                             sub_sub_group, alias.strip()))
 
-        main_menu.exec_(click_point)
+        main_menu.exec(click_point)
 
     def _manage_load_all(self, menu, state=None):
 

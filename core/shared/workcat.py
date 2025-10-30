@@ -37,11 +37,11 @@ class GwWorkcat:
         self.dlg_man = GwWorkcatManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
-        self.dlg_man.tbl_workcat.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_man.tbl_workcat.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat)
 
         # Populate custom context menu
-        self.dlg_man.tbl_workcat.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_man.tbl_workcat.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_man.tbl_workcat.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_workcat))
 
         # Auto-completion
@@ -212,7 +212,7 @@ class GwWorkcat:
 
         if 'sys_geometry' in item:
             # Zoom to result
-            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            list_coord = re.search(r'\(\((.*)\)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
                 tools_qgis.show_warning(msg)
@@ -240,12 +240,12 @@ class GwWorkcat:
         search_csv_path = tools_gw.get_config_parser('btn_search', 'search_csv_path', "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
 
-        self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.items_dialog.tbl_psm_end.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.items_dialog.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.items_dialog.tbl_document.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.items_dialog.tbl_psm_end.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.items_dialog.tbl_document.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.items_dialog.tbl_document.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         self._set_enable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
         self._set_enable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
@@ -462,7 +462,7 @@ class GwWorkcat:
         self._workcat_fill_table(qtable, table_name, expr=expr)
         tools_gw.set_tablemodel_config(dialog, qtable, table_name)
 
-    def _workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill table @widget filtering query by @workcat_id
         Set a model with selected filter.
         Attach that model to selected table
@@ -478,7 +478,7 @@ class GwWorkcat:
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
         model.setSort(0, 0)
         model.select()
 
@@ -535,7 +535,7 @@ class GwWorkcat:
 
         # Get list of all coords in field geometry
         try:
-            list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+            list_coord = re.search(r'\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
         except Exception:
@@ -682,7 +682,7 @@ class GwWorkcat:
         all_rows = []
         headers = []
         for i in range(0, model_1.columnCount()):
-            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+            headers.append(str(model_1.headerData(i, Qt.Orientation.Horizontal)))
         all_rows.append(headers)
         for rows in range(0, model_1.rowCount()):
             row = []
@@ -692,7 +692,7 @@ class GwWorkcat:
         if qtable_2 is not None:
             headers = []
             for i in range(0, model_2.columnCount()):
-                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
+                headers.append(str(model_2.headerData(i, Qt.Orientation.Horizontal)))
             all_rows.append(headers)
             for rows in range(0, model_2.rowCount()):
                 row = []

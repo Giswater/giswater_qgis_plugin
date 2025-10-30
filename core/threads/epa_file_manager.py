@@ -315,11 +315,11 @@ class GwEpaFileManager(GwTask):
         read = True
         for row in all_rows:
             # Use regexp to check which targets to read (everyone except GULLY)
-            if bool(re.match('\[(.*?)\]', row['text'])) and \
+            if bool(re.match(r'\[(.*?)\]', row['text'])) and \
                     ('GULLY' in row['text'] or 'LINK' in row['text'] or
                      'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
                 read = False
-            elif bool(re.match('\[(.*?)\]', row['text'])):
+            elif bool(re.match(r'\[(.*?)\]', row['text'])):
                 read = True
             if row.get('text') is not None and read:
                 line = row['text'].rstrip() + "\n"
@@ -344,7 +344,7 @@ class GwEpaFileManager(GwTask):
             save_file = False
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
-                if bool(re.match('\[(.*?)\]', row['text'])) and \
+                if bool(re.match(r'\[(.*?)\]', row['text'])) and \
                         ('GULLY' in row['text'] or 'LINK' in row['text'] or
                          'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
 
@@ -352,14 +352,14 @@ class GwEpaFileManager(GwTask):
                     if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
                        'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
                         save_file = True
-                elif bool(re.match('\[(.*?)\]', row['text'])):
+                elif bool(re.match(r'\[(.*?)\]', row['text'])):
                     read = False
 
                 if row.get('text') is not None and read:
 
                     line = row['text'].rstrip() + "\n"
 
-                    if not bool(re.match(';;-(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
+                    if not bool(re.match(r';;-(.*?)', row['text'])) and not bool(re.match(r'\[(.*?)', row['text'])):
                         line = re.sub(';;', '', line)
                         line = re.sub(' +', ' ', line)
                         aditional_file.write(line)
@@ -431,7 +431,7 @@ class GwEpaFileManager(GwTask):
                 levels = context.get(tools_qt.tr('levels')) or context.get('levels')
 
                 # Check if this is an EPA RESULTS layer
-                
+
                 context = tools_db.get_row("SELECT idval FROM config_typevalue WHERE id = (SELECT context FROM sys_table WHERE id = 'v_rpt_arc');")
                 context = json.loads(context[0])
                 if len(levels) > 1 and levels[0] == context[0] and levels[1] == context[1]:
@@ -570,7 +570,7 @@ class GwEpaFileManager(GwTask):
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
                     # Split tokens that look like numbers glued with minus signs (e.g., "123-45...")
-                    if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
+                    if bool(re.search(r'[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -583,7 +583,7 @@ class GwEpaFileManager(GwTask):
                         sp_n.append(json_elem)
 
                     # Detect overlapped numeric columns (two dots in the same token), which indicates broken alignment
-                    elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
+                    elif bool(re.search(r'(\d\..*\.\d)', str(dirty_list[x]))):
                         if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
                             msg = "Error near line {0} -> {1}"
                             msg_params = (line_number + 1, dirty_list,)

@@ -507,7 +507,7 @@ class GwGo2EpaButton(GwAction):
 
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
 
@@ -553,7 +553,7 @@ class GwGo2EpaButton(GwAction):
                 else:
                     layout_list = grbox.findChildren(QGridLayout)
                     for lyt in layout_list:
-                        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                        spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
                         lyt.addItem(spacer)
 
     def _go2epa_options(self):
@@ -583,7 +583,7 @@ class GwGo2EpaButton(GwAction):
             else:
                 layout_list = grbox.findChildren(QGridLayout)
                 for lyt in layout_list:
-                    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                    spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
                     lyt.addItem(spacer)
 
         # Event on change from combo parent

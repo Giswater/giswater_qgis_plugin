@@ -80,7 +80,7 @@ class RecursiveEpa():
             message = f"Config file not found at: {setting_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
-        settings = QSettings(setting_file, QSettings.IniFormat)
+        settings = QSettings(setting_file, QSettings.Format.IniFormat)
         settings.setIniCodec(sys.getfilesystemencoding())
         list1 = settings.value("list1/list1")
         list2 = settings.value("list2/list1")

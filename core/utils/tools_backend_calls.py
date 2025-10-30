@@ -11,7 +11,7 @@ import subprocess
 import webbrowser
 
 from functools import partial
-from qgis.PyQt.QtCore import QDate, QRegExp, QRegularExpression
+from qgis.PyQt.QtCore import QDate, QRegularExpression
 from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox, QMenu
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsLayerTreeLayer, QgsVectorLayer
@@ -655,10 +655,10 @@ def refresh_attribute_table(**kwargs):
             # Set field constraints
             if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
                 if field['widgetcontrols']['setQgisConstraints'] is True:
-                    layer.setFieldConstraint(field_idx, QgsFieldConstraints.ConstraintNotNull,
-                                             QgsFieldConstraints.ConstraintStrengthSoft)
-                    layer.setFieldConstraint(field_idx, QgsFieldConstraints.ConstraintUnique,
-                                             QgsFieldConstraints.ConstraintStrengthHard)
+                    layer.setFieldConstraint(field_idx, QgsFieldConstraints.Constraint.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrength.ConstraintStrengthSoft)
+                    layer.setFieldConstraint(field_idx, QgsFieldConstraints.Constraint.ConstraintUnique,
+                                             QgsFieldConstraints.ConstraintStrength.ConstraintStrengthHard)
 
             # Manage editability
             kwargs = {"layer": layer, "field": field, "fieldIndex": field_idx}
@@ -851,13 +851,13 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
 
     widget_list = []
     if no_tabs:
-        widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
     else:
-        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
     return complet_list, widget_list
 
 
@@ -1088,9 +1088,9 @@ def reload_table_manager(**kwargs):
     filter_fields = ''
 
     widget_list = []
-    widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
 
     for table in list_tables:
         widgetname = table.objectName()
@@ -1166,13 +1166,13 @@ def _reload_table(**kwargs):
     field_id = str(complet_result['body']['feature']['idName'])
     widget_list = []
     if no_tabs:
-        widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
     else:
-        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
-        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
 
     for table in list_tables:
         widgetname = table.objectName()

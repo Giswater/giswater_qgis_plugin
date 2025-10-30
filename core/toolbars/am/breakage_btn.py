@@ -131,7 +131,7 @@ class GwAmBreakageButton(GwAction):
         dlg.txt_cluster_length.setValidator(int_validator)
 
         range_validator = QRegularExpressionValidator(
-            QRegularExpression("\d+(\.\d*)?-\d+(\.\d*)?")
+            QRegularExpression(r"\d+(\.\d*)?-\d+(\.\d*)?")
         )
         dlg.txt_diameter_range.setValidator(range_validator)
         dlg.txt_diameter_range.setEnabled(dlg.chk_diameter.isChecked())
@@ -360,7 +360,7 @@ class GwAmBreakageButton(GwAction):
 
         if dlg.chk_diameter.isChecked():
             diameter_range_string = dlg.txt_diameter_range.text()
-            if not re.fullmatch("\d+(\.\d*)?-\d+(\.\d*)?", diameter_range_string):
+            if not re.fullmatch(r"\d+(\.\d*)?-\d+(\.\d*)?", diameter_range_string):
                 msg = (
                     "Please enter the diameter range in this format: "
                     "[minimum factor]-[maximum factor]. "

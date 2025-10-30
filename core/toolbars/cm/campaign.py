@@ -74,8 +74,8 @@ class Campaign:
             return
         self.load_campaigns_into_manager()
 
-        self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
-        self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
+        self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+        self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
 
         # Populate combo date type (planned dates first, then real dates)
         rows = [
@@ -754,7 +754,7 @@ class Campaign:
         if not hasattr(self, '_feature_id_completer') or self._feature_id_completer is None:
             self._feature_id_completer = QCompleter(self._feature_id_model, dlg)
             self._feature_id_completer.setCaseSensitivity(False)
-            self._feature_id_completer.setCompletionMode(QCompleter.PopupCompletion)
+            self._feature_id_completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
             dlg.feature_id.setCompleter(self._feature_id_completer)
 
     def _connect_typeahead_handler(self, dlg: QDialog, feature: str, allowed_types: List[str]):

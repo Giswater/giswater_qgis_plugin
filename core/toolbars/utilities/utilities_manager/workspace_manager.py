@@ -9,7 +9,7 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
-from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
+from qgis.PyQt.QtCore import QRegularExpression, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
 
 from ...dialog import GwAction
@@ -40,7 +40,7 @@ class GwWorkspaceManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_workspace_manager)
 
         self.filter_name = self.dlg_workspace_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
+        reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
         # Fill table
@@ -158,7 +158,7 @@ class GwWorkspaceManagerButton(GwAction):
                 self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
             # TODO: config_form_tableview
             # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', 1, True)
-            tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SingleSelection)
+            tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SelectionMode.SingleSelection)
 
         return complet_list
 
@@ -173,7 +173,7 @@ class GwWorkspaceManagerButton(GwAction):
         cols = selected.indexes()
         if not cols:
             if deselected.indexes():
-                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.Select)
+                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.SelectionFlag.Select)
                 return
             tools_qt.set_widget_text(self.dlg_workspace_manager, 'tab_log_txt_infolog', "")
             return

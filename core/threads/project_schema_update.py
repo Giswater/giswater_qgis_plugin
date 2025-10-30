@@ -40,7 +40,7 @@ class GwUpdateSchemaTask(GwTask):
             pass
 
         # Disable red 'X' from dlg_readsql_create_project
-        self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.admin.dlg_readsql_show_info.show()
 
     def run(self):
@@ -67,7 +67,7 @@ class GwUpdateSchemaTask(GwTask):
         # Enable dlg_readsql_show_info buttons
         self.admin.dlg_readsql_show_info.btn_close.setEnabled(True)
         # Enable red 'X' from dlg_readsql_show_info
-        self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowCloseButtonHint, True)
+        self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
         self.admin.dlg_readsql_show_info.show()
         # Show Message Info in tab log
         self.admin.infolog_updates.setText(self.admin.message_infolog)

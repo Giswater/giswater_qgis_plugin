@@ -886,19 +886,19 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
             self.action = QAction(icon, "show")
-        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+        self.txt_pass.addAction(self.action, QLineEdit.ActionPosition.TrailingPosition)
 
     def show_pass(self):
 
         icon_path = ""
         text = ""
         if self.txt_pass.echoMode() == 0:
-            self.txt_pass.setEchoMode(QLineEdit.Password)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
             icon_path = os.path.dirname(
                 __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
-            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
             icon_path = os.path.dirname(
                 __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
             text = "Hide password"
@@ -935,18 +935,18 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
             icon = QIcon(icon_path)
             self.action = QAction(icon, "show")
         self.action.triggered.connect(self.show_pass)
-        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+        self.txt_pass.addAction(self.action, QLineEdit.ActionPosition.TrailingPosition)
 
     def show_pass(self):
 
         icon_path = ""
         text = ""
         if self.txt_pass.echoMode() == 0:
-            self.txt_pass.setEchoMode(QLineEdit.Password)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
             icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
-            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
             icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
             text = "Hide password"
         if os.path.exists(icon_path):
@@ -981,17 +981,17 @@ class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
             icon = QIcon(icon_path)
             self.action = QAction(icon, "show")
         self.action.triggered.connect(self.show_pass)
-        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+        self.txt_pass.addAction(self.action, QLineEdit.ActionPosition.TrailingPosition)
 
     def show_pass(self):
         icon_path = ""
         text = ""
         if self.txt_pass.echoMode() == 0:
-            self.txt_pass.setEchoMode(QLineEdit.Password)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
             icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
-            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
             icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
             text = "Hide password"
         if os.path.exists(icon_path):
@@ -1017,17 +1017,17 @@ class GwSchemaI18NManagerUi(GwDialog, FORM_CLASS):
             icon = QIcon(icon_path)
             self.action = QAction(icon, "show")
         self.action.triggered.connect(self.show_pass)
-        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+        self.txt_pass.addAction(self.action, QLineEdit.ActionPosition.TrailingPosition)
 
     def show_pass(self):
         icon_path = ""
         text = ""
         if self.txt_pass.echoMode() == 0:
-            self.txt_pass.setEchoMode(QLineEdit.Password)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
             icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
-            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
             icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
             text = "Hide password"
         if os.path.exists(icon_path):

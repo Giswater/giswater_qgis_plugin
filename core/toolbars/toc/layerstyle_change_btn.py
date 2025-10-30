@@ -98,7 +98,7 @@ class GwLayerStyleChangeButton(GwAction):
         x = cursor.pos().x()
         y = cursor.pos().y()
         click_point = QPoint(x + 5, y + 5)
-        self.menu.exec_(click_point)
+        self.menu.exec(click_point)
 
     def _populate_menu(self) -> None:
         """Populate the menu with available contexts."""

@@ -24,7 +24,7 @@ class GwAuxPointAddButton(GwMaptool):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
         self.cancel_point = False
         self.layer_points = None
         self.point_1 = None
@@ -37,7 +37,7 @@ class GwAuxPointAddButton(GwMaptool):
         self.rb_bg_point = tools_gw.create_rubberband(self.canvas, "point")
         self.rb_bg_point.setColor(QColor(0, 0, 0, 150))
         self.rb_bg_line = tools_gw.create_rubberband(self.canvas, "line")
-        self.rb_bg_line.setLineStyle(Qt.DashLine)
+        self.rb_bg_line.setLineStyle(Qt.PenStyle.DashLine)
         self.rb_bg_line.setColor(QColor(0, 0, 0, 150))
         # Start point from where it will calculate final point
         self.rb_start_point = tools_gw.create_rubberband(self.canvas, "point")
@@ -47,7 +47,7 @@ class GwAuxPointAddButton(GwMaptool):
         self.rb_final_point = tools_gw.create_rubberband(self.canvas, "point")
         self.rb_final_point.setColor(QColor(255, 0, 0, 150))
         self.rb_final_point.setWidth(3)
-        self.rb_final_point.setIcon(QgsRubberBand.ICON_X)
+        self.rb_final_point.setIcon(QgsRubberBand.IconType.ICON_X)
         self.rb_final_point.setIconSize(10)
 
     def cancel(self):
@@ -71,7 +71,7 @@ class GwAuxPointAddButton(GwMaptool):
 
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
@@ -312,7 +312,7 @@ class GwAuxPointAddButton(GwMaptool):
 
     def _add_aux_point(self, event):
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
 
             # Get coordinates
             x = event.pos().x()
@@ -361,7 +361,7 @@ class GwAuxPointAddButton(GwMaptool):
                 self.point_1 = None
                 self.point_2 = None
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self._reset_rubberbands()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)

@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 from functools import partial
 
-from qgis.PyQt.QtCore import QDateTime, QDate
+from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea
 
@@ -53,7 +53,7 @@ class GwAudit:
         # Fill audit table
         self._fill_manager_table(complet_list)
 
-        self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=0)
 
         # Connect signals
@@ -81,7 +81,7 @@ class GwAudit:
             self.date.setEnabled(False)
         else:
             # Convert first_snapshot_date to QDateTime for widget
-            q_first_snapshot_date = QDateTime(QDate(first_log_date.year, first_log_date.month, first_log_date.day))
+            q_first_snapshot_date = QDateTime(QDate(first_log_date.year, first_log_date.month, first_log_date.day), QTime(0, 0, 0))
 
             # Set minimum date to first snapshot date
             self.date.setMinimumDateTime(q_first_snapshot_date)
@@ -238,7 +238,7 @@ class GwAudit:
                 self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, field)
 
         tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, 'audit_results')
-        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.NoEditTriggers)
+        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
 
         self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
 

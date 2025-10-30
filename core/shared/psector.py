@@ -159,16 +159,16 @@ class GwPsector:
         # Tables
         # tab Elements
         self.qtbl_arc: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_arc")
-        self.qtbl_arc.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_arc.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.qtbl_node: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_node")
-        self.qtbl_node.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_node.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.qtbl_connec: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_connec")
-        self.qtbl_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_connec.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         if self.project_type.upper() == 'UD':
             self.qtbl_gully: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_gully")
-            self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         all_rows = self.dlg_plan_psector.findChild(QTableView, "all_rows")
-        all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        all_rows.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         all_rows.horizontalHeader().setSectionResizeMode(3)
 
         # if a row is selected from mg_psector_mangement(button 62 or button 61)
@@ -188,7 +188,7 @@ class GwPsector:
 
         # tbl_psector_x_arc
         self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="arc", field_id="arc_id")
+                        set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=expr, feature_type="arc", field_id="arc_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
         self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
         self.qtbl_arc.model().flags = lambda index: self.flags(index, self.qtbl_arc.model())
@@ -197,7 +197,7 @@ class GwPsector:
 
         # tbl_psector_x_node
         self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="node", field_id="node_id")
+                        set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=expr, feature_type="node", field_id="node_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
         self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
         self.qtbl_node.model().flags = lambda index: self.flags(index, self.qtbl_node.model())
@@ -206,7 +206,7 @@ class GwPsector:
 
         # tbl_psector_x_connec
         self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="connec", field_id="connec_id")
+                        set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=expr, feature_type="connec", field_id="connec_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
         self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
         self.qtbl_connec.model().flags = lambda index: self.flags(index, self.qtbl_connec.model(), table_specific_editable=['arc_id'])
@@ -216,7 +216,7 @@ class GwPsector:
         # tbl_psector_x_gully
         if self.project_type.upper() == 'UD':
             self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
-                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully", field_id="gully_id")
+                            set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=expr, feature_type="gully", field_id="gully_id")
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
             self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
             self.qtbl_gully.model().flags = lambda index: self.flags(index, self.qtbl_gully.model())
@@ -253,7 +253,7 @@ class GwPsector:
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
 
-        self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
+        self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key.Key_Delete))
 
         # Reset snapping when any button is clicked
         for button in self.dlg_plan_psector.findChildren(QPushButton):
@@ -479,7 +479,7 @@ class GwPsector:
             sql = f"SELECT st_astext(st_envelope(the_geom)) FROM ve_plan_psector WHERE psector_id = {psector_id}"
             row = tools_db.get_row(sql)
             if row[0]:
-                list_coord = re.search('\(\((.*)\)\)', str(row[0]))
+                list_coord = re.search(r'\(\((.*)\)\)', str(row[0]))
 
         if list_coord:
             # Get canvas extend in order to create a QgsRectangle
@@ -515,7 +515,7 @@ class GwPsector:
 
     def flags(self, index, model, editable_columns=None, table_specific_editable=None):
 
-        column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
+        column_name = model.headerData(index.column(), Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
 
         # Check if column is specifically allowed to be editable for this table
         if table_specific_editable and column_name in table_specific_editable:
@@ -525,10 +525,10 @@ class GwPsector:
 
         # If column is in non-editable list, make it non-editable
         if column_name in self.no_editable_fields:
-            return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            return Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
 
         if editable_columns and column_name not in editable_columns:
-            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
             return flags
 
         if isinstance(model, QSqlTableModel):
@@ -594,7 +594,7 @@ class GwPsector:
 
         if tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
             if 'nt' in sys.builtin_module_names:
-                plugin_dir = os.path.expanduser("~\Documents")
+                plugin_dir = os.path.expanduser(r"~\Documents")
             else:
                 plugin_dir = os.path.expanduser("~")
             tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, plugin_dir)
@@ -695,7 +695,7 @@ class GwPsector:
         msg = "Reports generated successfully"
         tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
 
-        # Close dialog  
+        # Close dialog
         tools_gw.close_dialog(self.dlg_psector_rapport)
 
     def generate_composer(self, path):
@@ -1185,7 +1185,7 @@ class GwPsector:
 
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
-        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.fill_table(dialog, tbl_all_rows, tableleft)
         tools_gw.set_tablemodel_config(dialog, tbl_all_rows, tableleft)
         tbl_all_rows.horizontalHeader().setStretchLastSection(False)
@@ -1417,7 +1417,7 @@ class GwPsector:
     def _set_price_geom(self, dialog, tableright, point: QgsPointXY, button):
         """ Add clicked geom to the_geom column for selected prices """
 
-        if button == Qt.RightButton or point is None:
+        if button == Qt.MouseButton.RightButton or point is None:
             global_vars.canvas.setMapTool(self.previous_map_tool)
             return
         # Add clicked geom to the_geom column for selected prices
@@ -1454,7 +1454,7 @@ class GwPsector:
                f" WHERE psector_id = '{psector_id}')")
         tools_db.fill_table_by_query(qtable, sql)
 
-    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,
+    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers,
                    expr=None, feature_type=None, field_id=None, refresh_table=True):
         """ Set a model with selected filter.
             Attach that model to selected table
@@ -1474,7 +1474,7 @@ class GwPsector:
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
         model.setSort(0, 0)
         model.select()
 
@@ -1504,11 +1504,11 @@ class GwPsector:
 
         if self.tablename_psector_x_connec in table_name and refresh_table:
             self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="connec",
+                            set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=expr, feature_type="connec",
                             field_id="connec_id", refresh_table=False)
         elif self.project_type == 'ud' and self.tablename_psector_x_gully in table_name and refresh_table:
             self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
-                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully",
+                            set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=expr, feature_type="gully",
                             field_id="gully_id", refresh_table=False)
 
     def refresh_table(self, dialog, widget):
@@ -1541,7 +1541,7 @@ class GwPsector:
         update_clauses = []
 
         for column in range(model.columnCount()):
-            column_name = model.headerData(column, Qt.Horizontal, Qt.DisplayRole)
+            column_name = model.headerData(column, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
             if column_name:
                 value = record.value(column_name)
                 columns.append(column_name)
@@ -1645,7 +1645,7 @@ class GwPsector:
                 self.psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
             filter_ = f"psector_id = '{self.psector_id}'"
             self.fill_table(self.dlg_plan_psector, widget_to_refresh, table_name,
-                            set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+                            set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=filter_)
             qtbl_to_refresh.model().flags = lambda index: self.flags(index, qtbl_to_refresh.model(), table_specific_editable=table_specific_editable)
 
         # Force a map refresh
@@ -1666,7 +1666,7 @@ class GwPsector:
         # self._refresh_tables_relations()
         filter_ = "psector_id = '" + str(self.psector_id) + "'"
         self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+                        set_edit_triggers=QTableView.EditTrigger.DoubleClicked, expr=filter_)
 
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
@@ -1768,11 +1768,11 @@ class GwPsector:
 
         # Tables
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
-        self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
 
         # Populate custom context menu
-        self.dlg_psector_mng.tbl_psm.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_psector_mng.tbl_psm.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_psector_mng.tbl_psm.customContextMenuRequested.connect(partial(self._show_context_menu_right_click, self.dlg_psector_mng.tbl_psm))
 
         # Set signals
@@ -2214,7 +2214,7 @@ class GwPsector:
         else:
             # Ask user if they want to set this psector as current
             msg = "Do you want to set this psector as current?"
-            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True, 
+            result = tools_qt.show_question(msg, title="Info", context_name="giswater", force_action=True,
                                            buttons=["Yes", "No"])
             if result:
                 self.update_current_psector(self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id")
@@ -2785,7 +2785,7 @@ class GwPsector:
                         continue
 
                     if f"{feature_id}" in feature_ids and f"{state}" == "1":
-                        selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+                        selection_model.select(index, (QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows))
         except Exception as e:
             print(f"Error in _manage_selection_changed: {e}")
             pass

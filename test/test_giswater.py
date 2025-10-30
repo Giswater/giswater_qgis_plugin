@@ -46,7 +46,7 @@ class GwTest(QObject):
             return
 
         # Set plugin settings
-        self.settings = QSettings(setting_file, QSettings.IniFormat)
+        self.settings = QSettings(setting_file, QSettings.Format.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
 
         # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)

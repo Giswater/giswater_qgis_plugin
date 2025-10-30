@@ -82,7 +82,7 @@ class GwImportOsm:
         for chk_muni in chk_municipalities:
             widget = QCheckBox()
             widget.setObjectName(f'chk_{chk_muni[0]}')
-            widget.setLayoutDirection(Qt.LeftToRight)
+            widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
             widget.setText(chk_muni[1])
             layout.addWidget(widget)
 

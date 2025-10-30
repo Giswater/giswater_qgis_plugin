@@ -173,7 +173,7 @@ class GwVisit(QObject):
         self.btn_doc_new = self.dlg_add_visit.findChild(QPushButton, "btn_doc_new")
         self.btn_open_doc = self.dlg_add_visit.findChild(QPushButton, "btn_open_doc")
         self.tbl_document = self.dlg_add_visit.findChild(QTableView, "tbl_document")
-        self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
         widget_list = self.dlg_add_visit.findChildren(QTableView)
         for widget in widget_list:
@@ -297,7 +297,7 @@ class GwVisit(QObject):
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
 
         # Populate custom context menu
-        self.dlg_visit_manager.tbl_visit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_visit_manager.tbl_visit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_visit_manager.tbl_visit.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_visit_manager.tbl_visit))
 
         # manage save and rollback when closing the dialog
@@ -364,7 +364,7 @@ class GwVisit(QObject):
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         if expr_filter is not None:
             model.setFilter(expr_filter)
         model.select()
@@ -1353,7 +1353,7 @@ class GwVisit(QObject):
         tools_gw.add_btn_help(self.dlg_event)
         tools_qt._translate_form(dlg_name, self.dlg_event)
         self.dlg_event.messageBar().hide()
-        ret = self.dlg_event.exec_()
+        ret = self.dlg_event.exec()
 
         # check return
         if not ret:
@@ -1643,7 +1643,7 @@ class GwVisit(QObject):
         self.dlg_event.parameter_id.setText(parameter_id)
 
         tools_qt._translate_form(dlg_name, self.dlg_event)
-        if self.dlg_event.exec_():
+        if self.dlg_event.exec():
 
             # set record values basing on widget
             for field_name in event.field_names():

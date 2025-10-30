@@ -322,7 +322,7 @@ class GwResultManagerButton(GwAction):
         widget,
         table_name,
         relations=[],
-        set_edit_triggers=QTableView.NoEditTriggers,
+        set_edit_triggers=QTableView.EditTrigger.NoEditTriggers,
         expr=None,
     ):
         """Set a model with selected filter.
@@ -340,12 +340,12 @@ class GwResultManagerButton(GwAction):
             model.setJoinMode(QSqlRelationalTableModel.JoinMode.LeftJoin)
             for column, table, key, value in relations:
                 model.setRelation(column, QSqlRelation(table, key, value))
-            model.setEditStrategy(QSqlRelationalTableModel.OnManualSubmit)
+            model.setEditStrategy(QSqlRelationalTableModel.EditStrategy.OnManualSubmit)
             model.setSort(0, 0)
             model.select()
 
             widget.setEditTriggers(set_edit_triggers)
-            widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+            widget.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
             # Check for errors
             if model.lastError().isValid():

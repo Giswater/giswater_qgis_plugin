@@ -641,7 +641,7 @@ class GwMincut:
 
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
-        tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.EditTrigger.DoubleClicked)
         message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -1162,7 +1162,7 @@ class GwMincut:
         self.dlg_connec = GwMincutConnecUi(self)
         self.dlg_connec.setWindowTitle("Connec management")
         tools_gw.load_settings(self.dlg_connec)
-        self.dlg_connec.tbl_om_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_connec.tbl_om_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         # Set icons
         tools_gw.add_icon(self.dlg_connec.btn_insert, "111")
         tools_gw.add_icon(self.dlg_connec.btn_delete, "112")
@@ -1326,7 +1326,7 @@ class GwMincut:
         self.dlg_hydro = GwMincutHydrometerUi(self)
         tools_gw.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
-        self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
         # Set icons
         tools_gw.add_icon(self.dlg_hydro.btn_insert, "111")
@@ -1832,7 +1832,7 @@ class GwMincut:
         all_rows = []
         headers = []
         for i in range(0, model.columnCount()):
-            headers.append(str(model.headerData(i, Qt.Horizontal)))
+            headers.append(str(model.headerData(i, Qt.Orientation.Horizontal)))
         all_rows.append(headers)
         for rows in range(0, model.rowCount()):
             row = []
@@ -1881,7 +1881,7 @@ class GwMincut:
             except RuntimeError:
                 pass
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             self.action_mincut.setChecked(False)
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             tools_gw.disconnect_signal('mincut')
@@ -2210,7 +2210,7 @@ class GwMincut:
     def _custom_mincut_snapping(self, action, point, btn):
         """ Custom mincut snapping function """
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
             tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)

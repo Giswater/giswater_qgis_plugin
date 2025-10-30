@@ -20,7 +20,7 @@ class GwTask(QgsTask, QObject):
     def __init__(self, description, duration=0):
 
         QObject.__init__(self)
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.exception = None
         self.duration = duration
         self.aux_conn = None

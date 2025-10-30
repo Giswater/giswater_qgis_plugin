@@ -12,7 +12,7 @@ import json
 from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
+from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
     QShortcut, QApplication, QWidget, QLabel, QGridLayout, QToolButton, QPushButton
 from qgis.PyQt.QtWidgets import QLineEdit
@@ -126,7 +126,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Apply filter validator
         self.filter_name = self.dlg_hydrology_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
+        reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
         # Checkbox show inactive
@@ -143,7 +143,7 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_manager_table('ve_cat_hydrology', dialog=self.dlg_hydrology_manager, scenario_type="hydrology")
 
         # Populate custom context menu
-        self.dlg_hydrology_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_hydrology_manager.tbl_dscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_hydrology_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_hydrology_manager.tbl_dscenario))
 
         # Connect main dialog signals
@@ -196,7 +196,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Apply filter validator
         self.filter_name = self.dlg_dwf_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
+        reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
         # Checkbox show inactive
@@ -213,7 +213,7 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_manager_table('ve_cat_dwf', dialog=self.dlg_dwf_manager, scenario_type="dwf")
 
         # Populate custom context menu
-        self.dlg_dwf_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_dwf_manager.tbl_dscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_dwf_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_dwf_manager.tbl_dscenario))
 
         # Connect main dialog signals
@@ -267,7 +267,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Apply filter validator
         self.filter_name = self.dlg_dscenario_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
+        reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
         # Checkbox show inactive
@@ -275,7 +275,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
-        
+
         self._fill_manager_table('ve_cat_dscenario')
 
         # CheckBox filter
@@ -286,7 +286,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.findChild(QWidget, 'lbl_vdefault_dscenario').setVisible(False)
 
         # Populate custom context menu
-        self.dlg_dscenario_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_dscenario_manager.tbl_dscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_dscenario_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_dscenario_manager.tbl_dscenario))
 
         # Connect main dialog signals
@@ -369,7 +369,7 @@ class GwDscenarioManagerButton(GwAction):
             col_idx = tools_qt.get_col_index_by_col_name(tableview, self.views_dict[view])
             if not col_idx:
                 col_idx = 0
-        
+
             scenario_id = index.sibling(index.row(), col_idx).data()
             active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
             active = tools_os.set_boolean(active)
@@ -423,7 +423,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Execute the stored procedure
         result = tools_gw.execute_procedure("gw_fct_set_toggle_current", body)
-        
+
         # Check if the stored procedure returned a successful status
         if result.get("status") == "Accepted":
             # Refresh the table view and set the label for the current scenario
@@ -510,7 +510,7 @@ class GwDscenarioManagerButton(GwAction):
         # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
         tools_qt.set_tableview_config(self.tbl_dscenario)
         # Optionally set current scenario label if context provided
-        
+
         if dialog is not None and dialog.findChild(QWidget, 'lbl_vdefault_dscenario').isVisible() and scenario_type is not None:
             self._set_label_current_dscenario_type(dialog, scenario_type=scenario_type, from_open_dialog=True)
         return complet_list
@@ -563,7 +563,7 @@ class GwDscenarioManagerButton(GwAction):
         # Default connections
         default_connect = [partial(self._fill_manager_table, view, dialog=dialog, scenario_type=scenario_type),
                            partial(tools_gw.refresh_selectors)]
-        
+
         # Merge connect with defaults
         if connect is None:
             connect = default_connect
@@ -778,7 +778,7 @@ class GwDscenarioManagerButton(GwAction):
         # Refresh tableview
         self._fill_dscenario_table()
 
-    def _fill_dscenario_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _fill_dscenario_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill dscenario table with data from its corresponding table """
 
         # Manage exception if dialog is closed
@@ -795,7 +795,7 @@ class GwDscenarioManagerButton(GwAction):
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(self.table_name)
         model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
         model.setSort(0, 0)
         model.select()
         # Set item delegates
@@ -822,7 +822,7 @@ class GwDscenarioManagerButton(GwAction):
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
         tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
@@ -875,7 +875,7 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
 
         self.dlg_dscenario.btn_snapping.setMenu(None)
-        self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.DelayedPopup)
+        self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.ToolButtonPopupMode.DelayedPopup)
         if tableview.objectName() == "inp_dscenario_demand" and self.project_type == 'ws':
             # Create main menu and get cursor click position
             btn_menu = QMenu()
@@ -885,14 +885,14 @@ class GwDscenarioManagerButton(GwAction):
             action_connec = btn_menu.addAction("CONNEC")
             action_connec.triggered.connect(partial(self._set_active_layer, action_connec, 've_connec'))
             self.dlg_dscenario.btn_snapping.setMenu(btn_menu)
-            self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)
+            self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.ToolButtonPopupMode.MenuButtonPopup)
 
             # Populate custom context menu
-            tableview.setContextMenuPolicy(Qt.CustomContextMenu)
+            tableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             tableview.customContextMenuRequested.connect(partial(self._paste_dscenario_demand_custom_menu, tableview))
 
             # Copy values from clipboard only in dscenario demand in ws projects
-            paste_shortcut = QShortcut(QKeySequence.Paste, self.dlg_dscenario.main_tab)
+            paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, self.dlg_dscenario.main_tab)
             paste_shortcut.activated.connect(partial(self._paste_dscenario_demand_values, tableview))
 
         # Deactivate btn_snapping functionality
@@ -991,7 +991,7 @@ class GwDscenarioManagerButton(GwAction):
                     self.selected_dscenario_id = index.sibling(index.row(), col_idx_ds).data()
             except Exception:
                 pass
-        field_id = tableview.model().headerData(col_idx, Qt.Horizontal).lower().replace(' ', '_')
+        field_id = tableview.model().headerData(col_idx, Qt.Orientation.Horizontal).lower().replace(' ', '_')
 
         if tablename == "inp_dscenario_controls":
             return self._manage_upsert_controls(feature_id)
@@ -1077,10 +1077,10 @@ class GwDscenarioManagerButton(GwAction):
 
     def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
         """ Accept the properties dialog """
-        
+
         if not my_json:
             return
-        
+
         fields = json.dumps(my_json)
         id_val = ""
         if pkey:
@@ -1173,7 +1173,7 @@ class GwDscenarioManagerButton(GwAction):
                 widgetAction.defaultWidget().stateChanged.connect(
                     partial(self._check_action_ischecked, tablename, the_geom, pk, -1, alias.strip(), sub_group))
 
-        main_menu.exec_(click_point)
+        main_menu.exec(click_point)
 
     def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, sub_group, state):
         """ Control if user check or uncheck action menu, then add or remove layer from toc

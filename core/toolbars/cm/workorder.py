@@ -26,8 +26,8 @@ class Workorder:
         self.load_workorders_into_manager()
 
         tbl = self.manager_dialog.tbl_workorder
-        tbl.setEditTriggers(QTableView.NoEditTriggers)
-        tbl.setSelectionBehavior(QTableView.SelectRows)
+        tbl.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+        tbl.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
 
         # fill filter combos
         sql = "SELECT id, idval FROM cm.workorder_class ORDER BY id"

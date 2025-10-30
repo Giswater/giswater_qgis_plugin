@@ -34,7 +34,7 @@ class AddNewLot:
         self.ids: List[Any] = []
         self.canvas = global_vars.canvas
         self.rb_red = tools_gw.create_rubberband(self.canvas)
-        self.rb_red.setColor(Qt.darkRed)
+        self.rb_red.setColor(Qt.GlobalColor.darkRed)
         self.rb_red.setIconSize(20)
         self.rb_list: List[Any] = []
         self.schema_parent = lib_vars.schema_name
@@ -188,9 +188,9 @@ class AddNewLot:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
                 tools_qt.set_tableview_config(view, sortingEnabled=True)
-                view.setSelectionBehavior(QAbstractItemView.SelectRows)
-                view.setSelectionMode(QAbstractItemView.ExtendedSelection)  # or SingleSelection
-                view.setEditTriggers(QAbstractItemView.NoEditTriggers)
+                view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+                view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)  # or SingleSelection
+                view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
@@ -835,8 +835,8 @@ class AddNewLot:
         self.dlg_lot_man = LotManagementUi(self)
         tools_gw.load_settings(self.dlg_lot_man)
 
-        self.dlg_lot_man.tbl_lots.setEditTriggers(QTableView.NoEditTriggers)
-        self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectRows)
+        self.dlg_lot_man.tbl_lots.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+        self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
 
         # Fill combo values for lot date_filter_type combo
         date_types = [['real_startdate', tools_qt.tr("Start date", context_name="cm")],
@@ -1079,7 +1079,7 @@ class AddNewLot:
             if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
                 self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
                 self._lot_feature_completer.setCaseSensitivity(False)
-                self._lot_feature_completer.setCompletionMode(QCompleter.PopupCompletion)
+                self._lot_feature_completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
                 feature_id_lineedit.setCompleter(self._lot_feature_completer)
 
             try:
@@ -1417,8 +1417,8 @@ class AddNewLot:
         model.setHorizontalHeaderLabels(columns)
 
         # Set table parameters
-        table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.setSortingEnabled(True)
 
         # Populate table view
@@ -1457,7 +1457,7 @@ class AddNewLot:
         if active_col is None or active_col == -1:
             # Fallback: try to find by header text
             for i in range(model.columnCount()):
-                if str(model.headerData(i, Qt.Horizontal)).lower() == 'active':
+                if str(model.headerData(i, Qt.Orientation.Horizontal)).lower() == 'active':
                     active_col = i
                     break
         id_col = 0  # id is first column in our population logic

@@ -37,7 +37,7 @@ class GwValveOperationCheck(GwTask):
         output_folder,
         file_name,
     ):
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.input_network = network
         self.config = config
         self.output_folder = output_folder

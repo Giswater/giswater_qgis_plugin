@@ -226,7 +226,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
     def _featuretype_change(self, event):
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()
             return
 

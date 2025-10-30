@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from qgis.PyQt.QtCore import QDateTime, QVariant, QDate
+from qgis.PyQt.QtCore import QDateTime, QVariant, QDate, QTime
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField, QgsSymbol, QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
@@ -68,7 +68,7 @@ class GwSnapshotViewButton(GwAction):
         self.date = self.dlg_snapshot_view.findChild(QWidget, "tab_none_date")
 
         # Convert first_snapshot_date to QDateTime for widget
-        q_first_snapshot_date = QDateTime(QDate(first_snapshot_date.year, first_snapshot_date.month, first_snapshot_date.day))
+        q_first_snapshot_date = QDateTime(QDate(first_snapshot_date.year, first_snapshot_date.month, first_snapshot_date.day), QTime(0, 0, 0))
 
         # Set minimum date to first snapshot date
         self.date.setMinimumDateTime(q_first_snapshot_date)

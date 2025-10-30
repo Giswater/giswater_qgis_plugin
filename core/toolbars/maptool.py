@@ -43,7 +43,7 @@ class GwMaptool(QgsMapTool):
 
         # Change map tool cursor
         self.cursor = QCursor()
-        self.cursor.setShape(Qt.CrossCursor)
+        self.cursor.setShape(Qt.CursorShape.CrossCursor)
 
         # Get default cursor
         # noinspection PyCallingNonCallable
@@ -121,13 +121,13 @@ class GwMaptool(QgsMapTool):
 
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.cancel_map_tool()
             return
 
     def canvasReleaseEvent(self, event):
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()
 
     def recover_previus_maptool(self):
@@ -147,11 +147,11 @@ class GwMaptool(QgsMapTool):
     def reset_rubber_band(self, geom_type="polygon"):
 
         if geom_type == "polygon":
-            geom_type = QgsWkbTypes.PolygonGeometry
+            geom_type = QgsWkbTypes.GeometryType.PolygonGeometry
         elif geom_type == "line":
-            geom_type = QgsWkbTypes.LineGeometry
+            geom_type = QgsWkbTypes.GeometryType.LineGeometry
         else:
-            geom_type = QgsWkbTypes.PointGeometry
+            geom_type = QgsWkbTypes.GeometryType.PointGeometry
         self.rubber_band.reset(geom_type)
 
     def reset(self):

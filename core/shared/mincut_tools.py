@@ -9,7 +9,7 @@ import datetime
 import json
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QRegExp
+from qgis.PyQt.QtCore import Qt, QRegularExpression
 from qgis.PyQt.QtWidgets import QComboBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView
 from qgis.gui import QgsDateTimeEdit
@@ -67,7 +67,7 @@ class GwMincutTools:
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
 
         # Populate custom context menu
-        self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tbl_mincut_edit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tbl_mincut_edit.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, self.tbl_mincut_edit, self.dlg_mincut_man))
 
     def load_tableviews(self, complet_result, filter_fields=''):
@@ -168,7 +168,7 @@ class GwMincutTools:
                 tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mincut_man)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             layout.addItem(vertical_spacer1)
 
 
@@ -289,9 +289,9 @@ def _reload_table(dialog, complet_result):
     list_tables = dialog.findChildren(QTableView)
 
     widget_list = []
-    widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
     for table in list_tables:
         widgetname = table.objectName()
         columnname = table.property('columnname')

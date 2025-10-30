@@ -37,7 +37,7 @@ class GwCopySchemaTask(GwTask):
             pass
 
         # Disable red 'X' from dlg_readsql_copy
-        self.admin.dlg_readsql_copy.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.admin.dlg_readsql_copy.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.admin.dlg_readsql_copy.show()
 
     def run(self):
@@ -73,7 +73,7 @@ class GwCopySchemaTask(GwTask):
         # Enable dlg_readsql_show_info buttons
         self.admin.dlg_readsql_copy.btn_cancel.setEnabled(True)
         # Enable red 'X' from dlg_readsql_show_info
-        self.admin.dlg_readsql_copy.setWindowFlag(Qt.WindowCloseButtonHint, True)
+        self.admin.dlg_readsql_copy.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
         self.admin.dlg_readsql_copy.show()
 
         if self.timer:

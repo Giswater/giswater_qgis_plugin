@@ -279,7 +279,7 @@ class GwFeatureEndButton(GwAction):
                 partial(self._filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
 
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
-            self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
             filter_ = ""
             for row in self.selected_list:
@@ -474,7 +474,7 @@ class GwFeatureEndButton(GwAction):
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         model.setFilter(filter_)
         model.select()
 

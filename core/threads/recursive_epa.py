@@ -28,7 +28,7 @@ class GwRecursiveEpa(GwTask):
 
     def __init__(self, description, prefix, path, settings, plugin_dir):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.prefix = prefix
         self.path = path
         self.settings = settings
@@ -223,7 +223,7 @@ class GwRecursiveEpa(GwTask):
                 if 'status' in self.rpt_result:
                     if "Failed" in self.rpt_result['status']:
                         tools_gw.manage_json_exception(self.rpt_result)
-                        
+
         if self.error_msg:
             title = "Task aborted - {0}"
             title_params = (self.description(),)
@@ -281,7 +281,7 @@ class GwRecursiveEpa(GwTask):
         for i in range(1, 8):
             self.body = tools_gw.create_body(extras=extras + f', "step": {i}')
             msg = "Task 'Go2Epa' execute procedure '{1}' step {2} with parameters: '{1}', '{3}', '{4}', '{5}', '{6}'"
-            msg_params = ("gw_fct_pg2epa_main", i, self.body, "log_sql=True", f"aux_conn={self.aux_conn}", 
+            msg_params = ("gw_fct_pg2epa_main", i, self.body, "log_sql=True", f"aux_conn={self.aux_conn}",
                           "is_thread=True",)
             tools_log.log_info(msg, msg_params=msg_params)
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
@@ -345,11 +345,11 @@ class GwRecursiveEpa(GwTask):
         read = True
         for row in all_rows:
             # Use regexp to check which targets to read (everyone except GULLY)
-            if bool(re.match('\[(.*?)\]', row['text'])) and \
+            if bool(re.match(r'\[(.*?)\]', row['text'])) and \
                     ('GULLY' in row['text'] or 'LINK' in row['text'] or
                      'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
                 read = False
-            elif bool(re.match('\[(.*?)\]', row['text'])):
+            elif bool(re.match(r'\[(.*?)\]', row['text'])):
                 read = True
             if 'text' in row and row['text'] is not None and read:
                 line = row['text'].rstrip() + "\n"
@@ -367,14 +367,14 @@ class GwRecursiveEpa(GwTask):
             save_file = False
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
-                if bool(re.match('\[(.*?)\]', row['text'])) and \
+                if bool(re.match(r'\[(.*?)\]', row['text'])) and \
                         ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
                          'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
                     read = True
                     if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
                        'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
                         save_file = True
-                elif bool(re.match('\[(.*?)\]', row['text'])):
+                elif bool(re.match(r'\[(.*?)\]', row['text'])):
                     read = False
                 if 'text' in row and row['text'] is not None and read:
                     line = row['text'].rstrip() + "\n"
@@ -529,7 +529,7 @@ class GwRecursiveEpa(GwTask):
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
-                    if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
+                    if bool(re.search(r'[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -541,7 +541,7 @@ class GwRecursiveEpa(GwTask):
                         json_elem = dirty_list[x][last_index:i]
                         sp_n.append(json_elem)
 
-                    elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
+                    elif bool(re.search(r'(\d\..*\.\d)', str(dirty_list[x]))):
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
                             msg = "Error near line {0} -> {1}"
                             msg_params = (line_number + 1, dirty_list,)

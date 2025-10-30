@@ -172,7 +172,7 @@ class GwMenuLoad(QObject):
 
         # Resize columns
         header = self.tree_config_files.header()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
@@ -229,7 +229,7 @@ class GwMenuLoad(QObject):
             # Obtain the actual top-level item
             top_level_item = self.tree_config_files.topLevelItem(index)
             # Sort
-            top_level_item.sortChildren(0, Qt.AscendingOrder)
+            top_level_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
 
     def _set_config_value(self, item, column):
 
@@ -246,7 +246,7 @@ class GwMenuLoad(QObject):
 
         tmp = item.flags()
         if column == 2 and item.text(2):
-            item.setFlags(tmp | Qt.ItemIsEditable)
+            item.setFlags(tmp | Qt.ItemFlag.ItemIsEditable)
 
     def _set_log_sql(self):
 

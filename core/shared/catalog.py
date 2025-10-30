@@ -55,7 +55,7 @@ class GwCatalog:
 
         group_box_1.setLayout(self.filter_form)
         main_layout.addWidget(group_box_1)
-        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         main_layout.addItem(vertical_spacer1)
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
@@ -170,7 +170,7 @@ class GwCatalog:
 
         widget = QComboBox()
         widget.setObjectName(field['columnname'])
-        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self._fill_combo(widget, field)
         tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
 
