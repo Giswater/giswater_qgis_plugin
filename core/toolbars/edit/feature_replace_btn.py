@@ -524,6 +524,12 @@ class GwFeatureReplaceButton(GwMaptool):
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_replace.new_featurecat_id, rows)
+        
+        # Set default value
+        default_value = tools_gw.get_config_value(f"feat_{feature_type_new.lower()}_vdefault")
+        default_value = default_value[0] if default_value[0] else default_value
+        if default_value and default_value[0] and default_value[0] is not None:
+            tools_qt.set_combo_value(self.dlg_replace.new_featurecat_id, default_value, 0)
         tools_qt.set_autocompleter(self.dlg_replace.new_featurecat_id)
 
     def _manage_plan_widgets(self):
