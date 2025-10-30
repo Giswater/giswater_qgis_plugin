@@ -36,9 +36,8 @@ v_featuretype text;
 v_action text;
 v_lastfeeding date;
 v_fields json;
-v_fields_array json[];
+v_fields_array jsonb;
 v_query text;
-v_union_queries text[] := '{}';
 v_feature_list text[];
 v_feat text;
 
@@ -71,47 +70,67 @@ BEGIN
 		END IF;
 	ELSIF v_featuretype = 'ELEMENT' THEN
 		-- Handle ELEMENT separately
+		v_fields_array := '[]'::jsonb;
+
 		IF v_action = 'INSERT' THEN
-			v_union_queries := ARRAY[
-				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+			-- Elements from nodes
+			v_query := 'SELECT json_agg(row_to_json(a)) FROM (%s) a';
+			EXECUTE format(v_query, 'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
 				'node_id as "nodeId", serial_number as "serialNumber", brand_id as brand, ' ||
 				'model_id as model, descript as descript, comment as "aresepId" ' ||
-				'FROM v_element_x_node WHERE updated_at >= '''||v_lastfeeding||'''',
+				'FROM v_element_x_node WHERE updated_at >= '''||v_lastfeeding||'''')
+			INTO v_fields;
+			IF v_fields IS NOT NULL THEN
+				v_fields_array := v_fields_array || v_fields::jsonb;
+			END IF;
 
-				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+			-- Elements from connecs
+			EXECUTE format(v_query, 'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
 				'connec_id as "connecId", serial_number as "serialNumber", brand_id as brand, ' ||
 				'model_id as model, descript as descript, comment as "aresepId" ' ||
-				'FROM v_element_x_connec WHERE updated_at >= '''||v_lastfeeding||''''
-			];
+				'FROM v_element_x_connec WHERE updated_at >= '''||v_lastfeeding||'''')
+			INTO v_fields;
+			IF v_fields IS NOT NULL THEN
+				v_fields_array := v_fields_array || v_fields::jsonb;
+			END IF;
+
 		ELSIF v_action = 'UPDATE' THEN
-			v_union_queries := ARRAY[
-				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+			-- Elements from nodes
+			v_query := 'SELECT json_agg(row_to_json(a)) FROM (%s) a';
+			EXECUTE format(v_query, 'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
 				'node_id as "nodeId", serial_number as "serialNumber", brand_id as brand, ' ||
 				'model_id as model, descript as descript, comment as "aresepId" ' ||
 				'FROM v_element_x_node WHERE updated_at >= '''||v_lastfeeding||''' AND element_id IN ' ||
 				'(SELECT (newdata->>''node_id'')::int FROM audit.log WHERE EXISTS ' ||
 				'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key ' ||
 				'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL ' ||
-				'AND table_name ILIKE ''%_node%'' AND schema = ''SCHEMA_NAME''))',
+				'AND table_name ILIKE ''%_node%'' AND schema = ''SCHEMA_NAME''))')
+			INTO v_fields;
+			IF v_fields IS NOT NULL THEN
+				v_fields_array := v_fields_array || v_fields::jsonb;
+			END IF;
 
-				'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
+			-- Elements from connecs
+			EXECUTE format(v_query, 'SELECT element_id as "elementId", elementcat_id as "featureClass", ' ||
 				'connec_id as "connecId", serial_number as "serialNumber", brand_id as brand, ' ||
 				'model_id as model, descript as descript, comment as "aresepId" ' ||
 				'FROM v_element_x_connec WHERE updated_at >= '''||v_lastfeeding||''' AND element_id IN ' ||
 				'(SELECT (newdata->>''connec_id'')::int FROM audit.log WHERE EXISTS ' ||
 				'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''conneccat_id'', ''asset_id'']) AS key ' ||
 				'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL ' ||
-				'AND table_name ILIKE ''%_connec%'' AND schema = ''SCHEMA_NAME''))'
-			];
+				'AND table_name ILIKE ''%_connec%'' AND schema = ''SCHEMA_NAME''))')
+			INTO v_fields;
+			IF v_fields IS NOT NULL THEN
+				v_fields_array := v_fields_array || v_fields::jsonb;
+			END IF;
 		END IF;
-		EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s) a', array_to_string(v_union_queries, ' UNION ALL '))
-		INTO v_fields_array;
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"4140", "function":"3374","parameters":{"feature_type":"'||v_featuretype::text||'"}}}$$);';
 	END IF;
 
 	-- Process features if not ELEMENT
 	IF v_featuretype != 'ELEMENT' AND v_feature_list IS NOT NULL THEN
+		v_fields_array := '[]'::jsonb;
 		FOREACH v_feat IN ARRAY v_feature_list
 		LOOP
 			-- Build query based on action
@@ -130,8 +149,6 @@ BEGIN
 				-- Add feature-specific fields
 				IF v_feat = 'connec' THEN
 					v_query := concat(v_query, ', customer_code as "customerCode"');
-				ELSE
-					v_query := concat(v_query, ', NULL as "customerCode"');
 				END IF;
 
 				v_query := concat(
@@ -156,8 +173,6 @@ BEGIN
 				-- Add feature-specific fields
 				IF v_feat = 'connec' THEN
 					v_query := concat(v_query, ', customer_code as "customerCode"');
-				ELSE
-					v_query := concat(v_query, ', NULL as "customerCode"');
 				END IF;
 
 				v_query := concat(v_query, ', created_at as "createdAt", updated_at as "updatedAt"',
@@ -168,15 +183,18 @@ BEGIN
 				);
 			END IF;
 
-			v_union_queries := array_append(v_union_queries, v_query);
-		END LOOP;
+			-- Execute query for this feature type and append results
+			EXECUTE format('SELECT json_agg(row_to_json(a)) FROM (%s) a', v_query)
+			INTO v_fields;
 
-		-- Execute combined query
-		EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s) a', array_to_string(v_union_queries, ' UNION ALL '))
-		INTO v_fields_array;
+			-- Append to results array (skip if no results)
+			IF v_fields IS NOT NULL THEN
+				v_fields_array := v_fields_array || v_fields::jsonb;
+			END IF;
+		END LOOP;
 	END IF;
 
-	v_fields := array_to_json(v_fields_array);
+	v_fields := v_fields_array::json;
 
 	-- Control nulls
 	v_fields := COALESCE(v_fields, '[]');
