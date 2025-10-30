@@ -118,14 +118,50 @@ BEGIN
 			IF v_action = 'INSERT' THEN
 				v_query := concat(
 					'SELECT ', v_feat, '_id as "', v_feat, 'Id", ',
-					v_feat, 'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state, created_at as "createdAt", updated_at as "updatedAt"',
-					'FROM ve_', v_feat, ' WHERE created_at >= ''', v_lastfeeding, ''''
+					v_feat, 'cat_id as "featureClass", ',
+					'macrosector_id as "macroSector", ',
+					'comment as "aresepId", ',
+					'asset_id as "assetId", ',
+					'state, ',
+					'uuid, ',
+					'expl_id as "exploitation"'
+				);
+
+				-- Add feature-specific fields
+				IF v_feat = 'connec' THEN
+					v_query := concat(v_query, ', customer_code as "customerCode"');
+				ELSE
+					v_query := concat(v_query, ', NULL as "customerCode"');
+				END IF;
+
+				v_query := concat(
+					v_query,
+					', created_at as "createdAt", ',
+					'updated_at as "updatedAt"',
+					' FROM ve_', v_feat,
+					' WHERE created_at >= ''', v_lastfeeding, ''''
 				);
 			ELSIF v_action = 'UPDATE' THEN
 				v_query := concat(
 					'SELECT ', v_feat, '_id as "', v_feat, 'Id", ',
-					v_feat, 'cat_id as "featureClass", macrosector_id as "macroSector", comment as "aresepId", asset_id as "assetId", state, created_at as "createdAt", updated_at as "updatedAt"',
-					'FROM ve_', v_feat, ' WHERE updated_at >= ''', v_lastfeeding, ''' AND ', v_feat, '_id IN ',
+					v_feat, 'cat_id as "featureClass", ',
+					'macrosector_id as "macroSector", ',
+					'comment as "aresepId", ',
+					'asset_id as "assetId", ',
+					'state, ',
+					'uuid, ',
+					'expl_id as "exploitation"'
+				);
+
+				-- Add feature-specific fields
+				IF v_feat = 'connec' THEN
+					v_query := concat(v_query, ', customer_code as "customerCode"');
+				ELSE
+					v_query := concat(v_query, ', NULL as "customerCode"');
+				END IF;
+
+				v_query := concat(v_query, ', created_at as "createdAt", updated_at as "updatedAt"',
+					' FROM ve_', v_feat, ' WHERE updated_at >= ''', v_lastfeeding, ''' AND ', v_feat, '_id IN ',
 					'(SELECT (newdata->>''', v_feat, '_id'')::int FROM audit.log WHERE EXISTS ',
 					'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''', v_feat, 'cat_id'', ''asset_id'']) AS key ',
 					'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL AND table_name ILIKE ''%_', v_feat, '%'' AND schema = ''SCHEMA_NAME''))'
