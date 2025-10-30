@@ -102,7 +102,7 @@ class GwMainWindow(QMainWindow):
         else:
             tag = str(self.objectName())
 
-        if event.type() == QtCore.QEvent.ActivationChange and self.isActiveWindow():
+        if event.type() == QtCore.QEvent.Type.ActivationChange and self.isActiveWindow():
             lib_vars.session_vars['last_focus'] = tag
             return True
 
@@ -111,10 +111,10 @@ class GwMainWindow(QMainWindow):
     def keyPressEvent(self, event):
 
         try:
-            if event.key() == QtCore.Qt.Key_Escape:
+            if event.key() == QtCore.Qt.Key.Key_Escape:
                 self.key_escape.emit()
                 return super().keyPressEvent(event)
-            if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+            if event.key() == QtCore.Qt.Key.Key_Return or event.key() == QtCore.Qt.Key.Key_Enter:
                 self.key_enter.emit()
                 return super().keyPressEvent(event)
         except RuntimeError:

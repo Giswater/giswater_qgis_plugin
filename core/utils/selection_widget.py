@@ -868,7 +868,7 @@ class GwSelectionWidget(QWidget):
                 if data is not None:
                     target_item.setData(data, role)
 
-            # Copy any custom user roles (above Qt.UserRole)
+            # Copy any custom user roles (above Qt.ItemDataRole.UserRole)
             for role in range(Qt.ItemDataRole.UserRole + 1, Qt.ItemDataRole.UserRole + 100):
                 data = model.data(source_index, role)
                 if data is not None:
