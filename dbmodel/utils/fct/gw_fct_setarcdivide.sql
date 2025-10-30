@@ -195,7 +195,7 @@ BEGIN
 			-- Find closest arc inside tolerance
 			SELECT arc_id, state, the_geom, code INTO v_arc_id, v_state_arc, v_arc_geom, v_code  FROM ve_arc AS a
 			WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) AND node_1 != v_node_id AND node_2 != v_node_id
-			ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
+			ORDER BY a.the_geom <-> v_node_geom LIMIT 1;
 
 			IF v_arc_id IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -585,7 +585,7 @@ BEGIN
 						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1
 						AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 						LOOP
-							SELECT a.arc_id INTO v_arc_closest FROM connec c, v_edit_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
+							SELECT a.arc_id INTO v_arc_closest FROM connec c, ve_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
 							AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) ORDER BY st_distance(a.the_geom, c.the_geom) ASC LIMIT 1;
 							
 							UPDATE connec SET arc_id = v_arc_closest WHERE connec_id = rec_connec.connec_id;
