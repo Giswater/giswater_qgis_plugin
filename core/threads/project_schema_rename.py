@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
 from ...libs import tools_qt, tools_db
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 
 class GwRenameSchemaTask(GwTask):

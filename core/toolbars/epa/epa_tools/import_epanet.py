@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import (
     QTableWidgetItem,
     QTextEdit,
 )
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from .....libs import tools_db, tools_qgis, tools_qt
 from ....ui.dialog import GwDialog

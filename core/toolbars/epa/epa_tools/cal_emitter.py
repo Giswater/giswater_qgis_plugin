@@ -9,7 +9,7 @@ import os
 from time import time
 from datetime import timedelta
 from pathlib import Path
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from functools import partial
 

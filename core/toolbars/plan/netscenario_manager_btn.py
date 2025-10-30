@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 import json
 
 from qgis.core import QgsProject

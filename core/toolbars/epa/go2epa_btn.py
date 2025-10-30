@@ -10,7 +10,7 @@ import sys
 import json
 
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import timedelta
 

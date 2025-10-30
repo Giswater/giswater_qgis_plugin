@@ -15,7 +15,7 @@ from typing import Union
 from functools import partial
 from qgis.core import QgsEditFormConfig
 
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, Qt, QRegularExpression, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel, QCursor

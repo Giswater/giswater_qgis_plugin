@@ -8,7 +8,7 @@ or (at your option) any later version.
 import json
 
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QDateTime

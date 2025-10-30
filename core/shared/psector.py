@@ -13,7 +13,7 @@ import sys
 from typing import Union
 from collections import OrderedDict
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QPixmap

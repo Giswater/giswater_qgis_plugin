@@ -10,7 +10,7 @@ import json
 from functools import partial
 from osgeo import gdal
 from pyproj import CRS, Transformer
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QStandardItemModel, QCursor
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QAction, QMenu, QPushButton

@@ -16,7 +16,7 @@ import sqlite3
 from typing import Literal, Dict, Optional, Union
 import webbrowser
 import xml.etree.ElementTree as ET
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 if 'nt' in sys.builtin_module_names:
     import ctypes

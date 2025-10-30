@@ -8,7 +8,7 @@ or (at your option) any later version.
 import json
 import os
 import csv
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import datetime, timedelta
 from functools import partial

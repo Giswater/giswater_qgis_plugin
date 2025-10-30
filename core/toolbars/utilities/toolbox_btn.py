@@ -9,7 +9,7 @@ import csv
 import os
 from functools import partial
 import json
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import timedelta
 

@@ -10,7 +10,7 @@ import os
 import re
 import sys
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import timedelta
 from typing import Union
@@ -717,7 +717,7 @@ class GwAdminButton:
         # Process each version folder in order
         project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
         plugin_tuple = tuple(int(x) for x in str(self.plugin_version).split('.'))
-        
+
         for major, minor, patch, folder_path in version_folders:
             current_tuple = (major, minor, patch)
             if new_project:
@@ -1265,7 +1265,7 @@ class GwAdminButton:
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
-        
+
         if result:
             self._open_project(qgs_path)
 
@@ -1733,7 +1733,7 @@ class GwAdminButton:
 
         # Process each version folder in order
         project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
-        
+
         for major, minor, patch, folder_path in version_folders:
             current_tuple = (major, minor, patch)
             if current_tuple > project_tuple:

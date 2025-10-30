@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 from datetime import datetime
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
