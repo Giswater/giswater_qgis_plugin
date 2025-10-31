@@ -24,7 +24,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoub
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, \
     QMenu, QToolButton, QTableWidget, QDialog
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
-    QgsPointXY, QgsProject, QgsFeature, QgsGeometry
+    QgsPointXY, QgsProject, QgsFeature, QgsGeometry, Qgis
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsCollapsibleGroupBox
 
 from ..shared.catalog import GwCatalog
@@ -518,7 +518,7 @@ class GwInfo(QObject):
         self._get_features(complet_result)
         if self.layer is None:
             msg = "Layer not found"
-            tools_qgis.show_message(msg, 2, parameter=self.table_parent)
+            tools_qgis.show_message(msg, Qgis.Critical, parameter=self.table_parent)
             return False, self.dlg_cf
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
@@ -807,12 +807,12 @@ class GwInfo(QObject):
                 if field['layoutname'] is None:
                     msg = "The field layoutname is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
+                    tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
                 if field['layoutorder'] is None:
                     msg = "The field layoutorder is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
+                    tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
 
                 # The data tab is somewhat special (it has 2 columns)
@@ -831,7 +831,7 @@ class GwInfo(QObject):
             elif field['layoutname'] != 'lyt_none':
                 msg = "The field layoutname is not configured for"
                 param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
+                tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_cf)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
@@ -1221,14 +1221,14 @@ class GwInfo(QObject):
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
-                    tools_qgis.show_message(msg, message_level=0, parameter=self.node1)
+                    tools_qgis.show_message(msg, message_level=Qgis.Info, parameter=self.node1)
                     dlg_interpolate.btn_accept.setEnabled(False)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
-                    tools_qgis.show_message(msg, message_level=0, parameter=self.node2)
+                    tools_qgis.show_message(msg, message_level=Qgis.Info, parameter=self.node2)
                     dlg_interpolate.btn_accept.setEnabled(True)
 
         if self.node1 and self.node2:
@@ -3086,7 +3086,7 @@ class GwInfo(QObject):
             result = json_result['body']['data']
             if 'fields' not in result:
                 msg = "No listValues for"
-                tools_qgis.show_message(msg, 2, parameter=json_result['body']['data'])
+                tools_qgis.show_message(msg, Qgis.Critical, parameter=json_result['body']['data'])
             else:
                 for field in json_result['body']['data']['fields']:
                     label = QLabel()
@@ -4634,7 +4634,7 @@ def open_selected_doc(tbl_list_doc):
     # Selected item from list
     if tbl_list_doc.currentItem() is None:
         msg = "No document selected."
-        tools_qgis.show_message(msg, 1)
+        tools_qgis.show_message(msg, Qgis.Warning)
         return
 
     selected_document = tbl_list_doc.currentItem().text()

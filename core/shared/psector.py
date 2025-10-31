@@ -20,7 +20,7 @@ from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStand
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlRecord
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
-from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer
+from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer, Qgis
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from .document import GwDocument, global_vars
@@ -1136,7 +1136,7 @@ class GwPsector:
             msg += tools_qt.tr("There are some topological inconsistences on psector '{0}'. Would you like to see the log?")
             msg_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
-            tools_qgis.show_message_function(msg, function, message_level=1, duration=0, text_params=msg_params, dialog=self.dlg_plan_psector)
+            tools_qgis.show_message_function(msg, function, message_level=Qgis.Warning, duration=0, text_params=msg_params, dialog=self.dlg_plan_psector)
             if from_toggle:
                 return False
 

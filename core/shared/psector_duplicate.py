@@ -70,10 +70,10 @@ class GwPsectorDuplicate(QObject):
                 "SET value = False "
                 "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
-        
+
         if not complet_result or complet_result['status'] == 'Failed':
             msg = 'Function gw_fct_psector_duplicate executed with no result'
-            tools_qgis.show_message(msg, 3, dialog=self.dlg_duplicate_psector)
+            tools_qgis.show_message(msg, Qgis.Success, dialog=self.dlg_duplicate_psector)
             return
 
         # Populate tab info

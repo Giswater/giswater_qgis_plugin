@@ -117,7 +117,7 @@ class GwSearch:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
                           "widgetname='{1}' AND widgettype='{2}'"
                     msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             gridlayout.addItem(vertical_spacer1)
@@ -209,7 +209,7 @@ class GwSearch:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
                           "widgetname='{1}' AND widgettype='{2}'"
                     msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
 
     # region private functions
 

@@ -1175,7 +1175,7 @@ class GwMincut:
         self.dlg_connec.btn_accept.clicked.connect(partial(self._accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.rejected.connect(partial(tools_gw.close_dialog, self.dlg_connec))
         self.dlg_connec.rejected.connect(partial(tools_qgis.disconnect_signal_selection_changed))
-        
+
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
 
@@ -1218,7 +1218,7 @@ class GwMincut:
     def _snapping_init_connec(self):
         """ Snap connec """
         self.rel_feature_type = 'connec'
-        
+
         tools_gw.selection_init(self, self.dlg_connec, 'om_mincut', GwSelectionMode.MINCUT_CONNEC)
 
     def _snapping_selection_hydro(self):
@@ -2010,7 +2010,7 @@ class GwMincut:
                 msg = complet_result.get('message')
                 if not msg:
                     msg = "Mincut done successfully"
-                    tools_qgis.show_message(msg, 3)
+                    tools_qgis.show_message(msg, Qgis.Success)
                 else:
                     tools_qgis.show_message(msg.get('text'), msg.get('level'))
 
@@ -2135,7 +2135,7 @@ class GwMincut:
                 msg = complet_result.get('message')
                 if not msg:
                     msg = "Mincut done successfully"
-                    tools_qgis.show_message(msg, 3)
+                    tools_qgis.show_message(msg, Qgis.Success)
                 else:
                     tools_qgis.show_message(msg.get('text'), msg.get('level'))
 
@@ -2316,7 +2316,7 @@ class GwMincut:
             template_files = os.listdir(template_folder)
         except FileNotFoundError:
             msg = "Your composer's path is bad configured. Please, modify it and try again."
-            tools_qgis.show_message(msg, 1)
+            tools_qgis.show_message(msg, Qgis.Warning)
             return
 
         # Set dialog add_connec

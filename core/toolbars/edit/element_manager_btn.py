@@ -36,7 +36,7 @@ class GwElementManagerButton(GwAction):
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
             msg = "Failed to fetch dialog configuration"
-            tools_qgis.show_message(msg, 2, parameter=json_result)
+            tools_qgis.show_message(msg, Qgis.Critical, parameter=json_result)
             return
         self.complet_result = json_result
 
@@ -94,7 +94,7 @@ class GwElementManagerButton(GwAction):
                 if field['layoutorder'] is None:
                     msg = "The field layoutorder is not configured for"
                     param = f"formname:form_element, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mng)
+                    tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_mng)
                     continue
 
                 if current_layout != field['layoutname']:
@@ -113,7 +113,7 @@ class GwElementManagerButton(GwAction):
             elif field['layoutname'] != 'lyt_none':
                 msg = "The field layoutname is not configured for"
                 param = f"formname:form_element, columnname:{field['columnname']}"
-                tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_mng)
+                tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_mng)
 
             if isinstance(widget, QTableView):
                 # Populate custom context menu
@@ -136,4 +136,3 @@ class GwElementManagerButton(GwAction):
             if complet_list is False:
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_mng, widget_list, columnname, widgetname)
-

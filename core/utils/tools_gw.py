@@ -2157,7 +2157,7 @@ def add_button(**kwargs):
         if not exist:
             msg = "widget {0} has associated function {1}, but {2} not exist"
             msg_params = (real_name, function_name, function_name,)
-            tools_qgis.show_message(msg, 2, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -2314,11 +2314,11 @@ def add_checkbox(**kwargs):
                 if not exist:
                     msg = "widget {0} has associated function {1}, but {2} not exist"
                     msg_params = (field['widgetname'], function_name, function_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                     return widget
             else:
                 msg = "Parameter functionName is null for check"
-                tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                tools_qgis.show_message(msg, Qgis.Critical, parameter=widget.objectName())
 
     func_params = ""
 
@@ -2329,7 +2329,7 @@ def add_checkbox(**kwargs):
         if not exist:
             msg = "widget {0} has associated function {1}, but {2} not exist"
             msg_params = (field['widgetname'], function_name, function_name,)
-            tools_qgis.show_message(msg, 2, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -2402,16 +2402,16 @@ def add_hyperlink(field):
                 if not exist:
                     msg = "widget {0} have associated function {1}, but {2} not exist"
                     msg_params = (real_name, func_name, func_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                     return widget
             else:
                 msg = "Parameter widgetfunction is null for widget hyperlink"
-                tools_qgis.show_message(msg, 2, parameter=real_name)
+                tools_qgis.show_message(msg, Qgis.Critical, parameter=real_name)
         else:
             tools_log.log_info(field['widgetfunction'])
     else:
         msg = "Parameter widgetfunction not found for widget type hyperlink"
-        tools_qgis.show_message(msg, 2)
+        tools_qgis.show_message(msg, Qgis.Critical)
 
     if func_name is not None:
         # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
@@ -2452,13 +2452,13 @@ def add_calendar(dlg, fld, **kwargs):
                 if not exist:
                     msg = "widget {0} have associated function {1}, but {2} not exist"
                     msg_params = (real_name, function_name, function_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                     return widget
                 if 'parameters' in fld['widgetfunction']:
                     func_params = fld['widgetfunction']['parameters']
             else:
                 msg = "Parameter button_function is null for button"
-                tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                tools_qgis.show_message(msg, Qgis.Critical, parameter=widget.objectName())
 
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
@@ -2645,7 +2645,7 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], c
             if not exist:
                 msg = "widget {0} have associated function {1}, but {2} not exist"
                 msg_params = (real_name, function_name, function_name,)
-                tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                 return widget
             if 'parameters' in field['widgetfunction']:
                 func_params = field['widgetfunction']['parameters']
@@ -2719,11 +2719,11 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
                     if not exist:
                         msg = "widget {0} has associated function {1}, but {2} not exist"
                         msg_params = (widget.property('widgetname'), function_name, function_name,)
-                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                        tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                         return widget
                 else:
                     msg = "Parameter functionName is null for button"
-                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                    tools_qgis.show_message(msg, Qgis.Critical, parameter=widget.objectName())
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -2971,11 +2971,11 @@ def add_multiple_checkbox(field, dialog=None, complet_result=None, ignore_functi
                     if not exist:
                         msg = "widget {0} has associated function {1}, but {2} not exist"
                         msg_params = (widget.property('widgetname'), function_name, function_name,)
-                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                        tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                         return widget
                 else:
                     msg = "Parameter functionName is null for button"
-                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                    tools_qgis.show_message(msg, Qgis.Critical, parameter=widget.objectName())
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -3002,7 +3002,7 @@ def fill_multiple_checkbox(widget, field, index_to_show=1, index_to_compare=0):
     else:
         msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
         msg_params = (field['widgetname'], field['widgettype'],)
-        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+        tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
     # Populate combo
     for record in combolist:
         item = QListWidgetItem()
@@ -3127,7 +3127,7 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
     else:
         msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
         msg_params = (field['widgetname'], field['widgettype'],)
-        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+        tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
     # Populate combo
     for record in combolist:
         widget.addItem(record[index_to_show], record)
@@ -6781,11 +6781,11 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
                         if not exist:
                             msg = "widget {0} has associated function {1}, but {2} not exist"
                             msg_params = (widget.property('widgetname'), function_name, function_name,)
-                            tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                            tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                             return widget
                     else:
                         msg = "Parameter functionName is null for button"
-                        tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                        tools_qgis.show_message(msg, Qgis.Critical, parameter=widget.objectName())
 
             func_params = ""
             function_name = ""
@@ -6796,7 +6796,7 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
                 if not exist:
                     msg = "widget {0} has associated function {1}, but {2} not exist"
                     msg_params = (widget.property('widgetname'), function_name, function_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
                     return widget
                 if 'parameters' in widgetfunction[i]:
                     func_params = widgetfunction[i]['parameters']
@@ -6915,7 +6915,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
     if 'widgettype' in field and not field['widgettype']:
         msg = "The field widgettype is not configured for"
         param = f"formname:{tablename}, columnname:{field['columnname']}"
-        tools_qgis.show_message(msg, 2, parameter=param, dialog=dialog)
+        tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=dialog)
         return label, widget
 
     if field['widgettype'] == 'label':
@@ -6928,7 +6928,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
     except Exception as e:
         msg = "{0}: {1} Python function: tools_gw.set_widgets. WHERE columname='{2}' AND widgetname='{3}' AND widgettype='{4}'"
         msg_params = (type(e).__name__, e, field['columnname'], field['widgetname'], field['widgettype'],)
-        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+        tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
         return label, widget
 
     try:

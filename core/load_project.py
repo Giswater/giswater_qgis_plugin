@@ -9,7 +9,7 @@ import os
 from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils, QgsVectorLayer, QgsEditFormConfig, QgsAttributeEditorContainer, \
-                    QgsAttributeEditorField, QgsEditorWidgetSetup
+                    QgsAttributeEditorField, QgsEditorWidgetSetup, Qgis
 from qgis.PyQt.QtCore import QObject, Qt, QEvent
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton, QMenu, QAction
 
@@ -234,11 +234,11 @@ class GwLoadProject(QObject):
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.Warning, btn_text="Open wiki")
         if pgrouting_version is not None and minorPgrVersion is not None:
             if int(str(pgrouting_version).replace('.', '')) < int(minorPgrVersion):
                 msg = "pgRouting version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.Warning, btn_text="Open wiki")
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """
@@ -589,13 +589,13 @@ class GwLoadProject(QObject):
             popup = view.window()
             rect = self.cmb_psector.rect()
             global_pos = self.cmb_psector.mapToGlobal(rect.topLeft())
-            
+
             # Calculate popup height based on maxVisibleItems
             item_height = view.sizeHintForRow(0) if self.cmb_psector.count() > 0 else 24
             max_visible = self.cmb_psector.maxVisibleItems()
             visible_count = min(self.cmb_psector.count(), max_visible)
             popup_height = visible_count * item_height + 4  # +4 for border
-            
+
             # Position popup above the combo box
             popup.move(global_pos.x(), global_pos.y() - popup_height)
             popup.resize(self.cmb_psector.width(), popup_height)
