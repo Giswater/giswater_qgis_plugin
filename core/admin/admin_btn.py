@@ -2324,10 +2324,14 @@ class GwAdminButton:
                 file_content = f.read()
                 f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
                     "PARENT_SCHEMA", PARENT_SCHEMA).replace("PARENT_TYPE", self.project_type_selected)
-                if "BD_NAME" in f_to_read:
+                
+                # Case-insensitive BD_NAME replacement
+                if re.search(r'bd_name', f_to_read, re.IGNORECASE):
                     BD_NAME = self._get_current_db_name()
-                    if BD_NAME:
-                        f_to_read = f_to_read.replace("BD_NAME", BD_NAME)
+                    if not BD_NAME:
+                        print("ERROR: Cannot get current database name, but SQL requires BD_NAME placeholder")
+                        return False
+                    f_to_read = re.sub(r'bd_name', BD_NAME, f_to_read, flags=re.IGNORECASE)
 
                 status = tools_db.execute_sql(f_to_read, filepath=filepath, commit=self.dev_commit, is_thread=False)
 
@@ -2374,9 +2378,19 @@ class GwAdminButton:
 
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
-        db_name = settings.value("database", "")
+        
+        # Check if using pg_service
+        service_name = settings.value("service", "")
+        if service_name:
+            # Get database name from pg_service.conf
+            credentials_service = tools_os.manage_pg_service(service_name)
+            db_name = credentials_service.get('dbname', None) if credentials_service else None
+        else:
+            # Get database name from connection settings
+            db_name = settings.value("database", "")
+        
         settings.endGroup()
-        return db_name
+        return db_name if db_name else None
 
     def _execute_sql_files(self, filedir, set_progress_bar=False):
         """"""
