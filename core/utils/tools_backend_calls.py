@@ -433,7 +433,7 @@ def filter_table(**kwargs):
             model.clear()
             tools_gw.add_tableview_header(qtable, field)
             tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, 1)
+            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, Qt.SortOrder.DescendingOrder)
             tools_qt.set_tableview_config(qtable)
 
     return complet_list
@@ -473,7 +473,7 @@ def filter_table_mincut(**kwargs):
             model.clear()
             tools_gw.add_tableview_header(qtable, field)
             tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1)
+            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], Qt.SortOrder.DescendingOrder)
             tools_qt.set_tableview_config(qtable)
 
     return complet_list
@@ -846,7 +846,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
             continue
         widget = tools_gw.add_tableview_header(widget, field, headers)
         widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
+        widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(widget)
 
     widget_list = []

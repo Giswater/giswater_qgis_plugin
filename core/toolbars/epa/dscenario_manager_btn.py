@@ -507,7 +507,7 @@ class GwDscenarioManagerButton(GwAction):
                 self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, field)
                 self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, field)
         # TODO: config_form_tableview
-        # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
+        # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', Qt.SortOrder.DescendingOrder, True)
         tools_qt.set_tableview_config(self.tbl_dscenario)
         # Optionally set current scenario label if context provided
 
@@ -796,7 +796,7 @@ class GwDscenarioManagerButton(GwAction):
         model.setTable(self.table_name)
         model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
-        model.setSort(0, 0)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
         # Set item delegates
         readonly_delegate = ReadOnlyDelegate(widget)

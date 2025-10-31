@@ -495,7 +495,7 @@ class GwDimensioning:
             widget = tools_gw.add_tableview(db_return, field, dialog)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=Qt.SortOrder.DescendingOrder)
             tools_qt.set_tableview_config(widget)
         widget.setObjectName(widget.property('columnname'))
 

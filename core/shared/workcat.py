@@ -87,7 +87,7 @@ class GwWorkcat:
             if field['value']:
                 self.dlg_man.tbl_workcat = tools_gw.add_tableview_header(self.dlg_man.tbl_workcat, field)
                 self.dlg_man.tbl_workcat = tools_gw.fill_tableview_rows(self.dlg_man.tbl_workcat, field)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, 'cat_work', 0)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, 'cat_work', Qt.SortOrder.AscendingOrder)
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         return True
 
@@ -479,7 +479,7 @@ class GwWorkcat:
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
-        model.setSort(0, 0)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
 
         widget.setEditTriggers(set_edit_triggers)

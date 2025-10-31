@@ -2961,7 +2961,7 @@ class GwInfo(QObject):
             widget = tools_gw.add_tableview_header(widget, field, headers)
             widget = tools_gw.fill_tableview_rows(widget, field)
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
-            widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
+            widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()

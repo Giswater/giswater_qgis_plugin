@@ -267,7 +267,7 @@ class GwNetscenarioManagerButton(GwAction):
                 self.tbl_netscenario = tools_gw.add_tableview_header(self.tbl_netscenario, field)
                 self.tbl_netscenario = tools_gw.fill_tableview_rows(self.tbl_netscenario, field)
         # TODO: config_form_tableview
-        # widget = tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'tbl_netscenario', 1, True)
+        # widget = tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'tbl_netscenario', Qt.SortOrder.DescendingOrder, True)
         tools_qt.set_tableview_config(self.tbl_netscenario)
 
         return complet_list
@@ -469,7 +469,7 @@ class GwNetscenarioManagerButton(GwAction):
             filter_str += f" AND {netscenario_type}_id::text NOT IN ('-1', '0')"
         model.setFilter(filter_str)
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
-        model.setSort(0, 0)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
 
         # Check for errors

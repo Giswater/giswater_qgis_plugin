@@ -4912,7 +4912,7 @@ def manage_docker_options(option_name='position'):
         lib_vars.session_vars['dialog_docker'].position = 2
 
 
-def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=None):
+def set_tablemodel_config(dialog, widget, table_name, sort_order=Qt.SortOrder.AscendingOrder, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
     widget = tools_qt.get_widget(dialog, widget)
@@ -6635,7 +6635,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
             continue
         widget = add_tableview_header(widget, field)
         widget = fill_tableview_rows(widget, field)
-        widget = set_tablemodel_config(dialog, widget, short_name, 1)
+        widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
     widget_list = []

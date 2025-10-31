@@ -1212,7 +1212,7 @@ class CalculatePriority:
             model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
             model.setTable(table_name)
             model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
-            model.setSort(0, 0)
+            model.setSort(0, Qt.SortOrder.AscendingOrder)
             model.select()
 
             # When change some field we need to refresh Qtableview and filter by psector_id

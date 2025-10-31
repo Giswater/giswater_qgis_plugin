@@ -341,7 +341,7 @@ class GwResultManagerButton(GwAction):
             for column, table, key, value in relations:
                 model.setRelation(column, QSqlRelation(table, key, value))
             model.setEditStrategy(QSqlRelationalTableModel.EditStrategy.OnManualSubmit)
-            model.setSort(0, 0)
+            model.setSort(0, Qt.SortOrder.AscendingOrder)
             model.select()
 
             widget.setEditTriggers(set_edit_triggers)

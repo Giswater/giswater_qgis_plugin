@@ -199,7 +199,7 @@ class GwMapzoneManager:
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(self.table_name)
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
-        model.setSort(0, 0)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
 
         # Check for errors

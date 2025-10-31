@@ -519,7 +519,7 @@ class GwDocument(QObject):
             if field['value']:
                 self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
                 self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', 0)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', Qt.SortOrder.AscendingOrder)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         return True
