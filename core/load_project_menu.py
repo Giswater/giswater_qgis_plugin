@@ -55,7 +55,7 @@ class GwMenuLoad(QObject):
             if not action_help_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", "shortcut_help", f"{action_help_shortcut}", "user", "init",
                                            prefix=False)
-            action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
+            action_help.setShortcut(QKeySequence(f"{action_help_shortcut}"))
             action_help.triggered.connect(tools_gw.open_dlg_help)
 
         # Action 'Reset dialogs'
@@ -70,7 +70,7 @@ class GwMenuLoad(QObject):
             if not action_reset_plugin_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", "shortcut_reset_plugin",
                     f"{action_reset_plugin_shortcut}", "user", "init", prefix=False)
-            action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
+            action_reset_plugin.setShortcut(QKeySequence(f"{action_reset_plugin_shortcut}"))
             action_reset_plugin.triggered.connect(self._reset_plugin)
 
         # Action 'Toggle Log DB'
@@ -79,7 +79,7 @@ class GwMenuLoad(QObject):
         if not log_sql_shortcut:
             tools_gw.set_config_parser("actions_shortcuts", "shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
                 "init", prefix=False)
-        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
+        action_set_log_sql.setShortcut(QKeySequence(f"{log_sql_shortcut}"))
         action_set_log_sql.triggered.connect(self._set_log_sql)
 
             # endregion
