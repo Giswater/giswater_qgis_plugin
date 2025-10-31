@@ -270,12 +270,17 @@ BEGIN
 
 		-- use specific sequence for code when its name matches featurecat_code_seq
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_feature_type_new))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
 
+		SELECT c.relname
+		FROM pg_catalog.pg_class c
+			JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+		WHERE c.relname = v_seq_name
+			AND n.nspname = 'SCHEMA_NAME'
+		INTO v_sql;
 
 		IF v_sql IS NOT NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				v_code=concat(v_code_prefix,v_seq_code);
+			SELECT nextval(v_seq_name) INTO v_seq_code;
+			v_code=concat(v_code_prefix,v_seq_code);
 		END IF;
 
 		--Copy id to code field
