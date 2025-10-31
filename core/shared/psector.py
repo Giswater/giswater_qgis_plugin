@@ -889,7 +889,12 @@ class GwPsector:
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
 
         if not self.update:
-            self.insert_or_update_new_psector(from_tab_change=True)
+            result = self.insert_or_update_new_psector(from_tab_change=True)
+            if result is False:
+                self.dlg_plan_psector.tabwidget.blockSignals(True)
+                self.dlg_plan_psector.tabwidget.setCurrentIndex(0)
+                self.dlg_plan_psector.tabwidget.blockSignals(False)
+                return
 
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
@@ -968,7 +973,7 @@ class GwPsector:
         if psector_name == "":
             msg = "Mandatory field is missing. Please, set a value"
             tools_qgis.show_warning(msg, parameter='Name', dialog=self.dlg_plan_psector)
-            return
+            return False
 
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
         if rotation == "":
@@ -978,14 +983,14 @@ class GwPsector:
             return False
 
         if not self._check_psector_name_availability(psector_name):
-            return
+            return False
 
         columns = self._get_psector_columns()
         if columns is None:
-            return
+            return False
 
         if not self._check_workcat_for_executed_status(psector_name):
-            return
+            return False
 
         self._toggle_topology_trigger(enable=True)
         
