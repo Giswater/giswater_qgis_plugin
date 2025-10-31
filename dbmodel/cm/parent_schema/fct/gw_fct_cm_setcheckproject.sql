@@ -43,6 +43,8 @@ DECLARE
 	v_querytext_cfg text;
     v_rec record;
     v_check_result json;
+	v_feature_type_item text;
+	v_layer_item text;
 
 	v_check_mandatory_fid integer := 100;
 	v_check_fkeys_fid integer := 101;
