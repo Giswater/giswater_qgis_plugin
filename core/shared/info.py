@@ -651,7 +651,7 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
             dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
-            dlg_cf.dlg_closed.connect(self._reset_my_json, True)
+            dlg_cf.dlg_closed.connect(self._reset_my_json)
             dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
