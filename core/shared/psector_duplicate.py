@@ -8,6 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.core import Qgis
 
 from ..ui.ui_manager import GwPsectorDuplicateUi
 from ..utils import tools_gw

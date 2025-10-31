@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTim
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
-    QgsVectorLayer
+    QgsVectorLayer, Qgis
 from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools

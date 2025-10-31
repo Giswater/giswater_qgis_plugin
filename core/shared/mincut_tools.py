@@ -13,6 +13,7 @@ from qgis.PyQt.QtCore import Qt, QRegularExpression
 from qgis.PyQt.QtWidgets import QComboBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView
 from qgis.gui import QgsDateTimeEdit
+from qgis.core import Qgis
 
 from ..utils import tools_backend_calls
 

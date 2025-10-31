@@ -9,6 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableView, QGridLayout
+from qgis.core import Qgis
 
 from ...utils import tools_gw
 from ...ui.ui_manager import GwElementManagerUi

@@ -9,7 +9,7 @@ import os
 import shutil
 
 from functools import partial
-from qgis.core import QgsProject, QgsSettings
+from qgis.core import QgsProject, QgsSettings, Qgis
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QApplication

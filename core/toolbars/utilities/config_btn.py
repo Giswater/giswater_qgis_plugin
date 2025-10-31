@@ -14,6 +14,7 @@ from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSizePolicy, QGridLayout, QLabel, \
     QTextEdit, QLineEdit, QCompleter, QTabWidget, QWidget, QGroupBox
 from qgis.gui import QgsDateTimeEdit
+from qgis.core import Qgis
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi

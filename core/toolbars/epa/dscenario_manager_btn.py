@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCu
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
-    QShortcut, QApplication, QWidget, QLabel, QGridLayout, QToolButton, QPushButton
+    QShortcut, QApplication, QWidget, QLabel, QGridLayout, QToolButton, QPushButton, QHeaderView
 from qgis.PyQt.QtWidgets import QLineEdit
 
 from ..dialog import GwAction

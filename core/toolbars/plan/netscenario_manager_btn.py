@@ -13,7 +13,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QPushButton, QHeaderView
 from qgis.PyQt.QtWidgets import QLineEdit
 
 from ..dialog import GwAction

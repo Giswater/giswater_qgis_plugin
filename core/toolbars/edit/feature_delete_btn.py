@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.core import QgsVectorLayer, QgsFeatureRequest
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, Qgis
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi

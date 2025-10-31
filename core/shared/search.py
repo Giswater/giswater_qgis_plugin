@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtWidgets import QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QCheckBox
-from qgis.core import QgsPointXY
+from qgis.core import QgsPointXY, Qgis
 
 from libs import tools_os
 from .info import GwInfo

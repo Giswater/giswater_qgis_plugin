@@ -10,6 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget, \
     QWidget, QApplication, QDockWidget, QToolButton, QAction, QScrollArea
+from qgis.core import Qgis
 
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw

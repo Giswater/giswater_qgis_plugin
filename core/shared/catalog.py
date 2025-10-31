@@ -9,6 +9,7 @@ import operator
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
+from qgis.core import Qgis
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwInfoCatalogUi

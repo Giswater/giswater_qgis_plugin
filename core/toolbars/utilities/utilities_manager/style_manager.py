@@ -18,6 +18,7 @@ from qgis.PyQt.QtWidgets import QHeaderView, QTableView, QMenu, QAction, QPushBu
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtGui import QCursor
+from qgis.core import Qgis
 
 
 class GwStyleManager:
