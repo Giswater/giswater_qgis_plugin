@@ -18,7 +18,7 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QShortcut, QApplication, QMenu, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QShortcut, QApplication, QMenu, QAction, QPushButton, QHeaderView
 from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
@@ -267,7 +267,7 @@ class GwNonVisual:
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=1, stretchLastSection=False)
+                                      sectionResizeMode=QHeaderView.ResizeMode.Stretch, stretchLastSection=False)
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
@@ -739,7 +739,7 @@ class GwNonVisual:
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
         self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget, None, None)
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_curve')
@@ -1213,7 +1213,7 @@ class GwNonVisual:
             result = self._insert_curve_values(dialog, tbl_curve_value, curve_id)
             if not result:
                 return
-            
+
             post_actions = True
 
         # Commit and refresh UI once per operation
@@ -1313,7 +1313,7 @@ class GwNonVisual:
         undo_shortcut.activated.connect(partial(self._undo_paste_patterns, tbl_pattern_value))
 
         # Set scale-to-fit for tableview
-        tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
+        tbl_pattern_value.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         tbl_pattern_value.horizontalHeader().setMinimumSectionSize(50)
 
         # Create plot widget
@@ -1668,7 +1668,7 @@ class GwNonVisual:
     def _scale_to_fit_pattern_tableviews(self, dialog):
         tables = [dialog.tbl_monthly, dialog.tbl_daily, dialog.tbl_hourly, dialog.tbl_weekend]
         for table in tables:
-            table.horizontalHeader().setSectionResizeMode(1)
+            table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             table.horizontalHeader().setMinimumSectionSize(50)
 
     def _populate_ud_patterns_widgets(self, pattern_id, duplicate=False):
@@ -2245,7 +2245,7 @@ class GwNonVisual:
             self._load_timeseries_widgets(self.dialog)
 
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
         is_new = (timser_id is None) or duplicate
 

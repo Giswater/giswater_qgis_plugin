@@ -169,7 +169,7 @@ class GwPsector:
             self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         all_rows = self.dlg_plan_psector.findChild(QTableView, "all_rows")
         all_rows.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        all_rows.horizontalHeader().setSectionResizeMode(3)
+        all_rows.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # if a row is selected from mg_psector_mangement(button 62 or button 61)
         # if psector_id contains "1" or "0" python takes it as boolean, if it is True, it means that it does not
@@ -1769,7 +1769,7 @@ class GwPsector:
         # Tables
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
+        tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         # Populate custom context menu
         self.dlg_psector_mng.tbl_psm.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)

@@ -31,7 +31,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout, QHeaderView
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -4965,7 +4965,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
             if style:
                 stretch = style.get('stretch')
                 if stretch is not None:
-                    stretch = 1 if stretch else 0
+                    stretch = QHeaderView.ResizeMode.Stretch if stretch else QHeaderView.ResizeMode.Interactive
                     widget.horizontalHeader().setSectionResizeMode(col_idx, stretch)
             width = row['width']
             if width is None:

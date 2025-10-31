@@ -40,7 +40,7 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked = {}
         self.TRV_PROCESSES = tools_qt.tr('trv_processes', 'toolbox', default="Processes")
         self.TRV_REPORTS = tools_qt.tr('trv_reports', 'toolbox', default="Raports")
-        
+
         self.ignore_widgets = ['qt_spinbox_lineedit', 'qt_calendar_yearedit']
         self.temp_layers_added = []
         self.add_columns = {}
@@ -397,7 +397,7 @@ class GwToolBoxButton(GwAction):
                 layout.addWidget(widget, 1, order)
 
             # Set scale-to-fit
-            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=0)
+            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         # Update tbl in case filters have default value
         self._update_tbl_reports()
@@ -670,7 +670,7 @@ class GwToolBoxButton(GwAction):
             status = True
 
         return status
-    
+
     def _filter_combo_values(self, dialog, combo):
         parent_name = combo.property('parentname')
         parent_combo = dialog.findChild(QComboBox, parent_name)

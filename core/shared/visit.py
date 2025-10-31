@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime,
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QTableView, \
-    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit, QAction, QMenu
+    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit, QAction, QMenu, QHeaderView
 
 from .document import GwDocument
 from ..models.om_visit import GwOmVisit
@@ -270,7 +270,7 @@ class GwVisit(QObject):
         # Create the dialog
         self.dlg_visit_manager = GwVisitManagerUi(self)
         tools_gw.load_settings(self.dlg_visit_manager)
-        tools_qt.set_tableview_config(self.dlg_visit_manager.tbl_visit, sectionResizeMode=0)
+        tools_qt.set_tableview_config(self.dlg_visit_manager.tbl_visit, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         if feature_type is None:
             # Set a model with selected filter. Attach that model to selected table
@@ -1401,7 +1401,7 @@ class GwVisit(QObject):
         model = QStandardItemModel()
         self.dlg_event.tbl_docs_x_event.setModel(model)
         self.dlg_event.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-        self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+        self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Get columns name and set headers of model with that
         columns_name = tools_db.get_columns_list('om_visit_event_photo')

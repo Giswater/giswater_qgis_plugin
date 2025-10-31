@@ -220,7 +220,7 @@ class GwMapzoneManager:
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=0)
+                                      sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         tools_gw.set_tablemodel_config(self.mapzone_mng_dlg, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns

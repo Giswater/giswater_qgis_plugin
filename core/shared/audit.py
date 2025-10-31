@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 from qgis.PyQt.QtGui import QStandardItemModel
-from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea
+from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea, QHeaderView
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
@@ -54,7 +54,7 @@ class GwAudit:
         self._fill_manager_table(complet_list)
 
         self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=0)
+        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         # Connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))
@@ -87,7 +87,7 @@ class GwAudit:
             self.date.setMinimumDateTime(q_first_snapshot_date)
 
             self.date.setMaximumDateTime(today)
-        
+
         # Do not allow null dates
         for widget in self.dlg_audit_manager.findChildren(tools_gw.CustomQgsDateTimeEdit):
             widget.setAllowNull(False)
@@ -184,7 +184,7 @@ class GwAudit:
                 msg = "No results"
                 tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
                 return
-            
+
             for row, (key, new_value) in enumerate(new_data.items()):
                 old_value = str(old_data.get(key, ""))
                 new_value = str(new_value)
@@ -203,7 +203,7 @@ class GwAudit:
                         line_edit = QLineEdit(old_value)
                         line_edit.setEnabled(False)
                         layout.addWidget(line_edit, row + 1, 1)
-            
+
                     # Create line edit for new value
                     line_edit = QLineEdit(new_value)
                     line_edit.setEnabled(False)
@@ -278,9 +278,9 @@ def open(**kwargs):
 
 
 def open_date(**kwargs):
-    """ Open audit in selected date """    
+    """ Open audit in selected date """
 
-    class_obj = kwargs["class"]    
+    class_obj = kwargs["class"]
     query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' AND \"schema\" = '{lib_vars.schema_name}' AND feature_id = '{class_obj.feature_id}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)
 
@@ -290,8 +290,3 @@ def open_date(**kwargs):
             form.append({"logId": row[0]})
 
     class_obj.fill_dialog(form)
-
-
-
-
-

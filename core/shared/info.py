@@ -22,7 +22,7 @@ from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel, QCursor
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, \
-    QMenu, QToolButton, QTableWidget, QDialog
+    QMenu, QToolButton, QTableWidget, QDialog, QHeaderView
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
     QgsPointXY, QgsProject, QgsFeature, QgsGeometry, Qgis
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsCollapsibleGroupBox
@@ -2960,7 +2960,7 @@ class GwInfo(QObject):
                 continue
             widget = tools_gw.add_tableview_header(widget, field, headers)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=0)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
             widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
@@ -4781,7 +4781,7 @@ def _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id):
     model = QStandardItemModel()
     dlg_event_full.tbl_docs_x_event.setModel(model)
     dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-    dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+    dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
     # Get columns name and set headers of model with that
     columns_name = tools_db.get_columns_list('om_visit_event_photo')
     headers = []
