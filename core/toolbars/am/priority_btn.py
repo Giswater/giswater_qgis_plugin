@@ -13,7 +13,7 @@ import configparser
 import os
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtCore import QTimer, Qt
 from qgis.PyQt.QtWidgets import (
     QLabel,
     QMenu,

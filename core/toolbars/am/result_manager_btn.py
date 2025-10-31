@@ -12,6 +12,7 @@ from qgis.PyQt.QtWidgets import (
     QTableView,
 )
 from qgis.PyQt.QtSql import QSqlRelation, QSqlRelationalTableModel
+from qgis.PyQt.QtCore import Qt
 
 from .priority_btn import CalculatePriority
 from ...ui.ui_manager import GwPriorityManagerUi, GwStatusSelectorUi

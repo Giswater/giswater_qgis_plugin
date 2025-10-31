@@ -11,7 +11,7 @@ import subprocess
 import webbrowser
 
 from functools import partial
-from qgis.PyQt.QtCore import QDate, QRegularExpression
+from qgis.PyQt.QtCore import QDate, QRegularExpression, Qt
 from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox, QMenu
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsLayerTreeLayer, QgsVectorLayer
