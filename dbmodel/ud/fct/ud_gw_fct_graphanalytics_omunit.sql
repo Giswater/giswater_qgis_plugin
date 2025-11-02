@@ -276,8 +276,14 @@ BEGIN
         )
     SELECT 
         m.mapzone_id, 
-        i.node_id AS node_1,i.graph_delimiter AS graph_delimiter_1, 
-        o.node_id AS node_2,o.graph_delimiter AS graph_delimiter_2
+        i.node_id AS node_1,
+        CASE WHEN i.graph_delimiter = 'OMUNIT' THEN TRUE
+        ELSE FALSE 
+        END AS is_way_in, 
+        o.node_id AS node_2,
+        CASE WHEN o.graph_delimiter = 'OMUNIT' THEN TRUE
+        ELSE FALSE 
+        END AS is_way_out
     FROM mapzones m
     JOIN way_in i USING (mapzone_id)
     JOIN way_out o USING (mapzone_id)
@@ -320,8 +326,14 @@ BEGIN
         )
     SELECT 
         m.macromapzone_id, 
-        i.node_id AS node_1,i.graph_delimiter AS graph_delimiter_1, 
-        o.node_id AS node_2,o.graph_delimiter AS graph_delimiter_2
+        i.node_id AS node_1,
+        CASE WHEN i.graph_delimiter = 'OMUNIT' THEN TRUE
+        ELSE FALSE 
+        END AS is_way_in, 
+        o.node_id AS node_2,
+        CASE WHEN o.graph_delimiter = 'OMUNIT' THEN TRUE
+        ELSE FALSE 
+        END AS is_way_out
     FROM macromapzones m
     JOIN way_in i USING (macromapzone_id)
     JOIN way_out o USING (macromapzone_id)
