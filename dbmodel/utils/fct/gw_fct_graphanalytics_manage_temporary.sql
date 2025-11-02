@@ -170,9 +170,24 @@ BEGIN
                     agg_cost FLOAT8 NULL,
                     CONSTRAINT temp_pgr_drivingdistance_initoverflowpath_pkey PRIMARY KEY (seq)
                 );
-            CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_start_vid_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (start_vid);
-            CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_node_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (node);
-            CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_edge_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (edge);
+                CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_start_vid_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (start_vid);
+                CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_node_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (node);
+                CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_edge_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (edge);
+            END IF;
+            IF v_fct_name = 'OMUNIT' THEN
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_linegraph (
+                    seq INT8 NOT NULL,
+                    "source" INT8 NULL,
+                    "target" INT8 NULL,
+                    "cost" FLOAT8 NULL,
+                    reverse_cost FLOAT8 NULL,
+                    graph_delimiter VARCHAR(30) DEFAULT 'NONE',
+                    CONSTRAINT temp_pgr_linegraph_pkey PRIMARY KEY (seq)
+                );
+                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_source_idx ON temp_pgr_linegraph USING btree ("source");
+                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_target_idx ON temp_pgr_linegraph USING btree ("target");
+                ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
+                ALTER TABLE temp_pgr_node ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
             END IF;
         END IF;
 
@@ -413,6 +428,7 @@ BEGIN
                         a.sector_id,
                         a.dwfzone_id,
                         a.omzone_id,
+                        a.omunit_id,
                         a.fluid_type,
                         a.muni_id,
                         a.minsector_id,
@@ -453,6 +469,7 @@ BEGIN
                     node.sector_id,
                     node.dwfzone_id,
                     node.omzone_id,
+                    node.omunit_id,
                     node.fluid_type,
                     node.muni_id,
                     node.minsector_id,
@@ -503,6 +520,7 @@ BEGIN
                         connec.sector_id,
                         connec.dwfzone_id,
                         connec.omzone_id,
+                        connec.omunit_id,
                         connec.fluid_type,
                         connec.plot_code,
                         connec.muni_id,
@@ -554,6 +572,7 @@ BEGIN
                         gully.sector_id,
                         gully.dwfzone_id,
                         gully.omzone_id,
+                        gully.omunit_id,
                         gully.fluid_type,
                         gully.muni_id,
                         gully.minsector_id,
@@ -608,6 +627,7 @@ BEGIN
                         l.sector_id,
                         l.dwfzone_id,
                         l.omzone_id,
+                        --l.omunit_id,
                         l.fluid_type,
                         l.muni_id,
                         l.the_geom
@@ -660,6 +680,7 @@ BEGIN
                         l.sector_id,
                         l.dwfzone_id,
                         l.omzone_id,
+                        --l.omunit_id,
                         l.fluid_type,
                         l.muni_id,
                         l.the_geom
@@ -773,6 +794,7 @@ BEGIN
                     a.sector_id,
                     a.dwfzone_id,
                     a.omzone_id,
+                    a.omunit_id,
                     a.fluid_type,
                     a.muni_id,
                     a.minsector_id,
@@ -791,6 +813,7 @@ BEGIN
                     n.sector_id,
                     n.dwfzone_id,
                     n.omzone_id,
+                    n.omunit_id,
                     n.fluid_type,
                     n.muni_id,
                     n.minsector_id,
@@ -811,6 +834,7 @@ BEGIN
                     c.sector_id,
                     c.dwfzone_id,
                     c.omzone_id,
+                    c.omunit_id,
                     c.fluid_type,
                     c.plot_code,
                     c.muni_id,
@@ -830,6 +854,7 @@ BEGIN
                     g.sector_id,
                     g.dwfzone_id,
                     g.omzone_id,
+                    g.omunit_id,
                     g.fluid_type,
                     g.muni_id,
                     g.minsector_id,
@@ -850,6 +875,7 @@ BEGIN
                     l.sector_id,
                     l.dwfzone_id,
                     l.omzone_id,
+                    --l.omunit_id,
                     l.fluid_type,
                     l.muni_id,
                     l.the_geom
@@ -870,6 +896,7 @@ BEGIN
                     l.sector_id,
                     l.dwfzone_id,
                     l.omzone_id,
+                    --l.omunit_id,
                     l.fluid_type,
                     l.muni_id,
                     l.the_geom
@@ -974,6 +1001,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector_mincut_valve;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
+        DROP TABLE IF EXISTS temp_pgr_linegraph;
 
         DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
 
