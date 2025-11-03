@@ -30,7 +30,7 @@ SELECT columns_are(
         'nodetype_1', 'elevation1', 'depth1', 'staticpressure1', 'nodetype_2', 'elevation2', 'depth2', 'staticpressure2',
         'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
         'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
-        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid'
+        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid', 'uncertain'
     ],
     'Table arc should have the correct columns'
 );
@@ -136,6 +136,7 @@ SELECT col_type_is('arc', 'created_by', 'varchar(50)', 'Column created_by should
 SELECT col_type_is('arc', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
 SELECT col_type_is('arc', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('arc', 'uuid', 'uuid', 'Column uuid should be uuid');
+SELECT col_type_is('arc', 'uncertain', 'boolean', 'Column uncertain should be boolean');
 
 -- Check foreign keys
 SELECT has_fk('arc', 'Table arc should have foreign keys');
