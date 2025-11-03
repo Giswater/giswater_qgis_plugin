@@ -33,3 +33,7 @@ ADD CONSTRAINT chk_exec_order
 CHECK (
   exec_end >= exec_start
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"uncertain", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"uncertain", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"uncertain", "dataType":"boolean", "isUtils":"False"}}$$);
