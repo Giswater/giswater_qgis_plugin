@@ -880,6 +880,11 @@ class GwMincut:
         time_end_predict = self.dlg_mincut.cbx_hours_end_predict.time()
         forecast_end_predict = date_end_predict.toString('yyyy-MM-dd') + " " + time_end_predict.toString('HH:mm:ss')
 
+        if forecast_start_predict > forecast_end_predict:
+            message = "The start date must be before the end date"
+            tools_qgis.show_warning(message)
+            return
+
         # Get real date - start
         date_start_real = self.dlg_mincut.cbx_date_start.date()
         time_start_real = self.dlg_mincut.cbx_hours_start.time()
@@ -889,6 +894,11 @@ class GwMincut:
         date_end_real = self.dlg_mincut.cbx_date_end.date()
         time_end_real = self.dlg_mincut.cbx_hours_end.time()
         forecast_end_real = date_end_real.toString('yyyy-MM-dd') + " " + time_end_real.toString('HH:mm:ss')
+
+        if forecast_start_real > forecast_end_real:
+            message = "The start date real must be before the end date real"
+            tools_qgis.show_warning(message)
+            return
 
         # Check data
         received_day = self.dlg_mincut.cbx_recieved_day.date()
@@ -2633,9 +2643,6 @@ class GwMincut:
         self.form_has_changes = True
         self.dlg_mincut.btn_accept.setEnabled(False)
         self.dlg_mincut.btn_accept.setToolTip("You need to reexecute the mincut")
-
-        # Optional: change visual style to indicate pending changes
-        self.dlg_mincut.btn_accept.setStyleSheet("background-color: #ffcccc;")
 
     def _reset_form_has_changes(self):
         """Reset form has changes"""
