@@ -1751,6 +1751,7 @@ BEGIN
 
 				INSERT INTO om_waterbalance_dma_graph 
 				SELECT * FROM temp_pgr_om_waterbalance_dma_graph 
+				WHERE dma_id <> -1
 				ON CONFLICT (dma_id, node_id) DO NOTHING;
 
 			ELSIF v_mapzone_name = 'DWFZONE' THEN
