@@ -17,7 +17,7 @@ TO EXECUTE
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_omunit('{"data":{"parameters":{"commitChanges":true, "exploitation":"1,2", "updateFeature":"TRUE", "updateMapZone":2 ,"geomParamUpdate":4}}}');
 
---fid: 125,134
+--fid: 640
 
 */
 
@@ -33,7 +33,7 @@ DECLARE
 
     v_data JSON;
 
-    v_fid INTEGER = 134;
+    v_fid INTEGER = 640;
 
     v_version TEXT;
     v_srid INTEGER;

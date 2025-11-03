@@ -7,3 +7,6 @@ or (at your option) any later version.
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+INSERT INTO sys_fprocess (fid,fprocess_name,project_type,"source",isaudit,fprocess_type,active)
+VALUES (640,'Dynamic omunit analysis','ud','core',true,'Function process',true);
