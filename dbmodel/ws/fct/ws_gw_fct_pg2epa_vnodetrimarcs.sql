@@ -135,7 +135,57 @@ BEGIN
 	WHERE st_dwithin ( temp_t_arc.the_geom, geom_point, 0.01)
 	AND temp_t_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_t_arc.state > 0;
 
-	RAISE NOTICE 'vnodetrimarcs 6 - insert connec over arc';
+	RAISE NOTICE 'vnodetrimarcs 6 - update links connected to a NODE2ARC setting n2a node as node_2';
+	-- SELECT links connected to a node2arc arc
+	WITH geom_arc AS (
+	    SELECT
+	        l.link_id,
+	        t.arc_id AS arc_id_geom
+	    FROM temp_link l
+	    JOIN LATERAL (
+	        SELECT t2.arc_id
+	        FROM temp_t_arc t2
+	        WHERE t2.arc_type = 'NODE2ARC'
+	          AND t2.state > 0
+	          AND ST_DWithin(t2.the_geom, ST_EndPoint(l.the_geom), 0.001)
+	        LIMIT 1
+	    ) t ON TRUE
+	),
+	link_arc AS (
+	    SELECT link_id, exit_id AS arc_id_link, feature_id
+	    FROM temp_link
+	)
+	-- insert data for later update
+	INSERT INTO t_t_go2epa (arc_id, vnode_id, locate, elevation)
+	SELECT DISTINCT
+	    CONCAT('CO', c.connec_id, 'NODE2ARC') AS arc_id,
+	    n.node_id AS vnode_id,
+	    NULL::double precision AS locate,
+	    NULL::double precision AS elevation
+	FROM link_arc la
+	JOIN geom_arc ga ON ga.link_id = la.link_id
+	JOIN temp_t_arc a1 ON a1.arc_id = la.arc_id_link
+	JOIN temp_t_arc a2 ON a2.arc_id = ga.arc_id_geom
+	JOIN temp_t_node n ON n.node_id IN (a1.node_1, a1.node_2)
+	                   AND n.node_id IN (a2.node_1, a2.node_2)
+	JOIN connec c ON c.connec_id::TEXT = la.feature_id;
+
+	-- update links setting n2a node as node_2 and update geometry
+	UPDATE temp_t_arc arc
+	SET 
+	    the_geom = ST_MakeLine(ST_StartPoint(arc.the_geom), t.node_geom),
+	    node_2 = t.vnode_id
+	FROM (
+	    SELECT t.arc_id, t.vnode_id, n.the_geom AS node_geom
+	    FROM t_t_go2epa t
+	    JOIN temp_t_node n ON n.node_id = t.vnode_id
+	) t
+	WHERE concat(arc.arc_id, 'NODE2ARC') = t.arc_id;
+	
+	-- delete used data
+	DELETE from t_t_go2epa where arc_id ilike '%NODE2ARC';
+
+	RAISE NOTICE 'vnodetrimarcs 7 - insert connec over arc';
 	INSERT INTO t_t_go2epa (arc_id, vnode_id, locate, elevation)
 	SELECT distinct on (node_id)
 	temp_t_arc.arc_id,
@@ -150,7 +200,7 @@ BEGIN
 	AND vnode.state > 0 AND temp_t_arc.arc_type NOT IN ('NODE2ARC', 'LINK');
 
 
-	RAISE NOTICE 'vnodetrimarcs 7 - insert previous data into data on temp_table';
+	RAISE NOTICE 'vnodetrimarcs 8 - insert previous data into data on temp_table';
 	INSERT INTO temp_t_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc.arc_id::text, vnode_id, locate,
 	case when t.elevation is null then (n1.top_elev - locate*(n1.top_elev-n2.top_elev))::numeric(12,3) ELSE t.elevation END as elevation,
@@ -164,7 +214,7 @@ BEGIN
 	DROP TABLE t_t_go2epa;
 
 
-	RAISE NOTICE 'vnodetrimarcs 8 - Delete connec over arcs ';
+	RAISE NOTICE 'vnodetrimarcs 9 - Delete connec over arcs ';
 	UPDATE temp_t_node SET epa_type = 'TODELETE' FROM arc JOIN connec c USING (arc_id)
 	WHERE node_type = 'CONNEC' AND st_dwithin ( arc.the_geom, temp_t_node.the_geom, 0.01) AND c.connec_id::text = temp_t_node.node_id;
 	DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
@@ -189,7 +239,7 @@ BEGIN
 		WHERE vnode_id like 'VN%' AND a.arc_type !='LINK';
 
 
-	RAISE NOTICE 'vnodetrimarcs 9 - new nodes from connecs over arc on temp_t_node table ';
+	RAISE NOTICE 'vnodetrimarcs 10 - new nodes from connecs over arc on temp_t_node table ';
 	INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam, dma_id, presszone_id, dqa_id, minsector_id)
 	SELECT
 		vnode_id as node_id,
@@ -209,7 +259,7 @@ BEGIN
 		WHERE vnode_id like 'VC%' AND a.arc_type !='LINK';
 
 
-	RAISE NOTICE 'vnodetrimarcs 10 - update temp_table to work with next process';
+	RAISE NOTICE 'vnodetrimarcs 11 - update temp_table to work with next process';
 	UPDATE temp_t_go2epa SET idmin = c.idmin FROM
 	(SELECT min(id) as idmin, arc_id FROM (
 		SELECT  a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
@@ -221,7 +271,7 @@ BEGIN
 		WHERE temp_t_go2epa.arc_id = c.arc_id;
 
 
-	RAISE NOTICE 'vnodetrimarcs 11 - new arcs on temp_t_arc table';
+	RAISE NOTICE 'vnodetrimarcs 12 - new arcs on temp_t_arc table';
 	INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status,
 	the_geom, flw_code, minorloss, addparam, arcparent, dma_id, presszone_id, dqa_id, minsector_id)
 
@@ -258,7 +308,7 @@ BEGIN
 		ORDER BY temp_t_arc.arc_id, a.id;
 
 
-	RAISE NOTICE 'vnodetrimarcs 12 - delete only trimmed arc on temp_t_arc table';
+	RAISE NOTICE 'vnodetrimarcs 13 - delete only trimmed arc on temp_t_arc table';
 	-- step 1
 	UPDATE temp_t_arc SET epa_type ='TODELETE'
 		FROM (SELECT DISTINCT arcparent AS arc_id FROM temp_t_arc WHERE arcparent !='') a
