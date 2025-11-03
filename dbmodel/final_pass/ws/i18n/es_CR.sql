@@ -221,6 +221,7 @@ FROM (
     ('om_mincut_analysis_dinletsector', 'Mincudo para la entrada dinámica anl:', 'Utilice mincut para analizar el sector de entrada dinámico a pesar del flujo de trabajo estándar de mincut'),
     ('om_mincut_analysis_dminsector', 'Mincut para minsector anl:', 'Utilizar mincut para analizar minsectores a pesar del flujo de trabajo estándar de mincut'),
     ('om_mincut_analysis_pipehazard', 'Mincut por peligro de tubería anl:', 'Utilice mincut para analizar pipehazard a pesar del flujo de trabajo estándar de mincut'),
+    ('plan_psector_auto_insert_connec', 'Inserción de acometida automática:', 'Inserción automática de acometidas conectadas al insertar un arco'),
     ('edit_state_vdefault', 'Estado:', 'Valor por defecto del parámetro de estado'),
     ('inp_energy_demand_charge', 'Cargo por demanda:', 'Cargo de energía adicional por consumo máximo de kilovatios.'),
     ('inp_energy_price', 'Precio de la energía por Kwh:', 'Precio de la energía por Kwh'),

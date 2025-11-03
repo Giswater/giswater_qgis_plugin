@@ -20,3 +20,6 @@ UPDATE config_toolbox SET inputparams='[
 {"label": "Commit changes:", "value": null, "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 11},
 {"label": "Mapzones from zero:", "value": null, "tooltip": "If true, mapzones are calculated automatically from zero", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "fromZero", "widgettype": "check", "layoutorder": 12}
 ]'::json WHERE id=3256;
+
+INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,layoutname,iseditable,"source")
+VALUES ('plan_psector_auto_insert_connec','config','Automatic insertion of connected connecs when inserting an arc','role_plan','Automatic connec insertion:',true,12,'utils',false,false,'boolean','check',false,'lyt_masterplan',true,'core');

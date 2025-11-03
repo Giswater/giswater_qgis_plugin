@@ -114,6 +114,7 @@ FROM (
     ('feat_wjoin_vdefault', 'Catálogo predeterminado para wjoin:', 'Catálogo predeterminado de valores para wjoin cat_feature'),
     ('feat_wwtp_vdefault', 'Catálogo predeterminado para wwtp:', 'Catálogo predeterminado de valores para wwtp cat_feature'),
     ('feat_x_vdefault', 'Catálogo predeterminado para x:', 'Catálogo predeterminado de valores para x cat_feature'),
+    ('plan_psector_auto_insert_connec', 'Inserción de acometida/sumidero automática:', 'Inserción automática de acometidas/sumideros conectadas al insertar un arco'),
     ('utils_checkproject_qgislayer', 'Mostrar registro de capa para advertencias al verificar la base de datos:', 'Mostrar registro de capa temporal cuando haya advertencias en la base de datos de verificación para el proyecto de carga'),
     ('edit_state_vdefault', 'Estado:', 'Valor del parámetro de estado'),
     ('edit_enddate_vdefault', 'Fecha final:', 'Valor de la fecha de finalización, que es la fecha en que finalizará la simulación'),
