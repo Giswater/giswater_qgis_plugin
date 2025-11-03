@@ -278,7 +278,7 @@ BEGIN
     END IF;
     
     -- set values of node
-    UPDATE PARENT_SCHEMA.node SET sector_id = rec_aux1.sector_id, omzone_id = rec_aux1.omzone_id WHERE node_id = v_node_id;
+    UPDATE PARENT_SCHEMA.node SET sector_id = rec_aux1.sector_id, omzone_id = rec_aux1.omzone_id, muni_id = rec_aux1.muni_id WHERE node_id = v_node_id;
 
     IF v_project_type ='WS' THEN
         UPDATE PARENT_SCHEMA.node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id, dma_id = rec_aux1.dma_id,

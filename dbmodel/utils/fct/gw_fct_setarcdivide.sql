@@ -1103,8 +1103,8 @@ BEGIN
 						"data":{"message":"3044", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
 
-					-- set values of node
-					UPDATE node SET sector_id = rec_aux1.sector_id, omzone_id = rec_aux1.omzone_id WHERE node_id = v_node_id;
+				-- set values of node
+				UPDATE node SET sector_id = rec_aux1.sector_id, omzone_id = rec_aux1.omzone_id, muni_id = rec_aux1.muni_id WHERE node_id = v_node_id;
 
 					IF v_project_type ='WS' THEN
 
