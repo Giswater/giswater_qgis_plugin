@@ -21,3 +21,15 @@ ALTER TABLE plan_netscenario_presszone RENAME COLUMN expl_id2 TO expl_id;
 ALTER TABLE plan_netscenario_presszone ALTER COLUMN expl_id TYPE _int4 USING ARRAY[expl_id::int4];
 ALTER TABLE plan_netscenario_presszone ADD muni_id _int4 NULL;
 ALTER TABLE plan_netscenario_presszone ADD sector_id _int4 NULL;
+
+ALTER TABLE om_mincut
+ADD CONSTRAINT chk_forecast_order
+CHECK (
+  forecast_end >= forecast_start
+);
+
+ALTER TABLE om_mincut
+ADD CONSTRAINT chk_exec_order
+CHECK (
+  exec_end >= exec_start
+);
