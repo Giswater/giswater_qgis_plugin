@@ -930,6 +930,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -963,6 +964,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -996,6 +998,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1029,6 +1032,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1062,6 +1066,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1095,6 +1100,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1134,6 +1140,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
             if global_vars.project_type != 'ud':

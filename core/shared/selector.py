@@ -411,6 +411,7 @@ class GwSelector:
         level = json_result['body']['message']['level']
         if level == 0:
             message = json_result['body']['message']['text']
+            level = Qgis.MessageLevel(level)
             tools_qgis.show_message(message, level)
 
         # Apply zoom only to the selected tabs

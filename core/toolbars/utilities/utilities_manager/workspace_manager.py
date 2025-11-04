@@ -11,6 +11,7 @@ from functools import partial
 from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegularExpression, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
+from qgis.core import Qgis
 
 from ...dialog import GwAction
 from ....ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi
@@ -257,7 +258,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         if result and result.get('message') and result['message'].get('text'):
             msg = result["message"].get('text')
-            tools_qgis.show_message(msg, result["message"].get('level'), dialog=self.dlg_workspace_manager)
+            tools_qgis.show_message(msg, level = Qgis.MessageLevel(result["message"].get('level')), dialog=self.dlg_workspace_manager)
 
         if result and result['status'] == "Accepted":
             # Set labels
@@ -318,7 +319,7 @@ class GwWorkspaceManagerButton(GwAction):
             message = result.get('message')
             if message:
                 msg = message['text']
-                tools_qgis.show_message(msg, message['level'], dialog=self.dlg_workspace_manager)
+                tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
             self._fill_tbl(self.filter_name.text())
 
     def _update_workspace(self):
@@ -361,7 +362,7 @@ class GwWorkspaceManagerButton(GwAction):
                 message = result.get('message')
                 if message:
                     msg = message['text']
-                    tools_qgis.show_message(msg, message['level'], dialog=self.dlg_workspace_manager)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
 
                 tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
                 self._fill_tbl(self.filter_name.text())
@@ -402,7 +403,7 @@ class GwWorkspaceManagerButton(GwAction):
                 message = result.get('message')
                 if message:
                     msg = message['text']
-                    tools_qgis.show_message(msg, message['level'], dialog=self.dlg_workspace_manager)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
 
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)

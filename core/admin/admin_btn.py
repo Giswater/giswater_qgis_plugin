@@ -3384,7 +3384,7 @@ class GwAdminButton:
             msg = message.get('text')
             if msg is None:
                 msg = "Key on returned json from ddbb is missed"
-
+            level = Qgis.MessageLevel(level)
             tools_qgis.show_message(msg, level, parameter=parameter, title=title)
 
         data = json_result['body'].get('data')

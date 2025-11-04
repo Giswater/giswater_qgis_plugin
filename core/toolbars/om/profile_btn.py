@@ -16,7 +16,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
-from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
+from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression, Qgis
 from qgis.gui import QgsMapToolEmitPoint
 
 from ..dialog import GwAction
@@ -200,6 +200,7 @@ class GwProfileButton(GwAction):
         if self.profile_json['message']:
             level = int(self.profile_json['message']['level'])
             msg = self.profile_json['message']['text']
+            level = Qgis.MessageLevel(level)
             tools_qgis.show_message(msg, level)
             if self.profile_json['message']['level'] != 3:
                 return
@@ -453,6 +454,7 @@ class GwProfileButton(GwAction):
                         if result['message']:
                             level = int(result['message']['level'])
                             msg = result['message']['text']
+                            level = Qgis.MessageLevel(level)
                             tools_qgis.show_message(msg, level)
                             if result['message']['level'] != 3:
                                 # If error reset profile

@@ -2012,7 +2012,7 @@ class GwMincut:
                     msg = "Mincut done successfully"
                     tools_qgis.show_message(msg, Qgis.Success)
                 else:
-                    tools_qgis.show_message(msg.get('text'), msg.get('level'))
+                    tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
@@ -2137,7 +2137,7 @@ class GwMincut:
                     msg = "Mincut done successfully"
                     tools_qgis.show_message(msg, Qgis.Success)
                 else:
-                    tools_qgis.show_message(msg.get('text'), msg.get('level'))
+                    tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
@@ -2259,6 +2259,7 @@ class GwMincut:
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
         # Disconnect snapping and related signals
@@ -2592,6 +2593,7 @@ class GwMincut:
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
     def _calculate_elapsed_time(self, dialog):

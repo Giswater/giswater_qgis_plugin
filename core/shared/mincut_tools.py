@@ -55,6 +55,7 @@ class GwMincutTools:
             if 'text' in json_result['message']:
                 msg = json_result['message']['text']
                 msg_params = None
+            level = Qgis.MessageLevel(level)
             tools_qgis.show_message(msg, level, msg_params=msg_params)
             return False, None
 

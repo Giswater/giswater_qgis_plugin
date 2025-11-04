@@ -214,6 +214,7 @@ class GwInfo(QObject):
                 if 'text' in json_result['message']:
                     msg = json_result['message']['text']
                     msg_params = None
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, msg_params=msg_params)
                 return False, None
 
@@ -1891,6 +1892,7 @@ class GwInfo(QObject):
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 2
+                msg_level = Qgis.MessageLevel(msg_level)
                 tools_qgis.show_message(msg, message_level=msg_level, dialog=dialog)
                 return False
 
@@ -1901,6 +1903,7 @@ class GwInfo(QObject):
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 1
+                msg_level = Qgis.MessageLevel(msg_level)
                 tools_qgis.show_message(msg, message_level=msg_level, dialog=dialog)
                 self._reload_fields(dialog, json_result, p_widget)
                 if epa_type_changed:
@@ -2252,6 +2255,7 @@ class GwInfo(QObject):
 
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(field['message']['text'], level)
 
     def _enabled_accept(self, dialog):
