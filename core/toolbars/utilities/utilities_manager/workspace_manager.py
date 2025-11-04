@@ -258,7 +258,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         if result and result.get('message') and result['message'].get('text'):
             msg = result["message"].get('text')
-            tools_qgis.show_message(msg, level = Qgis.MessageLevel(result["message"].get('level')), dialog=self.dlg_workspace_manager)
+            tools_qgis.show_message(msg, Qgis.MessageLevel(result["message"].get('level')), dialog=self.dlg_workspace_manager)
 
         if result and result['status'] == "Accepted":
             # Set labels
