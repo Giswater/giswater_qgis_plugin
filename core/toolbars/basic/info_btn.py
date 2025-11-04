@@ -139,18 +139,54 @@ class GwInfoButton(GwMaptool):
                     label = str(feature['label'])
                 else:
                     label = str(feature['id'])
-                action = QAction(label, None)
-                action.setProperty('feature_id', str(feature['id']))
-                sub_menu.addAction(action)
-                action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
-                action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                
+                # If plan_psector_data exists, create a submenu for this feature
+                if 'plan_psector_data' in feature and feature['plan_psector_data'] is not None:
+                    psector_menu = sub_menu.addMenu(label)
+                    # Add main feature action in submenu
+                    action = QAction(label, None)
+                    action.setProperty('feature_id', str(feature['id']))
+                    action.setProperty('layer_name', layer_name.name())
+                    psector_menu.addAction(action)
+                    action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
+                    action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                    
+                    # Add separator
+                    psector_menu.addSeparator()
+                    
+                    # Add psector info actions (informational only)
+                    psector_data = feature['plan_psector_data']
+                    if 'psector_id' in psector_data:
+                        info_action = psector_menu.addAction(f"{tools_qt.tr('Psector ID')}: {psector_data['psector_id']}")
+                        info_action.setEnabled(False)
+                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                    if 'name' in psector_data:
+                        info_action = psector_menu.addAction(f"{tools_qt.tr('Name')}: {psector_data['name']}")
+                        info_action.setEnabled(False)
+                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                    if 'insert_user' in psector_data:
+                        info_action = psector_menu.addAction(f"{tools_qt.tr('User')}: {psector_data['insert_user']}")
+                        info_action.setEnabled(False)
+                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                    if 'insert_tstamp' in psector_data:
+                        info_action = psector_menu.addAction(f"{tools_qt.tr('Date')}: {psector_data['insert_tstamp']}")
+                        info_action.setEnabled(False)
+                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                else:
+                    # No plan_psector_data, add action directly
+                    action = QAction(label, None)
+                    action.setProperty('feature_id', str(feature['id']))
+                    action.setProperty('layer_name', layer_name.name())
+                    sub_menu.addAction(action)
+                    action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
+                    action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
         # Identify all
         cont = 0
         for layer in json_result['body']['data']['layersNames']:
             cont += len(layer['ids'])
-        action = QAction(f'Identify all ({cont})', None)
+        action = QAction(f'{tools_qt.tr('Identify all')} ({cont})', None)
         action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
@@ -278,8 +314,13 @@ class GwInfoButton(GwMaptool):
         """ Set active selected layer """
 
         tools_gw.reset_rubberband(self.rubber_band)
-        parent_menu = action.associatedWidgets()[0]
-        layer = tools_qgis.get_layer_by_layername(parent_menu.title())
+        # Get layer name from action property (for nested menus) or from parent menu title
+        layer_name_str = action.property('layer_name')
+        if layer_name_str:
+            layer = tools_qgis.get_layer_by_layername(layer_name_str)
+        else:
+            parent_menu = action.associatedWidgets()[0]
+            layer = tools_qgis.get_layer_by_layername(parent_menu.title())
         if layer:
             layer_source = tools_qgis.get_layer_source(layer)
             self.iface.setActiveLayer(layer)

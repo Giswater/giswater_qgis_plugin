@@ -1634,6 +1634,10 @@
 			<translation>Datos recuperados y visualizados correctamente.</translation>
 		</message>
 		<message>
+			<source>Date</source>
+			<translation>Fecha</translation>
+		</message>
+		<message>
 			<source>Date from:</source>
 			<translation>Fecha de:</translation>
 		</message>
@@ -2846,6 +2850,10 @@
 			<translation>Id ya seleccionado</translation>
 		</message>
 		<message>
+			<source>Identify all</source>
+			<translation>Identificar todo</translation>
+		</message>
+		<message>
 			<source>Identifying all nodes that lie outside the polygon...</source>
 			<translation>Identificar todos los nodos que se encuentran fuera del polígono...</translation>
 		</message>
@@ -3400,6 +3408,10 @@
 		<message>
 			<source>\n</source>
 			<translation>\n</translation>
+		</message>
+		<message>
+			<source>Name</source>
+			<translation>Nombre</translation>
 		</message>
 		<message>
 			<source>Name, description and code are required fields</source>
@@ -4188,6 +4200,10 @@
 		<message>
 			<source>Psector features loaded successfully on the map.</source>
 			<translation>Las características del psector se han cargado correctamente en el mapa.</translation>
+		</message>
+		<message>
+			<source>Psector ID</source>
+			<translation>Psector ID</translation>
 		</message>
 		<message>
 			<source>Psector ID not found</source>
@@ -5704,6 +5720,10 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>    url = {https://geoffboeing.com/publications/osmnx-paper/},</source>
 			<translation>    url = {https://geoffboeing.com/publications/osmnx-paper/},</translation>
+		</message>
+		<message>
+			<source>User</source>
+			<translation>Usuario</translation>
 		</message>
 		<message>
 			<source>User '{0}' was created, but failed to grant roles ('{1}', 'role_basic').</source>
