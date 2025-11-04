@@ -34,3 +34,5 @@ UPDATE sys_param_user SET feature_field_id = 'pavcat_id' WHERE id = 'edit_paveme
 UPDATE config_form_fields
 SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
 WHERE formname='ve_link' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+
+UPDATE sys_param_user SET label = 'Disable forced style:' WHERE id = 'plan_psector_disable_forced_style';

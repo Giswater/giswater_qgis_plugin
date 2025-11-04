@@ -86,6 +86,7 @@ FROM (
     ('om_visit_startdate_vdefault', 'Fecha de inicio de la visita:', 'Valor predeterminado de la fecha de inicio de la visita'),
     ('om_visit_status_vdefault', 'Estado de la visita:', 'Valor predeterminado del estado de la visita'),
     ('plan_psector_current', 'Psector (Alternativa):', 'Valor por defecto del parámetro psector'),
+    ('plan_psector_disable_forced_style', 'Deshabilitar estilo forzado', 'Variable to disable forced style changes to apply GwPlan'),
     ('plan_psector_force_delete', 'Forzar la eliminación prevista:', 'Permitir la eliminación automática de características planificadas cuando se elimina un psector y esta característica no está presente en otro psector.'),
     ('plan_psector_gexpenses_vdefault', 'Gastos del sector:', 'Valor por defecto del parámetro de gastos generales del psector'),
     ('plan_psector_measurement_vdefault', 'Medida de psectors:', 'Valor predeterminado del parámetro de medición del psector'),
