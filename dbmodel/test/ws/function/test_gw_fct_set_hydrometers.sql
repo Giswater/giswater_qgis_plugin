@@ -11,14 +11,14 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(17);
+SELECT plan(16);
 
 -- Test 1: Insert single hydrometer
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"INSERT", "hydrometers":[
-        {"code":"TEST_H001", "hydro_number":"12345", "connec_id":3001, "link":"http://test.com", 
-         "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1, 
+        {"code":"TEST_H001", "hydro_number":"12345", "connec_id":3001, "link":"http://test.com",
+         "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1,
          "start_date":"2025-10-30"}
     ]}}$$)::JSON)->>'status',
     'Accepted',
@@ -48,7 +48,7 @@ SELECT is(
 
 -- Test 5: Insert multiple hydrometers
 SELECT is(
-    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"}, 
+    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"INSERT", "hydrometers":[
         {"code":"TEST_H002", "hydro_number":"12346", "connec_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
         {"code":"TEST_H003", "hydro_number":"12347", "connec_id":3003, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
@@ -66,7 +66,7 @@ SELECT is(
 
 -- Test 7: Update single hydrometer
 SELECT is(
-    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"}, 
+    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"UPDATE", "hydrometers":[
         {"code":"TEST_H001", "hydro_number":"12345-UPDATED", "state_id":2}
     ]}}$$)::JSON)->>'status',
@@ -90,7 +90,7 @@ SELECT is(
 
 -- Test 10: Update multiple hydrometers
 SELECT is(
-    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"}, 
+    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"UPDATE", "hydrometers":[
         {"code":"TEST_H002", "state_id":2},
         {"code":"TEST_H003", "state_id":3}
@@ -101,7 +101,7 @@ SELECT is(
 
 -- Test 11: Delete single hydrometer
 SELECT is(
-    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"}, 
+    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"DELETE", "hydrometers":[
         {"code":"TEST_H001"}
     ]}}$$)::JSON)->>'status',
@@ -118,7 +118,7 @@ SELECT is(
 
 -- Test 13: Delete multiple hydrometers
 SELECT is(
-    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"}, 
+    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"DELETE", "hydrometers":[
         {"code":"TEST_H002"},
         {"code":"TEST_H003"}
@@ -133,9 +133,9 @@ INSERT INTO ext_rtc_hydrometer (id, code, hydro_number, state_id, expl_id)
 VALUES ('TEST_H010', 'TEST_H010', '10001', 1, 1),
        ('TEST_H011', 'TEST_H011', '10002', 1, 1);
 
--- Test 15: Execute REPLACE
+-- Execute REPLACE
 SELECT is(
-    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"}, 
+    (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"REPLACE", "hydrometers":[
         {"code":"TEST_H020", "hydro_number":"20001", "connec_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
         {"code":"TEST_H021", "hydro_number":"20002", "connec_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
@@ -144,14 +144,14 @@ SELECT is(
     'Test REPLACE action'
 );
 
--- Test 16: Verify old hydrometers were deleted
+-- Test 15: Verify old hydrometers were deleted
 SELECT is(
     (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H010', 'TEST_H011')),
     0,
     'Verify old hydrometers were deleted by REPLACE'
 );
 
--- Test 17: Verify new hydrometers were inserted
+-- Test 16: Verify new hydrometers were inserted
 SELECT is(
     (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H020', 'TEST_H021')),
     2,
