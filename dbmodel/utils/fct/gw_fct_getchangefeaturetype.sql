@@ -171,7 +171,7 @@ BEGIN
         IF (aux_json->>'columnname') = 'location_type' THEN
             SELECT array_agg(location_type ORDER BY location_type NULLS FIRST) INTO v_locations
             FROM man_type_location
-            WHERE lower(feature_type) = v_feature_type
+            WHERE lower(v_feature_type) = ANY (SELECT lower(f) FROM unnest(feature_type) as f)
                 AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
                 AND (active IS TRUE OR active IS NULL);
 
@@ -189,7 +189,7 @@ BEGIN
         IF (aux_json->>'columnname') = 'category_type' THEN
             SELECT array_agg(category_type ORDER BY category_type NULLS FIRST) INTO v_categories
             FROM man_type_category
-            WHERE lower(feature_type) = v_feature_type
+            WHERE lower(v_feature_type) = ANY (SELECT lower(f) FROM unnest(feature_type) as f)
                 AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
                 AND (active IS TRUE OR active IS NULL);
 
@@ -206,8 +206,7 @@ BEGIN
         IF (aux_json->>'columnname') = 'function_type' THEN
             SELECT array_agg(function_type ORDER BY function_type NULLS FIRST) INTO v_functions
             FROM man_type_function
-            WHERE lower(feature_type) = v_feature_type
-                AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
+            WHERE lower(v_feature_type) = ANY (SELECT lower(f) FROM unnest(feature_type) as f)                AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
                 AND (active IS TRUE OR active IS NULL);
 
             -- Enable null value

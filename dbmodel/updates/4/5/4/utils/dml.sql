@@ -36,3 +36,10 @@ SET dv_querytext='SELECT location_type as id, location_type as idval FROM man_ty
 WHERE formname='ve_link' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
 
 UPDATE sys_param_user SET label = 'Disable forced style:' WHERE id = 'plan_psector_disable_forced_style';
+
+UPDATE config_form_fields SET dv_querytext='SELECT category_type as id, category_type AS idval FROM man_type_category WHERE category_type IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='category_type' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT function_type as id, function_type AS idval FROM man_type_function WHERE function_type IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='function_type' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT location_type as id, location_type AS idval FROM man_type_location WHERE location_type IS NOT NULL'
+WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='location_type' AND tabname='tab_none';
