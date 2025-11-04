@@ -186,7 +186,7 @@ class GwInfoButton(GwMaptool):
         cont = 0
         for layer in json_result['body']['data']['layersNames']:
             cont += len(layer['ids'])
-        action = QAction(f'{tools_qt.tr('Identify all')} ({cont})', None)
+        action = QAction(f"{tools_qt.tr('Identify all')} ({cont})", None)
         action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
