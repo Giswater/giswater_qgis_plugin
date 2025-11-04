@@ -8,10 +8,7 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE config_form_fields
-SET dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE ((featurecat_id is null AND ''LINK''=ANY(feature_type)) ) AND active IS TRUE'
-WHERE formname='ve_link' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
-
 DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector_connec ON ve_plan_psector_x_connec;
+DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector_gully ON ve_plan_psector_x_gully;
 DROP FUNCTION IF EXISTS gw_trg_edit_plan_psector_x_connect();
 DELETE FROM sys_function WHERE id = 3174;
