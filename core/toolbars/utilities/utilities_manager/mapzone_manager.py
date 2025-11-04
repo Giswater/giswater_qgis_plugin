@@ -233,7 +233,7 @@ class GwMapzoneManager:
             widget.setColumnHidden(geom_col_idx, True)
 
         # Sort the table
-        model.sort(0, 0)
+        model.sort(0, Qt.SortOrder.AscendingOrder)
 
     def _filter_active(self, dialog, active):
         """ Filters manager table by active """

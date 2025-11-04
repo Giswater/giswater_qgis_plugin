@@ -271,7 +271,7 @@ class GwNonVisual:
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
-        model.sort(1, 0)
+        model.sort(1, Qt.SortOrder.AscendingOrder)
 
     def _filter_table(self, dialog, active):
         """ Filters manager table by active """

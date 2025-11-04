@@ -835,7 +835,7 @@ class GwDscenarioManagerButton(GwAction):
             widget.setColumnHidden(geom_col_idx, True)
 
         # Sort the table by feature id
-        model.sort(1, 0)
+        model.sort(1, Qt.SortOrder.AscendingOrder)
 
         # Clear txt_feature_id
         self.dlg_dscenario.txt_feature_id.setText('')
