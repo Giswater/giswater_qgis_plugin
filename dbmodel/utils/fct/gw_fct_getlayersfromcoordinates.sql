@@ -75,6 +75,7 @@ v_closed_valve_netscenario bool;
 v_netscenario_id int;
 v_valve_value_netscenario bool;
 v_valve_epa_type text;
+v_feature_type text;
 
 
 BEGIN
@@ -205,14 +206,24 @@ BEGIN
 
 				--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
 				IF v_parenttype IS NOT NULL and v_parenttype != 'link' THEN
+					v_feature_type := substring(v_layer from 4 for length(v_layer) - 1);
 					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-					SELECT '||quote_ident(v_idname)||' AS id, CONCAT('||v_idname||','' : '','||v_parenttype||'_type) AS label, 
-					'||quote_ident(v_the_geom)||' as the_geom, 
-					(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
-					FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
-					ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
-					INTO v_ids
-					USING v_point, v_sensibility;
+						SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
+						(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry),
+						(
+					        SELECT row_to_json(psector)
+					        FROM (
+					        	SELECT px.psector_id, p.name, px.insert_user, px.insert_tstamp
+					        	FROM plan_psector_x_'||v_feature_type||' AS px
+					        	JOIN plan_psector p ON p.psector_id = px.psector_id
+					        	WHERE px.'||quote_ident(v_idname)||' = '||quote_ident(v_layer)||'.'||quote_ident(v_idname)||'
+									AND px.state = 1
+					        ) AS psector
+					    ) AS plan_psector_data
+						FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+						ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
+						INTO v_ids
+						USING v_point, v_sensibility;
 
                     -- Get closest valve if there is one
                     IF v_project_type = 'WS' AND v_ids IS NOT NULL THEN
