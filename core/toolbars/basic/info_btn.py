@@ -155,23 +155,31 @@ class GwInfoButton(GwMaptool):
                     psector_menu.addSeparator()
                     
                     # Add psector info actions (informational only)
+                    # Handle both single object and array of psector_data
                     psector_data = feature['plan_psector_data']
-                    if 'psector_id' in psector_data:
-                        info_action = psector_menu.addAction(f"{tools_qt.tr('Psector ID')}: {psector_data['psector_id']}")
-                        info_action.setEnabled(False)
-                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
-                    if 'name' in psector_data:
-                        info_action = psector_menu.addAction(f"{tools_qt.tr('Name')}: {psector_data['name']}")
-                        info_action.setEnabled(False)
-                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
-                    if 'insert_user' in psector_data:
-                        info_action = psector_menu.addAction(f"{tools_qt.tr('User')}: {psector_data['insert_user']}")
-                        info_action.setEnabled(False)
-                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
-                    if 'insert_tstamp' in psector_data:
-                        info_action = psector_menu.addAction(f"{tools_qt.tr('Date')}: {psector_data['insert_tstamp']}")
-                        info_action.setEnabled(False)
-                        info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                    psector_list = psector_data if isinstance(psector_data, list) else [psector_data]
+                    
+                    for idx, psector_item in enumerate(psector_list):
+                        # Add separator between multiple psectors (except before the first one)
+                        if idx > 0:
+                            psector_menu.addSeparator()
+                        
+                        if 'psector_id' in psector_item:
+                            info_action = psector_menu.addAction(f"{tools_qt.tr('Psector ID')}: {psector_item['psector_id']}")
+                            info_action.setEnabled(False)
+                            info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                        if 'name' in psector_item:
+                            info_action = psector_menu.addAction(f"{tools_qt.tr('Name')}: {psector_item['name']}")
+                            info_action.setEnabled(False)
+                            info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                        if 'insert_user' in psector_item:
+                            info_action = psector_menu.addAction(f"{tools_qt.tr('User')}: {psector_item['insert_user']}")
+                            info_action.setEnabled(False)
+                            info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                        if 'insert_tstamp' in psector_item:
+                            info_action = psector_menu.addAction(f"{tools_qt.tr('Date')}: {psector_item['insert_tstamp']}")
+                            info_action.setEnabled(False)
+                            info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
                 else:
                     # No plan_psector_data, add action directly
                     action = QAction(label, None)
