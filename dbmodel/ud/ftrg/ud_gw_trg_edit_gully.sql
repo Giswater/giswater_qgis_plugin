@@ -158,7 +158,7 @@ BEGIN
 		ELSE
 			IF (SELECT true from cat_gully where id=NEW.gullycat_id) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3282", "function":"1206","parameters":{"catalog_value":"'||NEW.gullycat_id||'"}}})$$);';
+				"data":{"message":"3282", "function":"1206","parameters":{"catalog_value":"'||NEW.gullycat_id||'"}}}$$);';
 			END IF;
 		END IF;
 

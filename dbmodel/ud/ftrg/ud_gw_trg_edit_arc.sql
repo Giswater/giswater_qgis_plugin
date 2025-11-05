@@ -126,7 +126,7 @@ BEGIN
 		ELSE
 			IF (SELECT true from cat_arc where id=NEW.arccat_id) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3282", "function":"1202","parameters":{"catalog_value":"'||NEW.arccat_id||'"}}})$$);';
+				"data":{"message":"3282", "function":"1202","parameters":{"catalog_value":"'||NEW.arccat_id||'"}}}$$);';
 			END IF;
 		END IF;
 

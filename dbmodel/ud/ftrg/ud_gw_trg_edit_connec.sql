@@ -132,7 +132,7 @@ BEGIN
 		ELSE
 			IF (SELECT true from cat_connec where id=NEW.conneccat_id) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3282", "function":"1204","parameters":{"catalog_value":"'||NEW.conneccat_id||'"}}})$$);';
+				"data":{"message":"3282", "function":"1204","parameters":{"catalog_value":"'||NEW.conneccat_id||'"}}}$$);';
 			END IF;
 		END IF;
 
