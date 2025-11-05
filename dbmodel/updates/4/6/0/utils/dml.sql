@@ -35,3 +35,9 @@ WHERE id=5008;
 UPDATE sys_message
 SET id=4458
 WHERE id=5010;
+
+INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
+VALUES (4460,'Used plan psectors: %v_psectors%',0,true,'ud','core','UI');
+
+INSERT INTO sys_message (id,error_message,log_level,show_user,project_type,"source",message_type)
+VALUES (4462,'Commit changes: %v_commit_changes%',0,true,'ud','core','UI');
