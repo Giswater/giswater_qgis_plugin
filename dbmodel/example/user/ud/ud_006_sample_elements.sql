@@ -5593,2404 +5593,1206 @@ INSERT INTO rtc_hydrometer VALUES ('3198', 'www.giswater.org');
 INSERT INTO rtc_hydrometer VALUES ('3199', 'www.giswater.org');
 
 
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3', '3169');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('60', '3274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('61', '3032');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('62', '3065');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('63', '3038');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('64', '3201');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('65', '3067');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('66', '3129');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('67', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('68', '3258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('69', '3147');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('70', '3039');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('71', '3264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('72', '3231');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('73', '3017');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('74', '3144');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('75', '3166');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('76', '3227');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('77', '3115');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('78', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('79', '3225');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('80', '3255');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('81', '3045');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('82', '3215');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('83', '3169');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('84', '3115');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('85', '3252');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('86', '3265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('87', '3234');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('88', '3101');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('89', '3061');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('90', '3195');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('91', '3062');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('92', '3053');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('93', '3099');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('94', '3096');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('95', '3274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('96', '3152');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('97', '3066');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('98', '3231');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('99', '3030');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('100', '3010');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('101', '3109');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('102', '3130');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('103', '3006');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('104', '3016');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('105', '3165');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('106', '3005');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('107', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('108', '3173');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('109', '3233');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('110', '3154');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('111', '3181');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('112', '3165');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('113', '3260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('114', '3014');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('115', '3259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('116', '3055');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('117', '3009');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('118', '3008');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('119', '3100');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('120', '3259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('121', '3109');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('122', '3213');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('123', '3225');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('124', '3177');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('125', '3219');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('126', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('127', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('128', '3137');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('129', '3010');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('130', '3130');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('132', '3021');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('638', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('134', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('135', '3115');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('136', '3080');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('137', '3196');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('138', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('139', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('140', '3243');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('141', '3012');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('142', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('143', '3242');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('144', '3189');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('145', '3054');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('146', '3161');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('147', '3265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('148', '3151');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('149', '3147');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('150', '3080');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('151', '3096');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('152', '3063');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('153', '3029');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('154', '3047');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('155', '3235');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('156', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('157', '3156');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('158', '3067');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('159', '3040');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('160', '3113');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('161', '3262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('162', '3051');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('163', '3117');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('164', '3265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('165', '3144');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('166', '3059');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('167', '3009');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('168', '3136');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('169', '3211');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('170', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('171', '3018');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('172', '3062');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('173', '3039');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('174', '3024');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('175', '3077');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('176', '3232');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('177', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('178', '3134');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('639', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('640', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('181', '3211');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('182', '3100');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('183', '3160');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('184', '3222');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('185', '3194');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('186', '3113');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('187', '3103');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('188', '3259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('189', '3112');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('641', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('191', '3067');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('192', '3193');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('193', '3187');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('194', '3027');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('195', '3061');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('196', '3069');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('197', '3019');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('198', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('199', '3231');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('200', '3066');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('201', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('202', '3159');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('203', '3215');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('204', '3209');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('205', '3173');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('206', '3264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('207', '3013');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('208', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('209', '3231');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('642', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('643', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('212', '3275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('214', '3115');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('215', '3098');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('216', '3203');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('217', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('218', '3257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('219', '3132');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('220', '3149');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('221', '3011');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('222', '3264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('223', '3276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('224', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('225', '3250');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('226', '3081');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('227', '3103');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('228', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('229', '3274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('230', '3080');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('231', '3078');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('232', '3046');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('233', '3223');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('234', '3181');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('235', '3270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('236', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('237', '3004');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('238', '3131');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('239', '3089');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('240', '3244');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('241', '3205');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('242', '3219');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('244', '3171');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('245', '3187');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('246', '3141');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('247', '3209');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('248', '3035');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('249', '3138');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('250', '3051');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('131', '3213');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('251', '3059');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('252', '3010');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('253', '3030');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('254', '3208');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('255', '3219');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('256', '3051');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('257', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('258', '3022');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('259', '3074');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('260', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('261', '3264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('262', '3149');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('263', '3140');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('264', '3043');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('265', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('266', '3074');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('267', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('268', '3244');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('269', '3150');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('270', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('271', '3240');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('272', '3267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('273', '3179');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('274', '3229');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('275', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('276', '3047');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('277', '3165');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('278', '3008');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('279', '3276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('280', '3215');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('281', '3024');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('282', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('283', '3217');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('284', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('285', '3262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('286', '3132');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('287', '3161');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('288', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('289', '3242');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('290', '3263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('291', '3270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('292', '3109');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('293', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('294', '3145');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('295', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('296', '3070');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('297', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('298', '3215');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('299', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('300', '3244');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('301', '3069');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('302', '3202');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('303', '3098');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('304', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('305', '3198');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('306', '3180');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('307', '3141');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('308', '3231');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('309', '3187');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('310', '3220');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('311', '3151');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('312', '3263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('313', '3227');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('314', '3038');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('315', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('316', '3147');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('317', '3172');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('318', '3038');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('319', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('320', '3249');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('321', '3178');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('322', '3077');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('323', '3029');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('324', '3219');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('325', '3165');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('326', '3235');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('327', '3035');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('644', '3057');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('329', '3062');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('330', '3145');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('645', '3057');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('332', '3166');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('333', '3124');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('334', '3071');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('335', '3258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('336', '3139');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('337', '3038');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('338', '3194');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('339', '3160');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('340', '3021');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('341', '3275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('342', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('343', '3113');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('344', '3035');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('345', '3083');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('346', '3119');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('347', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('348', '3193');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('349', '3137');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('350', '3272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('351', '3186');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('352', '3105');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('353', '3190');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('354', '3192');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('355', '3239');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('356', '3229');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('357', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('358', '3244');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('359', '3255');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('360', '3234');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('361', '3262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('362', '3059');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('363', '3083');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('364', '3174');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('365', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('366', '3190');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('367', '3272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('646', '3057');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('369', '3070');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('370', '3255');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('371', '3272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('372', '3089');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('373', '3188');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('374', '3171');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('375', '3173');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('376', '3158');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('377', '3185');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('378', '3012');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('379', '3201');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('380', '3028');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('381', '3173');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('382', '3205');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('383', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('384', '3204');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('385', '3062');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('386', '3017');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('387', '3265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('388', '3250');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('389', '3051');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('390', '3101');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('391', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('392', '3251');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('393', '3099');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('394', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('395', '3274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('396', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('397', '3082');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('398', '3125');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('399', '3260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('400', '3009');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('401', '3160');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('402', '3245');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('403', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('404', '3209');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('405', '3252');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('406', '3071');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('407', '3082');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('647', '3057');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('409', '3209');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('410', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('411', '3069');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('412', '3236');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('413', '3203');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('414', '3251');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('415', '3045');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('416', '3169');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('417', '3021');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('418', '3130');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('419', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('420', '3190');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('421', '3190');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('422', '3059');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('423', '3242');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('424', '3181');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('425', '3144');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('426', '3002');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('427', '3043');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('428', '3249');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('429', '3132');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('430', '3066');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('431', '3223');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('432', '3131');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('433', '3154');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('648', '3057');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('435', '3271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('436', '3055');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('437', '3230');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('438', '3138');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('439', '3041');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('440', '3219');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('441', '3187');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('442', '3027');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('443', '3163');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('444', '3148');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('445', '3267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('446', '3274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('447', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('448', '3117');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('449', '3196');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('450', '3230');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('451', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('452', '3249');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('453', '3151');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('454', '3235');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('455', '3003');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('456', '3119');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('457', '3060');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('458', '3260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('459', '3105');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('460', '3013');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('461', '3100');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('462', '3275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('463', '3196');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('464', '3276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('465', '3266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('466', '3221');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('467', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('468', '3234');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('469', '3268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('470', '3116');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('471', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('473', '3134');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('474', '3171');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('476', '3131');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('477', '3137');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('478', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('479', '3066');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('480', '3205');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('481', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('482', '3160');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('483', '3150');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('485', '3208');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('486', '3046');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('487', '3252');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('489', '3033');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('490', '3009');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('491', '3043');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('492', '3114');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('493', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('494', '3049');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('495', '3064');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('496', '3264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('497', '3061');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('498', '3033');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('499', '3030');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('500', '3243');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('501', '3233');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('502', '3186');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('503', '3125');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('504', '3022');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('505', '3270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('506', '3085');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('507', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('508', '3149');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('509', '3077');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('510', '3144');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('511', '3075');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('512', '3253');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('513', '3172');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('515', '3090');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('516', '3017');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('517', '3268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('518', '3083');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('519', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('520', '3186');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('521', '3236');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('522', '3078');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('523', '3096');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('524', '3275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('525', '3223');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('526', '3189');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('527', '3171');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('528', '3019');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('529', '3224');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('530', '3070');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('484', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('133', '3271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('179', '3032');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('180', '3271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('190', '3133');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('211', '3133');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('213', '3075');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('328', '3129');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('331', '3040');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('368', '3213');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('408', '3016');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('434', '3018');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('472', '3216');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('475', '3177');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('488', '3018');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('514', '3217');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('604', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('605', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('606', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('607', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('608', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('609', '3068');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('649', '3090');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('650', '3090');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('651', '3090');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('652', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('653', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('654', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('655', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('656', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('657', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('658', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('659', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('660', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('661', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('662', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('663', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('664', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('665', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('666', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('667', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('668', '3226');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('669', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('670', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('671', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('672', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('673', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('674', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('675', '3153');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('676', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('680', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('681', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('682', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('683', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('684', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('685', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('686', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('687', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('688', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('689', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('690', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('691', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('692', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('693', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('694', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('695', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('696', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('697', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('698', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('699', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('700', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('701', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('702', '3020');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('703', '3163');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('704', '3163');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('705', '3163');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('706', '3163');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('707', '3163');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('708', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('709', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('710', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('711', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('712', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('713', '3197');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('714', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('715', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('716', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('717', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('718', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('59', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('589', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('243', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('15', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('4', '3064');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('5', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('6', '3264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('7', '3099');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('8', '3059');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('9', '3252');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('10', '3122');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('11', '3272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('12', '3188');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('13', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('14', '3033');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('16', '3140');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('17', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('18', '3232');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('19', '3011');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('20', '3060');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('21', '3190');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('22', '3220');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('23', '3029');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('24', '3209');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('25', '3061');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('26', '3220');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('27', '3230');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('28', '3216');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('29', '3221');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('30', '3065');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('31', '3255');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('32', '3196');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('33', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('34', '3139');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('35', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('36', '3089');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('37', '3137');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('38', '3122');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('39', '3266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('40', '3134');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('41', '3043');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('42', '3266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('43', '3100');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('44', '3202');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('45', '3144');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('47', '3172');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('48', '3235');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('677', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('46', '3114');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('49', '3129');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('51', '3159');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('58', '3177');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('678', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('679', '3164');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('719', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('720', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('721', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('722', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('723', '3183');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('724', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('725', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('726', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('727', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('728', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('729', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('730', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('731', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('732', '3157');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('733', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('734', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('735', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('736', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('737', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('738', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('739', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('740', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('741', '3167');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('742', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('743', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('744', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('745', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('746', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('747', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('748', '3093');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('749', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('750', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('751', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('752', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('753', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('754', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('755', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('756', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('757', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('758', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('759', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('760', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('761', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('762', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('763', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('764', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('765', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('766', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('767', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('768', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('769', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('770', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('771', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('772', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('773', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('774', '3056');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('775', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('776', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('777', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('778', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('779', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('780', '3126');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('781', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('782', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('783', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('784', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('785', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('786', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('787', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('788', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('789', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('790', '3168');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('791', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('792', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('793', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('794', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('795', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('796', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('797', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('798', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('799', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('800', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('801', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('802', '3176');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('803', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('804', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('805', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('806', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('807', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('808', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('809', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('810', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('811', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('812', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('813', '3182');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('50', '3186');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('52', '3014');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('53', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('54', '3139');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('55', '3049');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('56', '3057');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('57', '3124');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('814', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('815', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('816', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('817', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('818', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('819', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('820', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('821', '3086');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('822', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('823', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('824', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('825', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('826', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('827', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('828', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('829', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('830', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('831', '3120');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('832', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('833', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('834', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('835', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('836', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('837', '3246');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('838', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('839', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('840', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('841', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('842', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('843', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('844', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('845', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('846', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('210', '3001');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('847', '3076');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('848', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('849', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('850', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('851', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('852', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('853', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('854', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('855', '3007');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('856', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('857', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('858', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('859', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('860', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('861', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('862', '3278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('863', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('864', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('865', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('866', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('867', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('868', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('869', '3184');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('870', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('871', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('872', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('873', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('874', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('875', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('876', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('877', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('878', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('879', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('880', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('881', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('882', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('883', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('884', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('885', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('886', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('887', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('888', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('889', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('890', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('891', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('892', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('893', '3127');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('894', '3204');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('895', '3204');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('896', '3204');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('897', '3204');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('898', '3204');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('899', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('900', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('901', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('902', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('903', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('904', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('905', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('906', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('907', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('908', '3106');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('909', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('910', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('911', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('912', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('913', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('914', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('915', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('916', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('917', '3248');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('918', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('919', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('920', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('921', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('922', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('923', '3036');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('924', '3245');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('925', '3245');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('926', '3245');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('927', '3245');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('928', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('929', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('930', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('931', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('932', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('933', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('934', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('935', '3073');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('936', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('937', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('938', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('939', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('940', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('941', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('942', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('943', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('944', '3023');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('945', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('946', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('947', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('948', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('949', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('950', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('951', '3256');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('952', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('953', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('954', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('955', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('956', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('957', '3079');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('958', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('959', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('960', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('961', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('962', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('963', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('964', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('965', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('966', '3037');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('967', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('968', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('969', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('970', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('971', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('972', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('973', '3128');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('974', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('975', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('976', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('977', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('978', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('979', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('980', '3214');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('981', '3028');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('982', '3028');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('983', '3028');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('984', '3028');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('985', '3028');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('986', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('987', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('988', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('989', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('990', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('991', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('992', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('993', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('994', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('995', '3191');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('996', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('997', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('998', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('999', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1000', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1001', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1002', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1003', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1004', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1005', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1006', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1007', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1008', '3015');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1009', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1010', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1011', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1012', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1013', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1014', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1015', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1016', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1017', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1018', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1019', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1020', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1021', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1022', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1023', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1024', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1025', '3050');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1026', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1027', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1028', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1029', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1030', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1031', '3094');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1032', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1033', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1034', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1035', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1036', '3123');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1037', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1038', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1039', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1040', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1041', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1042', '3228');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1043', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1044', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1045', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1046', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1047', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1048', '3277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1049', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1050', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1051', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1052', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1053', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1054', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1055', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1056', '3212');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1057', '3268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1058', '3188');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1102', '3243');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1103', '3039');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1104', '3024');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1105', '3229');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1106', '3136');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1107', '3140');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1108', '3122');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1109', '3105');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1110', '3085');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1111', '3224');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1112', '3225');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1113', '3019');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1114', '3268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1115', '3188');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1116', '3116');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1117', '3098');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1118', '3065');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1119', '3078');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1120', '3217');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1121', '3166');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1122', '3152');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1123', '3054');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1124', '3071');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1125', '3016');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1126', '3074');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1127', '3027');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1128', '3060');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1129', '3222');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1130', '3208');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1131', '3145');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1132', '3119');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1133', '3117');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1134', '3159');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1135', '3216');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1136', '3138');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1137', '3049');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1138', '3221');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1139', '3075');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1140', '3064');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1141', '3148');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1142', '3211');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1143', '3198');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1144', '3185');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1145', '3032');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1146', '3158');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1147', '3022');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1148', '3011');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1149', '3114');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1150', '3227');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1151', '3194');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1152', '3263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1153', '3156');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1154', '3124');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1155', '3082');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1156', '3232');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1157', '3267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1158', '3008');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1159', '3243');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1160', '3039');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1161', '3024');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1162', '3229');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1163', '3136');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1164', '3140');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1165', '3122');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1166', '3105');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1167', '3085');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1168', '3224');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1169', '3225');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1170', '3019');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1171', '3268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1172', '3188');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1173', '3116');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1174', '3098');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1175', '3065');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1176', '3078');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1177', '3217');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1178', '3166');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1179', '3152');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1180', '3054');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1181', '3071');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1182', '3016');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1183', '3074');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1184', '3027');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1185', '3060');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1186', '3222');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1187', '3208');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1188', '3145');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1189', '3119');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1190', '3117');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1191', '3159');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1192', '3216');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1193', '3138');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1194', '3049');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1195', '3221');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1196', '3075');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1197', '3064');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1198', '3148');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1199', '3211');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1200', '3198');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1201', '3185');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1202', '3032');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1203', '3158');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('610', '3237');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('531', '3043');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('532', '3055');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('533', '3254');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('534', '3099');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('535', '3258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('536', '3270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('537', '3187');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('538', '3192');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('539', '3139');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('540', '3059');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('542', '3014');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('543', '3047');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('544', '3224');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('545', '3150');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('546', '3257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('547', '3189');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('549', '3265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('550', '3250');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('551', '3141');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('552', '3069');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('553', '3257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('554', '3085');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('555', '3070');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('556', '3116');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('557', '3147');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('558', '3161');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('559', '3238');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('560', '3233');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('561', '3046');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('562', '3103');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('563', '3201');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('564', '3207');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('565', '3156');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('566', '3155');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('567', '3222');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('568', '3025');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('569', '3152');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('570', '3251');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('571', '3200');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('572', '3029');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('573', '3172');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('574', '3017');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('575', '3274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('576', '3045');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('577', '3158');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('579', '3148');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('580', '3012');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('581', '3133');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('582', '3054');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('583', '3046');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('584', '3185');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('585', '3275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('586', '3247');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('587', '3113');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('588', '3136');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('611', '3237');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('590', '3063');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('591', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('592', '3154');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('593', '3193');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('594', '3234');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('595', '3237');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('596', '3192');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('597', '3101');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('598', '3236');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('599', '3063');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('600', '3202');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2', '3013');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('541', '3040');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('548', '3213');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('578', '3198');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('612', '3237');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('613', '3237');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('614', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('615', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('616', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('617', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('618', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('619', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('620', '3110');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('621', '3041');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('622', '3041');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('623', '3041');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('624', '3041');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('625', '3041');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('626', '3112');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('627', '3112');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('628', '3112');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('629', '3112');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('630', '3053');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('631', '3053');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('632', '3053');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('633', '3053');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('634', '3053');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('635', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('636', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('637', '3092');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1059', '3116');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1060', '3098');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1061', '3065');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1062', '3078');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1063', '3217');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1064', '3166');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1065', '3152');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1066', '3054');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1067', '3071');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1068', '3016');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1069', '3074');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1070', '3027');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1071', '3060');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1072', '3222');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1073', '3208');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1074', '3145');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1075', '3119');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1076', '3117');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1077', '3159');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1078', '3216');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1079', '3138');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1080', '3049');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1081', '3221');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1082', '3075');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1083', '3064');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1084', '3148');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1085', '3211');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1086', '3198');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1087', '3185');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1088', '3032');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1089', '3158');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1090', '3022');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1091', '3011');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1092', '3114');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1093', '3227');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1094', '3194');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1095', '3263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1096', '3156');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1097', '3124');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1098', '3082');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1099', '3232');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1100', '3267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('1101', '3008');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2550', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2551', '114442');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2552', '114368');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2556', '114436');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2558', '114448');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2559', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2561', '114375');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2581', '114327');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2586', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2590', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2592', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2595', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2598', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2599', '114334');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2607', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2608', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2609', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2610', '114295');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2614', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2615', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2626', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2631', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2632', '114340');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2633', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2638', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2646', '114369');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2648', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2649', '114280');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2650', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2652', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2653', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2656', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2657', '114329');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2658', '114323');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2663', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2667', '114444');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2670', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2674', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2675', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2676', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2678', '114329');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2682', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2685', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2687', '114346');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2691', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2692', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2699', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2701', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2702', '114374');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2706', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2710', '114295');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2711', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2713', '114305');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2714', '114417');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2717', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2728', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2731', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2733', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2734', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2735', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2737', '114397');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2739', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2741', '114449');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2747', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2750', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2751', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2752', '114319');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2754', '114316');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2755', '114399');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2757', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2758', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2760', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2761', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2771', '114315');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2773', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2780', '114330');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2783', '114407');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2785', '114295');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2786', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2789', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2793', '114283');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2794', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2800', '114333');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2802', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2803', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2804', '114336');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2805', '114319');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2806', '114436');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2818', '114363');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2820', '114348');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2822', '114338');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2823', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2825', '114371');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2826', '114408');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2828', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2834', '114334');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2840', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2849', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2850', '114323');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2853', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2854', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2857', '114401');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2861', '114398');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2865', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2868', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2875', '114260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2877', '114415');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2880', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2883', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2884', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2886', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2894', '114346');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2895', '114436');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2901', '114300');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2902', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2906', '114420');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2911', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2918', '114291');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2919', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2924', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2934', '114305');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2938', '114439');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2939', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2940', '114440');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2941', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2944', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2945', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2950', '114386');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2957', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2958', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2959', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2961', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2963', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2965', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2966', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2976', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2982', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2984', '114404');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2989', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2990', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3000', '114442');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3006', '114421');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3010', '114423');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3015', '114296');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3018', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3022', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3023', '114296');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3025', '114405');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3026', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3028', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3040', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3050', '114368');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3051', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3065', '114329');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2001', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2002', '114280');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2010', '114393');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2013', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2014', '114378');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2015', '114440');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2024', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2025', '114366');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2026', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3068', '114340');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3080', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3094', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3095', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3098', '114345');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3104', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3113', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3117', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3120', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3135', '114283');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2555', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2596', '114407');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2606', '114289');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2618', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2628', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2640', '114394');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2642', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2643', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2644', '114404');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2651', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2681', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2697', '114339');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2719', '114431');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2724', '114319');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2746', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2753', '114414');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2814', '114339');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2824', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2831', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2837', '114444');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2841', '114380');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2872', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2873', '114391');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2889', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2891', '114327');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2892', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2893', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2909', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2910', '114300');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2913', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2987', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2920', '114266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2915', '114342');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2948', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2960', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2991', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2992', '114338');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2995', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3021', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3037', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3038', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3042', '114346');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3063', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2005', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2006', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2008', '114400');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2011', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2017', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2018', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3079', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3085', '114339');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3088', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2557', '114443');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2575', '114414');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2673', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2725', '114408');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2774', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2779', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2801', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2821', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2843', '114419');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2930', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2931', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2981', '114284');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3049', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3055', '114383');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3067', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2776', '114371');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3115', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2250', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2256', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2279', '114432');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2300', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2309', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2312', '114406');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2327', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2345', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2349', '114393');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2357', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2360', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2364', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2387', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2390', '114446');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2393', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2397', '114323');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2404', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2406', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2412', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2419', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2422', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2428', '114413');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2434', '114443');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2435', '114434');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2458', '114289');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2484', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2504', '114418');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2505', '114304');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2519', '114364');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2533', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2534', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2538', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2544', '114360');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2547', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3092', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3109', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3114', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3124', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3128', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2251', '114338');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2278', '114405');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2296', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2343', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2421', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2450', '114318');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2451', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2454', '114368');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2500', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2548', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3099', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3123', '114414');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3132', '114403');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2311', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2358', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2373', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2407', '114384');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2415', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2513', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2253', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2262', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2515', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2037', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2038', '114443');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2041', '114441');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2048', '114378');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2049', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2055', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2060', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2066', '114392');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2070', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2074', '114340');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2078', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2079', '114421');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2104', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2108', '114386');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2110', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2111', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2113', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2028', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2036', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2064', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2069', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2081', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2094', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2095', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2097', '114407');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2098', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2030', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2083', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2096', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2106', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2032', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2052', '114284');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2034', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2044', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2029', '114416');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2031', '114406');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2033', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2035', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2039', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2040', '114399');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2042', '114439');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2043', '114379');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2045', '114449');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2046', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2047', '114334');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2050', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2051', '114442');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2053', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2054', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2056', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2057', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2058', '114425');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2059', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2061', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2062', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2063', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2065', '114417');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2067', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2068', '114445');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2071', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2072', '114300');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2073', '114447');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2075', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2076', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2077', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2080', '114411');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2082', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2084', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2085', '114431');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2086', '114340');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2087', '114447');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2088', '114344');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2089', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2090', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2091', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2092', '114416');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2093', '114335');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2099', '114448');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2100', '114402');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2101', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2102', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2103', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2105', '114416');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2107', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2109', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2112', '114397');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2114', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2115', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2116', '114409');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2117', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2118', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2119', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2120', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2122', '114318');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2123', '114369');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2124', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2125', '114345');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2126', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2127', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2128', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2129', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2130', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2132', '114363');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2135', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2136', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2137', '114344');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2138', '114266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2139', '114381');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2141', '114426');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2143', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2144', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2145', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2146', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2148', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2149', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2150', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2152', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2153', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2155', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2158', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2160', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2162', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2163', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2165', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2167', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2168', '114403');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2170', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2171', '114304');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2173', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2174', '114419');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2175', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2176', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2178', '114367');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2179', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2180', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2181', '114405');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2182', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2183', '114420');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2184', '114296');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2185', '114375');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2186', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2187', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2188', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2190', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2191', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2192', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2195', '114384');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2197', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2198', '114375');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2199', '114443');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2201', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2202', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2203', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2205', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2206', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2207', '114384');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2208', '114366');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2209', '114260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2211', '114376');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2212', '114335');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2213', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2214', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2217', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2218', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2219', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2222', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2223', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2224', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2226', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2227', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2230', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2232', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2233', '114363');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2234', '114316');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2235', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2236', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2237', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2238', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2239', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2241', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2242', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2243', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2244', '114304');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2246', '114312');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2247', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2248', '114442');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2254', '114410');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2255', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2257', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2258', '114342');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2260', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2261', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2263', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2265', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2266', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2267', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2268', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2270', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2271', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2272', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2273', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2274', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2275', '114266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2277', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2280', '114363');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2281', '114330');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2282', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2283', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2284', '114348');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2285', '114402');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2287', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2288', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2290', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2295', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2297', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2298', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2299', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2301', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2302', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2304', '114386');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2305', '114378');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2306', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2307', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2308', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2310', '114437');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2313', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2314', '114445');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2315', '114382');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2316', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2317', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2319', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2321', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2322', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2323', '114300');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2324', '114387');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2325', '114319');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2326', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2329', '114318');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2330', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2332', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2335', '114360');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2336', '114440');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2337', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2338', '114363');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2339', '114379');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2340', '114446');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2342', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2346', '114374');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2347', '114284');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2350', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2354', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2355', '114328');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2356', '114260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2363', '114367');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2365', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2366', '114379');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2367', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2368', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2369', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2370', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2371', '114432');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2372', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2374', '114381');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2376', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2377', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2379', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2382', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2384', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2385', '114425');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2386', '114413');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2388', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2389', '114335');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2391', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2392', '114385');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2394', '114295');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2395', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2396', '114401');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2398', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2399', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2401', '114406');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2402', '114291');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2405', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2408', '114348');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2409', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2410', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2413', '114407');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2414', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2420', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2423', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2425', '114440');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2427', '114376');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2429', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2430', '114409');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2431', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2432', '114394');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2436', '114378');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2437', '114339');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2438', '114284');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2439', '114445');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2441', '114335');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2442', '114284');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2443', '114374');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2444', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2445', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2446', '114289');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2447', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2453', '114280');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2456', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2459', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2461', '114291');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2463', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2464', '114433');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2465', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2466', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2467', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2468', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2471', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2472', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2473', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2474', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2475', '114330');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2476', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2478', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2479', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2485', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2486', '114433');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2487', '114366');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2488', '114425');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2489', '114413');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2490', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2491', '114367');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2492', '114346');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2494', '114380');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2495', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2497', '114307');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2498', '114296');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2499', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2502', '114443');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2503', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2507', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2508', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2509', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2510', '114348');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2512', '114336');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2514', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2518', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2522', '114369');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2523', '114401');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2524', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2525', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2526', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2527', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2528', '114423');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2529', '114328');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2530', '114401');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2531', '114440');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2532', '114363');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2536', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2537', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2539', '114299');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2540', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2541', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2542', '114392');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2543', '114329');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2545', '114427');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2546', '114430');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2549', '114340');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2553', '114369');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2554', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2560', '114371');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2562', '114414');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2563', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2564', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2565', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2566', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2567', '114441');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2568', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2569', '114364');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2570', '114364');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2571', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2572', '114366');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2573', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2574', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2576', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2577', '114417');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2578', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2579', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2580', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2582', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2583', '114387');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2584', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2585', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2587', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2588', '114360');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2589', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2591', '114318');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2593', '114418');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2594', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2597', '114411');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2600', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2601', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2602', '114399');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2603', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2604', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2605', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2611', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2612', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2613', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2616', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2617', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2619', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2620', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2621', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2622', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2623', '114421');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2624', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2625', '114304');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2627', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2629', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2630', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2634', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2635', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2636', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2637', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2639', '114382');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2641', '114407');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2645', '114368');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2647', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2654', '114316');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2655', '114429');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2659', '114336');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2660', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2661', '114406');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2662', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2664', '114346');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2665', '114266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2666', '114342');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2668', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2669', '114406');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2671', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2672', '114376');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2677', '114364');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2679', '114278');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2680', '114409');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2683', '114383');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2684', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2686', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2688', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2689', '114437');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2690', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2693', '114305');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2694', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2695', '114330');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2696', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2698', '114345');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2700', '114334');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2703', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2704', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2705', '114329');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2707', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2708', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2709', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2712', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2715', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2716', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2718', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2720', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2721', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2722', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2723', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2726', '114442');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2727', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2729', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2730', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2732', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2736', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2738', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2740', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2742', '114413');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2743', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2744', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2745', '114375');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2748', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2749', '114368');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2756', '114327');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2759', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2762', '114369');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2763', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2764', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2765', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2766', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2767', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2768', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2769', '114421');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2770', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2772', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2775', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2777', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2778', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2781', '114323');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2782', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2784', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2787', '114404');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2788', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2790', '114335');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2791', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2792', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2795', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2796', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2797', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2798', '114368');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2799', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2807', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2808', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2809', '114367');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2810', '114317');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2811', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2812', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2813', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2815', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2816', '114426');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2817', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2819', '114426');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2827', '114417');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2829', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2830', '114319');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2832', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2833', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2835', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2836', '114405');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2838', '114334');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2839', '114296');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2842', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2844', '114354');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2845', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2846', '114342');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2847', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2848', '114333');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2851', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2852', '114266');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2855', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2856', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2858', '114436');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2859', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2860', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2862', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2863', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2864', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2866', '114395');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2867', '114318');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2869', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2870', '114312');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2871', '114333');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2874', '114391');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2876', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2878', '114333');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2879', '114376');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2881', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2882', '114270');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2885', '114371');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2887', '114316');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2888', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2890', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2896', '114328');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2897', '114327');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2898', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2899', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2900', '114380');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2903', '114338');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2904', '114362');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2905', '114426');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2907', '114447');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2908', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2912', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2914', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2916', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2917', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2921', '114435');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2922', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2923', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2925', '114260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2926', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2927', '114425');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2928', '114328');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2929', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2932', '114417');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2933', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2935', '114342');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2936', '114440');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2937', '114283');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2942', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2943', '114323');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2946', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2947', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2949', '114345');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2951', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2952', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2953', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2954', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2955', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2956', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2962', '114416');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2964', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2967', '114412');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2968', '114445');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2969', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2970', '114376');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2971', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2972', '114434');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2973', '114293');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2974', '114323');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2975', '114405');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2977', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2978', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2979', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2980', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2983', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2985', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2986', '114418');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2988', '114380');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2993', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2994', '114373');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2996', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2997', '114423');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2998', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2999', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3001', '114398');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3002', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3003', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3004', '114418');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3005', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3007', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3008', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3009', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3011', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3012', '114338');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3013', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3014', '114398');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3016', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3017', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3019', '114400');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3020', '114448');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3024', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3027', '114400');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3029', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3030', '114427');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3031', '114402');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3032', '114374');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3033', '114291');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3034', '114332');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3035', '114355');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3036', '114295');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3039', '114415');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3041', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3043', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3044', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3045', '114392');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3046', '114260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3047', '114412');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3048', '114339');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3052', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3053', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3054', '114280');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3056', '114439');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3057', '114444');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3058', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3059', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3060', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3061', '114381');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3062', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3064', '114402');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3066', '114433');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2003', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2004', '114336');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2007', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2009', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2012', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2016', '114377');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2019', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2020', '114300');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2021', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2022', '114282');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2023', '114324');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3069', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3070', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3071', '114383');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3072', '114370');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3073', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3074', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3075', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3076', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3077', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3078', '114258');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3081', '114309');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3082', '114359');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3083', '114394');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3084', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3086', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3087', '114333');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3089', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3090', '114342');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3091', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3093', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3096', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3097', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3100', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3101', '114356');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3102', '114265');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3103', '114409');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3105', '114388');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3106', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3107', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3108', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3110', '114430');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3111', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3112', '114417');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3116', '114397');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3118', '114449');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3119', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3121', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3122', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3125', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3126', '114378');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3127', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3129', '114384');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3130', '114315');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3131', '114387');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3133', '114304');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3134', '114313');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3136', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2027', '114421');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2121', '114447');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2133', '114284');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2134', '114364');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2142', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2147', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2151', '114316');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2156', '114441');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2157', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2159', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2166', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2169', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2177', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2189', '114319');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2193', '114337');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2194', '114423');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2210', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2215', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2216', '114423');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2220', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2221', '114327');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2225', '114378');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2229', '114262');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2240', '114374');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2252', '114344');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2259', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2264', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2269', '114441');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2276', '114445');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2286', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2289', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2291', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2292', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2293', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2294', '114312');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2303', '114384');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2318', '114259');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2320', '114406');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2328', '114283');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2331', '114407');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2333', '114403');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2334', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2341', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2344', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2348', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2351', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2352', '114422');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2353', '114274');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2359', '114411');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2361', '114283');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2362', '114307');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2375', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2378', '114303');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2380', '114398');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2381', '114409');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2383', '114260');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2400', '114289');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2403', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2411', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2416', '114285');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2417', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2418', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2424', '114380');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2426', '114321');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2433', '114338');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2440', '114330');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2448', '114347');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2449', '114290');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2452', '114349');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2455', '114289');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2457', '114384');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2460', '114340');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2462', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2469', '114316');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2470', '114352');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2477', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2480', '114301');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2481', '114286');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2482', '114312');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2483', '114294');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2493', '114428');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2496', '114264');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2501', '114343');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2506', '114393');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2511', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2516', '114269');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2517', '114357');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2520', '114387');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2521', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2535', '114334');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2154', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2164', '114287');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2172', '114263');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2200', '114353');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2228', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2249', '114444');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2131', '114325');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2140', '114382');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2161', '114403');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2196', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2204', '114288');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2245', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('2231', '114292');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3137', '114392');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3153', '114348');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3155', '114364');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3163', '114306');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3169', '114351');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3171', '114434');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3172', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3173', '114436');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3176', '114273');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3178', '114329');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3181', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3182', '114272');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3187', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3189', '114322');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3198', '114396');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3199', '114257');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3140', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3168', '114326');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3180', '114402');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3188', '114279');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3160', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3139', '114424');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3138', '114390');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3141', '114314');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3142', '114369');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3143', '114419');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3144', '114341');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3145', '114295');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3146', '114361');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3147', '114268');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3148', '114410');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3149', '114400');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3150', '114367');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3151', '114277');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3152', '114358');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3154', '114404');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3156', '114310');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3157', '114297');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3158', '114438');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3159', '114320');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3161', '114276');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3162', '114389');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3164', '114281');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3165', '114372');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3166', '114302');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3167', '114350');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3170', '114365');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3174', '114311');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3175', '114275');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3177', '114271');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3179', '114386');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3183', '114308');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3184', '114283');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3185', '114261');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3186', '114296');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3190', '114387');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3191', '114430');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3192', '114443');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3193', '114298');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3194', '114331');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3195', '114312');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3196', '114267');
-INSERT INTO rtc_hydrometer_x_connec VALUES ('3197', '114368');
+INSERT INTO rtc_hydrometer_x_connec (hydrometer_id,connec_id) VALUES
+	 ('3',3169),
+	 ('60',3274),
+	 ('61',3032),
+	 ('62',3065),
+	 ('63',3038),
+	 ('64',3201),
+	 ('65',3067),
+	 ('66',3129),
+	 ('67',3238),
+	 ('68',3258),
+	 ('69',3147),
+	 ('70',3039),
+	 ('71',3264),
+	 ('72',3231),
+	 ('73',3017),
+	 ('74',3144),
+	 ('75',3166),
+	 ('76',3227),
+	 ('77',3115),
+	 ('78',3015),
+	 ('79',3225),
+	 ('80',3255),
+	 ('81',3045),
+	 ('82',3215),
+	 ('83',3169),
+	 ('84',3115),
+	 ('85',3252),
+	 ('86',3265),
+	 ('87',3234),
+	 ('88',3101),
+	 ('89',3061),
+	 ('90',3195),
+	 ('91',3062),
+	 ('92',3053),
+	 ('93',3099),
+	 ('94',3096),
+	 ('95',3274),
+	 ('96',3152),
+	 ('97',3066),
+	 ('98',3231),
+	 ('99',3030),
+	 ('100',3010),
+	 ('101',3109),
+	 ('102',3130),
+	 ('103',3006),
+	 ('104',3016),
+	 ('105',3165),
+	 ('106',3005),
+	 ('107',3007),
+	 ('108',3173),
+	 ('109',3233),
+	 ('110',3154),
+	 ('111',3181),
+	 ('112',3165),
+	 ('113',3260),
+	 ('114',3014),
+	 ('115',3259),
+	 ('116',3055),
+	 ('117',3009),
+	 ('118',3008),
+	 ('119',3100),
+	 ('120',3259),
+	 ('121',3109),
+	 ('122',3213),
+	 ('123',3225),
+	 ('124',3177),
+	 ('125',3219),
+	 ('126',3036),
+	 ('127',3073),
+	 ('128',3137),
+	 ('129',3010),
+	 ('130',3130),
+	 ('132',3021),
+	 ('638',3092),
+	 ('134',3182),
+	 ('135',3115),
+	 ('137',3196),
+	 ('138',3127),
+	 ('139',3184),
+	 ('140',3243),
+	 ('141',3012),
+	 ('142',3094),
+	 ('143',3242),
+	 ('144',3189),
+	 ('145',3054),
+	 ('146',3161),
+	 ('147',3265),
+	 ('148',3151),
+	 ('149',3147),
+	 ('151',3096),
+	 ('152',3063),
+	 ('153',3029),
+	 ('154',3047),
+	 ('155',3235),
+	 ('156',3092),
+	 ('157',3156),
+	 ('158',3067),
+	 ('159',3040),
+	 ('160',3113),
+	 ('161',3262),
+	 ('162',3051),
+	 ('163',3117),
+	 ('164',3265),
+	 ('165',3144),
+	 ('166',3059),
+	 ('167',3009),
+	 ('168',3136),
+	 ('169',3211),
+	 ('170',3050),
+	 ('171',3018),
+	 ('172',3062),
+	 ('173',3039),
+	 ('174',3024),
+	 ('175',3077),
+	 ('176',3232),
+	 ('177',3068),
+	 ('178',3134),
+	 ('639',3092),
+	 ('640',3092),
+	 ('181',3211),
+	 ('182',3100),
+	 ('183',3160),
+	 ('184',3222),
+	 ('185',3194),
+	 ('186',3113),
+	 ('187',3103),
+	 ('188',3259),
+	 ('189',3112),
+	 ('641',3092),
+	 ('191',3067),
+	 ('192',3193),
+	 ('193',3187),
+	 ('194',3027),
+	 ('195',3061),
+	 ('196',3069),
+	 ('197',3019),
+	 ('198',3212),
+	 ('199',3231),
+	 ('200',3066),
+	 ('201',3253),
+	 ('202',3159),
+	 ('203',3215),
+	 ('204',3209),
+	 ('205',3173),
+	 ('206',3264),
+	 ('207',3013),
+	 ('208',3253),
+	 ('209',3231),
+	 ('642',3092),
+	 ('643',3092),
+	 ('212',3275),
+	 ('214',3115),
+	 ('215',3098),
+	 ('216',3203),
+	 ('217',3120),
+	 ('218',3257),
+	 ('219',3132),
+	 ('220',3149),
+	 ('221',3011),
+	 ('222',3264),
+	 ('223',3276),
+	 ('224',3106),
+	 ('225',3250),
+	 ('226',3081),
+	 ('227',3103),
+	 ('228',3153),
+	 ('229',3274),
+	 ('231',3078),
+	 ('232',3046),
+	 ('233',3223),
+	 ('234',3181),
+	 ('235',3270),
+	 ('236',3191),
+	 ('237',3004),
+	 ('238',3131),
+	 ('239',3089),
+	 ('240',3244),
+	 ('241',3205),
+	 ('242',3219),
+	 ('244',3171),
+	 ('245',3187),
+	 ('246',3141),
+	 ('247',3209),
+	 ('248',3035),
+	 ('249',3138),
+	 ('250',3051),
+	 ('131',3213),
+	 ('251',3059),
+	 ('252',3010),
+	 ('253',3030),
+	 ('254',3208),
+	 ('255',3219),
+	 ('256',3051),
+	 ('257',3246),
+	 ('258',3022),
+	 ('259',3074),
+	 ('260',3123),
+	 ('261',3264),
+	 ('262',3149),
+	 ('263',3140),
+	 ('264',3043),
+	 ('265',3128),
+	 ('266',3074),
+	 ('267',3050),
+	 ('268',3244),
+	 ('269',3150),
+	 ('270',3168),
+	 ('271',3240),
+	 ('272',3267),
+	 ('273',3179),
+	 ('274',3229),
+	 ('275',3226),
+	 ('276',3047),
+	 ('277',3165),
+	 ('278',3008),
+	 ('279',3276),
+	 ('280',3215),
+	 ('281',3024),
+	 ('282',3238),
+	 ('283',3217),
+	 ('284',3076),
+	 ('285',3262),
+	 ('286',3132),
+	 ('287',3161),
+	 ('288',3086),
+	 ('289',3242),
+	 ('290',3263),
+	 ('291',3270),
+	 ('292',3109),
+	 ('293',3253),
+	 ('294',3145),
+	 ('295',3001),
+	 ('296',3070),
+	 ('297',3023),
+	 ('298',3215),
+	 ('299',3278),
+	 ('300',3244),
+	 ('301',3069),
+	 ('302',3202),
+	 ('303',3098),
+	 ('304',3197),
+	 ('305',3198),
+	 ('306',3180),
+	 ('307',3141),
+	 ('308',3231),
+	 ('309',3187),
+	 ('310',3220),
+	 ('311',3151),
+	 ('312',3263),
+	 ('313',3227),
+	 ('314',3038),
+	 ('315',3094),
+	 ('316',3147),
+	 ('317',3172),
+	 ('318',3038),
+	 ('319',3157),
+	 ('320',3249),
+	 ('321',3178),
+	 ('322',3077),
+	 ('323',3029),
+	 ('324',3219),
+	 ('325',3165),
+	 ('326',3235),
+	 ('327',3035),
+	 ('644',3057),
+	 ('329',3062),
+	 ('330',3145),
+	 ('645',3057),
+	 ('332',3166),
+	 ('333',3124),
+	 ('334',3071),
+	 ('335',3258),
+	 ('336',3139),
+	 ('337',3038),
+	 ('338',3194),
+	 ('339',3160),
+	 ('340',3021),
+	 ('341',3275),
+	 ('342',3167),
+	 ('343',3113),
+	 ('344',3035),
+	 ('345',3083),
+	 ('346',3119),
+	 ('347',3176),
+	 ('348',3193),
+	 ('349',3137),
+	 ('350',3272),
+	 ('351',3186),
+	 ('352',3105),
+	 ('353',3190),
+	 ('354',3192),
+	 ('355',3239),
+	 ('356',3229),
+	 ('357',3001),
+	 ('358',3244),
+	 ('359',3255),
+	 ('360',3234),
+	 ('361',3262),
+	 ('362',3059),
+	 ('363',3083),
+	 ('364',3174),
+	 ('365',3253),
+	 ('366',3190),
+	 ('367',3272),
+	 ('646',3057),
+	 ('369',3070),
+	 ('370',3255),
+	 ('371',3272),
+	 ('372',3089),
+	 ('373',3188),
+	 ('374',3171),
+	 ('375',3173),
+	 ('376',3158),
+	 ('377',3185),
+	 ('378',3012),
+	 ('379',3201),
+	 ('380',3028),
+	 ('381',3173),
+	 ('382',3205),
+	 ('383',3228),
+	 ('384',3204),
+	 ('385',3062),
+	 ('386',3017),
+	 ('387',3265),
+	 ('388',3250),
+	 ('389',3051),
+	 ('390',3101),
+	 ('391',3256),
+	 ('392',3251),
+	 ('393',3099),
+	 ('394',3214),
+	 ('395',3274),
+	 ('396',3123),
+	 ('397',3082),
+	 ('398',3125),
+	 ('399',3260),
+	 ('400',3009),
+	 ('401',3160),
+	 ('402',3245),
+	 ('403',3164),
+	 ('404',3209),
+	 ('405',3252),
+	 ('406',3071),
+	 ('407',3082),
+	 ('647',3057),
+	 ('409',3209),
+	 ('410',3253),
+	 ('411',3069),
+	 ('412',3236),
+	 ('413',3203),
+	 ('414',3251),
+	 ('415',3045),
+	 ('416',3169),
+	 ('417',3021),
+	 ('418',3130),
+	 ('419',3183),
+	 ('420',3190),
+	 ('421',3190),
+	 ('422',3059),
+	 ('423',3242),
+	 ('424',3181),
+	 ('425',3144),
+	 ('426',3002),
+	 ('427',3043),
+	 ('428',3249),
+	 ('429',3132),
+	 ('430',3066),
+	 ('431',3223),
+	 ('432',3131),
+	 ('433',3154),
+	 ('648',3057),
+	 ('435',3271),
+	 ('436',3055),
+	 ('437',3230),
+	 ('438',3138),
+	 ('439',3041),
+	 ('440',3219),
+	 ('441',3187),
+	 ('442',3027),
+	 ('443',3163),
+	 ('444',3148),
+	 ('445',3267),
+	 ('446',3274),
+	 ('447',3238),
+	 ('448',3117),
+	 ('449',3196),
+	 ('450',3230),
+	 ('451',3020),
+	 ('452',3249),
+	 ('453',3151),
+	 ('454',3235),
+	 ('455',3003),
+	 ('456',3119),
+	 ('457',3060),
+	 ('458',3260),
+	 ('459',3105),
+	 ('460',3013),
+	 ('461',3100),
+	 ('462',3275),
+	 ('463',3196),
+	 ('464',3276),
+	 ('465',3266),
+	 ('466',3221),
+	 ('467',3079),
+	 ('468',3234),
+	 ('469',3268),
+	 ('470',3116),
+	 ('471',3248),
+	 ('473',3134),
+	 ('474',3171),
+	 ('476',3131),
+	 ('477',3137),
+	 ('478',3093),
+	 ('479',3066),
+	 ('480',3205),
+	 ('481',3056),
+	 ('482',3160),
+	 ('483',3150),
+	 ('485',3208),
+	 ('486',3046),
+	 ('487',3252),
+	 ('489',3033),
+	 ('490',3009),
+	 ('491',3043),
+	 ('492',3114),
+	 ('493',3228),
+	 ('494',3049),
+	 ('495',3064),
+	 ('496',3264),
+	 ('497',3061),
+	 ('498',3033),
+	 ('499',3030),
+	 ('500',3243),
+	 ('501',3233),
+	 ('502',3186),
+	 ('503',3125),
+	 ('504',3022),
+	 ('505',3270),
+	 ('506',3085),
+	 ('507',3253),
+	 ('508',3149),
+	 ('509',3077),
+	 ('510',3144),
+	 ('511',3075),
+	 ('512',3253),
+	 ('513',3172),
+	 ('515',3090),
+	 ('516',3017),
+	 ('517',3268),
+	 ('518',3083),
+	 ('519',3212),
+	 ('520',3186),
+	 ('521',3236),
+	 ('522',3078),
+	 ('523',3096),
+	 ('524',3275),
+	 ('525',3223),
+	 ('526',3189),
+	 ('527',3171),
+	 ('528',3019),
+	 ('529',3224),
+	 ('530',3070),
+	 ('484',3277),
+	 ('133',3271),
+	 ('179',3032),
+	 ('180',3271),
+	 ('190',3133),
+	 ('211',3133),
+	 ('213',3075),
+	 ('328',3129),
+	 ('331',3040),
+	 ('368',3213),
+	 ('408',3016),
+	 ('434',3018),
+	 ('472',3216),
+	 ('475',3177),
+	 ('488',3018),
+	 ('514',3217),
+	 ('604',3068),
+	 ('605',3068),
+	 ('606',3068),
+	 ('607',3068),
+	 ('608',3068),
+	 ('609',3068),
+	 ('649',3090),
+	 ('650',3090),
+	 ('651',3090),
+	 ('652',3155),
+	 ('653',3155),
+	 ('654',3155),
+	 ('655',3155),
+	 ('656',3155),
+	 ('657',3155),
+	 ('658',3155),
+	 ('659',3226),
+	 ('660',3226),
+	 ('661',3226),
+	 ('662',3226),
+	 ('663',3226),
+	 ('664',3226);
+INSERT INTO rtc_hydrometer_x_connec (hydrometer_id,connec_id) VALUES
+	 ('665',3226),
+	 ('666',3226),
+	 ('667',3226),
+	 ('668',3226),
+	 ('669',3153),
+	 ('670',3153),
+	 ('671',3153),
+	 ('672',3153),
+	 ('673',3153),
+	 ('674',3153),
+	 ('675',3153),
+	 ('676',3164),
+	 ('680',3164),
+	 ('681',3164),
+	 ('682',3164),
+	 ('683',3164),
+	 ('684',3164),
+	 ('685',3164),
+	 ('686',3164),
+	 ('687',3207),
+	 ('688',3207),
+	 ('689',3207),
+	 ('690',3207),
+	 ('691',3207),
+	 ('692',3207),
+	 ('693',3020),
+	 ('694',3020),
+	 ('695',3020),
+	 ('696',3020),
+	 ('697',3020),
+	 ('698',3020),
+	 ('699',3020),
+	 ('700',3020),
+	 ('701',3020),
+	 ('702',3020),
+	 ('703',3163),
+	 ('704',3163),
+	 ('705',3163),
+	 ('706',3163),
+	 ('707',3163),
+	 ('708',3197),
+	 ('709',3197),
+	 ('710',3197),
+	 ('711',3197),
+	 ('712',3197),
+	 ('713',3197),
+	 ('714',3183),
+	 ('715',3183),
+	 ('716',3183),
+	 ('717',3183),
+	 ('718',3183),
+	 ('59',3001),
+	 ('589',3001),
+	 ('243',3001),
+	 ('15',3277),
+	 ('4',3064),
+	 ('5',3238),
+	 ('6',3264),
+	 ('7',3099),
+	 ('8',3059),
+	 ('9',3252),
+	 ('10',3122),
+	 ('11',3272),
+	 ('12',3188),
+	 ('13',3037),
+	 ('14',3033),
+	 ('16',3140),
+	 ('17',3001),
+	 ('18',3232),
+	 ('19',3011),
+	 ('20',3060),
+	 ('21',3190),
+	 ('22',3220),
+	 ('23',3029),
+	 ('24',3209),
+	 ('25',3061),
+	 ('26',3220),
+	 ('27',3230),
+	 ('28',3216),
+	 ('29',3221),
+	 ('30',3065),
+	 ('31',3255),
+	 ('32',3196),
+	 ('33',3126),
+	 ('34',3139),
+	 ('35',3238),
+	 ('36',3089),
+	 ('37',3137),
+	 ('38',3122),
+	 ('39',3266),
+	 ('40',3134),
+	 ('41',3043),
+	 ('42',3266),
+	 ('43',3100),
+	 ('44',3202),
+	 ('45',3144),
+	 ('47',3172),
+	 ('48',3235),
+	 ('677',3164),
+	 ('46',3114),
+	 ('49',3129),
+	 ('51',3159),
+	 ('58',3177),
+	 ('678',3164),
+	 ('679',3164),
+	 ('719',3183),
+	 ('720',3183),
+	 ('721',3183),
+	 ('722',3183),
+	 ('723',3183),
+	 ('724',3157),
+	 ('725',3157),
+	 ('726',3157),
+	 ('727',3157),
+	 ('728',3157),
+	 ('729',3157),
+	 ('730',3157),
+	 ('731',3157),
+	 ('732',3157),
+	 ('733',3167),
+	 ('734',3167),
+	 ('735',3167),
+	 ('736',3167),
+	 ('737',3167),
+	 ('738',3167),
+	 ('739',3167),
+	 ('740',3167),
+	 ('741',3167),
+	 ('742',3093),
+	 ('743',3093),
+	 ('744',3093),
+	 ('745',3093),
+	 ('746',3093),
+	 ('747',3093),
+	 ('748',3093),
+	 ('749',3025),
+	 ('750',3025),
+	 ('751',3025),
+	 ('752',3025),
+	 ('753',3025),
+	 ('754',3025),
+	 ('755',3025),
+	 ('756',3025),
+	 ('757',3025),
+	 ('758',3025),
+	 ('759',3025),
+	 ('760',3056),
+	 ('761',3056),
+	 ('762',3056),
+	 ('763',3056),
+	 ('764',3056),
+	 ('765',3056),
+	 ('766',3056),
+	 ('767',3056),
+	 ('768',3056),
+	 ('769',3056),
+	 ('770',3056),
+	 ('771',3056),
+	 ('772',3056),
+	 ('773',3056),
+	 ('774',3056),
+	 ('775',3126),
+	 ('776',3126),
+	 ('777',3126),
+	 ('778',3126),
+	 ('779',3126),
+	 ('780',3126),
+	 ('781',3168),
+	 ('782',3168),
+	 ('783',3168),
+	 ('784',3168),
+	 ('785',3168),
+	 ('786',3168),
+	 ('787',3168),
+	 ('788',3168),
+	 ('789',3168),
+	 ('790',3168),
+	 ('791',3176),
+	 ('792',3176),
+	 ('793',3176),
+	 ('794',3176),
+	 ('795',3176),
+	 ('796',3176),
+	 ('797',3176),
+	 ('798',3176),
+	 ('799',3176),
+	 ('800',3176),
+	 ('801',3176),
+	 ('802',3176),
+	 ('803',3182),
+	 ('804',3182),
+	 ('805',3182),
+	 ('806',3182),
+	 ('807',3182),
+	 ('808',3182),
+	 ('809',3182),
+	 ('810',3182),
+	 ('811',3182),
+	 ('812',3182),
+	 ('813',3182),
+	 ('50',3186),
+	 ('52',3014),
+	 ('53',3238),
+	 ('54',3139),
+	 ('55',3049),
+	 ('56',3057),
+	 ('57',3124),
+	 ('814',3086),
+	 ('815',3086),
+	 ('816',3086),
+	 ('817',3086),
+	 ('818',3086),
+	 ('819',3086),
+	 ('820',3086),
+	 ('821',3086),
+	 ('822',3120),
+	 ('823',3120),
+	 ('824',3120),
+	 ('825',3120),
+	 ('826',3120),
+	 ('827',3120),
+	 ('828',3120),
+	 ('829',3120),
+	 ('830',3120),
+	 ('831',3120),
+	 ('832',3246),
+	 ('833',3246),
+	 ('834',3246),
+	 ('835',3246),
+	 ('836',3246),
+	 ('837',3246),
+	 ('838',3076),
+	 ('839',3076),
+	 ('840',3076),
+	 ('841',3076),
+	 ('842',3076),
+	 ('843',3076),
+	 ('844',3076),
+	 ('845',3076),
+	 ('846',3076),
+	 ('210',3001),
+	 ('847',3076),
+	 ('848',3007),
+	 ('849',3007),
+	 ('850',3007),
+	 ('851',3007),
+	 ('852',3007),
+	 ('853',3007),
+	 ('854',3007),
+	 ('855',3007),
+	 ('856',3278),
+	 ('857',3278),
+	 ('858',3278),
+	 ('859',3278),
+	 ('860',3278),
+	 ('861',3278),
+	 ('862',3278),
+	 ('863',3184),
+	 ('864',3184),
+	 ('865',3184),
+	 ('866',3184),
+	 ('867',3184),
+	 ('868',3184),
+	 ('869',3184),
+	 ('870',3200),
+	 ('871',3200),
+	 ('872',3200),
+	 ('873',3200),
+	 ('874',3200),
+	 ('875',3200),
+	 ('876',3200),
+	 ('877',3200),
+	 ('878',3254),
+	 ('879',3254),
+	 ('880',3254),
+	 ('881',3254),
+	 ('882',3254),
+	 ('883',3254),
+	 ('884',3254),
+	 ('885',3254),
+	 ('886',3254),
+	 ('887',3127),
+	 ('888',3127),
+	 ('889',3127),
+	 ('890',3127),
+	 ('891',3127),
+	 ('892',3127),
+	 ('893',3127),
+	 ('894',3204),
+	 ('895',3204),
+	 ('896',3204),
+	 ('897',3204),
+	 ('898',3204),
+	 ('899',3106),
+	 ('900',3106),
+	 ('901',3106),
+	 ('902',3106),
+	 ('903',3106),
+	 ('904',3106),
+	 ('905',3106),
+	 ('906',3106),
+	 ('907',3106),
+	 ('908',3106),
+	 ('909',3248),
+	 ('910',3248),
+	 ('911',3248),
+	 ('912',3248),
+	 ('913',3248),
+	 ('914',3248),
+	 ('915',3248),
+	 ('916',3248),
+	 ('917',3248),
+	 ('918',3036),
+	 ('919',3036),
+	 ('920',3036),
+	 ('921',3036),
+	 ('922',3036),
+	 ('923',3036),
+	 ('924',3245),
+	 ('925',3245),
+	 ('926',3245),
+	 ('927',3245),
+	 ('928',3073),
+	 ('929',3073),
+	 ('930',3073),
+	 ('931',3073),
+	 ('932',3073),
+	 ('933',3073),
+	 ('934',3073),
+	 ('935',3073),
+	 ('936',3023),
+	 ('937',3023),
+	 ('938',3023),
+	 ('939',3023),
+	 ('940',3023),
+	 ('941',3023),
+	 ('942',3023),
+	 ('943',3023),
+	 ('944',3023),
+	 ('945',3256),
+	 ('946',3256),
+	 ('947',3256),
+	 ('948',3256),
+	 ('949',3256),
+	 ('950',3256),
+	 ('951',3256),
+	 ('952',3079),
+	 ('953',3079),
+	 ('954',3079),
+	 ('955',3079),
+	 ('956',3079),
+	 ('957',3079),
+	 ('958',3037),
+	 ('959',3037),
+	 ('960',3037),
+	 ('961',3037),
+	 ('962',3037),
+	 ('963',3037),
+	 ('964',3037),
+	 ('965',3037),
+	 ('966',3037),
+	 ('967',3128),
+	 ('968',3128),
+	 ('969',3128),
+	 ('970',3128),
+	 ('971',3128),
+	 ('972',3128),
+	 ('973',3128),
+	 ('974',3214),
+	 ('975',3214),
+	 ('976',3214),
+	 ('977',3214),
+	 ('978',3214),
+	 ('979',3214),
+	 ('980',3214),
+	 ('981',3028),
+	 ('982',3028),
+	 ('983',3028),
+	 ('984',3028),
+	 ('985',3028),
+	 ('986',3191),
+	 ('987',3191),
+	 ('988',3191),
+	 ('989',3191),
+	 ('990',3191),
+	 ('991',3191),
+	 ('992',3191),
+	 ('993',3191),
+	 ('994',3191),
+	 ('995',3191),
+	 ('996',3015),
+	 ('997',3015),
+	 ('998',3015),
+	 ('999',3015),
+	 ('1000',3015),
+	 ('1001',3015),
+	 ('1002',3015),
+	 ('1003',3015),
+	 ('1004',3015),
+	 ('1005',3015),
+	 ('1006',3015),
+	 ('1007',3015),
+	 ('1008',3015),
+	 ('1009',3247),
+	 ('1010',3247),
+	 ('1011',3247),
+	 ('1012',3247),
+	 ('1013',3247),
+	 ('1014',3247),
+	 ('1015',3247),
+	 ('1016',3247),
+	 ('1017',3050),
+	 ('1018',3050),
+	 ('1019',3050),
+	 ('1020',3050),
+	 ('1021',3050),
+	 ('1022',3050),
+	 ('1023',3050),
+	 ('1024',3050),
+	 ('1025',3050),
+	 ('1026',3094),
+	 ('1027',3094),
+	 ('1028',3094),
+	 ('1029',3094),
+	 ('1030',3094),
+	 ('1031',3094),
+	 ('1032',3123),
+	 ('1033',3123),
+	 ('1034',3123),
+	 ('1035',3123),
+	 ('1036',3123),
+	 ('1037',3228),
+	 ('1038',3228),
+	 ('1039',3228),
+	 ('1040',3228),
+	 ('1041',3228),
+	 ('1042',3228),
+	 ('1043',3277),
+	 ('1044',3277),
+	 ('1045',3277),
+	 ('1046',3277),
+	 ('1047',3277),
+	 ('1048',3277),
+	 ('1049',3212),
+	 ('1050',3212),
+	 ('1051',3212),
+	 ('1052',3212),
+	 ('1053',3212),
+	 ('1054',3212),
+	 ('1055',3212),
+	 ('1056',3212),
+	 ('1057',3268),
+	 ('1058',3188),
+	 ('1102',3243),
+	 ('1103',3039),
+	 ('1104',3024),
+	 ('1105',3229),
+	 ('1106',3136),
+	 ('1107',3140),
+	 ('1108',3122),
+	 ('1109',3105),
+	 ('1110',3085),
+	 ('1111',3224),
+	 ('1112',3225),
+	 ('1113',3019),
+	 ('1114',3268),
+	 ('1115',3188),
+	 ('1116',3116),
+	 ('1117',3098),
+	 ('1118',3065),
+	 ('1119',3078),
+	 ('1120',3217),
+	 ('1121',3166),
+	 ('1122',3152),
+	 ('1123',3054),
+	 ('1124',3071),
+	 ('1125',3016),
+	 ('1126',3074),
+	 ('1127',3027),
+	 ('1128',3060),
+	 ('1129',3222),
+	 ('1130',3208),
+	 ('1131',3145),
+	 ('1132',3119),
+	 ('1133',3117),
+	 ('1134',3159),
+	 ('1135',3216),
+	 ('1136',3138),
+	 ('1137',3049),
+	 ('1138',3221),
+	 ('1139',3075),
+	 ('1140',3064),
+	 ('1141',3148),
+	 ('1142',3211),
+	 ('1143',3198),
+	 ('1144',3185),
+	 ('1145',3032),
+	 ('1146',3158),
+	 ('1147',3022),
+	 ('1148',3011);
+INSERT INTO rtc_hydrometer_x_connec (hydrometer_id,connec_id) VALUES
+	 ('1149',3114),
+	 ('1150',3227),
+	 ('1151',3194),
+	 ('1152',3263),
+	 ('1153',3156),
+	 ('1154',3124),
+	 ('1155',3082),
+	 ('1156',3232),
+	 ('1157',3267),
+	 ('1158',3008),
+	 ('1159',3243),
+	 ('1160',3039),
+	 ('1161',3024),
+	 ('1162',3229),
+	 ('1163',3136),
+	 ('1164',3140),
+	 ('1165',3122),
+	 ('1166',3105),
+	 ('1167',3085),
+	 ('1168',3224),
+	 ('1169',3225),
+	 ('1170',3019),
+	 ('1171',3268),
+	 ('1172',3188),
+	 ('1173',3116),
+	 ('1174',3098),
+	 ('1175',3065),
+	 ('1176',3078),
+	 ('1177',3217),
+	 ('1178',3166),
+	 ('1179',3152),
+	 ('1180',3054),
+	 ('1181',3071),
+	 ('1182',3016),
+	 ('1183',3074),
+	 ('1184',3027),
+	 ('1185',3060),
+	 ('1186',3222),
+	 ('1187',3208),
+	 ('1188',3145),
+	 ('1189',3119),
+	 ('1190',3117),
+	 ('1191',3159),
+	 ('1192',3216),
+	 ('1193',3138),
+	 ('1194',3049),
+	 ('1195',3221),
+	 ('1196',3075),
+	 ('1197',3064),
+	 ('1198',3148),
+	 ('1199',3211),
+	 ('1200',3198),
+	 ('1201',3185),
+	 ('1202',3032),
+	 ('1203',3158),
+	 ('610',3237),
+	 ('531',3043),
+	 ('532',3055),
+	 ('533',3254),
+	 ('534',3099),
+	 ('535',3258),
+	 ('536',3270),
+	 ('537',3187),
+	 ('538',3192),
+	 ('539',3139),
+	 ('540',3059),
+	 ('542',3014),
+	 ('543',3047),
+	 ('544',3224),
+	 ('545',3150),
+	 ('546',3257),
+	 ('547',3189),
+	 ('549',3265),
+	 ('550',3250),
+	 ('551',3141),
+	 ('552',3069),
+	 ('553',3257),
+	 ('554',3085),
+	 ('555',3070),
+	 ('556',3116),
+	 ('557',3147),
+	 ('558',3161),
+	 ('559',3238),
+	 ('560',3233),
+	 ('561',3046),
+	 ('562',3103),
+	 ('563',3201),
+	 ('564',3207),
+	 ('565',3156),
+	 ('566',3155),
+	 ('567',3222),
+	 ('568',3025),
+	 ('569',3152),
+	 ('570',3251),
+	 ('571',3200),
+	 ('572',3029),
+	 ('573',3172),
+	 ('574',3017),
+	 ('575',3274),
+	 ('576',3045),
+	 ('577',3158),
+	 ('579',3148),
+	 ('580',3012),
+	 ('581',3133),
+	 ('582',3054),
+	 ('583',3046),
+	 ('584',3185),
+	 ('585',3275),
+	 ('586',3247),
+	 ('587',3113),
+	 ('588',3136),
+	 ('611',3237),
+	 ('590',3063),
+	 ('591',3110),
+	 ('592',3154),
+	 ('593',3193),
+	 ('594',3234),
+	 ('595',3237),
+	 ('596',3192),
+	 ('597',3101),
+	 ('598',3236),
+	 ('599',3063),
+	 ('600',3202),
+	 ('2',3013),
+	 ('541',3040),
+	 ('548',3213),
+	 ('578',3198),
+	 ('612',3237),
+	 ('613',3237),
+	 ('614',3110),
+	 ('615',3110),
+	 ('616',3110),
+	 ('617',3110),
+	 ('618',3110),
+	 ('619',3110),
+	 ('620',3110),
+	 ('621',3041),
+	 ('622',3041),
+	 ('623',3041),
+	 ('624',3041),
+	 ('625',3041),
+	 ('626',3112),
+	 ('627',3112),
+	 ('628',3112),
+	 ('629',3112),
+	 ('630',3053),
+	 ('631',3053),
+	 ('632',3053),
+	 ('633',3053),
+	 ('634',3053),
+	 ('635',3092),
+	 ('636',3092),
+	 ('637',3092),
+	 ('1059',3116),
+	 ('1060',3098),
+	 ('1061',3065),
+	 ('1062',3078),
+	 ('1063',3217),
+	 ('1064',3166),
+	 ('1065',3152),
+	 ('1066',3054),
+	 ('1067',3071),
+	 ('1068',3016),
+	 ('1069',3074),
+	 ('1070',3027),
+	 ('1071',3060),
+	 ('1072',3222),
+	 ('1073',3208),
+	 ('1074',3145),
+	 ('1075',3119),
+	 ('1076',3117),
+	 ('1077',3159),
+	 ('1078',3216),
+	 ('1079',3138),
+	 ('1080',3049),
+	 ('1081',3221),
+	 ('1082',3075),
+	 ('1083',3064),
+	 ('1084',3148),
+	 ('1085',3211),
+	 ('1086',3198),
+	 ('1087',3185),
+	 ('1088',3032),
+	 ('1089',3158),
+	 ('1090',3022),
+	 ('1091',3011),
+	 ('1092',3114),
+	 ('1093',3227),
+	 ('1094',3194),
+	 ('1095',3263),
+	 ('1096',3156),
+	 ('1097',3124),
+	 ('1098',3082),
+	 ('1099',3232),
+	 ('1100',3267),
+	 ('1101',3008);
+
 
 
 INSERT INTO man_chamber VALUES ('18868', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
