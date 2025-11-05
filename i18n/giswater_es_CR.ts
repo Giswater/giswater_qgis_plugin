@@ -554,8 +554,40 @@
 		</message>
 		<!-- PYTHON MESSAGES -->
 		<message>
+			<source>{0} campaign(s) deleted.</source>
+			<translation>{0} campaña(s) eliminada(s).</translation>
+		</message>
+		<message>
+			<source>{0} workorder(s) deleted.</source>
+			<translation>{0} orden(es) de trabajo eliminada(s).</translation>
+		</message>
+		<message>
 			<source>An error occurred saving the workorder.</source>
 			<translation>Se ha producido un error al guardar la orden de trabajo.</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>¿Está seguro que desea eliminar {0} campaña(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} workorder(s)?</source>
+			<translation>¿Está seguro que desea eliminar {0} orden(es) de trabajo?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete these records:</source>
+			<translation>¿Está seguro que desea eliminar estos registros:</translation>
+		</message>
+		<message>
+			<source>Campaign saved successfully.</source>
+			<translation>Campaña guardada exitosamente.</translation>
+		</message>
+		<message>
+			<source>CRITICAL ERROR in update_expl_sector_combos</source>
+			<translation>ERROR CRÍTICO en update_expl_sector_combos</translation>
+		</message>
+		<message>
+			<source>Delete Workorder(s)</source>
+			<translation>Eliminar Orden(es) de Trabajo</translation>
 		</message>
 		<message>
 			<source>End date</source>
@@ -566,8 +598,60 @@
 			<translation>Error</translation>
 		</message>
 		<message>
+			<source>Error creating or updating team</source>
+			<translation>Error al crear o actualizar el equipo</translation>
+		</message>
+		<message>
+			<source>Failed to fetch dialog configuration</source>
+			<translation>Error al cargar la configuración del diálogo</translation>
+		</message>
+		<message>
+			<source>Failed to load campaign form.</source>
+			<translation>Error al cargar el formulario de campaña.</translation>
+		</message>
+		<message>
+			<source>Failed to load team creation dialog configuration. Please check database configuration.</source>
+			<translation>Error al cargar la configuración del diálogo de creación de equipo. Verifique la configuración de la base de datos.</translation>
+		</message>
+		<message>
+			<source>Failed to load workorder form.</source>
+			<translation>Error al cargar el formulario de orden de trabajo.</translation>
+		</message>
+		<message>
+			<source>Failed to save campaign</source>
+			<translation>Error al guardar la campaña</translation>
+		</message>
+		<message>
+			<source>Info</source>
+			<translation>Información</translation>
+		</message>
+		<message>
+			<source>Invalid campaign ID.</source>
+			<translation>ID de campaña inválido.</translation>
+		</message>
+		<message>
+			<source>Invalid campaign mode</source>
+			<translation>Modo de campaña inválido</translation>
+		</message>
+		<message>
+			<source>Invalid workorder ID.</source>
+			<translation>ID de orden de trabajo inválido.</translation>
+		</message>
+		<message>
 			<source>Missing Data</source>
 			<translation>Faltan datos</translation>
+		</message>
+		<message>
+			<source>Missing required fields</source>
+			<translation>Faltan campos obligatorios</translation>
+		</message>
+		<message>
+			<source>No campaign selected.</source>
+			<translation>No hay campaña seleccionada.</translation>
+		</message>
+		<message>
+			<source>No records selected</source>
+			<translation>No hay registros seleccionados</translation>
 		</message>
 		<message>
 			<source>Planned end date</source>
@@ -582,8 +666,60 @@
 			<translation>Por favor, rellena todos los campos obligatorios (resaltados en rojo).</translation>
 		</message>
 		<message>
+			<source>Please select a team to assign.</source>
+			<translation>Por favor seleccione un equipo para asignar.</translation>
+		</message>
+		<message>
+			<source>Please select at least one user to assign a team.</source>
+			<translation>Por favor seleccione al menos un usuario para asignar un equipo.</translation>
+		</message>
+		<message>
+			<source>Please select at least one user to remove team assignment.</source>
+			<translation>Por favor seleccione al menos un usuario para quitar la asignación de equipo.</translation>
+		</message>
+		<message>
+			<source>Please select a valid team to assign.</source>
+			<translation>Por favor seleccione un equipo válido para asignar.</translation>
+		</message>
+		<message>
+			<source>Please select a workorder to open.</source>
+			<translation>Por favor seleccione una orden de trabajo para abrir.</translation>
+		</message>
+		<message>
+			<source>Real end date</source>
+			<translation>Fecha fin real</translation>
+		</message>
+		<message>
+			<source>Real start date</source>
+			<translation>Fecha inicio real</translation>
+		</message>
+		<message>
+			<source>Select a campaign to delete.</source>
+			<translation>Seleccione una campaña para eliminar.</translation>
+		</message>
+		<message>
+			<source>Select a lot to delete.</source>
+			<translation>Seleccione un lote para eliminar.</translation>
+		</message>
+		<message>
+			<source>Select a workorder to delete.</source>
+			<translation>Seleccione una orden de trabajo para eliminar.</translation>
+		</message>
+		<message>
+			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
+			<translation>Faltan algunos valores obligatorios. Verifique los campos marcados en rojo.</translation>
+		</message>
+		<message>
 			<source>Start date</source>
 			<translation>Fecha de final</translation>
+		</message>
+		<message>
+			<source>The team name already exists</source>
+			<translation>El nombre del equipo ya existe</translation>
+		</message>
+		<message>
+			<source>This will also delete the database user(s):</source>
+			<translation>Esto también eliminará el/los usuario(s) de base de datos:</translation>
 		</message>
 		<message>
 			<source></source>
@@ -1003,7 +1139,7 @@
 		</message>
 		<message>
 			<source>Atlas ID must be an integer.</source>
-			<translation>El ID de Atlas debe ser un número entero.</translation>
+			<translation>El ID del Atlas debe ser un número entero.</translation>
 		</message>
 		<message>
 			<source>    author = {Boeing, Geoff},</source>
@@ -5963,7 +6099,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>You are going to make this result corporate. From now on the result values will appear on feature form. Do you want to continue?</source>
-			<translation>Va a convertir este resultado en corporativo. A partir de ahora los valores del resultado aparecerán en el formulario de características. ¿Desea continuar?</translation>
+			<translation>Vas a hacer que este resultado sea corporativo. A partir de ahora, los valores del resultado aparecerán en el formulario del elemento. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>You are not enabled to modify this {0} widget</source>

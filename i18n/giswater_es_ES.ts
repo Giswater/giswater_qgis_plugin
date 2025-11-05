@@ -554,8 +554,40 @@
 		</message>
 		<!-- PYTHON MESSAGES -->
 		<message>
+			<source>{0} campaign(s) deleted.</source>
+			<translation>{0} campaña(s) eliminada(s).</translation>
+		</message>
+		<message>
+			<source>{0} workorder(s) deleted.</source>
+			<translation>{0} orden(es) de trabajo eliminada(s).</translation>
+		</message>
+		<message>
 			<source>An error occurred saving the workorder.</source>
 			<translation>Se ha producido un error al guardar la orden de trabajo.</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>¿Está seguro que desea eliminar {0} campaña(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} workorder(s)?</source>
+			<translation>¿Está seguro que desea eliminar {0} orden(es) de trabajo?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete these records:</source>
+			<translation>¿Está seguro que desea eliminar estos registros:</translation>
+		</message>
+		<message>
+			<source>Campaign saved successfully.</source>
+			<translation>Campaña guardada exitosamente.</translation>
+		</message>
+		<message>
+			<source>CRITICAL ERROR in update_expl_sector_combos</source>
+			<translation>ERROR CRÍTICO en update_expl_sector_combos</translation>
+		</message>
+		<message>
+			<source>Delete Workorder(s)</source>
+			<translation>Eliminar Orden(es) de Trabajo</translation>
 		</message>
 		<message>
 			<source>End date</source>
@@ -566,8 +598,60 @@
 			<translation>Error</translation>
 		</message>
 		<message>
+			<source>Error creating or updating team</source>
+			<translation>Error al crear o actualizar el equipo</translation>
+		</message>
+		<message>
+			<source>Failed to fetch dialog configuration</source>
+			<translation>Error al cargar la configuración del diálogo</translation>
+		</message>
+		<message>
+			<source>Failed to load campaign form.</source>
+			<translation>Error al cargar el formulario de campaña.</translation>
+		</message>
+		<message>
+			<source>Failed to load team creation dialog configuration. Please check database configuration.</source>
+			<translation>Error al cargar la configuración del diálogo de creación de equipo. Verifique la configuración de la base de datos.</translation>
+		</message>
+		<message>
+			<source>Failed to load workorder form.</source>
+			<translation>Error al cargar el formulario de orden de trabajo.</translation>
+		</message>
+		<message>
+			<source>Failed to save campaign</source>
+			<translation>Error al guardar la campaña</translation>
+		</message>
+		<message>
+			<source>Info</source>
+			<translation>Información</translation>
+		</message>
+		<message>
+			<source>Invalid campaign ID.</source>
+			<translation>ID de campaña inválido.</translation>
+		</message>
+		<message>
+			<source>Invalid campaign mode</source>
+			<translation>Modo de campaña inválido</translation>
+		</message>
+		<message>
+			<source>Invalid workorder ID.</source>
+			<translation>ID de orden de trabajo inválido.</translation>
+		</message>
+		<message>
 			<source>Missing Data</source>
 			<translation>Faltan datos</translation>
+		</message>
+		<message>
+			<source>Missing required fields</source>
+			<translation>Faltan campos obligatorios</translation>
+		</message>
+		<message>
+			<source>No campaign selected.</source>
+			<translation>No hay campaña seleccionada.</translation>
+		</message>
+		<message>
+			<source>No records selected</source>
+			<translation>No hay registros seleccionados</translation>
 		</message>
 		<message>
 			<source>Planned end date</source>
@@ -582,8 +666,60 @@
 			<translation>Por favor, rellena todos los campos obligatorios (resaltados en rojo).</translation>
 		</message>
 		<message>
+			<source>Please select a team to assign.</source>
+			<translation>Por favor seleccione un equipo para asignar.</translation>
+		</message>
+		<message>
+			<source>Please select at least one user to assign a team.</source>
+			<translation>Por favor seleccione al menos un usuario para asignar un equipo.</translation>
+		</message>
+		<message>
+			<source>Please select at least one user to remove team assignment.</source>
+			<translation>Por favor seleccione al menos un usuario para quitar la asignación de equipo.</translation>
+		</message>
+		<message>
+			<source>Please select a valid team to assign.</source>
+			<translation>Por favor seleccione un equipo válido para asignar.</translation>
+		</message>
+		<message>
+			<source>Please select a workorder to open.</source>
+			<translation>Por favor seleccione una orden de trabajo para abrir.</translation>
+		</message>
+		<message>
+			<source>Real end date</source>
+			<translation>Fecha fin real</translation>
+		</message>
+		<message>
+			<source>Real start date</source>
+			<translation>Fecha inicio real</translation>
+		</message>
+		<message>
+			<source>Select a campaign to delete.</source>
+			<translation>Seleccione una campaña para eliminar.</translation>
+		</message>
+		<message>
+			<source>Select a lot to delete.</source>
+			<translation>Seleccione un lote para eliminar.</translation>
+		</message>
+		<message>
+			<source>Select a workorder to delete.</source>
+			<translation>Seleccione una orden de trabajo para eliminar.</translation>
+		</message>
+		<message>
+			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
+			<translation>Faltan algunos valores obligatorios. Verifique los campos marcados en rojo.</translation>
+		</message>
+		<message>
 			<source>Start date</source>
 			<translation>Fecha de final</translation>
+		</message>
+		<message>
+			<source>The team name already exists</source>
+			<translation>El nombre del equipo ya existe</translation>
+		</message>
+		<message>
+			<source>This will also delete the database user(s):</source>
+			<translation>Esto también eliminará el/los usuario(s) de base de datos:</translation>
 		</message>
 		<message>
 			<source></source>
@@ -1000,6 +1136,10 @@
 		<message>
 			<source>A style already exists for the layer '{0}' in the selected style group.</source>
 			<translation>A style already exists for the layer '{0}' in the selected style group.</translation>
+		</message>
+		<message>
+			<source>Atlas ID must be an integer.</source>
+			<translation>El ID del Atlas debe ser un número entero.</translation>
 		</message>
 		<message>
 			<source>    author = {Boeing, Geoff},</source>
@@ -1499,7 +1639,7 @@
 		</message>
 		<message>
 			<source>Credentials will be stored in GIS project file. Do you want to continue?</source>
-			<translation>Credentials will be stored in GIS project file. Do you want to continue?</translation>
+			<translation>Las credenciales se almacenarán en el archivo del proyecto GIS. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>Credentials will be stored in the GIS project file as plain text, and will apply to both existing and future layers. Do you want to proceed?</source>
@@ -1630,6 +1770,10 @@
 			<translation>Data retrieved and displayed successfully.</translation>
 		</message>
 		<message>
+			<source>Date</source>
+			<translation>Fecha</translation>
+		</message>
+		<message>
 			<source>Date from:</source>
 			<translation>Date from:</translation>
 		</message>
@@ -1740,6 +1884,10 @@
 		<message>
 			<source>Do you want change it and continue?</source>
 			<translation>Do you want change it and continue?</translation>
+		</message>
+		<message>
+			<source>Do you want to continue?</source>
+			<translation>¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>Do you want to copy its values to the current node?</source>
@@ -2838,6 +2986,10 @@
 			<translation>Id ya seleccionado</translation>
 		</message>
 		<message>
+			<source>Identify all</source>
+			<translation>Identificar todo</translation>
+		</message>
+		<message>
 			<source>Identifying all nodes that lie outside the polygon...</source>
 			<translation>Identifying all nodes that lie outside the polygon...</translation>
 		</message>
@@ -3182,6 +3334,10 @@
 			<translation>Fugas sin tuberías intersectando su buffer: {leaks}.</translation>
 		</message>
 		<message>
+			<source>levels</source>
+			<translation>niveles</translation>
+		</message>
+		<message>
 			<source>LIDS</source>
 			<translation>LIDS</translation>
 		</message>
@@ -3290,6 +3446,10 @@
 			<translation>Med. Longevidad</translation>
 		</message>
 		<message>
+			<source>Merge requires at least 2 psectors to be selected</source>
+			<translation>La fusión necesita por lo menos tener 2 sectores seleccionados</translation>
+		</message>
+		<message>
 			<source>Message</source>
 			<translation>Message</translation>
 		</message>
@@ -3384,6 +3544,10 @@
 		<message>
 			<source>\n</source>
 			<translation>\n</translation>
+		</message>
+		<message>
+			<source>Name</source>
+			<translation>Nombre</translation>
 		</message>
 		<message>
 			<source>Name, description and code are required fields</source>
@@ -3490,6 +3654,14 @@
 			<translation>No event provided for point selection</translation>
 		</message>
 		<message>
+			<source>No features found in the selection for {0}.</source>
+			<translation>No se encontraron elementos en la selección para {0}.</translation>
+		</message>
+		<message>
+			<source>No features found in the selection for the enabled tabs ({0}).</source>
+			<translation>No se encontraron elementos en la selección para las pestañas activadas ({0}).</translation>
+		</message>
+		<message>
 			<source>NO FEATURE TYPE DEFINED</source>
 			<translation>NO FEATURE TYPE DEFINED</translation>
 		</message>
@@ -3520,6 +3692,10 @@
 		<message>
 			<source>No municipalities selected</source>
 			<translation>No municipalities selected</translation>
+		</message>
+		<message>
+			<source>No new features to insert. All selected features already exist in the table.</source>
+			<translation>No hay nuevos elementos para insertar. Todos los elementos seleccionados ya existen en la tabla.</translation>
 		</message>
 		<message>
 			<source>No node ID found at the snapped location.</source>
@@ -3603,7 +3779,7 @@
 		</message>
 		<message>
 			<source>No valid psector IDs found</source>
-			<translation>No valid psector IDs found</translation>
+			<translation>No se encontraron IDs de psector válidos.</translation>
 		</message>
 		<message>
 			<source>No valid snapping result. Please select a valid point.</source>
@@ -3764,6 +3940,14 @@
 		<message>
 			<source>Parameter widgetfunction not found for widget type hyperlink</source>
 			<translation>No se encontró la función de widget de parámetro para el tipo de componente hipervínculo</translation>
+		</message>
+		<message>
+			<source>Parent ID does not exist.</source>
+			<translation>El ID del padre no existe.</translation>
+		</message>
+		<message>
+			<source>Parent ID must be an integer.</source>
+			<translation>El ID del padre debe ser un número entero.</translation>
 		</message>
 		<message>
 			<source>Parsing error fixed</source>
@@ -4146,8 +4330,20 @@
 			<translation>Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?</translation>
 		</message>
 		<message>
+			<source>Psector could not be updated because of the following errors: </source>
+			<translation>El Psector no se pudo actualizar debido a los siguientes errores:</translation>
+		</message>
+		<message>
 			<source>Psector features loaded successfully on the map.</source>
 			<translation>Psector features loaded successfully on the map.</translation>
+		</message>
+		<message>
+			<source>Psector ID</source>
+			<translation>Psector ID</translation>
+		</message>
+		<message>
+			<source>Psector ID not found</source>
+			<translation>No se encontró el ID del psector.</translation>
 		</message>
 		<message>
 			<source>Psector is not archived</source>
@@ -4266,6 +4462,10 @@
 			<translation>Replacing template text</translation>
 		</message>
 		<message>
+			<source>Reports generated successfully</source>
+			<translation>Informes generados correctamente.</translation>
+		</message>
+		<message>
 			<source>Required fields are missing</source>
 			<translation>Required fields are missing</translation>
 		</message>
@@ -4310,6 +4510,10 @@
 			<translation>rio-vrt must be installed as an optional dependency to build VRTs.</translation>
 		</message>
 		<message>
+			<source>Rotation must be a number.</source>
+			<translation>La rotación debe ser un número.</translation>
+		</message>
+		<message>
 			<source>`route_colors` and `route_linewidths` must have same lengths as `routes`.</source>
 			<translation>`route_colors` and `route_linewidths` must have same lengths as `routes`.</translation>
 		</message>
@@ -4340,6 +4544,10 @@
 		<message>
 			<source>Saving results to DB</source>
 			<translation>Guardar resultados en la BD</translation>
+		</message>
+		<message>
+			<source>Scale must be a number.</source>
+			<translation>La escala debe ser un número.</translation>
 		</message>
 		<message>
 			<source>Schema audit not found, please create it first</source>
@@ -4835,7 +5043,7 @@
 		</message>
 		<message>
 			<source>The configuration file doesn't match the selected INP file. Some options may not be loaded or may be incorrect. Do you want to continue?</source>
-			<translation>The configuration file doesn't match the selected INP file. Some options may not be loaded or may be incorrect. Do you want to continue?</translation>
+			<translation>El archivo de configuración no coincide con el archivo INP seleccionado. Es posible que algunas opciones no se carguen o sean incorrectas. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>The connection to the database is broken.</source>
@@ -4908,6 +5116,10 @@
 		<message>
 			<source>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</source>
 			<translation>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</translation>
+		</message>
+		<message>
+			<source>The following fields differ between the selected arcs. You are about to merge them using the selected values.</source>
+			<translation>Los siguientes campos difieren entre los arcos seleccionados. Estás a punto de combinarlos utilizando los valores seleccionados.</translation>
 		</message>
 		<message>
 			<source>The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.</source>
@@ -5007,7 +5219,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>There are multiple queries configured. These are the lists that will be used. Do you want to continue?</source>
-			<translation>There are multiple queries configured. These are the lists that will be used. Do you want to continue?</translation>
+			<translation>Hay varias consultas configuradas. Estas son las listas que se utilizarán. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>There are multple tabs in order to configure all the necessary catalogs.</source>
@@ -5179,7 +5391,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>These are the lists that will be used. Do you want to continue?</source>
-			<translation>These are the lists that will be used. Do you want to continue?</translation>
+			<translation>Estas son las listas que se utilizarán. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>The second tab is the 'Features' tab, where you can select the corresponding feature classes for each type of feature on the network.</source>
@@ -5646,6 +5858,10 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>    url = {https://geoffboeing.com/publications/osmnx-paper/},</translation>
 		</message>
 		<message>
+			<source>User</source>
+			<translation>Usuario</translation>
+		</message>
+		<message>
 			<source>User '{0}' was created, but failed to grant roles ('{1}', 'role_basic').</source>
 			<translation>User '{0}' was created, but failed to grant roles ('{1}', 'role_basic').</translation>
 		</message>
@@ -5883,7 +6099,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>You are going to make this result corporate. From now on the result values will appear on feature form. Do you want to continue?</source>
-			<translation>You are going to make this result corporate. From now on the result values will appear on feature form. Do you want to continue?</translation>
+			<translation>Vas a hacer que este resultado sea corporativo. A partir de ahora, los valores del resultado aparecerán en el formulario del elemento. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>You are not enabled to modify this {0} widget</source>
@@ -5895,11 +6111,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?</source>
-			<translation>You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?</translation>
+			<translation>Estás intentando añadir o eliminar un registro de la tabla, habiendo cambios en los registros actuales. Si continúas, los cambios se descartarán sin guardar. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>You are trying to add/remove a record from the table, with changes to the current records.If you continue, the changes will be discarded without saving. Do you want to continue?</source>
-			<translation>You are trying to add/remove a record from the table, with changes to the current records.If you continue, the changes will be discarded without saving. Do you want to continue?</translation>
+			<translation>Estás intentando añadir o eliminar un registro de la tabla, habiendo cambios en los registros actuales. Si continúas, los cambios se descartarán sin guardar. ¿Quieres continuar?</translation>
 		</message>
 		<message>
 			<source>You are trying to delete your current psector. Please, change your current psector before delete.</source>
@@ -6000,6 +6216,18 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>You have to set this parameter</source>
 			<translation>Tiene que configurar este parámetro.</translation>
+		</message>
+		<message>
+			<source>You have to set this parameter: INP file</source>
+			<translation>Debes establecer este parámetro: archivo INP.</translation>
+		</message>
+		<message>
+			<source>You have to set this parameter: RPT file</source>
+			<translation>Debes establecer este parámetro: archivo RPT.</translation>
+		</message>
+		<message>
+			<source>You must choose at least one action</source>
+			<translation>You must choose at least one action</translation>
 		</message>
 		<message>
 			<source>You must pass at least 1 route.</source>
@@ -21042,7 +21270,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>label_6</source>
-			<translation>ID Workcat:</translation>
+			<translation>Expediente de alta:</translation>
 		</message>
 		<message>
 			<source>tooltip_label_6</source>
@@ -21266,7 +21494,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
-			<translation>ID Workcat:</translation>
+			<translation>Expediente de alta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
