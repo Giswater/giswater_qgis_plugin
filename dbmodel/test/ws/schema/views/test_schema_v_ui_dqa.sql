@@ -26,7 +26,7 @@ SELECT columns_are(
         'descript',
         'active',
         'dqa_type',
-        'macrodqa_id',
+        'macrodqa',
         'expl_id',
         'sector_id',
         'muni_id',
@@ -40,8 +40,7 @@ SELECT columns_are(
         'created_at',
         'created_by',
         'updated_at',
-        'updated_by',
-        'the_geom'
+        'updated_by'
     ],
     'View v_ui_dqa should have the correct columns'
 );
