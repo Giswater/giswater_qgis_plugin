@@ -110,7 +110,7 @@ BEGIN
 
 			IF NEW.workcat_id IS NULL THEN
 				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"5008", "function":"2446","parameters":null}}$$);';
+				"data":{"message":"4456", "function":"2446","parameters":null}}$$);';
 			END IF;
 		END IF;
 

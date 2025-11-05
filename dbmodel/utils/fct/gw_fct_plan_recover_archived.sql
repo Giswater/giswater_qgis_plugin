@@ -79,8 +79,8 @@ BEGIN
 	-- 	END LOOP;
 
 	-- 	-- Return error message
-	-- 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":5010, "infoType":1, "lang":"ES"},"feature":{},
-	-- 	"data":{"message":"5010", "function":"3512","parameters":null}}$$);';
+	-- 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	-- 	"data":{"message":"4458", "function":"3512","parameters":null}}$$);';
 	-- END IF;
 
 	-- set status and inactive (archived column doesn't exist in older versions)

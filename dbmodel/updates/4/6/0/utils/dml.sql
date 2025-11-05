@@ -20,3 +20,18 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4450, 'No hydrometers provided in the request.', 'The hydrometers array cannot be empty. Provide at least one hydrometer.', 2, true, 'utils', 'core', 'UI');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4452, 'Code is required for hydrometer #%hydrometer% when using INSERT or REPLACE action.', 'Provide a valid code for each hydrometer.', 1, true, 'utils', 'core', 'UI');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4454, 'Hydrometer with code %code% not found for UPDATE operation.', 'Verify that the hydrometer exists in the database.', 2, true, 'utils', 'core', 'UI');
+
+-- move there is and there are messages to -2 and -3, TEMPORARY SOLUTION
+UPDATE sys_message
+SET id=-3
+WHERE id=5002;
+UPDATE sys_message
+SET id=-2
+WHERE id=5000;
+
+UPDATE sys_message
+SET id=4456
+WHERE id=5008;
+UPDATE sys_message
+SET id=4458
+WHERE id=5010;
