@@ -34,7 +34,7 @@ SELECT columns_are(
         'created_at',
         'created_by',
         'updated_at',
-        'updated_by',
+        'updated_by'
     ],
     'View v_ui_macrosector should have the correct columns'
 );

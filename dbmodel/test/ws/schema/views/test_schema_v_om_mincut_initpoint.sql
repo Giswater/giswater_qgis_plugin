@@ -53,7 +53,7 @@ SELECT columns_are('v_om_mincut_initpoint', ARRAY[
         'exec_appropiate',
         'notified',
         'output',
-        'result_type',
+        'result_type'
 ], 'View v_om_mincut_initpoint should have the correct columns');
 
 SELECT * FROM finish();

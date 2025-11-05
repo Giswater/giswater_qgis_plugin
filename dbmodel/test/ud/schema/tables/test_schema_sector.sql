@@ -31,9 +31,9 @@ SELECT col_is_pk('sector', ARRAY['sector_id'], 'Column sector_id should be prima
 
 -- Check column types
 SELECT col_type_is('sector', 'sector_id', 'integer', 'Column sector_id should be integer');
-SELECT col_type_is('sector', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('sector', 'name', 'varchar(50)', 'Column name should be varchar(50)');
-SELECT col_type_is('sector', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('sector', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('sector', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('sector', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('sector', 'sector_type', 'varchar(50)', 'Column sector_type should be varchar(50)');
 SELECT col_type_is('sector', 'macrosector_id', 'integer', 'Column macrosector_id should be integer');
 SELECT col_type_is('sector', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');

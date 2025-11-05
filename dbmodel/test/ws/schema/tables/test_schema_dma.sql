@@ -32,9 +32,9 @@ SELECT col_is_pk('dma', ARRAY['dma_id'], 'Column dma_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('dma', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('dma', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('dma', 'name', 'varchar(30)', 'Column name should be varchar(30)');
-SELECT col_type_is('dma', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('dma', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('dma', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('dma', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('dma', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
 SELECT col_type_is('dma', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('dma', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');

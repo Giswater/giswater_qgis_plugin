@@ -38,7 +38,7 @@ SELECT columns_are(
         'created_at',
         'created_by',
         'updated_at',
-        'updated_by',
+        'updated_by'
     ],
     'View ve_sector should have the correct columns'
 );

@@ -32,10 +32,10 @@ SELECT col_is_pk('macroomzone', ARRAY['macroomzone_id'], 'Column macroomzone_id 
 
 -- Check column types
 SELECT col_type_is('macroomzone', 'macroomzone_id', 'integer', 'Column macroomzone_id should be integer');
-SELECT col_type_is('macroomzone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('macroomzone', 'name', 'varchar(50)', 'Column name should be varchar(50)');
+SELECT col_type_is('macroomzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('macroomzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
 SELECT col_type_is('macroomzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
-SELECT col_type_is('macroomzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('macroomzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('macroomzone', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macroomzone', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macroomzone', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');

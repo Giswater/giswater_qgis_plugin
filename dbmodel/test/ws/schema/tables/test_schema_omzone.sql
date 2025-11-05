@@ -32,9 +32,9 @@ SELECT col_is_pk('omzone', ARRAY['omzone_id'], 'Column omzone_id should be prima
 
 -- Check column types
 SELECT col_type_is('omzone', 'omzone_id', 'integer', 'Column omzone_id should be integer');
-SELECT col_type_is('omzone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('omzone', 'name', 'varchar(30)', 'Column name should be varchar(30)');
-SELECT col_type_is('omzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('omzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('omzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('omzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('omzone', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
 SELECT col_type_is('omzone', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('omzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');

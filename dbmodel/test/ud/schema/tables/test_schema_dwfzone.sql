@@ -31,13 +31,13 @@ SELECT col_is_pk('dwfzone', 'dwfzone_id', 'Column dwfzone_id should be primary k
 
 -- Check column types
 SELECT col_type_is('dwfzone', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
-SELECT col_type_is('dwfzone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('dwfzone', 'name', 'varchar(30)', 'Column name should bevarchar(30)');
+SELECT col_type_is('dwfzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('dwfzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
 SELECT col_type_is('dwfzone', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
 SELECT col_type_is('dwfzone', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
 SELECT col_type_is('dwfzone', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');
 SELECT col_type_is('dwfzone', 'sector_id', 'int4[]', 'Column sector_id should be int4[]');
-SELECT col_type_is('dwfzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('dwfzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('dwfzone', 'link', 'text', 'Column link should be text');
 SELECT col_type_is('dwfzone', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('dwfzone', 'stylesheet', 'json', 'Column stylesheet should be json');

@@ -32,9 +32,9 @@ SELECT col_is_pk('macrosector', ARRAY['macrosector_id'], 'Column macrosector_id 
 
 -- Check column types
 SELECT col_type_is('macrosector', 'macrosector_id', 'integer', 'Column macrosector_id should be integer');
-SELECT col_type_is('macrosector', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('macrosector', 'name', 'varchar(50)', 'Column name should be varchar(50)');
-SELECT col_type_is('macrosector', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('macrosector', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('macrosector', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('macrosector', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('macrosector', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macrosector', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macrosector', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');

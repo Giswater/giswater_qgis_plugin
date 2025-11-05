@@ -49,7 +49,7 @@ SELECT columns_are(
         'update_date',
         'hydrometer_link',
         'is_operative',
-        'shutdown_date',
+        'shutdown_date'
     ],
     'View v_rtc_hydrometer should have the correct columns'
 );

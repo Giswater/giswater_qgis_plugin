@@ -32,9 +32,9 @@ SELECT col_is_pk('presszone', ARRAY['presszone_id'], 'Column presszone_id should
 
 -- Check column types
 SELECT col_type_is('presszone', 'presszone_id', 'integer', 'Column presszone_id should be integer');
-SELECT col_type_is('presszone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('presszone', 'name', 'text', 'Column name should be text');
-SELECT col_type_is('presszone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('presszone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('presszone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('presszone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('presszone', 'presszone_type', 'text', 'Column presszone_type should be text');
 SELECT col_type_is('presszone', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('presszone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');

@@ -39,7 +39,7 @@ SELECT columns_are(
         'created_by',
         'updated_at',
         'updated_by',
-        'the_geom',
+        'the_geom'
     ],
     'View ve_omzone should have the correct columns'
 );

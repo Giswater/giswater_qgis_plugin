@@ -21,7 +21,7 @@ SELECT columns_are(
     'v_ui_om_visit',
     ARRAY[
         'id', 'visit_catalog', 'ext_code', 'startdate', 'enddate', 'user_name', 
-        'webclient_id', 'exploitation', 'the_geom', 'descript', 'is_done', 'visit_type',
+        'webclient_id', 'exploitation', 'the_geom', 'descript', 'is_done', 'visit_type'
     ],
     'View v_ui_om_visit should have the correct columns'
 );

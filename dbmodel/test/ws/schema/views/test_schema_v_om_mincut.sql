@@ -57,7 +57,7 @@ SELECT columns_are(
         'chlorine',
         'turbidity',
         'notified',
-        'output',
+        'output'
     ],
     'View v_om_mincut should have the correct columns'
 );

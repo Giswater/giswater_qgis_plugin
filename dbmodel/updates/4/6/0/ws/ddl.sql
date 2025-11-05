@@ -57,8 +57,6 @@ DROP VIEW IF EXISTS v_ui_dqa;
 DROP VIEW IF EXISTS ve_dqa;
 DROP VIEW IF EXISTS v_ui_macrodqa;
 DROP VIEW IF EXISTS ve_macrodqa;
-DROP VIEW IF EXISTS v_ui_macrocrmzone;
-DROP VIEW IF EXISTS ve_macrocrmzone;
 
 ALTER TABLE macroexploitation ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macroexploitation ALTER COLUMN name TYPE varchar(100);
@@ -82,7 +80,11 @@ ALTER TABLE dqa ALTER COLUMN descript TYPE varchar(255);
 
 ALTER TABLE macrodqa ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrodqa ALTER COLUMN name TYPE varchar(100);
-ALTER TABLE macrodqa ALTER COLUMN descript TYPE varchar(255);
+ALTER TABLE macrodqa ALTER COLUMN descript TYPE varchar(255);\
+
+ALTER TABLE crmzone ADD COLUMN code varchar(100);
+ALTER TABLE crmzone ALTER COLUMN name TYPE varchar(100);
+ALTER TABLE crmzone ALTER COLUMN descript TYPE varchar(255);
 
 ALTER TABLE macrocrmzone ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrocrmzone ALTER COLUMN name TYPE varchar(100);

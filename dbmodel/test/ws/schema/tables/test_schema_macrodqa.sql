@@ -32,9 +32,9 @@ SELECT col_is_pk('macrodqa', ARRAY['macrodqa_id'], 'Column macrodqa_id should be
 
 -- Check column types
 SELECT col_type_is('macrodqa', 'macrodqa_id', 'integer', 'Column macrodqa_id should be integer');
-SELECT col_type_is('macrodqa', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('macrodqa', 'name', 'varchar(50)', 'Column name should be varchar(50)');
-SELECT col_type_is('macrodqa', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('macrodqa', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('macrodqa', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('macrodqa', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('macrodqa', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('macrodqa', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macrodqa', 'active', 'boolean', 'Column active should be boolean');

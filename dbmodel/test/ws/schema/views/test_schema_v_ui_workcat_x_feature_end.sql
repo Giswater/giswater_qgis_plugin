@@ -20,7 +20,7 @@ SELECT has_view('v_ui_workcat_x_feature_end'::name, 'View v_ui_workcat_x_feature
 SELECT columns_are(
     'v_ui_workcat_x_feature_end',
     ARRAY[
-        'rid', 'feature_type', 'featurecat_id', 'feature_id', 'code', 'expl_name', 'workcat_id', 'expl_id',
+        'rid', 'feature_type', 'featurecat_id', 'feature_id', 'code', 'expl_name', 'workcat_id', 'expl_id'
     ],
     'View v_ui_workcat_x_feature_end should have the correct columns'
 );

@@ -46,7 +46,7 @@ SELECT columns_are(
         'start_date',
         'end_date',
         'update_date',
-        'hydrometer_link',
+        'hydrometer_link'
     ],
     'View v_rtc_hydrometer_x_connec should have the correct columns'
 );

@@ -32,9 +32,9 @@ SELECT col_is_pk('dqa', ARRAY['dqa_id'], 'Column dqa_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('dqa', 'dqa_id', 'integer', 'Column dqa_id should be integer');
-SELECT col_type_is('dqa', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('dqa', 'name', 'varchar(30)', 'Column name should be varchar(30)');
-SELECT col_type_is('dqa', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('dqa', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('dqa', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('dqa', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('dqa', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
 SELECT col_type_is('dqa', 'muni_id', '_int4', 'Column muni_id should be _int4');
 SELECT col_type_is('dqa', 'expl_id', '_int4', 'Column expl_id should be _int4');

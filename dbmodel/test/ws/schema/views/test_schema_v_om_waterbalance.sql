@@ -39,7 +39,7 @@ SELECT columns_are(
         'rw',
         'nrw',
         'nrw_eff',
-        'the_geom',
+        'the_geom'
     ],
     'View v_om_waterbalance should have the correct columns'
 );

@@ -48,7 +48,7 @@ SELECT columns_are(
        'expl_nrw_eff',
        'expl_nightvol',
        'expl_ili',
-       'expl_m4day',
+       'expl_m4day'
     ],
     'View v_om_waterbalance_report should have the correct columns'
 );

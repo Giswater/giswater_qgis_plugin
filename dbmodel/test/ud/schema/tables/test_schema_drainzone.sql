@@ -32,10 +32,10 @@ SELECT col_is_pk('drainzone', ARRAY['drainzone_id'], 'Column drainzone_id should
 
 -- Check column types
 SELECT col_type_is('drainzone', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
-SELECT col_type_is('drainzone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('drainzone', 'name', 'varchar(30)', 'Column name should be varchar(30)');
+SELECT col_type_is('drainzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('drainzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
 SELECT col_type_is('drainzone', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
-SELECT col_type_is('drainzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('drainzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('drainzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('drainzone', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('drainzone', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');

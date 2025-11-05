@@ -26,7 +26,7 @@ SELECT columns_are(
         'feature_customer_code',
         'state',
         'expl_name',
-        'hydrometer_link',
+        'hydrometer_link'
     ],
     'View v_ui_hydrometer should have the correct columns'
 );

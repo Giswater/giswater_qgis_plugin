@@ -32,9 +32,9 @@ SELECT col_is_pk('supplyzone', ARRAY['supplyzone_id'], 'Column supplyzone_id sho
 
 -- Check column types
 SELECT col_type_is('supplyzone', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
-SELECT col_type_is('supplyzone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('supplyzone', 'name', 'character varying(30)', 'Column name should be character varying(30)');
-SELECT col_type_is('supplyzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('supplyzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('supplyzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('supplyzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('supplyzone', 'supplyzone_type', 'character varying(16)', 'Column supplyzone_type should be character varying(16)');
 SELECT col_type_is('supplyzone', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('supplyzone', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');

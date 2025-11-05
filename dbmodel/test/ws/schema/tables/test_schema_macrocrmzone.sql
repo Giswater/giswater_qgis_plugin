@@ -30,9 +30,9 @@ SELECT col_is_pk('macrocrmzone', ARRAY['macrocrmzone_id'], 'Column macrocrmzone_
 
 -- Check column types
 SELECT col_type_is('macrocrmzone', 'macrocrmzone_id', 'integer', 'Column macrocrmzone_id should be integer');
-SELECT col_type_is('macrocrmzone', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('macrocrmzone', 'name', 'character varying(50)', 'Column name should be varchar(50)');
-SELECT col_type_is('macrocrmzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('macrocrmzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('macrocrmzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('macrocrmzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('macrocrmzone', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('macrocrmzone', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macrocrmzone', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');
