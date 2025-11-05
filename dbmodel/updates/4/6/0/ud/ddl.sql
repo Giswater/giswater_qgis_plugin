@@ -46,3 +46,16 @@ CREATE TABLE IF NOT EXISTS omunit (
     CONSTRAINT omunit_node_2_fkey FOREIGN KEY (node_2) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT omunit_macroomunit_id_fkey FOREIGN KEY (macroomunit_id) REFERENCES macroomunit(macroomunit_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+DROP VIEW IF EXISTS v_ui_dwfzone;
+DROP VIEW IF EXISTS ve_dwfzone;
+DROP VIEW IF EXISTS v_ui_drainzone;
+DROP VIEW IF EXISTS ve_drainzone;
+
+ALTER TABLE dwfzone ALTER COLUMN code TYPE varchar(100);
+ALTER TABLE dwfzone ALTER COLUMN name TYPE varchar(100);
+ALTER TABLE dwfzone ALTER COLUMN descript TYPE varchar(255);
+
+ALTER TABLE drainzone ALTER COLUMN code TYPE varchar(100);
+ALTER TABLE drainzone ALTER COLUMN name TYPE varchar(100);
+ALTER TABLE drainzone ALTER COLUMN descript TYPE varchar(255);

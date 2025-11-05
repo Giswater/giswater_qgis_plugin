@@ -1352,3 +1352,1215 @@ AS WITH sel_state AS (
     uuid,
     uncertain
    FROM connec_selected c;
+
+-- recreate views
+
+CREATE OR REPLACE VIEW v_ui_workcat_x_feature
+AS SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
+    arc.feature_type,
+    arc.arccat_id AS featurecat_id,
+    arc.arc_id AS feature_id,
+    arc.code,
+    exploitation.name AS expl_name,
+    arc.workcat_id,
+    exploitation.expl_id
+   FROM arc
+     JOIN exploitation ON exploitation.expl_id = arc.expl_id
+  WHERE arc.state = 1 AND arc.workcat_id IS NOT NULL
+UNION
+ SELECT row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
+    node.feature_type,
+    node.nodecat_id AS featurecat_id,
+    node.node_id AS feature_id,
+    node.code,
+    exploitation.name AS expl_name,
+    node.workcat_id,
+    exploitation.expl_id
+   FROM node
+     JOIN exploitation ON exploitation.expl_id = node.expl_id
+  WHERE node.state = 1 AND node.workcat_id IS NOT NULL
+UNION
+ SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
+    connec.feature_type,
+    connec.conneccat_id AS featurecat_id,
+    connec.connec_id AS feature_id,
+    connec.code,
+    exploitation.name AS expl_name,
+    connec.workcat_id,
+    exploitation.expl_id
+   FROM connec
+     JOIN exploitation ON exploitation.expl_id = connec.expl_id
+  WHERE connec.state = 1 AND connec.workcat_id IS NOT NULL
+UNION
+ SELECT row_number() OVER (ORDER BY element.element_id) + 4000000 AS rid,
+    element.feature_type,
+    element.elementcat_id AS featurecat_id,
+    element.element_id AS feature_id,
+    element.code,
+    exploitation.name AS expl_name,
+    element.workcat_id,
+    exploitation.expl_id
+   FROM element
+     JOIN exploitation ON exploitation.expl_id = element.expl_id
+  WHERE element.state = 1 AND element.workcat_id IS NOT NULL;
+
+
+CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end
+AS SELECT row_number() OVER (ORDER BY ve_arc.arc_id) + 1000000 AS rid,
+    'ARC'::character varying AS feature_type,
+    ve_arc.arccat_id AS featurecat_id,
+    ve_arc.arc_id AS feature_id,
+    ve_arc.code,
+    exploitation.name AS expl_name,
+    ve_arc.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM ve_arc
+     JOIN exploitation ON exploitation.expl_id = ve_arc.expl_id
+  WHERE ve_arc.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY ve_node.node_id) + 2000000 AS rid,
+    'NODE'::character varying AS feature_type,
+    ve_node.nodecat_id AS featurecat_id,
+    ve_node.node_id AS feature_id,
+    ve_node.code,
+    exploitation.name AS expl_name,
+    ve_node.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM ve_node
+     JOIN exploitation ON exploitation.expl_id = ve_node.expl_id
+  WHERE ve_node.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY ve_connec.connec_id) + 3000000 AS rid,
+    'CONNEC'::character varying AS feature_type,
+    ve_connec.conneccat_id AS featurecat_id,
+    ve_connec.connec_id AS feature_id,
+    ve_connec.code,
+    exploitation.name AS expl_name,
+    ve_connec.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM ve_connec
+     JOIN exploitation ON exploitation.expl_id = ve_connec.expl_id
+  WHERE ve_connec.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY element.element_id) + 4000000 AS rid,
+    'ELEMENT'::character varying AS feature_type,
+    element.elementcat_id AS featurecat_id,
+    element.element_id AS feature_id,
+    element.code,
+    exploitation.name AS expl_name,
+    element.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM element
+     JOIN exploitation ON exploitation.expl_id = element.expl_id
+  WHERE element.state = 0;
+
+
+CREATE OR REPLACE VIEW v_ui_mincut
+AS SELECT om_mincut.id,
+    om_mincut.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    exploitation.name AS exploitation,
+    ext_municipality.name AS municipality,
+    om_mincut.postcode,
+    ext_streetaxis.name AS streetaxis,
+    om_mincut.postnumber,
+    c.idval AS anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.anl_feature_id,
+    om_mincut.anl_feature_type,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    cat_users.name AS assigned_to,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_from_plot,
+    om_mincut.exec_depth,
+    om_mincut.exec_appropiate,
+    om_mincut.chlorine,
+    om_mincut.turbidity,
+    om_mincut.notified,
+    om_mincut.output
+FROM om_mincut
+LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
+LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
+LEFT JOIN om_typevalue c ON c.id::integer = om_mincut.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+LEFT JOIN exploitation ON exploitation.expl_id = om_mincut.expl_id
+LEFT JOIN macroexploitation ON macroexploitation.macroexpl_id = om_mincut.macroexpl_id
+LEFT JOIN ext_municipality ON ext_municipality.muni_id = om_mincut.muni_id
+LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = om_mincut.streetaxis_id::text
+LEFT JOIN cat_users ON cat_users.id::text = om_mincut.assigned_to::text
+WHERE om_mincut.id > 0;
+
+-- improve performance of v_om_mincut with a CTE instead of a cross join
+
+CREATE OR REPLACE VIEW v_om_mincut
+AS WITH sel_mincut_result AS (
+    SELECT result_id
+    FROM selector_mincut_result
+    WHERE cur_user = CURRENT_USER
+)
+SELECT om_mincut.id,
+    om_mincut.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    om_mincut.expl_id,
+    exploitation.name AS expl_name,
+    macroexploitation.name AS macroexpl_name,
+    om_mincut.macroexpl_id,
+    om_mincut.muni_id,
+    ext_municipality.name AS muni_name,
+    om_mincut.postcode,
+    om_mincut.streetaxis_id,
+    ext_streetaxis.name AS street_name,
+    om_mincut.postnumber,
+    c.idval AS anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.anl_feature_id,
+    om_mincut.anl_feature_type,
+    om_mincut.anl_the_geom,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut.assigned_to,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_the_geom,
+    om_mincut.exec_from_plot,
+    om_mincut.exec_depth,
+    om_mincut.exec_appropiate,
+    om_mincut.chlorine,
+    om_mincut.turbidity,
+    om_mincut.notified,
+    om_mincut.output
+FROM om_mincut
+LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
+LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
+LEFT JOIN om_typevalue c ON c.id::integer = om_mincut.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+LEFT JOIN exploitation ON om_mincut.expl_id = exploitation.expl_id
+LEFT JOIN ext_streetaxis ON om_mincut.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
+LEFT JOIN ext_municipality ON om_mincut.muni_id = ext_municipality.muni_id
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_mincut_result
+    WHERE sel_mincut_result.result_id = om_mincut.id
+)
+AND om_mincut.id > 0;
+
+CREATE OR REPLACE VIEW v_om_waterbalance
+AS SELECT e.name AS exploitation,
+    d.name AS dma,
+    p.code AS period,
+    om_waterbalance.auth_bill,
+    om_waterbalance.auth_unbill,
+    om_waterbalance.loss_app,
+    om_waterbalance.loss_real,
+    om_waterbalance.total_in,
+    om_waterbalance.total_out,
+    om_waterbalance.total,
+    om_waterbalance.startdate,
+    om_waterbalance.enddate,
+    om_waterbalance.ili,
+    om_waterbalance.auth,
+    om_waterbalance.loss,
+        CASE
+            WHEN om_waterbalance.total > 0::double precision THEN (100::numeric::double precision * (om_waterbalance.auth_bill + om_waterbalance.auth_unbill) / om_waterbalance.total)::numeric(20,2)
+            ELSE 0::numeric(20,2)
+        END AS loss_eff,
+    om_waterbalance.auth_bill AS rw,
+    (om_waterbalance.total - om_waterbalance.auth_bill)::numeric(20,2) AS nrw,
+        CASE
+            WHEN om_waterbalance.total > 0::double precision THEN (100::numeric::double precision * om_waterbalance.auth_bill / om_waterbalance.total)::numeric(20,2)
+            ELSE 0::numeric(20,2)
+        END AS nrw_eff,
+    d.the_geom
+FROM exploitation e,
+om_waterbalance
+JOIN dma d USING (dma_id)
+LEFT JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text
+WHERE e.expl_id = ANY (d.expl_id);
+
+CREATE OR REPLACE VIEW v_om_waterbalance_report
+AS WITH expl_data AS (
+         SELECT sum(w_1.auth) / sum(w_1.total) AS expl_rw_eff,
+            1::double precision - sum(w_1.auth) / sum(w_1.total) AS expl_nrw_eff,
+            NULL::text AS expl_nightvol,
+                CASE
+                    WHEN sum(w_1.arc_length) = 0::double precision THEN NULL::double precision
+                    ELSE sum(w_1.nrw) / sum(w_1.arc_length) / (date_part('epoch'::text, age(p_1.end_date, p_1.start_date)) / 3600::numeric::double precision)
+                END AS expl_m4day,
+                CASE
+                    WHEN sum(w_1.arc_length) = 0::double precision AND sum(w_1.n_connec) = 0 AND sum(w_1.link_length) = 0::double precision THEN NULL::double precision
+                    ELSE sum(w_1.loss) * (365::numeric::double precision / date_part('day'::text, p_1.end_date - p_1.start_date)) / (6.57::double precision * sum(w_1.arc_length) + 9.13::double precision * sum(w_1.link_length) + (0.256 * sum(w_1.n_connec)::numeric * avg(d_1.avg_press))::double precision)
+                END AS expl_ili,
+            w_1.expl_id,
+            w_1.cat_period_id,
+            p_1.start_date
+           FROM om_waterbalance w_1
+             JOIN ext_cat_period p_1 ON w_1.cat_period_id::text = p_1.id::text
+             JOIN dma d_1 ON d_1.dma_id = w_1.dma_id
+          GROUP BY w_1.expl_id, w_1.cat_period_id, p_1.end_date, p_1.start_date
+        )
+ SELECT DISTINCT ex.name AS exploitation,
+    ex.expl_id,
+    d.name AS dma,
+    w.dma_id,
+    w.cat_period_id,
+    p.code AS period,
+    p.start_date,
+    p.end_date,
+    w.meters_in,
+    w.meters_out,
+    w.n_connec,
+    w.n_hydro,
+    w.arc_length,
+    w.link_length,
+    w.total_in,
+    w.total_out,
+    w.total,
+    w.auth,
+    w.nrw,
+        CASE
+            WHEN w.total <> 0::double precision THEN w.auth / w.total
+            ELSE NULL::double precision
+        END AS dma_rw_eff,
+        CASE
+            WHEN w.total <> 0::double precision THEN 1::double precision - w.auth / w.total
+            ELSE NULL::double precision
+        END AS dma_nrw_eff,
+    w.ili AS dma_ili,
+    NULL::text AS dma_nightvol,
+    w.nrw / w.arc_length / (date_part('epoch'::text, age(p.end_date, p.start_date)) / 3600::numeric::double precision) AS dma_m4day,
+    ed.expl_rw_eff,
+    ed.expl_nrw_eff,
+    ed.expl_nightvol,
+    ed.expl_ili,
+    ed.expl_m4day
+FROM exploitation ex,
+om_waterbalance w
+JOIN dma d USING (dma_id)
+LEFT JOIN ext_cat_period p ON w.cat_period_id::text = p.id::text
+JOIN expl_data ed ON ed.expl_id = w.expl_id AND w.cat_period_id::text = p.id::text
+WHERE ed.start_date = p.start_date AND (ex.expl_id = ANY (d.expl_id));
+
+-- improve performance of v_rtc_hydrometer_x_node with a CTE instead of a cross join
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node
+AS WITH sel_hydrometer AS (
+    SELECT state_id
+    FROM selector_hydrometer
+    WHERE cur_user = CURRENT_USER
+), sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN node.node_id IS NULL THEN NULL::integer
+            ELSE node.node_id
+        END AS node_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text::character varying
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS node_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    node.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+FROM rtc_hydrometer
+LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
+JOIN node ON node.node_id = man_netwjoin.node_id
+LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
+LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_hydrometer
+    WHERE sel_hydrometer.state_id = ext_rtc_hydrometer.state_id
+)
+AND EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = node.expl_id
+);
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec
+AS WITH sel_hydrometer AS (
+    SELECT state_id
+    FROM selector_hydrometer
+    WHERE cur_user = CURRENT_USER
+), sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN connec.connec_id IS NULL THEN NULL::integer
+            ELSE connec.connec_id
+        END AS connec_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text::character varying
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS connec_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+FROM rtc_hydrometer
+LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
+LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_hydrometer
+    WHERE sel_hydrometer.state_id = ext_rtc_hydrometer.state_id
+)
+AND EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = connec.expl_id
+);
+
+CREATE OR REPLACE VIEW v_ui_hydrometer
+AS SELECT v_rtc_hydrometer_x_connec.hydrometer_id,
+    v_rtc_hydrometer_x_connec.connec_id AS feature_id,
+    v_rtc_hydrometer_x_connec.hydrometer_customer_code,
+    v_rtc_hydrometer_x_connec.connec_customer_code AS feature_customer_code,
+    v_rtc_hydrometer_x_connec.state,
+    v_rtc_hydrometer_x_connec.expl_name,
+    v_rtc_hydrometer_x_connec.hydrometer_link
+   FROM v_rtc_hydrometer_x_connec
+UNION
+ SELECT v_rtc_hydrometer_x_node.hydrometer_id,
+    v_rtc_hydrometer_x_node.node_id AS feature_id,
+    v_rtc_hydrometer_x_node.hydrometer_customer_code,
+    v_rtc_hydrometer_x_node.node_customer_code AS feature_customer_code,
+    v_rtc_hydrometer_x_node.state,
+    v_rtc_hydrometer_x_node.expl_name,
+    v_rtc_hydrometer_x_node.hydrometer_link
+   FROM v_rtc_hydrometer_x_node;
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer
+AS WITH sel_hydrometer AS (
+    SELECT state_id
+    FROM selector_hydrometer
+    WHERE cur_user = CURRENT_USER
+), sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN connec.connec_id IS NULL THEN NULL::integer
+            ELSE connec.connec_id
+        END AS feature_id,
+    'CONNEC'::text AS feature_type,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text::character varying
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+FROM rtc_hydrometer
+LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
+LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_hydrometer
+    WHERE sel_hydrometer.state_id = ext_rtc_hydrometer.state_id
+)
+AND EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = connec.expl_id
+)
+UNION
+ SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN node.node_id IS NULL THEN NULL::integer
+            ELSE node.node_id
+        END AS feature_id,
+    'NODE'::text AS feature_type,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id IS NULL THEN 'XXXX'::text::character varying
+            ELSE ext_rtc_hydrometer.connec_id
+        END AS customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    node.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+FROM rtc_hydrometer
+LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
+JOIN node ON node.node_id = man_netwjoin.node_id
+LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
+LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_hydrometer
+    WHERE sel_hydrometer.state_id = ext_rtc_hydrometer.state_id
+)
+AND EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = node.expl_id
+);
+
+
+CREATE OR REPLACE VIEW v_om_mincut_initpoint
+AS WITH sel_mincut_result AS (
+SELECT selector_mincut_result.result_id,
+  selector_mincut_result.result_type
+  FROM selector_mincut_result
+WHERE selector_mincut_result.cur_user = CURRENT_USER
+)
+ SELECT om.id,
+    om.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om.mincut_type,
+    om.received_date,
+    om.expl_id,
+    exploitation.name AS expl_name,
+    macroexploitation.name AS macroexpl_name,
+    om.macroexpl_id,
+    om.muni_id,
+    ext_municipality.name AS muni_name,
+    om.postcode,
+    om.streetaxis_id,
+    ext_streetaxis.name AS street_name,
+    om.postnumber,
+    c.idval AS anl_cause,
+    om.anl_tstamp,
+    om.anl_user,
+    om.anl_descript,
+    om.anl_feature_id,
+    om.anl_feature_type,
+    om.anl_the_geom,
+    om.forecast_start,
+    om.forecast_end,
+    om.assigned_to,
+    om.exec_start,
+    om.exec_end,
+    om.exec_user,
+    om.exec_descript,
+    om.exec_from_plot,
+    om.exec_depth,
+    om.exec_appropiate,
+    om.notified,
+    om.output,
+    sm.result_type
+FROM om_mincut om
+LEFT JOIN om_typevalue a ON a.id::integer = om.mincut_state AND a.typevalue = 'mincut_state'::text
+LEFT JOIN om_typevalue b ON b.id::integer = om.mincut_class AND b.typevalue = 'mincut_class'::text
+LEFT JOIN om_typevalue c ON c.id::integer = om.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+LEFT JOIN exploitation ON om.expl_id = exploitation.expl_id
+LEFT JOIN ext_streetaxis ON om.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN macroexploitation ON om.macroexpl_id = macroexploitation.macroexpl_id
+LEFT JOIN ext_municipality ON om.muni_id = ext_municipality.muni_id
+LEFT JOIN sel_mincut_result sm ON sm.result_id = om.id
+AND om.id > 0;
+
+-- improve performance of ve_macroexploitation with a CTE instead of a cross join
+CREATE OR REPLACE VIEW ve_macroexploitation
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (m.macroexpl_id) m.macroexpl_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.lock_level,
+    m.the_geom,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
+FROM macroexploitation m
+JOIN exploitation e USING (macroexpl_id)
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = e.expl_id
+)
+AND m.active IS TRUE;
+
+-- improve performance of v_ui_sector with a CTE instead of a cross join
+CREATE OR REPLACE VIEW v_ui_sector
+AS WITH sel_sector AS (
+    SELECT sector_id
+    FROM selector_sector
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (s.sector_id) s.sector_id,
+    s.code,
+    s.name,
+    s.descript,
+    s.active,
+    et.idval AS sector_type,
+    ms.name AS macrosector,
+    s.expl_id,
+    s.muni_id,
+    s.avg_press,
+    s.pattern_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.lock_level,
+    s.link,
+    s.addparam::text AS addparam,
+    s.created_at,
+    s.created_by,
+    s.updated_at,
+    s.updated_by
+FROM sector s
+LEFT JOIN macrosector ms USING (macrosector_id)
+LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_sector
+    WHERE sel_sector.sector_id = s.sector_id
+)
+AND s.sector_id > 0
+ORDER BY s.sector_id;
+
+CREATE OR REPLACE VIEW ve_sector
+AS WITH sel_sector AS (
+    SELECT sector_id
+    FROM selector_sector
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (s.sector_id) s.sector_id,
+    s.code,
+    s.name,
+    s.descript,
+    s.active,
+    s.sector_type,
+    s.macrosector_id,
+    s.expl_id,
+    s.muni_id,
+    s.avg_press,
+    s.pattern_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.lock_level,
+    s.link,
+    s.addparam::text AS addparam,
+    s.created_at,
+    s.created_by,
+    s.updated_at,
+    s.updated_by,
+    s.the_geom
+FROM sector s
+WHERE EXISTS (
+  SELECT 1
+  FROM sel_sector
+  WHERE sel_sector.sector_id = s.sector_id
+)
+AND s.sector_id > 0
+ORDER BY s.sector_id;
+
+CREATE OR REPLACE VIEW v_ui_omzone
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (o.omzone_id) o.omzone_id,
+    o.code,
+    o.name,
+    o.descript,
+    o.active,
+    et.idval AS omzone_type,
+    mo.name AS macroomzone,
+    o.expl_id,
+    o.sector_id,
+    o.muni_id,
+    o.graphconfig,
+    o.stylesheet,
+    o.lock_level,
+    o.link,
+    o.addparam,
+    o.created_at,
+    o.created_by,
+    o.updated_at,
+    o.updated_by
+FROM omzone o
+LEFT JOIN macroomzone mo USING (macroomzone_id)
+LEFT JOIN edit_typevalue et ON et.id::text = o.omzone_type::text AND et.typevalue::text = 'omzone_type'::text
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(o.expl_id)
+)
+AND o.omzone_id > 0
+ORDER BY o.omzone_id;
+
+-- ve_omzone source
+
+CREATE OR REPLACE VIEW ve_omzone
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (o.omzone_id) o.omzone_id,
+    o.code,
+    o.name,
+    o.descript,
+    o.active,
+    o.omzone_type,
+    o.macroomzone_id,
+    o.expl_id,
+    o.sector_id,
+    o.muni_id,
+    o.graphconfig,
+    o.stylesheet,
+    o.lock_level,
+    o.link,
+    o.addparam,
+    o.created_at,
+    o.created_by,
+    o.updated_at,
+    o.updated_by,
+    o.the_geom
+FROM omzone o
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(o.expl_id)
+)
+AND o.omzone_id > 0
+ORDER BY o.omzone_id;
+
+CREATE OR REPLACE VIEW v_ui_dma
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (d.dma_id) d.dma_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    et.idval AS dma_type,
+    md.name AS macrodma,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.effc,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.lock_level,
+    d.link,
+    d.addparam::text AS addparam,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
+FROM dma d
+LEFT JOIN macrodma md USING (macrodma_id)
+LEFT JOIN edit_typevalue et ON et.id::text = d.dma_type::text AND et.typevalue::text = 'dma_type'::text
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(d.expl_id)
+)
+AND d.dma_id > 0;
+
+
+CREATE OR REPLACE VIEW ve_dma
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (d.dma_id) d.dma_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    d.dma_type,
+    d.macrodma_id,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.effc,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.lock_level,
+    d.link,
+    d.addparam::text AS addparam,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by,
+    d.the_geom
+FROM dma d
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(d.expl_id)
+)
+AND d.dma_id > 0;
+
+CREATE OR REPLACE VIEW v_ui_macrodma
+AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
+    code,
+    name,
+    descript,
+    active,
+    expl_id,
+    sector_id,
+    muni_id,
+    stylesheet::text AS stylesheet,
+    lock_level,
+    link,
+    addparam::text AS addparam,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by
+   FROM macrodma m
+  WHERE macrodma_id > 0
+  ORDER BY macrodma_id;
+
+
+CREATE OR REPLACE VIEW ve_macrodma
+AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
+    code,
+    name,
+    descript,
+    active,
+    expl_id,
+    sector_id,
+    muni_id,
+    stylesheet::text AS stylesheet,
+    lock_level,
+    link,
+    addparam::text AS addparam,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by,
+    the_geom
+FROM macrodma m
+WHERE macrodma_id > 0
+ORDER BY macrodma_id;
+
+CREATE OR REPLACE VIEW v_ui_supplyzone
+AS SELECT DISTINCT ON (d.supplyzone_id) d.supplyzone_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    et.idval AS supplyzone_type,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.lock_level,
+    d.link,
+    d.addparam::text AS addparam,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
+FROM supplyzone d
+LEFT JOIN edit_typevalue et ON et.id::text = d.supplyzone_type::text AND et.typevalue::text = 'supplyzone_type'::text
+WHERE d.supplyzone_id > 0
+ORDER BY d.supplyzone_id;
+
+-- ve_supplyzone source
+
+CREATE OR REPLACE VIEW ve_supplyzone
+AS SELECT DISTINCT ON (supplyzone_id) supplyzone_id,
+    code,
+    name,
+    descript,
+    active,
+    supplyzone_type,
+    expl_id,
+    sector_id,
+    muni_id,
+    avg_press,
+    pattern_id,
+    graphconfig::text AS graphconfig,
+    stylesheet::text AS stylesheet,
+    lock_level,
+    link,
+    addparam::text AS addparam,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by,
+    the_geom
+FROM supplyzone d
+WHERE supplyzone_id > 0
+ORDER BY supplyzone_id;
+
+CREATE OR REPLACE VIEW v_ui_presszone
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (p.presszone_id) p.presszone_id,
+    p.code,
+    p.name,
+    p.descript,
+    p.active,
+    et.idval AS presszone_type,
+    p.expl_id,
+    p.sector_id,
+    p.muni_id,
+    p.avg_press,
+    p.head,
+    p.graphconfig::text AS graphconfig,
+    p.stylesheet::text AS stylesheet,
+    p.lock_level,
+    p.link,
+    p.addparam::text AS addparam,
+    p.created_at,
+    p.created_by,
+    p.updated_at,
+    p.updated_by
+FROM presszone p
+LEFT JOIN edit_typevalue et ON et.id::text = p.presszone_type AND et.typevalue::text = 'presszone_type'::text
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(p.expl_id)
+)
+AND p.presszone_id > 0
+ORDER BY p.presszone_id;
+
+-- ve_presszone source
+
+CREATE OR REPLACE VIEW ve_presszone
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (p.presszone_id) p.presszone_id,
+    p.code,
+    p.name,
+    p.descript,
+    p.active,
+    p.presszone_type,
+    p.expl_id,
+    p.sector_id,
+    p.muni_id,
+    p.avg_press,
+    p.head,
+    p.graphconfig::text AS graphconfig,
+    p.stylesheet::text AS stylesheet,
+    p.lock_level,
+    p.link,
+    p.addparam::text AS addparam,
+    p.created_at,
+    p.created_by,
+    p.updated_at,
+    p.updated_by,
+    p.the_geom
+FROM presszone p
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(p.expl_id)
+)
+AND p.presszone_id > 0
+ORDER BY p.presszone_id;
+
+CREATE OR REPLACE VIEW v_ui_dqa
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (d.dqa_id) d.dqa_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    et.idval AS dqa_type,
+    md.name AS macrodqa,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.lock_level,
+    d.link,
+    d.addparam::text AS addparam,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
+FROM dqa d
+LEFT JOIN macrodqa md USING (macrodqa_id)
+LEFT JOIN edit_typevalue et ON et.id::text = d.dqa_type::text AND et.typevalue::text = 'dqa_type'::text
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(d.expl_id)
+)
+AND d.dqa_id > 0
+  ORDER BY d.dqa_id;
+
+
+CREATE OR REPLACE VIEW ve_dqa
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (d.dqa_id) d.dqa_id,
+    d.code,
+    d.name,
+    d.descript,
+    d.active,
+    d.dqa_type,
+    d.macrodqa_id,
+    d.expl_id,
+    d.sector_id,
+    d.muni_id,
+    d.avg_press,
+    d.pattern_id,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.lock_level,
+    d.link,
+    d.addparam::text AS addparam,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by,
+    d.the_geom
+FROM dqa d
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(d.expl_id)
+)
+AND d.dqa_id > 0
+ORDER BY d.dqa_id;
+
+CREATE OR REPLACE VIEW v_ui_macrodqa
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,
+    m.sector_id,
+    m.muni_id,
+    m.stylesheet::text AS stylesheet,
+    m.lock_level,
+    m.link,
+    m.addparam::text AS addparam,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
+FROM macrodqa m
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(m.expl_id)
+)
+AND m.macrodqa_id > 0
+ORDER BY m.macrodqa_id;
+
+-- ve_macrodqa source
+
+CREATE OR REPLACE VIEW ve_macrodqa
+AS WITH sel_expl AS (
+    SELECT expl_id
+    FROM selector_expl
+    WHERE cur_user = CURRENT_USER
+)
+SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
+    m.code,
+    m.name,
+    m.descript,
+    m.active,
+    m.expl_id,
+    m.sector_id,
+    m.muni_id,
+    m.stylesheet::text AS stylesheet,
+    m.lock_level,
+    m.link,
+    m.addparam::text AS addparam,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by,
+    m.the_geom
+FROM macrodqa m
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = ANY(m.expl_id)
+)
+AND m.macrodqa_id > 0
+ORDER BY m.macrodqa_id;
