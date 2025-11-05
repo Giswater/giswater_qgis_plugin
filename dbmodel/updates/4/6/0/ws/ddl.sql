@@ -77,10 +77,6 @@ ALTER TABLE macrodqa ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrodqa ALTER COLUMN name TYPE varchar(100);
 ALTER TABLE macrodqa ALTER COLUMN descript TYPE varchar(255);
 
-ALTER TABLE crmzone ADD COLUMN code varchar(100);
-ALTER TABLE crmzone ALTER COLUMN name TYPE varchar(100);
-ALTER TABLE crmzone ALTER COLUMN descript TYPE varchar(255);
-
 ALTER TABLE macrocrmzone ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrocrmzone ALTER COLUMN name TYPE varchar(100);
 ALTER TABLE macrocrmzone ALTER COLUMN descript TYPE varchar(255);
