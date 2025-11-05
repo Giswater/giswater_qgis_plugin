@@ -586,7 +586,7 @@ BEGIN
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by,
 			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
-			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id, uuid)
+			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id, uuid, treatment_type)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,COALESCE(NEW.sector_id, 0),
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,COALESCE(NEW.omzone_id, 0),NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.conserv_state,
@@ -595,14 +595,14 @@ BEGIN
 			COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, NEW.updated_at, NEW.updated_by,
 			NEW.asset_id,  NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type, NEW.label_quadrant,
 			NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
-			NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), COALESCE(NEW.omunit_id, 0), NEW.uuid);
+			NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), COALESCE(NEW.omunit_id, 0), NEW.uuid, COALESCE(NEW.treatment_type, 0));
 		ELSE
 			INSERT INTO node (node_id, code, sys_code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			omzone_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, conserv_state,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by, matcat_id,
 			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
-			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id, uuid)
+			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id, uuid, treatment_type)
 			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,COALESCE(NEW.sector_id, 0),
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,COALESCE(NEW.omzone_id, 0),NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.conserv_state,
@@ -611,7 +611,7 @@ BEGIN
 			COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.updated_at, NEW.updated_by,NEW.matcat_id,
 			NEW.asset_id,  NEW.parent_id, NEW.arc_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
-			NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), COALESCE(NEW.omunit_id, 0), NEW.uuid);
+			NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), COALESCE(NEW.omunit_id, 0), NEW.uuid, COALESCE(NEW.treatment_type, 0));
 		END IF;
 
 		-- insert into node_add

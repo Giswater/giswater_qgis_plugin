@@ -59,3 +59,8 @@ ALTER TABLE dwfzone ALTER COLUMN descript TYPE varchar(255);
 ALTER TABLE drainzone ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE drainzone ALTER COLUMN name TYPE varchar(100);
 ALTER TABLE drainzone ALTER COLUMN descript TYPE varchar(255);
+
+ALTER TABLE node ALTER COLUMN treatment_type SET DEFAULT 0;
+ALTER TABLE arc ALTER COLUMN treatment_type SET DEFAULT 0;
+ALTER TABLE connec ALTER COLUMN treatment_type SET DEFAULT 0;
+ALTER TABLE gully ALTER COLUMN treatment_type SET DEFAULT 0;
