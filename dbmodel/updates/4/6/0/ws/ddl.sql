@@ -37,3 +37,11 @@ CHECK (
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"uncertain", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"uncertain", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"uncertain", "dataType":"boolean", "isUtils":"False"}}$$);
+
+ALTER TABLE node ALTER COLUMN dma_id SET DEFAULT 0;
+ALTER TABLE node ALTER COLUMN dqa_id SET DEFAULT 0;
+ALTER TABLE node ALTER COLUMN presszone_id SET DEFAULT 0;
+ALTER TABLE node ALTER COLUMN supplyzone_id SET DEFAULT 0;
+ALTER TABLE node ALTER COLUMN omzone_id SET DEFAULT 0;
+ALTER TABLE node ALTER COLUMN minsector_id SET DEFAULT 0;
+ALTER TABLE arc ALTER COLUMN minsector_id SET DEFAULT 0;

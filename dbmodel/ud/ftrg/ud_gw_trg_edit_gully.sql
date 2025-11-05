@@ -578,15 +578,15 @@ BEGIN
 				updated_at, updated_by, asset_id, epa_type, units_placement, groove_height, groove_length, expl_visibility, adate, adescript,
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width, drainzone_outfall, dwfzone_outfall, omunit_id, dma_id, uuid)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
-				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
-				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
+				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, COALESCE(NEW.sector_id, 0), NEW."state",
+				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate,
-				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
+				NEW.ownercat_id, COALESCE(NEW.muni_id, 0), NEW.postcode, NEW.district_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,
-				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
+				NEW.label_x, NEW.label_y, NEW.label_rotation,  COALESCE(NEW.expl_id, 0) , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.units_placement,
 				NEW.groove_height, NEW.groove_length, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.siphon_type, NEW.odorflap,
-				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id, NEW.uuid);
+				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.omunit_id, 0), COALESCE(NEW.dma_id, 0), NEW.uuid);
 		ELSE
 
 			INSERT INTO gully (gully_id, code, sys_code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
@@ -597,15 +597,15 @@ BEGIN
 				updated_at, updated_by, asset_id, connec_matcat_id, epa_type, units_placement, groove_height, groove_length, expl_visibility, adate, adescript,
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, lock_level, length, width, drainzone_outfall, dwfzone_outfall, omunit_id, dma_id, uuid)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
-				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
-				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
+				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, COALESCE(NEW.sector_id, 0), NEW."state",
+				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate,
-				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
+				NEW.ownercat_id, COALESCE(NEW.muni_id, 0), NEW.postcode, NEW.district_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,
-				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
+				NEW.label_x, NEW.label_y, NEW.label_rotation,  COALESCE(NEW.expl_id, 0) , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.connec_matcat_id,
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.expl_visibility, NEW.adate, NEW.adescript,
-				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.omunit_id, NEW.dma_id, NEW.uuid);
+				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.length, NEW.width, NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.omunit_id, 0), COALESCE(NEW.dma_id, 0), NEW.uuid);
 
 		END IF;
 

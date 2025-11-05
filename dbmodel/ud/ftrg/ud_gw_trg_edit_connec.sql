@@ -477,14 +477,14 @@ BEGIN
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, brand_id, model_id,
 			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid)
-			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
-			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
-			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
+			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, COALESCE(NEW.sector_id, 0), NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
+			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
+			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, COALESCE(NEW.muni_id, 0), NEW.postcode, NEW.district_id,
 			NEW.streetaxis2_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
-			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id,
+			NEW.accessibility, NEW.diagonal, COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, NEW.omunit_id, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.dma_id, NEW.uuid);
+			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, COALESCE(NEW.omunit_id, 0), NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), NEW.uuid);
 		ELSE
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
 			"observ","comment",  omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
@@ -492,14 +492,14 @@ BEGIN
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, matcat_id, brand_id, model_id,
 			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid)
-			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
-			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
-			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
+			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, COALESCE(NEW.sector_id, 0), NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
+			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
+			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, COALESCE(NEW.muni_id, 0), NEW.postcode, NEW.district_id,
 			NEW.streetaxis2_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
-			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.brand_id, NEW.model_id,
+			NEW.accessibility, NEW.diagonal, COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.brand_id, NEW.model_id,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, NEW.omunit_id, NEW.drainzone_outfall, NEW.dwfzone_outfall, NEW.dma_id, NEW.uuid);
+			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, COALESCE(NEW.omunit_id, 0), NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), NEW.uuid);
 		END IF;
 
 		--check if feature is double geom

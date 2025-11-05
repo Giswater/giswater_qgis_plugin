@@ -528,14 +528,16 @@ BEGIN
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id,streetaxis_id,
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified,label_x,label_y,label_rotation,
 		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, updated_at, updated_by, asset_id,
-		om_state, conserv_state, access_type, placement_type, expl_visibility, brand_id, model_id, serial_number, label_quadrant, pavcat_id, lock_level, is_scadamap, uuid)
+		om_state, conserv_state, access_type, placement_type, expl_visibility, brand_id, model_id, serial_number, label_quadrant, pavcat_id, lock_level, is_scadamap, uuid, minsector_id,
+		supplyzone_id, omzone_id)
 		VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW.custom_top_elev, NEW.datasource, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
-		NEW.comment,NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,
+		NEW.comment, COALESCE(NEW.dma_id, 0), COALESCE(NEW.dqa_id, 0), COALESCE(NEW.presszone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.streetaxis2_id, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified,NEW.label_x,NEW.label_y,NEW.label_rotation,
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere, NEW.num_value,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id,
-		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap, NEW.uuid);
+		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap, NEW.uuid,
+		COALESCE(NEW.minsector_id, 0), COALESCE(NEW.supplyzone_id, 0), COALESCE(NEW.omzone_id, 0));
 
 
 		-- Insert into node_add

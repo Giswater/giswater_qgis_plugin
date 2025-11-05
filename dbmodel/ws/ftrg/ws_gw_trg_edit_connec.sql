@@ -530,9 +530,9 @@ BEGIN
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.muni_id, NEW.streetaxis2_id, NEW.postcode, NEW.district_id, NEW.postcomplement,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
-		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
+		NEW.num_value, NEW.connec_length, NEW.arc_id, COALESCE(NEW.minsector_id, 0), COALESCE(NEW.dqa_id, 0), NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
-		NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_visibility, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
+		NEW.access_type, NEW.placement_type, COALESCE(NEW.crmzone_id, 0), NEW.expl_visibility, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
 		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_code, NEW.n_hydrometer, NEW.uuid);
 
 		-- insert into connec_add table
