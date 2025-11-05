@@ -46,7 +46,6 @@ ALTER TABLE node ALTER COLUMN omzone_id SET DEFAULT 0;
 ALTER TABLE node ALTER COLUMN minsector_id SET DEFAULT 0;
 ALTER TABLE arc ALTER COLUMN minsector_id SET DEFAULT 0;
 
-DROP VIEW IF EXISTS ve_macroexploitation;
 DROP VIEW IF EXISTS v_ui_macrodma;
 DROP VIEW IF EXISTS ve_macrodma;
 DROP VIEW IF EXISTS v_ui_supplyzone;
@@ -57,10 +56,6 @@ DROP VIEW IF EXISTS v_ui_dqa;
 DROP VIEW IF EXISTS ve_dqa;
 DROP VIEW IF EXISTS v_ui_macrodqa;
 DROP VIEW IF EXISTS ve_macrodqa;
-
-ALTER TABLE macroexploitation ALTER COLUMN code TYPE varchar(100);
-ALTER TABLE macroexploitation ALTER COLUMN name TYPE varchar(100);
-ALTER TABLE macroexploitation ALTER COLUMN descript TYPE varchar(255);
 
 ALTER TABLE macrodma ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrodma ALTER COLUMN name TYPE varchar(100);
@@ -80,7 +75,7 @@ ALTER TABLE dqa ALTER COLUMN descript TYPE varchar(255);
 
 ALTER TABLE macrodqa ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrodqa ALTER COLUMN name TYPE varchar(100);
-ALTER TABLE macrodqa ALTER COLUMN descript TYPE varchar(255);\
+ALTER TABLE macrodqa ALTER COLUMN descript TYPE varchar(255);
 
 ALTER TABLE crmzone ADD COLUMN code varchar(100);
 ALTER TABLE crmzone ALTER COLUMN name TYPE varchar(100);

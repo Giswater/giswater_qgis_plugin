@@ -27,6 +27,7 @@ DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_node;
 DROP VIEW IF EXISTS v_rtc_hydrometer;
 DROP VIEW IF EXISTS v_om_mincut_initpoint;
+DROP VIEW IF EXISTS ve_macroexploitation;
 DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS ve_sector;
 DROP VIEW IF EXISTS v_ui_macrosector;
@@ -41,6 +42,10 @@ DROP VIEW IF EXISTS ve_dma;
 ALTER TABLE exploitation ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE exploitation ALTER COLUMN name TYPE varchar(100);
 ALTER TABLE exploitation ALTER COLUMN descript TYPE varchar(255);
+
+ALTER TABLE macroexploitation ALTER COLUMN code TYPE varchar(100);
+ALTER TABLE macroexploitation ALTER COLUMN name TYPE varchar(100);
+ALTER TABLE macroexploitation ALTER COLUMN descript TYPE varchar(255);
 
 ALTER TABLE sector ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE sector ALTER COLUMN name TYPE varchar(100);
