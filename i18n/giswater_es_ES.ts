@@ -554,8 +554,20 @@
 		</message>
 		<!-- PYTHON MESSAGES -->
 		<message>
+			<source>For select on canvas is mandatory to load v_asset_arc_input layer</source>
+			<translation>Para seleccionar en el lienzo es obligatorio cargar la capa v_asset_arc_input</translation>
+		</message>
+		<message>
+			<source>Please select a result with not empty type</source>
+			<translation>Por favor, seleccione un resultado con tipo no vacío</translation>
+		</message>
+		<message>
 			<source>{0} campaign(s) deleted.</source>
 			<translation>{0} campaña(s) eliminada(s).</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lote(s) eliminado(s).</translation>
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
@@ -566,8 +578,16 @@
 			<translation>Se ha producido un error al guardar la orden de trabajo.</translation>
 		</message>
 		<message>
+			<source>Are you sure you want to assign team '{0}' to {1} selected user(s)?</source>
+			<translation>¿Está seguro de que desea asignar el equipo '{0}' a {1} usuario(s) seleccionado(s)?</translation>
+		</message>
+		<message>
 			<source>Are you sure you want to delete {0} campaign(s)?</source>
 			<translation>¿Está seguro que desea eliminar {0} campaña(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} lot(s)?</source>
+			<translation>¿Está seguro de que desea eliminar {0} lote(s)?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
@@ -575,7 +595,15 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records:</source>
-			<translation>¿Está seguro que desea eliminar estos registros:</translation>
+			<translation>¿Está seguro de que desea eliminar estos registros:</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to remove team assignment from {0} selected user(s)?</source>
+			<translation>¿Está seguro de que desea eliminar la asignación de equipo de {0} usuario(s) seleccionado(s)?</translation>
+		</message>
+		<message>
+			<source>Assign Team</source>
+			<translation>Asignar Equipo</translation>
 		</message>
 		<message>
 			<source>Campaign saved successfully.</source>
@@ -584,6 +612,14 @@
 		<message>
 			<source>CRITICAL ERROR in update_expl_sector_combos</source>
 			<translation>ERROR CRÍTICO en update_expl_sector_combos</translation>
+		</message>
+		<message>
+			<source>Delete Lot(s)</source>
+			<translation>Eliminar Lote(s)</translation>
+		</message>
+		<message>
+			<source>Delete records</source>
+			<translation>Eliminar registros</translation>
 		</message>
 		<message>
 			<source>Delete Workorder(s)</source>
@@ -598,16 +634,40 @@
 			<translation>Error</translation>
 		</message>
 		<message>
+			<source>Error assigning team: {0}</source>
+			<translation>Error al asignar equipo: {0}</translation>
+		</message>
+		<message>
+			<source>Error creating dynamic dialog: {0}</source>
+			<translation>Error al crear diálogo dinámico: {0}</translation>
+		</message>
+		<message>
 			<source>Error creating or updating team</source>
 			<translation>Error al crear o actualizar el equipo</translation>
 		</message>
 		<message>
+			<source>Error removing team assignment: {0}</source>
+			<translation>Error al eliminar asignación de equipo: {0}</translation>
+		</message>
+		<message>
+			<source>Error saving lot.</source>
+			<translation>Error al guardar el lote.</translation>
+		</message>
+		<message>
+			<source>Error toggling state: {0}</source>
+			<translation>Error al cambiar estado: {0}</translation>
+		</message>
+		<message>
 			<source>Failed to fetch dialog configuration</source>
-			<translation>Error al cargar la configuración del diálogo</translation>
+			<translation>Error al obtener la configuración del diálogo</translation>
 		</message>
 		<message>
 			<source>Failed to load campaign form.</source>
 			<translation>Error al cargar el formulario de campaña.</translation>
+		</message>
+		<message>
+			<source>Failed to load lot form.</source>
+			<translation>Error al cargar el formulario de lote.</translation>
 		</message>
 		<message>
 			<source>Failed to load team creation dialog configuration. Please check database configuration.</source>
@@ -632,6 +692,10 @@
 		<message>
 			<source>Invalid campaign mode</source>
 			<translation>Modo de campaña inválido</translation>
+		</message>
+		<message>
+			<source>Invalid lot ID.</source>
+			<translation>ID de lote inválido.</translation>
 		</message>
 		<message>
 			<source>Invalid workorder ID.</source>
@@ -666,6 +730,10 @@
 			<translation>Por favor, rellena todos los campos obligatorios (resaltados en rojo).</translation>
 		</message>
 		<message>
+			<source>Please select a lot to open.</source>
+			<translation>Por favor, seleccione un lote para abrir.</translation>
+		</message>
+		<message>
 			<source>Please select a team to assign.</source>
 			<translation>Por favor seleccione un equipo para asignar.</translation>
 		</message>
@@ -694,6 +762,10 @@
 			<translation>Fecha inicio real</translation>
 		</message>
 		<message>
+			<source>Remove Team Assignment</source>
+			<translation>Eliminar Asignación de Equipo</translation>
+		</message>
+		<message>
 			<source>Select a campaign to delete.</source>
 			<translation>Seleccione una campaña para eliminar.</translation>
 		</message>
@@ -706,6 +778,10 @@
 			<translation>Seleccione una orden de trabajo para eliminar.</translation>
 		</message>
 		<message>
+			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
+			<translation>Faltan algunos campos obligatorios. Por favor, complete los campos requeridos (marcados en rojo).</translation>
+		</message>
+		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
 			<translation>Faltan algunos valores obligatorios. Verifique los campos marcados en rojo.</translation>
 		</message>
@@ -714,12 +790,20 @@
 			<translation>Fecha de final</translation>
 		</message>
 		<message>
+			<source>Successfully assigned team '{0}' to {1} user(s).</source>
+			<translation>Equipo '{0}' asignado exitosamente a {1} usuario(s).</translation>
+		</message>
+		<message>
+			<source>Successfully removed team assignment from {0} user(s).</source>
+			<translation>Asignación de equipo eliminada exitosamente de {0} usuario(s).</translation>
+		</message>
+		<message>
 			<source>The team name already exists</source>
 			<translation>El nombre del equipo ya existe</translation>
 		</message>
 		<message>
 			<source>This will also delete the database user(s):</source>
-			<translation>Esto también eliminará el/los usuario(s) de base de datos:</translation>
+			<translation>Esto también eliminará el/los usuario(s) de la base de datos:</translation>
 		</message>
 		<message>
 			<source></source>
@@ -775,11 +859,11 @@
 		</message>
 		<message>
 			<source>"{0}" does not exist. Please select a valid config file.</source>
-			<translation>"{0}" does not exist. Please select a valid config file.</translation>
+			<translation>"{0}" no existe. Por favor, seleccione un archivo de configuración válido.</translation>
 		</message>
 		<message>
 			<source>"{0}" does not exist. Please select a valid folder.</source>
-			<translation>"{0}" does not exist. Please select a valid folder.</translation>
+			<translation>"{0}" no existe. Por favor, seleccione una carpeta válida.</translation>
 		</message>
 		<message>
 			<source>{0} error {1}</source>
@@ -1019,7 +1103,7 @@
 		</message>
 		<message>
 			<source>Are you sure to save this feature?</source>
-			<translation>Are you sure to save this feature?</translation>
+			<translation>¿Está seguro de guardar esta entidad?</translation>
 		</message>
 		<message>
 			<source>Are you sure to update the project schema to last version?</source>
@@ -1295,7 +1379,7 @@
 		</message>
 		<message>
 			<source>Changes applied to "{0}" successfully.</source>
-			<translation>Changes applied to "{0}" successfully.</translation>
+			<translation>Cambios aplicados a "{0}" exitosamente.</translation>
 		</message>
 		<message>
 			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. </source>
@@ -2246,6 +2330,10 @@
 			<translation>Error saving the configuration</translation>
 		</message>
 		<message>
+			<source>Error setting node</source>
+			<translation>Error al establecer el nodo</translation>
+		</message>
+		<message>
 			<source>Error translating: {0}</source>
 			<translation>Error translating: {0}</translation>
 		</message>
@@ -2323,7 +2411,7 @@
 		</message>
 		<message>
 			<source>Exception in info (def _get_id)</source>
-			<translation>Exception in info (def _get_id)</translation>
+			<translation>Excepción en info (def _get_id)</translation>
 		</message>
 		<message>
 			<source>Exception in unload when {0}</source>
@@ -2551,7 +2639,7 @@
 		</message>
 		<message>
 			<source>Feature not upserted</source>
-			<translation>Feature not upserted</translation>
+			<translation>Entidad no actualizada</translation>
 		</message>
 		<message>
 			<source>Feature replaced successfully</source>
@@ -2559,7 +2647,7 @@
 		</message>
 		<message>
 			<source>Feature upserted</source>
-			<translation>Feature upserted</translation>
+			<translation>Entidad actualizada</translation>
 		</message>
 		<message>
 			<source>Field catalog_id required!</source>
@@ -2735,7 +2823,7 @@
 		</message>
 		<message>
 			<source>Function gw_fct_psector_duplicate executed with no result</source>
-			<translation>Function gw_fct_psector_duplicate executed with no result</translation>
+			<translation>La función gw_fct_psector_duplicate se ejecutó sin resultado</translation>
 		</message>
 		<message>
 			<source>Function gw_fct_setfeaturedelete executed with no result </source>
@@ -3294,6 +3382,10 @@
 			<translation>No se encontró la capa</translation>
 		</message>
 		<message>
+			<source>Layer of CM project will be added to the project when create</source>
+			<translation>La capa del proyecto CM se agregará al proyecto al crear</translation>
+		</message>
+		<message>
 			<source>Layers of your role not found</source>
 			<translation>No se encontraron capas de su rol</translation>
 		</message>
@@ -3470,6 +3562,10 @@
 			<translation>MINCUT</translation>
 		</message>
 		<message>
+			<source>Mincut canceled!</source>
+			<translation>¡Corte mínimo cancelado!</translation>
+		</message>
+		<message>
 			<source>Mincut done</source>
 			<translation>Polígono de corte generado, pero tiene conflicto y se superpone con</translation>
 		</message>
@@ -3640,6 +3736,10 @@
 		<message>
 			<source>Node replaced successfully</source>
 			<translation>Nodo reemplazado con éxito</translation>
+		</message>
+		<message>
+			<source>Node set correctly</source>
+			<translation>Nodo establecido correctamente</translation>
 		</message>
 		<message>
 			<source>Node type has been updated!</source>
@@ -4055,7 +4155,7 @@
 		</message>
 		<message>
 			<source>Please enter a new catalog name when the "{0}" option is selected.</source>
-			<translation>Please enter a new catalog name when the "{0}" option is selected.</translation>
+			<translation>Por favor, ingrese un nuevo nombre de catálogo cuando se seleccione la opción "{0}".</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the built date range.</source>
@@ -4451,7 +4551,7 @@
 		</message>
 		<message>
 			<source>Replace feature done successfully</source>
-			<translation>Replace feature done successfully</translation>
+			<translation>Reemplazo de entidad realizado exitosamente</translation>
 		</message>
 		<message>
 			<source>Replacement cost</source>
@@ -4539,7 +4639,7 @@
 		</message>
 		<message>
 			<source>Save feature</source>
-			<translation>Save feature</translation>
+			<translation>Guardar entidad</translation>
 		</message>
 		<message>
 			<source>Saving results to DB</source>
@@ -5083,15 +5183,15 @@
 		</message>
 		<message>
 			<source>The file "{0}.csv" already exists. Do you want to overwrite it?</source>
-			<translation>The file "{0}.csv" already exists. Do you want to overwrite it?</translation>
+			<translation>El archivo "{0}.csv" ya existe. ¿Desea sobrescribirlo?</translation>
 		</message>
 		<message>
 			<source>The file "{0}.in" already exists. Do you want to overwrite it?</source>
-			<translation>The file "{0}.in" already exists. Do you want to overwrite it?</translation>
+			<translation>El archivo "{0}.in" ya existe. ¿Desea sobrescribirlo?</translation>
 		</message>
 		<message>
 			<source>The file "{0}.inp" already exists. Do you want to overwrite it?</source>
-			<translation>The file "{0}.inp" already exists. Do you want to overwrite it?</translation>
+			<translation>El archivo "{0}.inp" ya existe. ¿Desea sobrescribirlo?</translation>
 		</message>
 		<message>
 			<source>The files {0} already exist. Do you want to overwrite them?</source>
@@ -5099,11 +5199,11 @@
 		</message>
 		<message>
 			<source>The files "{0}.in" and "{1}.csv" already exist. Do you want to overwrite them?</source>
-			<translation>The files "{0}.in" and "{1}.csv" already exist. Do you want to overwrite them?</translation>
+			<translation>Los archivos "{0}.in" y "{1}.csv" ya existen. ¿Desea sobrescribirlos?</translation>
 		</message>
 		<message>
 			<source>The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?</source>
-			<translation>The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?</translation>
+			<translation>Los archivos "{0}.inp" y "{1}.csv" ya existen. ¿Desea sobrescribirlos?</translation>
 		</message>
 		<message>
 			<source>The file selected is not a GPKG file</source>
@@ -5243,7 +5343,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>There are some error in the records with id</source>
-			<translation>There are some error in the records with id</translation>
+			<translation>Hay algunos errores en los registros con id</translation>
 		</message>
 		<message>
 			<source>There have been errors translating:</source>
@@ -5515,7 +5615,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>The Workcat_id "{0}" is already in use. Please enter a different ID.</source>
-			<translation>The Workcat_id "{0}" is already in use. Please enter a different ID.</translation>
+			<translation>El Workcat_id "{0}" ya está en uso. Por favor, ingrese un ID diferente.</translation>
 		</message>
 		<message>
 			<source>The XML file you are loading appears to have been generated by OSMnx: this use case is not supported and may not behave as expected. To save/load graphs to/from disk for later use in OSMnx, use the `io.save_graphml` and `io.load_graphml` functions instead. Refer to the documentation for details.</source>

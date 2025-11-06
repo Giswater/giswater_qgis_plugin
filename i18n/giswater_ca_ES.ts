@@ -554,8 +554,20 @@
 		</message>
 		<!-- PYTHON MESSAGES -->
 		<message>
+			<source>For select on canvas is mandatory to load v_asset_arc_input layer</source>
+			<translation>Per seleccionar al llenç és obligatori carregar la capa v_asset_arc_input</translation>
+		</message>
+		<message>
+			<source>Please select a result with not empty type</source>
+			<translation>Si us plau, seleccioneu un resultat amb tipus no buit</translation>
+		</message>
+		<message>
 			<source>{0} campaign(s) deleted.</source>
 			<translation>{0} campanya(es) eliminada(es).</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lot(s) eliminat(s).</translation>
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
@@ -566,8 +578,16 @@
 			<translation>S'ha produït un error en desar l'ordre de treball.</translation>
 		</message>
 		<message>
+			<source>Are you sure you want to assign team '{0}' to {1} selected user(s)?</source>
+			<translation>Esteu segurs que voleu assignar l'equip '{0}' a {1} usuari(s) seleccionat(s)?</translation>
+		</message>
+		<message>
 			<source>Are you sure you want to delete {0} campaign(s)?</source>
 			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} lot(s)?</source>
+			<translation>Esteu segurs que voleu eliminar {0} lot(s)?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
@@ -575,7 +595,15 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records:</source>
-			<translation>Esteu segur que voleu eliminar aquests registres:</translation>
+			<translation>Esteu segurs que voleu eliminar aquests registres:</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to remove team assignment from {0} selected user(s)?</source>
+			<translation>Esteu segurs que voleu eliminar l'assignació d'equip de {0} usuari(s) seleccionat(s)?</translation>
+		</message>
+		<message>
+			<source>Assign Team</source>
+			<translation>Assignar Equip</translation>
 		</message>
 		<message>
 			<source>Campaign saved successfully.</source>
@@ -584,6 +612,14 @@
 		<message>
 			<source>CRITICAL ERROR in update_expl_sector_combos</source>
 			<translation>ERROR CRÍTIC en update_expl_sector_combos</translation>
+		</message>
+		<message>
+			<source>Delete Lot(s)</source>
+			<translation>Eliminar Lot(s)</translation>
+		</message>
+		<message>
+			<source>Delete records</source>
+			<translation>Eliminar registres</translation>
 		</message>
 		<message>
 			<source>Delete Workorder(s)</source>
@@ -598,16 +634,40 @@
 			<translation>Error</translation>
 		</message>
 		<message>
+			<source>Error assigning team: {0}</source>
+			<translation>Error en assignar equip: {0}</translation>
+		</message>
+		<message>
+			<source>Error creating dynamic dialog: {0}</source>
+			<translation>Error en crear diàleg dinàmic: {0}</translation>
+		</message>
+		<message>
 			<source>Error creating or updating team</source>
 			<translation>Error en crear o actualitzar l'equip</translation>
 		</message>
 		<message>
+			<source>Error removing team assignment: {0}</source>
+			<translation>Error en eliminar assignació d'equip: {0}</translation>
+		</message>
+		<message>
+			<source>Error saving lot.</source>
+			<translation>Error en desar el lot.</translation>
+		</message>
+		<message>
+			<source>Error toggling state: {0}</source>
+			<translation>Error en canviar estat: {0}</translation>
+		</message>
+		<message>
 			<source>Failed to fetch dialog configuration</source>
-			<translation>Error en carregar la configuració del diàleg</translation>
+			<translation>Error en obtenir la configuració del diàleg</translation>
 		</message>
 		<message>
 			<source>Failed to load campaign form.</source>
 			<translation>Error en carregar el formulari de campanya.</translation>
+		</message>
+		<message>
+			<source>Failed to load lot form.</source>
+			<translation>Error en carregar el formulari de lot.</translation>
 		</message>
 		<message>
 			<source>Failed to load team creation dialog configuration. Please check database configuration.</source>
@@ -632,6 +692,10 @@
 		<message>
 			<source>Invalid campaign mode</source>
 			<translation>Mode de campanya invàlid</translation>
+		</message>
+		<message>
+			<source>Invalid lot ID.</source>
+			<translation>ID de lot invàlid.</translation>
 		</message>
 		<message>
 			<source>Invalid workorder ID.</source>
@@ -666,6 +730,10 @@
 			<translation>Si us plau, omple tots els camps obligatoris (ressaltats en vermell).</translation>
 		</message>
 		<message>
+			<source>Please select a lot to open.</source>
+			<translation>Si us plau, seleccioneu un lot per obrir.</translation>
+		</message>
+		<message>
 			<source>Please select a team to assign.</source>
 			<translation>Si us plau seleccioneu un equip per assignar.</translation>
 		</message>
@@ -694,6 +762,10 @@
 			<translation>Data d'inici real</translation>
 		</message>
 		<message>
+			<source>Remove Team Assignment</source>
+			<translation>Eliminar Assignació d'Equip</translation>
+		</message>
+		<message>
 			<source>Select a campaign to delete.</source>
 			<translation>Seleccioneu una campanya per eliminar.</translation>
 		</message>
@@ -706,6 +778,10 @@
 			<translation>Seleccioneu una ordre de treball per eliminar.</translation>
 		</message>
 		<message>
+			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
+			<translation>Falten alguns camps obligatoris. Si us plau, completeu els camps requerits (marcats en vermell).</translation>
+		</message>
+		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
 			<translation>Falten alguns valors obligatoris. Verifiqueu els camps marcats en vermell.</translation>
 		</message>
@@ -714,12 +790,20 @@
 			<translation>Data inici</translation>
 		</message>
 		<message>
+			<source>Successfully assigned team '{0}' to {1} user(s).</source>
+			<translation>Equip '{0}' assignat exitosament a {1} usuari(s).</translation>
+		</message>
+		<message>
+			<source>Successfully removed team assignment from {0} user(s).</source>
+			<translation>Assignació d'equip eliminada exitosament de {0} usuari(s).</translation>
+		</message>
+		<message>
 			<source>The team name already exists</source>
 			<translation>El nom de l'equip ja existeix</translation>
 		</message>
 		<message>
 			<source>This will also delete the database user(s):</source>
-			<translation>Això també eliminarà l'usuari(s) de base de dades:</translation>
+			<translation>Això també eliminarà el/los usuari(s) de la base de dades:</translation>
 		</message>
 		<message>
 			<source></source>
@@ -775,11 +859,11 @@
 		</message>
 		<message>
 			<source>"{0}" does not exist. Please select a valid config file.</source>
-			<translation>"{0}" does not exist. Please select a valid config file.</translation>
+			<translation>"{0}" no existeix. Si us plau, seleccioneu un fitxer de configuració vàlid.</translation>
 		</message>
 		<message>
 			<source>"{0}" does not exist. Please select a valid folder.</source>
-			<translation>"{0}" does not exist. Please select a valid folder.</translation>
+			<translation>"{0}" no existeix. Si us plau, seleccioneu una carpeta vàlida.</translation>
 		</message>
 		<message>
 			<source>{0} error {1}</source>
@@ -1019,7 +1103,7 @@
 		</message>
 		<message>
 			<source>Are you sure to save this feature?</source>
-			<translation>Are you sure to save this feature?</translation>
+			<translation>Esteu segurs de desar aquesta entitat?</translation>
 		</message>
 		<message>
 			<source>Are you sure to update the project schema to last version?</source>
@@ -1295,7 +1379,7 @@
 		</message>
 		<message>
 			<source>Changes applied to "{0}" successfully.</source>
-			<translation>Changes applied to "{0}" successfully.</translation>
+			<translation>Canvis aplicats a "{0}" exitosament.</translation>
 		</message>
 		<message>
 			<source>Changes on this page are dangerous and can break Giswater plugin in various ways. </source>
@@ -2246,6 +2330,10 @@
 			<translation>Error saving the configuration</translation>
 		</message>
 		<message>
+			<source>Error setting node</source>
+			<translation>Error en establir el node</translation>
+		</message>
+		<message>
 			<source>Error translating: {0}</source>
 			<translation>Error translating: {0}</translation>
 		</message>
@@ -2323,7 +2411,7 @@
 		</message>
 		<message>
 			<source>Exception in info (def _get_id)</source>
-			<translation>Exception in info (def _get_id)</translation>
+			<translation>Excepció en info (def _get_id)</translation>
 		</message>
 		<message>
 			<source>Exception in unload when {0}</source>
@@ -2551,7 +2639,7 @@
 		</message>
 		<message>
 			<source>Feature not upserted</source>
-			<translation>Feature not upserted</translation>
+			<translation>Entitat no actualitzada</translation>
 		</message>
 		<message>
 			<source>Feature replaced successfully</source>
@@ -2559,7 +2647,7 @@
 		</message>
 		<message>
 			<source>Feature upserted</source>
-			<translation>Feature upserted</translation>
+			<translation>Entitat actualitzada</translation>
 		</message>
 		<message>
 			<source>Field catalog_id required!</source>
@@ -2735,7 +2823,7 @@
 		</message>
 		<message>
 			<source>Function gw_fct_psector_duplicate executed with no result</source>
-			<translation>Function gw_fct_psector_duplicate executed with no result</translation>
+			<translation>La funció gw_fct_psector_duplicate s'ha executat sense resultat</translation>
 		</message>
 		<message>
 			<source>Function gw_fct_setfeaturedelete executed with no result </source>
@@ -3294,6 +3382,10 @@
 			<translation>No s'ha trobat la capa</translation>
 		</message>
 		<message>
+			<source>Layer of CM project will be added to the project when create</source>
+			<translation>La capa del projecte CM s'afegirà al projecte en crear</translation>
+		</message>
+		<message>
 			<source>Layers of your role not found</source>
 			<translation>No s'han trobat capes del seu rol</translation>
 		</message>
@@ -3470,6 +3562,10 @@
 			<translation>MINCUT</translation>
 		</message>
 		<message>
+			<source>Mincut canceled!</source>
+			<translation>Tall mínim cancel·lat!</translation>
+		</message>
+		<message>
 			<source>Mincut done</source>
 			<translation>Mincut fet, però té conflictes i se solapa amb</translation>
 		</message>
@@ -3640,6 +3736,10 @@
 		<message>
 			<source>Node replaced successfully</source>
 			<translation>Node reemplaçat amb èxit</translation>
+		</message>
+		<message>
+			<source>Node set correctly</source>
+			<translation>Node establert correctament</translation>
 		</message>
 		<message>
 			<source>Node type has been updated!</source>
@@ -4056,7 +4156,7 @@
 		</message>
 		<message>
 			<source>Please enter a new catalog name when the "{0}" option is selected.</source>
-			<translation>Please enter a new catalog name when the "{0}" option is selected.</translation>
+			<translation>Si us plau, introduïu un nou nom de catàleg quan es seleccioni l'opció "{0}".</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the built date range.</source>
@@ -4452,7 +4552,7 @@
 		</message>
 		<message>
 			<source>Replace feature done successfully</source>
-			<translation>Replace feature done successfully</translation>
+			<translation>Reemplaçament d'entitat realitzat exitosament</translation>
 		</message>
 		<message>
 			<source>Replacement cost</source>
@@ -4540,7 +4640,7 @@
 		</message>
 		<message>
 			<source>Save feature</source>
-			<translation>Save feature</translation>
+			<translation>Desar entitat</translation>
 		</message>
 		<message>
 			<source>Saving results to DB</source>
@@ -5084,15 +5184,15 @@
 		</message>
 		<message>
 			<source>The file "{0}.csv" already exists. Do you want to overwrite it?</source>
-			<translation>The file "{0}.csv" already exists. Do you want to overwrite it?</translation>
+			<translation>El fitxer "{0}.csv" ja existeix. Voleu sobreescriure'l?</translation>
 		</message>
 		<message>
 			<source>The file "{0}.in" already exists. Do you want to overwrite it?</source>
-			<translation>The file "{0}.in" already exists. Do you want to overwrite it?</translation>
+			<translation>El fitxer "{0}.in" ja existeix. Voleu sobreescriure'l?</translation>
 		</message>
 		<message>
 			<source>The file "{0}.inp" already exists. Do you want to overwrite it?</source>
-			<translation>The file "{0}.inp" already exists. Do you want to overwrite it?</translation>
+			<translation>El fitxer "{0}.inp" ja existeix. Voleu sobreescriure'l?</translation>
 		</message>
 		<message>
 			<source>The files {0} already exist. Do you want to overwrite them?</source>
@@ -5100,11 +5200,11 @@
 		</message>
 		<message>
 			<source>The files "{0}.in" and "{1}.csv" already exist. Do you want to overwrite them?</source>
-			<translation>The files "{0}.in" and "{1}.csv" already exist. Do you want to overwrite them?</translation>
+			<translation>Els fitxers "{0}.in" i "{1}.csv" ja existeixen. Voleu sobreescriure'ls?</translation>
 		</message>
 		<message>
 			<source>The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?</source>
-			<translation>The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?</translation>
+			<translation>Els fitxers "{0}.inp" i "{1}.csv" ja existeixen. Voleu sobreescriure'ls?</translation>
 		</message>
 		<message>
 			<source>The file selected is not a GPKG file</source>
@@ -5242,7 +5342,7 @@
 		</message>
 		<message>
 			<source>There are some error in the records with id</source>
-			<translation>There are some error in the records with id</translation>
+			<translation>Hi ha alguns errors en els registres amb id</translation>
 		</message>
 		<message>
 			<source>There have been errors translating:</source>
@@ -5514,7 +5614,7 @@
 		</message>
 		<message>
 			<source>The Workcat_id "{0}" is already in use. Please enter a different ID.</source>
-			<translation>The Workcat_id "{0}" is already in use. Please enter a different ID.</translation>
+			<translation>El Workcat_id "{0}" ja està en ús. Si us plau, introduïu un ID diferent.</translation>
 		</message>
 		<message>
 			<source>The XML file you are loading appears to have been generated by OSMnx: this use case is not supported and may not behave as expected. To save/load graphs to/from disk for later use in OSMnx, use the `io.save_graphml` and `io.load_graphml` functions instead. Refer to the documentation for details.</source>
