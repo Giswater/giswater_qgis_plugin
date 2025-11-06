@@ -72,7 +72,7 @@ class GwPsectorDuplicate(QObject):
         tools_db.execute_sql(sql)
         
         if not complet_result or complet_result['status'] == 'Failed':
-            msg = 'Function gw_fct_psector_duplicate executed with no result'
+            msg = tools_qt.tr('Function gw_fct_psector_duplicate executed with no result')
             tools_qgis.show_message(msg, 3, dialog=self.dlg_duplicate_psector)
             return
 

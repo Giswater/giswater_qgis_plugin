@@ -192,7 +192,7 @@ class QuantizedDemands:
             tools_qt.show_info_box(msg)
             return False
         elif not Path(output_folder).exists():
-            msg = '"{0}" does not exist. Please select a valid folder.'
+            msg = tools_qt.tr('"{0}" does not exist. Please select a valid folder.')
             msg_params = (output_folder,)
             tools_qt.show_info_box(msg, msg_params=msg_params)
             return False

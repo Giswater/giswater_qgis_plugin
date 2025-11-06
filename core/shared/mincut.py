@@ -726,7 +726,7 @@ class GwMincut:
                     tools_db.execute_sql(sql)
                     print('ok delete mincut')
                     self._update_result_selector()
-                    tools_qgis.show_info("Mincut canceled!")
+                    tools_qgis.show_info(tools_qt.tr("Mincut canceled!"))
 
             # Rollback transaction
             else:
