@@ -80,3 +80,6 @@ ALTER TABLE macrodqa ALTER COLUMN descript TYPE varchar(255);
 ALTER TABLE macrocrmzone ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE macrocrmzone ALTER COLUMN name TYPE varchar(100);
 ALTER TABLE macrocrmzone ALTER COLUMN descript TYPE varchar(255);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);

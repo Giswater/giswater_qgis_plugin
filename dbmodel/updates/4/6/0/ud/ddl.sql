@@ -64,3 +64,6 @@ ALTER TABLE node ALTER COLUMN treatment_type SET DEFAULT 0;
 ALTER TABLE arc ALTER COLUMN treatment_type SET DEFAULT 0;
 ALTER TABLE connec ALTER COLUMN treatment_type SET DEFAULT 0;
 ALTER TABLE gully ALTER COLUMN treatment_type SET DEFAULT 0;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);

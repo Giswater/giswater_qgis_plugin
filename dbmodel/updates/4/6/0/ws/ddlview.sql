@@ -693,7 +693,8 @@ AS WITH sel_state AS (
             node.the_geom,
             node_selector.p_state,
             node.uuid,
-            node.uncertain
+            node.uncertain,
+            node.xyz_date
            FROM node_selector
              JOIN node ON node.node_id = node_selector.node_id
              JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
@@ -838,7 +839,8 @@ AS WITH sel_state AS (
     the_geom,
     p_state,
     uuid,
-    uncertain
+    uncertain,
+    xyz_date
    FROM node_selected n;
 
 
@@ -1196,7 +1198,8 @@ AS WITH sel_state AS (
             connec.the_geom,
             connec_selector.p_state,
             connec.uuid,
-            connec.uncertain
+            connec.uncertain,
+            connec.xyz_date
            FROM connec_selector
              JOIN connec ON connec.connec_id = connec_selector.connec_id
              JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
@@ -1350,7 +1353,8 @@ AS WITH sel_state AS (
     the_geom,
     p_state,
     uuid,
-    uncertain
+    uncertain,
+    xyz_date
    FROM connec_selected c;
 
 -- recreate views

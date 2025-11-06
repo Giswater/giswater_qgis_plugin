@@ -32,7 +32,7 @@ SELECT columns_are(
         'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'n_hydrometer',
         'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_code',
-        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid', 'uncertain'
+        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid', 'uncertain', 'xyz_date'
     ],
     'Table connec should have the correct columns'
 );
@@ -126,6 +126,7 @@ SELECT col_type_is('connec', 'updated_at', 'timestamp with time zone', 'Column u
 SELECT col_type_is('connec', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('connec', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('connec', 'uncertain', 'boolean', 'Column uncertain should be boolean');
+SELECT col_type_is('connec', 'xyz_date', 'date', 'Column xyz_date should be date');
 
 -- Check foreign keys
 SELECT has_fk('connec', 'Table connec should have foreign keys');

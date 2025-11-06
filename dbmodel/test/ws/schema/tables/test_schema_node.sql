@@ -32,7 +32,7 @@ SELECT columns_are(
         'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id', 'serial_number',
         'label_quadrant', 'supplyzone_id', 'lock_level', 'is_scadamap', 'pavcat_id',
         'omzone_id',
-        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid', 'uncertain'
+        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid', 'uncertain', 'xyz_date'
     ],
     'Table node should have the correct columns'
 );
@@ -47,6 +47,7 @@ SELECT col_type_is('node', 'feature_type', 'varchar(16)', 'Column feature_type s
 SELECT col_default_is('node', 'feature_type', 'NODE', 'Column feature_type should default to NODE');
 SELECT col_type_is('node', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('node', 'uncertain', 'boolean', 'Column uncertain should be boolean');
+SELECT col_type_is('node', 'xyz_date', 'date', 'Column xyz_date should be date');
 
 -- Check foreign keys
 SELECT has_fk('node', 'Table node should have foreign keys');

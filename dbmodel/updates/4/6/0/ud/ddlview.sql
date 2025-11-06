@@ -1774,9 +1774,6 @@ AS WITH sel_state AS (
     treatment_type
    FROM arc_selected;
 
-
--- ve_connec source
-
 CREATE OR REPLACE VIEW ve_connec
 AS WITH sel_state AS (
          SELECT selector_state.state_id
@@ -2040,7 +2037,8 @@ AS WITH sel_state AS (
             connec.diagonal,
             connec_selector.p_state,
             connec.uuid,
-            connec.treatment_type
+            connec.treatment_type,
+            connec.xyz_date
            FROM connec_selector
              JOIN connec USING (connec_id)
              JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
@@ -2162,7 +2160,8 @@ AS WITH sel_state AS (
     diagonal,
     p_state,
     uuid,
-    treatment_type
+    treatment_type,
+    xyz_date
    FROM connec_selected;
 
 CREATE OR REPLACE VIEW ve_gully
@@ -2458,7 +2457,8 @@ AS WITH sel_state AS (
             gully.the_geom,
             gully_selector.p_state,
             gully.uuid,
-            gully.treatment_type
+            gully.treatment_type,
+            gully.xyz_date
            FROM gully_selector
              JOIN gully USING (gully_id)
              JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
@@ -2587,5 +2587,6 @@ AS WITH sel_state AS (
     the_geom,
     p_state,
     uuid,
-    treatment_type
+    treatment_type,
+    xyz_date
    FROM gully_selected;
