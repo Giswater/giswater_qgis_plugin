@@ -22,7 +22,7 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source"
 VALUES(642, 'Treatment type calculation	', 'ud	', NULL, 'core', true, 'Function process', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true);
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3520, 'Treatment type analysis', '{"featureType":[]}'::json, '[
+VALUES(3522, 'Treatment type analysis', '{"featureType":[]}'::json, '[
 {
   "label": "Process name:", 
   "value": null, 
