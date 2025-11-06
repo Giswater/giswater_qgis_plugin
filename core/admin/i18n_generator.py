@@ -728,7 +728,7 @@ class GwI18NGenerator:
 
                 elif "dbplan_price" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")
         del file
 
     # endregion
