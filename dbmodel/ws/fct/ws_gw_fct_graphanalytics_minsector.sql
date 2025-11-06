@@ -675,7 +675,30 @@ BEGIN
 
         -- the changestatus valves
         IF v_ignore_changestatus_valves THEN
-            -- TODO
+            EXECUTE format('
+                WITH today_mincuts AS (
+					SELECT o.id AS result_id
+					FROM om_mincut o
+					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
+					WHERE o.mincut_state IN (%s, %s)
+						AND o.mincut_class = %s
+						AND c.virtual = FALSE 
+						AND o.forecast_start <= o.forecast_end 
+						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
+				)
+                UPDATE temp_pgr_arc_minsector tpa
+                SET changestatus = TRUE, cost = 0, reverse_cost = 0
+                WHERE tpa.graph_delimiter = ''MINSECTOR''
+                AND EXISTS (
+                    SELECT 1
+                    FROM om_mincut_valve omv
+                    JOIN today_mincuts tm USING (result_id)
+                    WHERE omv.changestatus = TRUE
+                    AND omv.node_id = tpa.arc_id
+            );',
+            v_mincut_plannified_state, v_mincut_in_progress_state, 
+            v_mincut_network_class,
+            v_day_start, v_day_end);
         END IF;
 
         -- FINISH preparing

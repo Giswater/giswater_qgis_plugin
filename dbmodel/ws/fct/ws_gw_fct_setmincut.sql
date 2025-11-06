@@ -304,7 +304,7 @@ BEGIN
 				ELSE unaccess 
 			END
 		WHERE node_id = v_valve_node_id
-		AND result_id = v_mincut_id;
+			AND result_id = v_mincut_id;
 
 		GET DIAGNOSTICS v_row_count = ROW_COUNT;
 
@@ -329,16 +329,11 @@ BEGIN
 			v_core_mincut := TRUE;
 		END IF;
 	ELSIF v_action = 'mincutChangeValveStatus' THEN
-		-- TODO: use changestatus column instead of updating real network
-		UPDATE man_valve SET closed = NOT closed 
+		UPDATE om_mincut_valve 
+		SET changestatus = NOT changestatus
 		WHERE node_id = v_valve_node_id
-		AND EXISTS (
-			SELECT 1 FROM v_temp_node 
-			WHERE node_id = v_valve_node_id
-				AND 'MINSECTOR' = ANY(graph_delimiter)
-		)
-		AND to_arc IS NULL;
-
+			AND closed = TRUE -- only change the status of closed valves
+			AND result_id = v_mincut_id;
 		GET DIAGNOSTICS v_row_count = ROW_COUNT;
 
 		IF v_row_count = 0 THEN
@@ -725,6 +720,13 @@ BEGIN
 
 		EXECUTE format('
 			UPDATE %I 
+			SET changestatus = FALSE, cost = -1, reverse_cost = -1
+			WHERE changestatus = TRUE
+			AND old_mapzone_id = 0;
+		', v_temp_arc_table);
+
+		EXECUTE format('
+			UPDATE %I 
 			SET proposed = FALSE, cost = 0, reverse_cost = 0,closed = FALSE, old_mapzone_id = 0
 			WHERE proposed = TRUE
 				AND old_mapzone_id <> 0;
@@ -746,6 +748,16 @@ BEGIN
 			FROM om_mincut_valve omv
 			WHERE omv.result_id = %L
 			AND omv.unaccess = TRUE
+			AND omv.node_id = %s
+			AND tpa.graph_delimiter = ''MINSECTOR'';
+		', v_temp_arc_table, v_mincut_id, v_query_text);
+
+		EXECUTE format('
+			UPDATE %I tpa
+			SET changestatus = TRUE, cost = 0, reverse_cost = 0
+			FROM om_mincut_valve omv
+			WHERE omv.result_id = %L
+			AND omv.changestatus = TRUE
 			AND omv.node_id = %s
 			AND tpa.graph_delimiter = ''MINSECTOR'';
 		', v_temp_arc_table, v_mincut_id, v_query_text);
@@ -818,8 +830,8 @@ BEGIN
 			', v_mincut_id, v_temp_node_table);
 
 			EXECUTE format('
-				INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, proposed, the_geom, to_arc)
-				SELECT %L, tpa.arc_id AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.proposed, vtn.the_geom, tpa.to_arc[1]
+				INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, changestatus, proposed, the_geom, to_arc)
+				SELECT %L, tpa.arc_id AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.changestatus, tpa.proposed, vtn.the_geom, tpa.to_arc[1]
 				FROM %I tpa
 				JOIN v_temp_node vtn ON vtn.node_id = tpa.arc_id
 				WHERE tpa.mapzone_id <> 0
@@ -844,8 +856,8 @@ BEGIN
 			', v_mincut_id, v_temp_node_table);
 
 			EXECUTE format('
-				INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, proposed, the_geom, to_arc)
-				SELECT %L, COALESCE(tpa.node_1, tpa.node_2) AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.proposed, vtn.the_geom, tpa.to_arc[1]
+				INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, changestatus, proposed, the_geom, to_arc)
+				SELECT %L, COALESCE(tpa.node_1, tpa.node_2) AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.changestatus, tpa.proposed, vtn.the_geom, tpa.to_arc[1]
 				FROM %I tpa
 				JOIN v_temp_node vtn ON vtn.node_id = COALESCE(tpa.node_1, tpa.node_2)
 				WHERE tpa.mapzone_id <> 0
@@ -1225,8 +1237,8 @@ BEGIN
 							', v_mincut_affected_id, v_temp_node_table, v_mincut_conflict_record.component);
 
 							EXECUTE format('
-								INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, proposed) 
-								SELECT %L, arc_id, closed, broken, to_arc[0], unaccess, proposed
+								INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, changestatus, proposed) 
+								SELECT %L, arc_id, closed, broken, to_arc[0], unaccess, changestatus, proposed
 								FROM %I tpa
 								WHERE tpa.mapzone_id <> 0 
 									AND tpa.graph_delimiter = ''MINSECTOR''
@@ -1289,8 +1301,8 @@ BEGIN
 							v_mincut_id, v_mincut_group_record.mincut_group);
 
 							EXECUTE format('
-								INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, proposed) 
-								SELECT %L, COALESCE (node_1, node_2), closed, broken, to_arc[0], unaccess, proposed
+								INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, changestatus, proposed) 
+								SELECT %L, COALESCE (node_1, node_2), closed, broken, to_arc[0], unaccess, changestatus, proposed
 								FROM %I a
 								WHERE a.mapzone_id <> 0 
 									AND graph_delimiter = ''MINSECTOR''
@@ -1531,6 +1543,13 @@ BEGIN
 				EXECUTE format('
 					UPDATE %I
 					SET proposed = FALSE, cost = 0, reverse_cost = 0, closed = FALSE, old_mapzone_id = 0
+					WHERE proposed = TRUE
+						AND old_mapzone_id <> 0;
+				', v_temp_arc_table);
+
+				EXECUTE format('
+					UPDATE %I
+					SET changestatus = FALSE, cost = 0, reverse_cost = 0, closed = FALSE, old_mapzone_id = 0
 					WHERE proposed = TRUE
 						AND old_mapzone_id <> 0;
 				', v_temp_arc_table);
