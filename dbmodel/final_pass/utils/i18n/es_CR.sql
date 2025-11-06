@@ -12246,14 +12246,7 @@ FROM (
     ('A_PVC50_PN10', 'Tubería de alcantarillado de PVC, diámetro exterior nominal 50 mm, presión nominal 10 bar', 'Tubería de alcantarillado de PVC, diámetro exterior nominal 50 mm, presión nominal 10 bar', '6675.1200'),
     ('A_PVC63_PN10', 'Tubería de PVC de 63 mm de diámetro exterior nominal, presión nominal 16 bar', 'Tubería de PVC de 63 mm de diámetro exterior nominal, presión nominal 16 bar', '7130.6400'),
     ('A_PVC90_PN16', 'Tubería de alcantarillado de PVC, diámetro exterior nominal 90 mm, presión nominal 16 bar', 'Tubería de alcantarillado de PVC, diámetro exterior nominal 90 mm, presión nominal 16 bar', '9869.6000'),
-    ('F9265C51', NULL, NULL, NULL),
-    ('F931201F', NULL, NULL, NULL),
     ('F9E1311N', 'Pavimento de baldosa gris de acera 20x20x4 cm sobre base de arena de 3 cm', 'Pavimento de baldosa gris de acera 20x20x4 cm sobre base de arena de 3 cm', '38159.6112'),
-    ('F9G1A732', NULL, NULL, NULL),
-    ('F9H11251', NULL, NULL, NULL),
-    ('F9H118E1', NULL, NULL, NULL),
-    ('F9J12X40', NULL, NULL, NULL),
-    ('F9J13Y40', NULL, NULL, NULL),
     ('N_AIRVAL_DN50', 'Válvula de aire embutida DN 50 mm, presión de prueba 16 bar', 'Válvula de aire embutida DN 50 mm, presión de prueba 16 bar', '112361.6000'),
     ('N_CHKVAL100_PN10', 'Válvula de retención de disco oscilante, diámetro nominal 100 mm, presión nominal 10 bar', 'Válvula de retención de disco oscilante, diámetro nominal 100 mm, presión nominal 10 bar', '107578.6400'),
     ('N_CHKVAL150_PN10', 'Válvula de retención de disco oscilante, diámetro nominal 150 mm, presión nominal 10 bar', 'Válvula de retención de disco oscilante, diámetro nominal 150 mm, presión nominal 10 bar', '182511.6800'),
@@ -12312,21 +12305,13 @@ FROM (
     ('N_WATERWELL-01', 'Construcción completamente equipada de pozo de agua', 'Construcción completamente equipada de pozo de agua', '3504000.0000'),
     ('N_XDN110-90_PN16', 'Derivación en T, diámetros nominales 110 mm y 90 mm, presión nominal 16 bar', 'Derivación en T, diámetros nominales 110 mm y 90 mm, presión nominal 16 bar', '49815.2000'),
     ('N_XDN110_PN16', 'Derivación en T, diámetro nominal 110 mm, presión nominal 16 bar', 'Derivación en T, diámetro nominal 110 mm, presión nominal 16 bar', '53114.8000'),
-    ('P_ASPHALT-10', NULL, NULL, NULL),
-    ('P_CONCRETE-20', NULL, NULL, NULL),
     ('PROTEC_SERVIS', 'Protección servicios afectados', 'Protección servicios afectados', '292.0000'),
-    ('P_SLAB-4P', NULL, NULL, NULL),
     ('SECURITY_HEALTH', 'Seguridad y salud en el trabajo', 'Seguridad y salud en el trabajo', '175.2000'),
     ('S_EXC', 'Excavación de zanja para canalización hasta 2 m en ancho de zanja y hasta 4 m en depth', 'Excavación de zanja para canalización hasta 2 m en ancho de zanja y hasta 4 m en depth', '5274.9216'),
     ('S_NULL', 'Relleno y compactación tubería material', 'Relleno y compactación tubería material', '0.0000'),
     ('S_REB', 'Reposición de zanja y zanjas para tuberías de ancho de zanja ditch más de 1.5 y hasta 2 m', 'Reposición de zanja y zanjas para tuberías de ancho de zanja ditch más de 1.5 y hasta 2 m', '5211.6744'),
     ('S_REP', 'Reexcavación de zanjas para tuberías en suelo denso de 0.6 a 1.5 m de ancho', 'Reexcavación o revisión y zanjas para tuberías de denso suelo de más de 0.6 y less than 1.5 m en ancho de zanja', '1501.3472'),
-    ('S_TRANS', 'Transporte de residuos a planta autorizada con camión de 12 t', 'Transporte de residuos a planta autorizada de gestión de residuos, con camión de 12 t y tiempo de espera para carga', '4739.9776'),
-    ('S_TRENCH', NULL, NULL, NULL),
-    ('VIRTUAL_M', NULL, NULL, NULL),
-    ('VIRTUAL_M2', NULL, NULL, NULL),
-    ('VIRTUAL_M3', NULL, NULL, NULL),
-    ('VIRTUAL_U', NULL, NULL, NULL)
+    ('S_TRANS', 'Transporte de residuos a planta autorizada con camión de 12 t', 'Transporte de residuos a planta autorizada de gestión de residuos, con camión de 12 t y tiempo de espera para carga', '4739.9776')
 ) AS v(id, descript, text, price)
 WHERE t.id = v.id;
 

@@ -12246,14 +12246,7 @@ FROM (
     ('A_PVC50_PN10', 'PVC sewer pipe with nominal exterior diameter of 50mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 50mm, nominal pressure of 10 bar', '11.4300'),
     ('A_PVC63_PN10', 'PVC tube of 63 mm of nominal external diameter, of 16 bar of nominal pressure', 'PVC tube of 63 mm of nominal external diameter, of 16 bar of nominal pressure, elastic union with elastomeric ring of watertight, according to the norm UNE-EN 1452-2 and placed at the bottom of the ditch', '12.2100'),
     ('A_PVC90_PN16', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar, with elastic join and elastomeric ring, according to the UNE-EN 1452-2; placed on the bottom trench.', '16.9000'),
-    ('F9265C51', NULL, NULL, NULL),
-    ('F931201F', NULL, NULL, NULL),
     ('F9E1311N', 'Tile pavement for gray sidewalk of 20x20x4 cm on support of 3 cm of sand', 'Tile pavement for gray sidewalk of 20x20x4 cm, first class, top price, on support of 3 cm of sand, made in the work with concrete mixer of 165 l and portland cement', '65.3418'),
-    ('F9G1A732', NULL, NULL, NULL),
-    ('F9H11251', NULL, NULL, NULL),
-    ('F9H118E1', NULL, NULL, NULL),
-    ('F9J12X40', NULL, NULL, NULL),
-    ('F9J13Y40', NULL, NULL, NULL),
     ('N_AIRVAL_DN50', 'Embossed air valve of 50 mm DN, 16 bar of test pressure', 'Embossed air valve of 50 mm DN, 16 bar of test pressure, smelting, high price and mounted in a buried channeling', '192.4000'),
     ('N_CHKVAL100_PN10', 'Check valve with tilting disc check, with diameter nominal 100mm, nominal pressure of 10 bar', 'Check valve with tilting disc check, according to UNE-EN 12334, with flanges, with diameter nominal 100mm, nominal pressure of 10 bar, iron nodular body cast EN-GJS-400-15 (GGG40) and epoxy resin coating (200 micres), iron nodular tilting discs EN-GJS-400-15 (GGG40), elastic closure seatclosing, mounted in a mini manhole. ', '184.2100'),
     ('N_CHKVAL150_PN10', 'Check valve with tilting disc check, with diameter nominal 150mm, nominal pressure of 10 bar', 'Check valve with tilting disc check, according to UNE-EN 12334, with flanges, with diameter nominal 150mm, nominal pressure of 10 bar, iron nodular body cast EN-GJS-400-15 (GGG40) and epoxy resin coating (200 micres), iron nodular tilting discs EN-GJS-400-15 (GGG40), elastic closure seatclosing, mounted in a mini manhole. ', '312.5200'),
@@ -12312,21 +12305,13 @@ FROM (
     ('N_WATERWELL-01', 'Fully equipied construction of waterwell ', 'Fully equipied construction of waterwell ', '6000.0000'),
     ('N_XDN110-90_PN16', 'Derivation on T, with diameter nominal 110mm and 90mm, nominal pressure of 16 bar', 'Derivation on T, with diameter nominal 110mm and 90mm, nominal pressure of 16 bar', '85.3000'),
     ('N_XDN110_PN16', 'Derivation on T, with diameter nominal 110mm, nominal pressure of 16 bar', 'Derivation on T, with diameter nominal 110mm, nominal pressure of 16 bar', '90.9500'),
-    ('P_ASPHALT-10', NULL, NULL, NULL),
-    ('P_CONCRETE-20', NULL, NULL, NULL),
     ('PROTEC_SERVIS', 'Protection of extsting services', 'Location and protection of all existing services that maybe affected by the works.', '0.5000'),
-    ('P_SLAB-4P', NULL, NULL, NULL),
     ('SECURITY_HEALTH', 'Health and safety of works', 'Plan for the implementation of health and safety throughout the works according to the program and instructions of project management.', '0.3000'),
     ('S_EXC', 'Excavation of trench up to 2 m in width and up to 4 m in depth', 'Excavation of trench up to 2 m in width and up to 4 m in depth, in compact terrain, with excavator shovel and load mechanics of excavated material', '9.0324'),
     ('S_NULL', 'Filling pipe material', 'Filling pipe material', '0.0000'),
     ('S_REB', 'Reversing and trenching of width ditch more than 1.5 and up to 2 m', 'Reversing and trenching of width ditch more than 1.5 and up to 2 m, with selected material, in tongades of thickness up to 25 cm, using vibratory roller to compact, with 95% PM compaction', '8.9241'),
     ('S_REP', 'Revision and trenching of dense soil of more than 0.6 and less than 1.5 m in width', 'Revision and trenching of dense soil of more than 0.6 and less than 1.5 m in width, with 90% PM compaction', '2.5708'),
-    ('S_TRANS', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loa', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loading, with a route of more than 15 and up to 20 km', '8.1164'),
-    ('S_TRENCH', NULL, NULL, NULL),
-    ('VIRTUAL_M', NULL, NULL, NULL),
-    ('VIRTUAL_M2', NULL, NULL, NULL),
-    ('VIRTUAL_M3', NULL, NULL, NULL),
-    ('VIRTUAL_U', NULL, NULL, NULL)
+    ('S_TRANS', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loa', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loading, with a route of more than 15 and up to 20 km', '8.1164')
 ) AS v(id, descript, text, price)
 WHERE t.id = v.id;
 
