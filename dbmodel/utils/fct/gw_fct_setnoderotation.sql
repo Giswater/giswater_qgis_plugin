@@ -71,7 +71,7 @@ BEGIN
 		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (SELECT arc_id FROM ve_arc) v WHERE v.arc_id = arc.arc_id';
 	ELSE
 		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (
-		SELECT arc_id FROM ve_arc WHERE (node_1 IN (SELECT node_id FROM ve_node WHERE node_type IN ('||v_nodetype||')) OR  (node_2 IN (SELECT node_id FROM ve_node WHERE node_type IN ('||v_nodetype||'))))
+		SELECT arc_id FROM ve_arc WHERE (node_1 IN (SELECT node_id FROM ve_node WHERE node_type IN ('||quote_literal(v_nodetype)||')) OR  (node_2 IN (SELECT node_id FROM ve_node WHERE node_type IN ('||quote_literal(v_nodetype)||'))))
 		) v WHERE v.arc_id = arc.arc_id';
 	END IF;
 	EXECUTE v_querytext;
