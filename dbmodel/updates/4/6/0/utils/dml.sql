@@ -60,3 +60,18 @@ WHERE columnname IN ('y2', 'custom_y2', 'elev2', 'custom_elev2')
 AND formname LIKE 've_arc_%'
 AND formtype = 'form_feature'
 AND widgetcontrols::text LIKE '%autoupdateReloadFields%';
+
+DO
+$$
+DECLARE
+    v_rec record;
+BEGIN
+    FOR v_rec IN SELECT fid, except_msg FROM sys_fprocess LOOP
+        IF right(v_rec.except_msg, 1) <> '.' AND right(v_rec.except_msg, 1) <> '!' AND right(v_rec.except_msg, 1) <> '?' THEN
+            UPDATE sys_fprocess
+            SET except_msg = v_rec.except_msg || '.'
+            WHERE fid = v_rec.fid;
+        END IF;
+    END LOOP;
+END;
+$$;

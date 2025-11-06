@@ -23,3 +23,8 @@ UPDATE config_toolbox SET inputparams='[
 
 INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,layoutname,iseditable,"source")
 VALUES ('plan_psector_auto_insert_connec','config','Automatic insertion of connected connecs when inserting an arc','role_plan','Automatic connec insertion:',true,12,'utils',false,false,'boolean','check',false,'lyt_masterplan',true,'core');
+
+-- 06/11/2025
+UPDATE sys_fprocess
+	SET except_msg='dry nodes/connecs with demand which have been set to zero on the go2epa process.'
+	WHERE fid=233;
