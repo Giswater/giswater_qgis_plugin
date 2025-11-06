@@ -2126,7 +2126,7 @@ class GwAdminButton:
     def on_btn_pschema_qgis_file_clicked(self):
         """ Sets the project to be created as a 'CM' project. """
         self.is_cm_project = True
-        tools_qgis.show_info("Layer of CM project will be added to the project when create", dialog=self.dlg_readsql_create_cm_project)
+        tools_qgis.show_info(tools_qt.tr("Layer of CM project will be added to the project when create"), dialog=self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
     def _open_rename(self):

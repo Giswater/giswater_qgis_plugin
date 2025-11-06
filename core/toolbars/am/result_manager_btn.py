@@ -288,7 +288,7 @@ class GwResultManagerButton(GwAction):
         result_type_i18n = dlg.tbl_results.model().record(row).value(2)
 
         if not result_type_i18n:
-            tools_qgis.show_warning("Please select a result with not empty type", dialog=dlg)
+            tools_qgis.show_warning(tools_qt.tr("Please select a result with not empty type"), dialog=dlg)
             return
         result_type = self._value_result_type[result_type_i18n]
 
@@ -306,7 +306,7 @@ class GwResultManagerButton(GwAction):
         result_type_i18n = dlg.tbl_results.model().record(row).value(2)
 
         if not result_type_i18n:
-            tools_qgis.show_warning("Please select a result with not empty type", dialog=dlg)
+            tools_qgis.show_warning(tools_qt.tr("Please select a result with not empty type"), dialog=dlg)
             return
 
         result_type = self._value_result_type[result_type_i18n]
