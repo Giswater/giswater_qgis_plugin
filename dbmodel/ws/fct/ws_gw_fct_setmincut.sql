@@ -255,7 +255,7 @@ BEGIN
 	END IF;
 
 	-- manage actions
-	IF v_action IN ('mincutNetwork', 'mincutRefresh') THEN
+	IF v_action = 'mincutNetwork' THEN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
@@ -270,10 +270,11 @@ BEGIN
 		ELSE
 			v_init_mincut := FALSE;
 			v_prepare_mincut := TRUE;
+			DELETE FROM om_mincut_valve WHERE result_id=v_mincut_id;
 		END IF;
 		v_core_mincut := TRUE;
 
-		IF v_action = 'mincutNetwork' AND v_device = 5 AND v_mincut_id IS NULL THEN
+		IF v_device = 5 AND v_mincut_id IS NULL THEN
 			SELECT setval('om_mincut_seq', COALESCE((SELECT max(id::integer)+1 FROM om_mincut), 1), true) INTO v_mincut_id;
 			INSERT INTO om_mincut (id, mincut_state) VALUES (v_mincut_id, v_mincut_on_planning_state);
 
@@ -294,6 +295,24 @@ BEGIN
 			);
 			EXECUTE v_query_text;
 		END IF;
+	
+	ELSIF v_action = 'mincutRefresh' THEN 
+		-- check if the arc exists in the cluster:
+			-- true: refresh mincut
+			-- false: init and refresh mincut
+		IF v_mincut_version = '6.1' THEN
+			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
+		ELSE 
+			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
+		END IF;
+		IF v_row_count = 0 THEN
+			v_init_mincut := TRUE;
+			v_prepare_mincut := FALSE;
+		ELSE
+			v_init_mincut := FALSE;
+			v_prepare_mincut := TRUE;
+		END IF;
+		v_core_mincut := TRUE;
 
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 		UPDATE om_mincut_valve 
@@ -670,38 +689,20 @@ BEGIN
 		EXECUTE format('
 			UPDATE %I 
 			SET proposed = FALSE 
-			WHERE proposed = TRUE
-			AND old_mapzone_id = 0;
+			WHERE proposed = TRUE;
 		', v_temp_arc_table);
 
 		EXECUTE format('
 			UPDATE %I 
 			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
-			WHERE unaccess = TRUE
-			AND old_mapzone_id = 0;
+			WHERE unaccess = TRUE;
 		', v_temp_arc_table);
 
 		EXECUTE format('
 			UPDATE %I 
 			SET changestatus = FALSE, cost = -1, reverse_cost = -1
-			WHERE changestatus = TRUE
-			AND old_mapzone_id = 0;
+			WHERE changestatus = TRUE;
 		', v_temp_arc_table);
-
-		EXECUTE format('
-			UPDATE %I 
-			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
-			WHERE proposed = TRUE
-				AND old_mapzone_id <> 0;
-		', v_temp_arc_table);
-
-		EXECUTE format('
-			UPDATE %I 
-			SET changestatus = FALSE, cost = -1, reverse_cost = -1, old_mapzone_id = 0
-			WHERE changestatus = TRUE
-				AND old_mapzone_id <> 0;
-		', v_temp_arc_table);
-
 	END IF;
 
 	IF v_core_mincut THEN
