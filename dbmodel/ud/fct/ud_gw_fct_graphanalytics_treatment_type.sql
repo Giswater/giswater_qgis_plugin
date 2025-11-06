@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 -- The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 
---FUNCTION CODE: 3520
+--FUNCTION CODE: 3522
 --FID: 642
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_treatment_type(json);
