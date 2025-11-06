@@ -8071,7 +8071,7 @@ FROM (
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
 UPDATE plan_price AS t
-SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')
+SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric
 FROM (
     VALUES
     ('F9265C51', 'Concrete base of HM-20/B/10/ I, soft consistency with mechanical interior transport', 'Concrete base of HM-20/B/10/I, of soft consistency and maximum size of 10 mm granulate, with mechanical interior transport with manual extension and vibration, with a rusty finish', '87.0445'),

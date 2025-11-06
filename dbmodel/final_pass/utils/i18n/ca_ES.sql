@@ -12155,7 +12155,7 @@ FROM (
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
 UPDATE plan_price AS t
-SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')
+SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric
 FROM (
     VALUES
     ('A_CON_DN100', 'Concrete sewer pipe with nominal external diameter of 1000mm', 'Concrete sewer pipe with nominal external diameter of 1000mm, sealing inside with cement mortar 1:6, base of 25cm filling up half of a pipe and protected by concrete layer HM-20/P/20/I.', '169.5776'),
