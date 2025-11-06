@@ -164,6 +164,10 @@ BEGIN
 		ELSIF lower(v_feature.type)='element' THEN
 			EXECUTE 'INSERT INTO cat_feature_element (id, epa_default)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
+
+		ELSIF lower(v_feature.type)='link' THEN
+			EXECUTE 'INSERT INTO cat_feature_link (id)
+			VALUES ('||quote_literal(NEW.id)||');';
 		END IF;
 
 		--create child view
