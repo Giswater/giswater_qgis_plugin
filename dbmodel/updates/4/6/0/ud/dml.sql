@@ -15,7 +15,7 @@ INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layo
 VALUES ('plan_psector_auto_insert_connec','config','Automatic insertion of connected connecs/gullies when inserting an arc','role_plan','Automatic connec/gully insertion:',true,12,'utils',false,false,'boolean','check',false,'lyt_masterplan',true,'core');
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
-VALUES(3520, 'gw_fct_graphanalytics_treatment_type', 'ud', 'function', 'json', 'json',
+VALUES(3522, 'gw_fct_graphanalytics_treatment_type', 'ud', 'function', 'json', 'json',
 'Function to generate treatment_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.', 'role_plan', NULL, 'core', NULL);
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
