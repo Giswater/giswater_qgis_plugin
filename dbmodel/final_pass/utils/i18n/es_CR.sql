@@ -12155,7 +12155,7 @@ FROM (
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
 UPDATE plan_price AS t
-SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')
+SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric
 FROM (
     VALUES
     ('A_CON_DN100', 'Tubo de hormigón para alcantarillado con un diámetro exterior nominal de 1000 mm', 'Tubería de alcantarillado de hormigón con diámetro exterior nominal de 1000mm, sellado interior con mortero de cemento 1:6, base de 25cm rellenando la mitad de una tubería y protegida por capa de hormigón HM-20/P/20/I.', '99033.3184'),
@@ -12256,7 +12256,7 @@ FROM (
     ('N_CUR30_PVC110', 'Conexión DN 110 mm en ángulo de 30°', 'Conexión DN 110 mm en ángulo de 30°', '60204.5600'),
     ('N_CUR45_PVC110', 'Conexión DN 110 mm en ángulo de 45°', 'Conexión DN 110 mm en ángulo de 45°', '60204.5600'),
     ('N_ENDLINE', 'Tapón ciego', 'Tapón ciego', '54055.0400'),
-    ('N_ETAP', 'Planta de tratamiento de agua', 'Planta de tratamiento de agua', '1138800000.0000'),
+    ('N_ETAP', 'Planta de tratamiento de agua', 'Planta de tratamiento de agua', '11388000.0000'),
     ('N_EXPANTANK', 'Depósito de expansión', 'Depósito de expansión', '2306800.0000'),
     ('N_FILTER-01', 'Filtro en Y con bridas, diámetro nominal 200 mm', 'Filtro en Y con bridas, diámetro nominal 200 mm', '650727.8400'),
     ('N_FLEXUNION', 'Flexión, presión nominal 10 bar', 'Flexión, presión nominal 10 bar', '9052.0000'),

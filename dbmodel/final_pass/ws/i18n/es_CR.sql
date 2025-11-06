@@ -8071,7 +8071,7 @@ FROM (
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
 UPDATE plan_price AS t
-SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')
+SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric
 FROM (
     VALUES
     ('F9265C51', 'Hormigón HM-20/B/10/I consistencia blanda con transporte mecánico', 'Hormigón de base o de relleno estructural HM-20/B/10/I, consistencia blanda, con transporte interior mecánico', '50833.9880'),
@@ -8114,7 +8114,7 @@ FROM (
     ('N_CUR30_PVC110', 'Conexión DN 110 mm en ángulo de 30°', 'Conexión DN 110 mm en ángulo de 30°', '60204.5600'),
     ('N_CUR45_PVC110', 'Conexión DN 110 mm en ángulo de 45°', 'Conexión DN 110 mm en ángulo de 45°', '60204.5600'),
     ('N_ENDLINE', 'Tapón ciego', 'Tapón ciego', '54055.0400'),
-    ('N_ETAP', 'Planta de tratamiento de agua', 'Planta de tratamiento de agua', '1138800000.0000'),
+    ('N_ETAP', 'Planta de tratamiento de agua', 'Planta de tratamiento de agua', '11388000.0000'),
     ('N_EXPANTANK', 'Depósito de expansión', 'Depósito de expansión', '2306800.0000'),
     ('N_FILTER-01', 'Filtro en Y con bridas, diámetro nominal 200 mm', 'Filtro en Y con bridas, diámetro nominal 200 mm', '650727.8400'),
     ('N_FLEXUNION', 'Flexión, presión nominal 10 bar', 'Flexión, presión nominal 10 bar', '9052.0000'),

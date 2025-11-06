@@ -8998,7 +8998,7 @@ FROM (
 WHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;
 
 UPDATE plan_price AS t
-SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')
+SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric
 FROM (
     VALUES
     ('A_CON_DN100', 'Tubo de hormigón para alcantarillado con un diámetro exterior nominal de 1000 mm', 'Tubería de alcantarillado de hormigón con diámetro exterior nominal de 1000mm, sellado interior con mortero de cemento 1:6, base de 25cm rellenando la mitad de una tubería y protegida por capa de hormigón HM-20/P/20/I.', '99033.3184'),
