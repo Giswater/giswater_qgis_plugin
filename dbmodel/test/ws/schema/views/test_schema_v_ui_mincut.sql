@@ -48,7 +48,9 @@ SELECT columns_are('v_ui_mincut', ARRAY[
     'chlorine',
     'turbidity',
     'notified',
-    'output'
+    'output',
+    'reagent_lot',
+    'equipment_code'
 ], 'View v_ui_mincut should have the correct columns');
 
 SELECT * FROM finish();
