@@ -1328,6 +1328,13 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         if expl_data and isinstance(expl_data, list):
             expl_id = expl_data[0]
 
+    expl_id_int = None
+    if expl_id is not None:
+        try:
+            expl_id_int = int(expl_id)
+        except (TypeError, ValueError):
+            expl_id_int = None
+
     schema = lib_vars.schema_name
     sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
 
@@ -1339,10 +1346,10 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         else:  # If sector_ids is None or an empty list []
             filters.append("1=0")  # Effectively blocks all sectors for this organization
 
-    if expl_id:
-        filters.append(f"macrosector_id = {expl_id}")
+    if expl_id_int is not None:
+        filters.append(f"{schema}.sector.expl_id @> ARRAY[{expl_id_int}]")
     else:
-        # If no expl_id is selected, no sectors should be shown
+        # If no expl_id is selected or it is not numeric, no sectors should be shown
         filters.append("1=0")
 
     if filters:
