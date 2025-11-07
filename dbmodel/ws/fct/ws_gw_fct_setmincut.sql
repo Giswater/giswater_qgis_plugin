@@ -270,7 +270,6 @@ BEGIN
 		ELSE
 			v_init_mincut := FALSE;
 			v_prepare_mincut := TRUE;
-			DELETE FROM om_mincut_valve WHERE result_id=v_mincut_id;
 		END IF;
 		v_core_mincut := TRUE;
 
@@ -348,11 +347,14 @@ BEGIN
 			v_core_mincut := TRUE;
 		END IF;
 	ELSIF v_action = 'mincutChangeValveStatus' THEN
-		UPDATE om_mincut_valve 
-		SET changestatus = NOT changestatus
+		UPDATE om_mincut_valve
+		SET changestatus =
+			CASE 
+				WHEN changestatus = TRUE THEN FALSE 
+				WHEN closed = TRUE AND broken = FALSE AND to_arc IS NULL THEN TRUE 
+				ELSE changestatus 
+			END
 		WHERE node_id = v_valve_node_id
-			AND closed = TRUE -- only change the status of closed valves
-			AND to_arc IS NULL
 			AND result_id = v_mincut_id;
 		GET DIAGNOSTICS v_row_count = ROW_COUNT;
 
@@ -688,7 +690,19 @@ BEGIN
 
 		EXECUTE format('
 			UPDATE %I 
-			SET proposed = FALSE 
+			SET old_mapzone_id = 0 
+			WHERE old_mapzone_id <> 0;
+		', v_temp_arc_table);
+
+		EXECUTE format('
+			UPDATE %I 
+			SET old_mapzone_id = 0 
+			WHERE old_mapzone_id <> 0;
+		', v_temp_node_table);
+
+		EXECUTE format('
+			UPDATE %I 
+			SET proposed = FALSE, cost = 0, reverse_cost = 0 
 			WHERE proposed = TRUE;
 		', v_temp_arc_table);
 
@@ -729,8 +743,9 @@ BEGIN
 			SET changestatus = TRUE, cost = 0, reverse_cost = 0
 			FROM om_mincut_valve omv
 			WHERE omv.result_id = %L
-			AND omv.changestatus = TRUE
 			AND omv.node_id = %s
+			AND omv.changestatus = TRUE
+			AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
 			AND tpa.graph_delimiter = ''MINSECTOR'';
 		', v_temp_arc_table, v_mincut_id, v_query_text);
 
@@ -1052,14 +1067,7 @@ BEGIN
 
 			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
 
-				-- prepare mincut 
-				EXECUTE format('
-					UPDATE %I 
-					SET proposed = FALSE 
-					WHERE proposed = TRUE
-					AND old_mapzone_id = 0;
-				', v_temp_arc_table);
-
+				-- prepare mincut
 				EXECUTE format('
 					UPDATE %I 
 					SET mapzone_id = 0 
@@ -1072,6 +1080,27 @@ BEGIN
 					WHERE mapzone_id <> 0;
 				', v_temp_node_table);
 
+				EXECUTE format('
+					UPDATE %I 
+					SET proposed = FALSE 
+					WHERE proposed = TRUE
+						AND old_mapzone_id = 0;
+				', v_temp_arc_table);
+
+				EXECUTE format('
+					UPDATE %I
+					SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+					WHERE proposed = TRUE
+						AND old_mapzone_id <> 0;
+				', v_temp_arc_table);
+
+				EXECUTE format('
+					UPDATE %I
+					SET changestatus = FALSE, cost = -1, reverse_cost = -1, old_mapzone_id = 0
+					WHERE changestatus = TRUE
+						AND old_mapzone_id <> 0;
+				', v_temp_arc_table);
+
 				IF v_mincut_version = '6.1' THEN
 					v_query_text := 'tpa.arc_id';
 				ELSE
@@ -1083,8 +1112,9 @@ BEGIN
 					SET changestatus = omv.changestatus, cost = 0, reverse_cost = 0, old_mapzone_id = omv.result_id
 					FROM om_mincut_valve omv
 					WHERE omv.result_id = ANY(%L)
-						AND omv.changestatus = TRUE
 						AND omv.node_id = %s
+						AND omv.changestatus = TRUE
+						AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
 						AND tpa.graph_delimiter = ''MINSECTOR'';
 				', v_temp_arc_table, v_mincut_group_record.mincut_group, v_query_text);
 
@@ -1528,21 +1558,6 @@ BEGIN
 				ELSE
 					v_overlap_status = 'Ok';
 				END IF;
-
-
-				EXECUTE format('
-					UPDATE %I
-					SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
-					WHERE proposed = TRUE
-						AND old_mapzone_id <> 0;
-				', v_temp_arc_table);
-
-				EXECUTE format('
-					UPDATE %I
-					SET changestatus = FALSE, cost = -1, reverse_cost = -1, old_mapzone_id = 0
-					WHERE changestatus = TRUE
-						AND old_mapzone_id <> 0;
-				', v_temp_arc_table);
 
 			END LOOP;
 
