@@ -130,8 +130,8 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
         tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
-        tools_qt.set_checked(self.dlg_mincut, "txt_equipment_code", row['equipment_code'])
-        tools_qt.set_checked(self.dlg_mincut, "txt_reagent_lot", row['reagent_lot'])
+        tools_qt.set_widget_text(self.dlg_mincut, "txt_equipment_code", row['equipment_code'])
+        tools_qt.set_widget_text(self.dlg_mincut, "txt_reagent_lot", row['reagent_lot'])
 
         # Manage assigend_to combo
         index = self.dlg_mincut.assigned_to.findText(row['assigned_to_name'])
