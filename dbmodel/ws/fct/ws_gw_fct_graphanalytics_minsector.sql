@@ -644,7 +644,7 @@ BEGIN
 		END IF;
 
         -- the unaccess valves
-        IF v_ignore_unaccess_valves THEN
+        IF v_ignore_unaccess_valves = FALSE THEN
             EXECUTE format('
                 WITH today_mincuts AS (
 					SELECT o.id AS result_id
@@ -674,7 +674,7 @@ BEGIN
         END IF;
 
         -- the changestatus valves
-        IF v_ignore_changestatus_valves THEN
+        IF v_ignore_changestatus_valves = FALSE THEN
             EXECUTE format('
                 WITH today_mincuts AS (
 					SELECT o.id AS result_id
@@ -689,6 +689,7 @@ BEGIN
                 UPDATE temp_pgr_arc_minsector tpa
                 SET changestatus = TRUE, cost = 0, reverse_cost = 0
                 WHERE tpa.graph_delimiter = ''MINSECTOR''
+                AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
                 AND EXISTS (
                     SELECT 1
                     FROM om_mincut_valve omv
