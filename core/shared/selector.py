@@ -279,7 +279,7 @@ class GwSelector:
                 except Exception:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND widgetname='{1}'"
                     msg_params = (field['columnname'], field['widgetname'],)
-                    tools_qgis.show_message(msg, Qgis.Critical, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             gridlayout.addItem(vertical_spacer1)

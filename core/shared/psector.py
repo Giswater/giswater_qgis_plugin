@@ -1136,7 +1136,7 @@ class GwPsector:
             msg += tools_qt.tr("There are some topological inconsistences on psector '{0}'. Would you like to see the log?")
             msg_params = (psector_name,)
             function = partial(self.show_psector_topoerror_log, json_result, psector_id)
-            tools_qgis.show_message_function(msg, function, message_level=Qgis.Warning, duration=0, text_params=msg_params, dialog=self.dlg_plan_psector)
+            tools_qgis.show_message_function(msg, function, message_level=Qgis.MessageLevel.Warning, duration=0, text_params=msg_params, dialog=self.dlg_plan_psector)
             if from_toggle:
                 return False
 

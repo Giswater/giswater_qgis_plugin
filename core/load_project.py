@@ -234,11 +234,11 @@ class GwLoadProject(QObject):
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.Warning, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
         if pgrouting_version is not None and minorPgrVersion is not None:
             if int(str(pgrouting_version).replace('.', '')) < int(minorPgrVersion):
                 msg = "pgRouting version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.Warning, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """

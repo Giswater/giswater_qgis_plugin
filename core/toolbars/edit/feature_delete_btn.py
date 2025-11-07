@@ -199,7 +199,7 @@ class GwFeatureDeleteButton(GwAction):
 
         if not complet_result:
             msg = "Function gw_fct_setfeaturedelete executed with no result "
-            tools_qgis.show_message(msg, Qgis.Success)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
             return
 
         if complet_result.get('status') == 'Failed':

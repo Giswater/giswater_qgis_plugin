@@ -2010,7 +2010,7 @@ class GwMincut:
                 msg = complet_result.get('message')
                 if not msg:
                     msg = "Mincut done successfully"
-                    tools_qgis.show_message(msg, Qgis.Success)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
                 else:
                     tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
@@ -2135,7 +2135,7 @@ class GwMincut:
                 msg = complet_result.get('message')
                 if not msg:
                     msg = "Mincut done successfully"
-                    tools_qgis.show_message(msg, Qgis.Success)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
                 else:
                     tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
@@ -2317,7 +2317,7 @@ class GwMincut:
             template_files = os.listdir(template_folder)
         except FileNotFoundError:
             msg = "Your composer's path is bad configured. Please, modify it and try again."
-            tools_qgis.show_message(msg, Qgis.Warning)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
             return
 
         # Set dialog add_connec

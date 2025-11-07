@@ -569,7 +569,7 @@ class GwStyleManager:
                 "using the 'GwBasic' style information.\n"
                 "You can change it and use 'Update Style' to create a personalized version.")
             msg_params = (selected_stylegroup_name, table_name,)
-            tools_qgis.show_message(msg, Qgis.Success, dialog=self.style_mng_dlg, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Success, dialog=self.style_mng_dlg, msg_params=msg_params)
 
             self._load_styles()
 

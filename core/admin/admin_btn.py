@@ -444,7 +444,7 @@ class GwAdminButton:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
             message_log.setVisible(True)
-            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", Qgis.Info)
+            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", Qgis.MessageLevel.Info)
 
             # Manage Log Messages in tab log
             main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
@@ -1096,7 +1096,7 @@ class GwAdminButton:
         elif connection_status is False:
             self.form_enabled = False
             msg = "Connection Failed. Please, check connection parameters"
-            tools_qgis.show_message(msg, Qgis.Warning)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
             tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
@@ -3545,7 +3545,7 @@ class GwAdminButton:
 
         if self.ws_project_name == "" or self.ud_project_name == "":
             msg = "You need to have a ws and ud schema created to create a utils schema"
-            tools_qgis.show_message(msg, Qgis.Info)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         # Get giswater version for ws and ud project selected
@@ -3566,7 +3566,7 @@ class GwAdminButton:
             msg = ("You need to select same version for ws and ud projects. "
                    "Versions: WS - {} ; UD - {}")
             msg_params = (self.ws_project_result, self.ud_project_result,)
-            tools_qgis.show_message(msg, Qgis.Info, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info, msg_params=msg_params)
             return
 
         # Check is project name already exists
@@ -3575,7 +3575,7 @@ class GwAdminButton:
         row = tools_db.get_row(sql, commit=False)
         if row:
             msg = "Schema Utils already exist."
-            tools_qgis.show_message(msg, Qgis.Info)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         self.error_count = 0

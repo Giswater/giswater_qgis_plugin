@@ -114,7 +114,7 @@ class GwMincutTools:
                 if field['layoutorder'] is None:
                     msg = "The field layoutorder is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_mincut_man)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_mincut_man)
                     continue
 
                 # Manage widget and label positions
@@ -167,7 +167,7 @@ class GwMincutTools:
             elif field['layoutname'] != 'lyt_none':
                 msg = "The field layoutname is not configured for"
                 param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(msg, Qgis.Critical, parameter=param, dialog=self.dlg_mincut_man)
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_mincut_man)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)

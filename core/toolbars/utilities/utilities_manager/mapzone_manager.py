@@ -1131,7 +1131,7 @@ class GwMapzoneManager:
         json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
         if not json_result or 'status' not in json_result:
             msg = "Failed to get a valid response from gw_fct_config_mapzones."
-            tools_qgis.show_message(msg, level=Qgis.Critical)
+            tools_qgis.show_message(msg, level=Qgis.MessageLevel.Critical)
             return
 
         if 'status' in json_result and json_result['status'] == 'Accepted':
