@@ -10,10 +10,10 @@ SET label = v.label, tooltip = v.tooltip
 FROM (
     VALUES
     ('active', 'campaign_inventory', 'form_feature', 'tab_data', 'Aktywny:', 'Aktywny'),
-    ('campaign_id', 'campaign_inventory', 'form_feature', 'tab_data', 'Kampania Id:', 'Id'),
+    ('campaign_id', 'campaign_inventory', 'form_feature', 'tab_data', 'Kampania id:', 'Id'),
     ('descript', 'campaign_inventory', 'form_feature', 'tab_data', 'Opis:', 'Opis'),
     ('enddate', 'campaign_inventory', 'form_feature', 'tab_data', 'Planowany koniec:', 'Planowany koniec'),
-    ('expl_id', 'campaign_inventory', 'form_feature', 'tab_data', 'Expl Id:', 'Expl Id'),
+    ('expl_id', 'campaign_inventory', 'form_feature', 'tab_data', 'Expl id:', 'Expl id'),
     ('inventoryclass_id', 'campaign_inventory', 'form_feature', 'tab_data', 'Klasa zapasów:', 'Klasa zapasów'),
     ('name', 'campaign_inventory', 'form_feature', 'tab_data', 'Imię i nazwisko:', 'Nazwa'),
     ('organization_id', 'campaign_inventory', 'form_feature', 'tab_data', 'Organizacja:', 'Organizacja'),
@@ -23,10 +23,10 @@ FROM (
     ('startdate', 'campaign_inventory', 'form_feature', 'tab_data', 'Planowany start:', 'Planowany start'),
     ('status', 'campaign_inventory', 'form_feature', 'tab_data', 'Status:', 'Status'),
     ('active', 'campaign_review', 'form_feature', 'tab_data', 'Aktywny:', 'Aktywny'),
-    ('campaign_id', 'campaign_review', 'form_feature', 'tab_data', 'Kampania Id:', 'Id'),
+    ('campaign_id', 'campaign_review', 'form_feature', 'tab_data', 'Kampania id:', 'Id'),
     ('descript', 'campaign_review', 'form_feature', 'tab_data', 'Opis:', 'Opis'),
     ('enddate', 'campaign_review', 'form_feature', 'tab_data', 'Planowany koniec:', 'Planowany koniec'),
-    ('expl_id', 'campaign_review', 'form_feature', 'tab_data', 'Expl Id:', 'Expl Id'),
+    ('expl_id', 'campaign_review', 'form_feature', 'tab_data', 'Expl id:', 'Expl id'),
     ('name', 'campaign_review', 'form_feature', 'tab_data', 'Imię i nazwisko:', 'Nazwa'),
     ('organization_id', 'campaign_review', 'form_feature', 'tab_data', 'Organizacja:', 'Organizacja'),
     ('real_enddate', 'campaign_review', 'form_feature', 'tab_data', 'Prawdziwy koniec:', 'Prawdziwy koniec'),
@@ -36,10 +36,10 @@ FROM (
     ('startdate', 'campaign_review', 'form_feature', 'tab_data', 'Planowany start:', 'Planowany start'),
     ('status', 'campaign_review', 'form_feature', 'tab_data', 'Status:', 'Status'),
     ('active', 'campaign_visit', 'form_feature', 'tab_data', 'Aktywny:', 'Aktywny'),
-    ('campaign_id', 'campaign_visit', 'form_feature', 'tab_data', 'Lot Id:', 'Id'),
+    ('campaign_id', 'campaign_visit', 'form_feature', 'tab_data', 'Lot id:', 'Id'),
     ('descript', 'campaign_visit', 'form_feature', 'tab_data', 'Opis:', 'Opis'),
     ('enddate', 'campaign_visit', 'form_feature', 'tab_data', 'Planowany koniec:', 'Planowany koniec'),
-    ('expl_id', 'campaign_visit', 'form_feature', 'tab_data', 'Expl Id:', 'Expl Id'),
+    ('expl_id', 'campaign_visit', 'form_feature', 'tab_data', 'Expl id:', 'Expl id'),
     ('name', 'campaign_visit', 'form_feature', 'tab_data', 'Imię i nazwisko:', 'Nazwa'),
     ('organization_id', 'campaign_visit', 'form_feature', 'tab_data', 'Organizacja:', 'Organizacja'),
     ('real_enddate', 'campaign_visit', 'form_feature', 'tab_data', 'Prawdziwy koniec:', 'Prawdziwy koniec'),
@@ -60,7 +60,7 @@ FROM (
     ('campaign_id', 'lot', 'form_feature', 'tab_data', 'Identyfikator kampanii:', 'Identyfikator kampanii'),
     ('descript', 'lot', 'form_feature', 'tab_data', 'Opis:', 'Opis'),
     ('enddate', 'lot', 'form_feature', 'tab_data', 'Planowany koniec:', 'Planowany koniec'),
-    ('expl_id', 'lot', 'form_feature', 'tab_data', 'Expl Id:', 'Expl Id'),
+    ('expl_id', 'lot', 'form_feature', 'tab_data', 'Expl id:', 'Expl id'),
     ('lot_id', 'lot', 'form_feature', 'tab_data', 'Identyfikator działki:', 'Id'),
     ('name', 'lot', 'form_feature', 'tab_data', 'Imię i nazwisko:', 'Nazwa'),
     ('organization_assigned', 'lot', 'form_feature', 'tab_data', 'Przydzielona organizacja:', 'Przypisana organizacja'),
@@ -78,7 +78,7 @@ FROM (
     ('serie', 'workorder', 'form_feature', 'tab_data', 'Seria:', 'Seria'),
     ('startdate', 'workorder', 'form_feature', 'tab_data', 'Data rozpoczęcia:', 'Data rozpoczęcia'),
     ('workorder_class', 'workorder', 'form_feature', 'tab_data', 'Klasa zlecenia roboczego:', 'Klasa zlecenia roboczego'),
-    ('workorder_id', 'workorder', 'form_feature', 'tab_data', 'Workorder Id:', 'Identyfikator zlecenia'),
+    ('workorder_id', 'workorder', 'form_feature', 'tab_data', 'Workorder id:', 'Identyfikator zlecenia'),
     ('workorder_name', 'workorder', 'form_feature', 'tab_data', 'Nazwa zlecenia:', 'Nazwa zlecenia'),
     ('workorder_type', 'workorder', 'form_feature', 'tab_data', 'Typ zlecenia:', 'Typ zlecenia')
 ) AS v(columnname, formname, formtype, tabname, label, tooltip)
@@ -328,10 +328,10 @@ UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
     VALUES
-    (100, 'wartość null w kolumnie %check_column% %table_name%', 'Kolumna %check_column% w %table_name% ma prawidłowe wartości.', 'Sprawdź spójność zer'),
+    (100, 'wartość null w kolumnie %check_column% %table_name%.', 'Kolumna %check_column% w %table_name% ma prawidłowe wartości.', 'Sprawdź spójność zer'),
     (200, 'Niektórzy użytkownicy nie mają przypisanego zespołu.', 'Wszyscy użytkownicy mają przypisany zespół.', 'Sprawdź spójność użytkowników'),
     (201, 'zespołów bez przypisanych użytkowników.', 'Wszystkie zespoły mają przypisanych użytkowników.', 'Sprawdź spójność zespołów'),
-    (202, 'Istnieje kilka osieroconych węzłów', 'Nie ma osieroconych węzłów.', 'Sprawdź osierocone węzły'),
+    (202, 'Istnieje kilka osieroconych węzłów.', 'Nie ma osieroconych węzłów.', 'Sprawdź osierocone węzły'),
     (203, 'węzłów zduplikowanych ze stanem 1.', 'Nie ma zduplikowanych węzłów ze stanem 1', 'Sprawdź zduplikowane węzły')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
