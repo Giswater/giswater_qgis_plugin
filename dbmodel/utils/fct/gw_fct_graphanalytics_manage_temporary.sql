@@ -182,12 +182,27 @@ BEGIN
                     "cost" FLOAT8 NULL,
                     reverse_cost FLOAT8 NULL,
                     graph_delimiter VARCHAR(30) DEFAULT 'NONE',
+                    omunit_id INTEGER DEFAULT 0,
+                    macrounit_id INTEGER DEFAULT 0,
+                    catchment_id INTEGER DEFAULT 0,
+                    order_id INTEGER DEFAULT 0,
                     CONSTRAINT temp_pgr_linegraph_pkey PRIMARY KEY (seq)
                 );
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_source_idx ON temp_pgr_linegraph USING btree ("source");
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_target_idx ON temp_pgr_linegraph USING btree ("target");
                 ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
                 ALTER TABLE temp_pgr_node ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
+                ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS catchment_id INTEGER DEFAULT 0;
+                ALTER TABLE temp_pgr_node ADD COLUMN  IF NOT EXISTS catchment_id INTEGER DEFAULT 0;
+
+                CREATE TABLE temp_pgr_macrounit (
+                    macrounit_id int4 NOT NULL,
+                    node_1 int4 NULL,
+                    node_2 int4 NULL,
+                    CONSTRAINT temp_pgr_macrounit_pkey PRIMARY KEY (macrounit_id)
+                );
+                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_node_1_idx ON temp_pgr_macrounit USING btree ("node_1");
+                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_node_2_idx ON temp_pgr_macrounit USING btree ("node_2");
             END IF;
         END IF;
 
@@ -1002,6 +1017,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
         DROP TABLE IF EXISTS temp_pgr_linegraph;
+        DROP TABLE IF EXISTS temp_pgr_macrounit;
 
         DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
 

@@ -15,7 +15,20 @@ $BODY$
 /*
 TO EXECUTE
 
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_omunit('{"data":{"parameters":{"commitChanges":true, "exploitation":"1,2", "updateFeature":"TRUE", "updateMapZone":2 ,"geomParamUpdate":4}}}');
+SELECT gw_fct_graphanalytics_omunit('
+	{
+		"data":{
+			"parameters":{
+				"graphClass":"OMUNIT",
+				"exploitation":"1",
+				"updateMapZone":2,
+				"geomParamUpdate":15,
+				"commitChanges":true,
+				"usePlanPsector":false
+			}
+		}
+	}
+');
 
 --fid: 640
 
@@ -50,6 +63,12 @@ DECLARE
 
 	-- LOCK LEVEL LOGIC
 	v_original_disable_locklevel json;
+
+    -- general variables
+    
+    -- parameters
+    v_pgr_distance INTEGER;
+    v_root_vids int[];
 
 BEGIN
 
@@ -128,19 +147,131 @@ BEGIN
     -- SECTION: Create omunits
     -- TODO: Add Core function to create omunits
 
+    -- save as graph_delimiter the arcs 'INITOVERFLOWPATH' and put cost = -1
+    UPDATE temp_pgr_arc t
+    SET graph_delimiter = 'INITOVERFLOWPATH', cost = -1
+    FROM v_temp_arc v
+    WHERE v.arc_id = t.arc_id AND v.initoverflowpath;
+
     -- fill table temp_pgr_linegraph using pgr_lineGraph for oriented graphs with cost = 1 and reverse_cost = -1 
     -- in the result, reverse_cost will be always -1
     -- source and target are connected arcs
+    -- FOR SIMPLICITY WE USE ARC_ID, NODE_1, NODE_2 AND NOT PGR_ARC_ID, PGR_NODE_1, PGR_NODE_2
     INSERT INTO temp_pgr_linegraph (seq, source, target, COST, reverse_cost)
     SELECT seq, source, target, cost, reverse_cost
     FROM pgr_lineGraph(
-    'SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, cost, reverse_cost
+    'SELECT arc_id as id, node_1 as source, node_2 as target, cost, reverse_cost
         FROM temp_pgr_arc',
     true);
 
-    -- update with graph_delimiter = 'OMUNIT' the couple of arcs connected by an OMUNIT node
-    -- TODO don't put as 'OMUNIT' if they are no accesible - how we could know it?
+    -- CATCHMENTS
+    -- choose the best candidate among target arcs; the ones that are not the best candidate will have cost = -1;  only the best candidate will have cost 1
+    -- the result will be a tree; the relation between arcs-in and arcs-out of a node is n:1
+    -- TODO improve the condition 0.1, add section and elevation - if it's needed
+    WITH 
+        arcs AS (
+            SELECT l.SOURCE,l.seq, l.target, 
+            abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
+            - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+            ) AS azimuth_difference
+            FROM temp_pgr_linegraph l
+            JOIN v_temp_arc a1 ON l."source" = a1.arc_id
+            JOIN v_temp_arc a2 ON l."target" = a2.arc_id
+        ),
+        best_pair AS (
+            SELECT DISTINCT ON (SOURCE) SOURCE, target, seq
+            FROM arcs
+            ORDER BY SOURCE, azimuth_difference, target
+        )
     UPDATE temp_pgr_linegraph l
+    SET COST = -1
+    WHERE NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.seq = l.seq)
+    ;
+
+    -- generate catchment_id applying connectedComponents over temp_pgr_linegraph 
+    INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
+    SELECT seq, component, node 
+    FROM pgr_connectedcomponents(
+        'SELECT seq AS id, source, target, cost 
+        FROM temp_pgr_linegraph
+        '
+    );
+
+    -- Update the catchment_id field for arcs
+    UPDATE temp_pgr_linegraph l
+    SET catchment_id = c.component
+    FROM temp_pgr_connectedcomponents AS c
+    WHERE l.source = c.node AND l.cost = 1;
+
+    -- MACROUNITS
+    -- choose the best candidate among SOURCE arcs; the ones that are not the best candidate will have graph_delimiter = 'MACROUNIT'; 
+    -- every macrounit will be a chain, the relation between arcs-in and arcs-out of a node is 1:1
+    -- TODO improve the condition 0.1, add section and elevation - if it's needed
+    WITH 
+        arcs AS (
+            SELECT l.SOURCE,l.seq, l.target, 
+            abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
+            - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+            ) AS azimuth_difference
+            FROM temp_pgr_linegraph l
+            JOIN v_temp_arc a1 ON l."source" = a1.arc_id
+            JOIN v_temp_arc a2 ON l."target" = a2.arc_id
+        ),
+        best_pair AS (
+            SELECT DISTINCT ON (target) target, source, seq
+            FROM arcs
+            ORDER BY target, azimuth_difference, source
+        )
+    UPDATE temp_pgr_linegraph l
+    SET graph_delimiter = 'MACROUNIT'
+    WHERE NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.seq = l.seq)
+    ;
+
+    -- generate macrounit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'MACROUNIT'
+    TRUNCATE temp_pgr_connectedcomponents;
+    INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
+    SELECT seq, component, node 
+    FROM pgr_connectedcomponents(
+        'SELECT seq AS id, source, target, cost 
+        FROM temp_pgr_linegraph
+        WHERE graph_delimiter <> ''MACROUNIT''
+        '
+    );
+
+    -- Update the macrounit_id field for arcs
+    UPDATE temp_pgr_linegraph l
+    SET macrounit_id = c.component
+    FROM temp_pgr_connectedcomponents AS c
+    WHERE l.source = c.node AND l.cost = 1;
+
+    -- the init of every catchment using pgr_depthFirstSearch and macrounits tree
+    WITH 
+        vertices AS (
+            SELECT id, in_edges, out_edges
+            FROM pgr_extractvertices('SELECT seq AS id, source, target, cost, reverse_cost FROM temp_pgr_linegraph')
+        )
+    SELECT array_agg(l.target) INTO v_root_vids
+    FROM temp_pgr_linegraph l
+    WHERE EXISTS (SELECT 1 FROM vertices v WHERE v.out_edges IS NULL AND v.id = l.target);
+
+    -- Update the catchment_id field for arcs
+    UPDATE temp_pgr_arc a
+    SET catchment_id = c.component
+    FROM temp_pgr_connectedcomponents AS c
+    WHERE a.arc_id = c.node;
+
+    -- update catchment_id with arc_id when catchment_id is still 0 (these arcs are isolated arcs)
+   UPDATE temp_pgr_arc a
+   SET catchment_id = arc_id
+    WHERE catchment_id = 0;
+
+    -- TODO update macrounit_id for nodes if it's necessarily - (filter cost = 1 in temp_pgr_linegraph)
+
+   -- repeating the same process for omunit_id - from connectedComponents, filtering graph_delimiter = 'OMUNIT'
+
+   -- update with graph_delimiter = 'OMUNIT' the couple of arcs connected by an OMUNIT node
+    -- TODO don't put as 'OMUNIT' if they are no accesible - how we could know it?
+    /*UPDATE temp_pgr_linegraph l
     SET graph_delimiter = 'OMUNIT'
     FROM temp_pgr_arc a
     WHERE 
@@ -150,65 +281,6 @@ BEGIN
     )
     AND l.source = a.pgr_arc_id;
 
-    -- cost = -1 when the target arc has a difference in azimuth less than 0.1 direction compared to the "source" arc
-    -- if there are 2 target arcs connected with a source arc and both have a difference in azimuth less than 0.1, only one will have cost 1
-    -- TODO improve the condition 0.1, add section and elevation - if it's needed
-    WITH 
-        a AS (
-            SELECT a.pgr_arc_id, v.the_geom
-            FROM temp_pgr_arc a
-            JOIN v_temp_arc v USING (arc_id)
-        ),
-        la AS (
-            SELECT l.SOURCE,l.seq, l.target, 
-            abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
-            - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
-            ) AS azimuth_difference
-            FROM temp_pgr_linegraph l
-            JOIN a a1 ON l."source" = a1.pgr_arc_id
-            JOIN a a2 ON l."target" = a2.pgr_arc_id
-        ),
-        la_connected AS (
-            SELECT DISTINCT ON (SOURCE) SOURCE, target, seq
-            FROM la
-            WHERE azimuth_difference <= 0.1
-            ORDER BY SOURCE, azimuth_difference, target
-        )
-    UPDATE temp_pgr_linegraph l
-    SET COST = -1
-    WHERE NOT EXISTS (SELECT 1 FROM la_connected lc WHERE lc.seq = l.seq)
-    ;
-
-    -- generate macrounit_id applying connectedComponents over temp_pgr_linegraph 
-    -- without taking in account graph_delimiter = 'OMUNIT'
-    INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
-    SELECT seq, component, node 
-    FROM pgr_connectedcomponents(
-        'SELECT seq AS id, source, target, cost 
-        FROM temp_pgr_linegraph
-        '
-    );
-
-    -- Update the macromapzone_id field for arcs
-    UPDATE temp_pgr_arc a
-    SET macromapzone_id = agg.min_arc
-    FROM temp_pgr_connectedcomponents AS c
-    JOIN (
-    	SELECT c.component, MIN(a.arc_id) AS min_arc
-      FROM temp_pgr_connectedcomponents c
-      JOIN temp_pgr_arc a on a.pgr_arc_id = c.node
-      GROUP BY c.component
-    ) agg ON c.component = agg.component
-    WHERE a.pgr_arc_id = c.node;
-
-    -- update macromapzone_id with arc_id when macromapzone_id is still 0
-   UPDATE temp_pgr_arc a
-   SET macromapzone_id = arc_id
-    WHERE macromapzone_id = 0;
-
-    -- TODO update macrounit_id for nodes if it's necessarily - it can be used pgr_degree (filter cost = 1 in temp_pgr_linegraph)
-
-   -- repeating the same process for omunit_id - from connectedComponents, filtering graph_delimiter = 'OMUNIT'
    -- generate omunit_id applying connectedComponents over temp_pgr_linegraph 
     -- this time without the rows with graph_delimiter = 'OMUNIT'
     TRUNCATE temp_pgr_connectedcomponents;
@@ -237,7 +309,7 @@ BEGIN
    UPDATE temp_pgr_arc a
    SET mapzone_id = arc_id
    WHERE mapzone_id = 0;
-
+    */
    -- TODO update mapzone_id (omunit_id) for nodes if it's necessarily - it can be used pgr_degree (filter cost = 1 in temp_pgr_linegraph and graph_delimiter <> 'OMUNIT')
 
     -------------------------------------------------------
