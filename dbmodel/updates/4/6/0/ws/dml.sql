@@ -28,3 +28,8 @@ VALUES ('plan_psector_auto_insert_connec','config','Automatic insertion of conne
 UPDATE sys_fprocess
 	SET except_msg='dry nodes/connecs with demand which have been set to zero on the go2epa process.'
 	WHERE fid=233;
+
+-- 07/11/2025
+UPDATE config_form_list
+SET query_text='SELECT id,  work_order, state, class, mincut_type, received_date, exploitation, municipality, postcode, streetaxis, postnumber, anl_cause, anl_tstamp, anl_user, anl_descript, anl_feature_id, anl_feature_type, forecast_start, forecast_end, assigned_to, exec_start, exec_end, exec_user, exec_descript, exec_from_plot, exec_depth, exec_appropiate, chlorine, turbidity, notified, reagent_lot, equipment_code FROM v_ui_mincut WHERE id IS NOT NULL '
+WHERE listname='tbl_mincut_manager' AND device=5;

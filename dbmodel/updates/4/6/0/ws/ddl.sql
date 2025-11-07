@@ -83,3 +83,7 @@ ALTER TABLE macrocrmzone ALTER COLUMN descript TYPE varchar(255);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
+
+-- 07/11/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"reagent_lot", "dataType":"varchar(100)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"equipment_code", "dataType":"varchar(50)", "isUtils":"False"}}$$);

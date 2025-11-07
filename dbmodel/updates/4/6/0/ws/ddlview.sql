@@ -1490,7 +1490,9 @@ AS SELECT om_mincut.id,
     om_mincut.chlorine,
     om_mincut.turbidity,
     om_mincut.notified,
-    om_mincut.output
+    om_mincut.output,
+    om_mincut.reagent_lot,
+    om_mincut.equipment_code
 FROM om_mincut
 LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
 LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
@@ -1547,7 +1549,9 @@ SELECT om_mincut.id,
     om_mincut.chlorine,
     om_mincut.turbidity,
     om_mincut.notified,
-    om_mincut.output
+    om_mincut.output,
+    om_mincut.reagent_lot,
+    om_mincut.equipment_code
 FROM om_mincut
 LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
 LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
