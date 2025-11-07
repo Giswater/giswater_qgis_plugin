@@ -130,6 +130,8 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
         tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
+        tools_qt.set_checked(self.dlg_mincut, "txt_equipment_code", row['equipment_code'])
+        tools_qt.set_checked(self.dlg_mincut, "txt_reagent_lot", row['reagent_lot'])
 
         # Manage assigend_to combo
         index = self.dlg_mincut.assigned_to.findText(row['assigned_to_name'])
@@ -169,6 +171,8 @@ class GwMincut:
             self.dlg_mincut.cbx_recieved_time.setDisabled(False)
             self.dlg_mincut.txt_chlorine.setDisabled(False)
             self.dlg_mincut.txt_turbidity.setDisabled(False)
+            self.dlg_mincut.txt_equipment_code.setDisabled(False)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(False)
             # Group Prediction
             self.dlg_mincut.cbx_date_start_predict.setDisabled(False)
             self.dlg_mincut.cbx_hours_start_predict.setDisabled(False)
@@ -189,6 +193,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             if self.mincut_class == 1:
                 self.action_mincut.setDisabled(False)
@@ -234,6 +240,8 @@ class GwMincut:
             self.dlg_mincut.cbx_recieved_time.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Group Prediction dates
             self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
             self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
@@ -254,6 +262,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(False)
             self.dlg_mincut.txt_chlorine.setDisabled(False)
             self.dlg_mincut.txt_turbidity.setDisabled(False)
+            self.dlg_mincut.txt_equipment_code.setDisabled(False)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -294,6 +304,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -757,6 +769,8 @@ class GwMincut:
         self.dlg_mincut.real_description.setEnabled(True)
         self.dlg_mincut.txt_chlorine.setEnabled(True)
         self.dlg_mincut.txt_turbidity.setEnabled(True)
+        self.dlg_mincut.txt_equipment_code.setEnabled(True)
+        self.dlg_mincut.txt_reagent_lot.setEnabled(True)
 
         # Set state to 'In Progress'
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
@@ -868,6 +882,8 @@ class GwMincut:
         # chlorine and turbidity
         chlorine = tools_qt.get_text(self.dlg_mincut, "txt_chlorine", return_string_null=False)
         turbidity = tools_qt.get_text(self.dlg_mincut, "txt_turbidity", return_string_null=False)
+        equipment_code = tools_qt.get_text(self.dlg_mincut, "txt_equipment_code", return_string_null=False)
+        reagent_lot = tools_qt.get_text(self.dlg_mincut, "txt_reagent_lot", return_string_null=False)
 
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
@@ -952,6 +968,12 @@ class GwMincut:
             sql += f", chlorine = $${chlorine}$$"
         if turbidity != "":
             sql += f", turbidity = $${turbidity}$$"
+
+        # Manage fields 'equipment_code' and 'reagent_lot'
+        if equipment_code != "":
+            sql += f", equipment_code = $${equipment_code}$$"
+        if reagent_lot != "":
+            sql += f", reagent_lot = $${reagent_lot}$$"
 
         # Manage address
         if address_exploitation_id != -1:
@@ -2462,6 +2484,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(False)
             self.action_refresh_mincut.setDisabled(True)
@@ -2503,6 +2527,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(False)
             self.dlg_mincut.txt_chlorine.setDisabled(False)
             self.dlg_mincut.txt_turbidity.setDisabled(False)
+            self.dlg_mincut.txt_equipment_code.setDisabled(False)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -2544,6 +2570,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)

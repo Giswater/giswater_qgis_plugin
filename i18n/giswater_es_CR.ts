@@ -26560,6 +26560,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_equipment_code</source>
+			<translation>Equipo de medición de cloro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_equipment_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_exec_appropriate</source>
 			<translation>Adecuado:</translation>
 		</message>
@@ -26605,6 +26613,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reagent_lot</source>
+			<translation>Lote del reactivo de cloro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reagent_lot</source>
 			<translation>None</translation>
 		</message>
 		<message>
