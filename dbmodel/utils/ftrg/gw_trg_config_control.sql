@@ -65,10 +65,12 @@ BEGIN
 			END IF;
 
 			-- Insert into cat_mat_roughness if feature_type is ARC and operation is INSERT. Before rule called: insert_inp_cat_mat_roughness
-			IF TG_OP = 'INSERT' AND v_project_type = 'WS' THEN
-				IF NEW.feature_type IS NOT NULL AND 'ARC' = ANY(NEW.feature_type) THEN
-				    INSERT INTO cat_mat_roughness (matcat_id)
-				    VALUES (NEW.id) ON CONFLICT DO NOTHING;
+			IF v_configtable = 'cat_material' THEN
+				IF TG_OP = 'INSERT' AND v_project_type = 'WS' THEN
+					IF NEW.feature_type IS NOT NULL AND 'ARC' = ANY(NEW.feature_type) THEN
+						INSERT INTO cat_mat_roughness (matcat_id)
+						VALUES (NEW.id) ON CONFLICT DO NOTHING;
+					END IF;
 				END IF;
 			END IF;
 
