@@ -688,35 +688,34 @@ BEGIN
 			WHERE mapzone_id <> 0;
 		', v_temp_node_table);
 
+		-- set the default values for proposed valves for current mincut (old_mapzone_id = 0) and adjacents mincuts, if they exist (old_mapzone_id <> 0)
 		EXECUTE format('
 			UPDATE %I 
-			SET old_mapzone_id = 0 
-			WHERE old_mapzone_id <> 0;
+			SET proposed = FALSE
+			WHERE proposed = TRUE
+				AND old_mapzone_id = 0;
 		', v_temp_arc_table);
 
 		EXECUTE format('
 			UPDATE %I 
-			SET old_mapzone_id = 0 
-			WHERE old_mapzone_id <> 0;
-		', v_temp_node_table);
-
-		EXECUTE format('
-			UPDATE %I 
-			SET proposed = FALSE, cost = 0, reverse_cost = 0 
-			WHERE proposed = TRUE;
+			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+            WHERE proposed = TRUE
+                AND old_mapzone_id <> 0;
 		', v_temp_arc_table);
 
+		-- set the default values for unaccess valves for current mincut, the unaccess valves of the adjacents valves are not taken in account
 		EXECUTE format('
-			UPDATE %I 
-			SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
-			WHERE unaccess = TRUE;
-		', v_temp_arc_table);
+            UPDATE %I 
+            SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
+            WHERE unaccess = TRUE;
+        ', v_temp_arc_table);
 
+		-- set the default values for changestatus valves for current mincut (old_mapzone_id = 0) and adjacents mincuts, if they exist (old_mapzone_id <> 0)
 		EXECUTE format('
-			UPDATE %I 
-			SET changestatus = FALSE, cost = -1, reverse_cost = -1
-			WHERE changestatus = TRUE;
-		', v_temp_arc_table);
+            UPDATE %I 
+            SET changestatus = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
+            WHERE changestatus = TRUE;
+        ', v_temp_arc_table);
 	END IF;
 
 	IF v_core_mincut THEN
@@ -771,9 +770,17 @@ BEGIN
 		EXECUTE format('
 			UPDATE %I tpa
 			SET mapzone_id = %L
-			WHERE mapzone_id = 0
+			WHERE tpa.mapzone_id = 0
 			AND tpa.changestatus = TRUE;
-		', v_temp_arc_table, v_mincut_id); 
+		', v_temp_arc_table, v_mincut_id);
+
+		-- if a valve with changestatus = TRUE is proposed, remove changestatus 
+		EXECUTE format('
+			UPDATE %I tpa
+			SET changestatus = FALSE, cost = -1, reverse_cost = -1
+			WHERE tpa.changestatus = TRUE
+				AND tpa.proposed = TRUE;
+		', v_temp_arc_table);
 
 		DELETE FROM om_mincut_node where result_id=v_mincut_id;
 		DELETE FROM om_mincut_arc where result_id=v_mincut_id;
