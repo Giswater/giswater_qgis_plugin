@@ -52,7 +52,10 @@ class GwGo2EpaButton(GwAction):
 
     def clicked_event(self):
         if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
-            button = self.action.associatedWidgets()[1]
+            if hasattr(self.action, 'associatedObjects'):
+                button = QWidget(self.action.associatedObjects()[1])
+            elif hasattr(self.action, 'associatedWidgets'):
+                button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.exec(menu_point)
         else:
@@ -459,7 +462,7 @@ class GwGo2EpaButton(GwAction):
                 msg = "You need to select some sector"
                 tools_qt.show_info_box(msg)
                 return
-                
+
         if self.export_inp and self.file_inp == "null":
             message = "You have to set this parameter: INP file"
             tools_qgis.show_warning(message, dialog=self.dlg_go2epa)

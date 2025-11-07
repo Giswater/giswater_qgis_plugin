@@ -11,7 +11,7 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QIcon
-from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
+from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup, QWidget
 from qgis.PyQt.QtCore import QPoint
 from qgis.core import Qgis
 from ..dialog import GwAction
@@ -49,7 +49,10 @@ class GwFileTransferButton(GwAction):
         if self.menu.property('last_selection') is not None:
             getattr(self, self.menu.property('last_selection'))()
             return
-        button = self.action.associatedWidgets()[1]
+        if hasattr(self.action, 'associatedObjects'):
+            button = QWidget(self.action.associatedObjects()[1])
+        elif hasattr(self.action, 'associatedWidgets'):
+            button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
 

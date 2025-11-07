@@ -12,7 +12,7 @@ from pathlib import Path
 
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
+from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QWidget
 from qgis.PyQt.QtGui import QIcon
 
 from ..dialog import GwAction
@@ -45,7 +45,10 @@ class GwEpaTools(GwAction):
             toolbar.addAction(self.action)
 
     def clicked_event(self):
-        button = self.action.associatedWidgets()[1]
+        if hasattr(self.action, 'associatedObjects'):
+            button = QWidget(self.action.associatedObjects()[1])
+        elif hasattr(self.action, 'associatedWidgets'):
+            button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.exec(menu_point)
 
