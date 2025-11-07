@@ -244,6 +244,35 @@ BEGIN
     FROM temp_pgr_connectedcomponents c
     WHERE l.source = c.node AND l.cost = 1;
 
+    -- OMUNITS
+    UPDATE temp_pgr_linegraph l
+    SET graph_delimiter = 'OMUNIT'
+    FROM temp_pgr_arc a
+    WHERE l.graph_delimiter ='NONE'
+        AND EXISTS (
+            SELECT 1 FROM temp_pgr_node n WHERE n.graph_delimiter = 'OMUNIT'
+            AND a.pgr_node_2 = n.pgr_node_id   
+        )
+        AND l.source = a.arc_id;
+
+    -- generate omunit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'MACROUNIT' and 'OMUNIT'
+    TRUNCATE temp_pgr_connectedcomponents;
+    INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
+    SELECT seq, component, node 
+    FROM pgr_connectedcomponents(
+        'SELECT seq AS id, source, target, cost 
+        FROM temp_pgr_linegraph
+        WHERE graph_delimiter <> ''MACROUNIT'' OR graph_delimiter <> ''OMUNIT''
+        '
+    );
+
+    -- Update the omunit_id field for arcs
+    UPDATE temp_pgr_linegraph l
+    SET omunit_id = c.component
+    FROM temp_pgr_connectedcomponents c
+    WHERE l.source = c.node AND l.cost = 1;
+
+
     -- the init of every catchment using pgr_depthFirstSearch and macrounits tree
     WITH 
         vertices AS (
@@ -264,14 +293,19 @@ BEGIN
     WHERE a.arc_id = l.source;
 
     -- update catchment_id with arc_id when catchment_id is still 0 (these arcs are isolated arcs)
-   UPDATE temp_pgr_arc a
-   SET catchment_id = arc_id
+    UPDATE temp_pgr_arc a
+    SET catchment_id = arc_id
     WHERE catchment_id = 0;
 
     -- update macrounit_id with arc_id when macrounit_id is still 0 (these arcs are isolated arcs)
-   UPDATE temp_pgr_arc a
-   SET macromapzone_id = arc_id
+    UPDATE temp_pgr_arc a
+    SET macromapzone_id = arc_id
     WHERE macromapzone_id = 0;
+
+    -- update omunit_id with arc_id when omunit_id is still 0 (these arcs are isolated arcs)
+    UPDATE temp_pgr_arc a
+    SET mapzone_id = arc_id
+    WHERE mapzone_id = 0;
 
     -- TODO update macrounit_id for nodes if it's necessarily - (filter cost = 1 in temp_pgr_linegraph)
 
