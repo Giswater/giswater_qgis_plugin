@@ -7152,7 +7152,7 @@ FROM (
     (80, 'Se ha finalizado el administrador de visitas', NULL),
     (90, 'Lote salvado con éxito', NULL),
     (3012, 'The position value is bigger than the full length of the arc. %arc_id%', 'Please review your data.'),
-    (3014, 'The position id is not node_1 or node_2 of selected arc. %arc_id%', 'Please review your data.'),
+    (3014, 'El identificador de posición no es node_1 ni node_2 del arco seleccionado. %arc_id%', 'Por favor, revise sus datos.'),
     (3178, 'It is no possible to relate planned connec/gully over planned connec/gully wich not are on same psector', NULL),
     (3180, 'You are trying to modify some network element with related connects (connec / gully) on psector not selected. %debugmsg%', 'Please activate the psector before!'),
     (3182, 'It is not allowed to downgrade (state=0) on psector tables for planned features (state=2). Planned features only must have state=1 on psector. %psector_id%', 'If you are looking for unlink it, please remove it from psector. If feature only belongs to this psector, and you are looking to unlink it, you will need to delete from ve_* or v_edit_* or use end feature tool.'),
