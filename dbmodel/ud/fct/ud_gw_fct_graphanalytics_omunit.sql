@@ -241,7 +241,7 @@ BEGIN
     -- Update the macrounit_id field for arcs
     UPDATE temp_pgr_linegraph l
     SET macrounit_id = c.component
-    FROM temp_pgr_connectedcomponents AS c
+    FROM temp_pgr_connectedcomponents c
     WHERE l.source = c.node AND l.cost = 1;
 
     -- the init of every catchment using pgr_depthFirstSearch and macrounits tree
@@ -254,16 +254,24 @@ BEGIN
     FROM temp_pgr_linegraph l
     WHERE EXISTS (SELECT 1 FROM vertices v WHERE v.out_edges IS NULL AND v.id = l.target);
 
-    -- Update the catchment_id field for arcs
+    -- Update the catchment_id, macromapzone_id (macrounit), mapzone_id (omunit) for arcs
     UPDATE temp_pgr_arc a
-    SET catchment_id = c.component
-    FROM temp_pgr_connectedcomponents AS c
-    WHERE a.arc_id = c.node;
+    SET 
+        catchment_id = l.catchment_id, 
+        macromapzone_id = l.macrounit_id,
+        mapzone_id = l.omunit_id
+    FROM temp_pgr_linegraph l
+    WHERE a.arc_id = l.source;
 
     -- update catchment_id with arc_id when catchment_id is still 0 (these arcs are isolated arcs)
    UPDATE temp_pgr_arc a
    SET catchment_id = arc_id
     WHERE catchment_id = 0;
+
+    -- update macrounit_id with arc_id when macrounit_id is still 0 (these arcs are isolated arcs)
+   UPDATE temp_pgr_arc a
+   SET macromapzone_id = arc_id
+    WHERE macromapzone_id = 0;
 
     -- TODO update macrounit_id for nodes if it's necessarily - (filter cost = 1 in temp_pgr_linegraph)
 
