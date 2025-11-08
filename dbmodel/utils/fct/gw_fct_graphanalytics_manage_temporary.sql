@@ -51,8 +51,8 @@ BEGIN
         -- Create temporary tables
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_mapzone (
             id SERIAL NOT NULL,
-            component int4,
-            mapzone_id _int4,
+            component INTEGER,
+            mapzone_id INTEGER[],
             name VARCHAR(50),
             the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (id)
@@ -61,14 +61,14 @@ BEGIN
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node (
-            pgr_node_id INT GENERATED ALWAYS AS IDENTITY,
-            node_id int4,
-            old_node_id int4,
+            pgr_node_id INTEGER GENERATED ALWAYS AS IDENTITY,
+            node_id INTEGER,
+            old_node_id INTEGER,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER DEFAULT 0,
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
-            to_arc _int4,
+            to_arc INTEGER[],
             CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_node_node_id_idx ON temp_pgr_node USING btree (node_id);
@@ -76,21 +76,21 @@ BEGIN
 
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc (
-            pgr_arc_id INT GENERATED ALWAYS AS IDENTITY,
-            arc_id int4,
-            old_arc_id int4,
-            pgr_node_1 INT,
-            pgr_node_2 INT,
-            node_1 int4,
-            node_2 int4,
+            pgr_arc_id INTEGER GENERATED ALWAYS AS IDENTITY,
+            arc_id INTEGER,
+            old_arc_id INTEGER,
+            pgr_node_1 INTEGER,
+            pgr_node_2 INTEGER,
+            node_1 INTEGER,
+            node_2 INTEGER,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER DEFAULT 0,
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             modif1 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_1
             modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
-            cost INT DEFAULT 1,
-            reverse_cost INT DEFAULT 1,
-            to_arc _int4,
+            cost INTEGER DEFAULT 1,
+            reverse_cost INTEGER DEFAULT 1,
+            to_arc INTEGER[],
             CONSTRAINT temp_pgr_arc_pkey PRIMARY KEY (pgr_arc_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_arc_id_idx ON temp_pgr_arc USING btree (arc_id);
@@ -101,12 +101,12 @@ BEGIN
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_node2_idx ON temp_pgr_arc USING btree (node_2);
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance (
-                seq INT8 NOT NULL,
-                "depth" INT8 NULL,
-                start_vid INT8 NULL,
-                pred INT8 NULL,
-                node INT8 NULL,
-                edge INT8 NULL,
+                seq INTEGER NOT NULL,
+                "depth" INTEGER NULL,
+                start_vid INTEGER NULL,
+                pred INTEGER NULL,
+                node INTEGER NULL,
+                edge INTEGER NULL,
                 "cost" FLOAT8 NULL,
                 agg_cost FLOAT8 NULL,
                 CONSTRAINT temp_pgr_drivingdistance_pkey PRIMARY KEY (seq)
@@ -119,9 +119,9 @@ BEGIN
         CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_connectedcomponents (
-            seq INT8 NOT NULL,
-            component INT8 NULL,
-            node INT8 NULL,
+            seq INTEGER NOT NULL,
+            component INTEGER NULL,
+            node INTEGER NULL,
             CONSTRAINT temp_pgr_connectedcomponents_pkey PRIMARY KEY (seq)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
@@ -139,8 +139,8 @@ BEGIN
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INT DEFAULT 1;
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INT DEFAULT 1;
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INTEGER DEFAULT 1;
+                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INTEGER DEFAULT 1;
 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_minsector (LIKE temp_pgr_arc INCLUDING ALL);
@@ -157,15 +157,15 @@ BEGIN
             END IF;
         ELSE 
             IF v_fct_name = 'DWFZONE' THEN
-                ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS min_node int4;
+                ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS min_node INTEGER;
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS drainzone_id INTEGER DEFAULT 0;
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath (
-                    seq INT8 NOT NULL,
-                    "depth" INT8 NULL,
-                    start_vid INT8 NULL,
-                    pred INT8 NULL,
-                    node INT8 NULL,
-                    edge INT8 NULL,
+                    seq INTEGER NOT NULL,
+                    "depth" INTEGER NULL,
+                    start_vid INTEGER NULL,
+                    pred INTEGER NULL,
+                    node INTEGER NULL,
+                    edge INTEGER NULL,
                     "cost" FLOAT8 NULL,
                     agg_cost FLOAT8 NULL,
                     CONSTRAINT temp_pgr_drivingdistance_initoverflowpath_pkey PRIMARY KEY (seq)
@@ -176,33 +176,54 @@ BEGIN
             END IF;
             IF v_fct_name = 'OMUNIT' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_linegraph (
-                    seq INT8 NOT NULL,
-                    "source" INT8 NULL,
-                    "target" INT8 NULL,
+                    seq INTEGER NOT NULL,
+                    "source" INTEGER NULL,
+                    "target" INTEGER NULL,
                     "cost" FLOAT8 NULL,
                     reverse_cost FLOAT8 NULL,
                     graph_delimiter VARCHAR(30) DEFAULT 'NONE',
                     omunit_id INTEGER DEFAULT 0,
                     macrounit_id INTEGER DEFAULT 0,
                     catchment_id INTEGER DEFAULT 0,
-                    order_id INTEGER DEFAULT 0,
+                    order_number INTEGER DEFAULT 0,
                     CONSTRAINT temp_pgr_linegraph_pkey PRIMARY KEY (seq)
                 );
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_source_idx ON temp_pgr_linegraph USING btree ("source");
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_target_idx ON temp_pgr_linegraph USING btree ("target");
-                ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
-                ALTER TABLE temp_pgr_node ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
-                ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS catchment_id INTEGER DEFAULT 0;
-                ALTER TABLE temp_pgr_node ADD COLUMN  IF NOT EXISTS catchment_id INTEGER DEFAULT 0;
+                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_omunit_id_idx ON temp_pgr_linegraph USING btree ("omunit_id");
+                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_macrounit_id_idx ON temp_pgr_linegraph USING btree ("macrounit_id");
+                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_catchment_id_idx ON temp_pgr_linegraph USING btree ("catchment_id");
+
+                CREATE TABLE temp_pgr_omunit (
+                    omunit_id INTEGER NOT NULL,
+                    node_1 INTEGER,
+                    node_2 INTEGER,
+                    macrounit_id INTEGER DEFAULT 0,
+                    order_number INTEGER DEFAULT 0,
+                    CONSTRAINT temp_pgr_omunit_pkey PRIMARY KEY (omunit_id)
+                );
+                CREATE INDEX IF NOT EXISTS temp_pgr_omunit_node_1_idx ON temp_pgr_omunit USING btree ("node_1");
+                CREATE INDEX IF NOT EXISTS temp_pgr_omunit_node_2_idx ON temp_pgr_omunit USING btree ("node_2");
+                CREATE INDEX IF NOT EXISTS temp_pgr_omunit_macrounit_id_idx ON temp_pgr_omunit USING btree ("macrounit_id");
 
                 CREATE TABLE temp_pgr_macrounit (
-                    macrounit_id int4 NOT NULL,
-                    node_1 int4 NULL,
-                    node_2 int4 NULL,
+                    macrounit_id INTEGER NOT NULL,
+                    node_1 INTEGER NULL,
+                    node_2 INTEGER NULL,
+                    catchment_id INTEGER DEFAULT 0,
+                    order_number INTEGER DEFAULT 0,
                     CONSTRAINT temp_pgr_macrounit_pkey PRIMARY KEY (macrounit_id)
                 );
                 CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_node_1_idx ON temp_pgr_macrounit USING btree ("node_1");
                 CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_node_2_idx ON temp_pgr_macrounit USING btree ("node_2");
+                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_catchment_id_idx ON temp_pgr_macrounit USING btree ("catchment_id");
+
+                CREATE TABLE temp_pgr_catchment (
+                    catchment_id INTEGER NOT NULL,
+                    node_id INTEGER NULL,
+                    CONSTRAINT temp_pgr_catchment_pkey PRIMARY KEY (catchment_id)
+                );
+
             END IF;
         END IF;
 
@@ -319,7 +340,7 @@ BEGIN
                     SELECT
                         connec.connec_id,
                         connec.arc_id,
-                        NULL::integer AS link_id
+                        NULL::INTEGER AS link_id
                     FROM connec
                     WHERE NOT EXISTS (
                     SELECT 1
@@ -566,7 +587,7 @@ BEGIN
                     SELECT
                         gully.gully_id,
                         gully.arc_id,
-                        NULL::integer AS link_id
+                        NULL::INTEGER AS link_id
                     FROM gully
                     WHERE NOT EXISTS (
                         SELECT 1
@@ -1017,7 +1038,9 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
         DROP TABLE IF EXISTS temp_pgr_linegraph;
+        DROP TABLE IF EXISTS temp_pgr_omunit;
         DROP TABLE IF EXISTS temp_pgr_macrounit;
+        DROP TABLE IF EXISTS temp_pgr_catchment;
 
         DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
 
