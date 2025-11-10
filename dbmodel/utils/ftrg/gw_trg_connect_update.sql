@@ -61,7 +61,13 @@ BEGIN
     IF v_projectype = 'WS' AND (v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null) THEN
     	v_fluidtype_value = v_arc.fluid_type;
     	IF v_fluidtype_value not in (SELECT fluid_type FROM man_type_fluid WHERE 'CONNEC' = ANY(feature_type)) AND v_fluidtype_value IS NOT NULL THEN
-			INSERT INTO man_type_fluid (fluid_type, feature_type) VALUES (v_fluidtype_value, '{CONNEC}') ON CONFLICT (fluid_type, feature_type) DO NOTHING;
+			INSERT INTO man_type_fluid (fluid_type, feature_type) VALUES (v_fluidtype_value, ARRAY['CONNEC'])
+			ON CONFLICT (fluid_type) DO UPDATE SET feature_type = 
+				CASE 
+					WHEN NOT ('CONNEC' = ANY(man_type_fluid.feature_type)) 
+					THEN array_append(man_type_fluid.feature_type, 'CONNEC') 
+					ELSE man_type_fluid.feature_type 
+				END;
 		END IF;
     ELSE v_fluidtype_value = NEW.fluid_type;
     END IF;
