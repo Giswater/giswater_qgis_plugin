@@ -4727,25 +4727,25 @@ UPDATE config_csv AS t
 SET alias = v.alias, descript = v.descript
 FROM (
     VALUES
-    (234, 'Ceny importowe db', 'Plik csv musi zawierać następujące kolumny na tej samej pozycji: id, unit, descript, text, price. - Kolumna cena musi być liczbą z dwoma miejscami po przecinku. - Możesz wybrać nazwę katalogu dla tych cen, ustawiając etykietę importu. '),
-    (235, 'Importuj elementy', 'Plik csv musi zawierać kolejne kolumny na tej samej pozycji: Id (arc_id, node_id, connec_id), code, elementcat_id, observ, comment, num_elements, state type (id), workcat_id, verified (do wyboru z edit_typevalue>value_verified). - Pola obserwacji i komentarzy są opcjonalne - UWAGA! Etykieta importu musi być wypełniona typem elementu (węzeł, łuk, połączenie).'),
-    (238, 'Import podczas wizyty', 'Aby użyć tego parametru funkcji importu csv, należy skonfigurować przed jego uruchomieniem parametr systemowy ''utils_csv2pg_om_visit_parameters''. Zalecamy również przeczytanie adnotacji wewnątrz funkcji, aby działała jak najlepiej z'),
-    (384, 'Import krzywych inp', 'Funkcja automatyzująca import plików krzywych inp. Plik csv musi zawierać kolejne kolumny na tej samej pozycji: curve_id, x_value, y_value, curve_type (dla projektu WS LUB UD curve_type ma różne wartości. Sprawdź instrukcję obsługi)'),
-    (386, 'Importuj wzorce inp', 'Funkcja automatyzująca import plików wzorców inp. Plik csv musi zawierać kolejne kolumny na tej samej pozycji: pattern_id, pattern_type, factor1,.......,factorn. Dla WS użyj współczynnika 18, powtarzając wiersze, jeśli chcesz. Dla UD użyj współczynnika 24. Więcej niż jeden wiersz dla wzorca jest niedozwolony'),
-    (444, 'Import cat_feature_arc', 'Plik csv musi zawierać następujące kolumny w dokładnie takiej samej kolejności: id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active'),
-    (469, 'Importuj wartości scada', 'Zaimportuj wartości scada do tabeli ext_rtc_scada_x_data zgodnie z przykładowym plikiem scada_values.csv'),
-    (470, 'Import hydrometer_x_data', 'Plik csv musi zawierać następujące pola: hydrometer_id, cat_period_id, sum, value_date (opcjonalnie), value_type (opcjonalnie), value_status (opcjonalnie), value_state (opcjonalnie)'),
-    (471, 'Importowanie wartości okresu crm', 'Plik csv musi zawierać następujące pola: id, start_date, end_date, period_seconds (opcjonalnie), code'),
-    (445, 'Import cat_feature_node', 'Plik csv musi zawierać następujące kolumny w dokładnie takiej samej kolejności: id, system_id, epa_default, isarcdivide, isprofilesurface, choose_hemisphere, code_autofill, double_geom, num_arcs, graph_delimiter, shortcut_key, link_path, descript, active'),
-    (446, 'Import cat_feature_connec', 'Plik csv musi zawierać następujące kolumny w dokładnie takiej samej kolejności: id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active'),
-    (448, 'Import cat_node', 'Plik csv musi zawierać następujące kolumny w dokładnie takiej samej kolejności: id, nodetype_id, matcat_id, pnom, dnom, dint, dext, shape, descript, link, brand, model, svg, estimated_depth, cost_unit, cost, active, label, ischange, acoeff'),
-    (449, 'Import cat_connec', 'Plik csv musi zawierać następujące kolumny w dokładnie takiej samej kolejności: id, connectype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, active, label'),
-    (450, 'Import cat_arc', 'Plik csv musi zawierać następujące kolumny w dokładnie takiej samej kolejności: id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost'),
-    (500, 'Importuj stan zaworu', 'Plik csv musi zawierać następujące pola: dscenario_name, node_id, status'),
-    (501, 'Importuj żądania scenariusza', 'Plik csv musi zawierać następujące pola: dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source'),
-    (504, 'Import dziennych wartości przepływomierza', 'Zaimportuj dzienne wartości przepływomierza do tabeli ext_rtc_scada_x_data zgodnie z przykładowym plikiem scada_flowmeter_daily_values.csv'),
-    (506, 'Import wartości agresywnych przepływomierza', 'Zaimportuj zagregowane wartości przepływomierza do tabeli ext_rtc_scada_x_data zgodnie z przykładowym plikiem scada_flowmeter_agg_values.csv'),
-    (514, 'Importuj zawory zamknięte w scenariuszu sieciowym', 'Plik csv musi zawierać następujące pola: netscenario_id, node_id, closed')
+    (234, 'Import db prices', 'The csv file must contain the following columns in the same position: id, unit, descript, text, price. - The column price must be numeric with two decimals. - You can choose a catalog name for these prices by setting an import label.'),
+    (235, 'Import elements', 'The csv file must contain the following columns in the same position: Id (arc_id, node_id, connec_id), code, elementcat_id, observ, comment, num_elements, state type (id), workcat_id, verified (choose from edit_typevalue > value_verified). - Observations and comments fields are optional. - ATTENTION! Import label must be filled with the type of element (node, arc, connec).'),
+    (238, 'Import om visit', 'To use this import csv function parameter you need to configure beforehand the system parameter ''utils_csv2pg_om_visit_parameters''. We also recommend reading the annotations inside the function to ensure proper usage.'),
+    (384, 'Import inp curves', 'Function to automate the import of inp curve files. The csv file must contain the following columns in the same position: curve_id, x_value, y_value, curve_type (for WS project or UD project curve_type has different values — check user manual).'),
+    (386, 'Import inp patterns', 'Function to automate the import of inp pattern files. The csv file must contain the following columns in the same position: pattern_id, pattern_type, factor1, ..., factorn. For WS use up to factor18, repeating rows if you like. For UD use up to factor24. More than one row per pattern is not allowed.'),
+    (444, 'Import cat_feature_arc', 'The csv file must contain the following columns in the exact same order: id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active.'),
+    (445, 'Import cat_feature_node', 'The csv file must contain the following columns in the exact same order: id, system_id, epa_default, isarcdivide, isprofilesurface, choose_hemisphere, code_autofill, double_geom, num_arcs, graph_delimiter, shortcut_key, link_path, descript, active.'),
+    (446, 'Import cat_feature_connec', 'The csv file must contain the following columns in the exact same order: id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active.'),
+    (448, 'Import cat_node', 'The csv file must contain the following columns in the exact same order: id, nodetype_id, matcat_id, pnom, dnom, dint, dext, shape, descript, link, brand, model, svg, estimated_depth, cost_unit, cost, active, label, ischange, acoeff.'),
+    (449, 'Import cat_connec', 'The csv file must contain the following columns in the exact same order: id, connectype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, active, label.'),
+    (450, 'Import cat_arc', 'The csv file must contain the following columns in the exact same order: id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost.'),
+    (469, 'Import scada values', 'Import scada values into the table ext_rtc_scada_x_data according to the example file scada_values.csv.'),
+    (470, 'Import hydrometer_x_data', 'The csv file must contain the following fields: hydrometer_id, cat_period_id, sum, value_date (optional), value_type (optional), value_status (optional), value_state (optional).'),
+    (471, 'Import crm period values', 'The csv file must contain the following fields: id, start_date, end_date, period_seconds (optional), code.'),
+    (500, 'Import valve status', 'The csv file must contain the following fields: dscenario_name, node_id, status.'),
+    (501, 'Import dscenario demands', 'The csv file must contain the following fields: dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source.'),
+    (504, 'Import flowmeter daily values', 'Import daily flowmeter values into the table ext_rtc_scada_x_data according to the example file scada_flowmeter_daily_values.csv.'),
+    (506, 'Import flowmeter aggregated values', 'Import aggregated flowmeter values into the table ext_rtc_scada_x_data according to the example file scada_flowmeter_agg_values.csv.'),
+    (514, 'Import netscenario closed valves', 'The csv file must contain the following fields: netscenario_id, node_id, closed.')
 ) AS v(fid, alias, descript)
 WHERE t.fid = v.fid;
 
