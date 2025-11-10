@@ -133,19 +133,21 @@ BEGIN
 
 
 		-- Header
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 4, '-------------------------------------------------------------------------------------');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-12, current_user, v_fid, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-13, current_user, v_fid, 4, '-------------------------------------------------------------------------------------');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-14, current_user, v_fid, 4, '');
 
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 3, '');
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 3, 'CRITICAL ERRORS');
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 3, '----------------------');
-		
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 2, '');
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 2, 'WARNINGS');
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 2, '--------------');
-		
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 1, 'INFO');
-		INSERT INTO t_audit_check_data (cur_user, fid, criticity, error_message) VALUES (current_user, v_fid, 1, '-------');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-9, current_user, v_fid, 3, 'CRITICAL ERRORS');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-10, current_user, v_fid, 3, '----------------------');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-11, current_user, v_fid, 3, '');
+
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-6, current_user, v_fid, 2, 'WARNINGS');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-7, current_user, v_fid, 2, '--------------');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-8, current_user, v_fid, 2, '');
+
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-3, current_user, v_fid, 1, 'INFO');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-4, current_user, v_fid, 1, '-------');
+		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-5, current_user, v_fid, 1, '');
 
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Result id: '));
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));

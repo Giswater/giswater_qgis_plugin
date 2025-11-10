@@ -94,14 +94,21 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (
 			SELECT 
-				ROW_NUMBER() OVER (ORDER BY criticity DESC, tstamp, error_message ASC) AS id,
+				ROW_NUMBER() OVER (ORDER BY criticity DESC, CASE WHEN id < 0 THEN 0 ELSE 1 END, tstamp ASC, error_message ASC) AS id,
 				error_message AS message,
 				criticity
 			FROM (
-				SELECT DISTINCT error_message, criticity, tstamp
+				SELECT DISTINCT error_message, criticity, tstamp, id
 				FROM t_audit_check_data
+				WHERE criticity IN (
+					SELECT criticity
+					FROM t_audit_check_data
+					WHERE error_message NOT ILIKE '%-----%' AND error_message NOT IN ('')
+					GROUP BY criticity
+					HAVING COUNT(*) > 1
+				)
 			) t
-			ORDER BY criticity DESC, tstamp, message ASC
+			ORDER BY id ASC
 		) row;
 		v_result := COALESCE(v_result, '{}');
 		v_result := concat ('{"geometryType":"", "values":',v_result, '}');
