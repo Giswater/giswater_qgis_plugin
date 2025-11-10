@@ -87,3 +87,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 -- 07/11/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"reagent_lot", "dataType":"varchar(100)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"equipment_code", "dataType":"varchar(50)", "isUtils":"False"}}$$);
+
+-- 10/11/2025
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('om_mincut_conflict','Table of minimum cut analysis related to conflicts','role_om','core') ON CONFLICT DO NOTHING;
