@@ -12,7 +12,7 @@ RETURNS trigger AS
 $BODY$
 DECLARE 
 v_numConnecs numeric;
-v_arc text;
+v_arc_id integer;
 v_connec_proximity double precision;
 v_connec_proximity_control boolean;
 v_dsbl_error boolean;
@@ -40,13 +40,13 @@ BEGIN
 			AND c.connec_id != NEW.connec_id AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 0.001) LIMIT 1);
+		v_arc_id := (SELECT arc_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 0.001) LIMIT 1);
 
 		-- If there is an arc
-		IF v_arc IS NOT NULL THEN
+		IF v_arc_id IS NOT NULL THEN
 			NEW.pjoint_type = 'CONNEC';
 			NEW.pjoint_id = NEW.connec_id;
-			NEW.arc_id = v_arc;
+			NEW.arc_id = v_arc_id;
 		END IF;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -57,9 +57,9 @@ BEGIN
 		AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 0.001) LIMIT 1);
-		IF v_arc IS NOT NULL THEN
-			UPDATE connec SET pjoint_type = 'CONNEC', pjoint_id = NEW.connec_id, arc_id = v_arc WHERE connec_id = OLD.connec_id;
+		v_arc_id := (SELECT arc_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, 0.001) LIMIT 1);
+		IF v_arc_id IS NOT NULL THEN
+			UPDATE connec SET pjoint_type = 'CONNEC', pjoint_id = NEW.connec_id, arc_id = v_arc_id WHERE connec_id = OLD.connec_id;
 			DELETE FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC' RETURNING exit_id, exit_type INTO v_id, v_type;
 			IF v_type = 'VNODE' THEN
 				DELETE FROM vnode WHERE vnode_id = v_id;
