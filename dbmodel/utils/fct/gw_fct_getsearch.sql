@@ -104,6 +104,8 @@ BEGIN
     v_device = ((p_data ->>'client')::json->>'device');
 	v_filter_poly = ((p_data ->>'data')::json->>'filterFields')::json->>'searchPoly';
 
+	-- profilactic control of schema name
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' THEN v_addschema = null; END IF;
 
    	if v_device = 5 then
 		-- get epsg
@@ -111,9 +113,6 @@ BEGIN
 
 		-- profilactic control for singletab
 	    IF v_singletab IN ('NULL', 'None', '') then v_singletab = null; end if;
-
-		-- profilactic control of schema name
-		IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'THEN v_addschema = null; END IF;
 
 		-- profilactic control if table selector_expl is empty
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user = current_user) = 0 THEN INSERT INTO selector_expl VALUES(0,current_user); END IF;
@@ -211,7 +210,6 @@ BEGIN
 	        INTO v_version;
 
 	    -- get values from input
-	    v_addschema = (p_data ->>'data')::json->>'addSchema';
 	    v_singletab = (p_data ->>'form')::json->>'singleTab';
 
 		-- profilactic control for singletab
@@ -219,9 +217,7 @@ BEGIN
 
 
 		-- profilactic control of schema name
-		IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
-			THEN v_addschema = null;
-		ELSE
+		IF v_addschema IS NOT NULL THEN
 			IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3132", "function":"2580","parameters":null, "is_process":true}}$$)';
