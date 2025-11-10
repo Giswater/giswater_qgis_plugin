@@ -430,6 +430,8 @@ class AddNewLot:
             return
 
         feature_types = ['arc', 'node', 'connec', 'link']
+        if tools_gw.get_project_type() == 'ud':
+            feature_types.append('gully')
 
         for feature in feature_types:
             count_row = tools_db.get_row(
