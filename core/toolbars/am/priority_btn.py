@@ -813,7 +813,7 @@ class CalculatePriority:
 
         if layer is None:
             # show warning
-            tools_gw.show_warning(tools_qt.tr("For select on canvas is mandatory to load v_asset_arc_input layer"), dialog=self.dlg_priority)
+            tools_qgis.show_warning("For select on canvas is mandatory to load v_asset_arc_input layer", dialog=self.dlg_priority)
             return
         tools_gw.selection_init(self, self.dlg_priority, self.layer_to_work)
 
