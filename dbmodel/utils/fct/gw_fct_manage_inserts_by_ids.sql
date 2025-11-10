@@ -151,12 +151,10 @@ BEGIN
     -- Build SELECT and INSERT columns based on relation type
     -- Campaign tables have the_geom and cat columns, lot/psector/element/visit tables have different structures
     IF v_relation_type = 'campaign' THEN
-        -- Campaign tables: relation_id, feature_id, status, the_geom, cat_id, type
+        -- Campaign tables: relation_id, feature_id, status, the_geom, cat_id, optional type
         v_select_cols := v_relation_id || ', p.' || v_feature_id_col || ', 1, p.the_geom, p.' || v_cat_id_col;
         IF v_type_col IS NOT NULL THEN
             v_select_cols := v_select_cols || ', c.' || v_type_col;
-        ELSE
-            v_select_cols := v_select_cols || ', NULL';
         END IF;
 
         -- Add extra columns for arc features
@@ -165,7 +163,10 @@ BEGIN
         END IF;
 
         -- Build INSERT columns for campaign
-        v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', status, the_geom, ' || v_cat_id_col || ', ' || COALESCE(v_type_col, 'NULL');
+        v_insert_cols := v_relation_id_col || ', ' || v_feature_id_col || ', status, the_geom, ' || v_cat_id_col;
+        IF v_type_col IS NOT NULL THEN
+            v_insert_cols := v_insert_cols || ', ' || v_type_col;
+        END IF;
         IF v_feature_type = 'arc' THEN
             v_insert_cols := v_insert_cols || ', node_1, node_2';
         END IF;

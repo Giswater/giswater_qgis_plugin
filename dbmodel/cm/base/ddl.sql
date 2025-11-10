@@ -468,7 +468,7 @@ CREATE TABLE om_campaign_x_connec (
 	status int2 NULL,
 	admin_observ text NULL,
 	org_observ text NULL,
-	connectcat_id text NULL,
+	conneccat_id text NULL,
 	qindex1 numeric(12, 3) NULL,
 	qindex2 numeric(12, 3) NULL,
 	the_geom geometry(point, SRID_VALUE) NULL,
@@ -489,7 +489,7 @@ CREATE TABLE om_campaign_x_link (
 	linkcat_id text NULL,
 	qindex1 numeric(12, 3) NULL,
 	qindex2 numeric(12, 3) NULL,
-	the_geom geometry(polygon, SRID_VALUE) NULL,
+	the_geom geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT om_campaign_x_link_pkey PRIMARY KEY (id),
 	CONSTRAINT om_campaign_x_link_un UNIQUE (campaign_id, link_id),
 	CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES om_campaign(campaign_id) ON DELETE CASCADE ON UPDATE CASCADE
