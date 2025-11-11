@@ -164,20 +164,12 @@ class GwInfoButton(GwMaptool):
                         if idx > 0:
                             psector_menu.addSeparator()
                         
-                        if 'psector_id' in psector_item:
-                            info_action = psector_menu.addAction(f"{tools_qt.tr('Psector ID')}: {psector_item['psector_id']}")
+                        if 'psector_id' in psector_item and 'name' in psector_item:
+                            info_action = psector_menu.addAction(f"{psector_item['psector_id']} - {psector_item['name']}")
                             info_action.setEnabled(False)
                             info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
-                        if 'name' in psector_item:
-                            info_action = psector_menu.addAction(f"{tools_qt.tr('Name')}: {psector_item['name']}")
-                            info_action.setEnabled(False)
-                            info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
-                        if 'insert_user' in psector_item:
-                            info_action = psector_menu.addAction(f"{tools_qt.tr('User')}: {psector_item['insert_user']}")
-                            info_action.setEnabled(False)
-                            info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
-                        if 'insert_tstamp' in psector_item:
-                            info_action = psector_menu.addAction(f"{tools_qt.tr('Date')}: {psector_item['insert_tstamp']}")
+                        elif 'name' in psector_item:
+                            info_action = psector_menu.addAction(f"{psector_item['name']}")
                             info_action.setEnabled(False)
                             info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
                 else:
