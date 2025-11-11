@@ -19,3 +19,7 @@ DELETE FROM sys_function WHERE id = 3174;
 
 -- 07/11/2025
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'form_featuretype_change', 'tab_none', 'fluid_type', 'lyt_main_3', 5, 'string', 'combo', 'Fluid type:', 'Fluid type', NULL, NULL, NULL, true, NULL, NULL, 'SELECT fluid_type as id, fluid_type AS idval FROM man_type_fluid WHERE fluid_type IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+-- 10/11/2025
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('om_mincut_conflict','Table of minimum cut analysis related to conflicts','role_om','core') ON CONFLICT DO NOTHING;
