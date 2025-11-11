@@ -457,7 +457,6 @@ class GwMincut:
         # Set state name
         if self.states != {}:
             tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
-            print(self.states)
 
         self.current_state = 0
         self.sql_connec = ""
@@ -488,6 +487,11 @@ class GwMincut:
 
         self.is_new = True
         self.init_mincut_form()
+        try:
+            # mark as not saved until user accepts
+            self.dlg_mincut.setProperty('saved', False)
+        except Exception:
+            pass
         self.action = "get_mincut"
 
         # Get current date. Set all QDateEdit to current date
@@ -722,7 +726,6 @@ class GwMincut:
                         f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
                     )
                     tools_db.execute_sql(sql)
-                    print('ok delete mincuts_to_delete')
                     sql = (
                         f"WITH groups_conflict AS ("
                         f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
@@ -731,12 +734,10 @@ class GwMincut:
                         f"WHERE id IN (SELECT id FROM groups_conflict);"
                     )
                     tools_db.execute_sql(sql)
-                    print('ok delete groups_conflict')
                     sql = (
                         f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
                     )
                     tools_db.execute_sql(sql)
-                    print('ok delete mincut')
                     self._update_result_selector()
                     tools_qgis.show_info(tools_qt.tr("Mincut canceled!"))
 
@@ -1038,6 +1039,12 @@ class GwMincut:
             return
 
         self._mincut_ok(result)
+        self.form_has_changes = False
+        try:
+            # mark as saved so external guards can skip confirmation
+            self.dlg_mincut.setProperty('saved', True)
+        except Exception:
+            pass
 
         self._save_widgets_values()
         self.iface.actionPan().trigger()

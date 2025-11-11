@@ -4821,6 +4821,15 @@ def docker_dialog(dialog, dlg_name=None, title=None):
 
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
+
+    # If a previous guard set a block, skip attaching this dialog
+    if lib_vars.session_vars.get('block_next_form_attach'):
+        lib_vars.session_vars['block_next_form_attach'] = False
+        try:
+            dialog.close()
+        except Exception:
+            pass
+        return
     try:
         lib_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
         lib_vars.session_vars['dialog_docker'].setWidget(dialog)
@@ -4863,6 +4872,47 @@ def init_docker(docker_param='qgis_info_docker'):
                     return None
 
     if value == 'true':
+        if docker_param == 'qgis_form_docker':
+            docker = lib_vars.session_vars.get('dialog_docker')
+            widget = None
+            if docker and not isdeleted(docker):
+                try:
+                    widget = docker.widget()
+                except RuntimeError:
+                    widget = None
+            # Guard: ask ONLY when mincut is open and DB state is '4'
+            # Do NOT ask when: not created yet (no id/row) or already saved (state!=4).
+            if widget and not isdeleted(widget) and widget.objectName() == 'dlg_mincut':
+                class_obj = widget.property('class_obj')
+                mincut_obj = getattr(class_obj, 'mincut', None)
+
+                rid_text = None
+                try:
+                    rid_widget = getattr(mincut_obj.dlg_mincut, 'result_mincut_id', None) if mincut_obj else None
+                    rid_text = rid_widget.text() if rid_widget else None
+                except Exception:
+                    rid_text = None
+
+                has_id = rid_text not in (None, '', 'null')
+                db_state = None
+                if has_id:
+                    try:
+                        row = tools_db.get_row(f"SELECT mincut_state FROM om_mincut WHERE id = '{rid_text}'")
+                        if row:
+                            # row can be dict or sequence depending on tools_db
+                            db_state = row.get('mincut_state') if isinstance(row, dict) else row[0]
+                    except Exception:
+                        db_state = None
+                # Ask only when DB says it's 'Sobre la planificación' (4)
+                if has_id and str(db_state) == '4':
+                    if not tools_qt.show_question(
+                        "The mincut will be canceled, are you sure?",
+                        title="Cancel mincut",
+                        force_action=True
+                    ):
+                        # Tell docker_dialog to skip attaching the new dialog
+                        lib_vars.session_vars['block_next_form_attach'] = True
+                        return docker  # Stay on current mincut docker; do not open the new one
         close_docker()
         lib_vars.session_vars['docker_type'] = docker_param
         lib_vars.session_vars['dialog_docker'] = GwDocker()
