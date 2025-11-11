@@ -436,8 +436,11 @@ class GwFeatureReplaceButton(GwMaptool):
             return
 
         # Ask question before executing
-        msg = ("Are you sure you want to replace selected feature with a new one?\n "
-                  "If you have different addfields in your feature, they will be deleted.")
+        if global_vars.psignals is not None and global_vars.psignals.get('psector_active'):
+            msg = ("Are you sure you want to replace selected feature with a new one?")
+        else:
+            msg = ("Are you sure you want to replace selected feature with a new one?\n "
+                    "If you have different addfields in your feature, they will be deleted.")
         title = "Replace feature"
         answer = tools_qt.show_question(msg, title)
         if answer:
@@ -521,6 +524,12 @@ class GwFeatureReplaceButton(GwMaptool):
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_replace.new_featurecat_id, rows)
+        
+        # Set default value
+        default_value = tools_gw.get_config_value(f"feat_{feature_type_new.lower()}_vdefault")
+        default_value = default_value[0] if default_value[0] else default_value
+        if default_value and default_value[0] and default_value[0] is not None:
+            tools_qt.set_combo_value(self.dlg_replace.new_featurecat_id, default_value, 0)
         tools_qt.set_autocompleter(self.dlg_replace.new_featurecat_id)
 
     def _manage_plan_widgets(self):

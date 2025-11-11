@@ -1764,23 +1764,18 @@ class GwAdminButton:
         if filter_ is None:
             return
         # Populate Project data schema Name
-        sql = "SELECT schema_name FROM information_schema.schemata"
+        sql = "SELECT table_schema FROM information_schema.tables WHERE table_name = 'sys_version'"
         rows = tools_db.get_rows(sql, commit=self.dev_commit)
         if rows is None:
             return
 
         result_list = []
-        for row in rows:
-            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
-                   f"WHERE table_schema = '{row[0]}' "
-                   f"AND table_name = 'sys_version')")
-            exists = tools_db.get_row(sql)
-            if exists and str(exists[0]) == 'True':
-                sql = f"SELECT project_type FROM {row[0]}.sys_version"
-                result = tools_db.get_row(sql)
-                if result is not None and result[0] == filter_.upper():
-                    elem = [row[0], row[0]]
-                    result_list.append(elem)
+        for (schema_name,) in rows:
+            sql = f"SELECT project_type FROM {schema_name}.sys_version"
+            (project_type,) = tools_db.get_row(sql)
+            if project_type is not None and project_type == filter_.upper():
+                elem = [schema_name, schema_name]
+                result_list.append(elem)
         if not result_list:
             self.dlg_readsql.project_schema_name.clear()
             self._set_buttons_enabled()
