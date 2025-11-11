@@ -75,3 +75,23 @@ BEGIN
     END LOOP;
 END;
 $$;
+
+
+UPDATE sys_fprocess SET query_text='SELECT a.node_id, a.nodecat_id, a.expl_id, a.the_geom FROM t_node a 
+JOIN cat_node b ON a.nodecat_id = b.id
+JOIN cat_feature_node c ON c.id = b.node_type
+JOIN dma d ON d.dma_id = a.dma_id
+WHERE d.active IS FALSE
+AND ''DMA'' = ANY(c.graph_delimiter)' WHERE fid=636;
+
+UPDATE sys_fprocess SET query_text='SELECT a.node_id, a.nodecat_id, a.expl_id, a.the_geom FROM node a 
+JOIN cat_node b ON a.nodecat_id = b.id
+JOIN cat_feature_node c ON c.id = b.node_type
+JOIN presszone d ON d.presszone_id = a.presszone_id
+WHERE d.active IS FALSE
+AND ''PRESSZONE'' = ANY(c.graph_delimiter)' WHERE fid=182;
+
+UPDATE sys_fprocess SET except_msg = 'arcs with length shorter than value set as node proximity. Please, check your data before continue.', 
+query_text='SELECT arc_id,arccat_id,st_length(the_geom), the_geom, expl_id
+FROM t_arc, config_param_system where parameter = ''edit_node_proximity'' 
+and  st_length(the_geom) < json_extract_path_text(value::json,''value'')::numeric ' WHERE fid=391;
