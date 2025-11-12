@@ -560,12 +560,25 @@ class GwPsector:
 
         total_result = 0
         widgets = dialog.tab_other_prices.findChildren(QLabel)
-        symbol = tools_gw.get_config_value(parameter="admin_currency", columns="value::json->> 'symbol'",
-                                           table="config_param_system")[0]
+        
+        # Get currency config
+        currency_config = None
+        try:
+            row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row:
+                currency_config = json.loads(row[0])
+                symbol = currency_config.get('symbol', '$')
+        except Exception:
+            symbol = '$'
+        
+        # Sum up all widget totals
         for widget in widgets:
             if 'widget_total' in widget.objectName():
                 total_result = float(total_result) + float(widget.text().replace(symbol, '').strip())
-        tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
+        
+        # Format using the currency formatter
+        formatted_total = tools_gw.format_currency(total_result, currency_config)
+        tools_qt.set_widget_text(dialog, 'lbl_total_count', formatted_total)
 
     def open_dlg_reports(self):
 
@@ -784,6 +797,15 @@ class GwPsector:
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
+        # Get currency config
+        currency_config = None
+        try:
+            row_currency = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row_currency:
+                currency_config = json.loads(row_currency[0])
+        except Exception:
+            pass
+
         sql = (f"SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
                f" FROM v_plan_psector"
                f" WHERE psector_id = '{psector_id}'")
@@ -792,55 +814,57 @@ class GwPsector:
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        tools_qt.set_widget_text(dialog, column_name, f"{row[column_name]:.02f}")
+                        formatted_value = tools_gw.format_currency(row[column_name], currency_config)
+                        tools_qt.set_widget_text(dialog, column_name, formatted_value)
                     else:
-                        tools_qt.set_widget_text(dialog, column_name, f"{0:.02f}")
+                        formatted_value = tools_gw.format_currency(0, currency_config)
+                        tools_qt.set_widget_text(dialog, column_name, formatted_value)
 
-        self.calc_pec_pem(dialog)
-        self.calc_pecvat_pec(dialog)
-        self.calc_pca_pecvat(dialog)
+        self.calc_pec_pem(dialog, currency_config)
+        self.calc_pecvat_pec(dialog, currency_config)
+        self.calc_pca_pecvat(dialog, currency_config)
 
-    def calc_pec_pem(self, dialog):
+    def calc_pec_pem(self, dialog, currency_config=None):
 
         if tools_qt.get_text(dialog, 'pec') not in ('null', None):
-            pec = float(tools_qt.get_text(dialog, 'pec'))
+            pec = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec'), currency_config)
         else:
             pec = 0
 
         if tools_qt.get_text(dialog, 'pem') not in ('null', None):
-            pem = float(tools_qt.get_text(dialog, 'pem'))
+            pem = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pem'), currency_config)
         else:
             pem = 0
 
-        res = f"{round(pec - pem, 2):.02f}"
+        res = tools_gw.format_currency(round(pec - pem, 2), currency_config)
         tools_qt.set_widget_text(dialog, 'pec_pem', res)
 
-    def calc_pecvat_pec(self, dialog):
+    def calc_pecvat_pec(self, dialog, currency_config=None):
 
         if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
-            pec_vat = float(tools_qt.get_text(dialog, 'pec_vat'))
+            pec_vat = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec_vat'), currency_config)
         else:
             pec_vat = 0
 
         if tools_qt.get_text(dialog, 'pec') not in ('null', None):
-            pec = float(tools_qt.get_text(dialog, 'pec'))
+            pec = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec'), currency_config)
         else:
             pec = 0
-        res = f"{round(pec_vat - pec, 2):.02f}"
+        res = tools_gw.format_currency(round(pec_vat - pec, 2), currency_config)
         tools_qt.set_widget_text(dialog, 'pecvat_pem', res)
 
-    def calc_pca_pecvat(self, dialog):
+    def calc_pca_pecvat(self, dialog, currency_config=None):
 
         if tools_qt.get_text(dialog, 'pca') not in ('null', None):
-            pca = float(tools_qt.get_text(dialog, 'pca'))
+            pca = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pca'), currency_config)
         else:
             pca = 0
 
         if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
-            pec_vat = float(tools_qt.get_text(dialog, 'pec_vat'))
+            pec_vat = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec_vat'), currency_config)
         else:
             pec_vat = 0
-        res = f"{round(pca - pec_vat, 2):.02f}"
+        res = tools_gw.format_currency(round(pca - pec_vat, 2), currency_config)
         tools_qt.set_widget_text(dialog, 'pca_pecvat', res)
 
     def calculate_percents(self, tablename, field):

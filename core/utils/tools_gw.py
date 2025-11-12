@@ -3854,6 +3854,113 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
     return row
 
 
+def parse_currency(value_str, currency_config=None):
+    """
+    Parse a formatted currency string back to a float.
+    
+    Args:
+        value_str: Formatted currency string like "€1.000.000,25" or "$1,000,000.25"
+        currency_config: Dict with currency config. If None, fetches from DB.
+    
+    Returns:
+        Float value
+    """
+    import json
+    import re
+    
+    if currency_config is None:
+        try:
+            row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row:
+                currency_config = json.loads(row[0])
+        except Exception:
+            currency_config = {"symbol": "$", "separator": ",", "decimals": True}
+    
+    # Remove all currency symbols and spaces
+    cleaned = str(value_str).strip()
+    for symbol in ['€', '$', '₡', '£', '¥', ' ']:
+        cleaned = cleaned.replace(symbol, '')
+    
+    # Get separator config
+    thousands_sep = currency_config.get('separator', ',')
+    decimal_sep = ',' if thousands_sep == '.' else '.'
+    
+    # Remove thousands separator and replace decimal separator with dot
+    cleaned = cleaned.replace(thousands_sep, '')
+    cleaned = cleaned.replace(decimal_sep, '.')
+    
+    try:
+        return float(cleaned)
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def format_currency(value, currency_config=None):
+    """
+    Format a number as currency using admin_currency configuration.
+    
+    Args:
+        value: The numeric value to format
+        currency_config: Dict with currency config. If None, fetches from DB.
+                        Expected keys: symbol, separator, decimals
+    
+    Returns:
+        Formatted string like "₡1,000,000.25" or "€1.000.000,25"
+    
+    Examples:
+        {"symbol":"$", "separator":",", "decimals":true} -> $1,000,000.25
+        {"symbol":"€", "separator":".", "decimals":true} -> €1.000.000,25
+        {"symbol":"₡", "separator":",", "decimals":false} -> ₡1,000,000
+    """
+    import json
+    
+    if currency_config is None:
+        try:
+            row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row:
+                currency_config = json.loads(row[0])
+        except Exception:
+            # Fallback to default
+            currency_config = {"symbol": "$", "separator": ",", "decimals": True}
+    
+    # Extract config
+    symbol = currency_config.get('symbol', '$')
+    thousands_sep = currency_config.get('separator', ',')
+    show_decimals = currency_config.get('decimals', True)
+    
+    # Determine decimal separator (opposite of thousands separator)
+    decimal_sep = ',' if thousands_sep == '.' else '.'
+    
+    # Convert to float
+    try:
+        num_value = float(value)
+    except (ValueError, TypeError):
+        return f"{symbol}0"
+    
+    # Format the number
+    if show_decimals:
+        # Split into integer and decimal parts
+        int_part = int(abs(num_value))
+        decimal_part = abs(num_value) - int_part
+        
+        # Format integer part with thousands separator
+        int_str = f"{int_part:,}".replace(',', thousands_sep)
+        
+        # Format decimal part (always 2 decimal places)
+        decimal_str = f"{decimal_part:.2f}"[2:]  # Get digits after "0."
+        
+        # Combine
+        formatted = f"{'-' if num_value < 0 else ''}{int_str}{decimal_sep}{decimal_str}"
+    else:
+        # No decimals, round to integer
+        int_value = int(round(num_value))
+        formatted = f"{int_value:,}".replace(',', thousands_sep)
+        if num_value < 0 and not formatted.startswith('-'):
+            formatted = '-' + formatted
+    
+    return f"{symbol}{formatted}"
+
+
 def manage_layer_manager(json_result, sql=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
