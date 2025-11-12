@@ -3865,8 +3865,6 @@ def parse_currency(value_str, currency_config=None):
     Returns:
         Float value
     """
-    import json
-    import re
     
     if currency_config is None:
         try:
@@ -3912,7 +3910,6 @@ def format_currency(value, currency_config=None):
         {"symbol":"€", "separator":".", "decimals":true} -> €1.000.000,25
         {"symbol":"₡", "separator":",", "decimals":false} -> ₡1,000,000
     """
-    import json
     
     if currency_config is None:
         try:
