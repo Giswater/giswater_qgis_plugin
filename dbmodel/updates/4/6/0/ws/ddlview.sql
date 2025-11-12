@@ -1416,7 +1416,7 @@ AS SELECT row_number() OVER (ORDER BY ve_arc.arc_id) + 1000000 AS rid,
     ve_arc.arc_id AS feature_id,
     ve_arc.code,
     exploitation.name AS expl_name,
-    ve_arc.workcat_id_end AS workcat_id,
+    ve_arc.workcat_id_end,
     exploitation.expl_id
    FROM ve_arc
      JOIN exploitation ON exploitation.expl_id = ve_arc.expl_id
@@ -1428,7 +1428,7 @@ UNION
     ve_node.node_id AS feature_id,
     ve_node.code,
     exploitation.name AS expl_name,
-    ve_node.workcat_id_end AS workcat_id,
+    ve_node.workcat_id_end,
     exploitation.expl_id
    FROM ve_node
      JOIN exploitation ON exploitation.expl_id = ve_node.expl_id
@@ -1440,7 +1440,7 @@ UNION
     ve_connec.connec_id AS feature_id,
     ve_connec.code,
     exploitation.name AS expl_name,
-    ve_connec.workcat_id_end AS workcat_id,
+    ve_connec.workcat_id_end,
     exploitation.expl_id
    FROM ve_connec
      JOIN exploitation ON exploitation.expl_id = ve_connec.expl_id
@@ -1452,7 +1452,7 @@ UNION
     element.element_id AS feature_id,
     element.code,
     exploitation.name AS expl_name,
-    element.workcat_id_end AS workcat_id,
+    element.workcat_id_end,
     exploitation.expl_id
    FROM element
      JOIN exploitation ON exploitation.expl_id = element.expl_id
