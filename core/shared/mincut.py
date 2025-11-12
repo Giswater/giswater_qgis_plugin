@@ -472,7 +472,7 @@ class GwMincut:
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = "SELECT setval('om_mincut_seq', (SELECT max(id::integer) FROM om_mincut), true)"
+        sql = "SELECT last_value FROM om_mincut_seq"
         row = tools_db.get_row(sql)
         result_mincut_id = '1'
         if not row or row[0] is None or row[0] < 1:
@@ -681,6 +681,53 @@ class GwMincut:
             date_to.setDate(date_from.date())
             time_to.setTime(time_from.time())
 
+    def _mincut_cleanup_only(self, result_mincut_id):
+        """ Perform mincut cleanup without closing the dialog (for state 4 replacement) """
+        
+        # Restore user layer
+        tools_qgis.restore_user_layer('ve_node', self.user_current_layer)
+        
+        # Remove selections
+        self._remove_selection()
+        
+        # Reset rubber band
+        tools_qgis.reset_rubber_band(self.search.rubber_band)
+        
+        # Disconnect snapping
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
+        
+        # Delete from DB (including conflicts)
+        mincut_conflict_state = 5
+        sql = (
+            f"WITH groups_conflict AS ("
+            f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+            f"),"
+            f"mincuts_to_delete AS ("
+            f"    SELECT omc.mincut_id "
+            f"    FROM om_mincut_conflict omc "
+            f"    JOIN om_mincut om ON om.id = omc.mincut_id "
+            f"    WHERE om.mincut_state = {mincut_conflict_state} "
+            f"    AND omc.id IN (SELECT id FROM groups_conflict)"
+            f") "
+            f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
+        )
+        tools_db.execute_sql(sql)
+        sql = (
+            f"WITH groups_conflict AS ("
+            f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+            f") "
+            f"DELETE FROM om_mincut_conflict "
+            f"WHERE id IN (SELECT id FROM groups_conflict);"
+        )
+        tools_db.execute_sql(sql)
+        sql = f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
+        tools_db.execute_sql(sql)
+        
+        # Refresh map
+        self._remove_selection()
+        tools_qgis.refresh_map_canvas()
+
     def _mincut_close(self):
 
         if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['dialog_docker'].isFloating():
@@ -710,34 +757,8 @@ class GwMincut:
                        f" WHERE id = {result_mincut_id}")
                 row = tools_db.get_row(sql)
                 if row:
-                    # Delete conflicts if this mincut caused conflicts
-                    mincut_conflict_state = 5
-                    sql = (
-                        f"WITH groups_conflict AS ("
-                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
-                        f"),"
-                        f"mincuts_to_delete AS ("
-                        f"    SELECT omc.mincut_id "
-                        f"    FROM om_mincut_conflict omc "
-                        f"    JOIN om_mincut om ON om.id = omc.mincut_id "
-                        f"    WHERE om.mincut_state = {mincut_conflict_state} "
-                        f"    AND omc.id IN (SELECT id FROM groups_conflict)"
-                        f") "
-                        f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
-                    )
-                    tools_db.execute_sql(sql)
-                    sql = (
-                        f"WITH groups_conflict AS ("
-                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
-                        f") "
-                        f"DELETE FROM om_mincut_conflict "
-                        f"WHERE id IN (SELECT id FROM groups_conflict);"
-                    )
-                    tools_db.execute_sql(sql)
-                    sql = (
-                        f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
-                    )
-                    tools_db.execute_sql(sql)
+                    # Use the cleanup method to delete from DB
+                    self._mincut_cleanup_only(result_mincut_id)
                     self._update_result_selector()
                     tools_qgis.show_info(tools_qt.tr("Mincut canceled!"))
 
