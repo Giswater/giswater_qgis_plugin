@@ -176,6 +176,7 @@ class GwWorkcat:
         workcat_id = item['sys_id']
         field_id = item['filter_text']
         display_name = item['display_name']
+        self.current_workcat_id = workcat_id
         if workcat_id is None:
             return False
         if 'sys_geometry' not in item:
@@ -296,28 +297,15 @@ class GwWorkcat:
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self._workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_psm, table_name)
-        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        expr = "workcat_id_end ILIKE '%" + str(workcat_id) + "%'"
         self._workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self._workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
-        # Select workcat features
-        layers = [
-            tools_qgis.get_layer_by_tablename("ve_arc"),
-            tools_qgis.get_layer_by_tablename("ve_node"),
-            tools_qgis.get_layer_by_tablename("ve_connec"),
-            tools_qgis.get_layer_by_tablename("ve_link"),
-            tools_qgis.get_layer_by_tablename("ve_man_frelem"),
-            tools_qgis.get_layer_by_tablename("ve_man_genelem"),
-            tools_qgis.get_layer_by_tablename("ve_gully"),
-        ]
-        expr = QgsExpression(expr)
-        for lyr in layers:
-            if lyr is None:
-                continue
-            tools_qgis.select_features_by_expr(lyr, expr)
+        # Select workcat features (installed by default - state=1)
+        self._select_workcat_features(workcat_id, 'workcat_id', state=1)
 
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
@@ -325,6 +313,10 @@ class GwWorkcat:
         extension = '_end'
         self._fill_label_data(workcat_id, table_name)
         self._fill_label_data(workcat_id, table_name_end, extension)
+
+        # Connect tab change signal to maintain selection
+        if hasattr(self.items_dialog, 'tabWidget') and self.items_dialog.tabWidget is not None:
+            self.items_dialog.tabWidget.currentChanged.connect(self._on_tab_changed)
 
         tools_gw.open_dialog(self.items_dialog, dlg_name='search_workcat')
         title = self.items_dialog.windowTitle()
@@ -383,7 +375,7 @@ class GwWorkcat:
                f"  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
                f"   WHERE workcat_id='{workcat_id}' "
                f"   UNION SELECT expl_id, expl_name FROM v_ui_workcat_x_feature_end "
-               f"   WHERE workcat_id='{workcat_id}'"
+               f"   WHERE workcat_id_end='{workcat_id}'"
                f"   ) AS a "
                f" WHERE expl_id NOT IN "
                f"  (SELECT expl_id FROM selector_expl "
@@ -440,6 +432,13 @@ class GwWorkcat:
         qbutton.setEnabled(False)
         tools_qgis.refresh_map_canvas()
         qtable.model().select()
+        
+        # Trigger selection after state is activated
+        if hasattr(self, 'current_workcat_id'):
+            if state == 1:
+                self._select_workcat_features(self.current_workcat_id, 'workcat_id', state=1)
+            elif state == 0:
+                self._select_workcat_features(self.current_workcat_id, 'workcat_id_end', state=0)
 
     def _write_to_csv(self, dialog, folder_path=None, all_rows=None):
 
@@ -453,12 +452,15 @@ class GwWorkcat:
     def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
 
+        # Use workcat_id_end for the _end table
+        workcat_field = 'workcat_id_end' if 'feature_end' in table_name else 'workcat_id'
+        
         result_select = tools_qt.get_text(dialog, widget_txt)
         if result_select != 'null':
-            expr = (f"workcat_id = '{workcat_id}'"
+            expr = (f"{workcat_field} = '{workcat_id}'"
                     f" and {field_id} ILIKE '%{result_select}%'")
         else:
-            expr = f"workcat_id ILIKE '%{workcat_id}%'"
+            expr = f"{workcat_field} ILIKE '%{workcat_id}%'"
         self._workcat_fill_table(qtable, table_name, expr=expr)
         tools_gw.set_tablemodel_config(dialog, qtable, table_name)
 
@@ -546,11 +548,14 @@ class GwWorkcat:
         if workcat_id == "null":
             return
 
+        # Use workcat_id_end for the _end table
+        workcat_field = 'workcat_id_end' if 'feature_end' in table_name else 'workcat_id'
+        
         features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
         for feature in features:
             sql = (f"SELECT feature_id "
                    f" FROM {table_name}")
-            sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
+            sql += f" WHERE {workcat_field} = '{workcat_id}' AND feature_type = '{feature}'"
             rows = tools_db.get_rows(sql)
             if extension is not None:
                 widget_name = f"lbl_total_{feature.lower()}{extension}"
@@ -658,6 +663,38 @@ class GwWorkcat:
     def _reset_rubber_band(self):
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.reset_rubberband(self.aux_rubber_band)
+
+    def _select_workcat_features(self, workcat_id, field_name='workcat_id', state=None):
+        """ Select features on map for the given workcat_id """
+        expr = f"{field_name} ILIKE '%{workcat_id}%'"
+        if state is not None:
+            expr += f" AND state = {state}"
+        expr_obj = QgsExpression(expr)
+        layers = [
+            tools_qgis.get_layer_by_tablename("ve_arc"),
+            tools_qgis.get_layer_by_tablename("ve_node"),
+            tools_qgis.get_layer_by_tablename("ve_connec"),
+            tools_qgis.get_layer_by_tablename("ve_link"),
+            tools_qgis.get_layer_by_tablename("ve_man_frelem"),
+            tools_qgis.get_layer_by_tablename("ve_man_genelem"),
+            tools_qgis.get_layer_by_tablename("ve_gully"),
+        ]
+        for lyr in layers:
+            if lyr is None:
+                continue
+            lyr.removeSelection()
+            tools_qgis.select_features_by_expr(lyr, expr_obj)
+
+    def _on_tab_changed(self, index):
+        """ Re-select features when switching tabs """
+        if not hasattr(self, 'current_workcat_id'):
+            return
+        # Installed tab (index 0) - select by workcat_id and state=1
+        if index == 0:
+            self._select_workcat_features(self.current_workcat_id, 'workcat_id', state=1)
+        # Removed tab (index 1) - select by workcat_id_end and state=0
+        elif index == 1:
+            self._select_workcat_features(self.current_workcat_id, 'workcat_id_end', state=0)
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
