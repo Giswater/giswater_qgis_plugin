@@ -179,6 +179,8 @@ class GwInfoButton(GwMaptool):
                                 # Create QCheckBox widget for psector
                                 label = f"{psector_item['psector_id']} - {psector_item['name']}"
                                 checkbox = QCheckBox(label)
+                                if psector_item['active'] is False:
+                                    checkbox.setStyleSheet("QCheckBox {color: #E9E7E3;}")
                                 container = QWidget(psector_menu)
                                 layout = QHBoxLayout(container)
                                 layout.setContentsMargins(10, 4, 10, 4)
