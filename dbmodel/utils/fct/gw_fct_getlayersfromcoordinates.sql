@@ -218,7 +218,7 @@ BEGIN
 									FROM plan_psector_x_'||v_feature_type||' AS px
 									JOIN plan_psector p ON p.psector_id = px.psector_id
 									WHERE px.'||quote_ident(v_idname)||' = '||quote_ident(v_layer)||'.'||quote_ident(v_idname)||'
-										AND px.state = 1
+										AND px.state = 1 AND p.status NOT IN (5, 6, 7)
 								) AS psector
 							) AS plan_psector_data
 							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
@@ -282,7 +282,7 @@ BEGIN
 									FROM plan_psector_x_connec AS px
 										JOIN plan_psector p ON p.psector_id = px.psector_id
 									WHERE px.link_id = ve_link.link_id
-										AND px.state = 1
+										AND px.state = 1 AND p.status NOT IN (5, 6, 7)
 								) AS psector
 							) AS plan_psector_data
 							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
