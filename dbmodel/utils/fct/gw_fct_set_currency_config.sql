@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 3522
+--FUNCTION CODE: 3524
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_currency_config(numeric);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_currency_config(p_value numeric)

@@ -101,4 +101,4 @@ UPDATE config_param_system
 	WHERE "parameter"='admin_currency';
 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,"source")
-	VALUES (3522,'gw_fct_set_currency_config','utils','function','num','num','Function to transform nuemric values of price to user configuration from admin_currency in config_param_system','core');
+	VALUES (3524,'gw_fct_set_currency_config','utils','function','num','num','Function to transform nuemric values of price to user configuration from admin_currency in config_param_system','core');
