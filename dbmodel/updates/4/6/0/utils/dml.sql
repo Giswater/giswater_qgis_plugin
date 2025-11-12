@@ -95,3 +95,10 @@ UPDATE sys_fprocess SET except_msg = 'arcs with length shorter than value set as
 query_text='SELECT arc_id,arccat_id,st_length(the_geom), the_geom, expl_id
 FROM t_arc, config_param_system where parameter = ''edit_node_proximity'' 
 and  st_length(the_geom) < json_extract_path_text(value::json,''value'')::numeric ' WHERE fid=391;
+
+UPDATE config_param_system
+	SET value='{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}'
+	WHERE "parameter"='admin_currency';
+
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,"source")
+	VALUES (3522,'gw_fct_set_currency_config','utils','function','num','num','Function to transform nuemric values of price to user configuration from admin_currency in config_param_system','core');

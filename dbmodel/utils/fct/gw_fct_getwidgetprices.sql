@@ -48,8 +48,14 @@ BEGIN
 	INTO v_columns_array
 	USING v_schemaname, v_tablename;
 
-	-- Get table rows
-	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, price_id, unit, price_descript, price, measurement, observ, concat(total_budget,'' '','||quote_literal(v_currency)||') as total FROM '||v_tablename||' WHERE psector_id = '||v_psector_id||')a ' 
+	-- Get table rows with formatted currency
+	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
+		SELECT id, price_id, unit, price_descript, 
+		gw_fct_set_currency_config(price::numeric(12,2)) as price,
+		measurement, observ, 
+		gw_fct_set_currency_config(total_budget::numeric(12,2)) as total 
+		FROM '||v_tablename||' WHERE psector_id = '||v_psector_id||'
+	)a ' 
 	INTO v_fields_array;
 
 	v_columns := array_to_json(v_columns_array);

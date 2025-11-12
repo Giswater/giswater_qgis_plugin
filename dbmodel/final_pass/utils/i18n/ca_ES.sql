@@ -8045,6 +8045,9 @@ FROM (
     (3512, NULL),
     (3514, 'Funció per actualitzar automàticament les taules i les vistes de cmd perquè coincideixin amb les definicions principals.'),
     (3516, 'Funció per gestionar les insercions per lots de funcions en diverses taules de relacions (campanya, lot, sector, element, visita) en funció del tipus de relació i tipus de característica.Retorna el nombre de funcions inserides.'),
+    (3518, 'Funció per obtenir les propietats d’una entitat.'),
+    (3520, 'Funció per establir/registrar hidròmetres a la base de dades.'),
+    (3522, 'Funció per transformar els valors numèrics de preu a la configuració de l’usuari, fent servir admin_currency a config_param_system.'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -12314,7 +12317,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

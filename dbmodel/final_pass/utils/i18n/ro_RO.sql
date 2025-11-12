@@ -8045,6 +8045,9 @@ FROM (
     (3512, NULL),
     (3514, 'Funcție de actualizare automată a vizualizărilor și tabelelor cm pentru a se potrivi cu definițiile părinților lor.'),
     (3516, 'Funcție de gestionare a inserțiilor pe loturi de caracteristici în diverse tabele de relații (campanie, lot, psector, element, vizită) pe baza tipului de relație și a tipului de caracteristică. Returnează numărul de caracteristici inserate.'),
+    (3518, 'Funcție pentru obținerea proprietăților unei entități.'),
+    (3520, 'Funcție pentru setarea/înregistrarea hidrometrelor în baza de date.'),
+    (3522, 'Funcție pentru a transforma valorile numerice ale prețului la configurația utilizatorului, folosind admin_currency din config_param_system.'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -12314,7 +12317,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

@@ -207,9 +207,9 @@ BEGIN
 				concat (',quote_literal(p_tabname),',''_'',identif) AS widgetname, ''string'' AS datatype,
 				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext,
-				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost ,
-				'''||v_currency||'/'',unit,'' = '', total_cost::numeric(12,2), '' '||v_currency||''') as value, null as stylesheet,
-				null as widgetcontrols, null as hidden
+				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, 
+				concat(measurement, '' '', unit, '' x '', gw_fct_set_currency_config(cost), ''/'', unit, '' = '', gw_fct_set_currency_config(total_cost)) as value, 
+				null as stylesheet, null as widgetcontrols, null as hidden
 				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_nullable(p_id),'
 			UNION
 				SELECT label, columnname, widgettype,

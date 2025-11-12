@@ -5303,6 +5303,9 @@ FROM (
     (3512, NULL),
     (3514, 'Funtion to auto-update cm views and tables to match their parent definitions.'),
     (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.'),
+    (3518, 'Function to get the properties of a feature.'),
+    (3520, 'Function to set hydrometers in the database.'),
+    (3522, 'Function to transform nuemric values of price to user configuration from admin_currency in config_param_system'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -8177,7 +8180,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

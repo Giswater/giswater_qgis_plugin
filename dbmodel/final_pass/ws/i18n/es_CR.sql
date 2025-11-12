@@ -5303,6 +5303,9 @@ FROM (
     (3512, NULL),
     (3514, 'Función para auto-actualizar vistas cm y tablas para que coincidan con sus definiciones padre.'),
     (3516, 'Función para gestionar la inserción por lotes de características en varias tablas de relaciones (campaña, lote, psector, elemento, visita) basándose en el tipo de relación y el tipo de característica. Devuelve el número de características insertadas.'),
+    (3518, 'Función para obtener las propiedades de una entidad.'),
+    (3520, 'Función para establecer/registrar hidrómetros en la base de datos.'),
+    (3522, 'Función para transformar los valores numéricos de precio a la configuración del usuario, usando admin_currency en config_param_system.'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -8177,7 +8180,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"CRC", "descript":"COLONOS", "symbol":"₡"}')
+    ('admin_currency', '{"id":"CRC", "descript":"COLONOS", "symbol":"₡", "separator":".", "decimals":false}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 
