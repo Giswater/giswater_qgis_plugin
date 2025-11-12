@@ -214,7 +214,7 @@ BEGIN
 							(
 								SELECT array_agg(row_to_json(psector))
 								FROM (
-									SELECT px.psector_id, p.name, px.insert_user, px.insert_tstamp
+									SELECT px.psector_id, p.name, p.active
 									FROM plan_psector_x_'||v_feature_type||' AS px
 									JOIN plan_psector p ON p.psector_id = px.psector_id
 									WHERE px.'||quote_ident(v_idname)||' = '||quote_ident(v_layer)||'.'||quote_ident(v_idname)||'
@@ -278,7 +278,7 @@ BEGIN
 							(
 								SELECT array_agg(row_to_json(psector))
 								FROM (
-									SELECT px.psector_id, p.name, px.insert_user, px.insert_tstamp
+									SELECT px.psector_id, p.name, p.active
 									FROM plan_psector_x_connec AS px
 										JOIN plan_psector p ON p.psector_id = px.psector_id
 									WHERE px.link_id = ve_link.link_id
