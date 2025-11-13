@@ -20,7 +20,8 @@ from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStand
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlRecord
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
-from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer
+from qgis.core import QgsLayoutExporter, QgsLayoutItemLabel, QgsLayoutObject, QgsProject, QgsRectangle, QgsPointXY, \
+    QgsGeometry, QgsMapLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from .document import GwDocument, global_vars
@@ -633,20 +634,109 @@ class GwPsector:
             self.dlg_psector_rapport.chk_composer.setChecked(False)
             self.dlg_psector_rapport.cmb_templates.setEnabled(False)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(False)
-            self.dlg_psector_rapport.lbl_composer_disabled.setText('No composers defined.')
-            self.dlg_psector_rapport.lbl_composer_disabled.setStyleSheet('color: red')
+            self._set_composer_warning('Composer disabled: no layouts available.')
             return
         else:
             # If composer configured, enable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(True)
             self.dlg_psector_rapport.cmb_templates.setEnabled(True)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
-            self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records)
+
+        if not hasattr(self, '_composer_template_signal_connected') or not self._composer_template_signal_connected:
+            self.dlg_psector_rapport.cmb_templates.currentIndexChanged.connect(self._on_composer_template_changed)
+            self.dlg_psector_rapport.chk_composer.stateChanged.connect(self._on_composer_checkbox_changed)
+            self._composer_template_signal_connected = True
 
         row = tools_gw.get_config_value('composer_plan_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0])
+
+        self._update_composer_status(initial=True)
+
+    def _on_composer_template_changed(self, _index):
+        self._update_composer_status()
+
+    def _on_composer_checkbox_changed(self, state):
+        if state:
+            self._update_composer_status()
+        else:
+            self._set_composer_warning('')
+
+    def _update_composer_status(self, initial=False):
+        if not getattr(self.dlg_psector_rapport, 'chk_composer', None):
+            return False
+
+        composer_checked = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
+        if not composer_checked and not initial:
+            self._set_composer_warning('')
+            return False
+
+        layout = self._validate_composer_layout()
+        if layout is None:
+            if composer_checked:
+                self.dlg_psector_rapport.chk_composer.setChecked(False)
+            return False
+
+        self._set_composer_warning('')
+        return True
+
+    def _validate_composer_layout(self):
+
+        layout_manager = QgsProject.instance().layoutManager()
+        layout_name = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
+
+        if not layout_name or layout_name in ('null', '-1'):
+            self._set_composer_warning("Composer disabled: select a template.")
+            return None
+
+        layout = layout_manager.layoutByName(layout_name)
+
+        if layout is None:
+            self._set_composer_warning("Composer disabled: layout not found.")
+            return None
+
+        atlas = layout.atlas()
+        coverage_layer = atlas.coverageLayer() if atlas else None
+
+        if atlas is None or not atlas.enabled() or coverage_layer is None:
+            self._set_composer_warning(
+                "Composer disabled: atlas must be enabled with coverage layer 've_plan_psector'.")
+            return None
+
+        if coverage_layer.name() != "ve_plan_psector":
+            self._set_composer_warning("Composer disabled: atlas coverage layer must be 've_plan_psector'.")
+            return None
+
+        total_text_items = 0
+        dynamic_text_items = 0
+        for item in layout.items():
+            if isinstance(item, QgsLayoutItemLabel):
+                dd_props = item.dataDefinedProperties()
+                total_text_items += 1
+                has_active_property = any(dd_props.isActive(prop_id) for prop_id in dd_props.propertyKeys())
+
+                if has_active_property:
+                    dynamic_text_items += 1
+                    continue
+
+        if total_text_items == 0 or dynamic_text_items == 0:
+            self._set_composer_warning("Composer disabled: layout contains no dynamic text expressions.")
+            return None
+
+        return layout
+
+    def _set_composer_warning(self, message=''):
+
+        label = getattr(self.dlg_psector_rapport, 'lbl_composer_disabled', None)
+        if not label:
+            return
+
+        label.setText(message)
+        if message:
+            label.setStyleSheet('color: red')
+        else:
+            label.setStyleSheet('')
 
     def generate_reports(self):
 
@@ -671,6 +761,8 @@ class GwPsector:
 
         # Generate Composer
         if chk_composer:
+            if not self._update_composer_status():
+                return
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 msg = "File name is required"
@@ -678,7 +770,8 @@ class GwPsector:
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
-            self.generate_composer(path)
+            if not self.generate_composer(path):
+                return
 
         # Generate csv detail
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
@@ -711,14 +804,14 @@ class GwPsector:
         # Close dialog  
         tools_gw.close_dialog(self.dlg_psector_rapport)
 
-    def generate_composer(self, path):
+    def generate_composer(self, path=None, dry_run=False):
 
-        # Get layout manager object
-        layout_manager = QgsProject.instance().layoutManager()
+        layout = self._validate_composer_layout()
+        if layout is None:
+            return False
 
-        # Get our layout
-        layout_name = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
-        layout = layout_manager.layoutByName(layout_name)
+        if dry_run:
+            return True
 
         # Since qgis 3.4 cant do .setAtlasMode(QgsComposition.PreviewAtlas)
         # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
@@ -730,28 +823,28 @@ class GwPsector:
         action.trigger()
 
         # Export to PDF file
-        if layout:
-            try:
-                exporter = QgsLayoutExporter(layout)
-                exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
-                if os.path.exists(path):
-                    msg = "Document PDF created in"
-                    tools_qgis.show_info(msg, parameter=path, dialog=self.dlg_plan_psector)
-                    status, message = tools_os.open_file(path)
-                    if status is False and message is not None:
-                        tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_plan_psector)
-                else:
-                    msg = "Cannot create file, check if its open"
-                    tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
-            except Exception as e:
-                tools_log.log_warning(str(e))
-                msg = "Cannot create file, check if selected composer is the correct composer"
+        try:
+            exporter = QgsLayoutExporter(layout)
+            exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
+            if os.path.exists(path):
+                msg = "Document PDF created in"
+                tools_qgis.show_info(msg, parameter=path, dialog=self.dlg_plan_psector)
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_plan_psector)
+            else:
+                msg = "Cannot create file, check if its open"
                 tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
-            finally:
-                designer_window.close()
-        else:
-            msg = "Layout not found"
-            tools_qgis.show_warning(msg, parameter=layout_name, dialog=self.dlg_plan_psector)
+        except Exception as e:
+            tools_log.log_warning(str(e))
+            msg = "Cannot create file, check if selected composer is the correct composer"
+            tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
+            self._set_composer_warning("Composer disabled: export failed, check layout configuration.")
+            return False
+        finally:
+            designer_window.close()
+
+        return True
 
     def generate_csv(self, path, viewname):
 
