@@ -2840,9 +2840,14 @@ def make_list_multiple_option(completer, model, widget, field, list_widget):
     # Build display list from results
     display_list = []
     if result:
-        # Extract id and value from each result row
+        # Gather all current items' text from the list widget to avoid duplicates
+        existing_items = set()
+        for i in range(list_widget.count()):
+            existing_items.add(list_widget.item(i).text())
+
+        # Extract id and value from each result row, skip those already present
         for data in result:
-            if data[1] not in list_widget.items().text():
+            if data[1] not in existing_items:
                 item = {"id": data[0], "idval": data[1]}
                 display_list.append(item)
 
