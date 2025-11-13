@@ -9,6 +9,14 @@ or (at your option) any later version.
 SET search_path = cm, public, pg_catalog;
 
 
+DROP TRIGGER IF EXISTS gw_trg_ui_doc_x_gully ON cm.v_ui_doc_x_gully;
+CREATE TRIGGER gw_trg_ui_doc_x_gully
+INSTEAD OF INSERT OR DELETE OR UPDATE
+ON cm.v_ui_doc_x_gully
+FOR EACH ROW
+EXECUTE FUNCTION cm.gw_trg_ui_doc('gully');
+
+
 DROP TRIGGER IF EXISTS trg_lot_x_gully_feature_before ON cm.om_campaign_lot_x_gully;
 DROP TRIGGER IF EXISTS trg_lot_x_gully_feature_after ON cm.om_campaign_lot_x_gully;
 

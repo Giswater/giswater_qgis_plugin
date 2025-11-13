@@ -747,3 +747,73 @@ CREATE TABLE cm_audit.error_log (
 
 CREATE INDEX IF NOT EXISTS cm_audit_error_log_insert_at ON cm_audit.error_log USING btree (insert_at);
 CREATE INDEX IF NOT EXISTS cm_audit_error_log_error_code ON cm_audit.error_log USING btree (error_code);
+
+CREATE TABLE cm.doc (
+	id serial NOT NULL,
+	name text NULL,
+	doc_type varchar(30) NULL,
+	"path" text NULL,
+	observ varchar(512) NULL,
+	"date" timestamp(6) DEFAULT now() NULL,
+	user_name varchar(50) DEFAULT USER NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	the_geom public.geometry(point, 8908) NULL,
+	CONSTRAINT doc_pkey PRIMARY KEY (id),
+	CONSTRAINT name_chk UNIQUE (name)
+);
+
+GRANT ALL ON TABLE cm.doc TO role_cm_manager;
+GRANT ALL ON TABLE cm.doc TO role_cm_field;
+
+--drop table cm.doc_x_node;
+CREATE TABLE cm.doc_x_node (
+	doc_id int4 NOT NULL,
+	node_id int4 NULL,
+	node_uuid uuid NOT NULL,
+	CONSTRAINT doc_x_node_pkey PRIMARY KEY (doc_id, node_uuid)
+);
+
+ALTER TABLE cm.doc_x_node ADD CONSTRAINT doc_x_node_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT ALL ON TABLE cm.doc_x_node TO role_cm_manager;
+GRANT ALL ON TABLE cm.doc_x_node TO role_cm_field;
+
+--drop table cm.doc_x_arc;
+CREATE TABLE cm.doc_x_arc (
+	doc_id int4 NOT NULL,
+	arc_id int4 NULL,
+	arc_uuid uuid NOT NULL,
+	CONSTRAINT doc_x_arc_pkey PRIMARY KEY (doc_id, arc_uuid)
+);
+
+ALTER TABLE cm.doc_x_arc ADD CONSTRAINT doc_x_arc_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT ALL ON TABLE cm.doc_x_arc TO role_cm_manager;
+GRANT ALL ON TABLE cm.doc_x_arc TO role_cm_field;
+
+--drop table cm.doc_x_connec;
+CREATE TABLE cm.doc_x_connec (
+	doc_id int4 NOT NULL,
+	connec_id int4 NULL,
+	connec_uuid uuid NOT NULL,
+	CONSTRAINT doc_x_connec_pkey PRIMARY KEY (doc_id, connec_uuid)
+);
+
+ALTER TABLE cm.doc_x_connec ADD CONSTRAINT doc_x_connec_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT ALL ON TABLE cm.doc_x_connec TO role_cm_manager;
+GRANT ALL ON TABLE cm.doc_x_connec TO role_cm_field;
+
+--drop table cm.doc_x_link;
+CREATE TABLE cm.doc_x_link (
+	doc_id int4 NOT NULL,
+	link_id int4 NULL,
+	link_uuid uuid NOT NULL,
+	CONSTRAINT doc_x_link_pkey PRIMARY KEY (doc_id, link_uuid)
+);
+
+ALTER TABLE cm.doc_x_link ADD CONSTRAINT doc_x_link_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT ALL ON TABLE cm.doc_x_link TO role_cm_manager;
+GRANT ALL ON TABLE cm.doc_x_link TO role_cm_field;
+
