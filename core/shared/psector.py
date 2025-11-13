@@ -20,7 +20,7 @@ from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStand
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlRecord
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
-from qgis.core import QgsLayoutExporter, QgsLayoutItemLabel, QgsLayoutObject, QgsProject, QgsRectangle, QgsPointXY, \
+from qgis.core import QgsLayoutExporter, QgsLayoutItemLabel, QgsProject, QgsRectangle, QgsPointXY, \
     QgsGeometry, QgsMapLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
