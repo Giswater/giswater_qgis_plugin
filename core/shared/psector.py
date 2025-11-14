@@ -709,19 +709,12 @@ class GwPsector:
             return None
 
         total_text_items = 0
-        dynamic_text_items = 0
         for item in layout.items():
             if isinstance(item, QgsLayoutItemLabel):
-                dd_props = item.dataDefinedProperties()
                 total_text_items += 1
-                has_active_property = any(dd_props.isActive(prop_id) for prop_id in dd_props.propertyKeys())
 
-                if has_active_property:
-                    dynamic_text_items += 1
-                    continue
-
-        if total_text_items == 0 or dynamic_text_items == 0:
-            self._set_composer_warning("Composer disabled: layout contains no dynamic text expressions.")
+        if total_text_items == 0:
+            self._set_composer_warning("Composer disabled: file is empty.")
             return None
 
         return layout
