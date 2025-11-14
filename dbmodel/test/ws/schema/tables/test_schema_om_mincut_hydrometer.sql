@@ -31,7 +31,7 @@ SELECT col_is_pk('om_mincut_hydrometer', ARRAY['id'], 'Column id should be prima
 -- Check column types
 SELECT col_type_is('om_mincut_hydrometer', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('om_mincut_hydrometer', 'result_id', 'integer', 'Column result_id should be integer');
-SELECT col_type_is('om_mincut_hydrometer', 'hydrometer_id', 'varchar(16)', 'Column hydrometer_id should be varchar(16)');
+SELECT col_type_is('om_mincut_hydrometer', 'hydrometer_id', 'integer', 'Column hydrometer_id should be integer');
 
 -- Check unique constraints
 SELECT col_is_unique('om_mincut_hydrometer', ARRAY['result_id', 'hydrometer_id'], 'Columns result_id and hydrometer_id should have a unique constraint');

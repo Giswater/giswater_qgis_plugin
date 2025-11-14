@@ -20,19 +20,19 @@ SELECT has_table('ext_rtc_hydrometer'::name, 'Table ext_rtc_hydrometer should ex
 SELECT columns_are(
     'ext_rtc_hydrometer',
     ARRAY[
-        'id', 'code', 'customer_name', 'address', 'house_number', 'id_number', 'start_date', 'hydro_number',
-        'identif', 'state_id', 'expl_id', 'connec_id', 'hydrometer_customer_code', 'plot_code', 'priority_id',
+        'hydrometer_id', 'code', 'customer_name', 'address', 'house_number', 'id_number', 'start_date', 'hydro_number',
+        'identif', 'state_id', 'expl_id', 'hydrometer_customer_code', 'plot_code', 'priority_id',
         'catalog_id', 'category_id', 'crm_number', 'muni_id', 'address1', 'address2', 'address3', 'address2_1',
-        'address2_2', 'address2_3', 'm3_volume', 'hydro_man_date', 'end_date', 'update_date', 'shutdown_date', 'is_waterbal'
+        'address2_2', 'address2_3', 'm3_volume', 'hydro_man_date', 'end_date', 'update_date', 'shutdown_date', 'is_waterbal', 'link'
     ],
     'Table ext_rtc_hydrometer should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('ext_rtc_hydrometer', ARRAY['id'], 'Column id should be primary key');
+SELECT col_is_pk('ext_rtc_hydrometer', ARRAY['hydrometer_id'], 'Column hydrometer_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('ext_rtc_hydrometer', 'id', 'varchar(16)', 'Column id should be varchar(16)');
+SELECT col_type_is('ext_rtc_hydrometer', 'hydrometer_id', 'integer', 'Column hydrometer_id should be integer');
 SELECT col_type_is('ext_rtc_hydrometer', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('ext_rtc_hydrometer', 'customer_name', 'text', 'Column customer_name should be text');
 SELECT col_type_is('ext_rtc_hydrometer', 'address', 'text', 'Column address should be text');
@@ -43,7 +43,6 @@ SELECT col_type_is('ext_rtc_hydrometer', 'hydro_number', 'text', 'Column hydro_n
 SELECT col_type_is('ext_rtc_hydrometer', 'identif', 'text', 'Column identif should be text');
 SELECT col_type_is('ext_rtc_hydrometer', 'state_id', 'smallint', 'Column state_id should be smallint');
 SELECT col_type_is('ext_rtc_hydrometer', 'expl_id', 'integer', 'Column expl_id should be integer');
-SELECT col_type_is('ext_rtc_hydrometer', 'connec_id', 'varchar(30)', 'Column connec_id should be varchar(30)');
 SELECT col_type_is('ext_rtc_hydrometer', 'hydrometer_customer_code', 'varchar(30)', 'Column hydrometer_customer_code should be varchar(30)');
 SELECT col_type_is('ext_rtc_hydrometer', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
 SELECT col_type_is('ext_rtc_hydrometer', 'priority_id', 'integer', 'Column priority_id should be integer');
@@ -63,6 +62,7 @@ SELECT col_type_is('ext_rtc_hydrometer', 'end_date', 'date', 'Column end_date sh
 SELECT col_type_is('ext_rtc_hydrometer', 'update_date', 'date', 'Column update_date should be date');
 SELECT col_type_is('ext_rtc_hydrometer', 'shutdown_date', 'date', 'Column shutdown_date should be date');
 SELECT col_type_is('ext_rtc_hydrometer', 'is_waterbal', 'boolean', 'Column is_waterbal should be boolean');
+SELECT col_type_is('ext_rtc_hydrometer', 'link', 'text', 'Column link should be text');
 
 -- Check foreign keys
 SELECT hasnt_fk('ext_rtc_hydrometer', 'Table ext_rtc_hydrometer should have no foreign keys');
@@ -72,9 +72,10 @@ SELECT hasnt_fk('ext_rtc_hydrometer', 'Table ext_rtc_hydrometer should have no f
 -- Check rules
 
 -- Check sequences
+SELECT has_sequence('ext_rtc_hydrometer_hydrometer_id_seq', 'Sequence ext_rtc_hydrometer_hydrometer_id_seq should exist');
 
 -- Check constraints
-SELECT col_not_null('ext_rtc_hydrometer', 'id', 'Column id should be NOT NULL');
+SELECT col_not_null('ext_rtc_hydrometer', 'hydrometer_id', 'Column hydrometer_id should be NOT NULL');
 SELECT col_default_is('ext_rtc_hydrometer', 'is_waterbal', 'true', 'Column is_waterbal should default to true');
 
 SELECT * FROM finish();

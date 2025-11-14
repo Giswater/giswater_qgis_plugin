@@ -106,6 +106,7 @@ ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN hydrometer_id TYPE int4 USING h
 CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
   
 ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id SET DEFAULT nextval('ext_rtc_hydrometer_hydrometer_id_seq');
+ALTER TABLE ext_rtc_hydrometer ADD CONSTRAINT ext_rtc_hydrometer_code_unique UNIQUE (code);
 
 DROP TABLE IF EXISTS selector_hydrometer;
 

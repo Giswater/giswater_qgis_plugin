@@ -31,7 +31,7 @@ SELECT col_is_pk('ext_rtc_hydrometer_x_data', ARRAY['id'], 'Column id should be 
 
 -- Check column types
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'id', 'bigint', 'Column id should be bigint');
-SELECT col_type_is('ext_rtc_hydrometer_x_data', 'hydrometer_id', 'varchar(16)', 'Column hydrometer_id should be varchar(16)');
+SELECT col_type_is('ext_rtc_hydrometer_x_data', 'hydrometer_id', 'integer', 'Column hydrometer_id should be integer');
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'min', 'double precision', 'Column min should be double precision');
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'max', 'double precision', 'Column max should be double precision');
 SELECT col_type_is('ext_rtc_hydrometer_x_data', 'avg', 'double precision', 'Column avg should be double precision');

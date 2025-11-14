@@ -34,7 +34,7 @@ SELECT is(
 
 -- Test 3: Verify hydrometer connec relation was inserted (UD doesn't have rtc_hydrometer table with link)
 SELECT is(
-    (SELECT count(*)::integer FROM rtc_hydrometer_x_connec WHERE hydrometer_id = 'TEST_H001'),
+    (SELECT count(*)::integer FROM rtc_hydrometer_x_connec WHERE code = 'TEST_H001'),
     1,
     'Verify hydrometer connec relation was inserted'
 );
@@ -162,7 +162,7 @@ SELECT is(
 );
 
 -- Cleanup: ensure test data is removed
-DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id LIKE 'TEST_H%';
+DELETE FROM rtc_hydrometer_x_connec WHERE code LIKE 'TEST_H%';
 DELETE FROM ext_rtc_hydrometer WHERE code LIKE 'TEST_H%';
 
 -- Finish the test

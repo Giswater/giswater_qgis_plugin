@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('rtc_hydrometer_x_node', ARRAY['hydrometer_id'], 'Column hydrometer_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('rtc_hydrometer_x_node', 'hydrometer_id', 'character varying(16)', 'Column hydrometer_id should be character varying(16)');
+SELECT col_type_is('rtc_hydrometer_x_node', 'hydrometer_id', 'integer', 'Column hydrometer_id should be integer');
 SELECT col_type_is('rtc_hydrometer_x_node', 'node_id', 'integer', 'Column node_id should be integer');
 
 -- Check constraints
