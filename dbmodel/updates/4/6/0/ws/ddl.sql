@@ -138,6 +138,10 @@ ALTER TABLE om_mincut_hydrometer ALTER COLUMN hydrometer_id TYPE int4 USING hydr
 ALTER TABLE ext_rtc_hydrometer_x_data ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 
+CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
+  
+ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id SET DEFAULT nextval('ext_rtc_hydrometer_hydrometer_id_seq');
+
 ALTER TABLE rtc_hydrometer_x_connec ADD CONSTRAINT rtc_hydrometer_x_connec_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE rtc_hydrometer_x_node ADD CONSTRAINT rtc_hydrometer_x_node_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
 

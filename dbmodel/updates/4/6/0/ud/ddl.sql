@@ -103,6 +103,10 @@ ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id TYPE int4 USING hydrom
 ALTER TABLE ext_rtc_hydrometer_x_data ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 
+CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
+  
+ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id SET DEFAULT nextval('ext_rtc_hydrometer_hydrometer_id_seq');
+
 DROP TABLE IF EXISTS selector_hydrometer;
 
 ALTER TABLE IF EXISTS ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE RESTRICT;
