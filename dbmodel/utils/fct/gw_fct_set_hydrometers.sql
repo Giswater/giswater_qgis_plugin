@@ -77,7 +77,7 @@ v_updated integer := 0;
 v_deleted integer := 0;
 v_error_context text;
 v_query text;
-v_id text;
+v_id integer;
 v_code text;
 v_hydro_number text;
 v_feature_id integer;

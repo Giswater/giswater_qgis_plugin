@@ -34,7 +34,7 @@ SELECT is(
 
 -- Test 4: Verify hydrometer connec relation was inserted
 SELECT is(
-    (SELECT count(*)::integer FROM rtc_hydrometer_x_connec WHERE hydrometer_id = 'TEST_H001'),
+    (SELECT count(*)::integer FROM rtc_hydrometer_x_connec c JOIN ext_rtc_hydrometer h ON h.hydrometer_id = c.hydrometer_id WHERE h.code = 'TEST_H001'),
     1,
     'Verify hydrometer connec relation was inserted'
 );

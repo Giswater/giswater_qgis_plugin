@@ -17,7 +17,7 @@ SELECT plan(16);
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"INSERT", "hydrometers":[
-        {"code":"TEST_H001", "hydro_number":"12345", "connec_id":3001,
+        {"code":"TEST_H001", "hydro_number":"12345", "feature_id":3001,
          "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1,
          "start_date":"2025-10-30"}
     ]}}$$)::JSON)->>'status',
@@ -43,8 +43,8 @@ SELECT is(
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"INSERT", "hydrometers":[
-        {"code":"TEST_H002", "hydro_number":"12346", "connec_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
-        {"code":"TEST_H003", "hydro_number":"12347", "connec_id":3003, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
+        {"code":"TEST_H002", "hydro_number":"12346", "feature_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
+        {"code":"TEST_H003", "hydro_number":"12347", "feature_id":3003, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
     ]}}$$)::JSON)->>'status',
     'Accepted',
     'Test multiple hydrometers INSERT'
@@ -140,8 +140,8 @@ VALUES ('TEST_H010', 'TEST_H010', '10001', 1, 1),
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"REPLACE", "hydrometers":[
-        {"code":"TEST_H020", "hydro_number":"20001", "connec_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
-        {"code":"TEST_H021", "hydro_number":"20002", "connec_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
+        {"code":"TEST_H020", "hydro_number":"20001", "feature_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
+        {"code":"TEST_H021", "hydro_number":"20002", "feature_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
     ]}}$$)::JSON)->>'status',
     'Accepted',
     'Test REPLACE action'
