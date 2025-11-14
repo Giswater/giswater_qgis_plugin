@@ -104,9 +104,9 @@ BEGIN
 	END IF;
 
 	-- log for hydrometer's state
-	SELECT count(*) INTO v_count FROM selector_hydrometer JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE;
-	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(state_id,'-',name) as c FROM selector_hydrometer
-	JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE order by state_id) a;
+	SELECT count(*) INTO v_count FROM ext_rtc_hydrometer_state WHERE is_operative IS TRUE;
+	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(id,'-',name) as c
+	FROM ext_rtc_hydrometer_state WHERE is_operative IS TRUE order by id) a;
 
 	IF v_count = 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4386", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';

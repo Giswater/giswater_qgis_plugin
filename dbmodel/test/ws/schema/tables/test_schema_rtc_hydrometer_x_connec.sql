@@ -39,7 +39,7 @@ SELECT col_is_unique('rtc_hydrometer_x_connec', ARRAY['connec_id', 'hydrometer_i
 
 -- Check foreign keys
 SELECT has_fk('rtc_hydrometer_x_connec', 'Table rtc_hydrometer_x_connec should have foreign keys');
-SELECT fk_ok('rtc_hydrometer_x_connec', 'hydrometer_id', 'rtc_hydrometer', 'hydrometer_id', 'FK hydrometer_id should reference rtc_hydrometer.hydrometer_id');
+SELECT fk_ok('rtc_hydrometer_x_connec', 'hydrometer_id', 'ext_rtc_hydrometer', 'hydrometer_id', 'FK hydrometer_id should reference ext_rtc_hydrometer.hydrometer_id');
 SELECT fk_ok('rtc_hydrometer_x_connec', 'connec_id', 'connec', 'connec_id', 'FK connec_id should reference connec.connec_id');
 
 -- Check indexes

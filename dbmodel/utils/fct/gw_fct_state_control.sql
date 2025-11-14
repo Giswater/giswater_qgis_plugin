@@ -249,8 +249,15 @@ BEGIN
 				END IF;
 
 				-- hydrometer control
-				SELECT count(*) INTO v_num_feature FROM ext_rtc_hydrometer h JOIN connec c ON h.connec_id::varchar = customer_code::varchar WHERE c.connec_id = feature_id_aux
-                AND state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+				SELECT count(*) INTO v_num_feature
+				FROM rtc_hydrometer_x_connec h
+					JOIN connec c ON h.connec_id = c.connec_id
+					JOIN ext_rtc_hydrometer e ON h.hydrometer_id = e.hydrometer_id
+				WHERE c.connec_id = feature_id_aux
+                	AND e.state_id IN (
+								SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER
+								FROM config_param_system
+								where parameter  = 'admin_hydrometer_state');
 
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -269,8 +276,15 @@ BEGIN
 				END IF;
 
 				-- hydrometer control
-				SELECT count(*) INTO v_num_feature FROM ext_rtc_hydrometer h JOIN connec c ON h.connec_id::varchar = customer_code::varchar WHERE c.connec_id = feature_id_aux
-                AND state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+				SELECT count(*) INTO v_num_feature
+				FROM rtc_hydrometer_x_connec rhc
+					JOIN connec c ON rhc.connec_id=c.connec_id
+					JOIN ext_rtc_hydrometer h ON h.hydrometer_id=rhc.hydrometer_id
+				WHERE c.connec_id = feature_id_aux
+                	AND h.state_id IN (
+								SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER
+								FROM config_param_system
+								where parameter  = 'admin_hydrometer_state');
 
 				IF v_num_feature > 0 THEN
 					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'

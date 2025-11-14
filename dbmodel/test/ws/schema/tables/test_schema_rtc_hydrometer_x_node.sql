@@ -38,7 +38,7 @@ SELECT col_not_null('rtc_hydrometer_x_node', 'node_id', 'Column node_id should b
 
 -- Check foreign keys
 SELECT has_fk('rtc_hydrometer_x_node', 'Table rtc_hydrometer_x_node should have foreign keys');
-SELECT fk_ok('rtc_hydrometer_x_node', 'hydrometer_id', 'rtc_hydrometer', 'hydrometer_id', 'FK hydrometer_id should reference rtc_hydrometer.hydrometer_id');
+SELECT fk_ok('rtc_hydrometer_x_node', 'hydrometer_id', 'ext_rtc_hydrometer', 'hydrometer_id', 'FK hydrometer_id should reference ext_rtc_hydrometer.hydrometer_id');
 SELECT fk_ok('rtc_hydrometer_x_node', 'node_id', 'node', 'node_id', 'FK node_id should reference node.node_id');
 
 -- Check indexes

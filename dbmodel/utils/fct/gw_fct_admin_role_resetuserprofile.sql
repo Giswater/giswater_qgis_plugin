@@ -83,11 +83,9 @@ BEGIN
 					-- basic selectors
 					DELETE FROM selector_state WHERE cur_user=v_user;
 					DELETE FROM selector_expl WHERE cur_user=v_user;
-					DELETE FROM selector_hydrometer WHERE cur_user=v_user;
 					DELETE FROM selector_workcat WHERE cur_user=v_user;
 
 					INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM selector_expl WHERE cur_user=v_copyfromuser;
-					INSERT INTO selector_hydrometer (state_id, cur_user) SELECT state_id, v_user FROM selector_hydrometer WHERE cur_user=v_copyfromuser;
 					INSERT INTO selector_state (state_id, cur_user) SELECT state_id, v_user FROM selector_state WHERE cur_user=v_copyfromuser;
 					INSERT INTO selector_workcat (workcat_id, cur_user) SELECT workcat_id, v_user FROM selector_workcat WHERE cur_user=v_copyfromuser;
 
@@ -212,11 +210,9 @@ BEGIN
 			-- selectors
 			DELETE FROM selector_expl WHERE cur_user=v_user;
 			DELETE FROM selector_state WHERE cur_user=v_user;
-			DELETE FROM selector_hydrometer WHERE cur_user=v_user;
 
 			INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM exploitation;
 			INSERT INTO selector_state (state_id, cur_user) SELECT 1, v_user FROM value_state LIMIT 1;
-			INSERT INTO selector_hydrometer (state_id, cur_user) SELECT id, v_user FROM ext_rtc_hydrometer_state;
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
 								"data":{"message":"3838", "function":"2922", "parameters":{"v_user":"'||v_user||'"},"fid":"358", "prefix_id":"1001", "is_process":true}}$$)';

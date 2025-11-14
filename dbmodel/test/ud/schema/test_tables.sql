@@ -286,7 +286,6 @@ SELECT has_table('rpt_summary_raingage') AS "Table 'rpt_summary_raingage' exists
 SELECT has_table('rpt_summary_subcatchment') AS "Table 'rpt_summary_subcatchment' exists";
 SELECT has_table('rpt_timestep_critelem') AS "Table 'rpt_timestep_critelem' exists";
 SELECT has_table('rpt_warning_summary') AS "Table 'rpt_warning_summary' exists";
-SELECT has_table('rtc_hydrometer') AS "Table 'rtc_hydrometer' exists";
 SELECT has_table('rtc_hydrometer_x_connec') AS "Table 'rtc_hydrometer_x_connec' exists";
 SELECT has_table('rtc_scada_node') AS "Table 'rtc_scada_node' exists";
 SELECT has_table('samplepoint') AS "Table 'samplepoint' exists";

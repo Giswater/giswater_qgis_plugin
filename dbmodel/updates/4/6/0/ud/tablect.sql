@@ -10,14 +10,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 05/11/2025
 ALTER TABLE rtc_hydrometer_x_connec
-    ADD CONSTRAINT rtc_hydrometer_x_connec_unique
-    UNIQUE (connec_id, hydrometer_id);
-
-ALTER TABLE rtc_hydrometer_x_connec
     ADD CONSTRAINT rtc_hydrometer_x_connec_connec_id_fkey
     FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE rtc_hydrometer_x_connec
     ADD CONSTRAINT rtc_hydrometer_x_connec_hydrometer_id_fkey
-    FOREIGN KEY (hydrometer_id) REFERENCES rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
 

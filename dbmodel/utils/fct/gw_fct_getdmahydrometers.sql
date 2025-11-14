@@ -44,15 +44,16 @@ BEGIN
     END IF;
 
     -- Build the select statement for hydrometers in the specified DMA
-    v_select = concat('SELECT h.id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
-                     'h.connec_id as "connecId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+    v_select = concat('SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
+                     'rhxc.connec_id as "connecId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
                      'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
                      'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
                      'c.dma_id as "dmaId" ',
                      'FROM ext_rtc_hydrometer h ',
-                     'JOIN connec c ON c.customer_code = h.connec_id ',
+                     'JOIN rtc_hydrometer_x_connec rhxc ON rhxc.hydrometer_id = h.hydrometer_id ',
+                     'JOIN connec c ON c.connec_id = rhxc.connec_id ',
                      'WHERE c.dma_id = ', v_dma_id, ' ',
-                     'ORDER BY h.id');
+                     'ORDER BY h.hydrometer_id');
 
     -- Execute the query and aggregate hydrometers
     EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s) a', v_select)

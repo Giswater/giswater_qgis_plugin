@@ -327,7 +327,7 @@ BEGIN
 	SELECT result_id_arg, rhxc.hydrometer_id 
 	FROM rtc_hydrometer_x_connec rhxc
 	JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
-	JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.id
+	JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.hydrometer_id
 	WHERE result_id = result_id_arg 
 		AND rhxc.connec_id = omc.connec_id
 		AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
@@ -336,7 +336,7 @@ BEGIN
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT result_id_arg, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
 	JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
-	JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.id
+	JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.hydrometer_id
 	WHERE result_id = result_id_arg 
 		AND rhxn.node_id = omn.node_id
 		AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');

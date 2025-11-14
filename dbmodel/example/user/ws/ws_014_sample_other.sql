@@ -50,8 +50,6 @@ doc.id,
 om_visit.id
 FROM doc, om_visit;
 
-INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, current_user);
-
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo1','combo1');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo2','combo2');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo3','combo3');

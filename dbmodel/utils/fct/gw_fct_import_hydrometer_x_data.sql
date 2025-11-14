@@ -56,7 +56,7 @@ BEGIN
 	LOOP
 		i = i+1;
 		INSERT INTO ext_rtc_hydrometer_x_data (hydrometer_id, cat_period_id, sum, value_date, value_type, value_status, value_state) VALUES
-		(v_addfields.csv1, v_addfields.csv2, v_addfields.csv3::float, v_addfields.csv4::timestamp, v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7::integer);
+		(v_addfields.csv1::integer, v_addfields.csv2, v_addfields.csv3::float, v_addfields.csv4::timestamp, v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7::integer);
 	END LOOP;
 
 	-- manage log (fid: v_fid)

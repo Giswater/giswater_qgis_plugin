@@ -309,9 +309,7 @@ BEGIN
 		hydrometer_result AS (
 			SELECT h.mapzone_id, count(*) AS num_hydro
 			FROM hydrometer h
-			JOIN ext_rtc_hydrometer e ON e.id::TEXT = h.hydrometer_id::TEXT
-			JOIN selector_hydrometer s ON s.cur_user = CURRENT_USER AND s.state_id = e.state_id
-			WHERE s.state_id = ANY (v_hydrometer_service)
+			JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
 			GROUP BY h.mapzone_id
 		)
 	UPDATE temp_pgr_minsector t

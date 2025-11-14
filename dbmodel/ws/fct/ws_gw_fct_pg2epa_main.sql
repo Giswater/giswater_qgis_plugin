@@ -150,11 +150,7 @@ BEGIN
 		-- save previous values to set hydrometer selector
 		DELETE FROM temp_t_table WHERE fid=435 AND cur_user=current_user;
 		INSERT INTO temp_t_table (fid, text_column)
-		SELECT 435, (array_agg(state_id)) FROM selector_hydrometer WHERE cur_user=current_user;
-
-		-- reset selector
-		INSERT INTO selector_hydrometer SELECT id, current_user FROM ext_rtc_hydrometer_state
-		ON CONFLICT (state_id, cur_user) DO NOTHING;
+		SELECT 435, (array_agg(id)) FROM ext_rtc_hydrometer_state;
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7 - Preprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
@@ -372,12 +368,6 @@ BEGIN
 
 		-- move patterns data
 		INSERT INTO rpt_inp_pattern_value SELECT * FROM t_rpt_inp_pattern_value;
-
-		-- restore hydrometer selector
-		DELETE FROM selector_hydrometer WHERE cur_user = current_user;
-		INSERT INTO selector_hydrometer (state_id, cur_user)
-		select unnest(text_column::integer[]), current_user from temp_table where fid=435 and cur_user=current_user
-		ON CONFLICT (state_id, cur_user) DO NOTHING;
 
 		-- drop temp tables
 		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"WS", "action":"DROP", "group":"EPAMAIN"}}}');

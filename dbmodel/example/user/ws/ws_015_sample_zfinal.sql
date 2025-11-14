@@ -88,7 +88,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
 
 
-UPDATE ext_rtc_hydrometer SET is_waterbal = false WHERE  id::integer in (3,4);
+UPDATE ext_rtc_hydrometer SET is_waterbal = false WHERE hydrometer_id::integer in (3,4);
 
 INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction1','{NODE}','{JUNCTION}');
 INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction2','{NODE}','{JUNCTION}');

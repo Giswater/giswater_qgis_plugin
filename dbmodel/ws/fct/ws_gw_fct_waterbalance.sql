@@ -155,7 +155,7 @@ v_queryhydro =
 			hydro_data_selected AS (
 				SELECT d.*
 				FROM hydro_data_calculat d
-				JOIN ext_rtc_hydrometer h ON d.hydrometer_id = h.id
+				JOIN ext_rtc_hydrometer h ON d.hydrometer_id = h.hydrometer_id
 				WHERE h.end_date IS NULL
 			),
 			hydro_data_selected_expl AS (
@@ -311,7 +311,7 @@ v_queryhydro =
 				SELECT dma_id, (sum(d.sum))::numeric as value
 				FROM ext_rtc_hydrometer_x_data d
 				JOIN hydrometer h USING (hydrometer_id) 
-				JOIN ext_rtc_hydrometer e ON e.id::text = d.hydrometer_id::text
+				JOIN ext_rtc_hydrometer e ON e.hydrometer_id = d.hydrometer_id
 				WHERE d.cat_period_id = '||quote_literal(v_period)||'::text 
 				AND (e.is_waterbal IS TRUE OR e.is_waterbal IS NULL)
 				GROUP BY dma_id
@@ -347,7 +347,7 @@ v_queryhydro =
 			SELECT count(DISTINCT d.hydrometer_id)
 			FROM ext_rtc_hydrometer_x_data d
 			JOIN hydrometer h USING (hydrometer_id) 
-			JOIN ext_rtc_hydrometer e ON e.id::text = h.hydrometer_id::TEXT
+			JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
 			JOIN om_waterbalance n ON n.dma_id = h.dma_id
 			WHERE (e.is_waterbal = TRUE OR e.is_waterbal IS NULL) 
 			AND n.cat_period_id = '||quote_literal(v_period) ||'::text 
@@ -439,7 +439,7 @@ v_queryhydro =
 				sum(d.sum*(p.c_seconds/p.p_seconds))::numeric as value
 				FROM ext_rtc_hydrometer_x_data d
 				JOIN hydrometer h USING (hydrometer_id) 
-				JOIN ext_rtc_hydrometer e ON e.id::text = d.hydrometer_id::text
+				JOIN ext_rtc_hydrometer e ON e.hydrometer_id = d.hydrometer_id
 				JOIN period_selected p USING (cat_period_id)
 				WHERE (e.is_waterbal IS TRUE OR e.is_waterbal IS NULL)
 				GROUP BY dma_id
@@ -503,7 +503,7 @@ v_queryhydro =
 			FROM ext_rtc_hydrometer_x_data d
 			JOIN period_selected p USING (cat_period_id)
 			JOIN hydrometer h ON h.hydrometer_id = d.hydrometer_id
-			JOIN ext_rtc_hydrometer e ON e.id::text = h.hydrometer_id::TEXT
+			JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
 			JOIN om_waterbalance n ON n.dma_id = h.dma_id
 			WHERE (e.is_waterbal = TRUE OR e.is_waterbal IS NULL) 
 			AND n.startdate::date = '||quote_literal(v_startdate)||'::date 

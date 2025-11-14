@@ -187,12 +187,6 @@ BEGIN
 	-- Force muni selector for 0 values
 	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
-	-- force hydrometer_selector in case of null values
-	IF (select cur_user FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
-		INSERT INTO selector_hydrometer (state_id, cur_user)
-		SELECT id, current_user FROM ext_rtc_hydrometer_state ON CONFLICT (state_id, cur_user) DO NOTHING;
-	END IF;
-
 	--Force hydrology_selector when null values from user
 	IF v_project_type='UD' THEN
 		IF (SELECT hydrology_id FROM cat_hydrology LIMIT 1) IS NOT NULL THEN

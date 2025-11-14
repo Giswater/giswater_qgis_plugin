@@ -102,3 +102,5 @@ UPDATE config_param_system
 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,"source")
 	VALUES (3524,'gw_fct_set_currency_config','utils','function','num','num','Function to transform nuemric values of price to user configuration from admin_currency in config_param_system','core');
+
+UPDATE sys_table SET id = 'v_rtc_hydrometer_x_connec' WHERE id = 'v_hydrometer_x_connec';

@@ -163,7 +163,6 @@ SELECT is(
 
 -- Cleanup: ensure test data is removed
 DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id LIKE 'TEST_H%';
-DELETE FROM rtc_hydrometer WHERE hydrometer_id LIKE 'TEST_H%';
 DELETE FROM ext_rtc_hydrometer WHERE code LIKE 'TEST_H%';
 
 -- Finish the test

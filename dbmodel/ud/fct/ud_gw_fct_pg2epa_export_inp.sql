@@ -124,7 +124,7 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_buildup AS
 	 SELECT inp_buildup.landus_id,
 	    inp_buildup.poll_id,
-	    inp_typevalue.idval AS funcb_type,
+	    inp_typevalue.id AS funcb_type,
 	    inp_buildup.c1,
 	    inp_buildup.c2,
 	    inp_buildup.c3,
@@ -568,7 +568,7 @@ BEGIN
 		UNION
 		 SELECT inp_lid_value.id,
 		    inp_lid_value.lidco_id,
-		    inp_typevalue.idval AS lidco_type,
+		    inp_typevalue.id AS lidco_type,
 		    CASE WHEN inp_lid_value.value_2 = 0 THEN 0 ELSE inp_lid_value.value_2 END AS other1,
 		    CASE WHEN inp_lid_value.value_3 = 0 THEN 0 ELSE inp_lid_value.value_3 END AS other2,
 		    CASE WHEN inp_lid_value.value_4 = 0 THEN 0 ELSE inp_lid_value.value_4 END AS other3,
@@ -642,7 +642,7 @@ BEGIN
 	    concat(inp_mapdim.x1, ' ', inp_mapdim.y1, ' ', inp_mapdim.x2, ' ', inp_mapdim.y2) AS other_val
 	   FROM inp_mapdim
 	UNION
-	 SELECT inp_typevalue.idval AS type_dim,
+	 SELECT inp_typevalue.id AS type_dim,
 	    inp_mapunits.map_type AS other_val
 	   FROM inp_mapunits
 	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_mapunits.type_units::text
@@ -785,7 +785,7 @@ BEGIN
 	    r.form_type,
 	    r.intvl,
 	    r.scf,
-	    inp_typevalue.idval AS raingage_type,
+	    inp_typevalue.id AS raingage_type,
 	    r.timser_id AS other1,
 	    NULL::character varying AS other2,
 	    NULL::character varying AS other3
@@ -798,7 +798,7 @@ BEGIN
 	    r.form_type,
 	    r.intvl,
 	    r.scf,
-	    inp_typevalue.idval AS raingage_type,
+	    inp_typevalue.id AS raingage_type,
 	    r.fname AS other1,
 	    r.sta AS other2,
 	    r.units AS other3
@@ -984,7 +984,7 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_washoff  AS
 	 SELECT inp_washoff.landus_id,
 	    inp_washoff.poll_id,
-	    inp_typevalue.idval AS funcw_type,
+	    inp_typevalue.id AS funcw_type,
 	    inp_washoff.c1,
 	    inp_washoff.c2,
 	    inp_washoff.sweepeffic,
@@ -1260,7 +1260,7 @@ BEGIN
 				CASE
 				    WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
 				       FROM inp_curve_value sub
-				      WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
+				      WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.id
 				    ELSE NULL::character varying
 				END AS curve_type,
 			    inp_curve_value.x_value,

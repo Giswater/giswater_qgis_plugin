@@ -120,7 +120,7 @@ BEGIN
     ), hydro_data_selected AS (
         SELECT d.*
         FROM hydro_data_calculat d
-        JOIN ext_rtc_hydrometer h ON d.hydrometer_id = h.id
+        JOIN ext_rtc_hydrometer h ON d.hydrometer_id = h.hydrometer_id
         WHERE h.end_date IS NULL
 	), hydro_data_selected_expl AS (
 	     SELECT d.*, c.expl_id AS expl_id
@@ -386,7 +386,7 @@ BEGIN
 			UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 			FROM ext_rtc_hydrometer h
 			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
-			WHERE d.source = h.id::text
+			WHERE d.source = h.hydrometer_id::text
 			AND dscenario_id = v_scenarioid;
 
 		ELSIF v_pattern = 7 THEN -- feature pattern

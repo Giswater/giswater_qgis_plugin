@@ -217,11 +217,6 @@ BEGIN
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
-
-		IF v_projectype ='WS' THEN
-			ALTER TABLE rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
-		END IF;
-
 			
 		v_return = concat('{"constraints dropped":"',v_36,'","notnull dropped":"',v_37,'"}');	
 		
@@ -282,11 +277,6 @@ BEGIN
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
-
-		IF v_projectype ='WS' THEN
-			ALTER TABLE rtc_hydrometer ENABLE TRIGGER gw_trg_rtc_hydrometer;
-		END IF;
-
 
 		v_return = concat('{"constraints reloaded":"',v_36,'","notnull reloaded":"',v_37,'"}');
 	

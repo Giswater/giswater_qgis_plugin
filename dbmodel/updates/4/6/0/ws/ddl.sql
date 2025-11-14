@@ -87,3 +87,61 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 -- 07/11/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"reagent_lot", "dataType":"varchar(100)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"equipment_code", "dataType":"varchar(50)", "isUtils":"False"}}$$);
+
+-- 12/11/2025
+ALTER TABLE rtc_hydrometer_x_connec DROP CONSTRAINT IF EXISTS rtc_hydrometer_x_connec_hydrometer_id_fkey;
+ALTER TABLE rtc_hydrometer_x_node DROP CONSTRAINT IF EXISTS rtc_hydrometer_x_node_hydrometer_id_fkey;
+
+DROP VIEW IF EXISTS v_rtc_hydrometer;
+DROP VIEW IF EXISTS v_ui_hydrometer;
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_node;
+DROP VIEW IF EXISTS v_ui_mincut_hydrometer;
+DROP VIEW IF EXISTS v_om_mincut_hydrometer;
+DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
+DROP VIEW IF EXISTS v_ui_hydroval;
+DROP VIEW IF EXISTS ve_rtc_hydro_data_x_connec;
+DROP VIEW IF EXISTS v_om_mincut_current_hydrometer;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
+
+INSERT INTO ext_rtc_hydrometer (id, link)
+SELECT hydrometer_id, link FROM rtc_hydrometer
+ON CONFLICT (id) DO UPDATE SET link = EXCLUDED.link;
+
+DROP TABLE IF EXISTS rtc_hydrometer;
+
+
+INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
+SELECT id, connec.connec_id
+FROM ext_rtc_hydrometer
+	JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+ON CONFLICT (hydrometer_id, connec_id) DO NOTHING;
+
+ALTER TABLE rtc_hydrometer_x_node ADD CONSTRAINT rtc_hydrometer_x_node_unique UNIQUE (node_id, hydrometer_id);
+
+INSERT INTO rtc_hydrometer_x_node (hydrometer_id, node_id)
+SELECT id, node.node_id
+FROM ext_rtc_hydrometer
+	JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
+    JOIN node ON node.node_id = man_netwjoin.node_id
+ON CONFLICT (hydrometer_id, node_id) DO NOTHING;
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_hydrometer", "column":"connec_id", "isUtils":"False"}}$$);
+
+ALTER TABLE ext_rtc_hydrometer RENAME COLUMN id TO hydrometer_id;
+
+ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+ALTER TABLE rtc_hydrometer_x_node ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+ALTER TABLE om_mincut_hydrometer ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+ALTER TABLE ext_rtc_hydrometer_x_data ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+
+ALTER TABLE rtc_hydrometer_x_connec ADD CONSTRAINT rtc_hydrometer_x_connec_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rtc_hydrometer_x_node ADD CONSTRAINT rtc_hydrometer_x_node_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+DROP TABLE IF EXISTS selector_hydrometer;
+
+ALTER TABLE ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE om_mincut_hydrometer ADD CONSTRAINT om_mincut_hydrometer_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE RESTRICT;

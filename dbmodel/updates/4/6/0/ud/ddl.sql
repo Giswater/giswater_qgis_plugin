@@ -67,3 +67,42 @@ ALTER TABLE gully ALTER COLUMN treatment_type SET DEFAULT 0;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
+
+-- 12/11/2025
+ALTER TABLE IF EXISTS rtc_hydrometer_x_connec DROP CONSTRAINT IF EXISTS rtc_hydrometer_x_connec_hydrometer_id_fkey;
+DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
+DROP VIEW IF EXISTS v_ui_hydroval;
+DROP VIEW IF EXISTS ve_rtc_hydro_data_x_connec;
+DROP VIEW IF EXISTS v_rtc_hydrometer;
+DROP VIEW IF EXISTS v_ui_hydrometer;
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
+
+INSERT INTO ext_rtc_hydrometer (id, link)
+SELECT hydrometer_id, link FROM rtc_hydrometer
+ON CONFLICT (id) DO UPDATE SET link = EXCLUDED.link;
+
+DROP TABLE IF EXISTS rtc_hydrometer;
+
+ALTER TABLE rtc_hydrometer_x_connec
+    ADD CONSTRAINT rtc_hydrometer_x_connec_unique
+    UNIQUE (connec_id, hydrometer_id);
+
+INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
+SELECT id, connec.connec_id
+FROM ext_rtc_hydrometer
+	JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+ON CONFLICT (hydrometer_id, connec_id) DO NOTHING;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_hydrometer", "column":"connec_id", "isUtils":"False"}}$$);
+
+ALTER TABLE IF EXISTS ext_rtc_hydrometer RENAME COLUMN id TO hydrometer_id;
+
+ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+ALTER TABLE ext_rtc_hydrometer_x_data ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
+
+DROP TABLE IF EXISTS selector_hydrometer;
+
+ALTER TABLE IF EXISTS ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE RESTRICT;
