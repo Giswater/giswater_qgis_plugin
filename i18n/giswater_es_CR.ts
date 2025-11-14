@@ -1638,6 +1638,10 @@
 			<translation>No se ha podido obtener el ID de característica del punto de encaje</translation>
 		</message>
 		<message>
+			<source>Could not load EPA Results layers</source>
+			<translation>No se pudo cargar las capas de resultados de EPA</translation>
+		</message>
+		<message>
 			<source>Could not retrieve feature from layer</source>
 			<translation>No se ha podido recuperar la característica de la capa</translation>
 		</message>
