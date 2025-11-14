@@ -318,16 +318,12 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
             tools_qt.set_widget_text(self.dlg_plan_psector, 'tab_general_active', active)
 
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
+            currency_labels = (
+                'cur_total_node', 'cur_total_arc', 'cur_total_other', 'cur_pem', 'cur_pec_pem',
+                'cur_pec', 'cur_pecvat_pem', 'cur_pec_vat', 'cur_pca_pecvat', 'cur_pca'
+            )
+            for label in currency_labels:
+                tools_qt.set_widget_text(self.dlg_plan_psector, label, self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
         viewname = "ve_" + self.rel_feature_type
@@ -578,7 +574,7 @@ class GwPsector:
                 total_result = float(total_result) + float(widget.text().replace(symbol, '').strip())
         
         # Format using the currency formatter
-        formatted_total = tools_gw.format_currency(total_result, currency_config)
+        formatted_total = tools_gw.format_currency(total_result, currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'lbl_total_count', formatted_total)
 
     def open_dlg_reports(self):
@@ -900,10 +896,10 @@ class GwPsector:
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        formatted_value = tools_gw.format_currency(row[column_name], currency_config)
+                        formatted_value = tools_gw.format_currency(row[column_name], currency_config, with_symbol=False)
                         tools_qt.set_widget_text(dialog, column_name, formatted_value)
                     else:
-                        formatted_value = tools_gw.format_currency(0, currency_config)
+                        formatted_value = tools_gw.format_currency(0, currency_config, with_symbol=False)
                         tools_qt.set_widget_text(dialog, column_name, formatted_value)
 
         self.calc_pec_pem(dialog, currency_config)
@@ -922,7 +918,7 @@ class GwPsector:
         else:
             pem = 0
 
-        res = tools_gw.format_currency(round(pec - pem, 2), currency_config)
+        res = tools_gw.format_currency(round(pec - pem, 2), currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'pec_pem', res)
 
     def calc_pecvat_pec(self, dialog, currency_config=None):
@@ -936,7 +932,7 @@ class GwPsector:
             pec = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec'), currency_config)
         else:
             pec = 0
-        res = tools_gw.format_currency(round(pec_vat - pec, 2), currency_config)
+        res = tools_gw.format_currency(round(pec_vat - pec, 2), currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'pecvat_pem', res)
 
     def calc_pca_pecvat(self, dialog, currency_config=None):
@@ -950,7 +946,7 @@ class GwPsector:
             pec_vat = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec_vat'), currency_config)
         else:
             pec_vat = 0
-        res = tools_gw.format_currency(round(pca - pec_vat, 2), currency_config)
+        res = tools_gw.format_currency(round(pca - pec_vat, 2), currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'pca_pecvat', res)
 
     def calculate_percents(self, tablename, field):

@@ -3898,7 +3898,7 @@ def parse_currency(value_str, currency_config=None):
         return 0.0
 
 
-def format_currency(value, currency_config=None):
+def format_currency(value, currency_config=None, with_symbol=True):
     """
     Format a number as currency using admin_currency configuration.
     
@@ -3960,7 +3960,7 @@ def format_currency(value, currency_config=None):
         if num_value < 0 and not formatted.startswith('-'):
             formatted = '-' + formatted
     
-    return f"{symbol}{formatted}"
+    return f"{symbol}{formatted}" if with_symbol else formatted
 
 
 def manage_layer_manager(json_result, sql=None):
