@@ -360,9 +360,12 @@ BEGIN
 
 EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "message":{"level":3, "text":"'||SQLERRM||'"}, "version":"'||v_version||'"'||
-			',"body":{"form":{},"feature":{},"data":'||json_build_object('error', v_error_context)||'}}')::json;
-
+	RETURN (
+		'{"status":"Failed", "message":{"level":3, "text":"'||
+		REPLACE(REPLACE(REPLACE(SQLERRM,'\','\\'),'"','\"'), E'\n', '\n') ||
+		'"}, "version":"' || v_version || '"'||
+		',"body":{"form":{},"feature":{},"data":' || json_build_object('error', v_error_context) || '}}'
+	)::json;
 END;
 $function$
 ;
