@@ -184,9 +184,9 @@ BEGIN
 
 				IF v_exists THEN
 					-- Delete from relation tables first
-					DELETE FROM rtc_hydrometer_x_connec WHERE code = v_code;
+					DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id = v_id;
 					IF v_project_type = 'WS' THEN
-						DELETE FROM rtc_hydrometer_x_node WHERE code = v_code;
+						DELETE FROM rtc_hydrometer_x_node WHERE hydrometer_id = v_id;
 					END IF;
 					DELETE FROM ext_rtc_hydrometer WHERE code = v_code;
 					v_deleted := v_deleted + 1;
@@ -323,14 +323,14 @@ BEGIN
 				-- Delete old relation
 				IF v_project_type = 'WS' THEN
 					IF (SELECT EXISTS(SELECT 1 FROM node WHERE node_id = v_feature_id)) THEN
-						DELETE FROM rtc_hydrometer_x_node WHERE code = v_code;
+						DELETE FROM rtc_hydrometer_x_node WHERE hydrometer_id = v_id;
 
 						INSERT INTO rtc_hydrometer_x_node (hydrometer_id, node_id)
 						VALUES (v_id, v_feature_id)
 						ON CONFLICT (hydrometer_id, node_id) DO NOTHING;
 					END IF;
 				END IF;
-				DELETE FROM rtc_hydrometer_x_connec WHERE code = v_code;
+				DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id = v_id;
 				-- Insert new relation
 				INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
 				VALUES (v_id, v_feature_id)
