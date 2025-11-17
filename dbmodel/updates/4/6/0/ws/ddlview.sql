@@ -2710,3 +2710,67 @@ AS SELECT inp_shortpipe.node_id,
      JOIN inp_shortpipe USING (node_id)
      LEFT JOIN v_rpt_arc_stats ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
      LEFT JOIN man_valve v ON v.node_id = inp_shortpipe.node_id;
+
+CREATE OR REPLACE VIEW ve_inp_valve
+AS SELECT n.node_id,
+    n.top_elev,
+    n.custom_top_elev,
+    n.depth,
+    n.nodecat_id,
+    n.expl_id,
+    n.sector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    concat(n.node_id, '_n2a') AS nodarc_id,
+    inp_valve.valve_type,
+    inp_valve.setting,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    v.to_arc,
+        CASE
+            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
+            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+            ELSE NULL::character varying(12)
+        END AS status,
+    n.cat_dint,
+    inp_valve.custom_dint,
+    inp_valve.add_settings,
+    inp_valve.init_quality,
+    n.the_geom
+   FROM ve_node n
+     JOIN inp_valve USING (node_id)
+     JOIN man_valve v USING (node_id)
+  WHERE n.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW ve_inp_shortpipe
+AS SELECT n.node_id,
+    n.top_elev,
+    n.custom_top_elev,
+    n.depth,
+    n.nodecat_id,
+    n.expl_id,
+    n.sector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    concat(n.node_id, '_n2a') AS nodarc_id,
+    inp_shortpipe.minorloss,
+        CASE
+            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
+            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'CV'::character varying(12)
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+            ELSE NULL::character varying(12)
+        END AS status,
+    inp_shortpipe.bulk_coeff,
+    inp_shortpipe.wall_coeff,
+    n.the_geom
+   FROM ve_node n
+     JOIN inp_shortpipe USING (node_id)
+     LEFT JOIN man_valve v ON v.node_id = n.node_id
+  WHERE n.is_operative IS TRUE;
