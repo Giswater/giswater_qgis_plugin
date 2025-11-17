@@ -159,6 +159,8 @@ BEGIN
             IF v_fct_name = 'DWFZONE' THEN
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS min_node INTEGER;
                 ALTER TABLE temp_pgr_mapzone ADD COLUMN  IF NOT EXISTS drainzone_id INTEGER DEFAULT 0;
+                CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_drainzone_id_idx ON temp_pgr_mapzone USING btree ("drainzone_id");
+
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath (
                     seq INTEGER NOT NULL,
                     "depth" INTEGER NULL,
@@ -175,6 +177,9 @@ BEGIN
                 CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_edge_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (edge);
             END IF;
             IF v_fct_name = 'OMUNIT' THEN
+                ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
+                CREATE INDEX IF NOT EXISTS temp_pgr_arc_macromapzone_id_idx ON temp_pgr_arc USING btree ("macromapzone_id");
+
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_linegraph (
                     seq INTEGER NOT NULL,
                     "source" INTEGER NULL,
@@ -182,18 +187,11 @@ BEGIN
                     "cost" FLOAT8 NULL,
                     reverse_cost FLOAT8 NULL,
                     graph_delimiter VARCHAR(30) DEFAULT 'NONE',
-                    omunit_id INTEGER DEFAULT 0,
-                    macrounit_id INTEGER DEFAULT 0,
-                    catchment_id INTEGER DEFAULT 0,
-                    order_number INTEGER DEFAULT 0,
                     CONSTRAINT temp_pgr_linegraph_pkey PRIMARY KEY (seq)
                 );
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_source_idx ON temp_pgr_linegraph USING btree ("source");
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_target_idx ON temp_pgr_linegraph USING btree ("target");
-                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_omunit_id_idx ON temp_pgr_linegraph USING btree ("omunit_id");
-                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_macrounit_id_idx ON temp_pgr_linegraph USING btree ("macrounit_id");
-                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_catchment_id_idx ON temp_pgr_linegraph USING btree ("catchment_id");
-
+               
                 CREATE TABLE temp_pgr_omunit (
                     omunit_id INTEGER NOT NULL,
                     node_1 INTEGER,
@@ -208,21 +206,11 @@ BEGIN
 
                 CREATE TABLE temp_pgr_macrounit (
                     macrounit_id INTEGER NOT NULL,
-                    node_1 INTEGER NULL,
-                    node_2 INTEGER NULL,
-                    catchment_id INTEGER DEFAULT 0,
+                    catchment_node INTEGER,
                     order_number INTEGER DEFAULT 0,
                     CONSTRAINT temp_pgr_macrounit_pkey PRIMARY KEY (macrounit_id)
                 );
-                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_node_1_idx ON temp_pgr_macrounit USING btree ("node_1");
-                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_node_2_idx ON temp_pgr_macrounit USING btree ("node_2");
-                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_catchment_id_idx ON temp_pgr_macrounit USING btree ("catchment_id");
-
-                CREATE TABLE temp_pgr_catchment (
-                    catchment_id INTEGER NOT NULL,
-                    node_id INTEGER NULL,
-                    CONSTRAINT temp_pgr_catchment_pkey PRIMARY KEY (catchment_id)
-                );
+                CREATE INDEX IF NOT EXISTS temp_pgr_macrounit_catchment_node_idx ON temp_pgr_macrounit USING btree ("catchment_node");
 
             END IF;
         END IF;
@@ -1040,7 +1028,6 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_linegraph;
         DROP TABLE IF EXISTS temp_pgr_omunit;
         DROP TABLE IF EXISTS temp_pgr_macrounit;
-        DROP TABLE IF EXISTS temp_pgr_catchment;
 
         DROP TABLE IF EXISTS temp_pgr_om_waterbalance_dma_graph;
 
