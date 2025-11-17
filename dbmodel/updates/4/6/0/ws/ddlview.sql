@@ -2634,3 +2634,79 @@ AS SELECT om_mincut_hydrometer.id,
      JOIN connec ON rtc_hydrometer_x_connec.connec_id = connec.connec_id
      JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
   WHERE om_mincut.mincut_state = 1;
+
+
+CREATE OR REPLACE VIEW ve_epa_valve
+AS SELECT inp_valve.node_id,
+    inp_valve.valve_type,
+    cat_node.dint,
+    inp_valve.custom_dint,
+    inp_valve.setting,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    v.to_arc,
+        CASE
+            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
+            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+            ELSE NULL::character varying(12)
+        END AS status,
+    inp_valve.add_settings,
+    inp_valve.init_quality,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min
+   FROM node
+     JOIN inp_valve USING (node_id)
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_valve.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_valve.node_id;
+
+CREATE OR REPLACE VIEW ve_epa_shortpipe
+AS SELECT inp_shortpipe.node_id,
+    inp_shortpipe.minorloss,
+    cat_node.dint,
+    inp_shortpipe.custom_dint,
+    v.to_arc,
+        CASE
+            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
+            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'CV'::character varying(12)
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+            ELSE NULL::character varying(12)
+        END AS status,
+    inp_shortpipe.bulk_coeff,
+    inp_shortpipe.wall_coeff,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min
+   FROM node
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN inp_shortpipe USING (node_id)
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_shortpipe.node_id;
