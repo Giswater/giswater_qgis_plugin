@@ -17,7 +17,7 @@ AS $function$
 -- Single hydrometer INSERT
 SELECT SCHEMA_NAME.gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
 "data":{"action":"INSERT", "hydrometers":[
-    {"code":"H001", "hydro_number":"12345", "connec_id":3001, "link":"http://link.com",
+    {"code":"H001", "hydro_number":"12345", "feature_id":3001, "link":"http://link.com",
      "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1,
      "start_date":"2025-10-30", "end_date":null, "update_date":"2025-10-30", "shutdown_date":null}
 ]}}$$);
@@ -25,8 +25,8 @@ SELECT SCHEMA_NAME.gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1,
 -- Multiple hydrometers INSERT
 SELECT SCHEMA_NAME.gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
 "data":{"action":"INSERT", "hydrometers":[
-    {"code":"H001", "hydro_number":"12345", "connec_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
-    {"code":"H002", "hydro_number":"12346", "connec_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
+    {"code":"H001", "hydro_number":"12345", "feature_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
+    {"code":"H002", "hydro_number":"12346", "feature_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
 ]}}$$);
 
 -- Single hydrometer UPDATE
@@ -58,8 +58,8 @@ SELECT SCHEMA_NAME.gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1,
 -- REPLACE all hydrometers (delete all existing, insert new ones)
 SELECT SCHEMA_NAME.gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
 "data":{"action":"REPLACE", "hydrometers":[
-    {"code":"H001", "hydro_number":"12345", "connec_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
-    {"code":"H002", "hydro_number":"12346", "connec_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
+    {"code":"H001", "hydro_number":"12345", "feature_id":3001, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1},
+    {"code":"H002", "hydro_number":"12346", "feature_id":3002, "state_id":1, "catalog_id":1, "category_id":1, "priority_id":1, "exploitation":1}
 ]}}$$);
 
 */
