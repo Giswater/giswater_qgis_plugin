@@ -523,7 +523,13 @@ BEGIN
 		v_action := json_extract_path_text(p_data,'data','action');
 		IF v_action = '' THEN v_action = NULL; END IF;
 
-
+		DROP TABLE IF EXISTS temp_exploitation;
+		DROP TABLE IF EXISTS temp_macroexploitation;
+		DROP TABLE IF EXISTS temp_sector;
+		DROP TABLE IF EXISTS temp_macrosector;
+		DROP TABLE IF EXISTS temp_municipality;
+		DROP TABLE IF EXISTS temp_t_mincut;
+		DROP TABLE IF EXISTS temp_network;
 		-- Return formtabs
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":'||v_message||
@@ -549,6 +555,13 @@ BEGIN
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	DROP TABLE IF EXISTS temp_exploitation;
+	DROP TABLE IF EXISTS temp_macroexploitation;
+	DROP TABLE IF EXISTS temp_sector;
+	DROP TABLE IF EXISTS temp_macrosector;
+	DROP TABLE IF EXISTS temp_municipality;
+	DROP TABLE IF EXISTS temp_t_mincut;
+	DROP TABLE IF EXISTS temp_network;
 	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
