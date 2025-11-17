@@ -5844,8 +5844,12 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         force_change (bool): If True, forces UI update. Useful when called from another function.
     """
 
-    # Manage play/pause button
+    # Check if psector widgets exist (plan toolbar must be loaded)
     psignals_widgets = global_vars.psignals['widgets']
+    if not psignals_widgets or len(psignals_widgets) < 2:
+        return
+
+    # Manage play/pause button
     btn_psector_playpause = psignals_widgets[0]
     if btn_psector_playpause is not None:
         active = btn_psector_playpause.property('psector_active')
