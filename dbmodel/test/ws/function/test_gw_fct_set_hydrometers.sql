@@ -11,7 +11,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(16);
+SELECT plan(15);
 
 -- Test 1: Insert single hydrometer
 SELECT is(
@@ -32,14 +32,14 @@ SELECT is(
     'Verify hydrometer was inserted into ext_rtc_hydrometer'
 );
 
--- Test 4: Verify hydrometer connec relation was inserted
+-- Test 3: Verify hydrometer connec relation was inserted
 SELECT is(
     (SELECT count(*)::integer FROM rtc_hydrometer_x_connec c JOIN ext_rtc_hydrometer h ON h.hydrometer_id = c.hydrometer_id WHERE h.code = 'TEST_H001'),
     1,
     'Verify hydrometer connec relation was inserted'
 );
 
--- Test 5: Insert multiple hydrometers
+-- Test 4: Insert multiple hydrometers
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"INSERT", "hydrometers":[
@@ -50,14 +50,14 @@ SELECT is(
     'Test multiple hydrometers INSERT'
 );
 
--- Test 6: Verify multiple hydrometers were inserted
+-- Test 5: Verify multiple hydrometers were inserted
 SELECT is(
     (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H002', 'TEST_H003')),
     2,
     'Verify multiple hydrometers were inserted'
 );
 
--- Test 7: Update single hydrometer
+-- Test 6: Update single hydrometer
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"UPDATE", "hydrometers":[
@@ -67,21 +67,21 @@ SELECT is(
     'Test single hydrometer UPDATE'
 );
 
--- Test 8: Verify hydrometer was updated
+-- Test 7: Verify hydrometer was updated
 SELECT is(
     (SELECT hydro_number FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
     '12345-UPDATED',
     'Verify hydrometer hydro_number was updated'
 );
 
--- Test 9: Verify hydrometer state was updated
+-- Test 8: Verify hydrometer state was updated
 SELECT is(
     (SELECT state_id FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
     2::smallint,
     'Verify hydrometer state_id was updated'
 );
 
--- Test 10: Update multiple hydrometers
+-- Test 9: Update multiple hydrometers
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"UPDATE", "hydrometers":[
@@ -92,7 +92,7 @@ SELECT is(
     'Test multiple hydrometers UPDATE'
 );
 
--- Test 11: Delete single hydrometer
+-- Test 10: Delete single hydrometer
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"DELETE", "hydrometers":[
@@ -102,14 +102,14 @@ SELECT is(
     'Test single hydrometer DELETE'
 );
 
--- Test 12: Verify hydrometer was deleted
+-- Test 11: Verify hydrometer was deleted
 SELECT is(
     (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
     0,
     'Verify hydrometer was deleted'
 );
 
--- Test 13: Delete multiple hydrometers
+-- Test 12: Delete multiple hydrometers
 SELECT is(
     (gw_fct_set_hydrometers($${"client":{"device":5, "infoType":1, "lang":"ES"},
     "data":{"action":"DELETE", "hydrometers":[
@@ -120,7 +120,7 @@ SELECT is(
     'Test multiple hydrometers DELETE'
 );
 
--- Test 14: REPLACE action (delete all and insert new ones)
+-- Test 13: REPLACE action (delete all and insert new ones)
 -- First insert some test data
 INSERT INTO ext_rtc_hydrometer (code, hydro_number, state_id, expl_id)
 VALUES ('TEST_H010', '10001', 1, 1),
@@ -137,14 +137,14 @@ SELECT is(
     'Test REPLACE action'
 );
 
--- Test 15: Verify old hydrometers were deleted
+-- Test 14: Verify old hydrometers were deleted
 SELECT is(
     (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H010', 'TEST_H011')),
     0,
     'Verify old hydrometers were deleted by REPLACE'
 );
 
--- Test 16: Verify new hydrometers were inserted
+-- Test 15: Verify new hydrometers were inserted
 SELECT is(
     (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H020', 'TEST_H021')),
     2,
