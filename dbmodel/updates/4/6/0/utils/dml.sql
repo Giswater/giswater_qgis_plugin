@@ -151,3 +151,5 @@ BEGIN
 END;
 $$;
 
+UPDATE sys_fprocess SET except_msg = 'registers on arc''s catalog with null values on dint column.' WHERE fid=283;
+UPDATE sys_message SET error_message = 'No node was found at these coordinates' WHERE id=3694;
