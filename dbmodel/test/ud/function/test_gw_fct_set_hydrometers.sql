@@ -132,9 +132,9 @@ SELECT is(
 
 -- Test 14: REPLACE action (delete all and insert new ones)
 -- First insert some test data
-INSERT INTO ext_rtc_hydrometer (id, code, hydro_number, state_id, expl_id)
-VALUES ('TEST_H010', 'TEST_H010', '10001', 1, 1),
-       ('TEST_H011', 'TEST_H011', '10002', 1, 1);
+INSERT INTO ext_rtc_hydrometer (code, hydro_number, state_id, expl_id)
+VALUES ('TEST_H010', '10001', 1, 1),
+       ('TEST_H011', '10002', 1, 1);
 
 -- Execute REPLACE
 SELECT is(
