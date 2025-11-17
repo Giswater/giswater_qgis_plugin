@@ -31,3 +31,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"doc_x_conne
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"doc_x_link", "column":"link_uuid", "dataType":"uuid"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"doc_x_element", "column":"element_uuid", "dataType":"uuid"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"code", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"dma_type", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"avg_press", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"pattern_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"effc", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"stylesheet", "dataType":"json", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+
+

@@ -139,7 +139,9 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":
 
 -- Redo omzone
 DROP VIEW IF EXISTS v_ui_omzone;
-DROP VIEW IF EXISTS ve_omzone;
+DROP VIEW IF EXISTS ve_omzone cascade;
+DROP VIEW IF EXISTS v_edit_omzone cascade;
+
 ALTER TABLE omzone DROP CONSTRAINT IF EXISTS omzone_expl_id_fkey;
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"omzone", "column":"expl_id", "dataType":"int4[]"}}$$);
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"omzone", "column":"sector_id", "dataType":"int4[]", "isUtils":"False"}}$$);

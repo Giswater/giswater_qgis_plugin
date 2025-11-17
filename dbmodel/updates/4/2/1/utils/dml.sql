@@ -143,7 +143,8 @@ INSERT INTO sys_param_user
 feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable,
 dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
 VALUES('edit_arc_division_dsbl', 'dynamic', 'If true, disable the arc divide in a internal proces of database', 'role_edit', NULL, 'Disable arc division',
-NULL, NULL, true, null, 'utils', false, NULL, NULL, NULL, false, 'boolean', null, false, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 'core');
+NULL, NULL, true, null, 'utils', false, NULL, NULL, NULL, false, 'boolean', null, false, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 'core')
+on conflict (id) do nothing;
 
 INSERT INTO sys_param_user
 (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc,

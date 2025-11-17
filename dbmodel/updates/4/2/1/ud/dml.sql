@@ -579,7 +579,7 @@ UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval
 
 DELETE FROM config_form_fields WHERE columnname = 'nodarc_id';
 -- 25/08/2025
-INSERT INTO dma (dma_id, name, expl_id) VALUES (0, 'UNDEFINED', '{0}');
+INSERT INTO dma (dma_id, name, expl_id) VALUES (0, 'UNDEFINED', '{0}') ON CONFLICT (dma_id) DO NOTHING;
 
 -- ve_dma
 DELETE FROM config_form_fields where formname in ('v_ui_dma', 've_dma');

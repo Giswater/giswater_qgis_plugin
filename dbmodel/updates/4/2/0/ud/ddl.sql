@@ -287,5 +287,5 @@ DROP VIEW IF EXISTS ve_element_eweir;
 DROP VIEW IF EXISTS ve_element_eoutlet;
 DROP VIEW IF EXISTS ve_element_epump;
 DROP VIEW IF EXISTS ve_man_frelem;
-DROP VIEW IF EXISTS ve_frelem;
+DROP VIEW IF EXISTS ve_frelem CASCADE;
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_frelem", "column":"order_id"}}$$);
