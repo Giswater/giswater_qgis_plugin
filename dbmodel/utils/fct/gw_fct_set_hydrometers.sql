@@ -120,10 +120,10 @@ BEGIN
 		-- Count before deleting
 		SELECT count(*) INTO v_deleted FROM ext_rtc_hydrometer;
 
-		TRUNCATE rtc_hydrometer_x_connec;
-		TRUNCATE ext_rtc_hydrometer;
+		TRUNCATE rtc_hydrometer_x_connec CASCADE;
+		TRUNCATE ext_rtc_hydrometer CASCADE;
 		IF v_project_type = 'WS' THEN
-			TRUNCATE rtc_hydrometer_x_node;
+			TRUNCATE rtc_hydrometer_x_node CASCADE;
 		END IF;
 	END IF;
 
