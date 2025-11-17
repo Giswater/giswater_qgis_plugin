@@ -104,3 +104,50 @@ INSERT INTO sys_function (id,function_name,project_type,function_type,input_para
 	VALUES (3524,'gw_fct_set_currency_config','utils','function','num','num','Function to transform nuemric values of price to user configuration from admin_currency in config_param_system','core');
 
 UPDATE sys_table SET id = 'v_rtc_hydrometer_x_connec' WHERE id = 'v_hydrometer_x_connec';
+
+do $$
+DECLARE
+    column_name TEXT;
+    v_admin_control_trigger BOOLEAN;
+    table_name CONSTANT TEXT := 'config_form_fields';
+    table_records RECORD;
+BEGIN
+    -- Store and disable the config control trigger
+    SELECT value::boolean INTO v_admin_control_trigger 
+    FROM config_param_system 
+    WHERE parameter = 'admin_config_control_trigger';
+    
+    UPDATE config_param_system 
+    SET value = 'FALSE' 
+    WHERE parameter = 'admin_config_control_trigger';
+    
+    -- Perform the replacements
+    FOR table_records IN SELECT formname, formtype, columnname, tabname, label, tooltip FROM config_form_fields WHERE label LIKE '%ID%' OR tooltip LIKE '%ID%' LOOP
+        UPDATE config_form_fields
+            SET label = regexp_replace(table_records.label, '\mID\M', 'Id', 'g'),
+                tooltip = regexp_replace(table_records.tooltip, '\mID\M', 'Id', 'g')
+            WHERE formname = table_records.formname
+                AND formtype = table_records.formtype
+                AND columnname = table_records.columnname
+                AND tabname = table_records.tabname;
+		raise notice '%', table_records.label;
+
+        -- Step 2: Capitalize only the first letter of each entry
+        UPDATE config_form_fields
+            SET label = UPPER(LEFT(label, 1)) || SUBSTRING(label FROM 2),
+                tooltip = UPPER(LEFT(tooltip, 1)) || SUBSTRING(tooltip FROM 2)
+            WHERE formname = table_records.formname
+                AND formtype = table_records.formtype
+                AND columnname = table_records.columnname
+                AND tabname = table_records.tabname;
+    END LOOP;
+    
+    -- Restore the original trigger setting
+    IF v_admin_control_trigger IS NOT NULL THEN
+        UPDATE config_param_system 
+        SET value = v_admin_control_trigger::text 
+        WHERE parameter = 'admin_config_control_trigger';
+    END IF;
+END;
+$$;
+
