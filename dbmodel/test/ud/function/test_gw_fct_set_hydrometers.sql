@@ -161,10 +161,6 @@ SELECT is(
     'Verify new hydrometers were inserted by REPLACE'
 );
 
--- Cleanup: ensure test data is removed
-DELETE FROM rtc_hydrometer_x_connec WHERE code LIKE 'TEST_H%';
-DELETE FROM ext_rtc_hydrometer WHERE code LIKE 'TEST_H%';
-
 -- Finish the test
 SELECT finish();
 
