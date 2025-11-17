@@ -76,10 +76,10 @@ BEGIN
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		v_sql:= 'SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from ve_arc) 
-		and node_id in (select node_2 from ve_arc) and node_id IN ('||v_array||') AND verified != ''VERIFIED'')';
+		and node_id in (select node_2 from ve_arc) and node_id IN ('||v_array||') AND (verified IS NULL OR verified != 1)';
 	ELSE
 		v_sql:= ('SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from ve_arc) 
-		and node_id in (select node_2 from ve_arc) AND verified != ''VERIFIED''');
+		and node_id in (select node_2 from ve_arc) AND (verified IS NULL OR verified != 1)');
 	END IF;
 
 

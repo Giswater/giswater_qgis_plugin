@@ -69,7 +69,7 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id, state)
 				SELECT node_1 as node_id, n.expl_id, 112, count(node_1) as num_arcs, n.the_geom,nodecat_id, n.state
 				FROM arc JOIN '||v_worklayer||' n ON node_id=node_1 AND node_id IN ('||v_array||')
-				WHERE arc.state=1 and n.state=1 AND (n.verified !=''VERIFIED'' OR n.verified IS NULL) 
+				WHERE arc.state=1 and n.state=1 AND (n.verified != 1 OR n.verified IS NULL) 
 				GROUP BY node_1, n.expl_id, n.the_geom, n.nodecat_id, n.state
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';
@@ -77,7 +77,7 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id,state)
 				SELECT node_1 as node_id, n.expl_id, 112, count(node_1) as num_arcs, n.the_geom, nodecat_id, n.state
 				FROM arc JOIN '||v_worklayer||' n ON node_id=node_1
-				WHERE arc.state=1 and n.state=1 AND (n.verified !=''VERIFIED'' OR n.verified IS NULL) 
+				WHERE arc.state=1 and n.state=1 AND (n.verified != 1 OR n.verified IS NULL) 
 				GROUP BY node_1, n.expl_id, n.the_geom, n.nodecat_id, n.state
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';

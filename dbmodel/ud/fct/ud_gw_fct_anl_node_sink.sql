@@ -68,11 +68,11 @@ BEGIN
 		v_sql := 'SELECT * FROM '||v_worklayer||' AS a WHERE state=1 
 					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_2 = a.node_id) > 0)  
 					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0)
-					AND node_id IN ('||v_array||') AND (verified IS NULL OR verified != ''VERIFIED'');';
+					AND node_id IN ('||v_array||') AND (verified IS NULL OR verified != 1);';
 	ELSE
 		v_sql := 'SELECT * FROM '||v_worklayer||' AS a WHERE state=1 
 					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_2 = a.node_id) > 0)  
-					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0) AND (verified IS NULL OR verified != ''VERIFIED'') ;';
+					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0) AND (verified IS NULL OR verified != 1);';
 	END IF;
 
 	FOR rec_node IN  EXECUTE v_sql
