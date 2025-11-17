@@ -424,9 +424,21 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
 def close_dialog(dlg, delete_dlg=True, plugin='core'):
     """ Close dialog """
 
-    save_settings(dlg, plugin=plugin)
+    if dlg is None or isdeleted(dlg):
+        return
+
+    try:
+        save_settings(dlg, plugin=plugin)
+    except RuntimeError:
+        pass
+
     lib_vars.session_vars['last_focus'] = None
-    dlg.close()
+    
+    try:
+        dlg.close()
+    except RuntimeError:
+        pass
+    
     if delete_dlg:
         try:
             dlg.deleteLater()
