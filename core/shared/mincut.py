@@ -8,7 +8,7 @@ or (at your option) any later version.
 import json
 import os
 import csv
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import datetime, timedelta
 from functools import partial
@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTim
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
-    QgsVectorLayer
+    QgsVectorLayer, Qgis
 from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools
@@ -657,7 +657,7 @@ class GwMincut:
 
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
-        tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.EditTrigger.DoubleClicked)
         message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -1222,7 +1222,7 @@ class GwMincut:
         self.dlg_connec = GwMincutConnecUi(self)
         self.dlg_connec.setWindowTitle("Connec management")
         tools_gw.load_settings(self.dlg_connec)
-        self.dlg_connec.tbl_om_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_connec.tbl_om_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         # Set icons
         tools_gw.add_icon(self.dlg_connec.btn_insert, "111")
         tools_gw.add_icon(self.dlg_connec.btn_delete, "112")
@@ -1235,7 +1235,7 @@ class GwMincut:
         self.dlg_connec.btn_accept.clicked.connect(partial(self._accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.rejected.connect(partial(tools_gw.close_dialog, self.dlg_connec))
         self.dlg_connec.rejected.connect(partial(tools_qgis.disconnect_signal_selection_changed))
-        
+
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
 
@@ -1278,7 +1278,7 @@ class GwMincut:
     def _snapping_init_connec(self):
         """ Snap connec """
         self.rel_feature_type = 'connec'
-        
+
         tools_gw.selection_init(self, self.dlg_connec, 'om_mincut', GwSelectionMode.MINCUT_CONNEC)
 
     def _snapping_selection_hydro(self):
@@ -1386,7 +1386,7 @@ class GwMincut:
         self.dlg_hydro = GwMincutHydrometerUi(self)
         tools_gw.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
-        self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
         # Set icons
         tools_gw.add_icon(self.dlg_hydro.btn_insert, "111")
@@ -1892,7 +1892,7 @@ class GwMincut:
         all_rows = []
         headers = []
         for i in range(0, model.columnCount()):
-            headers.append(str(model.headerData(i, Qt.Horizontal)))
+            headers.append(str(model.headerData(i, Qt.Orientation.Horizontal)))
         all_rows.append(headers)
         for rows in range(0, model.rowCount()):
             row = []
@@ -1941,7 +1941,7 @@ class GwMincut:
             except RuntimeError:
                 pass
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             self.action_mincut.setChecked(False)
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             tools_gw.disconnect_signal('mincut')
@@ -2070,9 +2070,9 @@ class GwMincut:
                 msg = complet_result.get('message')
                 if not msg:
                     msg = "Mincut done successfully"
-                    tools_qgis.show_message(msg, 3)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
                 else:
-                    tools_qgis.show_message(msg.get('text'), msg.get('level'))
+                    tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
@@ -2195,9 +2195,9 @@ class GwMincut:
                 msg = complet_result.get('message')
                 if not msg:
                     msg = "Mincut done successfully"
-                    tools_qgis.show_message(msg, 3)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
                 else:
-                    tools_qgis.show_message(msg.get('text'), msg.get('level'))
+                    tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
@@ -2270,7 +2270,7 @@ class GwMincut:
     def _custom_mincut_snapping(self, action, point, btn):
         """ Custom mincut snapping function """
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
             tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
@@ -2319,6 +2319,7 @@ class GwMincut:
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
         # Disconnect snapping and related signals
@@ -2376,7 +2377,7 @@ class GwMincut:
             template_files = os.listdir(template_folder)
         except FileNotFoundError:
             msg = "Your composer's path is bad configured. Please, modify it and try again."
-            tools_qgis.show_message(msg, 1)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
             return
 
         # Set dialog add_connec
@@ -2658,6 +2659,7 @@ class GwMincut:
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 msg = result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
     def _calculate_elapsed_time(self, dialog):

@@ -20,6 +20,7 @@ from qgis.PyQt.QtWidgets import (
     QMenu,
     QAction,
     QActionGroup,
+    QWidget,
 )
 
 
@@ -67,7 +68,10 @@ class GwAmBreakageButton(GwAction):
 
     def clicked_event(self):
         if self.action:
-            button = self.action.associatedWidgets()[1]
+            if hasattr(self.action, 'associatedObjects'):
+                button = QWidget(self.action.associatedObjects()[1])
+            elif hasattr(self.action, 'associatedWidgets'):
+                button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.exec(menu_point)
 
@@ -131,7 +135,7 @@ class GwAmBreakageButton(GwAction):
         dlg.txt_cluster_length.setValidator(int_validator)
 
         range_validator = QRegularExpressionValidator(
-            QRegularExpression("\d+(\.\d*)?-\d+(\.\d*)?")
+            QRegularExpression(r"\d+(\.\d*)?-\d+(\.\d*)?")
         )
         dlg.txt_diameter_range.setValidator(range_validator)
         dlg.txt_diameter_range.setEnabled(dlg.chk_diameter.isChecked())
@@ -360,7 +364,7 @@ class GwAmBreakageButton(GwAction):
 
         if dlg.chk_diameter.isChecked():
             diameter_range_string = dlg.txt_diameter_range.text()
-            if not re.fullmatch("\d+(\.\d*)?-\d+(\.\d*)?", diameter_range_string):
+            if not re.fullmatch(r"\d+(\.\d*)?-\d+(\.\d*)?", diameter_range_string):
                 msg = (
                     "Please enter the diameter range in this format: "
                     "[minimum factor]-[maximum factor]. "

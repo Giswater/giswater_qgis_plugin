@@ -101,7 +101,7 @@ class GwVisitGallery:
                 else:
                     pixmap = QPixmap(str(self.img_path_list[0][i]))
 
-                pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+                pixmap = pixmap.scaled(171, 151, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
                 widget_extended = GwExtendedQLabel(widget)
                 widget_extended.setPixmap(pixmap)
                 widget_extended.clicked.connect(partial(self._zoom_img, i, visit_id, event_id))
@@ -155,7 +155,7 @@ class GwVisitGallery:
             else:
                 pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
 
-            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            pixmap = pixmap.scaled(171, 151, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
             self.list_widget[i].setPixmap(pixmap)
 
         # Control sliding buttons
@@ -191,7 +191,7 @@ class GwVisitGallery:
             else:
                 pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
 
-            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            pixmap = pixmap.scaled(171, 151, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
             self.list_widget[i].setPixmap(pixmap)
 
         # Control sliding buttons
@@ -227,8 +227,8 @@ class GwVisitGallery:
             pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
 
         # Scale the pixmap to fit within the dialog's constraints while keeping the aspect ratio
-        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.KeepAspectRatio,
-                               transformMode=Qt.SmoothTransformation)
+        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                               transformMode=Qt.TransformationMode.SmoothTransformation)
 
         self.lbl_img.setPixmap(pixmap)
 
@@ -278,8 +278,8 @@ class GwVisitGallery:
             pixmap = QPixmap(str(self.img_path_list1D[indx]))
 
         # Scale the pixmap
-        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.KeepAspectRatio,
-                               transformMode=Qt.SmoothTransformation)
+        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                               transformMode=Qt.TransformationMode.SmoothTransformation)
 
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i - 1
@@ -313,8 +313,8 @@ class GwVisitGallery:
             pixmap = QPixmap(str(self.img_path_list1D[indx]))
 
         # Scale the pixmap
-        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.KeepAspectRatio,
-                               transformMode=Qt.SmoothTransformation)
+        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                               transformMode=Qt.TransformationMode.SmoothTransformation)
 
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i + 1

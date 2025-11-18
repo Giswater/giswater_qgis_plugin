@@ -10,7 +10,7 @@ import os
 import re
 import sys
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import timedelta
 from typing import Union
@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
     QGridLayout, QTabWidget, QDialog
-from qgis.core import QgsProject, QgsApplication, QgsMessageLog
+from qgis.core import QgsProject, QgsApplication, QgsMessageLog, Qgis
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
@@ -444,7 +444,7 @@ class GwAdminButton:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
             message_log.setVisible(True)
-            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", 0)
+            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", Qgis.MessageLevel.Info)
 
             # Manage Log Messages in tab log
             main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
@@ -717,7 +717,7 @@ class GwAdminButton:
         # Process each version folder in order
         project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
         plugin_tuple = tuple(int(x) for x in str(self.plugin_version).split('.'))
-        
+
         for major, minor, patch, folder_path in version_folders:
             current_tuple = (major, minor, patch)
             if new_project:
@@ -782,7 +782,7 @@ class GwAdminButton:
 
     # region private functions
 
-    def _fill_table(self, qtable, table_name, model, expr_filter, edit_strategy=QSqlTableModel.OnManualSubmit):
+    def _fill_table(self, qtable, table_name, model, expr_filter, edit_strategy=QSqlTableModel.EditStrategy.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
@@ -881,6 +881,8 @@ class GwAdminButton:
         # Create dialog object
         self.dlg_readsql = GwAdminUi(self)
         tools_gw.load_settings(self.dlg_readsql)
+        for widget in self.dlg_readsql.findChildren(QWidget):
+            print(widget.objectName())
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
@@ -1094,7 +1096,7 @@ class GwAdminButton:
         elif connection_status is False:
             self.form_enabled = False
             msg = "Connection Failed. Please, check connection parameters"
-            tools_qgis.show_message(msg, 1)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
             tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
@@ -1265,7 +1267,7 @@ class GwAdminButton:
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
-        
+
         if result:
             self._open_project(qgs_path)
 
@@ -1733,7 +1735,7 @@ class GwAdminButton:
 
         # Process each version folder in order
         project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
-        
+
         for major, minor, patch, folder_path in version_folders:
             current_tuple = (major, minor, patch)
             if current_tuple > project_tuple:
@@ -1790,7 +1792,7 @@ class GwAdminButton:
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
         tools_qt.set_widget_text(self.dlg_readsql_create_project, self.filter_srid, '25831')
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
-        self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.model_srid = QSqlQueryModel()
         self.tbl_srid.setModel(self.model_srid)
         self.tbl_srid.clicked.connect(partial(self._set_selected_srid))
@@ -2605,7 +2607,7 @@ class GwAdminButton:
 
         # Build the dialog
         self.dlg_replace = GwReplaceInFileUi(self)
-        self.dlg_replace.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_replace.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         tools_gw.load_settings(self.dlg_replace)
 
         # Add a widget for each word to replace
@@ -2616,7 +2618,7 @@ class GwAdminButton:
         self.dlg_replace.btn_cancel.clicked.connect(partial(self.dlg_replace.reject))
         self.dlg_replace.finished.connect(partial(tools_gw.save_settings, self.dlg_replace))
 
-        resp = self.dlg_replace.exec_()  # We do exec_() because we want the execution to stop until the dlg is closed
+        resp = self.dlg_replace.exec()  # We do exec_() because we want the execution to stop until the dlg is closed
         if resp == 0:
             return False
         return True
@@ -2745,8 +2747,9 @@ class GwAdminButton:
                 return
 
             # Set plugin settings
-            self.dev_settings = QSettings(setting_file, QSettings.IniFormat)
-            self.dev_settings.setIniCodec(sys.getfilesystemencoding())
+            self.dev_settings = QSettings(setting_file, QSettings.Format.IniFormat)
+            if hasattr(self.dev_settings, "setIniCodec"):
+                self.dev_settings.setIniCodec(sys.getfilesystemencoding())
 
             # Get values
             self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False,
@@ -2945,7 +2948,7 @@ class GwAdminButton:
         for column in range(widget.model().columnCount()):
             index = widget.model().index(row, column)
 
-            result = tools_qt.get_widget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Horizontal)))
+            result = tools_qt.get_widget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Orientation.Horizontal)))
             if result is None:
                 continue
 
@@ -3009,7 +3012,7 @@ class GwAdminButton:
         # Populate table update
         qtable = dialog.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
-        qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        qtable.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         if is_multi_addfield:
             expr_filter = "cat_feature_id IS NULL"
         else:
@@ -3390,7 +3393,7 @@ class GwAdminButton:
             msg = message.get('text')
             if msg is None:
                 msg = "Key on returned json from ddbb is missed"
-
+            level = Qgis.MessageLevel(level)
             tools_qgis.show_message(msg, level, parameter=parameter, title=title)
 
         data = json_result['body'].get('data')
@@ -3551,7 +3554,7 @@ class GwAdminButton:
 
         if self.ws_project_name == "" or self.ud_project_name == "":
             msg = "You need to have a ws and ud schema created to create a utils schema"
-            tools_qgis.show_message(msg, 0)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         # Get giswater version for ws and ud project selected
@@ -3572,7 +3575,7 @@ class GwAdminButton:
             msg = ("You need to select same version for ws and ud projects. "
                    "Versions: WS - {} ; UD - {}")
             msg_params = (self.ws_project_result, self.ud_project_result,)
-            tools_qgis.show_message(msg, 0, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info, msg_params=msg_params)
             return
 
         # Check is project name already exists
@@ -3581,7 +3584,7 @@ class GwAdminButton:
         row = tools_db.get_row(sql, commit=False)
         if row:
             msg = "Schema Utils already exist."
-            tools_qgis.show_message(msg, 0)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         self.error_count = 0

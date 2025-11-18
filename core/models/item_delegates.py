@@ -30,11 +30,11 @@ class EditableDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         value = editor.text()
         if not value:
-            model.setData(index, None, QtCore.Qt.EditRole)
+            model.setData(index, None, QtCore.Qt.ItemDataRole.EditRole)
         else:
             try:
                 number = float(value)
             except (TypeError, ValueError):
-                model.setData(index, value, QtCore.Qt.EditRole)
+                model.setData(index, value, QtCore.Qt.ItemDataRole.EditRole)
             else:
-                model.setData(index, number, QtCore.Qt.EditRole)
+                model.setData(index, number, QtCore.Qt.ItemDataRole.EditRole)

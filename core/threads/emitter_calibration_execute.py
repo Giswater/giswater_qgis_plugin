@@ -43,7 +43,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
     ):
 
         QObject.__init__(self)
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.exception = None
         self.timer = timer
 

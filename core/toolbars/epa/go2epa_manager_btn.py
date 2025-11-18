@@ -9,9 +9,9 @@ import json
 
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QRegExp
+from qgis.PyQt.QtCore import Qt, QRegularExpression
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu, QPushButton
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
@@ -40,21 +40,21 @@ class GwGo2EpaManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_manager)
 
         # Manage widgets
-        reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
-        self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
+        reg_exp = QRegularExpression(r"^[A-Za-z0-9_]{1,16}$")
+        self.dlg_manager.txt_result_id.setValidator(QRegularExpressionValidator(reg_exp))
         self.dlg_manager.tab_log_txt_infolog.setReadOnly(True)
         self.dlg_manager.btn_toggle_corporate.setEnabled(False)
         self.dlg_manager.btn_archive.setEnabled(False)
 
         # Fill combo box and table view
         # self._fill_combo_result_id()
-        self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self._fill_manager_table()    
+        self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._fill_manager_table()
 
         # Populate custom context menu
-        self.dlg_manager.tbl_rpt_cat_result.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_manager.tbl_rpt_cat_result.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_manager.tbl_rpt_cat_result))    
-        
+        self.dlg_manager.tbl_rpt_cat_result.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.dlg_manager.tbl_rpt_cat_result.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_manager.tbl_rpt_cat_result))
+
         # Set signals
         self.dlg_manager.btn_edit.clicked.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_show_inp_data.clicked.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
@@ -69,13 +69,13 @@ class GwGo2EpaManagerButton(GwAction):
         selection_model.selectionChanged.connect(partial(self._enable_buttons))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))   
+        self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
 
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
 
-    def _show_context_menu(self, qtableview):        
-        """ Show custom context menu """                        
+    def _show_context_menu(self, qtableview):
+        """ Show custom context menu """
         menu = QMenu(qtableview)
 
         action_edit = QAction("Edit", qtableview)
@@ -90,18 +90,18 @@ class GwGo2EpaManagerButton(GwAction):
         action_toggle_active.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_archive"))
         action_toggle_active.setEnabled(qtableview.window().btn_archive.isEnabled())
         menu.addAction(action_toggle_active)
-        
+
         action_set_corporate = QAction("Set corporate", qtableview)
         action_set_corporate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_corporate"))
         action_set_corporate.setEnabled(qtableview.window().btn_toggle_corporate.isEnabled())
-        menu.addAction(action_set_corporate)  
+        menu.addAction(action_set_corporate)
 
         action_delete = QAction("Delete", qtableview)
         action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
-                       
+
     def _fill_manager_table(self, filter_id=None):
         """ Fill dscenario manager table with data from ve_cat_dscenario """
 
@@ -123,7 +123,7 @@ class GwGo2EpaManagerButton(GwAction):
                 self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, field)
 
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.NoEditTriggers)
+        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
 
         return complet_list
 
@@ -379,7 +379,7 @@ class GwGo2EpaManagerButton(GwAction):
         answer = tools_qt.show_question(msg)
         if not answer:
             return
-        
+
         result_id = ""
         set_corporate = True
         for i in range(0, len(selected_list)):
@@ -399,9 +399,9 @@ class GwGo2EpaManagerButton(GwAction):
         elif result['message'].get('level') == 2:
             tools_qgis.show_warning(result['message']['text'], dialog=self.dlg_manager)
             return
-                
+
         tools_qgis.show_info(result['message']['text'], dialog=self.dlg_manager)
-        
+
         # Refresh table
         self._fill_manager_table()
 
@@ -420,12 +420,12 @@ class GwGo2EpaManagerButton(GwAction):
         row = index.row()
         model = widget.model()
         value = model.item(row, column).text()
-        header = model.headerData(column, Qt.Horizontal)
+        header = model.headerData(column, Qt.Orientation.Horizontal)
         result_id = model.data(model.index(row, 0))
 
         edit_dialog = GwEditDialog(dialog, title=f"Edit {header}", label_text=f"Set new '{header}' value for result '{result_id}':",
                                 widget_type="QTextEdit", initial_value=value)
-        if edit_dialog.exec_() == QDialog.Accepted:
+        if edit_dialog.exec() == QDialog.DialogCode.Accepted:
             new_value = edit_dialog.get_value()
             self._update_data(result_id, columnname, new_value)
 

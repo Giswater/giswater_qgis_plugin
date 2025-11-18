@@ -42,7 +42,7 @@ class GwInfoButton(GwMaptool):
 
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             for rb in self.rubberband_list:
                 tools_gw.reset_rubberband(rb)
             tools_gw.reset_rubberband(self.rubber_band)
@@ -63,7 +63,7 @@ class GwInfoButton(GwMaptool):
             self.action.setChecked(True)
         # Change map tool cursor
         self.cursor = QCursor()
-        self.cursor.setShape(Qt.WhatsThisCursor)
+        self.cursor.setShape(Qt.CursorShape.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
         self.rubberband_list = []
         self.tab_type = 'data'
@@ -248,7 +248,7 @@ class GwInfoButton(GwMaptool):
             main_menu.addSeparator()
 
         main_menu.aboutToHide.connect(self._reset_rubber_bands)
-        main_menu.exec_(click_point)
+        main_menu.exec(click_point)
 
     def _identify_all(self, complet_list, rb_list):
 
@@ -258,7 +258,7 @@ class GwInfoButton(GwMaptool):
         for layer in complet_list['body']['data']['layersNames']:
             for feature in layer['ids']:
                 points = []
-                list_coord = re.search('\(+([^)]+)\)+', str(feature['geometry']))
+                list_coord = re.search(r'\(+([^)]+)\)+', str(feature['geometry']))
                 coords = list_coord.group(1)
                 polygon = coords.split(',')
                 for i in range(0, len(polygon)):
@@ -370,7 +370,7 @@ class GwInfoButton(GwMaptool):
             self.block_signal = False
             return
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
 
             point = tools_qgis.create_point(self.canvas, self.iface, event)
             if point is False:
@@ -384,7 +384,7 @@ class GwInfoButton(GwMaptool):
                 tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 
-        elif event.button() == Qt.RightButton:
+        elif event.button() == Qt.MouseButton.RightButton:
             point = tools_qgis.create_point(self.canvas, self.iface, event)
             if point is False:
                 return

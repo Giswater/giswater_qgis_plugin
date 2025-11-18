@@ -115,7 +115,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()
             return
 

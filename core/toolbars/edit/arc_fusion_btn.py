@@ -156,7 +156,7 @@ class GwArcFusionButton(GwMaptool):
 
     def _get_arc_fusion(self, event):
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()
             return
 

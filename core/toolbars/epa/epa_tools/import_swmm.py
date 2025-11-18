@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import (
     QTableWidgetItem,
     QTextEdit,
 )
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from .....libs import tools_db, tools_qgis, tools_qt
 from ....ui.dialog import GwDialog
@@ -530,14 +530,14 @@ class GwImportSwmm:
                 tbl_nodes.setRowCount(row + 1)
 
                 first_column = QTableWidgetItem(tag)
-                first_column.setFlags(Qt.ItemIsEnabled)
+                first_column.setFlags(Qt.ItemFlag.ItemIsEnabled)
                 tbl_nodes.setItem(row, 0, first_column)
 
                 combo_cat = QComboBox()
                 tbl_nodes.setCellWidget(row, 1, combo_cat)
 
                 new_cat_name = QTableWidgetItem("")
-                new_cat_name.setFlags(Qt.NoItemFlags)
+                new_cat_name.setFlags(Qt.ItemFlag.NoItemFlags)
                 tbl_nodes.setItem(row, 2, new_cat_name)
                 combo_cat.currentTextChanged.connect(
                     partial(self._toggle_enabled_new_catalog_field, new_cat_name)
@@ -558,20 +558,20 @@ class GwImportSwmm:
                 tbl_arcs.setRowCount(row + 1)
 
                 first_column = QTableWidgetItem("CONDUIT")
-                first_column.setFlags(Qt.ItemIsEnabled)
+                first_column.setFlags(Qt.ItemFlag.ItemIsEnabled)
                 tbl_arcs.setItem(row, 0, first_column)
 
                 for idx, prop in enumerate(cat_tuple):
                     value = str(prop) if prop is not None else ''
                     item = QTableWidgetItem(value)
-                    item.setFlags(Qt.ItemIsEnabled)
+                    item.setFlags(Qt.ItemFlag.ItemIsEnabled)
                     tbl_arcs.setItem(row, idx + 1, item)
 
                 combo_cat = QComboBox()
                 tbl_arcs.setCellWidget(row, 6, combo_cat)
 
                 new_cat_name = QTableWidgetItem("")
-                new_cat_name.setFlags(Qt.NoItemFlags)
+                new_cat_name.setFlags(Qt.ItemFlag.NoItemFlags)
                 tbl_arcs.setItem(row, 7, new_cat_name)
                 combo_cat.currentTextChanged.connect(
                     partial(self._toggle_enabled_new_catalog_field, new_cat_name)
@@ -594,7 +594,7 @@ class GwImportSwmm:
                 tbl_material.setRowCount(row + 1)
 
                 first_column = QTableWidgetItem(str(roughness))
-                first_column.setFlags(Qt.ItemIsEnabled)
+                first_column.setFlags(Qt.ItemFlag.ItemIsEnabled)
                 tbl_material.setItem(row, 0, first_column)
 
                 combo_mat = QComboBox()
@@ -630,7 +630,7 @@ class GwImportSwmm:
             tbl_feature.setRowCount(row + 1)
 
             first_column = QTableWidgetItem(tag)
-            first_column.setFlags(Qt.ItemIsEnabled)
+            first_column.setFlags(Qt.ItemFlag.ItemIsEnabled)
             tbl_feature.setItem(row, 0, first_column)
 
             combo_feat = QComboBox()
@@ -896,7 +896,7 @@ class GwImportSwmm:
 
             # Fill the first column
             first_column = QTableWidgetItem(tag)
-            first_column.setFlags(Qt.ItemIsEnabled)
+            first_column.setFlags(Qt.ItemFlag.ItemIsEnabled)
             tbl.setItem(row, 0, first_column)
 
             # Create the combo box and put it in the second or fourth column
@@ -906,7 +906,7 @@ class GwImportSwmm:
 
             # Fill the "NEW CATALOG" column
             new_cat_name = QTableWidgetItem("")
-            new_cat_name.setFlags(Qt.NoItemFlags)
+            new_cat_name.setFlags(Qt.ItemFlag.NoItemFlags)
             tbl.setItem(row, combo_idx + 1, new_cat_name)
 
             # Connect signal to the new combo
@@ -972,9 +972,9 @@ class GwImportSwmm:
         self, field: QTableWidgetItem, text: str
     ) -> None:
         field.setFlags(
-            Qt.ItemIsEnabled | Qt.ItemIsEditable
+            Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsEditable
             if text == CREATE_NEW
-            else Qt.NoItemFlags
+            else Qt.ItemFlag.NoItemFlags
         )
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:

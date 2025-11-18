@@ -8,6 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.core import Qgis
 
 from ..ui.ui_manager import GwPsectorDuplicateUi
 from ..utils import tools_gw
@@ -70,10 +71,10 @@ class GwPsectorDuplicate(QObject):
                 "SET value = False "
                 "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
-        
+
         if not complet_result or complet_result['status'] == 'Failed':
             msg = tools_qt.tr('Function gw_fct_psector_duplicate executed with no result')
-            tools_qgis.show_message(msg, 3, dialog=self.dlg_duplicate_psector)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Success, dialog=self.dlg_duplicate_psector)
             return
 
         # Populate tab info

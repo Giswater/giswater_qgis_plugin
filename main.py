@@ -9,7 +9,7 @@ import os
 import shutil
 
 from functools import partial
-from qgis.core import QgsProject, QgsSettings
+from qgis.core import QgsProject, QgsSettings, Qgis
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QApplication
@@ -236,7 +236,7 @@ class Giswater(QObject):
             tools_gw.recreate_config_files()
             msg = "The user config files have been recreated. A backup of the broken ones have been created at"
             title = "Parsing error fixed"
-            tools_qgis.show_message(msg, title=title, message_level=3, parameter=f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}")
+            tools_qgis.show_message(msg, title=title, message_level=Qgis.MessageLevel.Success, parameter=f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}")
         else:
             # Check if user has config files 'init' and 'session' and its parameters (only those without prefix)
             try:

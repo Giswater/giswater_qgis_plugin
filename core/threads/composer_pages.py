@@ -26,7 +26,7 @@ class GwComposerPages(GwTask):
 
     def __init__(self, description, result, layout, designer, prefix, path, is_single, sleep_time, skip_psectors=0):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.result = result
         self.layout = layout
         self.atlas = layout.atlas()

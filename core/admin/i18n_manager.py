@@ -21,7 +21,7 @@ from typing import List, Dict, Any
 from ..ui.ui_manager import GwSchemaI18NManagerUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
-from PyQt5.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication
 
 
 class GwSchemaI18NManager:

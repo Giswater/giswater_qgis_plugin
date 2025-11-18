@@ -18,6 +18,7 @@ from qgis.PyQt.QtWidgets import QHeaderView, QTableView, QMenu, QAction, QPushBu
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtGui import QCursor
+from qgis.core import Qgis
 
 
 class GwStyleManager:
@@ -48,7 +49,7 @@ class GwStyleManager:
         self._load_styles()
 
         # Populate custom context menu
-        self.style_mng_dlg.tbl_style.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.style_mng_dlg.tbl_style.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.style_mng_dlg.tbl_style.customContextMenuRequested.connect(partial(self._show_context_menu, self.style_mng_dlg.tbl_style))
 
         # Connect signals to the corresponding methods
@@ -227,13 +228,13 @@ class GwStyleManager:
             return
 
         self.style_mng_dlg.tbl_style.setModel(model)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        self.style_mng_dlg.tbl_style.setSelectionBehavior(QTableView.SelectRows)
-        self.style_mng_dlg.tbl_style.setEditTriggers(QTableView.NoEditTriggers)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
+        self.style_mng_dlg.tbl_style.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
+        self.style_mng_dlg.tbl_style.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
 
         # Customize table view
         header = self.style_mng_dlg.tbl_style.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         header.setStretchLastSection(True)
 
     def _check_style_exists(self, dialog_create):
@@ -568,7 +569,7 @@ class GwStyleManager:
                 "using the 'GwBasic' style information.\n"
                 "You can change it and use 'Update Style' to create a personalized version.")
             msg_params = (selected_stylegroup_name, table_name,)
-            tools_qgis.show_message(msg, 3, dialog=self.style_mng_dlg, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Success, dialog=self.style_mng_dlg, msg_params=msg_params)
 
             self._load_styles()
 

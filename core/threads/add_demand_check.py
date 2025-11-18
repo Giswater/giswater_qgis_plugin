@@ -42,7 +42,7 @@ class GwAddDemandCheck(GwTask):
     def __init__(
         self, description, input_file, config, output_folder, file_name, results={}
     ):
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.input_file = input_file
         self.config = config
         self.output_folder = output_folder

@@ -162,7 +162,7 @@ class GwTestQgis:
         tools_db.set_search_path(project_name)
         dlg = self.test_giswater.visit_manager.dlg_add_visit
         res = dlg.exec()
-        if res == QDialog.Accepted:
+        if res == QDialog.DialogCode.Accepted:
             print('Accepted')
 
         return

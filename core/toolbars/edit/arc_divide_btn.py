@@ -76,7 +76,7 @@ class GwArcDivideButton(GwMaptool):
         # Reset
         self.reset()
 
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setIconType(QgsVertexMarker.IconType.ICON_CIRCLE)
 
         # Show help message when action is activated
         if self.show_help:
@@ -194,7 +194,7 @@ class GwArcDivideButton(GwMaptool):
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             feature_id = self.snapper_manager.get_snapped_feature_id(result)
-            point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
+            point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.IconType.ICON_CROSS)
             # Select the arc
             layer.removeSelection()
             layer.select([feature_id])
@@ -236,7 +236,7 @@ class GwArcDivideButton(GwMaptool):
 
     def _release_event(self, event):
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()
             return
 

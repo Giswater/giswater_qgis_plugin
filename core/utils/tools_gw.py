@@ -16,7 +16,7 @@ import sqlite3
 from typing import Literal, Dict, Optional, Union
 import webbrowser
 import xml.etree.ElementTree as ET
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -24,14 +24,14 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp, \
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, \
     QItemSelectionModel, QTimer
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
-    QIntValidator, QDoubleValidator, QRegExpValidator
+    QIntValidator, QDoubleValidator, QRegularExpressionValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout, QHeaderView
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
@@ -389,10 +389,10 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
         dlg.setWindowTitle(title)
 
     # Manage stay on top, maximize/minimize button and information button
-    flags = Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint | Qt.Window
+    flags = Qt.WindowType.WindowCloseButtonHint | Qt.WindowType.WindowMinMaxButtonsHint | Qt.WindowType.Window
 
     if stay_on_top:
-        flags |= Qt.WindowStaysOnTopHint
+        flags |= Qt.WindowType.WindowStaysOnTopHint
 
     dlg.setWindowFlags(flags)
     if issubclass(type(dlg), GwDialog):
@@ -433,12 +433,12 @@ def close_dialog(dlg, delete_dlg=True, plugin='core'):
         pass
 
     lib_vars.session_vars['last_focus'] = None
-    
+
     try:
         dlg.close()
     except RuntimeError:
         pass
-    
+
     if delete_dlg:
         try:
             dlg.deleteLater()
@@ -582,10 +582,10 @@ def refresh_legend():
             ltm = global_vars.iface.layerTreeView().model()
             legend_nodes = ltm.layerLegendNodes(ltl)
             for ln in legend_nodes:
-                current_state = ln.data(Qt.CheckStateRole)
-                ln.setData(Qt.Unchecked, Qt.CheckStateRole)
-                ln.setData(Qt.Checked, Qt.CheckStateRole)
-                ln.setData(current_state, Qt.CheckStateRole)
+                current_state = ln.data(Qt.ItemDataRole.CheckStateRole)
+                ln.setData(Qt.CheckState.Unchecked, Qt.ItemDataRole.CheckStateRole)
+                ln.setData(Qt.CheckState.Checked, Qt.ItemDataRole.CheckStateRole)
+                ln.setData(current_state, Qt.ItemDataRole.CheckStateRole)
 
 
 def get_cursor_multiple_selection():
@@ -595,7 +595,7 @@ def get_cursor_multiple_selection():
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
-        cursor = QCursor(Qt.ArrowCursor)
+        cursor = QCursor(Qt.CursorShape.ArrowCursor)
 
     return cursor
 
@@ -738,7 +738,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
     # Adding auto-completion to a QLineEdit
     completer = QCompleter()
-    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
     widget.setCompleter(completer)
     model = QStringListModel()
     sql = (f"SELECT {feature_type}_id"
@@ -883,7 +883,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         for prop, value in properties.items():
             if prop == 'hiddenForm' and value == 'true':
                 cfg = layer.editFormConfig()
-                cfg.setSuppress(QgsEditFormConfig.SuppressOn)
+                cfg.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
                 layer.setEditFormConfig(cfg)
 
     # Apply mapzone styling if this is a mapzone layer
@@ -1199,17 +1199,17 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         widgetcontrols = field.get('widgetcontrols')
         if widgetcontrols:
             if widgetcontrols.get('setQgisConstraints') is True:
-                layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
-                                         QgsFieldConstraints.ConstraintStrengthSoft)
-                layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
-                                         QgsFieldConstraints.ConstraintStrengthHard)
+                layer.setFieldConstraint(field_index, QgsFieldConstraints.Constraint.ConstraintNotNull,
+                                         QgsFieldConstraints.ConstraintStrength.ConstraintStrengthSoft)
+                layer.setFieldConstraint(field_index, QgsFieldConstraints.Constraint.ConstraintUnique,
+                                         QgsFieldConstraints.ConstraintStrength.ConstraintStrengthHard)
 
         if field.get('ismandatory') is True:
-            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
-                                     QgsFieldConstraints.ConstraintStrengthHard)
+            layer.setFieldConstraint(field_index, QgsFieldConstraints.Constraint.ConstraintNotNull,
+                                     QgsFieldConstraints.ConstraintStrength.ConstraintStrengthHard)
         else:
-            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
-                                     QgsFieldConstraints.ConstraintStrengthSoft)
+            layer.setFieldConstraint(field_index, QgsFieldConstraints.Constraint.ConstraintNotNull,
+                                     QgsFieldConstraints.ConstraintStrength.ConstraintStrengthSoft)
 
         # Manage editability
         # Get layer config
@@ -1500,23 +1500,23 @@ def enable_all(dialog, result, from_apply=False):
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.NoFocus)
+                            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
                             if type(widget) is GwHyperLinkLineEdit:
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
-                            widget.setFocusPolicy(Qt.StrongFocus)
+                            widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                             if not from_apply:
                                 widget.setStyleSheet(None)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit)):
                         widget.setEnabled(field['iseditable'])
                         if not from_apply:
                             widget.setStyleSheet(None)
-                        widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
+                        widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus if field['iseditable'] else Qt.FocusPolicy.NoFocus)
 
                     elif type(widget) in (QCheckBox, QPushButton):
                         widget.setEnabled(field['iseditable'])
-                        widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
+                        widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus if field['iseditable'] else Qt.FocusPolicy.NoFocus)
     except RuntimeError:
         pass
 
@@ -1752,7 +1752,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             widget.textChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('combo', 'combobox'):
             widget = add_combo(field)
-            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
             widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('check', 'checkbox'):
             kwargs = {"dialog": dialog, "field": field}
@@ -1765,7 +1765,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             kwargs = {"dialog": dialog, "field": field}
             widget = add_multiple_checkbox(**kwargs)
             widget.itemChanged.connect(partial(get_values, dialog, widget, my_json))
-            label.setAlignment(Qt.AlignTop)
+            label.setAlignment(Qt.AlignmentFlag.AlignTop)
         elif field['widgettype'] == 'multiple_option':
             # Create completer for autocomplete functionality
             completer = QCompleter()
@@ -1785,7 +1785,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             widget.findChild(QListWidget).model().rowsInserted.connect(partial(get_values, dialog, widget, my_json))
 
             # Align label to top since this widget can grow vertically
-            label.setAlignment(Qt.AlignTop)
+            label.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
@@ -1810,7 +1810,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
         grid_layout.addWidget(label, order, 0)
         grid_layout.addWidget(widget, order, 1)
 
-    vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
     grid_layout.addItem(vertical_spacer1)
 
     # Handle actions dynamically based on tab_name
@@ -1881,7 +1881,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 lbl.setObjectName('lbl' + field['widgetname'])
                 lbl.setText(field['label'])
                 lbl.setMinimumSize(160, 0)
-                lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
                 if 'tooltip' in field:
                     lbl.setToolTip(field['tooltip'])
 
@@ -1899,7 +1899,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if widgetcontrols and widgetcontrols.get('regexpControl') is not None:
                         pass
                     widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                     datatype = field.get('datatype')
                     if datatype == 'int':
                         widget.setValidator(QIntValidator())
@@ -1915,14 +1915,14 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if signal:
                         widget.currentIndexChanged.connect(partial(getattr(module, signal), dialog))
                         getattr(module, signal)(dialog)
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
                     if field.get('value') is not None:
                         widget.setChecked(tools_os.set_boolean(field['value']))
                         widget.setProperty('value', field['value'])
                     widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = CustomQgsDateTimeEdit()
                     widget.setAllowNull(True)
@@ -1936,7 +1936,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         widget.setProperty('value', field['value'].replace('/', '-'))
                         widget.setDate(date)
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     widgetcontrols = field.get('widgetcontrols')
@@ -1952,7 +1952,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         widget.setValue(value)
                         widget.setProperty('value', field['value'])
                     widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 elif field['widgettype'] == 'button':
                     kwargs = {"dialog": dialog, "field": field, "temp_layers_added": temp_layers_added}
                     widget = add_button(**kwargs)
@@ -2169,7 +2169,7 @@ def add_button(**kwargs):
         if not exist:
             msg = "widget {0} has associated function {1}, but {2} not exist"
             msg_params = (real_name, function_name, function_name,)
-            tools_qgis.show_message(msg, 2, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -2250,8 +2250,8 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
             return _json
         value = []
         for i in range(widget.count()):
-            if widget.item(i).checkState() == Qt.Checked:
-                v = widget.item(i).data(Qt.UserRole)
+            if widget.item(i).checkState() == Qt.CheckState.Checked:
+                v = widget.item(i).data(Qt.ItemDataRole.UserRole)
                 try:
                     v = int(v)
                 except ValueError:
@@ -2271,7 +2271,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
             value = []
             for i in range(widget.count()):
                 # Get the data stored in UserRole for each item
-                v = widget.item(i).data(Qt.UserRole)
+                v = widget.item(i).data(Qt.ItemDataRole.UserRole)
                 # Try to convert to integer if possible
                 try:
                     v = int(v)
@@ -2326,11 +2326,11 @@ def add_checkbox(**kwargs):
                 if not exist:
                     msg = "widget {0} has associated function {1}, but {2} not exist"
                     msg_params = (field['widgetname'], function_name, function_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                     return widget
             else:
                 msg = "Parameter functionName is null for check"
-                tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=widget.objectName())
 
     func_params = ""
 
@@ -2341,7 +2341,7 @@ def add_checkbox(**kwargs):
         if not exist:
             msg = "widget {0} has associated function {1}, but {2} not exist"
             msg_params = (field['widgetname'], function_name, function_name,)
-            tools_qgis.show_message(msg, 2, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -2400,7 +2400,7 @@ def add_hyperlink(field):
     if 'value' in field:
         widget.setText(field['value'])
         widget.setProperty('value', field['value'])
-    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+    widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
     real_name = widget.objectName()
@@ -2414,16 +2414,16 @@ def add_hyperlink(field):
                 if not exist:
                     msg = "widget {0} have associated function {1}, but {2} not exist"
                     msg_params = (real_name, func_name, func_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                     return widget
             else:
                 msg = "Parameter widgetfunction is null for widget hyperlink"
-                tools_qgis.show_message(msg, 2, parameter=real_name)
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=real_name)
         else:
             tools_log.log_info(field['widgetfunction'])
     else:
         msg = "Parameter widgetfunction not found for widget type hyperlink"
-        tools_qgis.show_message(msg, 2)
+        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical)
 
     if func_name is not None:
         # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
@@ -2464,13 +2464,13 @@ def add_calendar(dlg, fld, **kwargs):
                 if not exist:
                     msg = "widget {0} have associated function {1}, but {2} not exist"
                     msg_params = (real_name, function_name, function_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                     return widget
                 if 'parameters' in fld['widgetfunction']:
                     func_params = fld['widgetfunction']['parameters']
             else:
                 msg = "Parameter button_function is null for button"
-                tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=widget.objectName())
 
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
@@ -2585,7 +2585,7 @@ def add_lineedit(field):
     widget.setObjectName(field['widgetname'])
 
     if field.get('columnname') == 'password':
-        widget.setEchoMode(QLineEdit.Password)
+        widget.setEchoMode(QLineEdit.EchoMode.Password)
         widget.setClearButtonEnabled(True)
 
         # Add toggle password visibility action
@@ -2593,7 +2593,7 @@ def add_lineedit(field):
         action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "142.png")))
         action.setCheckable(True)
         action.triggered.connect(partial(toggle_visibility, widget, action))
-        widget.addAction(action, QLineEdit.TrailingPosition)
+        widget.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
@@ -2617,10 +2617,10 @@ def add_lineedit(field):
 
 def toggle_visibility(widget, action, checked):
     if checked:
-        widget.setEchoMode(QLineEdit.Normal)
+        widget.setEchoMode(QLineEdit.EchoMode.Normal)
         action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "141.png")))
     else:
-        widget.setEchoMode(QLineEdit.Password)
+        widget.setEchoMode(QLineEdit.EchoMode.Password)
         action.setIcon(QIcon(os.path.join(lib_vars.plugin_dir, "icons", "dialogs", "142.png")))
 
 
@@ -2657,7 +2657,7 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], c
             if not exist:
                 msg = "widget {0} have associated function {1}, but {2} not exist"
                 msg_params = (real_name, function_name, function_name,)
-                tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                 return widget
             if 'parameters' in field['widgetfunction']:
                 func_params = field['widgetfunction']['parameters']
@@ -2679,8 +2679,8 @@ def add_frame(field, x=None):
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
 
-    widget.setFrameShape(QFrame.HLine)
-    widget.setFrameShadow(QFrame.Sunken)
+    widget.setFrameShape(QFrame.Shape.HLine)
+    widget.setFrameShadow(QFrame.Shadow.Sunken)
 
     return widget
 
@@ -2731,11 +2731,11 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
                     if not exist:
                         msg = "widget {0} has associated function {1}, but {2} not exist"
                         msg_params = (widget.property('widgetname'), function_name, function_name,)
-                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                         return widget
                 else:
                     msg = "Parameter functionName is null for button"
-                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=widget.objectName())
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -2887,7 +2887,7 @@ def add_item_multiple_option(completer, widget, typeahead):
     item = QListWidgetItem()
     item.setText(value)  # Set display text
     if _key:
-        item.setData(Qt.UserRole, _key)  # Store key in user role
+        item.setData(Qt.ItemDataRole.UserRole, _key)  # Store key in user role
     widget.addItem(item)  # Add item to list widget
 
     typeahead.setText('')
@@ -2940,7 +2940,7 @@ def fill_multiple_option(widget, field, index_to_show=1, index_to_compare=0):
         set_multiple_option_value(widget, selected_values)
 
     # Configure widget size policy to adjust to contents
-    widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    widget.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
     return widget
 
 
@@ -2988,11 +2988,11 @@ def add_multiple_checkbox(field, dialog=None, complet_result=None, ignore_functi
                     if not exist:
                         msg = "widget {0} has associated function {1}, but {2} not exist"
                         msg_params = (widget.property('widgetname'), function_name, function_name,)
-                        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                         return widget
                 else:
                     msg = "Parameter functionName is null for button"
-                    tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=widget.objectName())
             widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -3019,19 +3019,19 @@ def fill_multiple_checkbox(widget, field, index_to_show=1, index_to_compare=0):
     else:
         msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
         msg_params = (field['widgetname'], field['widgettype'],)
-        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
     # Populate combo
     for record in combolist:
         item = QListWidgetItem()
         item.setText(record[index_to_show])
-        item.setData(Qt.UserRole, record[index_to_compare])
-        item.setFlags(item.flags() | Qt.ItemIsUserCheckable)  # make it checkable
-        item.setCheckState(Qt.Unchecked)  # start unchecked
+        item.setData(Qt.ItemDataRole.UserRole, record[index_to_compare])
+        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)  # make it checkable
+        item.setCheckState(Qt.CheckState.Unchecked)  # start unchecked
         widget.addItem(item)
     if 'selectedId' in field:
         set_multiple_checkbox_value(widget, field['selectedId'])
     # Set size policy for QListWidget - use setSizeAdjustPolicy instead
-    widget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    widget.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
     return widget
 
 
@@ -3057,7 +3057,7 @@ def set_multiple_option_value(listwidget, value):
     for id, val in value:
         item = QListWidgetItem()
         item.setText(val)  # Set display text
-        item.setData(Qt.UserRole, id)  # Store ID in user role
+        item.setData(Qt.ItemDataRole.UserRole, id)  # Store ID in user role
 
         listwidget.addItem(item)
     return False
@@ -3101,24 +3101,24 @@ def set_multiple_checkbox_value(listwidget, value, add_new=True):
     for i in range(0, listwidget.count()):
         elem = listwidget.item(i)
         for j in range(len(value)):
-            if str(value[j]) == str(elem.data(Qt.UserRole)):
-                listwidget.item(i).setCheckState(Qt.Checked)
+            if str(value[j]) == str(elem.data(Qt.ItemDataRole.UserRole)):
+                listwidget.item(i).setCheckState(Qt.CheckState.Checked)
 
     # Add new value if @value not in combo
     if add_new and value not in ("", None, 'None', 'none', '-1', -1):
         for val in value:
             found = False
             for i in range(listwidget.count()):
-                if str(val) == str(listwidget.item(i).data(Qt.UserRole)):
+                if str(val) == str(listwidget.item(i).data(Qt.ItemDataRole.UserRole)):
                     found = True
                     break
 
             if not found:
                 item = QListWidgetItem()
                 item.setText(f"({val})")
-                item.setData(Qt.UserRole, val)
-                item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-                item.setCheckState(Qt.Checked)
+                item.setData(Qt.ItemDataRole.UserRole, val)
+                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+                item.setCheckState(Qt.CheckState.Checked)
                 listwidget.addItem(item)
     return False
 
@@ -3144,7 +3144,7 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
     else:
         msg = "key 'comboIds' or/and comboNames not found WHERE widgetname='{0}' AND widgettype='{1}'"
         msg_params = (field['widgetname'], field['widgettype'],)
-        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
     # Populate combo
     for record in combolist:
         widget.addItem(record[index_to_show], record)
@@ -3411,7 +3411,7 @@ def manage_json_geometry(json_result):
 
     tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
 
-    list_coord = re.search('\((.*)\)', str(json_result['body']['feature']['geometry']['st_astext']))
+    list_coord = re.search(r'\((.*)\)', str(json_result['body']['feature']['geometry']['st_astext']))
     points = tools_qgis.get_geometry_vertex(list_coord)
 
     for point in points:
@@ -3454,6 +3454,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
 
             # Show exception message only if we are not in a task process
             if len(lib_vars.session_vars['threads']) == 0:
+                level = Qgis.MessageLevel(level)
                 if 'SQLCONTEXT' in json_result:
                     tools_qgis.show_message(msg, level, sqlcontext=json_result['SQLCONTEXT'])
                 else:
@@ -3882,7 +3883,7 @@ def parse_currency(value_str, currency_config=None):
     Returns:
         Float value
     """
-    
+
     if currency_config is None:
         try:
             row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -3890,20 +3891,20 @@ def parse_currency(value_str, currency_config=None):
                 currency_config = json.loads(row[0])
         except Exception:
             currency_config = {"symbol": "$", "separator": ",", "decimals": True}
-    
+
     # Remove all currency symbols and spaces
     cleaned = str(value_str).strip()
     for symbol in ['€', '$', '₡', '£', '¥', ' ']:
         cleaned = cleaned.replace(symbol, '')
-    
+
     # Get separator config
     thousands_sep = currency_config.get('separator', ',')
     decimal_sep = ',' if thousands_sep == '.' else '.'
-    
+
     # Remove thousands separator and replace decimal separator with dot
     cleaned = cleaned.replace(thousands_sep, '')
     cleaned = cleaned.replace(decimal_sep, '.')
-    
+
     try:
         return float(cleaned)
     except (ValueError, TypeError):
@@ -3927,7 +3928,7 @@ def format_currency(value, currency_config=None, with_symbol=True):
         {"symbol":"€", "separator":".", "decimals":true} -> €1.000.000,25
         {"symbol":"₡", "separator":",", "decimals":false} -> ₡1,000,000
     """
-    
+
     if currency_config is None:
         try:
             row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -3936,33 +3937,33 @@ def format_currency(value, currency_config=None, with_symbol=True):
         except Exception:
             # Fallback to default
             currency_config = {"symbol": "$", "separator": ",", "decimals": True}
-    
+
     # Extract config
     symbol = currency_config.get('symbol', '$')
     thousands_sep = currency_config.get('separator', ',')
     show_decimals = currency_config.get('decimals', True)
-    
+
     # Determine decimal separator (opposite of thousands separator)
     decimal_sep = ',' if thousands_sep == '.' else '.'
-    
+
     # Convert to float
     try:
         num_value = float(value)
     except (ValueError, TypeError):
         return f"{symbol}0"
-    
+
     # Format the number
     if show_decimals:
         # Split into integer and decimal parts
         int_part = int(abs(num_value))
         decimal_part = abs(num_value) - int_part
-        
+
         # Format integer part with thousands separator
         int_str = f"{int_part:,}".replace(',', thousands_sep)
-        
+
         # Format decimal part (always 2 decimal places)
         decimal_str = f"{decimal_part:.2f}"[2:]  # Get digits after "0."
-        
+
         # Combine
         formatted = f"{'-' if num_value < 0 else ''}{int_str}{decimal_sep}{decimal_str}"
     else:
@@ -3971,7 +3972,7 @@ def format_currency(value, currency_config=None, with_symbol=True):
         formatted = f"{int_value:,}".replace(',', thousands_sep)
         if num_value < 0 and not formatted.startswith('-'):
             formatted = '-' + formatted
-    
+
     return f"{symbol}{formatted}" if with_symbol else formatted
 
 
@@ -4112,7 +4113,7 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
 
     global_vars.canvas.setMapTool(select_manager)
     if selection_type_enum == GwSelectionType.POINT:
-        cursor = QCursor(Qt.CrossCursor)
+        cursor = QCursor(Qt.CursorShape.CrossCursor)
     else:
         cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
@@ -4141,7 +4142,7 @@ def select_with_expression_dialog_custom(class_object, dialog, table_object, lay
     activation_function()
 
     # Show dialog
-    if show_expression_dialog(class_object.feature_type, dialog, table_object) in (QDialog.Accepted, QDialog.Rejected):
+    if show_expression_dialog(class_object.feature_type, dialog, table_object) in (QDialog.DialogCode.Accepted, QDialog.DialogCode.Rejected):
         # Execute deactivation function
         deactivation_function()
 
@@ -4396,7 +4397,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
                 if row_value in selected_ids_set:
                     column_index = model.fieldIndex(field_id)
                     index = model.index(row, column_index)
-                    selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+                    selection_model.select(index, QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
 
     # Safely check and call callback if it exists
     if hasattr(class_object, 'callback_later_selection') and class_object.callback_later_selection:
@@ -4434,7 +4435,7 @@ def _process_map_selection(class_object, selection_mode, field_id):
         field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
         if field_idx != -1:
             # Get all features to find matching QGIS feature IDs
-            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.Flag.NoGeometry).setSubsetOfAttributes([field_idx])
             matching_qgis_fids = []
 
             for feature in layer.getFeatures(request):
@@ -4534,7 +4535,7 @@ def _process_map_selection(class_object, selection_mode, field_id):
                 field_idx = layer.fields().indexOf(field_id)
                 if field_idx == -1:
                     continue
-                request = QgsFeatureRequest().setFilterFids(layer.selectedFeatureIds()).setFlags(QgsFeatureRequest.NoGeometry).setSubsetOfAttributes([field_idx])
+                request = QgsFeatureRequest().setFilterFids(layer.selectedFeatureIds()).setFlags(QgsFeatureRequest.Flag.NoGeometry).setSubsetOfAttributes([field_idx])
                 for feature in layer.getFeatures(request):
                     selected_id = str(feature.attribute(field_idx))
                     if selected_id:
@@ -4627,7 +4628,7 @@ def _select_rows_in_tables(dialog, ft, ids_list):
             else:
                 id_col_idx = -1
                 for c in range(qtable.model().columnCount()):
-                    if qtable.model().headerData(c, Qt.Horizontal) == id_col_name:
+                    if qtable.model().headerData(c, Qt.Orientation.Horizontal) == id_col_name:
                         id_col_idx = c
                         break
             if id_col_idx != -1:
@@ -4641,7 +4642,7 @@ def _select_rows_in_tables(dialog, ft, ids_list):
                     val = str(qtable.model().index(row, id_col_idx).data())
                     if val in ids_set:
                         index = qtable.model().index(row, id_col_idx)
-                        sel_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+                        sel_model.select(index, QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
     except Exception:
         pass
 
@@ -4706,7 +4707,7 @@ def get_model_index(model, row, field_name):
     else:
         column_index = -1
         for column in range(model.columnCount()):
-            if model.headerData(column, Qt.Horizontal) == field_name:
+            if model.headerData(column, Qt.Orientation.Horizontal) == field_name:
                 column_index = column
                 break
 
@@ -4775,7 +4776,7 @@ def show_expression_dialog(feature_type, dialog, table_object):
     layer = tools_qgis.get_layer_by_tablename(tablename)
     start_text = None
     dlg = QgsExpressionSelectionDialog(layer, start_text, dialog)
-    return dlg.exec_()
+    return dlg.exec()
 
 
 def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
@@ -4940,8 +4941,8 @@ def connect_signal_selection_changed(class_object, dialog, table_object, selecti
 
 def docker_dialog(dialog, dlg_name=None, title=None):
 
-    positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
-                 2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
+    positions = {8: Qt.DockWidgetArea.BottomDockWidgetArea, 4: Qt.DockWidgetArea.TopDockWidgetArea,
+                 2: Qt.DockWidgetArea.RightDockWidgetArea, 1: Qt.DockWidgetArea.LeftDockWidgetArea}
 
     # If a previous guard set a block, skip attaching this dialog
     if lib_vars.session_vars.get('block_next_form_attach'):
@@ -4951,21 +4952,21 @@ def docker_dialog(dialog, dlg_name=None, title=None):
         except Exception:
             pass
         return
-    
+
     # Ensure docker exists
     if not lib_vars.session_vars.get('dialog_docker'):
         lib_vars.session_vars['dialog_docker'] = GwDocker()
         lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
         manage_docker_options()
-    
+
     try:
         docker = lib_vars.session_vars['dialog_docker']
-        
+
         # Set new widget
         docker.setWindowTitle(dialog.windowTitle())
         docker.setWidget(dialog)
-        docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
-        
+        docker.setWindowFlags(Qt.WindowType.WindowContextHelpButtonHint)
+
         # Create btn_help
         add_btn_help(dialog)
         dialog.messageBar().hide()
@@ -4990,33 +4991,33 @@ def _check_mincut_state_4_replacement(docker):
     """
     if not docker or isdeleted(docker):
         return False
-    
+
     try:
         widget = docker.widget()
     except RuntimeError:
         return False
-    
+
     if not widget or isdeleted(widget) or widget.objectName() != 'dlg_mincut':
         return False
-    
+
     # Get mincut ID from the current widget (not from mincut object, which may already point to new mincut)
     try:
         rid_widget = widget.findChild(QLineEdit, 'result_mincut_id')
         rid_text = rid_widget.text() if rid_widget else None
     except Exception:
         return False
-    
+
     if not rid_text or rid_text in ('', 'null'):
         return False
-    
+
     # Check if mincut exists in DB and is in state 4
     try:
         row = tools_db.get_row(f"SELECT mincut_state FROM om_mincut WHERE id = '{rid_text}'", log_info=False)
         db_state = (row.get('mincut_state') if isinstance(row, dict) else row[0]) if row else None
-        
+
         if str(db_state) != '4':
             return False
-        
+
         # Ask user if they want to cancel the existing mincut
         if not tools_qt.show_question(
             "The mincut will be canceled, are you sure?",
@@ -5025,13 +5026,13 @@ def _check_mincut_state_4_replacement(docker):
         ):
             # User declined: block new mincut
             return True
-        
+
         # User accepted: cleanup the old mincut before opening new one
         class_obj = widget.property('class_obj')
         old_mincut = getattr(class_obj, 'mincut', None) if class_obj else None
         if old_mincut:
             old_mincut._mincut_cleanup_only(rid_text)
-        
+
         return False
     except Exception:
         return False
@@ -5116,7 +5117,7 @@ def manage_docker_options(option_name='position'):
         lib_vars.session_vars['dialog_docker'].position = 2
 
 
-def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=None):
+def set_tablemodel_config(dialog, widget, table_name, sort_order=Qt.SortOrder.AscendingOrder, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
     widget = tools_qt.get_widget(dialog, widget)
@@ -5169,14 +5170,14 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
             if style:
                 stretch = style.get('stretch')
                 if stretch is not None:
-                    stretch = 1 if stretch else 0
+                    stretch = QHeaderView.ResizeMode.Stretch if stretch else QHeaderView.ResizeMode.Interactive
                     widget.horizontalHeader().setSectionResizeMode(col_idx, stretch)
             width = row['width']
             if width is None:
                 width = 100
             widget.setColumnWidth(col_idx, width)
             if row['alias'] is not None:
-                widget.model().setHeaderData(col_idx, Qt.Horizontal, row['alias'])
+                widget.model().setHeaderData(col_idx, Qt.Orientation.Horizontal, row['alias'])
     widget.setProperty('columns', columns_dict)
     # Set order
     if isinstance(widget.model(), QStandardItemModel) is False:
@@ -5324,7 +5325,7 @@ def load_tableview_psector(dialog, feature_type):
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
     tablename = qtable.property('tablename')
-    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.EditStrategy.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, f"{tablename}")
@@ -5337,7 +5338,7 @@ def load_tableview_element(dialog, feature_id, rel_feature_type):
     expr = f"element_id = '{feature_id}'"
     qtable = tools_qt.get_widget(dialog, f'tab_features_tbl_element_x_{rel_feature_type}')
     tablename = f'v_ui_element_x_{rel_feature_type}'
-    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.EditStrategy.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
     tableview = f'tbl_element_x_{rel_feature_type}'
@@ -5351,7 +5352,7 @@ def load_tableview_visit(dialog, feature_id, rel_feature_type):
     expr = f"visit_id = '{feature_id}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_visit_x_{rel_feature_type}')
     tablename = f'om_visit_x_{rel_feature_type}'
-    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.EditStrategy.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
     tableview = f'tbl_visit_x_{rel_feature_type}'
@@ -5628,7 +5629,7 @@ def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
                 # QStandardItemModel - find column by name
                 col_index = -1
                 for c in range(model.columnCount()):
-                    if model.headerData(c, Qt.Horizontal) == field_id:
+                    if model.headerData(c, Qt.Orientation.Horizontal) == field_id:
                         col_index = c
                         break
                 if col_index != -1:
@@ -6328,7 +6329,7 @@ def export_layers_to_gpkg(layers, path):
             is_first = False
         else:
             # switch mode to append layer instead of overwriting the file
-            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+            options.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
             options.layerName = vlayer.name()
             QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
 
@@ -6543,7 +6544,7 @@ def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
         qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
         tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
 
-        message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+        message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.EditStrategy.OnFieldChange, schema_name='cm')
 
         # Get ids from qtable (that will only mark the ones wanted in snapping)
         feature_id_column = f"{feature_type}_id"
@@ -6685,7 +6686,7 @@ def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
         qtable = tools_qt.get_widget(dialog, table_widget_name)
 
         tablename = qtable.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
-        message = tools_qt.fill_table(qtable, tablename, expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+        message = tools_qt.fill_table(qtable, tablename, expr, QSqlTableModel.EditStrategy.OnFieldChange, schema_name='cm')
 
         # Get ids from qtable (used for selection in snapping)
         feature_id_column = f"{feature_type}_id"
@@ -6843,8 +6844,8 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
             continue
         widget = add_tableview_header(widget, field)
         widget = fill_tableview_rows(widget, field)
-        widget = set_tablemodel_config(dialog, widget, short_name, 1)
-        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
+        widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
+        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
     widget_list = []
     widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
@@ -6989,11 +6990,11 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
                         if not exist:
                             msg = "widget {0} has associated function {1}, but {2} not exist"
                             msg_params = (widget.property('widgetname'), function_name, function_name,)
-                            tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                            tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                             return widget
                     else:
                         msg = "Parameter functionName is null for button"
-                        tools_qgis.show_message(msg, 2, parameter=widget.objectName())
+                        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=widget.objectName())
 
             func_params = ""
             function_name = ""
@@ -7004,7 +7005,7 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
                 if not exist:
                     msg = "widget {0} has associated function {1}, but {2} not exist"
                     msg_params = (widget.property('widgetname'), function_name, function_name,)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
                     return widget
                 if 'parameters' in widgetfunction[i]:
                     func_params = widgetfunction[i]['parameters']
@@ -7123,7 +7124,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
     if 'widgettype' in field and not field['widgettype']:
         msg = "The field widgettype is not configured for"
         param = f"formname:{tablename}, columnname:{field['columnname']}"
-        tools_qgis.show_message(msg, 2, parameter=param, dialog=dialog)
+        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=dialog)
         return label, widget
 
     if field['widgettype'] == 'label':
@@ -7136,7 +7137,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
     except Exception as e:
         msg = "{0}: {1} Python function: tools_gw.set_widgets. WHERE columname='{2}' AND widgetname='{3}' AND widgettype='{4}'"
         msg_params = (type(e).__name__, e, field['columnname'], field['widgetname'], field['widgettype'],)
-        tools_qgis.show_message(msg, 2, msg_params=msg_params)
+        tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
         return label, widget
 
     try:
@@ -7209,8 +7210,8 @@ def _set_reg_exp(widget, field):
     if 'widgetcontrols' in field and field['widgetcontrols']:
         if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
             if field['widgetcontrols']['regexpControl'] is not None:
-                reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                widget.setValidator(QRegExpValidator(reg_exp))
+                reg_exp = QRegularExpression(str(field['widgetcontrols']['regexpControl']))
+                widget.setValidator(QRegularExpressionValidator(reg_exp))
 
     return widget
 
@@ -7472,7 +7473,7 @@ def _show_context_menu(self, qtableview):
 class CustomQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
@@ -7484,7 +7485,7 @@ class CustomQComboBox(QComboBox):
 class CustomQgsDateTimeEdit(QgsDateTimeEdit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():

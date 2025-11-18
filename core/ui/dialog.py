@@ -56,11 +56,11 @@ class GwDialog(QDialog):
             # Create a stacked layout to overlay the message bar
             self.stacked_layout = QStackedLayout(self)
             self.setLayout(self.stacked_layout)
-            self.stacked_layout.setStackingMode(1)
+            self.stacked_layout.setStackingMode(QStackedLayout.StackingMode.StackAll)
 
             # Create the message bar
             self._messageBar = QgsMessageBar()
-            self._messageBar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # Full width, fixed height
+            self._messageBar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)  # Full width, fixed height
             self._messageBar.setMaximumHeight(35)
 
             # Add message bar to stacked layout
@@ -90,7 +90,7 @@ class GwDialog(QDialog):
         else:
             tag = str(self.objectName())
 
-        if event.type() == QtCore.QEvent.ActivationChange and self.isActiveWindow():
+        if event.type() == QtCore.QEvent.Type.ActivationChange and self.isActiveWindow():
             lib_vars.session_vars['last_focus'] = tag
             return True
         return False
@@ -98,7 +98,7 @@ class GwDialog(QDialog):
     def keyPressEvent(self, event):
 
         try:
-            if event.key() == QtCore.Qt.Key_Escape:
+            if event.key() == QtCore.Qt.Key.Key_Escape:
                 self.key_escape.emit()
                 return super().keyPressEvent(event)
         except RuntimeError:

@@ -8,11 +8,11 @@ or (at your option) any later version.
 import json
 
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QDateTime
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton, QHeaderView
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
 
@@ -79,7 +79,7 @@ class GwMapzoneManager:
             qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
 
             # Populate custom context menu
-            qtableview.setContextMenuPolicy(Qt.CustomContextMenu)
+            qtableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
 
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
@@ -182,7 +182,7 @@ class GwMapzoneManager:
             # fallback
             self.mapzone_mng_dlg.btn_execute.setEnabled(False)
 
-    def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _fill_mapzone_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
         # Manage exception if dialog is closed
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
@@ -198,8 +198,8 @@ class GwMapzoneManager:
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(self.table_name)
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
-        model.setSort(0, 0)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
 
         # Check for errors
@@ -219,8 +219,8 @@ class GwMapzoneManager:
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=0)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
+                                      sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         tools_gw.set_tablemodel_config(self.mapzone_mng_dlg, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
@@ -233,7 +233,7 @@ class GwMapzoneManager:
             widget.setColumnHidden(geom_col_idx, True)
 
         # Sort the table
-        model.sort(0, 0)
+        model.sort(0, Qt.SortOrder.AscendingOrder)
 
     def _filter_active(self, dialog, active):
         """ Filters manager table by active """
@@ -453,7 +453,7 @@ class GwMapzoneManager:
             if isinstance(value, QDateTime):
                 temporal_values.append(value)
             elif isinstance(value, str):
-                parsed_value = QDateTime.fromString(value, Qt.ISODate)
+                parsed_value = QDateTime.fromString(value, Qt.DateFormat.ISODate)
                 if parsed_value.isValid():
                     temporal_values.append(parsed_value)
 
@@ -480,7 +480,7 @@ class GwMapzoneManager:
         """Identify the node at the selected point, retrieve node_id, and run flood analysis."""
 
         # Manage right click
-        if event == Qt.RightButton:
+        if event == Qt.MouseButton.RightButton:
             self._cancel_snapping_tool(dialog, None)
             return
 
@@ -813,7 +813,7 @@ class GwMapzoneManager:
         options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
                    'forceClosed': [force_closed_id_field, '_set_force_closed'], 'ignore': [ignore_id_field, '_set_ignore']}
 
-        if event == Qt.RightButton:
+        if event == Qt.MouseButton.RightButton:
             self._cancel_snapping_tool(dialog, action)
             return
 
@@ -930,6 +930,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -963,6 +964,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -996,6 +998,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1029,6 +1032,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1062,6 +1066,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1095,6 +1100,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
             preview = json_result['body']['data'].get('preview')
@@ -1125,7 +1131,7 @@ class GwMapzoneManager:
         json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
         if not json_result or 'status' not in json_result:
             msg = "Failed to get a valid response from gw_fct_config_mapzones."
-            tools_qgis.show_message(msg, level=2)
+            tools_qgis.show_message(msg, level=Qgis.MessageLevel.Critical)
             return
 
         if 'status' in json_result and json_result['status'] == 'Accepted':
@@ -1134,6 +1140,7 @@ class GwMapzoneManager:
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                     msg = json_result['message']['text']
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
             if global_vars.project_type != 'ud':
@@ -1256,7 +1263,7 @@ class GwMapzoneManager:
         mapzone_id = index.sibling(index.row(), 0).data()
         active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
         active = tools_os.set_boolean(active)
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
 
         sql = f"UPDATE {view.replace('v_ui_', 've_')} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
         tools_db.execute_sql(sql)
@@ -1268,7 +1275,7 @@ class GwMapzoneManager:
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl', '').replace('v_ui_', 've_')
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
 
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
@@ -1301,7 +1308,7 @@ class GwMapzoneManager:
         col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
 
         mapzone_id = index.sibling(index.row(), col_idx).data()
-        field_id = tableview.model().headerData(col_idx, Qt.Horizontal).lower()
+        field_id = tableview.model().headerData(col_idx, Qt.Orientation.Horizontal).lower()
 
         # Execute getinfofromid
         _id = f"{mapzone_id}"
@@ -1329,7 +1336,7 @@ class GwMapzoneManager:
             return
 
         # Get selected mapzone data
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
         mapzone_ids = [index.sibling(index.row(), 0).data() for index in selected_list]
 
         msg = "Are you sure you want to delete these records?"

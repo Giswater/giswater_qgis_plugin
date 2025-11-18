@@ -8,7 +8,7 @@ or (at your option) any later version.
 from .campaign import Campaign
 from ..dialog import GwAction
 from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
+from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup, QWidget
 from functools import partial
 from ....libs import tools_qt, tools_db
 from ...utils import tools_gw
@@ -79,7 +79,7 @@ class GwAddCampaignButton(GwAction):
         """ Fill action menu """
         if self.menu is None:
             return
-        
+
         actions = self.menu.actions()
         for action in actions:
             action.disconnect()
@@ -100,7 +100,7 @@ class GwAddCampaignButton(GwAction):
         if selected_action in (tools_qt.tr("Review"), tools_qt.tr("Visit"), tools_qt.tr("Inventory")):
             if self.menu is not None:
                 self.menu.setProperty("last_selection", selected_action.lower())
-            
+
             # Create the campaign
             if selected_action == tools_qt.tr("Review"):
                 self.new_campaign.create_campaign(dialog_type="review")
@@ -116,6 +116,9 @@ class GwAddCampaignButton(GwAction):
             if last_selection is not None:
                 self.new_campaign.create_campaign(dialog_type=last_selection)
             else:
-                button = self.action.associatedWidgets()[1]
+                if hasattr(self.action, 'associatedObjects'):
+                    button = QWidget(self.action.associatedObjects()[1])
+                elif hasattr(self.action, 'associatedWidgets'):
+                    button = self.action.associatedWidgets()[1]
                 menu_point = button.mapToGlobal(QPoint(0, button.height()))
                 self.menu.popup(menu_point)

@@ -9,14 +9,14 @@ import csv
 import os
 from functools import partial
 import json
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import timedelta
 
 from qgis.PyQt.QtCore import Qt, QTimer, QDate
 from qgis.PyQt.QtGui import QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
-    QCompleter, QGridLayout, QLabel, QTableWidgetItem
+    QCompleter, QGridLayout, QLabel, QTableWidgetItem, QHeaderView
 from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -40,7 +40,7 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked = {}
         self.TRV_PROCESSES = tools_qt.tr('trv_processes', 'toolbox', default="Processes")
         self.TRV_REPORTS = tools_qt.tr('trv_reports', 'toolbox', default="Raports")
-        
+
         self.ignore_widgets = ['qt_spinbox_lineedit', 'qt_calendar_yearedit']
         self.temp_layers_added = []
         self.add_columns = {}
@@ -173,7 +173,7 @@ class GwToolBoxButton(GwAction):
             return
 
         self.dlg_toolbox = GwToolboxUi(self, 'toolbox')
-        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
         self.no_clickable_items = [self.TRV_PROCESSES, self.TRV_REPORTS]
         extras = '"isToolbox":true'
@@ -384,7 +384,7 @@ class GwToolBoxButton(GwAction):
                         # Create a QTableWidgetItem and then set the data so the sorting works properly
                         # with Strings, Integers and any other type
                         qtable_item = QTableWidgetItem()
-                        qtable_item.setData(Qt.DisplayRole, value)
+                        qtable_item.setData(Qt.ItemDataRole.DisplayRole, value)
                         self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
 
                 continue
@@ -397,7 +397,7 @@ class GwToolBoxButton(GwAction):
                 layout.addWidget(widget, 1, order)
 
             # Set scale-to-fit
-            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=0)
+            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         # Update tbl in case filters have default value
         self._update_tbl_reports()
@@ -492,7 +492,7 @@ class GwToolBoxButton(GwAction):
                         # Create a QTableWidgetItem and then set the data so the sorting works properly
                         # with Strings, Integers and any other type
                         qtable_item = QTableWidgetItem()
-                        qtable_item.setData(Qt.DisplayRole, item)
+                        qtable_item.setData(Qt.ItemDataRole.DisplayRole, item)
                         self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
@@ -670,7 +670,7 @@ class GwToolBoxButton(GwAction):
             status = True
 
         return status
-    
+
     def _filter_combo_values(self, dialog, combo):
         parent_name = combo.property('parentname')
         parent_combo = dialog.findChild(QComboBox, parent_name)
@@ -850,7 +850,7 @@ class GwToolBoxButton(GwAction):
         all_rows = []
         headers = []
         for i in range(0, model.columnCount()):
-            headers.append(str(model.headerData(i, Qt.Horizontal)))
+            headers.append(str(model.headerData(i, Qt.Orientation.Horizontal)))
         all_rows.append(headers)
         for rows in range(0, model.rowCount()):
             row = []

@@ -24,7 +24,7 @@ from ....libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
 from ...utils.selection_widget import GwSelectionWidget
- 
+
 
 class AddNewLot:
 
@@ -34,7 +34,7 @@ class AddNewLot:
         self.ids: List[Any] = []
         self.canvas = global_vars.canvas
         self.rb_red = tools_gw.create_rubberband(self.canvas)
-        self.rb_red.setColor(Qt.darkRed)
+        self.rb_red.setColor(Qt.GlobalColor.darkRed)
         self.rb_red.setIconSize(20)
         self.rb_list: List[Any] = []
         self.schema_parent = lib_vars.schema_name
@@ -188,9 +188,9 @@ class AddNewLot:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
                 tools_qt.set_tableview_config(view, sortingEnabled=True)
-                view.setSelectionBehavior(QAbstractItemView.SelectRows)
-                view.setSelectionMode(QAbstractItemView.ExtendedSelection)  # or SingleSelection
-                view.setEditTriggers(QAbstractItemView.NoEditTriggers)
+                view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+                view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)  # or SingleSelection
+                view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
@@ -240,7 +240,7 @@ class AddNewLot:
             return
 
         response_body = response.get("body", {})
-        
+
         # Populate Organization
         if org_assigned_widget:
             org_name = response_body.get("organization_name")
@@ -462,7 +462,7 @@ class AddNewLot:
                     f"ORDER BY id"
                 )
                 self.populate_tableview(view, sql)
-        
+
         # Bind table selection to selectByIds via _select_layers_from_table
         for feature in features:
             table_widget_name = f"tbl_campaign_lot_x_{feature}"
@@ -728,13 +728,13 @@ class AddNewLot:
                 feature_type = current_tab.objectName().replace('tab_', '')
                 table_widget_name = f"tbl_campaign_lot_x_{feature_type}"
                 table_view = getattr(self.dlg_lot, table_widget_name, None)
-                
+
                 if table_view and table_view.model():
                     # If table has exactly 1 row now, it means it was the first insert
                     if table_view.model().rowCount() == 1:
                         self._apply_table_config_for_feature(table_view, feature_type)
                     return
-                
+
             # If we can't determine or table is empty, reload relations
             self._load_lot_relations(self.lot_id)
 
@@ -793,7 +793,7 @@ class AddNewLot:
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
         qtable.setModel(model)
-        
+
         # Determine table configuration based on widget name
         widget_name = qtable.objectName()
         if "tbl_campaign_lot_x_" in widget_name:
@@ -806,7 +806,7 @@ class AddNewLot:
         else:
             # Default fallback
             table_name = "v_ui_lot"
-        
+
         tools_gw.set_tablemodel_config(self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot, qtable, table_name, schema_name="cm")
 
     def get_current_user(self) -> Optional[Dict[str, Any]]:
@@ -837,8 +837,8 @@ class AddNewLot:
         self.dlg_lot_man = LotManagementUi(self)
         tools_gw.load_settings(self.dlg_lot_man)
 
-        self.dlg_lot_man.tbl_lots.setEditTriggers(QTableView.NoEditTriggers)
-        self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectRows)
+        self.dlg_lot_man.tbl_lots.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+        self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
 
         # Fill combo values for lot date_filter_type combo
         date_types = [['real_startdate', tools_qt.tr("Start date", context_name="cm")],
@@ -990,7 +990,7 @@ class AddNewLot:
                 tools_qgis.show_warning(msg, dialog=self.dlg_lot_man)
                 return
             lot_ids = [index.data() for index in selected]
-            
+
         for lot_id in lot_ids:
             try:
                 lot_id = int(lot_id)
@@ -1081,8 +1081,8 @@ class AddNewLot:
                 self._lot_feature_model = QStringListModel(dlg)
             if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
                 self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
-                self._lot_feature_completer.setCaseSensitivity(False)
-                self._lot_feature_completer.setCompletionMode(QCompleter.PopupCompletion)
+                self._lot_feature_completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+                self._lot_feature_completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
                 feature_id_lineedit.setCompleter(self._lot_feature_completer)
 
             try:
@@ -1133,16 +1133,16 @@ class AddNewLot:
         """Return list of allowed feature IDs for the lot's campaign and feature tab."""
         if not feature_type or feature_type not in ['arc', 'node', 'connec', 'gully', 'link']:
             return None
-            
+
         try:
             # Get campaign from lot with validation
             row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
             if not row or not row[0]:
                 return None
-                
+
             campaign_id = row[0]
             id_column = f"{feature_type}_id"
-            
+
             # Get all feature IDs from the campaign for this feature type
             sql = f"""
                 SELECT {id_column}::text AS {id_column}
@@ -1274,7 +1274,7 @@ class AddNewLot:
         """ Filter teams table by team name """
 
         team_name = tools_qt.get_text(self.dlg_resources_man, "txt_teams")
-        
+
         # Build sql filtering by team name and organization
         if team_name and team_name.strip():
             # Filter by team name
@@ -1290,7 +1290,7 @@ class AddNewLot:
                 sql_filter = f"WHERE co.organization_id = {self.user_data['org_id']}"
             else:
                 sql_filter = None  # Show all teams for admin
-        
+
         # Refresh table
         self._populate_resource_tableview("cat_team", sql_filter)
 
@@ -1352,13 +1352,13 @@ class AddNewLot:
         # Update users with the selected team
         ids_str = ",".join(selected_ids)
         sql = f"UPDATE cm.cat_user SET team_id = {team_id} WHERE user_id IN ({ids_str})"
-        
+
         try:
             tools_db.execute_sql(sql)
             msg = tools_qt.tr("Successfully assigned team '{0}' to {1} user(s).", context_name="cm")
             msg_params = (team_name, user_count)
             tools_qgis.show_info(msg, msg_params=msg_params)
-            
+
             # Refresh the users table
             self.filter_users_table()
         except Exception as e:
@@ -1387,13 +1387,13 @@ class AddNewLot:
         # Update users to remove team assignment
         ids_str = ",".join(selected_ids)
         sql = f"UPDATE cm.cat_user SET team_id = NULL WHERE user_id IN ({ids_str})"
-        
+
         try:
             tools_db.execute_sql(sql)
             msg = tools_qt.tr("Successfully removed team assignment from {0} user(s).", context_name="cm")
             msg_params = (user_count,)
             tools_qgis.show_info(msg, msg_params=msg_params)
-            
+
             # Refresh the users table
             self.filter_users_table()
         except Exception as e:
@@ -1434,8 +1434,8 @@ class AddNewLot:
         model.setHorizontalHeaderLabels(columns)
 
         # Set table parameters
-        table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.setSortingEnabled(True)
 
         # Populate table view
@@ -1475,7 +1475,7 @@ class AddNewLot:
         if active_col is None or active_col == -1:
             # Fallback: try to find by header text
             for i in range(model.columnCount()):
-                if str(model.headerData(i, Qt.Horizontal)).lower() == 'active':
+                if str(model.headerData(i, Qt.Orientation.Horizontal)).lower() == 'active':
                     active_col = i
                     break
         id_col = 0  # id is first column in our population logic
@@ -1579,7 +1579,7 @@ class AddNewLot:
 
         # Get dialog configuration from database
         json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
-        
+
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
             msg = tools_qt.tr("Failed to load team creation dialog configuration. Please check database configuration.", context_name="cm")
             tools_qgis.show_warning(msg)
@@ -1588,7 +1588,7 @@ class AddNewLot:
         # Create and open dialog
         self.dlg_create_team = TeamCreateUi(self)
         tools_gw.load_settings(self.dlg_create_team)
-        
+
         try:
             tools_gw.manage_dlg_widgets(self, self.dlg_create_team, json_result)
         except Exception as e:
@@ -1628,7 +1628,7 @@ class AddNewLot:
         # Connect buttons to functions
         self.dlg_create_team.btn_accept.clicked.connect(partial(upsert_team, dialog=self.dlg_create_team, class_obj=self))
         self.dlg_create_team.btn_cancel.clicked.connect(partial(close, dialog=self.dlg_create_team))
-        
+
         tools_gw.open_dialog(self.dlg_create_team, "create_team")
 
     def get_selected_ids(self, tablename: str) -> List[str]:
@@ -1651,7 +1651,7 @@ class AddNewLot:
             msg = tools_qt.tr("No records selected", context_name="cm")
             tools_qgis.show_warning(msg)
 
-        return values   
+        return values
 
     def _check_and_disable_campaign_combo(self):
         """Disable campaign combo if any relations exist."""
@@ -1688,11 +1688,11 @@ def upsert_team(**kwargs: Any):
     descript = tools_qt.get_text(dlg, "tab_none_descript")
     code = tools_qt.get_text(dlg, "tab_none_code")
     active = tools_qt.get_widget_value(dlg, "tab_none_active")
-    
+
     # Set default values automatically
     org_id = this.user_data['org_id']  # Current user's organization
     role_id = "role_cm_field"  # Default role
-    
+
     # Set default values if empty
     if not descript or not descript.strip():
         descript = ""

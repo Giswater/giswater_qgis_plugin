@@ -18,7 +18,7 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QShortcut, QApplication, QMenu, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QShortcut, QApplication, QMenu, QAction, QPushButton, QHeaderView
 from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
@@ -115,7 +115,7 @@ class GwNonVisual:
             function_name = f"get_{dict_views_project[key]}"
 
             # Populate custom context menu
-            qtableview.setContextMenuPolicy(Qt.CustomContextMenu)
+            qtableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
 
             self._fill_manager_table(qtableview, key, expr='active is true')
@@ -238,7 +238,7 @@ class GwNonVisual:
         if hasattr(self, function_name):
             getattr(self, function_name)(object_id)
 
-    def _fill_manager_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _fill_manager_table(self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fills manager table """
 
         if self.schema_name not in table_name:
@@ -247,8 +247,8 @@ class GwNonVisual:
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
-        model.setSort(0, 0)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
 
         # Check for errors
@@ -266,12 +266,12 @@ class GwNonVisual:
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=1, stretchLastSection=False)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
+                                      sectionResizeMode=QHeaderView.ResizeMode.Stretch, stretchLastSection=False)
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
-        model.sort(1, 0)
+        model.sort(1, Qt.SortOrder.AscendingOrder)
 
     def _filter_table(self, dialog, active):
         """ Filters manager table by active """
@@ -693,16 +693,16 @@ class GwNonVisual:
         cmb_curve_type = self.dialog.cmb_curve_type
 
         # Populate custom context menu
-        tbl_curve_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_curve_value.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         tbl_curve_value.customContextMenuRequested.connect(partial(self._paste_curves_custom_menu, tbl_curve_value))
 
         # Store previous state for undo
         self.previous_curve_values = []
 
         # Copy values from clipboard
-        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_curve_value)
+        paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, tbl_curve_value)
         paste_shortcut.activated.connect(partial(self._paste_curves_values, tbl_curve_value))
-        undo_shortcut = QShortcut(QKeySequence.Undo, tbl_curve_value)
+        undo_shortcut = QShortcut(QKeySequence.StandardKey.Undo, tbl_curve_value)
         undo_shortcut.activated.connect(partial(self._undo_paste, tbl_curve_value))
 
         # Populate combobox
@@ -739,7 +739,7 @@ class GwNonVisual:
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
         self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget, None, None)
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_curve')
@@ -1213,7 +1213,7 @@ class GwNonVisual:
             result = self._insert_curve_values(dialog, tbl_curve_value, curve_id)
             if not result:
                 return
-            
+
             post_actions = True
 
         # Commit and refresh UI once per operation
@@ -1303,17 +1303,17 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
 
         # Populate custom context menu
-        tbl_pattern_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_pattern_value.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         tbl_pattern_value.customContextMenuRequested.connect(partial(self._paste_patterns_custom_menu, tbl_pattern_value))
 
         # Copy values from clipboard
-        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_pattern_value)
+        paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, tbl_pattern_value)
         paste_shortcut.activated.connect(partial(self._paste_patterns_values, tbl_pattern_value))
-        undo_shortcut = QShortcut(QKeySequence.Undo, tbl_pattern_value)
+        undo_shortcut = QShortcut(QKeySequence.StandardKey.Undo, tbl_pattern_value)
         undo_shortcut.activated.connect(partial(self._undo_paste_patterns, tbl_pattern_value))
 
         # Set scale-to-fit for tableview
-        tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
+        tbl_pattern_value.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         tbl_pattern_value.horizontalHeader().setMinimumSectionSize(50)
 
         # Create plot widget
@@ -1668,7 +1668,7 @@ class GwNonVisual:
     def _scale_to_fit_pattern_tableviews(self, dialog):
         tables = [dialog.tbl_monthly, dialog.tbl_daily, dialog.tbl_hourly, dialog.tbl_weekend]
         for table in tables:
-            table.horizontalHeader().setSectionResizeMode(1)
+            table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             table.horizontalHeader().setMinimumSectionSize(50)
 
     def _populate_ud_patterns_widgets(self, pattern_id, duplicate=False):
@@ -1756,9 +1756,9 @@ class GwNonVisual:
         cur_table.setVisible(True)
 
         # Copy values from clipboard
-        paste_shortcut = QShortcut(QKeySequence.Paste, cur_table)
+        paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, cur_table)
         paste_shortcut.activated.connect(partial(self._paste_patterns_values, cur_table))
-        undo_shortcut = QShortcut(QKeySequence.Undo, cur_table)
+        undo_shortcut = QShortcut(QKeySequence.StandardKey.Undo, cur_table)
         undo_shortcut.activated.connect(partial(self._undo_paste_patterns, cur_table))
 
         try:
@@ -2227,11 +2227,11 @@ class GwNonVisual:
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
         # Populate custom context menu
-        tbl_timeseries_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_timeseries_value.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         tbl_timeseries_value.customContextMenuRequested.connect(partial(self._paste_timeseries_custom_menu, tbl_timeseries_value))
 
         # Copy values from clipboard
-        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
+        paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, tbl_timeseries_value)
         paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
 
         self.dialog.txt_id.setMaxLength(16)
@@ -2245,7 +2245,7 @@ class GwNonVisual:
             self._load_timeseries_widgets(self.dialog)
 
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
         is_new = (timser_id is None) or duplicate
 
@@ -3054,7 +3054,7 @@ class GwNonVisual:
     def _create_plot_widget(self, dialog):
 
         plot_widget = MplCanvas(dialog, width=5, height=4, dpi=100)
-        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
+        plot_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
         plot_widget.setMinimumSize(100, 100)
         dialog.lyt_plot.addWidget(plot_widget, 0, 0)
 

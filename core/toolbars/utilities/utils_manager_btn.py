@@ -9,7 +9,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtWidgets import QAction, QMenu, QWidget
 
 from .utilities_manager.style_manager import GwStyleManager
 from .... import global_vars
@@ -49,7 +49,10 @@ class GwUtilsManagerButton(GwAction):
         if self.menu.property('last_selection') is not None:
             getattr(self, self.menu.property('last_selection'))()
             return
-        button = self.action.associatedWidgets()[1]
+        if hasattr(self.action, 'associatedObjects'):
+            button = QWidget(self.action.associatedObjects()[1])
+        elif hasattr(self.action, 'associatedWidgets'):
+            button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
 
@@ -69,7 +72,7 @@ class GwUtilsManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [[tools_qt.tr('Mapzones manager'), '_mapzones_manager'], 
+        buttons = [[tools_qt.tr('Mapzones manager'), '_mapzones_manager'],
                     [tools_qt.tr('Workcat manager'), '_workcat_manager']]
         role = tools_gw.get_role_permissions(lib_vars.project_vars.get('project_role'))
         if role in ('role_plan', 'role_admin', 'role_system'):

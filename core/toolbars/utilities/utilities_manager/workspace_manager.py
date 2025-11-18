@@ -8,9 +8,10 @@ or (at your option) any later version.
 import json
 from functools import partial
 
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
-from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel
+from qgis.PyQt.QtCore import QRegularExpression, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
+from qgis.core import Qgis
 
 from ...dialog import GwAction
 from ....ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi
@@ -40,8 +41,8 @@ class GwWorkspaceManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_workspace_manager)
 
         self.filter_name = self.dlg_workspace_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Fill table
         self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, 'tbl_wrkspcm')
@@ -157,8 +158,8 @@ class GwWorkspaceManagerButton(GwAction):
                 self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, field)
                 self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
             # TODO: config_form_tableview
-            # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', 1, True)
-            tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SingleSelection)
+            # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', Qt.SortOrder.DescendingOrder, True)
+            tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SelectionMode.SingleSelection)
 
         return complet_list
 
@@ -173,7 +174,7 @@ class GwWorkspaceManagerButton(GwAction):
         cols = selected.indexes()
         if not cols:
             if deselected.indexes():
-                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.Select)
+                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.SelectionFlag.Select)
                 return
             tools_qt.set_widget_text(self.dlg_workspace_manager, 'tab_log_txt_infolog', "")
             return
@@ -257,7 +258,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         if result and result.get('message') and result['message'].get('text'):
             msg = result["message"].get('text')
-            tools_qgis.show_message(msg, result["message"].get('level'), dialog=self.dlg_workspace_manager)
+            tools_qgis.show_message(msg, Qgis.MessageLevel(result["message"].get('level')), dialog=self.dlg_workspace_manager)
 
         if result and result['status'] == "Accepted":
             # Set labels
@@ -318,7 +319,7 @@ class GwWorkspaceManagerButton(GwAction):
             message = result.get('message')
             if message:
                 msg = message['text']
-                tools_qgis.show_message(msg, message['level'], dialog=self.dlg_workspace_manager)
+                tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
             self._fill_tbl(self.filter_name.text())
 
     def _update_workspace(self):
@@ -361,7 +362,7 @@ class GwWorkspaceManagerButton(GwAction):
                 message = result.get('message')
                 if message:
                     msg = message['text']
-                    tools_qgis.show_message(msg, message['level'], dialog=self.dlg_workspace_manager)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
 
                 tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
                 self._fill_tbl(self.filter_name.text())
@@ -402,7 +403,7 @@ class GwWorkspaceManagerButton(GwAction):
                 message = result.get('message')
                 if message:
                     msg = message['text']
-                    tools_qgis.show_message(msg, message['level'], dialog=self.dlg_workspace_manager)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
 
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)

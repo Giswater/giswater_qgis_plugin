@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
 from ...libs import tools_qt, tools_db
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 
 class GwRenameSchemaTask(GwTask):
@@ -37,7 +37,7 @@ class GwRenameSchemaTask(GwTask):
                 pass
 
             # Disable red 'X' from dlg_readsql_rename
-            self.admin.dlg_readsql_rename.setWindowFlag(Qt.WindowCloseButtonHint, False)
+            self.admin.dlg_readsql_rename.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
             self.admin.dlg_readsql_rename.show()
 
     def run(self):
@@ -82,7 +82,7 @@ class GwRenameSchemaTask(GwTask):
             # Enable dlg_readsql_show_info buttons
             self.admin.dlg_readsql_rename.btn_cancel.setEnabled(True)
             # Enable red 'X' from dlg_readsql_show_info
-            self.admin.dlg_readsql_rename.setWindowFlag(Qt.WindowCloseButtonHint, True)
+            self.admin.dlg_readsql_rename.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
             self.admin.dlg_readsql_rename.show()
 
         if self.status:

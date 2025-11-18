@@ -90,8 +90,9 @@ def init_giswater_settings(setting_file):
     """ Function to set Giswater settings: stored in the registry (on Windows) or .ini file (on Unix) """
 
     global giswater_settings
-    giswater_settings = QSettings(setting_file, QSettings.IniFormat)
-    giswater_settings.setIniCodec(sys.getfilesystemencoding())
+    giswater_settings = QSettings(setting_file, QSettings.Format.IniFormat)
+    if hasattr(giswater_settings, "setIniCodec"):
+        giswater_settings.setIniCodec(sys.getfilesystemencoding())
 
 
 def init_qgis_settings(p_plugin_name):

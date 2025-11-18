@@ -20,7 +20,7 @@ class GWSetWidgetsTask(GwTask):
 
     def __init__(self, description, info, params):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self.info = info
         self.params = params
 
@@ -50,7 +50,7 @@ class GWSetWidgetsTask(GwTask):
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
         for layout in layout_list:
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             layout.addItem(vertical_spacer1)
         return True
 

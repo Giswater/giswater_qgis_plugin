@@ -6,14 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 import json
 
 from qgis.core import QgsProject
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QPushButton
+from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QPushButton, QHeaderView
 from qgis.PyQt.QtWidgets import QLineEdit
 
 from ..dialog import GwAction
@@ -61,8 +61,8 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Apply filter validator
         self.filter_name = self.dlg_netscenario_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\$]|\\$(?!\\$))*')  # Don't allow " or ' or \ or $$ because it breaks the query
-        self.filter_name.setValidator(QRegExpValidator(reg_exp))
+        reg_exp = QRegularExpression(r'([^"\'\\\\$]|\\$(?!\\$))*')  # Don't allow " or ' or \ or $$ because it breaks the query
+        self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Fill table
         self.tbl_netscenario = self.dlg_netscenario_manager.findChild(QTableView, 'tbl_netscenario')
@@ -70,7 +70,7 @@ class GwNetscenarioManagerButton(GwAction):
         self._set_label_current_netscenario(self.dlg_netscenario_manager, from_open_dialog=True)
 
         # Populate custom context menu
-        self.dlg_netscenario_manager.tbl_netscenario.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_netscenario_manager.tbl_netscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_netscenario_manager.tbl_netscenario.customContextMenuRequested.connect(partial(self._show_context_menu_right_click, self.dlg_netscenario_manager.findChild(QTableView, 'tbl_netscenario')))
 
         # Connect main dialog signals
@@ -267,7 +267,7 @@ class GwNetscenarioManagerButton(GwAction):
                 self.tbl_netscenario = tools_gw.add_tableview_header(self.tbl_netscenario, field)
                 self.tbl_netscenario = tools_gw.fill_tableview_rows(self.tbl_netscenario, field)
         # TODO: config_form_tableview
-        # widget = tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'tbl_netscenario', 1, True)
+        # widget = tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'tbl_netscenario', Qt.SortOrder.DescendingOrder, True)
         tools_qt.set_tableview_config(self.tbl_netscenario)
 
         return complet_list
@@ -447,7 +447,7 @@ class GwNetscenarioManagerButton(GwAction):
         title = f"Netscenario {self.selected_netscenario_id} - {netscenario_name}"
         tools_gw.open_dialog(self.dlg_netscenario, 'netscenario', title=f"{title}")
 
-    def _fill_netscenario_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _fill_netscenario_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill netscenario table with data from its corresponding table """
 
         # Manage exception if dialog is closed
@@ -468,8 +468,8 @@ class GwNetscenarioManagerButton(GwAction):
         if 'valve' not in self.table_name:
             filter_str += f" AND {netscenario_type}_id::text NOT IN ('-1', '0')"
         model.setFilter(filter_str)
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
-        model.setSort(0, 0)
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
+        model.setSort(0, Qt.SortOrder.AscendingOrder)
         model.select()
 
         # Check for errors
@@ -487,7 +487,7 @@ class GwNetscenarioManagerButton(GwAction):
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         tools_gw.set_tablemodel_config(self.dlg_netscenario, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
@@ -500,7 +500,7 @@ class GwNetscenarioManagerButton(GwAction):
             widget.setColumnHidden(geom_col_idx, True)
 
         # Sort the table by feature id
-        model.sort(1, 0)
+        model.sort(1, Qt.SortOrder.AscendingOrder)
 
     def _manage_current_changed(self):
         """ Manages tab changes """
@@ -654,7 +654,7 @@ class GwNetscenarioManagerButton(GwAction):
             if not is_manager:
                 # Get selected mapzone data
                 col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.selected_netscenario_type.lower()}_id')
-                field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+                field_id = tableview.model().headerData(col_idx, Qt.Orientation.Horizontal)
                 mapzone_id = index.sibling(index.row(), col_idx).data()
 
                 if field_id == 'presszone_id':
@@ -826,7 +826,7 @@ class GwNetscenarioManagerButton(GwAction):
                 widgetAction.defaultWidget().stateChanged.connect(
                     partial(self._check_action_ischecked, tablename, the_geom, pk, -1, alias.strip()))
 
-        main_menu.exec_(click_point)
+        main_menu.exec(click_point)
 
     def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, state):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
@@ -1053,4 +1053,3 @@ class GwNetscenarioManagerButton(GwAction):
         )
 
     # endregion
-

@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 from typing import Optional, List, Any, Dict, Union
 
-from qgis.PyQt.QtCore import QDate, QModelIndex, QStringListModel
+from qgis.PyQt.QtCore import QDate, QModelIndex, QStringListModel, Qt
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QTextEdit, QCompleter, \
     QTableView, QToolBar, QActionGroup, QDialog
@@ -23,15 +23,15 @@ from ...utils.selection_widget import GwSelectionWidget
 
 class Campaign:
     """Handles campaign creation, management, and database operations"""
-    
+
     # Constants for campaign types
     CAMPAIGN_TYPE_REVIEW = 1
     CAMPAIGN_TYPE_VISIT = 2
     CAMPAIGN_TYPE_INVENTORY = 3
-    
+
     # Valid feature types for campaigns
     VALID_FEATURE_TYPES = ['arc', 'node', 'connec', 'gully', 'link']
-    
+
     # Maximum results for typeahead
     MAX_TYPEAHEAD_RESULTS = 100
 
@@ -74,8 +74,8 @@ class Campaign:
             return
         self.load_campaigns_into_manager()
 
-        self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
-        self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
+        self.manager_dialog.tbl_campaign.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+        self.manager_dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
 
         # Populate combo date type (planned dates first, then real dates)
         rows = [
@@ -561,17 +561,17 @@ class Campaign:
             current_tab = self.dialog.tab_feature.currentWidget()
             if not current_tab:
                 return
-            
+
             feature_type = current_tab.objectName().replace('tab_', '')
             table_widget_name = f"tbl_campaign_x_{feature_type}"
             table_view = getattr(self.dialog, table_widget_name, None)
-            
+
             if table_view and table_view.model():
                 # If table has exactly 1 row now, it means it was the first insert
                 if table_view.model().rowCount() == 1:
                     self._apply_table_config_for_feature(table_view, feature_type)
                 return
-                
+
             # If we can't determine or table is empty, reload relations
             self._load_campaign_relations(self.campaign_id)
 
@@ -651,7 +651,7 @@ class Campaign:
             partial(self._update_feature_completer, self.dialog)
         )
         self.dialog.btn_delete.clicked.connect(self._check_and_disable_class_combos)
-        
+
         # Create menu for btn_snapping
         self_variables = {"selection_mode": GwSelectionMode.CAMPAIGN, "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
         general_variables = {"class_object": self, "dialog": self.dialog, "table_object": "campaign"}
@@ -669,7 +669,7 @@ class Campaign:
     def callback_values_later(self):
         """Return callback values for later execution in selection operations."""
         return {"dlg": self.dialog}
-        
+
     def _check_and_disable_class_combos(self):
         """Disable review/visit class combos if any relations exist."""
         if not self.campaign_id:
@@ -719,7 +719,7 @@ class Campaign:
         tab_widget = dlg.tab_feature.currentWidget()
         if not tab_widget:
             return
-            
+
         feature = tab_widget.objectName().replace('tab_', '')
         if not feature:
             return
@@ -754,8 +754,8 @@ class Campaign:
 
         if not hasattr(self, '_feature_id_completer') or self._feature_id_completer is None:
             self._feature_id_completer = QCompleter(self._feature_id_model, dlg)
-            self._feature_id_completer.setCaseSensitivity(False)
-            self._feature_id_completer.setCompletionMode(QCompleter.PopupCompletion)
+            self._feature_id_completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+            self._feature_id_completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
             dlg.feature_id.setCompleter(self._feature_id_completer)
 
     def _connect_typeahead_handler(self, dlg: QDialog, feature: str, allowed_types: List[str]):
@@ -772,7 +772,7 @@ class Campaign:
         if text and len(text) >= 1:
             # Get all allowed feature IDs using the same logic as map selection
             allowed_feature_ids = self.get_allowed_features_for_campaign(feature)
-            
+
             if allowed_feature_ids:
                 # Filter by text input from the allowed IDs with case-insensitive matching
                 safe = str(text).replace("'", "''")
@@ -800,13 +800,13 @@ class Campaign:
         """Update the completer model with filtered data and trigger completion."""
         # Clear any existing completer and force ours
         dlg.feature_id.setCompleter(None)
-        
+
         # Set our model with the filtered data
         self._feature_id_model.setStringList(value_list)
-        
+
         # Reattach our completer
         dlg.feature_id.setCompleter(self._feature_id_completer)
-        
+
         # Only show popup when there is user text and some results
         if text and value_list:
             try:
@@ -821,7 +821,7 @@ class Campaign:
         """
         if not feature or feature not in self.VALID_FEATURE_TYPES:
             return None
-            
+
         id_column = f"{feature}_id"
 
         # Inventory: no restriction
@@ -894,7 +894,7 @@ class Campaign:
             feature_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", selected_id)
         else:
             return
-        
+
         if self.campaign_id:          # campaign was already saved at least once
             self.save_campaign(True)  # from_tab_change=True => silent (doesn't close dialog)
 
@@ -1035,7 +1035,7 @@ class Campaign:
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
         qtable.setModel(model)
-        
+
         # Determine table configuration based on widget name
         widget_name = qtable.objectName()
         if "tbl_campaign_x_" in widget_name:
@@ -1045,7 +1045,7 @@ class Campaign:
         else:
             # Default for campaign manager table
             table_name = "v_ui_campaign"
-        
+
         tools_gw.set_tablemodel_config(self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog, qtable, table_name, schema_name="cm")
 
     # Campaign manager
@@ -1205,7 +1205,7 @@ class Campaign:
                 return
 
             campaign_ids = [index.data() for index in selected]
-            
+
         for campaign_id in campaign_ids:
             try:
                 campaign_id = int(campaign_id)
@@ -1368,4 +1368,3 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         index = sector_widget.findData(current_sector_data)
         if index > -1:
             sector_widget.setCurrentIndex(index)
-

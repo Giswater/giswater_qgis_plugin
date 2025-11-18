@@ -17,8 +17,8 @@ from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qt, tools_db, tools_log, tools_qgis
 from ... import global_vars
-from PyQt5.QtWidgets import QApplication, QListWidget, QCompleter, QLineEdit, QVBoxLayout, QWidget, QLabel, QCheckBox
-from PyQt5.QtGui import QStandardItemModel
+from qgis.PyQt.QtWidgets import QApplication, QListWidget, QCompleter, QLineEdit, QVBoxLayout, QWidget, QLabel, QCheckBox
+from qgis.PyQt.QtGui import QStandardItemModel
 
 class GwSchemaI18NUpdate:
 

@@ -16,7 +16,7 @@ from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import (
     QLabel,
 )
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 from qgis.core import QgsProject
 from pathlib import Path
 

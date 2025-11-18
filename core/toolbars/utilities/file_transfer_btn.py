@@ -11,8 +11,9 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QIcon
-from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
+from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup, QWidget
 from qgis.PyQt.QtCore import QPoint
+from qgis.core import Qgis
 from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
@@ -48,7 +49,10 @@ class GwFileTransferButton(GwAction):
         if self.menu.property('last_selection') is not None:
             getattr(self, self.menu.property('last_selection'))()
             return
-        button = self.action.associatedWidgets()[1]
+        if hasattr(self.action, 'associatedObjects'):
+            button = QWidget(self.action.associatedObjects()[1])
+        elif hasattr(self.action, 'associatedWidgets'):
+            button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
 
@@ -406,11 +410,11 @@ class GwFileTransferButton(GwAction):
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             msg = "Please choose a valid path"
-            tools_qgis.show_message(msg, message_level=0, dialog=dialog)
+            tools_qgis.show_message(msg, message_level=Qgis.MessageLevel.Info, dialog=dialog)
             return None
         if path.find('.csv') == -1:
             msg = "Please choose a csv file"
-            tools_qgis.show_message(msg, message_level=0, dialog=dialog)
+            tools_qgis.show_message(msg, message_level=Qgis.MessageLevel.Info, dialog=dialog)
             return None
 
         return path

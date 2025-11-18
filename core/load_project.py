@@ -9,7 +9,7 @@ import os
 from functools import partial
 
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils, QgsVectorLayer, QgsEditFormConfig, QgsAttributeEditorContainer, \
-                    QgsAttributeEditorField, QgsEditorWidgetSetup
+                    QgsAttributeEditorField, QgsEditorWidgetSetup, Qgis
 from qgis.PyQt.QtCore import QObject, Qt, QEvent
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton, QMenu, QAction
 
@@ -155,7 +155,7 @@ class GwLoadProject(QObject):
         global_vars.project_loaded = True
 
         # Set indexing strategy for snapping so that it uses less memory if possible
-        self.iface.mapCanvas().snappingUtils().setIndexingStrategy(QgsSnappingUtils.IndexHybrid)
+        self.iface.mapCanvas().snappingUtils().setIndexingStrategy(QgsSnappingUtils.IndexingStrategy.IndexHybrid)
 
         # Activate snapping
         tools_qgis.set_project_snapping_settings(enabled=True)
@@ -234,11 +234,11 @@ class GwLoadProject(QObject):
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
         if pgrouting_version is not None and minorPgrVersion is not None:
             if int(str(pgrouting_version).replace('.', '')) < int(minorPgrVersion):
                 msg = "pgRouting version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(msg, url_wiki, message_level=1, btn_text="Open wiki")
+                tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """
@@ -583,7 +583,7 @@ class GwLoadProject(QObject):
         tools_gw.fill_cmb_psector_id(self.cmb_psector)
 
         # Configure scroll bar to always show when needed
-        self.cmb_psector.view().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.cmb_psector.view().setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
 
         # Overwrite showPopup for upward popup
         original_show_popup = self.cmb_psector.showPopup
@@ -594,13 +594,13 @@ class GwLoadProject(QObject):
             popup = view.window()
             rect = self.cmb_psector.rect()
             global_pos = self.cmb_psector.mapToGlobal(rect.topLeft())
-            
+
             # Calculate popup height based on maxVisibleItems
             item_height = view.sizeHintForRow(0) if self.cmb_psector.count() > 0 else 24
             max_visible = self.cmb_psector.maxVisibleItems()
             visible_count = min(self.cmb_psector.count(), max_visible)
             popup_height = visible_count * item_height + 4  # +4 for border
-            
+
             # Position popup above the combo box
             popup.move(global_pos.x(), global_pos.y() - popup_height)
             popup.resize(self.cmb_psector.width(), popup_height)
@@ -609,7 +609,7 @@ class GwLoadProject(QObject):
         statusbar.insertPermanentWidget(1, self.cmb_psector)
 
         # Add right-click context menu to combobox popup
-        self.cmb_psector.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.cmb_psector.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.cmb_psector.customContextMenuRequested.connect(self._cmb_psector_context_menu_closed)
         self.cmb_psector.view().viewport().installEventFilter(self)
 
@@ -623,11 +623,11 @@ class GwLoadProject(QObject):
 
         try:
             if obj == self.cmb_psector.view().viewport():
-                if event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
+                if event.type() == QEvent.Type.MouseButtonPress and event.button() == Qt.MouseButton.RightButton:
                     view = self.cmb_psector.view()
                     index = view.indexAt(event.pos())
                     if index.isValid():
-                        self.selected_psector_id = self.cmb_psector.model().data(index, Qt.UserRole)
+                        self.selected_psector_id = self.cmb_psector.model().data(index, Qt.ItemDataRole.UserRole)
                     global_pos = obj.mapToGlobal(event.pos())
                     self._cmb_psector_context_menu(global_pos)
                     return True
@@ -641,7 +641,7 @@ class GwLoadProject(QObject):
         """Context menu for cmb_psector when menu requested (closed popup)."""
         idx = self.cmb_psector.currentIndex()
         if idx >= 0:
-            self.selected_psector_id = self.cmb_psector.itemData(idx, Qt.UserRole)
+            self.selected_psector_id = self.cmb_psector.itemData(idx, Qt.ItemDataRole.UserRole)
         self._show_psector_menu(self.cmb_psector.mapToGlobal(pos))
 
     def _cmb_psector_context_menu(self, pos):
@@ -657,7 +657,7 @@ class GwLoadProject(QObject):
         act_open.triggered.connect(lambda: self._execute_menu_action("open"))
         menu.addAction(act_zoom)
         menu.addAction(act_open)
-        action = menu.exec_(global_pos)
+        action = menu.exec(global_pos)
         if action:
             self.cmb_psector.hidePopup()
 
@@ -772,7 +772,7 @@ class GwLoadProject(QObject):
             return False
 
         if global_vars.project_type in ('ws', 'ud'):
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor)
             self.check_project = GwProjectCheckTask()
 
             # check project
@@ -1001,7 +1001,7 @@ class GwLoadProject(QObject):
 
         # Put form in Drag&Drop mode and clear previous layout
         form_cfg = layer.editFormConfig()
-        form_cfg.setLayout(QgsEditFormConfig.TabLayout)
+        form_cfg.setLayout(QgsEditFormConfig.EditorLayout.TabLayout)
         form_cfg.clearTabs()
 
         # Main container

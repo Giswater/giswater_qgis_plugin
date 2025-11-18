@@ -55,7 +55,7 @@ class GwMenuLoad(QObject):
             if not action_help_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", "shortcut_help", f"{action_help_shortcut}", "user", "init",
                                            prefix=False)
-            action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
+            action_help.setShortcut(QKeySequence(f"{action_help_shortcut}"))
             action_help.triggered.connect(tools_gw.open_dlg_help)
 
         # Action 'Reset dialogs'
@@ -70,7 +70,7 @@ class GwMenuLoad(QObject):
             if not action_reset_plugin_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", "shortcut_reset_plugin",
                     f"{action_reset_plugin_shortcut}", "user", "init", prefix=False)
-            action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
+            action_reset_plugin.setShortcut(QKeySequence(f"{action_reset_plugin_shortcut}"))
             action_reset_plugin.triggered.connect(self._reset_plugin)
 
         # Action 'Toggle Log DB'
@@ -79,7 +79,7 @@ class GwMenuLoad(QObject):
         if not log_sql_shortcut:
             tools_gw.set_config_parser("actions_shortcuts", "shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
                 "init", prefix=False)
-        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
+        action_set_log_sql.setShortcut(QKeySequence(f"{log_sql_shortcut}"))
         action_set_log_sql.triggered.connect(self._set_log_sql)
 
             # endregion
@@ -172,7 +172,7 @@ class GwMenuLoad(QObject):
 
         # Resize columns
         header = self.tree_config_files.header()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
@@ -229,7 +229,7 @@ class GwMenuLoad(QObject):
             # Obtain the actual top-level item
             top_level_item = self.tree_config_files.topLevelItem(index)
             # Sort
-            top_level_item.sortChildren(0, Qt.AscendingOrder)
+            top_level_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
 
     def _set_config_value(self, item, column):
 
@@ -246,7 +246,7 @@ class GwMenuLoad(QObject):
 
         tmp = item.flags()
         if column == 2 and item.text(2):
-            item.setFlags(tmp | Qt.ItemIsEditable)
+            item.setFlags(tmp | Qt.ItemFlag.ItemIsEditable)
 
     def _set_log_sql(self):
 

@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtWidgets import QAction, QMenu, QWidget
 
 from .print.fastprint import GwFastprint
 from .print.massive_composer import GwMassiveComposer
@@ -42,7 +42,10 @@ class GwPrintButton(GwAction):
         if self.menu.property('last_selection') is not None:
             getattr(self, self.menu.property('last_selection'))()
             return
-        button = self.action.associatedWidgets()[1]
+        if hasattr(self.action, 'associatedObjects'):
+            button = QWidget(self.action.associatedObjects()[1])
+        elif hasattr(self.action, 'associatedWidgets'):
+            button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
 

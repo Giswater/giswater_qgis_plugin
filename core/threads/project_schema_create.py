@@ -45,7 +45,7 @@ class GwCreateSchemaTask(GwTask):
                 pass
 
             # Disable red 'X' from dlg_readsql_create_project
-            self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
+            self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
             self.admin.dlg_readsql_create_project.show()
 
         if self.admin.dlg_readsql:
@@ -90,7 +90,7 @@ class GwCreateSchemaTask(GwTask):
             self.admin.dlg_readsql_create_project.btn_accept.show()
             self.admin.dlg_readsql_create_project.btn_close.setEnabled(True)
             # Enable red 'X' from dlg_readsql_create_project
-            self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
+            self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
             self.admin.dlg_readsql_create_project.show()
         if self.admin.dlg_readsql:
             # Enable dlg_readsql buttons

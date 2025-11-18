@@ -74,10 +74,10 @@ class GwFlow(GwMaptool):
         super().deactivate()
 
     def _set_flow(self, event, procedure_name):
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             return self.cancel_map_tool()
 
-        if event.button() == Qt.LeftButton and self.current_layer:
+        if event.button() == Qt.MouseButton.LeftButton and self.current_layer:
             if self.snapped_feat is None:
                 elem_id = 'null'
             else:

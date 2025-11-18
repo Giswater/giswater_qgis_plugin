@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.core import QgsVectorLayer, QgsFeatureRequest
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, Qgis
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi
@@ -199,7 +199,7 @@ class GwFeatureDeleteButton(GwAction):
 
         if not complet_result:
             msg = "Function gw_fct_setfeaturedelete executed with no result "
-            tools_qgis.show_message(msg, 3)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
             return
 
         if complet_result.get('status') == 'Failed':

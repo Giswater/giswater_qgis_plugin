@@ -77,7 +77,7 @@ class GwSelectManager(QgsMapTool):
         
         # Initialize vertex marker for snapping
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
         self.vertex_marker.setColor(QColor(255, 100, 255))
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
@@ -107,7 +107,7 @@ class GwSelectManager(QgsMapTool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasPressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             point = self.toMapCoordinates(event.pos())
 
             if self.selection_type == GwSelectionType.POINT:
@@ -121,11 +121,11 @@ class GwSelectManager(QgsMapTool):
             elif self.selection_type == GwSelectionType.FREEHAND:
                 self._handle_freehand_press(point)
 
-        elif event.button() == Qt.RightButton:
+        elif event.button() == Qt.MouseButton.RightButton:
             self._handle_right_click(event)
 
     def canvasReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             if self.selection_type == GwSelectionType.POINT:
                 # Point selection is handled in canvasPressEvent
                 pass
@@ -165,9 +165,9 @@ class GwSelectManager(QgsMapTool):
 
     def keyPressEvent(self, event):
         """Handle keyboard input"""
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self._clear_drawing()
-        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
+        elif event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             if self.selection_type == GwSelectionType.CIRCLE and hasattr(self, 'center_point') and self.center_point:
                 self._finish_circle_selection(self.center_point, getattr(self, 'current_radius', 0))
 
@@ -280,7 +280,7 @@ class GwSelectManager(QgsMapTool):
             self.rubber_band.hide()
             return
 
-        if event.button() != Qt.LeftButton:
+        if event.button() != Qt.MouseButton.LeftButton:
             self.rubber_band.hide()
             return
 
@@ -325,7 +325,7 @@ class GwSelectManager(QgsMapTool):
             self._draw_polygon(self.points)
 
     def _draw_polygon(self, points):
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         for i, point in enumerate(points):
             self.rubber_band.addPoint(point, i == len(points) - 1)
         self.rubber_band.show()
@@ -367,7 +367,7 @@ class GwSelectManager(QgsMapTool):
         if radius <= 0:
             return
 
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
         points = []
         for i in range(segments):
@@ -400,7 +400,7 @@ class GwSelectManager(QgsMapTool):
     def _handle_freehand_press(self, point):
         self.points = [point]
         self.is_drawing = True
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rubber_band.addPoint(point, False)
         self.rubber_band.show()
 
@@ -452,7 +452,7 @@ class GwSelectManager(QgsMapTool):
 
     def _update_freehand_rubber_band(self):
         if len(self.points) >= 2:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
             for i, point in enumerate(self.points):
                 self.rubber_band.addPoint(point, False)
             self.rubber_band.addPoint(self.points[0], True)
@@ -500,8 +500,8 @@ class GwSelectManager(QgsMapTool):
         Returns:
             GwSelectionBehavior: The selection behavior to use
         """
-        ctrl_pressed = QApplication.keyboardModifiers() & Qt.ControlModifier
-        shift_pressed = QApplication.keyboardModifiers() & Qt.ShiftModifier
+        ctrl_pressed = QApplication.keyboardModifiers() & Qt.KeyboardModifier.ControlModifier
+        shift_pressed = QApplication.keyboardModifiers() & Qt.KeyboardModifier.ShiftModifier
 
         if ctrl_pressed and shift_pressed:
             return GwSelectionBehavior.REMOVE
@@ -577,19 +577,19 @@ class GwSelectManager(QgsMapTool):
     def _perform_geometry_selection(self, geometry):
         """Perform selection using geometry (for polygon, circle, freehand)"""
         # Check modifier keys
-        ctrl_pressed = QApplication.keyboardModifiers() & Qt.ControlModifier
-        shift_pressed = QApplication.keyboardModifiers() & Qt.ShiftModifier
+        ctrl_pressed = QApplication.keyboardModifiers() & Qt.KeyboardModifier.ControlModifier
+        shift_pressed = QApplication.keyboardModifiers() & Qt.KeyboardModifier.ShiftModifier
 
         # Determine selection behavior:
         # Ctrl+Shift = Remove from selection
         # Ctrl only = Add to existing selection
         # No modifiers = Replace selection (clear previous and select new)
         if ctrl_pressed and shift_pressed:
-            behavior = QgsVectorLayer.RemoveFromSelection
+            behavior = QgsVectorLayer.SelectBehavior.RemoveFromSelection
         elif ctrl_pressed and not shift_pressed:
-            behavior = QgsVectorLayer.AddToSelection
+            behavior = QgsVectorLayer.SelectBehavior.AddToSelection
         else:
-            behavior = QgsVectorLayer.SetSelection
+            behavior = QgsVectorLayer.SelectBehavior.SetSelection
 
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, self.selection_mode)
@@ -682,11 +682,11 @@ class GwSelectManager(QgsMapTool):
             
             # Convert behavior enum to QgsVectorLayer selection behavior
             if selection_behavior == GwSelectionBehavior.REMOVE:
-                qgs_behavior = QgsVectorLayer.RemoveFromSelection
+                qgs_behavior = QgsVectorLayer.SelectBehavior.RemoveFromSelection
             elif selection_behavior == GwSelectionBehavior.ADD:
-                qgs_behavior = QgsVectorLayer.AddToSelection
+                qgs_behavior = QgsVectorLayer.SelectBehavior.AddToSelection
             else:  # GwSelectionBehavior.REPLACE or DEFAULT
-                qgs_behavior = QgsVectorLayer.SetSelection
+                qgs_behavior = QgsVectorLayer.SelectBehavior.SetSelection
             
             wkt = QgsGeometry.fromPointXY(point).asWkt()
             # Apply selection in scope

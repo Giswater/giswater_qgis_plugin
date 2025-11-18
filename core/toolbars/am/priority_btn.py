@@ -13,7 +13,7 @@ import configparser
 import os
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtCore import QTimer, Qt
 from qgis.PyQt.QtWidgets import (
     QLabel,
     QMenu,
@@ -389,7 +389,7 @@ class CalculatePriority:
 
         # Define tableviews
         self.qtbl_catalog = self.dlg_priority.findChild(QTableWidget, "tbl_catalog")
-        self.qtbl_catalog.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_catalog.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.qtbl_catalog.setSortingEnabled(True)
         if self.mode == "new":
             sql = "select * from am.config_catalog_def"
@@ -409,7 +409,7 @@ class CalculatePriority:
             self.qtbl_catalog.hideColumn(0)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
-        self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         if self.mode == "new":
             sql = "select * from am.config_material_def"
         else:
@@ -1196,7 +1196,7 @@ class CalculatePriority:
         widget,
         table_name,
         hidde=False,
-        set_edit_triggers=QTableView.NoEditTriggers,
+        set_edit_triggers=QTableView.EditTrigger.NoEditTriggers,
         expr=None,
     ):
         """Set a model with selected filter.
@@ -1211,8 +1211,8 @@ class CalculatePriority:
             # Set model
             model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
             model.setTable(table_name)
-            model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-            model.setSort(0, 0)
+            model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
+            model.setSort(0, Qt.SortOrder.AscendingOrder)
             model.select()
 
             # When change some field we need to refresh Qtableview and filter by psector_id

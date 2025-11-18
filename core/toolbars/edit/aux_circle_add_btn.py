@@ -26,13 +26,13 @@ class GwAuxCircleAddButton(GwMaptool):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
         self.cancel_circle = False
         self.layer_circle = None
         self.dialog_created = False
         self.snap_to_selected_layer = False
         self.rb_circle = tools_gw.create_rubberband(self.canvas, "line")
-        self.rb_circle.setLineStyle(Qt.DashLine)
+        self.rb_circle.setLineStyle(Qt.PenStyle.DashLine)
         self.rb_circle.setColor(QColor(255, 0, 0, 150))
 
     def cancel(self):
@@ -52,7 +52,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self._reset_rubberbands()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
@@ -159,7 +159,7 @@ class GwAuxCircleAddButton(GwMaptool):
         tools_gw.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 9999999.00, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
+        validator.setNotation(QDoubleValidator.Notation.StandardNotation)
         self.dlg_create_circle.radius.setValidator(validator)
 
         self.dlg_create_circle.radius.textChanged.connect(partial(self._preview_circle, point))
@@ -172,7 +172,7 @@ class GwAuxCircleAddButton(GwMaptool):
         self.dlg_create_circle.radius.setFocus()
 
     def _preview_circle(self, point, text):
-        self.rb_circle.reset(QgsWkbTypes.LineGeometry)
+        self.rb_circle.reset(QgsWkbTypes.GeometryType.LineGeometry)
         try:
             radius = float(text)
         except ValueError:
@@ -248,7 +248,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def _add_aux_circle(self, event):
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
 
             # Get coordinates
             x = event.pos().x()
@@ -268,7 +268,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
             self._init_create_circle_form(point)
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self._reset_rubberbands()
             self.iface.actionPan().trigger()
             self.cancel_circle = True

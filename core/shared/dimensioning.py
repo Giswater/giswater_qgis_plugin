@@ -31,7 +31,7 @@ class GwDimensioning:
         self.points = None
         self.snapper_manager = GwSnapManager(self.iface)
         self.vertex_marker = self.snapper_manager.vertex_marker
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setIconType(QgsVertexMarker.IconType.ICON_CIRCLE)
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
 
@@ -133,7 +133,7 @@ class GwDimensioning:
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             layout.addItem(vertical_spacer1)
 
         if self.layer_dimensions:
@@ -282,8 +282,8 @@ class GwDimensioning:
         if not self.layer_dimensions:
             return
 
-        if btn == Qt.RightButton:
-            if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
+            if btn == Qt.MouseButton.RightButton:
                 action.setChecked(False)
                 tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
                 tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
@@ -376,7 +376,7 @@ class GwDimensioning:
         if not self.layer_dimensions:
             return
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             action.setChecked(False)
             tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
             tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
@@ -495,7 +495,7 @@ class GwDimensioning:
             widget = tools_gw.add_tableview(db_return, field, dialog)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=Qt.SortOrder.DescendingOrder)
             tools_qt.set_tableview_config(widget)
         widget.setObjectName(widget.property('columnname'))
 

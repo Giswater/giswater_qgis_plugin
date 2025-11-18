@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtWidgets import QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QCheckBox
-from qgis.core import QgsPointXY
+from qgis.core import QgsPointXY, Qgis
 
 from libs import tools_os
 from .info import GwInfo
@@ -117,9 +117,9 @@ class GwSearch:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
                           "widgetname='{1}' AND widgettype='{2}'"
                     msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
 
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
@@ -149,7 +149,7 @@ class GwSearch:
         all_rows = []
         headers = []
         for i in range(0, model_1.columnCount()):
-            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+            headers.append(str(model_1.headerData(i, Qt.Orientation.Horizontal)))
         all_rows.append(headers)
         for rows in range(0, model_1.rowCount()):
             row = []
@@ -159,7 +159,7 @@ class GwSearch:
         if qtable_2 is not None:
             headers = []
             for i in range(0, model_2.columnCount()):
-                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
+                headers.append(str(model_2.headerData(i, Qt.Orientation.Horizontal)))
             all_rows.append(headers)
             for rows in range(0, model_2.rowCount()):
                 row = []
@@ -209,7 +209,7 @@ class GwSearch:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
                           "widgetname='{1}' AND widgettype='{2}'"
                     msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
-                    tools_qgis.show_message(msg, 2, msg_params=msg_params)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
 
     # region private functions
 
@@ -217,7 +217,7 @@ class GwSearch:
         """ Initialize dialog. Make it dockable in left dock widget area """
 
         tools_gw.add_btn_help(self.dlg_search)
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        self.iface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)
         # TODO: Remove this line if not needed
@@ -351,12 +351,12 @@ class GwSearch:
 
         # Tab 'psector'
         elif tab_selected == 'psector':
-            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            list_coord = re.search(r'\(\((.*)\)\)', str(item['sys_geometry']))
             self.manage_new_psector.get_psector(item['sys_id'], list_coord)
 
         # Tab 'visit'
         elif tab_selected == 'visit':
-            list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
+            list_coord = re.search(r'\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
                 tools_qgis.show_info(msg)
@@ -531,7 +531,7 @@ class GwSearch:
 
             # Find items in the "hydrometer_customer_code" column that match the feature_id
             # Adjust according to the specific column
-            matching_items = model.findItems(feature_id, Qt.MatchExactly, column_index)
+            matching_items = model.findItems(feature_id, Qt.MatchFlag.MatchExactly, column_index)
 
             if matching_items:
                 # Select the found row

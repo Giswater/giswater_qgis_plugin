@@ -10,10 +10,10 @@ import json
 from functools import partial
 from osgeo import gdal
 from pyproj import CRS, Transformer
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QStandardItemModel, QCursor
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QAction, QMenu, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QAction, QMenu, QPushButton, QHeaderView
 from qgis.PyQt.QtCore import pyqtSignal, QObject, Qt
 
 from ..utils import tools_gw
@@ -454,7 +454,7 @@ class GwDocument(QObject):
         self.dlg_man = GwDocManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document)
 
         # Adding auto-completion to a QLineEdit
@@ -462,7 +462,7 @@ class GwDocument(QObject):
         tools_gw.set_completer_object(self.dlg_man, table_object, field_id="name")
 
         # Populate custom context menu
-        self.dlg_man.tbl_document.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_man.tbl_document.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.dlg_man.tbl_document.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_document))
 
         status = self._fill_table()
@@ -519,8 +519,8 @@ class GwDocument(QObject):
             if field['value']:
                 self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
                 self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', 0)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', Qt.SortOrder.AscendingOrder)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         return True
 
@@ -571,7 +571,7 @@ class GwDocument(QObject):
     def _fill_table_doc(self, dialog, feature_type, feature_id):
         widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        widget.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget

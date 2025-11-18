@@ -15,16 +15,16 @@ from typing import Union
 from functools import partial
 from qgis.core import QgsEditFormConfig
 
-from sip import isdeleted
+from qgis.PyQt.sip import isdeleted
 
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, Qt, QRegularExpression, QDateTime
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, Qt, QRegularExpression, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel, QCursor
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, \
-    QMenu, QToolButton, QTableWidget, QDialog
+    QMenu, QToolButton, QTableWidget, QDialog, QHeaderView
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
-    QgsPointXY, QgsProject, QgsFeature, QgsGeometry
+    QgsPointXY, QgsProject, QgsFeature, QgsGeometry, Qgis
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsCollapsibleGroupBox
 
 from ..shared.catalog import GwCatalog
@@ -214,6 +214,7 @@ class GwInfo(QObject):
                 if 'text' in json_result['message']:
                     msg = json_result['message']['text']
                     msg_params = None
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, msg_params=msg_params)
                 return False, None
 
@@ -518,7 +519,7 @@ class GwInfo(QObject):
         self._get_features(complet_result)
         if self.layer is None:
             msg = "Layer not found"
-            tools_qgis.show_message(msg, 2, parameter=self.table_parent)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=self.table_parent)
             return False, self.dlg_cf
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
@@ -651,7 +652,7 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
             dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
-            dlg_cf.dlg_closed.connect(self._reset_my_json, True)
+            dlg_cf.dlg_closed.connect(self._reset_my_json)
             dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
@@ -807,12 +808,12 @@ class GwInfo(QObject):
                 if field['layoutname'] is None:
                     msg = "The field layoutname is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
                 if field['layoutorder'] is None:
                     msg = "The field layoutorder is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
 
                 # The data tab is somewhat special (it has 2 columns)
@@ -831,10 +832,10 @@ class GwInfo(QObject):
             elif field['layoutname'] != 'lyt_none':
                 msg = "The field layoutname is not configured for"
                 param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(msg, 2, parameter=param, dialog=self.dlg_cf)
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             layout.addItem(vertical_spacer1)
 
         # Manage dscenario sub-tab from epa tab
@@ -1221,14 +1222,14 @@ class GwInfo(QObject):
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
-                    tools_qgis.show_message(msg, message_level=0, parameter=self.node1)
+                    tools_qgis.show_message(msg, message_level=Qgis.MessageLevel.Info, parameter=self.node1)
                     dlg_interpolate.btn_accept.setEnabled(False)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
-                    tools_qgis.show_message(msg, message_level=0, parameter=self.node2)
+                    tools_qgis.show_message(msg, message_level=Qgis.MessageLevel.Info, parameter=self.node2)
                     dlg_interpolate.btn_accept.setEnabled(True)
 
         if self.node1 and self.node2:
@@ -1333,7 +1334,7 @@ class GwInfo(QObject):
 
     def _action_rotation_canvas_clicked(self, dialog, action, emit_point, point, btn):
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             global_vars.canvas.setMapTool(self.previous_map_tool)
             return
 
@@ -1423,7 +1424,7 @@ class GwInfo(QObject):
     def _manage_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
         """ Slot function when canvas is clicked """
 
-        if btn == Qt.RightButton:
+        if btn == Qt.MouseButton.RightButton:
             self._manage_disable_copy_paste(dialog, emit_point)
             return
 
@@ -1891,6 +1892,7 @@ class GwInfo(QObject):
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 2
+                msg_level = Qgis.MessageLevel(msg_level)
                 tools_qgis.show_message(msg, message_level=msg_level, dialog=dialog)
                 return False
 
@@ -1901,6 +1903,7 @@ class GwInfo(QObject):
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 1
+                msg_level = Qgis.MessageLevel(msg_level)
                 tools_qgis.show_message(msg, message_level=msg_level, dialog=dialog)
                 self._reload_fields(dialog, json_result, p_widget)
                 if epa_type_changed:
@@ -2048,7 +2051,7 @@ class GwInfo(QObject):
             getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
         """
 
-        if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
+        if value is None or bool(re.search(r"^\d*$", value)) or bool(re.search(r"^\d+\.\d+$", value)):
             widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
         else:
@@ -2061,7 +2064,7 @@ class GwInfo(QObject):
             getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
         """
 
-        if value is None or bool(re.search("^\d*$", value)):
+        if value is None or bool(re.search(r"^\d*$", value)):
             widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
         else:
@@ -2252,6 +2255,7 @@ class GwInfo(QObject):
 
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
+                level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(field['message']['text'], level)
 
     def _enabled_accept(self, dialog):
@@ -2913,7 +2917,7 @@ class GwInfo(QObject):
             row = selected_indexes[0].row()
             column_photo = tbl_visits.model().columnCount() - 1
             index = tbl_visits.model().index(row, column_photo)
-            value = tbl_visits.model().data(index, Qt.DisplayRole)
+            value = tbl_visits.model().data(index, Qt.ItemDataRole.DisplayRole)
             btn_open_gallery.setEnabled(value in [True, "True", 1, "1"])
         else:
             btn_open_gallery.setEnabled(False)
@@ -2960,8 +2964,8 @@ class GwInfo(QObject):
                 continue
             widget = tools_gw.add_tableview_header(widget, field, headers)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
-            widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+            widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()
@@ -2980,7 +2984,7 @@ class GwInfo(QObject):
                 dialog.btn_accept.clicked.connect(partial(save_tbl_changes, tbl_upsert, self, dialog, addparam))
 
             # Populate custom context menu
-            widget.setContextMenuPolicy(Qt.CustomContextMenu)
+            widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, self.tab_main.widget(index_tab)))
 
         widget_list = []
@@ -3086,7 +3090,7 @@ class GwInfo(QObject):
             result = json_result['body']['data']
             if 'fields' not in result:
                 msg = "No listValues for"
-                tools_qgis.show_message(msg, 2, parameter=json_result['body']['data'])
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=json_result['body']['data'])
             else:
                 for field in json_result['body']['data']['fields']:
                     label = QLabel()
@@ -3096,7 +3100,7 @@ class GwInfo(QObject):
                             plan_layout.addWidget(line, field['layoutorder'], x)
                     else:
                         label = QLabel()
-                        label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+                        label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
                         label.setObjectName('lbl_' + field['label'])
                         label.setText(field['label'].capitalize())
                         if 'tooltip' in field:
@@ -3106,19 +3110,19 @@ class GwInfo(QObject):
 
                     if field['widgettype'] == 'label':
                         widget = self._add_label(field)
-                        widget.setAlignment(Qt.AlignRight)
+                        widget.setAlignment(Qt.AlignmentFlag.AlignRight)
                         label.setWordWrap(True)
                         plan_layout.addWidget(label, field['layoutorder'], 0)
                         plan_layout.addWidget(widget, field['layoutorder'], 1)
 
-                plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
                 plan_layout.addItem(plan_vertical_spacer)
 
     def _add_label(self, field):
         """ Add widgets QLineEdit type """
 
         widget = QLabel()
-        widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        widget.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
             widget.setProperty('columnname', field['columnname'])
@@ -3238,7 +3242,7 @@ class GwInfo(QObject):
                     'set_to_arc_simple': ['arc_id', '_set_to_arc']
                    }
 
-        if event == Qt.RightButton:
+        if event == Qt.MouseButton.RightButton:
             self._cancel_snapping_tool(dialog, action)
             return
 
@@ -3530,9 +3534,9 @@ def epa_tbl_doubleClicked(tbl, dlg):
 
 def epa_tbl_flags(index, model, non_editable_columns=None):
 
-    column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
+    column_name = model.headerData(index.column(), Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
     if non_editable_columns and column_name in non_editable_columns:
-        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
         return flags
 
     return QStandardItemModel.flags(model, index)
@@ -3663,7 +3667,7 @@ def open_epa_dlg(windowtitle, **kwargs):
                 btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
 
         # Populate custom context menu
-        tbl.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         tbl.customContextMenuRequested.connect(partial(_show_context_menu, tbl, tableview))
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
@@ -4011,7 +4015,7 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
         getattr(info, f"my_json_{view}")[ids] = {}
 
     # Get edited cell
-    fieldname = model.headerData(index.column(), Qt.Horizontal)
+    fieldname = model.headerData(index.column(), Qt.Orientation.Horizontal)
     field = index.data()
 
     # Fill my_json
@@ -4272,7 +4276,7 @@ def add_frelem_to_dscenario(**kwargs):
     options = rows
 
     edit_dialog = GwEditDialog(dialog, title=title, label_text=label_text, widget_type="QComboBox", options=options)
-    if edit_dialog.exec() == QDialog.Accepted:
+    if edit_dialog.exec() == QDialog.DialogCode.Accepted:
         dscenario_id = edit_dialog.get_value()
         if dscenario_id is None:
             return
@@ -4370,9 +4374,9 @@ def _reload_table(**kwargs):
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
     widget_list = []
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
 
     for table in list_tables:
         widgetname = table.objectName()
@@ -4634,7 +4638,7 @@ def open_selected_doc(tbl_list_doc):
     # Selected item from list
     if tbl_list_doc.currentItem() is None:
         msg = "No document selected."
-        tools_qgis.show_message(msg, 1)
+        tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
         return
 
     selected_document = tbl_list_doc.currentItem().text()
@@ -4781,7 +4785,7 @@ def _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id):
     model = QStandardItemModel()
     dlg_event_full.tbl_docs_x_event.setModel(model)
     dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-    dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+    dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
     # Get columns name and set headers of model with that
     columns_name = tools_db.get_columns_list('om_visit_event_photo')
     headers = []

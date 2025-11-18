@@ -9,6 +9,7 @@ import operator
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
+from qgis.core import Qgis
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwInfoCatalogUi
@@ -55,7 +56,7 @@ class GwCatalog:
 
         group_box_1.setLayout(self.filter_form)
         main_layout.addWidget(group_box_1)
-        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         main_layout.addItem(vertical_spacer1)
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
@@ -170,7 +171,7 @@ class GwCatalog:
 
         widget = QComboBox()
         widget.setObjectName(field['columnname'])
-        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self._fill_combo(widget, field)
         tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
 
@@ -217,7 +218,7 @@ class GwCatalog:
             widget.setFocus()
         else:
             message = "Widget not found"
-            tools_qgis.show_message(message, 2, parameter=str(widget_name), dialog=previous_dialog)
+            tools_qgis.show_message(message, Qgis.MessageLevel.Critical, parameter=str(widget_name), dialog=previous_dialog)
 
         tools_gw.close_dialog(self.dlg_catalog)
 

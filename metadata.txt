@@ -17,6 +17,7 @@ tracker=https://github.com/giswater/giswater_qgis_plugin/issues
 category=Plugins
 icon=icons/dialogs/136.png
 experimental=False
+supportsQt6=True
 
 # Compatibility versions
 minorPgVersion=15.00.00

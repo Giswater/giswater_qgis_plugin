@@ -34,7 +34,7 @@ class GwSnapManager(object):
         # Set default vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
@@ -66,7 +66,7 @@ class GwSnapManager(object):
         if event_point is None:
             return None, None
 
-        result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+        result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.Type.All)
         if vertex_marker:
             if result.isValid():
                 # Get the point and add marker on it
@@ -202,8 +202,8 @@ class GwSnapManager(object):
     def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
 
         # Vertex marker
-        icons = {0: QgsVertexMarker.ICON_NONE, 1: QgsVertexMarker.ICON_CROSS, 2: QgsVertexMarker.ICON_X,
-                 3: QgsVertexMarker.ICON_BOX, 4: QgsVertexMarker.ICON_CIRCLE}
+        icons = {0: QgsVertexMarker.IconType.ICON_NONE, 1: QgsVertexMarker.IconType.ICON_CROSS, 2: QgsVertexMarker.IconType.ICON_X,
+                 3: QgsVertexMarker.IconType.ICON_BOX, 4: QgsVertexMarker.IconType.ICON_CIRCLE}
         colors = {0: QColor(255, 100, 255), 1: QColor(0, 255, 0), 2: QColor(0, 255, 0),
                   3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
 
