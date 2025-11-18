@@ -358,6 +358,8 @@ BEGIN
     FROM vertices 
     WHERE out_edges IS NULL; 
 
+    -- use pgr_depthFirstSearch for the lineGraph of the network, from target to source 
+    -- TODO order using elev2 instead of macromapzone_id for a better ordering, could be faster
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, node, edge, "cost", agg_cost)
     (
         SELECT seq, "depth", start_vid, node, edge, "cost", agg_cost
