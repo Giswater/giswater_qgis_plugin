@@ -424,9 +424,21 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
 def close_dialog(dlg, delete_dlg=True, plugin='core'):
     """ Close dialog """
 
-    save_settings(dlg, plugin=plugin)
+    if dlg is None or isdeleted(dlg):
+        return
+
+    try:
+        save_settings(dlg, plugin=plugin)
+    except RuntimeError:
+        pass
+
     lib_vars.session_vars['last_focus'] = None
-    dlg.close()
+
+    try:
+        dlg.close()
+    except RuntimeError:
+        pass
+
     if delete_dlg:
         try:
             dlg.deleteLater()
@@ -2840,9 +2852,14 @@ def make_list_multiple_option(completer, model, widget, field, list_widget):
     # Build display list from results
     display_list = []
     if result:
-        # Extract id and value from each result row
+        # Gather all current items' text from the list widget to avoid duplicates
+        existing_items = set()
+        for i in range(list_widget.count()):
+            existing_items.add(list_widget.item(i).text())
+
+        # Extract id and value from each result row, skip those already present
         for data in result:
-            if data[1] not in list_widget.items().text():
+            if data[1] not in existing_items:
                 item = {"id": data[0], "idval": data[1]}
                 display_list.append(item)
 
@@ -3855,6 +3872,110 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
     return row
 
 
+def parse_currency(value_str, currency_config=None):
+    """
+    Parse a formatted currency string back to a float.
+    
+    Args:
+        value_str: Formatted currency string like "€1.000.000,25" or "$1,000,000.25"
+        currency_config: Dict with currency config. If None, fetches from DB.
+    
+    Returns:
+        Float value
+    """
+
+    if currency_config is None:
+        try:
+            row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row:
+                currency_config = json.loads(row[0])
+        except Exception:
+            currency_config = {"symbol": "$", "separator": ",", "decimals": True}
+
+    # Remove all currency symbols and spaces
+    cleaned = str(value_str).strip()
+    for symbol in ['€', '$', '₡', '£', '¥', ' ']:
+        cleaned = cleaned.replace(symbol, '')
+
+    # Get separator config
+    thousands_sep = currency_config.get('separator', ',')
+    decimal_sep = ',' if thousands_sep == '.' else '.'
+
+    # Remove thousands separator and replace decimal separator with dot
+    cleaned = cleaned.replace(thousands_sep, '')
+    cleaned = cleaned.replace(decimal_sep, '.')
+
+    try:
+        return float(cleaned)
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def format_currency(value, currency_config=None, with_symbol=True):
+    """
+    Format a number as currency using admin_currency configuration.
+    
+    Args:
+        value: The numeric value to format
+        currency_config: Dict with currency config. If None, fetches from DB.
+                        Expected keys: symbol, separator, decimals
+    
+    Returns:
+        Formatted string like "₡1,000,000.25" or "€1.000.000,25"
+    
+    Examples:
+        {"symbol":"$", "separator":",", "decimals":true} -> $1,000,000.25
+        {"symbol":"€", "separator":".", "decimals":true} -> €1.000.000,25
+        {"symbol":"₡", "separator":",", "decimals":false} -> ₡1,000,000
+    """
+
+    if currency_config is None:
+        try:
+            row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row:
+                currency_config = json.loads(row[0])
+        except Exception:
+            # Fallback to default
+            currency_config = {"symbol": "$", "separator": ",", "decimals": True}
+
+    # Extract config
+    symbol = currency_config.get('symbol', '$')
+    thousands_sep = currency_config.get('separator', ',')
+    show_decimals = currency_config.get('decimals', True)
+
+    # Determine decimal separator (opposite of thousands separator)
+    decimal_sep = ',' if thousands_sep == '.' else '.'
+
+    # Convert to float
+    try:
+        num_value = float(value)
+    except (ValueError, TypeError):
+        return f"{symbol}0"
+
+    # Format the number
+    if show_decimals:
+        # Split into integer and decimal parts
+        int_part = int(abs(num_value))
+        decimal_part = abs(num_value) - int_part
+
+        # Format integer part with thousands separator
+        int_str = f"{int_part:,}".replace(',', thousands_sep)
+
+        # Format decimal part (always 2 decimal places)
+        decimal_str = f"{decimal_part:.2f}"[2:]  # Get digits after "0."
+
+        # Combine
+        formatted = f"{'-' if num_value < 0 else ''}{int_str}{decimal_sep}{decimal_str}"
+    else:
+        # No decimals, round to integer
+        int_value = int(round(num_value))
+        formatted = f"{int_value:,}".replace(',', thousands_sep)
+        if num_value < 0 and not formatted.startswith('-'):
+            formatted = '-' + formatted
+
+    return f"{symbol}{formatted}" if with_symbol else formatted
+
+
 def manage_layer_manager(json_result, sql=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
@@ -4822,25 +4943,99 @@ def docker_dialog(dialog, dlg_name=None, title=None):
 
     positions = {8: Qt.DockWidgetArea.BottomDockWidgetArea, 4: Qt.DockWidgetArea.TopDockWidgetArea,
                  2: Qt.DockWidgetArea.RightDockWidgetArea, 1: Qt.DockWidgetArea.LeftDockWidgetArea}
+
+    # If a previous guard set a block, skip attaching this dialog
+    if lib_vars.session_vars.get('block_next_form_attach'):
+        lib_vars.session_vars['block_next_form_attach'] = False
+        try:
+            dialog.close()
+        except Exception:
+            pass
+        return
+
+    # Ensure docker exists
+    if not lib_vars.session_vars.get('dialog_docker'):
+        lib_vars.session_vars['dialog_docker'] = GwDocker()
+        lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
+        manage_docker_options()
+
     try:
-        lib_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
-        lib_vars.session_vars['dialog_docker'].setWidget(dialog)
-        lib_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowType.WindowContextHelpButtonHint)
+        docker = lib_vars.session_vars['dialog_docker']
+
+        # Set new widget
+        docker.setWindowTitle(dialog.windowTitle())
+        docker.setWidget(dialog)
+        docker.setWindowFlags(Qt.WindowType.WindowContextHelpButtonHint)
+
         # Create btn_help
         add_btn_help(dialog)
         dialog.messageBar().hide()
-        global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
-                                        lib_vars.session_vars['dialog_docker'])
+        global_vars.iface.addDockWidget(positions[docker.position], docker)
 
         if dlg_name:
             tools_qt._translate_form(dlg_name, dialog)
         if title:
-            lib_vars.session_vars['dialog_docker'].setWindowTitle(tools_qt.tr(f'dlg_{title}', context_name=dlg_name))
+            docker.setWindowTitle(tools_qt.tr(f'dlg_{title}', context_name=dlg_name))
 
     except RuntimeError as e:
         msg = "{0}: {1}"
         msg_params = (type(e).__name__, e,)
         tools_log.log_warning(msg, msg_params=msg_params)
+
+
+def _check_mincut_state_4_replacement(docker):
+    """ 
+    Check if opening a mincut over another mincut in state 4 ("On Planning").
+    If so, ask user for confirmation and cleanup the old mincut if accepted.
+    Returns True if the operation should be blocked (user declined).
+    """
+    if not docker or isdeleted(docker):
+        return False
+
+    try:
+        widget = docker.widget()
+    except RuntimeError:
+        return False
+
+    if not widget or isdeleted(widget) or widget.objectName() != 'dlg_mincut':
+        return False
+
+    # Get mincut ID from the current widget (not from mincut object, which may already point to new mincut)
+    try:
+        rid_widget = widget.findChild(QLineEdit, 'result_mincut_id')
+        rid_text = rid_widget.text() if rid_widget else None
+    except Exception:
+        return False
+
+    if not rid_text or rid_text in ('', 'null'):
+        return False
+
+    # Check if mincut exists in DB and is in state 4
+    try:
+        row = tools_db.get_row(f"SELECT mincut_state FROM om_mincut WHERE id = '{rid_text}'", log_info=False)
+        db_state = (row.get('mincut_state') if isinstance(row, dict) else row[0]) if row else None
+
+        if str(db_state) != '4':
+            return False
+
+        # Ask user if they want to cancel the existing mincut
+        if not tools_qt.show_question(
+            "The mincut will be canceled, are you sure?",
+            title="Cancel mincut",
+            force_action=True
+        ):
+            # User declined: block new mincut
+            return True
+
+        # User accepted: cleanup the old mincut before opening new one
+        class_obj = widget.property('class_obj')
+        old_mincut = getattr(class_obj, 'mincut', None) if class_obj else None
+        if old_mincut:
+            old_mincut._mincut_cleanup_only(rid_text)
+
+        return False
+    except Exception:
+        return False
 
 
 def init_docker(docker_param='qgis_info_docker'):
@@ -4864,11 +5059,20 @@ def init_docker(docker_param='qgis_info_docker'):
                     return None
 
     if value == 'true':
-        close_docker()
+        # Check if we're trying to open a mincut over another mincut in state 4
+        if docker_param == 'qgis_form_docker':
+            docker = lib_vars.session_vars.get('dialog_docker')
+            if _check_mincut_state_4_replacement(docker):
+                # User declined to cancel existing mincut, block the new one
+                lib_vars.session_vars['block_next_form_attach'] = True
+                return docker
+        # Don't close docker if it already exists and is the same type - just reuse it
+        if not lib_vars.session_vars.get('dialog_docker') or lib_vars.session_vars.get('docker_type') != docker_param:
+            close_docker()
+            lib_vars.session_vars['dialog_docker'] = GwDocker()
+            lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
+            manage_docker_options()
         lib_vars.session_vars['docker_type'] = docker_param
-        lib_vars.session_vars['dialog_docker'] = GwDocker()
-        lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
-        manage_docker_options()
     else:
         lib_vars.session_vars['dialog_docker'] = None
         lib_vars.session_vars['docker_type'] = None
@@ -5653,8 +5857,12 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         force_change (bool): If True, forces UI update. Useful when called from another function.
     """
 
-    # Manage play/pause button
+    # Check if psector widgets exist (plan toolbar must be loaded)
     psignals_widgets = global_vars.psignals['widgets']
+    if not psignals_widgets or len(psignals_widgets) < 2:
+        return
+
+    # Manage play/pause button
     btn_psector_playpause = psignals_widgets[0]
     if btn_psector_playpause is not None:
         active = btn_psector_playpause.property('psector_active')

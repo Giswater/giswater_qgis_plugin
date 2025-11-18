@@ -180,7 +180,7 @@ class Campaign:
 
         response = tools_gw.execute_procedure("gw_fct_cm_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
-            msg = "Failed to load campaign form."
+            msg = tools_qt.tr("Failed to load campaign form.", context_name="cm")
             tools_qgis.show_warning(msg)
             return
 
@@ -194,7 +194,8 @@ class Campaign:
         }
         dialog_class = dialog_map.get(mode)
         if not dialog_class:
-            tools_qgis.show_warning(f"Invalid campaign mode: {mode}")
+            msg = tools_qt.tr("Invalid campaign mode", context_name="cm")
+            tools_qgis.show_warning(f"{msg}: {mode}")
             return
         self.dialog = dialog_class(self)
         if parent:
@@ -508,14 +509,14 @@ class Campaign:
                         list_mandatory.append(field['widgetname'])
 
         if list_mandatory:
-            tools_qgis.show_warning("Some mandatory values are missing. Please check the widgets marked in red.",
-                                    dialog=self.dialog)
+            msg = tools_qt.tr("Some mandatory values are missing. Please check the widgets marked in red.", context_name="cm")
+            tools_qgis.show_warning(msg, dialog=self.dialog)
             return False
 
         result = tools_gw.execute_procedure("gw_fct_cm_setcampaign", body, schema_name="cm")
 
         if result.get("status") == "Accepted":
-            msg = "Campaign saved successfully."
+            msg = tools_qt.tr("Campaign saved successfully.", context_name="cm")
             tools_qgis.show_info(msg, dialog=self.dialog)
             self.campaign_saved = True
             self.is_new_campaign = False
@@ -543,7 +544,7 @@ class Campaign:
                 self.dialog.accept()
 
         else:
-            msg = "Failed to save campaign"
+            msg = tools_qt.tr("Failed to save campaign", context_name="cm")
             tools_qgis.show_warning(result.get("message", msg))
 
     def _cleanup_map_selection(self):
@@ -1152,21 +1153,21 @@ class Campaign:
         """Delete the selected campaign"""
         selected = self.manager_dialog.tbl_campaign.selectionModel().selectedRows()
         if not selected:
-            msg = "Select a campaign to delete."
+            msg = tools_qt.tr("Select a campaign to delete.", context_name="cm")
             tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
 
         index = selected[0]
         campaign_id = index.data()
         if not str(campaign_id).isdigit():
-            msg = "Invalid campaign ID."
+            msg = tools_qt.tr("Invalid campaign ID.", context_name="cm")
             tools_qgis.show_warning(msg, dialog=self.manager_dialog)
             return
 
         # Confirm deletion
         count = len(selected)
 
-        msg = "Are you sure you want to delete {0} campaign(s)?"
+        msg = tools_qt.tr("Are you sure you want to delete {0} campaign(s)?", context_name="cm")
         msg_params = (count,)
         if not tools_qt.show_question(msg, msg_params=msg_params):
             return
@@ -1179,7 +1180,7 @@ class Campaign:
             sql = f"DELETE FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
             if tools_db.execute_sql(sql):
                 success += 1
-        msg = "{0} campaign(s) deleted."
+        msg = tools_qt.tr("{0} campaign(s) deleted.", context_name="cm")
         msg_params = (count,)
         tools_qgis.show_info(msg, msg_params=msg_params, dialog=self.manager_dialog)
         tools_gw.refresh_selectors(is_cm=True)
@@ -1199,7 +1200,7 @@ class Campaign:
         else:
             selected = self.manager_dialog.tbl_campaign.selectionModel().selectedRows()
             if not selected:
-                msg = "No campaign selected."
+                msg = tools_qt.tr("No campaign selected.", context_name="cm")
                 tools_qgis.show_warning(msg, dialog=self.manager_dialog)
                 return
 
@@ -1212,7 +1213,7 @@ class Campaign:
                     self.load_campaign_dialog(campaign_id, parent=self.manager_dialog)
                     self._check_and_disable_class_combos()
             except (ValueError, TypeError):
-                msg = "Invalid campaign ID."
+                msg = tools_qt.tr("Invalid campaign ID.", context_name="cm")
                 tools_qgis.show_warning(msg)
 
 
@@ -1277,7 +1278,8 @@ def update_expl_sector_combos(**kwargs: Any):
         update_sector_combo(dialog, saved_values)
 
     except Exception as e:
-        tools_qgis.show_warning(f"CRITICAL ERROR in update_expl_sector_combos: {e}", dialog=dialog)
+        msg = tools_qt.tr("CRITICAL ERROR in update_expl_sector_combos", context_name="cm")
+        tools_qgis.show_warning(f"{msg}: {e}", dialog=dialog)
 
 
 def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
@@ -1326,6 +1328,13 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         if expl_data and isinstance(expl_data, list):
             expl_id = expl_data[0]
 
+    expl_id_int = None
+    if expl_id is not None:
+        try:
+            expl_id_int = int(expl_id)
+        except (TypeError, ValueError):
+            expl_id_int = None
+
     schema = lib_vars.schema_name
     sql_sector = f"SELECT sector_id, name FROM {schema}.sector"
 
@@ -1337,10 +1346,10 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         else:  # If sector_ids is None or an empty list []
             filters.append("1=0")  # Effectively blocks all sectors for this organization
 
-    if expl_id:
-        filters.append(f"macrosector_id = {expl_id}")
+    if expl_id_int is not None:
+        filters.append(f"{schema}.sector.expl_id @> ARRAY[{expl_id_int}]")
     else:
-        # If no expl_id is selected, no sectors should be shown
+        # If no expl_id is selected or it is not numeric, no sectors should be shown
         filters.append("1=0")
 
     if filters:

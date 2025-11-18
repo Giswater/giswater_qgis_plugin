@@ -1719,8 +1719,8 @@ class GwInfo(QObject):
 
     def _ask_for_save(self, action_edit, fid):
 
-        msg = 'Are you sure to save this feature?'
-        title = "Save feature"
+        msg = tools_qt.tr('Are you sure to save this feature?')
+        title = tools_qt.tr("Save feature")
         answer = tools_qt.show_question(msg, title, None, parameter=fid)
         if not answer:
             tools_qt.set_action_checked(action_edit, True)
@@ -1888,7 +1888,7 @@ class GwInfo(QObject):
             if "Failed" in json_result['status']:
                 msg = json_result['message']['text']
                 if msg is None:
-                    msg = 'Feature not upserted'
+                    msg = tools_qt.tr('Feature not upserted')
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 2
@@ -1899,7 +1899,7 @@ class GwInfo(QObject):
             if "Accepted" in json_result['status']:
                 msg = json_result['message']['text']
                 if msg is None:
-                    msg = 'Feature upserted'
+                    msg = tools_qt.tr('Feature upserted')
                 msg_level = json_result['message']['level']
                 if msg_level is None:
                     msg_level = 1
@@ -2413,7 +2413,7 @@ class GwInfo(QObject):
         if json_response and json_response['status'] != "Failed":
             # Refresh canvas & send a message
             tools_qgis.refresh_map_canvas()
-            tools_qgis.show_info("Node set correctly", dialog=dialog)
+            tools_qgis.show_info(tools_qt.tr("Node set correctly"), dialog=dialog)
 
             # Delete lineedit
             widget.deleteLater()
@@ -2427,7 +2427,7 @@ class GwInfo(QObject):
             if layout is not None:
                 layout.addWidget(new_widget, int(field['layoutorder']), 2)
             return
-        tools_qgis.show_warning("Error setting node", dialog=dialog)
+        tools_qgis.show_warning(tools_qt.tr("Error setting node"), dialog=dialog)
 
     def _open_catalog(self, tab_type, feature_type, child_type):
 
@@ -3273,7 +3273,7 @@ class GwInfo(QObject):
                 #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
                 getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)
         except Exception as e:
-            tools_qgis.show_warning("Exception in info (def _get_id)", parameter=e)
+            tools_qgis.show_warning(tools_qt.tr("Exception in info (def _get_id)"), parameter=e)
         finally:
             self._cancel_snapping_tool(dialog, action)
 
@@ -3995,7 +3995,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
             pass
         return
 
-    tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
+    tools_qgis.show_warning(tools_qt.tr('Error'), parameter=json_result, dialog=dialog)
 
 
 def tbl_data_changed(info, view, tbl, model, addparam, index):
@@ -4062,7 +4062,7 @@ def save_tbl_changes(table_name, info, dialog, pk):
     if status:
         tools_gw.close_dialog(dialog)
     else:
-        msg = 'There are some error in the records with id'
+        msg = tools_qt.tr('There are some error in the records with id')
         tools_qgis.show_warning(msg, parameter=list_rows, dialog=dialog)
 
 
@@ -4093,7 +4093,7 @@ def save_widgets_changes(table_name, info, dialog, pk):
     if status:
         tools_gw.close_dialog(dialog)
     else:
-        msg = 'There are some error in the records with id'
+        msg = tools_qt.tr('There are some error in the records with id')
         tools_qgis.show_warning(msg, parameter=id_, dialog=dialog)
 
 

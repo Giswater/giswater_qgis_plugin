@@ -10,7 +10,7 @@ import json
 import os
 import re
 import sys
-from typing import Union
+from typing import Union, Optional
 from collections import OrderedDict
 from functools import partial
 from qgis.PyQt.sip import isdeleted
@@ -20,7 +20,8 @@ from qgis.PyQt.QtGui import QIntValidator, QKeySequence, QColor, QCursor, QStand
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlRecord
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu, QHeaderView
-from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer, Qgis
+from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapLayer, Qgis, \
+    QgsLayoutItemLabel
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from .document import GwDocument, global_vars
@@ -317,16 +318,12 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
             tools_qt.set_widget_text(self.dlg_plan_psector, 'tab_general_active', active)
 
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
-            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
+            currency_labels = (
+                'cur_total_node', 'cur_total_arc', 'cur_total_other', 'cur_pem', 'cur_pec_pem',
+                'cur_pec', 'cur_pecvat_pem', 'cur_pec_vat', 'cur_pca_pecvat', 'cur_pca'
+            )
+            for label in currency_labels:
+                tools_qt.set_widget_text(self.dlg_plan_psector, label, self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
         viewname = "ve_" + self.rel_feature_type
@@ -560,12 +557,25 @@ class GwPsector:
 
         total_result = 0
         widgets = dialog.tab_other_prices.findChildren(QLabel)
-        symbol = tools_gw.get_config_value(parameter="admin_currency", columns="value::json->> 'symbol'",
-                                           table="config_param_system")[0]
+
+        # Get currency config
+        currency_config = None
+        try:
+            row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row:
+                currency_config = json.loads(row[0])
+                symbol = currency_config.get('symbol', '$')
+        except Exception:
+            symbol = '$'
+
+        # Sum up all widget totals
         for widget in widgets:
             if 'widget_total' in widget.objectName():
                 total_result = float(total_result) + float(widget.text().replace(symbol, '').strip())
-        tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
+
+        # Format using the currency formatter
+        formatted_total = tools_gw.format_currency(total_result, currency_config, with_symbol=False)
+        tools_qt.set_widget_text(dialog, 'lbl_total_count', formatted_total)
 
     def open_dlg_reports(self):
 
@@ -575,7 +585,7 @@ class GwPsector:
         tools_gw.load_settings(self.dlg_psector_rapport)
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
-        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " prices detail.csv")
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + " prices.csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
@@ -620,20 +630,102 @@ class GwPsector:
             self.dlg_psector_rapport.chk_composer.setChecked(False)
             self.dlg_psector_rapport.cmb_templates.setEnabled(False)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(False)
-            self.dlg_psector_rapport.lbl_composer_disabled.setText('No composers defined.')
-            self.dlg_psector_rapport.lbl_composer_disabled.setStyleSheet('color: red')
+            self._set_composer_warning('Composer disabled: no layouts available.')
             return
         else:
             # If composer configured, enable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(True)
             self.dlg_psector_rapport.cmb_templates.setEnabled(True)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
-            self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records)
+
+        if not hasattr(self, '_composer_template_signal_connected') or not self._composer_template_signal_connected:
+            self.dlg_psector_rapport.cmb_templates.currentIndexChanged.connect(self._on_composer_template_changed)
+            self.dlg_psector_rapport.chk_composer.stateChanged.connect(self._on_composer_checkbox_changed)
+            self._composer_template_signal_connected = True
 
         row = tools_gw.get_config_value('composer_plan_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0])
+
+        self._update_composer_status(initial=True)
+
+    def _on_composer_template_changed(self, _index):
+        self._update_composer_status()
+
+    def _on_composer_checkbox_changed(self, state):
+        if state:
+            self._update_composer_status()
+        else:
+            self._set_composer_warning('')
+
+    def _update_composer_status(self, initial=False):
+        if not getattr(self.dlg_psector_rapport, 'chk_composer', None):
+            return False
+
+        composer_checked = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
+        if not composer_checked and not initial:
+            self._set_composer_warning('')
+            return False
+
+        layout = self._validate_composer_layout()
+        if layout is None:
+            if composer_checked:
+                self.dlg_psector_rapport.chk_composer.setChecked(False)
+            return False
+
+        self._set_composer_warning('')
+        return True
+
+    def _validate_composer_layout(self):
+
+        layout_manager = QgsProject.instance().layoutManager()
+        layout_name = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
+
+        if not layout_name or layout_name in ('null', '-1'):
+            self._set_composer_warning("Composer disabled: select a template.")
+            return None
+
+        layout = layout_manager.layoutByName(layout_name)
+
+        if layout is None:
+            self._set_composer_warning("Composer disabled: layout not found.")
+            return None
+
+        atlas = layout.atlas()
+        coverage_layer = atlas.coverageLayer() if atlas else None
+
+        if atlas is None or not atlas.enabled() or coverage_layer is None:
+            self._set_composer_warning(
+                "Composer disabled: atlas must be enabled with coverage layer 've_plan_psector'.")
+            return None
+
+        if coverage_layer.name() != "ve_plan_psector":
+            self._set_composer_warning("Composer disabled: atlas coverage layer must be 've_plan_psector'.")
+            return None
+
+        total_text_items = 0
+        for item in layout.items():
+            if isinstance(item, QgsLayoutItemLabel):
+                total_text_items += 1
+
+        if total_text_items == 0:
+            self._set_composer_warning("Composer disabled: file is empty.")
+            return None
+
+        return layout
+
+    def _set_composer_warning(self, message=''):
+
+        label = getattr(self.dlg_psector_rapport, 'lbl_composer_disabled', None)
+        if not label:
+            return
+
+        label.setText(message)
+        if message:
+            label.setStyleSheet('color: red')
+        else:
+            label.setStyleSheet('')
 
     def generate_reports(self):
 
@@ -658,6 +750,8 @@ class GwPsector:
 
         # Generate Composer
         if chk_composer:
+            if not self._update_composer_status():
+                return
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 msg = "File name is required"
@@ -665,14 +759,15 @@ class GwPsector:
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
-            self.generate_composer(path)
+            if not self.generate_composer(path):
+                return
 
         # Generate csv detail
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
-            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
+            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
             viewname = "v_plan_psector_budget_detail"
             if file_name is None or file_name == 'null':
-                msg = "Price list csv file name is required"
+                msg = "Price list detail csv file name is required"
                 tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
@@ -681,7 +776,7 @@ class GwPsector:
 
         # Generate csv
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
-            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
+            file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
             viewname = "v_plan_psector_budget"
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
@@ -698,14 +793,14 @@ class GwPsector:
         # Close dialog
         tools_gw.close_dialog(self.dlg_psector_rapport)
 
-    def generate_composer(self, path):
+    def generate_composer(self, path=None, dry_run=False):
 
-        # Get layout manager object
-        layout_manager = QgsProject.instance().layoutManager()
+        layout = self._validate_composer_layout()
+        if layout is None:
+            return False
 
-        # Get our layout
-        layout_name = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
-        layout = layout_manager.layoutByName(layout_name)
+        if dry_run:
+            return True
 
         # Since qgis 3.4 cant do .setAtlasMode(QgsComposition.PreviewAtlas)
         # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
@@ -717,28 +812,28 @@ class GwPsector:
         action.trigger()
 
         # Export to PDF file
-        if layout:
-            try:
-                exporter = QgsLayoutExporter(layout)
-                exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
-                if os.path.exists(path):
-                    msg = "Document PDF created in"
-                    tools_qgis.show_info(msg, parameter=path, dialog=self.dlg_plan_psector)
-                    status, message = tools_os.open_file(path)
-                    if status is False and message is not None:
-                        tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_plan_psector)
-                else:
-                    msg = "Cannot create file, check if its open"
-                    tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
-            except Exception as e:
-                tools_log.log_warning(str(e))
-                msg = "Cannot create file, check if selected composer is the correct composer"
+        try:
+            exporter = QgsLayoutExporter(layout)
+            exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
+            if os.path.exists(path):
+                msg = "Document PDF created in"
+                tools_qgis.show_info(msg, parameter=path, dialog=self.dlg_plan_psector)
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_plan_psector)
+            else:
+                msg = "Cannot create file, check if its open"
                 tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
-            finally:
-                designer_window.close()
-        else:
-            msg = "Layout not found"
-            tools_qgis.show_warning(msg, parameter=layout_name, dialog=self.dlg_plan_psector)
+        except Exception as e:
+            tools_log.log_warning(str(e))
+            msg = "Cannot create file, check if selected composer is the correct composer"
+            tools_qgis.show_warning(msg, parameter=path, dialog=self.dlg_plan_psector)
+            self._set_composer_warning("Composer disabled: export failed, check layout configuration.")
+            return False
+        finally:
+            designer_window.close()
+
+        return True
 
     def generate_csv(self, path, viewname):
 
@@ -784,6 +879,15 @@ class GwPsector:
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
+        # Get currency config
+        currency_config = None
+        try:
+            row_currency = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
+            if row_currency:
+                currency_config = json.loads(row_currency[0])
+        except Exception:
+            pass
+
         sql = (f"SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
                f" FROM v_plan_psector"
                f" WHERE psector_id = '{psector_id}'")
@@ -792,55 +896,57 @@ class GwPsector:
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        tools_qt.set_widget_text(dialog, column_name, f"{row[column_name]:.02f}")
+                        formatted_value = tools_gw.format_currency(row[column_name], currency_config, with_symbol=False)
+                        tools_qt.set_widget_text(dialog, column_name, formatted_value)
                     else:
-                        tools_qt.set_widget_text(dialog, column_name, f"{0:.02f}")
+                        formatted_value = tools_gw.format_currency(0, currency_config, with_symbol=False)
+                        tools_qt.set_widget_text(dialog, column_name, formatted_value)
 
-        self.calc_pec_pem(dialog)
-        self.calc_pecvat_pec(dialog)
-        self.calc_pca_pecvat(dialog)
+        self.calc_pec_pem(dialog, currency_config)
+        self.calc_pecvat_pec(dialog, currency_config)
+        self.calc_pca_pecvat(dialog, currency_config)
 
-    def calc_pec_pem(self, dialog):
+    def calc_pec_pem(self, dialog, currency_config=None):
 
         if tools_qt.get_text(dialog, 'pec') not in ('null', None):
-            pec = float(tools_qt.get_text(dialog, 'pec'))
+            pec = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec'), currency_config)
         else:
             pec = 0
 
         if tools_qt.get_text(dialog, 'pem') not in ('null', None):
-            pem = float(tools_qt.get_text(dialog, 'pem'))
+            pem = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pem'), currency_config)
         else:
             pem = 0
 
-        res = f"{round(pec - pem, 2):.02f}"
+        res = tools_gw.format_currency(round(pec - pem, 2), currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'pec_pem', res)
 
-    def calc_pecvat_pec(self, dialog):
+    def calc_pecvat_pec(self, dialog, currency_config=None):
 
         if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
-            pec_vat = float(tools_qt.get_text(dialog, 'pec_vat'))
+            pec_vat = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec_vat'), currency_config)
         else:
             pec_vat = 0
 
         if tools_qt.get_text(dialog, 'pec') not in ('null', None):
-            pec = float(tools_qt.get_text(dialog, 'pec'))
+            pec = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec'), currency_config)
         else:
             pec = 0
-        res = f"{round(pec_vat - pec, 2):.02f}"
+        res = tools_gw.format_currency(round(pec_vat - pec, 2), currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'pecvat_pem', res)
 
-    def calc_pca_pecvat(self, dialog):
+    def calc_pca_pecvat(self, dialog, currency_config=None):
 
         if tools_qt.get_text(dialog, 'pca') not in ('null', None):
-            pca = float(tools_qt.get_text(dialog, 'pca'))
+            pca = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pca'), currency_config)
         else:
             pca = 0
 
         if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
-            pec_vat = float(tools_qt.get_text(dialog, 'pec_vat'))
+            pec_vat = tools_gw.parse_currency(tools_qt.get_text(dialog, 'pec_vat'), currency_config)
         else:
             pec_vat = 0
-        res = f"{round(pca - pec_vat, 2):.02f}"
+        res = tools_gw.format_currency(round(pca - pec_vat, 2), currency_config, with_symbol=False)
         tools_qt.set_widget_text(dialog, 'pca_pecvat', res)
 
     def calculate_percents(self, tablename, field):
@@ -881,7 +987,12 @@ class GwPsector:
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
 
         if not self.update:
-            self.insert_or_update_new_psector(from_tab_change=True)
+            result = self.insert_or_update_new_psector(from_tab_change=True)
+            if result is False:
+                self.dlg_plan_psector.tabwidget.blockSignals(True)
+                self.dlg_plan_psector.tabwidget.setCurrentIndex(0)
+                self.dlg_plan_psector.tabwidget.blockSignals(False)
+                return
 
         self.psector_id = psector_id
         if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
@@ -953,37 +1064,72 @@ class GwPsector:
             return False
         return True
 
-    def insert_or_update_new_psector(self, from_tab_change=False):  # noqa: C901
+    def insert_or_update_new_psector(self, from_tab_change=False):
+        """Main function to insert or update psector"""
 
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name", return_string_null=False)
         if psector_name == "":
             msg = "Mandatory field is missing. Please, set a value"
             tools_qgis.show_warning(msg, parameter='Name', dialog=self.dlg_plan_psector)
-            return
+            return False
 
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_rotation", 0)
 
+        if not self._validate_psector_fields():
+            return False
+
+        if not self._check_psector_name_availability(psector_name):
+            return False
+
+        columns = self._get_psector_columns()
+        if columns is None:
+            return False
+
+        if not self._check_workcat_for_executed_status(psector_name):
+            return False
+
+        self._toggle_topology_trigger(enable=True)
+
+        if self.update:
+            self._update_psector()
+        else:
+            self._insert_psector(columns)
+
+        self._toggle_topology_trigger(enable=False)
+
+        if from_tab_change is False:
+            tools_gw.refresh_selectors()
+            tools_gw.close_dialog(self.dlg_plan_psector)
+
+    def _validate_psector_fields(self) -> bool:
+        """Validate numeric fields and parent_id"""
+
         msg = tools_qt.tr("Psector could not be updated because of the following errors: ")
         scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
         atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
         parent_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_parent_id", return_string_null=False)
+        rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
+
         if rotation != "":
             try:
                 float(rotation)
             except ValueError:
                 msg += tools_qt.tr("Rotation must be a number.")
+
         if scale != "":
             try:
                 float(scale)
             except ValueError:
                 msg += tools_qt.tr("Scale must be a number.")
+
         if atlas_id != "":
             try:
                 int(atlas_id)
             except ValueError:
                 msg += tools_qt.tr("Atlas ID must be an integer.")
+
         if parent_id != "":
             try:
                 int(parent_id)
@@ -991,24 +1137,39 @@ class GwPsector:
                 msg += tools_qt.tr("Parent ID must be an integer.")
 
         if parent_id is not None and parent_id != "":
-            try:
-                parent_id_exists = tools_db.get_rows(f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived")
-            except Exception:
-                parent_id_exists = None
-
-            if parent_id_exists is None or len(parent_id_exists) == 0:
+            if not self._validate_parent_id(parent_id):
                 msg += tools_qt.tr("Parent ID does not exist.")
 
         if msg != tools_qt.tr("Psector could not be updated because of the following errors: "):
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
             return False
 
-        name_exist = self.check_name(psector_name)
+        return True
 
+    def _validate_parent_id(self, parent_id: str) -> bool:
+        """Check if parent_id exists in ve_plan_psector"""
+
+        try:
+            parent_id_exists = tools_db.get_rows(
+                f"SELECT 1 FROM ve_plan_psector WHERE psector_id = {parent_id} AND NOT archived"
+            )
+        except Exception:
+            return False
+
+        return parent_id_exists is not None and len(parent_id_exists) > 0
+
+    def _check_psector_name_availability(self, psector_name: str) -> bool:
+        """Check if psector name is available for new psector"""
+
+        name_exist = self.check_name(psector_name)
         if name_exist and not self.update:
             msg = "The name is current in use"
             tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
-            return
+            return False
+        return True
+
+    def _get_psector_columns(self) -> Optional[list]:
+        """Get columns from ve_plan_psector view"""
 
         viewname = "'ve_plan_psector'"
         sql = (f"SELECT column_name FROM information_schema.columns "
@@ -1016,107 +1177,140 @@ class GwPsector:
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
                "ORDER BY ordinal_position;")
         rows = tools_db.get_rows(sql)
+
         if not rows or rows is None or rows == '':
             msg = "Check fields from table or view"
             tools_qgis.show_warning(msg, parameter=viewname, dialog=self.dlg_plan_psector)
-            return
+            return None
+
+        columns = []
+        for row in rows:
+            columns.append(str(row[0]))
+        return columns
+
+    def _check_workcat_for_executed_status(self, psector_name: str) -> bool:
+        """Check if workcat_id is set when psector status is Executed"""
 
         workcat_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_workcat_id')
         status_id = tools_qt.get_combo_value(self.dlg_plan_psector, 'tab_general_status')
 
-        # Check if psector status is "Executed" (status_id == 5) and has no workcat_id
         if int(status_id) == 5 and workcat_id in (None, 'null', ''):
             msg = "Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?"
             msg_params = (psector_name,)
             answer = tools_qt.show_question(msg, title='Psector', msg_params=msg_params)
             if answer is False:
-                return
+                return False
+        return True
 
-        sql = ("UPDATE config_param_user "
-                "SET value = True "
-                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+    def _toggle_topology_trigger(self, enable: bool) -> None:
+        """Enable or disable topology trigger"""
+
+        value = 'True' if enable else 'False'
+        sql = (f"UPDATE config_param_user "
+               f"SET value = {value} "
+               f"WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
-        columns = []
-        for row in rows:
-            columns.append(str(row[0]))
-        if self.update:
-            psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
-            updates = ""
-            for key, value in self.my_json.items():
-                if value in (None, 'null', 'NULL', ''):
-                    updates += f"{key} = NULL, "
-                else:
-                    value = str(value).replace("'", "''")
-                    updates += f"{key} = '{value}', "
-            if updates:
-                updates = updates[:-2]
-                sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
-                if tools_db.execute_sql(sql):
-                    msg = "Psector values updated successfully"
-                    tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
-            self.my_json = {}
+
+    def _update_psector(self) -> None:
+        """Update existing psector"""
+
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+        updates = ""
+
+        for key, value in self.my_json.items():
+            if value in (None, 'null', 'NULL', ''):
+                updates += f"{key} = NULL, "
+            else:
+                value = str(value).replace("'", "''")
+                updates += f"{key} = '{value}', "
+
+        if updates:
+            updates = updates[:-2]
+            sql = f"UPDATE ve_plan_psector SET {updates} WHERE psector_id = {psector_id}"
+            if tools_db.execute_sql(sql):
+                msg = "Psector values updated successfully"
+                tools_qgis.show_info(msg, dialog=self.dlg_plan_psector)
+
+        self.my_json = {}
+
+    def _insert_psector(self, columns: list) -> None:
+        """Insert new psector"""
+
+        if not columns:
+            return
+
+        sql = "INSERT INTO ve_plan_psector ("
+        values = "VALUES("
+
+        for column_name in columns:
+            widget_name = f"tab_general_{column_name}"
+            if tools_qt.get_widget(self.dlg_plan_psector, widget_name) is None:
+                widget_name = column_name
+
+            if widget_name == 'tab_general_psector_id':
+                continue
+
+            widget_value = self._get_widget_value_for_insert(widget_name)
+            if widget_value is not None:
+                sql += column_name + ", "
+                values += widget_value + ", "
+
+        sql = sql[:-2] + ") "
+        values = values[:-2] + ")"
+        sql += f"{values} RETURNING psector_id;"
+
+        new_psector_id = tools_db.execute_returning(sql)
+        if new_psector_id:
+            self._configure_new_psector(new_psector_id[0])
+
+    def _get_widget_value_for_insert(self, widget_name: str) -> Optional[str]:
+        """Get widget value formatted for SQL INSERT"""
+
+        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, widget_name)
+        if widget_type is None:
+            return None
+
+        value = None
+        if widget_type is QCheckBox:
+            value = str(tools_qt.is_checked(self.dlg_plan_psector, widget_name)).upper()
+        elif widget_type is QDateEdit:
+            date = self.dlg_plan_psector.findChild(QDateEdit, str(widget_name))
+            return f"'{date.dateTime().toString('yyyy-MM-dd HH:mm:ss')}'"
+        elif isinstance(widget_type, QComboBox) or widget_type is tools_gw.CustomQComboBox:
+            combo = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
+            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
         else:
-            values = "VALUES("
-            if columns:
-                sql = "INSERT INTO ve_plan_psector ("
-                for column_name in columns:
-                    if tools_qt.get_widget(self.dlg_plan_psector, f"tab_general_{column_name}") is not None:
-                        column_name = "tab_general_" + column_name
+            value = tools_qt.get_text(self.dlg_plan_psector, widget_name)
 
-                    if column_name != 'tab_general_psector_id':
-                        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, column_name)
-                        if widget_type is not None:
-                            value = None
-                            if widget_type is QCheckBox:
-                                value = str(tools_qt.is_checked(self.dlg_plan_psector, column_name)).upper()
-                            elif widget_type is QDateEdit:
-                                date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
-                                values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif isinstance(widget_type, QComboBox) or widget_type is tools_gw.CustomQComboBox:
-                                combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
-                                value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
-                            else:
-                                value = tools_qt.get_text(self.dlg_plan_psector, column_name)
+        if value in (None, 'null', 'NULL', ''):
+            return "null"
+        else:
+            return f"$${value}$$"
 
-                            if 'tab_general_' in column_name:
-                                column_name = column_name.replace('tab_general_', '')
-                            if value in (None, 'null', 'NULL', ''):
-                                sql += column_name + ", "
-                                values += "null, "
-                            else:
-                                values += f"$${value}$$, "
-                                sql += column_name + ", "
+    def _configure_new_psector(self, new_psector_id: int) -> None:
+        """Configure dialog and settings after creating new psector"""
 
-                sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 2] + ")"
-                sql += f"{values} RETURNING psector_id;"
-                new_psector_id = tools_db.execute_returning(sql)
-                if new_psector_id:
-                    self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").setEnabled(False)
-                    tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
-                    cur_psector = tools_gw.get_config_value('plan_psector_current')
-                    if cur_psector is not None:
-                        sql = ("UPDATE config_param_user "
-                            f" SET value = '{new_psector_id[0]}' "
-                            " WHERE parameter = 'plan_psector_current'"
-                            " AND cur_user=current_user; ")
-                    else:
-                        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                            f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
-                    tools_db.execute_sql(sql)
-                    self.update = True
-                    self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
-                    if getattr(self, 'dlg_psector_mng', None) is not None:
-                        self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
-                    tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id[0], do_call_fct=False, force_change=True)
+        self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").setEnabled(False)
+        tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id))
 
-        sql = ("UPDATE config_param_user "
-                "SET value = False "
-                "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
+        cur_psector = tools_gw.get_config_value('plan_psector_current')
+        if cur_psector is not None:
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{new_psector_id}' "
+                   f"WHERE parameter = 'plan_psector_current' "
+                   f"AND cur_user=current_user;")
+        else:
+            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+                   f"VALUES ('plan_psector_current', '{new_psector_id}', current_user);")
+
         tools_db.execute_sql(sql)
-        if from_tab_change is False:
-            tools_gw.refresh_selectors()
-            tools_gw.close_dialog(self.dlg_plan_psector)
+        self.update = True
+        self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
+
+        if getattr(self, 'dlg_psector_mng', None) is not None:
+            self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
+
+        tools_gw.set_psector_mode_enabled(enable=True, psector_id=new_psector_id, do_call_fct=False, force_change=True)
 
     def check_topology_psector(self, psector_id=None, psector_name=None, from_toggle=False):
 

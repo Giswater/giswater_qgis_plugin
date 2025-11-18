@@ -39,7 +39,8 @@ class GwCheckCMProjectButton(GwAction):
 
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
-            print(f"Failed to fetch dialog configuration: {json_result}")
+            msg = tools_qt.tr("Failed to fetch dialog configuration", context_name="cm")
+            tools_qgis.show_warning(msg, dialog=self.dialog if hasattr(self, 'dialog') else None)
             return
 
         # Store the dialog as an instance variable to prevent garbage collection

@@ -1953,3 +1953,5 @@ class GwSchemaI18NManager:
         message = "Atlas ID must be an integer."
         message = "Parent ID must be an integer."
         message = "Parent ID does not exist."
+        message = "The start date must be before the end date"
+        message = "The start date real must be before the end date real"

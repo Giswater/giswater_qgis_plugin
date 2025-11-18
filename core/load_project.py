@@ -558,6 +558,11 @@ class GwLoadProject(QObject):
 
     def _create_psector_status_bar(self):
         """Create Psector status bar with play/pause button and psector combobox."""
+        # Check if Masterplan (plan) toolbar is loaded
+        plan_toolbar = self.plugin_toolbars.get('plan')
+        if not plan_toolbar or not plan_toolbar.toolbar:
+            return
+
         statusbar = self.iface.mainWindow().statusBar()
 
         # Initialize psector manager

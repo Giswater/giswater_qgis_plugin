@@ -342,7 +342,7 @@ class GwImportEpanet:
         sql: str = "SELECT id FROM cat_work WHERE id = %s"
         row = tools_db.get_row(sql, params=(workcat,))
         if row is not None and not psector:
-            msg = 'The Workcat_id "{0}" is already in use. Please enter a different ID.'
+            msg = tools_qt.tr('The Workcat_id "{0}" is already in use. Please enter a different ID.')
             msg_params = (workcat,)
             tools_qt.show_info_box(msg, msg_params=msg_params)
             return
@@ -399,7 +399,7 @@ class GwImportEpanet:
                     new_catalog = new_catalog_cell.text().strip()
 
                     if combo_value == CREATE_NEW and new_catalog == "":
-                        msg = 'Please enter a new catalog name when the "{0}" option is selected.'
+                        msg = tools_qt.tr('Please enter a new catalog name when the "{0}" option is selected.')
                         msg_params = (CREATE_NEW,)
                         tools_qt.show_info_box(msg, msg_params=msg_params)
                         return

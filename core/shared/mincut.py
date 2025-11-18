@@ -130,6 +130,8 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
         tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
+        tools_qt.set_widget_text(self.dlg_mincut, "txt_equipment_code", row['equipment_code'])
+        tools_qt.set_widget_text(self.dlg_mincut, "txt_reagent_lot", row['reagent_lot'])
 
         # Manage assigend_to combo
         index = self.dlg_mincut.assigned_to.findText(row['assigned_to_name'])
@@ -169,6 +171,8 @@ class GwMincut:
             self.dlg_mincut.cbx_recieved_time.setDisabled(False)
             self.dlg_mincut.txt_chlorine.setDisabled(False)
             self.dlg_mincut.txt_turbidity.setDisabled(False)
+            self.dlg_mincut.txt_equipment_code.setDisabled(False)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(False)
             # Group Prediction
             self.dlg_mincut.cbx_date_start_predict.setDisabled(False)
             self.dlg_mincut.cbx_hours_start_predict.setDisabled(False)
@@ -189,6 +193,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             if self.mincut_class == 1:
                 self.action_mincut.setDisabled(False)
@@ -234,6 +240,8 @@ class GwMincut:
             self.dlg_mincut.cbx_recieved_time.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Group Prediction dates
             self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
             self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
@@ -254,6 +262,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(False)
             self.dlg_mincut.txt_chlorine.setDisabled(False)
             self.dlg_mincut.txt_turbidity.setDisabled(False)
+            self.dlg_mincut.txt_equipment_code.setDisabled(False)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -294,6 +304,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -445,7 +457,6 @@ class GwMincut:
         # Set state name
         if self.states != {}:
             tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
-            print(self.states)
 
         self.current_state = 0
         self.sql_connec = ""
@@ -461,7 +472,7 @@ class GwMincut:
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = "SELECT setval('om_mincut_seq', (SELECT max(id::integer) FROM om_mincut), true)"
+        sql = "SELECT last_value FROM om_mincut_seq"
         row = tools_db.get_row(sql)
         result_mincut_id = '1'
         if not row or row[0] is None or row[0] < 1:
@@ -476,6 +487,11 @@ class GwMincut:
 
         self.is_new = True
         self.init_mincut_form()
+        try:
+            # mark as not saved until user accepts
+            self.dlg_mincut.setProperty('saved', False)
+        except Exception:
+            pass
         self.action = "get_mincut"
 
         # Get current date. Set all QDateEdit to current date
@@ -665,6 +681,53 @@ class GwMincut:
             date_to.setDate(date_from.date())
             time_to.setTime(time_from.time())
 
+    def _mincut_cleanup_only(self, result_mincut_id):
+        """ Perform mincut cleanup without closing the dialog (for state 4 replacement) """
+        
+        # Restore user layer
+        tools_qgis.restore_user_layer('ve_node', self.user_current_layer)
+        
+        # Remove selections
+        self._remove_selection()
+        
+        # Reset rubber band
+        tools_qgis.reset_rubber_band(self.search.rubber_band)
+        
+        # Disconnect snapping
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
+        
+        # Delete from DB (including conflicts)
+        mincut_conflict_state = 5
+        sql = (
+            f"WITH groups_conflict AS ("
+            f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+            f"),"
+            f"mincuts_to_delete AS ("
+            f"    SELECT omc.mincut_id "
+            f"    FROM om_mincut_conflict omc "
+            f"    JOIN om_mincut om ON om.id = omc.mincut_id "
+            f"    WHERE om.mincut_state = {mincut_conflict_state} "
+            f"    AND omc.id IN (SELECT id FROM groups_conflict)"
+            f") "
+            f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
+        )
+        tools_db.execute_sql(sql)
+        sql = (
+            f"WITH groups_conflict AS ("
+            f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
+            f") "
+            f"DELETE FROM om_mincut_conflict "
+            f"WHERE id IN (SELECT id FROM groups_conflict);"
+        )
+        tools_db.execute_sql(sql)
+        sql = f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
+        tools_db.execute_sql(sql)
+        
+        # Refresh map
+        self._remove_selection()
+        tools_qgis.refresh_map_canvas()
+
     def _mincut_close(self):
 
         if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['dialog_docker'].isFloating():
@@ -694,39 +757,10 @@ class GwMincut:
                        f" WHERE id = {result_mincut_id}")
                 row = tools_db.get_row(sql)
                 if row:
-                    # Delete conflicts if this mincut caused conflicts
-                    mincut_conflict_state = 5
-                    sql = (
-                        f"WITH groups_conflict AS ("
-                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
-                        f"),"
-                        f"mincuts_to_delete AS ("
-                        f"    SELECT omc.mincut_id "
-                        f"    FROM om_mincut_conflict omc "
-                        f"    JOIN om_mincut om ON om.id = omc.mincut_id "
-                        f"    WHERE om.mincut_state = {mincut_conflict_state} "
-                        f"    AND omc.id IN (SELECT id FROM groups_conflict)"
-                        f") "
-                        f"DELETE FROM om_mincut WHERE id IN (SELECT mincut_id FROM mincuts_to_delete);"
-                    )
-                    tools_db.execute_sql(sql)
-                    print('ok delete mincuts_to_delete')
-                    sql = (
-                        f"WITH groups_conflict AS ("
-                        f"    SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = {result_mincut_id}"
-                        f") "
-                        f"DELETE FROM om_mincut_conflict "
-                        f"WHERE id IN (SELECT id FROM groups_conflict);"
-                    )
-                    tools_db.execute_sql(sql)
-                    print('ok delete groups_conflict')
-                    sql = (
-                        f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
-                    )
-                    tools_db.execute_sql(sql)
-                    print('ok delete mincut')
+                    # Use the cleanup method to delete from DB
+                    self._mincut_cleanup_only(result_mincut_id)
                     self._update_result_selector()
-                    tools_qgis.show_info("Mincut canceled!")
+                    tools_qgis.show_info(tools_qt.tr("Mincut canceled!"))
 
             # Rollback transaction
             else:
@@ -757,6 +791,8 @@ class GwMincut:
         self.dlg_mincut.real_description.setEnabled(True)
         self.dlg_mincut.txt_chlorine.setEnabled(True)
         self.dlg_mincut.txt_turbidity.setEnabled(True)
+        self.dlg_mincut.txt_equipment_code.setEnabled(True)
+        self.dlg_mincut.txt_reagent_lot.setEnabled(True)
 
         # Set state to 'In Progress'
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
@@ -868,6 +904,8 @@ class GwMincut:
         # chlorine and turbidity
         chlorine = tools_qt.get_text(self.dlg_mincut, "txt_chlorine", return_string_null=False)
         turbidity = tools_qt.get_text(self.dlg_mincut, "txt_turbidity", return_string_null=False)
+        equipment_code = tools_qt.get_text(self.dlg_mincut, "txt_equipment_code", return_string_null=False)
+        reagent_lot = tools_qt.get_text(self.dlg_mincut, "txt_reagent_lot", return_string_null=False)
 
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
@@ -880,6 +918,11 @@ class GwMincut:
         time_end_predict = self.dlg_mincut.cbx_hours_end_predict.time()
         forecast_end_predict = date_end_predict.toString('yyyy-MM-dd') + " " + time_end_predict.toString('HH:mm:ss')
 
+        if forecast_start_predict > forecast_end_predict:
+            message = "The start date must be before the end date"
+            tools_qgis.show_warning(message)
+            return
+
         # Get real date - start
         date_start_real = self.dlg_mincut.cbx_date_start.date()
         time_start_real = self.dlg_mincut.cbx_hours_start.time()
@@ -889,6 +932,11 @@ class GwMincut:
         date_end_real = self.dlg_mincut.cbx_date_end.date()
         time_end_real = self.dlg_mincut.cbx_hours_end.time()
         forecast_end_real = date_end_real.toString('yyyy-MM-dd') + " " + time_end_real.toString('HH:mm:ss')
+
+        if forecast_start_real > forecast_end_real:
+            message = "The start date real must be before the end date real"
+            tools_qgis.show_warning(message)
+            return
 
         # Check data
         received_day = self.dlg_mincut.cbx_recieved_day.date()
@@ -942,6 +990,12 @@ class GwMincut:
             sql += f", chlorine = $${chlorine}$$"
         if turbidity != "":
             sql += f", turbidity = $${turbidity}$$"
+
+        # Manage fields 'equipment_code' and 'reagent_lot'
+        if equipment_code != "":
+            sql += f", equipment_code = $${equipment_code}$$"
+        if reagent_lot != "":
+            sql += f", reagent_lot = $${reagent_lot}$$"
 
         # Manage address
         if address_exploitation_id != -1:
@@ -1006,6 +1060,12 @@ class GwMincut:
             return
 
         self._mincut_ok(result)
+        self.form_has_changes = False
+        try:
+            # mark as saved so external guards can skip confirmation
+            self.dlg_mincut.setProperty('saved', True)
+        except Exception:
+            pass
 
         self._save_widgets_values()
         self.iface.actionPan().trigger()
@@ -2453,6 +2513,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(False)
             self.action_refresh_mincut.setDisabled(True)
@@ -2494,6 +2556,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(False)
             self.dlg_mincut.txt_chlorine.setDisabled(False)
             self.dlg_mincut.txt_turbidity.setDisabled(False)
+            self.dlg_mincut.txt_equipment_code.setDisabled(False)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -2535,6 +2599,8 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             self.dlg_mincut.txt_chlorine.setDisabled(True)
             self.dlg_mincut.txt_turbidity.setDisabled(True)
+            self.dlg_mincut.txt_equipment_code.setDisabled(True)
+            self.dlg_mincut.txt_reagent_lot.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -2563,7 +2629,7 @@ class GwMincut:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set active and current layer
-        self.layer = tools_qgis.get_layer_by_tablename("ve_node")
+        self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
 
@@ -2635,9 +2701,6 @@ class GwMincut:
         self.form_has_changes = True
         self.dlg_mincut.btn_accept.setEnabled(False)
         self.dlg_mincut.btn_accept.setToolTip("You need to reexecute the mincut")
-
-        # Optional: change visual style to indicate pending changes
-        self.dlg_mincut.btn_accept.setStyleSheet("background-color: #ffcccc;")
 
     def _reset_form_has_changes(self):
         """Reset form has changes"""

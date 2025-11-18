@@ -49,15 +49,15 @@ class StaticCalibration:
         csv_exists = os.path.exists(csv_file)
         
         if inp_exists and csv_exists:
-            msg = 'The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?'
+            msg = tools_qt.tr('The files "{0}.inp" and "{1}.csv" already exist. Do you want to overwrite them?')
             msg_params = (file_name, file_name,)
             return tools_qt.show_question(msg, msg_params=msg_params)
         elif inp_exists:
-            msg = 'The file "{0}.inp" already exists. Do you want to overwrite it?'
+            msg = tools_qt.tr('The file "{0}.inp" already exists. Do you want to overwrite it?')
             msg_params = (file_name, file_name,)
             return tools_qt.show_question(msg, msg_params=msg_params)
         elif csv_exists:
-            msg = 'The file "{0}.csv" already exists. Do you want to overwrite it?'
+            msg = tools_qt.tr('The file "{0}.csv" already exists. Do you want to overwrite it?')
             msg_params = (file_name,)
             return tools_qt.show_question(msg, msg_params=msg_params)
 
@@ -265,7 +265,7 @@ class StaticCalibration:
         if tools_db.dao.conn.closed:
             tools_db.dao.init_db()
         if tools_db.execute_sql(sql):
-            msg = 'Changes applied to "{0}" successfully.'
+            msg = tools_qt.tr('Changes applied to "{0}" successfully.')
             msg_params = (dscenario_name,)
             tools_qt.show_info_box(msg, msg_params=msg_params)
 
@@ -350,7 +350,7 @@ class StaticCalibration:
             tools_qt.show_info_box(msg)
             return
         elif not os.path.exists(config_file):
-            msg = '"{0}" does not exist. Please select a valid config file.'
+            msg = tools_qt.tr('"{0}" does not exist. Please select a valid config file.')
             msg_params = (config_file,)
             tools_qt.show_info_box(msg, msg_params=msg_params)
             return
@@ -369,7 +369,7 @@ class StaticCalibration:
             tools_qt.show_info_box(msg)
             return
         elif not os.path.exists(output_folder):
-            msg = '"{0}" does not exist. Please select a valid folder.'
+            msg = tools_qt.tr('"{0}" does not exist. Please select a valid folder.')
             msg_params = (output_folder,)
             tools_qt.show_info_box(msg, msg_params=msg_params)
             return

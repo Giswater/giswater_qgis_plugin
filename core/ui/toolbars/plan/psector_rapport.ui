@@ -89,7 +89,7 @@
         <item row="1" column="1">
          <widget class="QLabel" name="lbl_prices_list">
           <property name="text">
-           <string>Prices list csv file: </string>
+           <string>Prices csv file:</string>
           </property>
          </widget>
         </item>
@@ -102,7 +102,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Detail csv file:</string>
+           <string>Prices detail csv file:</string>
           </property>
          </widget>
         </item>

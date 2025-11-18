@@ -10,9 +10,9 @@ import re
 import json
 from functools import partial
 
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import QPoint, Qt, QTimer
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
-from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QHBoxLayout, QMenu, QWidget, QWidgetAction
 from qgis.core import QgsApplication, QgsGeometry, QgsPointXY
 
 from ...shared.info import GwInfo
@@ -20,7 +20,7 @@ from ..maptool import GwMaptool
 from ...threads.toggle_valve_state import GwToggleValveTask
 from ...utils import tools_gw
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis, tools_os, tools_qt
+from ....libs import lib_vars, tools_db, tools_qgis, tools_os, tools_qt
 
 
 class GwInfoButton(GwMaptool):
@@ -139,18 +139,82 @@ class GwInfoButton(GwMaptool):
                     label = str(feature['label'])
                 else:
                     label = str(feature['id'])
-                action = QAction(label, None)
-                action.setProperty('feature_id', str(feature['id']))
-                sub_menu.addAction(action)
-                action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
-                action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+
+                # If plan_psector_data exists, create a submenu for this feature
+                if 'plan_psector_data' in feature and feature['plan_psector_data'] is not None:
+                    psector_menu = sub_menu.addMenu(label)
+                    # Add main feature action in submenu
+                    main_action = QAction(label, None)
+                    main_action.setProperty('feature_id', str(feature['id']))
+                    main_action.setProperty('layer_name', layer_name.name())
+                    psector_menu.addAction(main_action)
+                    main_action.triggered.connect(partial(self._get_info_from_selected_id, main_action, tab_type))
+                    main_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                    # Store reference to main action in menu property for restoration
+                    psector_menu.setProperty('main_action', main_action)
+                    psector_menu.setProperty('main_action_label', label)
+                    psector_menu.setProperty('feature_id', str(feature['id']))
+                    psector_menu.setProperty('layer_name', layer_name.name())
+                    psector_menu.setProperty('tab_type', tab_type)
+
+                    # Add separator
+                    psector_menu.addSeparator()
+
+                    # Add psector info actions (informational only)
+                    # Handle both single object and array of psector_data
+                    psector_data = feature['plan_psector_data']
+                    psector_list = psector_data if isinstance(psector_data, list) else [psector_data]
+
+                    for idx, psector_item in enumerate(psector_list):
+                        # Add separator between multiple psectors (except before the first one)
+                        if idx > 0:
+                            psector_menu.addSeparator()
+
+                        if 'name' in psector_item:
+                            if 'psector_id' in psector_item:
+                                # Check if psector exists in selector_psector
+                                sql = "SELECT psector_id FROM selector_psector WHERE psector_id = %s AND cur_user = current_user"
+                                row = tools_db.get_row(sql, params=(psector_item['psector_id'],), log_info=False)
+                                is_in_selector = row is not None
+                                # Create QCheckBox widget for psector
+                                label = f"{psector_item['psector_id']} - {psector_item['name']}"
+                                checkbox = QCheckBox(label)
+                                if psector_item['active'] is False:
+                                    checkbox.setStyleSheet("QCheckBox {color: #E9E7E3;}")
+                                container = QWidget(psector_menu)
+                                layout = QHBoxLayout(container)
+                                layout.setContentsMargins(10, 4, 10, 4)
+                                layout.addWidget(checkbox)
+                                checkbox.setChecked(is_in_selector)
+                                checkbox.setProperty('psector_id', psector_item['psector_id'])
+                                # Store reference to menu in checkbox property
+                                checkbox.setProperty('psector_menu', psector_menu)
+                                # Connect checkbox stateChanged to function that updates selector_psector
+                                checkbox.stateChanged.connect(partial(self._toggle_psector_selector, psector_item['psector_id']))
+                                # Create QWidgetAction to embed checkbox in menu
+                                widget_action = QWidgetAction(psector_menu)
+                                widget_action.setDefaultWidget(container)
+                                psector_menu.addAction(widget_action)
+                            else:
+                                label = f"{psector_item['name']}"
+                                info_action = psector_menu.addAction(label)
+                                info_action.setEnabled(False)
+                                info_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
+                else:
+                    # No plan_psector_data, add action directly
+                    action = QAction(label, None)
+                    action.setProperty('feature_id', str(feature['id']))
+                    action.setProperty('layer_name', layer_name.name())
+                    sub_menu.addAction(action)
+                    action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
+                    action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
         # Identify all
         cont = 0
         for layer in json_result['body']['data']['layersNames']:
             cont += len(layer['ids'])
-        action = QAction(f'Identify all ({cont})', None)
+        action = QAction(f"{tools_qt.tr('Identify all')} ({cont})", None)
         action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
@@ -278,8 +342,13 @@ class GwInfoButton(GwMaptool):
         """ Set active selected layer """
 
         tools_gw.reset_rubberband(self.rubber_band)
-        parent_menu = action.associatedWidgets()[0]
-        layer = tools_qgis.get_layer_by_layername(parent_menu.title())
+        # Get layer name from action property (for nested menus) or from parent menu title
+        layer_name_str = action.property('layer_name')
+        if layer_name_str:
+            layer = tools_qgis.get_layer_by_layername(layer_name_str)
+        else:
+            parent_menu = action.associatedWidgets()[0]
+            layer = tools_qgis.get_layer_by_layername(parent_menu.title())
         if layer:
             layer_source = tools_qgis.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
@@ -321,5 +390,66 @@ class GwInfoButton(GwMaptool):
                 return
 
             self._get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
+
+    def _toggle_psector_selector(self, psector_id: int, state):
+        """
+        Toggle psector in selector_psector when checkbox is toggled
+            :param psector_id: ID of the psector to toggle
+        """
+
+        # Get the checkbox that triggered this (sender)
+        checkbox = self.sender()
+        if checkbox is None:
+            return
+
+        # Get checked state
+        is_checked = checkbox.isChecked()
+
+        # Get menu reference from checkbox property
+        psector_menu = checkbox.property('psector_menu')
+        if psector_menu is None:
+            return
+
+        # Store reference to main action before executing procedure
+        main_action = psector_menu.property('main_action')
+        main_action_index = -1
+        if main_action:
+            actions = psector_menu.actions()
+            try:
+                main_action_index = actions.index(main_action)
+            except ValueError:
+                main_action_index = -1
+
+        # Update selector_psector using gw_fct_setselectors
+        value_str = "True" if is_checked else "False"
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":"{psector_id}", '
+                  f'"isAlone":"False", "value":"{value_str}", "addSchema":"{lib_vars.project_vars["add_schema"]}"')
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+
+        level = json_result['body']['message']['level']
+        if level == 0:
+            message = json_result['body']['message']['text']
+            tools_qgis.show_message(message, level)
+            QTimer.singleShot(0, partial(self.restore_state, checkbox, is_checked))
+            return
+
+        # Restore main action if it was removed after execute_procedure
+        if main_action:
+            actions_after = psector_menu.actions()
+            if main_action not in actions_after:
+                # Main action was removed, restore it
+                if main_action_index >= 0 and main_action_index < len(actions_after):
+                    psector_menu.insertAction(actions_after[main_action_index], main_action)
+                else:
+                    # Insert at the beginning
+                    psector_menu.insertAction(actions_after[0] if actions_after else None, main_action)
+
+        tools_gw.refresh_selectors()
+
+    def restore_state(self, checkbox, is_checked):
+        checkbox.blockSignals(True)
+        checkbox.setChecked(not is_checked)
+        checkbox.blockSignals(False)
 
     # endregion

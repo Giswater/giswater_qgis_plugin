@@ -1766,23 +1766,18 @@ class GwAdminButton:
         if filter_ is None:
             return
         # Populate Project data schema Name
-        sql = "SELECT schema_name FROM information_schema.schemata"
+        sql = "SELECT table_schema FROM information_schema.tables WHERE table_name = 'sys_version'"
         rows = tools_db.get_rows(sql, commit=self.dev_commit)
         if rows is None:
             return
 
         result_list = []
-        for row in rows:
-            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
-                   f"WHERE table_schema = '{row[0]}' "
-                   f"AND table_name = 'sys_version')")
-            exists = tools_db.get_row(sql)
-            if exists and str(exists[0]) == 'True':
-                sql = f"SELECT project_type FROM {row[0]}.sys_version"
-                result = tools_db.get_row(sql)
-                if result is not None and result[0] == filter_.upper():
-                    elem = [row[0], row[0]]
-                    result_list.append(elem)
+        for (schema_name,) in rows:
+            sql = f"SELECT project_type FROM {schema_name}.sys_version"
+            (project_type,) = tools_db.get_row(sql)
+            if project_type is not None and project_type == filter_.upper():
+                elem = [schema_name, schema_name]
+                result_list.append(elem)
         if not result_list:
             self.dlg_readsql.project_schema_name.clear()
             self._set_buttons_enabled()
@@ -2133,7 +2128,7 @@ class GwAdminButton:
     def on_btn_pschema_qgis_file_clicked(self):
         """ Sets the project to be created as a 'CM' project. """
         self.is_cm_project = True
-        tools_qgis.show_info("Layer of CM project will be added to the project when create", dialog=self.dlg_readsql_create_cm_project)
+        tools_qgis.show_info(tools_qt.tr("Layer of CM project will be added to the project when create"), dialog=self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
     def _open_rename(self):
@@ -2331,10 +2326,14 @@ class GwAdminButton:
                 file_content = f.read()
                 f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
                     "PARENT_SCHEMA", PARENT_SCHEMA).replace("PARENT_TYPE", self.project_type_selected)
-                if "BD_NAME" in f_to_read:
+                
+                # Case-insensitive BD_NAME replacement
+                if re.search(r'bd_name', f_to_read, re.IGNORECASE):
                     BD_NAME = self._get_current_db_name()
-                    if BD_NAME:
-                        f_to_read = f_to_read.replace("BD_NAME", BD_NAME)
+                    if not BD_NAME:
+                        print("ERROR: Cannot get current database name, but SQL requires BD_NAME placeholder")
+                        return False
+                    f_to_read = re.sub(r'bd_name', BD_NAME, f_to_read, flags=re.IGNORECASE)
 
                 status = tools_db.execute_sql(f_to_read, filepath=filepath, commit=self.dev_commit, is_thread=False)
 
@@ -2381,9 +2380,19 @@ class GwAdminButton:
 
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
-        db_name = settings.value("database", "")
+        
+        # Check if using pg_service
+        service_name = settings.value("service", "")
+        if service_name:
+            # Get database name from pg_service.conf
+            credentials_service = tools_os.manage_pg_service(service_name)
+            db_name = credentials_service.get('dbname', None) if credentials_service else None
+        else:
+            # Get database name from connection settings
+            db_name = settings.value("database", "")
+        
         settings.endGroup()
-        return db_name
+        return db_name if db_name else None
 
     def _execute_sql_files(self, filedir, set_progress_bar=False):
         """"""
