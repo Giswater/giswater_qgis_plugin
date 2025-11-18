@@ -627,7 +627,7 @@
 		</message>
 		<message>
 			<source>End date</source>
-			<translation>End date</translation>
+			<translation>Fecha de final</translation>
 		</message>
 		<message>
 			<source>Error</source>
@@ -743,7 +743,7 @@
 		</message>
 		<message>
 			<source>Please select at least one user to remove team assignment.</source>
-			<translation>Por favor seleccione al menos un usuario para quitar la asignación de equipo.</translation>
+			<translation>Por favor seleccione al menos un usuario para quitar de un equipo.</translation>
 		</message>
 		<message>
 			<source>Please select a valid team to assign.</source>
@@ -787,7 +787,7 @@
 		</message>
 		<message>
 			<source>Start date</source>
-			<translation>Fecha de final</translation>
+			<translation>Fecha de inicio</translation>
 		</message>
 		<message>
 			<source>Successfully assigned team '{0}' to {1} user(s).</source>
