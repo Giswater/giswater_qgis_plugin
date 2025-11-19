@@ -22,6 +22,7 @@ SELECT SCHEMA_NAME.gw_fct_getdmahydrometers('{"client":{"device":5, "epsg":SRID_
 DECLARE
     v_version text;
     v_epsg integer;
+    v_project_type text;
     v_result json;
     v_result_array json[];
     v_select text;
@@ -32,7 +33,7 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
+    SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version order by id desc limit 1;
     SELECT epsg INTO v_epsg FROM sys_version order by id desc limit 1;
 
     -- Get dma_id parameter
@@ -44,16 +45,41 @@ BEGIN
     END IF;
 
     -- Build the select statement for hydrometers in the specified DMA
-    v_select = concat('SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
-                     'rhxc.connec_id as "connecId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
-                     'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
-                     'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
-                     'c.dma_id as "dmaId" ',
-                     'FROM ext_rtc_hydrometer h ',
-                     'JOIN rtc_hydrometer_x_connec rhxc ON rhxc.hydrometer_id = h.hydrometer_id ',
-                     'JOIN connec c ON c.connec_id = rhxc.connec_id ',
-                     'WHERE c.dma_id = ', v_dma_id, ' ',
-                     'ORDER BY h.hydrometer_id');
+    IF v_project_type = 'WS' THEN
+        -- WS projects: hydrometers can be linked to both nodes and connecs
+        v_select = concat('SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
+                         'rhxc.connec_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+                         'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
+                         'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
+                         'c.dma_id as "dmaId" ',
+                         'FROM ext_rtc_hydrometer h ',
+                         'JOIN rtc_hydrometer_x_connec rhxc ON rhxc.hydrometer_id = h.hydrometer_id ',
+                         'JOIN connec c ON c.connec_id = rhxc.connec_id ',
+                         'WHERE c.dma_id = ', v_dma_id, ' ',
+                         'UNION ',
+                         'SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
+                         'rhxn.node_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+                         'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
+                         'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
+                         'n.dma_id as "dmaId" ',
+                         'FROM ext_rtc_hydrometer h ',
+                         'JOIN rtc_hydrometer_x_node rhxn ON rhxn.hydrometer_id = h.hydrometer_id ',
+                         'JOIN node n ON n.node_id = rhxn.node_id ',
+                         'WHERE n.dma_id = ', v_dma_id, ' ',
+                         'ORDER BY "hydrometerId"');
+    ELSE
+        -- UD projects: hydrometers are only linked to connecs
+        v_select = concat('SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
+                         'rhxc.connec_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+                         'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
+                         'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
+                         'c.dma_id as "dmaId" ',
+                         'FROM ext_rtc_hydrometer h ',
+                         'JOIN rtc_hydrometer_x_connec rhxc ON rhxc.hydrometer_id = h.hydrometer_id ',
+                         'JOIN connec c ON c.connec_id = rhxc.connec_id ',
+                         'WHERE c.dma_id = ', v_dma_id, ' ',
+                         'ORDER BY h.hydrometer_id');
+    END IF;
 
     -- Execute the query and aggregate hydrometers
     EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s) a', v_select)
