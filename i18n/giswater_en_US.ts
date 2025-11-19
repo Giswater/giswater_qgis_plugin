@@ -202,7 +202,7 @@
 		</message>
 		<message>
 			<source>GwAmPriorityButton</source>
-			<translation>Priority selection and Calculation</translation>
+			<translation>Priority Calculation by Selection</translation>
 		</message>
 		<message>
 			<source>GwArcAddButton</source>
