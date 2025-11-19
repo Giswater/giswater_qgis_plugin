@@ -19,3 +19,7 @@ UPDATE config_form_tableview SET alias = 'Timestamp' WHERE objectname = 'cat_res
 UPDATE config_form_tableview SET alias = 'Current User' WHERE objectname = 'cat_result' AND columnname = 'cur_user';
 UPDATE config_form_tableview SET alias = 'Status' WHERE objectname = 'cat_result' AND columnname = 'status';
 UPDATE config_form_tableview SET alias = 'Corporate' WHERE objectname = 'cat_result' AND columnname = 'iscorporate';
+UPDATE config_form_tableview SET alias = 'Features' WHERE objectname = 'cat_result' AND columnname = 'features';
+UPDATE config_form_tableview SET alias = 'DNOM' WHERE objectname = 'cat_result' AND columnname = 'dnom';
+UPDATE config_form_tableview SET alias = 'Presszone' WHERE objectname = 'cat_result' AND columnname = 'presszone_id';
+UPDATE config_form_tableview SET alias = 'Material' WHERE objectname = 'cat_result' AND columnname = 'material_id';
