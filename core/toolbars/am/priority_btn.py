@@ -992,6 +992,7 @@ class CalculatePriority:
             info = "Please choose a different name."
             tools_qt.show_info_box(
                 msg,
+                title="Info",
                 inf_text=info,
                 parameter=result_name,
             )

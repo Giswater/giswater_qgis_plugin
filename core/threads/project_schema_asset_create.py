@@ -80,7 +80,7 @@ class GwCreateSchemaAssetTask(GwTask):
 
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
-        for process in ['load_base', 'load_i18n', 'load_updates']:
+        for process in ['load_base', 'load_updates']:
             status = self.admin.load_sql_folder(self.dict_folders_process[process])
             if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                     or self.isCanceled():
@@ -92,7 +92,7 @@ class GwCreateSchemaAssetTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_i18n', 'load_updates']
+        list_process = ['load_base', 'load_updates', 'load_i18n']
 
         for process_name in list_process:
             dict_folders, total = self.get_number_of_files_process(process_name)
@@ -128,9 +128,16 @@ class GwCreateSchemaAssetTask(GwTask):
             dict_folders[self.admin.folder_i18n] = 0
 
         elif process_name == 'load_updates':
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2023-05')] = 0
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01')] = 0
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01', 'i18n')] = 0
+            # Automatically process all update folders
+            updates_folder = self.admin.folder_asset_updates
+            if os.path.exists(updates_folder):
+                for item in sorted(os.listdir(updates_folder)):
+                    item_path = os.path.join(updates_folder, item)
+                    if os.path.isdir(item_path):
+                        dict_folders[item_path] = 0
+                        # Also check for i18n subfolder
+                        # i18n_path = os.path.join(item_path, 'i18n')
+                        # if os.path.exists(i18n_path) and os.path.isdir(i18n_path):
+                        #     dict_folders[i18n_path] = 0
 
         return dict_folders
-

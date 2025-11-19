@@ -106,6 +106,15 @@ class GwResultManagerButton(GwAction):
         self.headers["name"] = self.headers.get("expl_id", "Explotation")
         self.headers["idval"] = self.headers.get("status", "Status")
 
+        # Set headers for virtual relational columns
+        model = self.dlg_priority_manager.tbl_results.model()
+        if model:
+            # Get column indices and set their headers
+            for col_idx in range(model.columnCount()):
+                field_name = model.record().fieldName(col_idx)
+                if field_name in self.headers:
+                    model.setHeaderData(col_idx, Qt.Orientation.Horizontal, self.headers[field_name])
+
         self._set_signals()
 
         # Create dicts for i18n labels:
@@ -153,7 +162,7 @@ class GwResultManagerButton(GwAction):
             field_name = record.fieldName(i)
             value = record.value(i)
 
-            txt += f"<b>{self.headers.get(field_name, field_name)}:</b><br>"
+            txt += f"<b>{self.headers.get(field_name, field_name) if self.headers.get(field_name) else field_name}:</b><br>"
             if field_name == "report":
                 txt += value.replace("\n", "<br>") + "<br><br>"
             elif field_name == "tstamp":

@@ -338,7 +338,6 @@ class GwAssignation(GwTask):
         )
 
         final_report = []
-        final_report.append('Task finished!')
 
         # Set final reports
         final_report_values = [
@@ -370,6 +369,9 @@ class GwAssignation(GwTask):
         for label, value in final_report_values:
             sentence = f'{label:<{label_width}}{str(value):>{value_width}}'
             final_report.append(sentence)
+
+        final_report.append("")
+        final_report.append(tools_qt.tr('Task finished!'))
 
         return final_report
 
