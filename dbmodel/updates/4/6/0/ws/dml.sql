@@ -33,3 +33,6 @@ UPDATE sys_fprocess
 UPDATE config_form_list
 SET query_text='SELECT id,  work_order, state, class, mincut_type, received_date, exploitation, municipality, postcode, streetaxis, postnumber, anl_cause, anl_tstamp, anl_user, anl_descript, anl_feature_id, anl_feature_type, forecast_start, forecast_end, assigned_to, exec_start, exec_end, exec_user, exec_descript, exec_from_plot, exec_depth, exec_appropiate, chlorine, turbidity, notified, reagent_lot, equipment_code FROM v_ui_mincut WHERE id IS NOT NULL '
 WHERE listname='tbl_mincut_manager' AND device=5;
+
+-- 19/11/2025
+UPDATE config_form_fields SET dv_isnullvalue=true WHERE formname='ve_epa_pump' AND formtype='form_feature' AND columnname='energy_pattern_id' AND tabname='tab_epa';
