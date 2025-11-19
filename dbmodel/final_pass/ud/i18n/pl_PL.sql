@@ -6094,7 +6094,11 @@ FROM (
     (3510, 'Funkcja pobierająca tablicę identyfikatorów eksploatacji'),
     (3512, NULL),
     (3514, 'Funtion to auto-update cm views and tables to match their parent definitions.'),
-    (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.')
+    (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.'),
+    (3518, 'Function to get the properties of a feature.'),
+    (3520, 'Function to set hydrometers in the database.'),
+    (3522, 'Function to generate treatment_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.'),
+    (3524, 'Function to transform nuemric values of price to user configuration from admin_currency in config_param_system')
 ) AS v(id, descript)
 WHERE t.id = v.id;
 
@@ -9081,7 +9085,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

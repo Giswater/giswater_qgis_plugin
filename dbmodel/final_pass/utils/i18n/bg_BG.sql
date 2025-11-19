@@ -6430,7 +6430,7 @@ FROM (
     (412, 'къси тръби над други възли на EPA.', 'Всички къси тръбни възли не са на една и съща позиция с другите възли на ЕАОС.', 'Shortpipe nodarc over other EPA node'),
     (413, 'EPA connecs over EPA nodes.', 'No EPA connecs over EPA node have been detected.', 'EPA connec over EPA node (goe2pa)'),
     (414, 'Connec catalog without material defined.', 'All connec catalog registers has material defined', 'Check material on connec catalog'),
-    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_ table'),
+    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_type_fluid table'),
     (425, 'Стойността на minlength ('',v_minlength,'') е лошо конфигурирана (повече от близост до възел или по-малко от 0,01).', 'Стойността за минимална дължина (",v_minlength,'') е добре конфигурирана.', 'Check minlength less than 0.01 or more than node proximity'),
     (441, NULL, NULL, 'Water balance calculation'),
     (460, 'презони с id, който не е числова стойност.', 'Всички presszone_ids са числови стойности.', 'Check zones without numeric id'),
@@ -7003,7 +7003,7 @@ FROM (
     (3688, 'Polygon connected with the feature: %v_connect_pol%', NULL),
     (3690, 'Links connected with the feature : %v_connect_connec%', NULL),
     (3692, 'Gullies connected with the feature : %v_connect_gully%', NULL),
-    (3694, 'Any node was found at these coordinates.', 'Please select a node to place your element.'),
+    (3694, 'No node was found at these coordinates.', 'Please select a node to place your element.'),
     (3696, 'ERROR: The dscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', NULL),
     (3700, 'Process done successfully.', NULL),
     (3714, 'Copy from: %v_copyfrom%', NULL),
@@ -8045,6 +8045,10 @@ FROM (
     (3512, NULL),
     (3514, 'Funtion to auto-update cm views and tables to match their parent definitions.'),
     (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.'),
+    (3518, 'Function to get the properties of a feature.'),
+    (3520, 'Function to set hydrometers in the database.'),
+    (3522, 'Function to generate treatment_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.'),
+    (3524, 'Function to transform nuemric values of price to user configuration from admin_currency in config_param_system'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -12314,7 +12318,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

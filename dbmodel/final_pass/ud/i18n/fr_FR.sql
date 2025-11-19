@@ -4433,7 +4433,7 @@ FROM (
     (280, 'pumps with null values at least on mandatory column curve_id. virtualpumps with null values at least on mandatory column curve_id.', 'Pumps checked. No mandatory values for curve_id missed. Virtualpumps checked. No mandatory values for curve_id missed.', 'Null values on pump curve_id '),
     (281, 'additional pumps with null values at least on mandatory column curve_id.', 'Additional pumps checked. No mandatory values for curve_id missed.', 'Null values on additional pump curve_id '),
     (282, 'pipes with null values for roughness. Check roughness catalog columns (init_age,end_age,roughness) before continue.''.', 'Roughness catalog checked. No mandatory values missed.', 'Null values on roughness catalog '),
-    (283, 'registers on arc''''s catalog with null values on dint column.''.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
+    (283, 'registers on arc''s catalog with null values on dint column.''.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
     (284, 'arcs without values on sys_elev1 or sys_elev2.', 'No arcs with null values on field elevation (sys_elev1 or sys_elev2) have been found.', 'Arcs without elevation'),
     (285, 'raingages with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type).', 'Mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed.', 'Null values on raingage'),
     (286, 'raingages with null values on the mandatory column for ''TIMESERIES'' raingage type.', 'Mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed.', 'Null values on raingage timeseries'),
@@ -5235,7 +5235,7 @@ FROM (
     (3688, 'Polygon connected with the feature: %v_connect_pol%', NULL),
     (3690, 'Links connected with the feature : %v_connect_connec%', NULL),
     (3692, 'Gullies connected with the feature : %v_connect_gully%', NULL),
-    (3694, 'Any node was found at these coordinates.', 'Please select a node to place your element.'),
+    (3694, 'No node was found at these coordinates.', 'Please select a node to place your element.'),
     (3696, 'ERROR: The dscenario ( %v_scenarioid% ) already exists with proposed name %v_name%. Please try another one.', NULL),
     (3700, 'Process done successfully.', NULL),
     (3714, 'Copy from: %v_copyfrom%', NULL),
@@ -6094,7 +6094,11 @@ FROM (
     (3510, 'Function to get the exploitation ID array'),
     (3512, NULL),
     (3514, 'Funtion to auto-update cm views and tables to match their parent definitions.'),
-    (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.')
+    (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.'),
+    (3518, 'Function to get the properties of a feature.'),
+    (3520, 'Function to set hydrometers in the database.'),
+    (3522, 'Function to generate treatment_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.'),
+    (3524, 'Function to transform nuemric values of price to user configuration from admin_currency in config_param_system')
 ) AS v(id, descript)
 WHERE t.id = v.id;
 
@@ -9081,7 +9085,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

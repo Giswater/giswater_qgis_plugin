@@ -3979,7 +3979,7 @@ FROM (
     (412, 'shortpipe nodarcs über andere EPA-Knoten".', 'Alle Shortpipe-Knoten befinden sich nicht an der gleichen Position wie andere EPA-Knoten.', 'Shortpipe-Knotenpunkt über anderen EPA-Knotenpunkt'),
     (413, 'EPA-Verbindungen über EPA-Knoten.', 'Es wurden keine EPA-Verbindungen über EPA-Knoten entdeckt.', 'EPA-Verbindung über EPA-Knoten (goe2pa)'),
     (414, 'Connec-Katalog ohne definiertes Material.', 'Alle Register des Verbindungskatalogs haben Material definiert', 'Material auf dem Katalog prüfen'),
-    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_ table'),
+    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_type_fluid table'),
     (425, 'minlength-Wert falsch konfiguriert ist (mehr als Knotennähe oder weniger als 0,01).', 'Minlength-Wert ('',v_minlength,'') ist gut konfiguriert.''', 'Prüfung der Mindestlänge auf weniger als 0,01 oder mehr als Knotennähe'),
     (441, 'Knoten mit Zustand 1 dupliziert.', 'Es gibt keine doppelten Knoten mit Zustand 1', 'Knoten dupliziert'),
     (460, 'presszones mit id, die kein numerischer Wert ist.', 'Alle presszone_ids sind numerische Werte.', 'Zonen ohne numerische Kennung prüfen'),
@@ -5303,6 +5303,10 @@ FROM (
     (3512, NULL),
     (3514, 'Funtion to auto-update cm views and tables to match their parent definitions.'),
     (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.'),
+    (3518, 'Function to get the properties of a feature.'),
+    (3520, 'Function to set hydrometers in the database.'),
+    (3522, 'Function to generate treatment_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.'),
+    (3524, 'Function to transform nuemric values of price to user configuration from admin_currency in config_param_system'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -8177,7 +8181,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 

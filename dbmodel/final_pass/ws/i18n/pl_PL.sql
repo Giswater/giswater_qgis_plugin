@@ -3979,7 +3979,7 @@ FROM (
     (412, 'shortpipe nad innymi węzłami EPA".', 'Wszystkie węzły shortpipe nie znajdują się na tej samej pozycji co inne węzły EPA.', 'Konfiguracja stref mapy'),
     (413, 'EPA łączy się z węzłami EPA.', 'Nie wykryto żadnych połączeń EPA z węzłem EPA.', 'Połączenie EPA przez węzeł EPA (goe2pa)'),
     (414, 'Katalog połączeń bez zdefiniowanego materiału.', 'Wszystkie rejestry katalogów połączeń mają zdefiniowany materiał', 'Sprawdź materiał w katalogu połączeń'),
-    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_ table'),
+    (423, 'features with fluid_type does not exists on man_type_fluid table.', 'All features has fluid_type informed on man_type_fluid table', 'Check fluid_type values exists on man_type_fluid table'),
     (425, 'wartość minlength jest źle skonfigurowana (więcej niż bliskość węzła lub mniej niż 0,01).', 'Wartość minlength ('',v_minlength,'') jest dobrze skonfigurowana.', 'Odwrócony łuk'),
     (441, 'węzłów zduplikowanych ze stanem 1.', 'Nie ma zduplikowanych węzłów ze stanem 1', 'Obliczanie bilansu wodnego'),
     (460, 'węzły osierocone gotowe do eksportu.', 'Nie znaleziono osieroconych węzłów', 'Węzły EPA przycinają łuki'),
@@ -5303,6 +5303,10 @@ FROM (
     (3512, NULL),
     (3514, 'Funtion to auto-update cm views and tables to match their parent definitions.'),
     (3516, 'Function to manage batch inserts of features into various relation tables (campaign, lot, psector, element, visit) based on relation type and feature type. Returns the number of inserted features.'),
+    (3518, 'Function to get the properties of a feature.'),
+    (3520, 'Function to set hydrometers in the database.'),
+    (3522, 'Function to generate treatment_type of your arcs and nodes. Stop your mouse over labels for more information about input parameters.'),
+    (3524, 'Function to transform nuemric values of price to user configuration from admin_currency in config_param_system'),
     (1302, NULL),
     (1304, NULL),
     (1306, NULL),
@@ -8177,7 +8181,7 @@ UPDATE config_param_system AS t
 SET value = v.value
 FROM (
     VALUES
-    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€"}')
+    ('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 
