@@ -514,16 +514,16 @@ BEGIN
 			v_overlap_status = 'Ok';
 
 			-- mincut details
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			
 			-- Stats
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "cur_user":"current_user"}}$$)';
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||COALESCE((v_mincut_record.output->'arcs'->>'volume'), '0')||'"}, "cur_user":"current_user"}}$$)';
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'connecs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincut_record.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "cur_user":"current_user"}}$$)';
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincut_record.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4368", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"volume":"'||COALESCE((v_mincut_record.output->'arcs'->>'volume'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4370", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'connecs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincut_record.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincut_record.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			END IF;
 
 		-- get results
