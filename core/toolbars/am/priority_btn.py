@@ -352,8 +352,9 @@ class CalculatePriority:
         self.type = type if mode == "new" else self.result["type"]
         self.mode = mode
         self.layer_to_work = "v_asset_arc_input"
-        self.layers = {}
-        self.layers["arc"] = []
+        self.rel_layers = {}
+        self.rel_layers["arc"] = []
+        self.excluded_layers = []
         self.list_ids = {}
         self.config = CalculatePriorityConfig(type)
         self.total_weight = {}
@@ -794,12 +795,12 @@ class CalculatePriority:
 
     def _snap_clicked(self):
         """Set canvas map tool to an instance of class 'GwSelectManager'"""
-        self.feature_type = "arc"
+        self.rel_feature_type = "arc"
         layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
-        self.layers["arc"].append(layer)
+        self.rel_layers["arc"].append(layer)
 
         # Remove all previous selections
-        self.layers = tools_gw.remove_selection(True, layers=self.layers)
+        self.rel_layers = tools_gw.remove_selection(True, layers=self.rel_layers)
 
         # In case of "duplicate" or "edit", load result selection
         if self.result["features"]:
@@ -900,6 +901,7 @@ class CalculatePriority:
         dlg.btn_accept.clicked.connect(self._manage_calculate)
         dlg.btn_again.clicked.connect(self._go_first_tab)
         dlg.btn_close.clicked.connect(self.close_dlg)
+        dlg.rejected.connect(self.close_dlg)
         dlg.btn_save2file.clicked.connect(self._save2file)
         dlg.cmb_expl_selection.currentIndexChanged.connect(partial(self._load_presszone))
         dlg.cmb_presszone.currentIndexChanged.connect(partial(self._load_diameter))
@@ -931,6 +933,7 @@ class CalculatePriority:
     def close_dlg(self):
         """ Close dialog """
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.remove_selection(True, layers=self.rel_layers)
         tools_gw.close_dialog(self.dlg_priority)
 
     def _go_first_tab(self):
@@ -1002,8 +1005,13 @@ class CalculatePriority:
         status = tools_qt.get_combo_value(dlg, dlg.cmb_status)
 
         features = None
-        if "arc" in self.list_ids:
-            features = self.list_ids["arc"] or None
+        try:
+            layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
+            if layer is not None and layer.selectedFeatureCount() > 0:
+                features = layer.selectedFeatures()
+                features = [str(feature.id()) for feature in features]
+        except Exception:
+            pass
 
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection") or None
         presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
