@@ -627,7 +627,7 @@
 		</message>
 		<message>
 			<source>End date</source>
-			<translation>An error occurred saving the workorder.</translation>
+			<translation>End date</translation>
 		</message>
 		<message>
 			<source>Error</source>
@@ -10128,7 +10128,7 @@
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -10180,7 +10180,7 @@
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Dialog</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -26151,7 +26151,7 @@
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>btn_close</source>

@@ -554,8 +554,76 @@
 		</message>
 		<!-- PYTHON MESSAGES -->
 		<message>
+			<source>For select on canvas is mandatory to load v_asset_arc_input layer</source>
+			<translation>For select on canvas is mandatory to load v_asset_arc_input layer</translation>
+		</message>
+		<message>
+			<source>Please select a result with not empty type</source>
+			<translation>Please select a result with not empty type</translation>
+		</message>
+		<message>
+			<source>{0} campaign(s) deleted.</source>
+			<translation>{0} campaign(s) deleted.</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lot(s) deleted.</translation>
+		</message>
+		<message>
+			<source>{0} workorder(s) deleted.</source>
+			<translation>{0} workorder(s) deleted.</translation>
+		</message>
+		<message>
 			<source>An error occurred saving the workorder.</source>
 			<translation>An error occurred saving the workorder.</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to assign team '{0}' to {1} selected user(s)?</source>
+			<translation>Are you sure you want to assign team '{0}' to {1} selected user(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>Are you sure you want to delete {0} campaign(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} lot(s)?</source>
+			<translation>Are you sure you want to delete {0} lot(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} workorder(s)?</source>
+			<translation>Are you sure you want to delete {0} workorder(s)?</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete these records:</source>
+			<translation>Are you sure you want to delete these records:</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to remove team assignment from {0} selected user(s)?</source>
+			<translation>Are you sure you want to remove team assignment from {0} selected user(s)?</translation>
+		</message>
+		<message>
+			<source>Assign Team</source>
+			<translation>Assign Team</translation>
+		</message>
+		<message>
+			<source>Campaign saved successfully.</source>
+			<translation>Campaign saved successfully.</translation>
+		</message>
+		<message>
+			<source>CRITICAL ERROR in update_expl_sector_combos</source>
+			<translation>CRITICAL ERROR in update_expl_sector_combos</translation>
+		</message>
+		<message>
+			<source>Delete Lot(s)</source>
+			<translation>Delete Lot(s)</translation>
+		</message>
+		<message>
+			<source>Delete records</source>
+			<translation>Delete records</translation>
+		</message>
+		<message>
+			<source>Delete Workorder(s)</source>
+			<translation>Delete Workorder(s)</translation>
 		</message>
 		<message>
 			<source>End date</source>
@@ -566,8 +634,88 @@
 			<translation>Error</translation>
 		</message>
 		<message>
+			<source>Error assigning team: {0}</source>
+			<translation>Error assigning team: {0}</translation>
+		</message>
+		<message>
+			<source>Error creating dynamic dialog: {0}</source>
+			<translation>Error creating dynamic dialog: {0}</translation>
+		</message>
+		<message>
+			<source>Error creating or updating team</source>
+			<translation>Error creating or updating team</translation>
+		</message>
+		<message>
+			<source>Error removing team assignment: {0}</source>
+			<translation>Error removing team assignment: {0}</translation>
+		</message>
+		<message>
+			<source>Error saving lot.</source>
+			<translation>Error saving lot.</translation>
+		</message>
+		<message>
+			<source>Error toggling state: {0}</source>
+			<translation>Error toggling state: {0}</translation>
+		</message>
+		<message>
+			<source>Failed to fetch dialog configuration</source>
+			<translation>Failed to fetch dialog configuration</translation>
+		</message>
+		<message>
+			<source>Failed to load campaign form.</source>
+			<translation>Failed to load campaign form.</translation>
+		</message>
+		<message>
+			<source>Failed to load lot form.</source>
+			<translation>Failed to load lot form.</translation>
+		</message>
+		<message>
+			<source>Failed to load team creation dialog configuration. Please check database configuration.</source>
+			<translation>Failed to load team creation dialog configuration. Please check database configuration.</translation>
+		</message>
+		<message>
+			<source>Failed to load workorder form.</source>
+			<translation>Failed to load workorder form.</translation>
+		</message>
+		<message>
+			<source>Failed to save campaign</source>
+			<translation>Failed to save campaign</translation>
+		</message>
+		<message>
+			<source>Info</source>
+			<translation>Info</translation>
+		</message>
+		<message>
+			<source>Invalid campaign ID.</source>
+			<translation>Invalid campaign ID.</translation>
+		</message>
+		<message>
+			<source>Invalid campaign mode</source>
+			<translation>Invalid campaign mode</translation>
+		</message>
+		<message>
+			<source>Invalid lot ID.</source>
+			<translation>Invalid lot ID.</translation>
+		</message>
+		<message>
+			<source>Invalid workorder ID.</source>
+			<translation>Invalid workorder ID.</translation>
+		</message>
+		<message>
 			<source>Missing Data</source>
 			<translation>Missing Data</translation>
+		</message>
+		<message>
+			<source>Missing required fields</source>
+			<translation>Missing required fields</translation>
+		</message>
+		<message>
+			<source>No campaign selected.</source>
+			<translation>No campaign selected.</translation>
+		</message>
+		<message>
+			<source>No records selected</source>
+			<translation>No records selected</translation>
 		</message>
 		<message>
 			<source>Planned end date</source>
@@ -582,8 +730,80 @@
 			<translation>Please fill all mandatory fields (highlighted in red).</translation>
 		</message>
 		<message>
+			<source>Please select a lot to open.</source>
+			<translation>Please select a lot to open.</translation>
+		</message>
+		<message>
+			<source>Please select a team to assign.</source>
+			<translation>Please select a team to assign.</translation>
+		</message>
+		<message>
+			<source>Please select at least one user to assign a team.</source>
+			<translation>Please select at least one user to assign a team.</translation>
+		</message>
+		<message>
+			<source>Please select at least one user to remove team assignment.</source>
+			<translation>Please select at least one user to remove team assignment.</translation>
+		</message>
+		<message>
+			<source>Please select a valid team to assign.</source>
+			<translation>Please select a valid team to assign.</translation>
+		</message>
+		<message>
+			<source>Please select a workorder to open.</source>
+			<translation>Please select a workorder to open.</translation>
+		</message>
+		<message>
+			<source>Real end date</source>
+			<translation>Real end date</translation>
+		</message>
+		<message>
+			<source>Real start date</source>
+			<translation>Real start date</translation>
+		</message>
+		<message>
+			<source>Remove Team Assignment</source>
+			<translation>Remove Team Assignment</translation>
+		</message>
+		<message>
+			<source>Select a campaign to delete.</source>
+			<translation>Select a campaign to delete.</translation>
+		</message>
+		<message>
+			<source>Select a lot to delete.</source>
+			<translation>Select a lot to delete.</translation>
+		</message>
+		<message>
+			<source>Select a workorder to delete.</source>
+			<translation>Select a workorder to delete.</translation>
+		</message>
+		<message>
+			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
+			<translation>Some mandatory fields are missing. Please fill the required fields (marked in red).</translation>
+		</message>
+		<message>
+			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
+			<translation>Some mandatory values are missing. Please check the widgets marked in red.</translation>
+		</message>
+		<message>
 			<source>Start date</source>
 			<translation>Start date</translation>
+		</message>
+		<message>
+			<source>Successfully assigned team '{0}' to {1} user(s).</source>
+			<translation>Successfully assigned team '{0}' to {1} user(s).</translation>
+		</message>
+		<message>
+			<source>Successfully removed team assignment from {0} user(s).</source>
+			<translation>Successfully removed team assignment from {0} user(s).</translation>
+		</message>
+		<message>
+			<source>The team name already exists</source>
+			<translation>The team name already exists</translation>
+		</message>
+		<message>
+			<source>This will also delete the database user(s):</source>
+			<translation>This will also delete the database user(s):</translation>
 		</message>
 		<message>
 			<source></source>
@@ -1002,6 +1222,10 @@
 			<translation>A style already exists for the layer '{0}' in the selected style group.</translation>
 		</message>
 		<message>
+			<source>Atlas ID must be an integer.</source>
+			<translation>Atlas ID must be an integer.</translation>
+		</message>
+		<message>
 			<source>    author = {Boeing, Geoff},</source>
 			<translation>    author = {Boeing, Geoff},</translation>
 		</message>
@@ -1414,6 +1638,10 @@
 			<translation>Could not get feature ID from snapped point</translation>
 		</message>
 		<message>
+			<source>Could not load EPA Results layers</source>
+			<translation>Could not load EPA Results layers</translation>
+		</message>
+		<message>
 			<source>Could not retrieve feature from layer</source>
 			<translation>Could not retrieve feature from layer</translation>
 		</message>
@@ -1630,6 +1858,10 @@
 			<translation>Data retrieved and displayed successfully.</translation>
 		</message>
 		<message>
+			<source>Date</source>
+			<translation>Date</translation>
+		</message>
+		<message>
 			<source>Date from:</source>
 			<translation>Date from:</translation>
 		</message>
@@ -1740,6 +1972,10 @@
 		<message>
 			<source>Do you want change it and continue?</source>
 			<translation>Do you want change it and continue?</translation>
+		</message>
+		<message>
+			<source>Do you want to continue?</source>
+			<translation>Do you want to continue?</translation>
 		</message>
 		<message>
 			<source>Do you want to copy its values to the current node?</source>
@@ -2096,6 +2332,10 @@
 		<message>
 			<source>Error saving the configuration</source>
 			<translation>Error saving the configuration</translation>
+		</message>
+		<message>
+			<source>Error setting node</source>
+			<translation>Error setting node</translation>
 		</message>
 		<message>
 			<source>Error translating: {0}</source>
@@ -2838,6 +3078,10 @@
 			<translation>Id вече е избран</translation>
 		</message>
 		<message>
+			<source>Identify all</source>
+			<translation>Identify all</translation>
+		</message>
+		<message>
 			<source>Identifying all nodes that lie outside the polygon...</source>
 			<translation>Identifying all nodes that lie outside the polygon...</translation>
 		</message>
@@ -3142,6 +3386,10 @@
 			<translation>Слоят не е намерен</translation>
 		</message>
 		<message>
+			<source>Layer of CM project will be added to the project when create</source>
+			<translation>Layer of CM project will be added to the project when create</translation>
+		</message>
+		<message>
 			<source>Layers of your role not found</source>
 			<translation>Не са открити слоевете на вашата роля</translation>
 		</message>
@@ -3180,6 +3428,10 @@
 		<message>
 			<source>Leaks without pipes intersecting its buffer: {leaks}.</source>
 			<translation>Течове без тръби, пресичащи буфера му: {leaks}.</translation>
+		</message>
+		<message>
+			<source>levels</source>
+			<translation>levels</translation>
 		</message>
 		<message>
 			<source>LIDS</source>
@@ -3290,6 +3542,10 @@
 			<translation>Med. Longevity</translation>
 		</message>
 		<message>
+			<source>Merge requires at least 2 psectors to be selected</source>
+			<translation>Merge requires at least 2 psectors to be selected</translation>
+		</message>
+		<message>
 			<source>Message</source>
 			<translation>Message</translation>
 		</message>
@@ -3308,6 +3564,10 @@
 		<message>
 			<source>MINCUT</source>
 			<translation>MINCUT</translation>
+		</message>
+		<message>
+			<source>Mincut canceled!</source>
+			<translation>Mincut canceled!</translation>
 		</message>
 		<message>
 			<source>Mincut done</source>
@@ -3384,6 +3644,10 @@
 		<message>
 			<source>\n</source>
 			<translation>\n</translation>
+		</message>
+		<message>
+			<source>Name</source>
+			<translation>Name</translation>
 		</message>
 		<message>
 			<source>Name, description and code are required fields</source>
@@ -3478,6 +3742,10 @@
 			<translation>Възелът е заменен успешно</translation>
 		</message>
 		<message>
+			<source>Node set correctly</source>
+			<translation>Node set correctly</translation>
+		</message>
+		<message>
 			<source>Node type has been updated!</source>
 			<translation>Типът на възела е актуализиран!</translation>
 		</message>
@@ -3488,6 +3756,14 @@
 		<message>
 			<source>No event provided for point selection</source>
 			<translation>No event provided for point selection</translation>
+		</message>
+		<message>
+			<source>No features found in the selection for {0}.</source>
+			<translation>No features found in the selection for {0}.</translation>
+		</message>
+		<message>
+			<source>No features found in the selection for the enabled tabs ({0}).</source>
+			<translation>No features found in the selection for the enabled tabs ({0}).</translation>
 		</message>
 		<message>
 			<source>NO FEATURE TYPE DEFINED</source>
@@ -3520,6 +3796,10 @@
 		<message>
 			<source>No municipalities selected</source>
 			<translation>No municipalities selected</translation>
+		</message>
+		<message>
+			<source>No new features to insert. All selected features already exist in the table.</source>
+			<translation>No new features to insert. All selected features already exist in the table.</translation>
 		</message>
 		<message>
 			<source>No node ID found at the snapped location.</source>
@@ -3764,6 +4044,14 @@
 		<message>
 			<source>Parameter widgetfunction not found for widget type hyperlink</source>
 			<translation>Параметърът widgetfunction не е намерен за тип джаджа хипервръзка</translation>
+		</message>
+		<message>
+			<source>Parent ID does not exist.</source>
+			<translation>Parent ID does not exist.</translation>
+		</message>
+		<message>
+			<source>Parent ID must be an integer.</source>
+			<translation>Parent ID must be an integer.</translation>
 		</message>
 		<message>
 			<source>Parsing error fixed</source>
@@ -4146,8 +4434,20 @@
 			<translation>Psector '{0}' has no workcat_id value set. Do you want to continue with the default value?</translation>
 		</message>
 		<message>
+			<source>Psector could not be updated because of the following errors: </source>
+			<translation>Psector could not be updated because of the following errors: </translation>
+		</message>
+		<message>
 			<source>Psector features loaded successfully on the map.</source>
 			<translation>Psector features loaded successfully on the map.</translation>
+		</message>
+		<message>
+			<source>Psector ID</source>
+			<translation>Psector ID</translation>
+		</message>
+		<message>
+			<source>Psector ID not found</source>
+			<translation>Psector ID not found</translation>
 		</message>
 		<message>
 			<source>Psector is not archived</source>
@@ -4266,6 +4566,10 @@
 			<translation>Replacing template text</translation>
 		</message>
 		<message>
+			<source>Reports generated successfully</source>
+			<translation>Reports generated successfully</translation>
+		</message>
+		<message>
 			<source>Required fields are missing</source>
 			<translation>Required fields are missing</translation>
 		</message>
@@ -4310,6 +4614,10 @@
 			<translation>rio-vrt must be installed as an optional dependency to build VRTs.</translation>
 		</message>
 		<message>
+			<source>Rotation must be a number.</source>
+			<translation>Rotation must be a number.</translation>
+		</message>
+		<message>
 			<source>`route_colors` and `route_linewidths` must have same lengths as `routes`.</source>
 			<translation>`route_colors` and `route_linewidths` must have same lengths as `routes`.</translation>
 		</message>
@@ -4340,6 +4648,10 @@
 		<message>
 			<source>Saving results to DB</source>
 			<translation>Записване на резултати в БД</translation>
+		</message>
+		<message>
+			<source>Scale must be a number.</source>
+			<translation>Scale must be a number.</translation>
 		</message>
 		<message>
 			<source>Schema audit not found, please create it first</source>
@@ -4908,6 +5220,10 @@
 		<message>
 			<source>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</source>
 			<translation>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</translation>
+		</message>
+		<message>
+			<source>The following fields differ between the selected arcs. You are about to merge them using the selected values.</source>
+			<translation>The following fields differ between the selected arcs. You are about to merge them using the selected values.</translation>
 		</message>
 		<message>
 			<source>The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.</source>
@@ -5646,6 +5962,10 @@
 			<translation>    url = {https://geoffboeing.com/publications/osmnx-paper/},</translation>
 		</message>
 		<message>
+			<source>User</source>
+			<translation>User</translation>
+		</message>
+		<message>
 			<source>User '{0}' was created, but failed to grant roles ('{1}', 'role_basic').</source>
 			<translation>User '{0}' was created, but failed to grant roles ('{1}', 'role_basic').</translation>
 		</message>
@@ -6000,6 +6320,18 @@
 		<message>
 			<source>You have to set this parameter</source>
 			<translation>Трябва да зададете този параметър.</translation>
+		</message>
+		<message>
+			<source>You have to set this parameter: INP file</source>
+			<translation>You have to set this parameter: INP file</translation>
+		</message>
+		<message>
+			<source>You have to set this parameter: RPT file</source>
+			<translation>You have to set this parameter: RPT file</translation>
+		</message>
+		<message>
+			<source>You must choose at least one action</source>
+			<translation>You must choose at least one action</translation>
 		</message>
 		<message>
 			<source>You must pass at least 1 route.</source>
@@ -9796,7 +10128,7 @@
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -9848,7 +10180,7 @@
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Dialog</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -17903,7 +18235,7 @@
 		</message>
 		<message>
 			<source>ve_inp_controls</source>
-			<translation>controls</translation>
+			<translation>Controls</translation>
 		</message>
 		<message>
 			<source>tooltip_ve_inp_controls</source>
@@ -25820,7 +26152,7 @@
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -26233,6 +26565,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_equipment_code</source>
+			<translation>Chlorine measurement equipment:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_equipment_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_exec_appropriate</source>
 			<translation>Подходящо:</translation>
 		</message>
@@ -26278,6 +26618,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reagent_lot</source>
+			<translation>Chlorine reagent lot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reagent_lot</source>
 			<translation>None</translation>
 		</message>
 		<message>

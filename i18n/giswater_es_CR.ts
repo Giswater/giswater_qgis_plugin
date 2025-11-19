@@ -9802,7 +9802,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>assignation</name>
 		<message>
 			<source>title</source>
-			<translation>Asignación de averías</translation>
+			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
@@ -9814,7 +9814,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>dlg_assignation</source>
-			<translation>Asignación de averías</translation>
+			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_assignation</source>
@@ -9929,7 +9929,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>priority</name>
 		<message>
 			<source>title</source>
-			<translation>Cálculo de prioridades</translation>
+			<translation>Cálculo de prioridad</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -9973,7 +9973,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>dlg_priority</source>
-			<translation>Cálculo de prioridades</translation>
+			<translation>Cálculo de prioridad</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -10037,7 +10037,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_expl_selection</source>
-			<translation>Operación:</translation>
+			<translation>Explotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl_selection</source>
@@ -10128,7 +10128,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Diálogo</translation>
+			<translation>Gestor de resultados</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -10180,7 +10180,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Diálogo</translation>
+			<translation>Gestor de resultados</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -10188,7 +10188,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_expl</source>
-			<translation>Operación:</translation>
+			<translation>Explotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl</source>
@@ -25857,7 +25857,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>assignation</name>
 		<message>
 			<source>title</source>
-			<translation>Asignación de averías</translation>
+			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
@@ -25984,7 +25984,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>priority</name>
 		<message>
 			<source>title</source>
-			<translation>Cálculo de prioridades</translation>
+			<translation>Cálculo de prioridad</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -26151,7 +26151,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Diálogo</translation>
+			<translation>Gestor de resultados</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
