@@ -90,18 +90,20 @@ BEGIN
 	-- get results
 	--points
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
   	SELECT jsonb_build_object(
      'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
   	FROM  anl_node WHERE cur_user="current_user"() AND fid=112) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+	v_result_point := COALESCE(v_result, '{}');
 
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=112;
 
@@ -123,7 +125,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=112 order by  id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');

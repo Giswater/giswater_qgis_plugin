@@ -434,7 +434,7 @@ BEGIN
     -- ENDSECTION
 
     v_result := COALESCE(v_result, '{}');
-    v_result_info := CONCAT('{"geometryType":"", "values":', v_result, '}');
+    v_result_info := CONCAT('{"values":', v_result, '}');
 
     -- Control nulls
     v_result_info := COALESCE(v_result_info, '{}');

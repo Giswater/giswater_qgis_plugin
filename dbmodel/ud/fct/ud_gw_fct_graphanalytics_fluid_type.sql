@@ -261,69 +261,75 @@ BEGIN
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with fluid type and geometry';
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom',
-			'crs',concat('EPSG:',ST_SRID(the_geom))
-		) AS feature
-		FROM (
-			SELECT v.arc_id AS feature_id, 'ARC' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-			FROM v_temp_arc v
-			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-			WHERE ot.typevalue = 'fluid_type'
-			UNION
-			SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-			FROM v_temp_link_connec v
-			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-			WHERE ot.typevalue = 'fluid_type'
-			UNION
-			SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-			FROM v_temp_link_gully v
-			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-			WHERE ot.typevalue = 'fluid_type'
-		) row) features;
+		v_result_line := jsonb_build_object(
+			'type', 'FeatureCollection',
+			'layerName', 'Lines',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type',       'Feature',
+						'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT v.arc_id AS feature_id, 'ARC' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM v_temp_arc v
+						JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
+						UNION
+						SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM v_temp_link_connec v
+						JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
+						UNION
+						SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM v_temp_link_gully v
+						JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
+					) row
+				) features
+			), '[]'::jsonb)
+		)::text;
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_line = concat ('{"geometryType":"LineString", "layerName": "Lines", "features":',v_result, '}');
+		v_result_point := jsonb_build_object(
+			'type', 'FeatureCollection',
+			'layerName', 'Points',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type',       'Feature',
+						'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT v.node_id AS feature_id, 'NODE' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM v_temp_node v
+						JOIN temp_pgr_node t ON t.node_id = v.node_id
+						JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
+						UNION
+						SELECT v.connec_id AS feature_id, 'CONNECT' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM v_temp_connec v
+						JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
+						UNION
+						SELECT v.gully_id AS feature_id, 'GULLY' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM v_temp_gully v
+						JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
+					) row
+				) features
+			), '[]'::jsonb)
+		)::text;
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom',
-			'crs',concat('EPSG:',ST_SRID(the_geom))
-		) AS feature
-		FROM (
-			SELECT v.node_id AS feature_id, 'NODE' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-			FROM v_temp_node v
-			JOIN temp_pgr_node t ON t.node_id = v.node_id
-			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-			WHERE ot.typevalue = 'fluid_type'
-			UNION
-			SELECT v.connec_id AS feature_id, 'CONNECT' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-			FROM v_temp_connec v
-			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-			WHERE ot.typevalue = 'fluid_type'
-			UNION
-			SELECT v.gully_id AS feature_id, 'GULLY' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-			FROM v_temp_gully v
-			JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-			JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-			WHERE ot.typevalue = 'fluid_type'
-		) row) features;
-
-		v_result := COALESCE(v_result, '{}');
-		v_result_point = concat ('{"geometryType":"Point", "layerName": "Points", "features":',v_result, '}');
-
-		v_result_polygon = '{"geometryType":"", "features":[]}';
+		v_result_polygon = '{}';
 
 		v_status = 'Accepted';
 		v_level = 3;
@@ -381,7 +387,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) ORDER BY criticity DESC, id ASC) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info := concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info := concat ('{"values":',v_result, '}');
 
 	-- Control NULL values
 	v_result_info := COALESCE(v_result_info, '{}');
@@ -416,4 +422,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

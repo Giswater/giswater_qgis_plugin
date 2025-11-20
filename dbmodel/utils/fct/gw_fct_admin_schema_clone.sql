@@ -240,12 +240,12 @@ BEGIN
 	PERFORM gw_fct_admin_role_permissions();
 
 	v_result_info := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	--geometry
-	v_result_line = '{"geometryType":"", "features":[]}';
-	v_result_polygon = '{"geometryType":"", "features":[]}';
-	v_result_point = '{"geometryType":"", "features":[]}';
+	v_result_line = '{}';
+	v_result_polygon = '{}';
+	v_result_point = '{}';
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Copy schema done successfully"}, "version":"'||v_version||'"'||

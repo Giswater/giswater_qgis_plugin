@@ -175,98 +175,98 @@ BEGIN
 	-- SECTION[epic=mincut]: Build GeoJSON
 	IF v_device = 5 THEN
 		-- v_om_mincut
-		SELECT COALESCE(jsonb_agg(features.feature), '[]'::jsonb) INTO v_result
-		FROM (
-			SELECT jsonb_build_object(
-				'type', 'Feature',
-				'geometry', ST_AsGeoJSON(anl_the_geom)::jsonb,
-				'properties', to_jsonb(row) - 'anl_the_geom' - 'srid',
-				'crs', concat('EPSG:', srid)
-			) AS feature
-			FROM (
-				SELECT id, anl_the_geom, ST_SRID(anl_the_geom) as srid
-				FROM v_om_mincut
-			) row
-		) features;
 		v_result_init := jsonb_build_object(
-			'geometryType', 'Point',
-			'features', COALESCE(v_result, '[]'::jsonb)
+			'type', 'FeatureCollection',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type', 'Feature',
+						'geometry', ST_AsGeoJSON(ST_Transform(anl_the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'anl_the_geom'
+					) AS feature
+					FROM (
+						SELECT id, anl_the_geom
+						FROM v_om_mincut
+					) row
+				) features
+			), '[]'::jsonb)
 		);
 
 		-- v_om_mincut_valve
-		SELECT COALESCE(jsonb_agg(features.feature), '[]'::jsonb) INTO v_result
-		FROM (
-			SELECT jsonb_build_object(
-				'type', 'Feature',
-				'geometry', ST_AsGeoJSON(the_geom)::jsonb,
-				'properties', to_jsonb(row) - 'the_geom' - 'srid',
-				'crs', concat('EPSG:', srid)
-			) AS feature
-			FROM (
-				SELECT id, the_geom, ST_SRID(the_geom) as srid
-				FROM v_om_mincut_valve
-			) row
-		) features;
 		v_result_valve := jsonb_build_object(
-			'geometryType', 'Point',
-			'features', COALESCE(v_result, '[]'::jsonb)
+			'type', 'FeatureCollection',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type', 'Feature',
+						'geometry', ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT id, the_geom
+						FROM v_om_mincut_valve
+					) row
+				) features
+			), '[]'::jsonb)
 		);
 
 		-- v_om_mincut_node
-		SELECT COALESCE(jsonb_agg(features.feature), '[]'::jsonb) INTO v_result
-		FROM (
-			SELECT jsonb_build_object(
-				'type', 'Feature',
-				'geometry', ST_AsGeoJSON(the_geom)::jsonb,
-				'properties', to_jsonb(row) - 'the_geom' - 'srid',
-				'crs', concat('EPSG:', srid)
-			) AS feature
-			FROM (
-				SELECT id, the_geom, ST_SRID(the_geom) as srid
-				FROM v_om_mincut_node
-			) row
-		) features;
 		v_result_node := jsonb_build_object(
-			'geometryType', 'Point',
-			'features', COALESCE(v_result, '[]'::jsonb)
+			'type', 'FeatureCollection',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type', 'Feature',
+						'geometry', ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT id, the_geom
+						FROM v_om_mincut_node
+					) row
+				) features
+			), '[]'::jsonb)
 		);
 
 		-- v_om_mincut_connec
-		SELECT COALESCE(jsonb_agg(features.feature), '[]'::jsonb) INTO v_result
-		FROM (
-			SELECT jsonb_build_object(
-				'type', 'Feature',
-				'geometry', ST_AsGeoJSON(the_geom)::jsonb,
-				'properties', to_jsonb(row) - 'the_geom' - 'srid',
-				'crs', concat('EPSG:', srid)
-			) AS feature
-			FROM (
-				SELECT id, the_geom, ST_SRID(the_geom) as srid
-				FROM v_om_mincut_connec
-			) row
-		) features;
 		v_result_connec := jsonb_build_object(
-			'geometryType', 'Point',
-			'features', COALESCE(v_result, '[]'::jsonb)
+			'type', 'FeatureCollection',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type', 'Feature',
+						'geometry', ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT id, the_geom
+						FROM v_om_mincut_connec
+					) row
+				) features
+			), '[]'::jsonb)
 		);
 
 		-- v_om_mincut_arc
-		SELECT COALESCE(jsonb_agg(features.feature), '[]'::jsonb) INTO v_result
-		FROM (
-			SELECT jsonb_build_object(
-				'type', 'Feature',
-				'geometry', ST_AsGeoJSON(the_geom)::jsonb,
-				'properties', to_jsonb(row) - 'the_geom' - 'srid',
-				'crs', concat('EPSG:', srid)
-			) AS feature
-			FROM (
-				SELECT id, arc_id, the_geom, ST_SRID(the_geom) as srid
-				FROM v_om_mincut_arc
-			) row
-		) features;
 		v_result_arc := jsonb_build_object(
-			'geometryType', 'LineString',
-			'features', COALESCE(v_result, '[]'::jsonb)
+			'type', 'FeatureCollection',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type', 'Feature',
+						'geometry', ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT id, arc_id, the_geom
+						FROM v_om_mincut_arc
+					) row
+				) features
+			), '[]'::jsonb)
 		);
 	END IF;
 

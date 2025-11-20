@@ -249,7 +249,7 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=213 order by
 	criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result,'}');
+	v_result_info = concat ('{"values":',v_result,'}');
 
 	-- control nulls
 	v_col_top= COALESCE(v_col_top::text,'');

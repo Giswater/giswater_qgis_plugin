@@ -75,7 +75,7 @@ DECLARE
 
     -- parameters
     v_pgr_distance INTEGER;
-    
+
 BEGIN
 
 	-- Search path
@@ -228,19 +228,19 @@ BEGIN
 
     -- if an arc is between 2 water sources nodes, minsector_id = arc_id
     UPDATE temp_pgr_arc a SET mapzone_id = a.arc_id
-    FROM v_temp_arc va 
+    FROM v_temp_arc va
     WHERE a.arc_id IS NOT NULL
     AND a.mapzone_id = 0
     AND a.arc_id = va.arc_id
     AND EXISTS (
-        SELECT 1 FROM v_temp_node n 
+        SELECT 1 FROM v_temp_node n
         WHERE 'SECTOR' = ANY (n.graph_delimiter)
-        AND va.node_1 = n.node_id 
+        AND va.node_1 = n.node_id
     )
     AND EXISTS (
-        SELECT 1 FROM v_temp_node n 
-        WHERE 'SECTOR' = ANY (n.graph_delimiter) 
-        AND va.node_2 = n.node_id 
+        SELECT 1 FROM v_temp_node n
+        WHERE 'SECTOR' = ANY (n.graph_delimiter)
+        AND va.node_2 = n.node_id
     );
 
     INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
@@ -423,11 +423,14 @@ BEGIN
 
 	IF v_commitchanges IS FALSE THEN
         -- Polygons
-        EXECUTE 'SELECT jsonb_agg(features.feature) 
+        EXECUTE 'SELECT jsonb_build_object(
+                ''type'', ''FeatureCollection'',
+                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+            )
         FROM (
             SELECT jsonb_build_object(
                 ''type'',       ''Feature'',
-                ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
                 ''properties'', to_jsonb(row) - ''the_geom''
             ) AS feature
             FROM (
@@ -439,7 +442,7 @@ BEGIN
             UNION
             SELECT jsonb_build_object(
                 ''type'',       ''Feature'',
-                ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
                 ''properties'', to_jsonb(row) - ''the_geom''
             ) AS feature
             FROM (
@@ -450,8 +453,7 @@ BEGIN
             ) row
         ) features' INTO v_result;
 
-        v_result := COALESCE(v_result, '{}');
-        v_result_polygon := CONCAT('{"geometryType":"Polygon", "layerName": "Minsector Analysis", "features":', v_result, '}');
+        v_result_polygon := v_result;
 
         v_visible_layer = NULL;
 
@@ -461,7 +463,7 @@ BEGIN
     ELSE
 
         -- Update minsector
-        DELETE FROM minsector 
+        DELETE FROM minsector
         WHERE EXISTS (
             SELECT 1 FROM v_temp_pgr_mapzone_old
             WHERE minsector.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
@@ -470,7 +472,7 @@ BEGIN
             SELECT 1 FROM temp_pgr_minsector
             WHERE minsector.minsector_id = temp_pgr_minsector.minsector_id
         );
-        
+
         INSERT INTO minsector SELECT * FROM temp_pgr_minsector;
 
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
@@ -622,22 +624,22 @@ BEGIN
             UPDATE temp_pgr_arc_minsector a
             SET cost_mincut = 0, reverse_cost_mincut = 0
             WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.closed = FALSE 
+            AND a.closed = FALSE
             AND a.broken = TRUE;
-        END IF;         
+        END IF;
 
         -- check valves
         IF v_ignore_check_valves THEN
             UPDATE temp_pgr_arc_minsector a
             SET cost_mincut = 0, reverse_cost_mincut = 0
             WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.closed = FALSE 
+            AND a.closed = FALSE
             AND a.cost <> a.reverse_cost;
-		ELSE 
+		ELSE
             UPDATE temp_pgr_arc_minsector a
             SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
             WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.closed = FALSE 
+            AND a.closed = FALSE
             AND a.cost <> a.reverse_cost;
 		END IF;
 
@@ -666,7 +668,7 @@ BEGIN
                     WHERE omv.unaccess = TRUE
                     AND omv.node_id = tpa.arc_id
             );',
-            v_mincut_plannified_state, v_mincut_in_progress_state, 
+            v_mincut_plannified_state, v_mincut_in_progress_state,
             v_mincut_network_class,
             v_day_start, v_day_end);
         END IF;
@@ -695,7 +697,7 @@ BEGIN
                     WHERE omv.changestatus = TRUE
                     AND omv.node_id = tpa.arc_id
             );',
-            v_mincut_plannified_state, v_mincut_in_progress_state, 
+            v_mincut_plannified_state, v_mincut_in_progress_state,
             v_mincut_network_class,
             v_day_start, v_day_end);
         END IF;
@@ -763,7 +765,7 @@ BEGIN
         SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user = current_user AND fid = v_fid ORDER BY id
     ) row;
     v_result := COALESCE(v_result, '{}');
-    v_result_info := CONCAT('{"geometryType":"", "values":', v_result, '}');
+    v_result_info := CONCAT('{"values":', v_result, '}');
 
     -- Control nulls
     v_result_info := COALESCE(v_result_info, '{}');

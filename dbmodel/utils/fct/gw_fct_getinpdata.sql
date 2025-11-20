@@ -18,7 +18,7 @@ DECLARE
     v_node JSON;
     v_result_point JSON;
     v_result_line JSON;
-    v_result_polygon JSON := '{"geometryType":"Polygon","features":[]}'; -- Without polygon, empty
+    v_result_polygon JSON := '{}'; -- Without polygon, empty
     result_ids text[];  -- Declare result_ids to store extracted array of text
 
 BEGIN
@@ -41,7 +41,7 @@ BEGIN
 
     -- Get GeoJSON from rpt_inp_node (Point)
     SELECT json_build_object(
-        'geometryType', 'Point',
+        'type', 'FeatureCollection',
         'layerName', 'Rpt INP Node',
         'features', json_agg(ST_AsGeoJSON(t.*)::json)
     )
@@ -51,7 +51,7 @@ BEGIN
 
     -- Get GeoJSON from rpt_inp_arc (LineString)
     SELECT json_build_object(
-        'geometryType', 'LineString',
+        'type', 'FeatureCollection',
         'layerName', 'Rpt INP Arc',
         'features', json_agg(ST_AsGeoJSON(t.*)::json)
     )
@@ -63,9 +63,9 @@ BEGIN
     RETURN gw_fct_json_create_return(
         ('{"status":"' || v_status || '", "message":{"level":3, "text":"' || v_message || '"},' ||
         '"body":{"data":{' ||
-        '"point":' || COALESCE(v_node::text, '{"geometryType":"Point","features":[]}') || ',' ||
-        '"line":' || COALESCE(v_result_line::text, '{"geometryType":"LineString","features":[]}') || ',' ||
-        '"polygon":' || COALESCE(v_result_polygon::text, '{"geometryType":"Polygon","features":[]}') || '}}}'
+        '"point":' || COALESCE(v_node::text, '{"type":"FeatureCollection","features":[]}') || ',' ||
+        '"line":' || COALESCE(v_result_line::text, '{"type":"FeatureCollection","features":[]}') || ',' ||
+        '"polygon":' || COALESCE(v_result_polygon::text, '{"type":"FeatureCollection","features":[]}') || '}}}'
         )::json, 2218, null, null, null
     );
 

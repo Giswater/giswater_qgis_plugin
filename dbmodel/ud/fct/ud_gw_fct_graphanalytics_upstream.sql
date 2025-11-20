@@ -203,47 +203,53 @@ BEGIN
 	WHERE n1.cur_user=current_user AND n1.fid = v_fid
 	AND n2.cur_user=current_user AND n2.fid = v_fid;
 
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-		'type',       'Feature',
-	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	'properties', to_jsonb(row) - 'the_geom',
-	'crs',concat('EPSG:',ST_SRID(the_geom))
-	) AS feature
-	FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, the_geom
-	FROM t_anl_arc WHERE cur_user=current_user AND fid=v_fid) row) features;
+	v_result_line := jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Flowtrace arc',
+		'features', COALESCE((
+			SELECT jsonb_agg(features.feature)
+			FROM (
+				SELECT jsonb_build_object(
+					'type',       'Feature',
+					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+					'properties', to_jsonb(row) - 'the_geom'
+				) AS feature
+				FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
+				FROM t_anl_arc WHERE cur_user=current_user AND fid=v_fid) row
+			) features
+		), '[]'::jsonb)
+	)::text;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
+	v_result_point := jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Flowtrace node',
+		'features', COALESCE((
+			SELECT jsonb_agg(features.feature)
+			FROM (
+				SELECT jsonb_build_object(
+					'type',       'Feature',
+					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+					'properties', to_jsonb(row) - 'the_geom'
+				) AS feature
+				FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id AS node_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, ST_Transform(the_geom, 4326) as the_geom
+				FROM  t_anl_node WHERE cur_user=current_user AND fid=v_fid
+				UNION
+				SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
+				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
+				WHERE cur_user=current_user AND fid=v_fid
+				AND c.state > 0
+				AND c.is_operative = TRUE
+				UNION
+				SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
+				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
+				WHERE cur_user=current_user AND fid=v_fid
+				AND g.state > 0
+				AND g.is_operative = TRUE) row
+			) features
+		), '[]'::jsonb)
+	)::text;
 
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-		'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom',
-		'crs',concat('EPSG:',ST_SRID(the_geom))
-	) AS feature
-	FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id AS node_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, the_geom
-	FROM  t_anl_node WHERE cur_user=current_user AND fid=v_fid
-	UNION
-	SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, c.the_geom
-	FROM t_anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
-	WHERE cur_user=current_user AND fid=v_fid
-	AND c.state > 0
-	AND c.is_operative = TRUE
-	UNION
-	SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, g.the_geom
-	FROM t_anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
-	WHERE cur_user=current_user AND fid=v_fid
-	AND g.state > 0
-	AND g.is_operative = TRUE) row) features;
-
-	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowtrace node", "features":',v_result, '}');
-
-	v_result_polygon = '{"geometryType":"", "features":[]}';
+	v_result_polygon = '{}';
 
 	v_status = 'Accepted';
 	v_level = 3;
@@ -269,4 +275,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

@@ -112,14 +112,18 @@ BEGIN
 
 		v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
 
-		v_querytext = concat('SELECT jsonb_agg(features.feature)
-				FROM (
-				SELECT jsonb_build_object(
-				''type'',       ''Feature'',
-				''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-				''properties'', to_jsonb(row) - ''the_geom''
-				) AS feature
-				FROM (', v_querytext, ') row) features');
+	v_querytext = concat('SELECT jsonb_build_object(
+			    ''type'', ''FeatureCollection'',
+				''layerName'', ''Graphconfig'',
+			    ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)				
+			)
+			FROM (
+			SELECT jsonb_build_object(
+			''type'',       ''Feature'',
+			''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+			''properties'', to_jsonb(row) - ''the_geom''
+			) AS feature
+			FROM (', v_querytext, ') row) features');
 
 		EXECUTE v_querytext INTO v_result;
 	ELSE
@@ -128,12 +132,7 @@ BEGIN
 	END IF;
 
 	-- profilactic nulls;
-	v_result := COALESCE(v_result, '{}');
-	IF v_result = '{}' THEN
-		v_result_point = '{"layerName": "Graphconfig", "geometryType":"", "features":[]}';
-	ELSE
-		v_result_point = concat ('{"layerName": "Graphconfig", "geometryType":"Point", "features":',v_result, '}');
-	END IF;
+	v_result_point := COALESCE(v_result, '{}');
 
 	v_result = null;
 	-- LINES:
@@ -146,7 +145,7 @@ BEGIN
 	-- profilactic nulls;
 	-- v_result := COALESCE(v_result, '{}');
 	-- IF v_result = '{}' THEN
-	-- 	v_result_line = '{"layerName": "Graphconfig", "geometryType":"", "features":[]}';
+	-- 	v_result_line = '{"layerName": "Graphconfig", "features":[]}';
 	-- ELSE
 	-- 	v_result_line = concat ('{"layerName": "Graphconfig", "geometryType":"LineString", "features":',v_result, '}');
 	-- END IF;

@@ -440,7 +440,7 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info
 		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	END IF;
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	-- get uservalues
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_current')

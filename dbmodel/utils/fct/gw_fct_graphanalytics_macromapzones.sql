@@ -131,26 +131,29 @@ BEGIN
 
 	ELSE -- temporal layer
 
-		EXECUTE '
-		SELECT COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
-		FROM (
-			SELECT jsonb_build_object(
-				''type'',       ''Feature'',
-				''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-				''properties'', to_jsonb(row) - ''the_geom''
-			) AS feature
-			FROM ('||v_query_geom||') AS row
-		) AS features
-		' INTO v_result;
+	EXECUTE '
+	SELECT jsonb_build_object(
+	    ''type'', ''FeatureCollection'',
+	    ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+	)
+	FROM (
+		SELECT jsonb_build_object(
+			''type'',       ''Feature'',
+			''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+			''properties'', to_jsonb(row) - ''the_geom''
+		) AS feature
+		FROM ('||v_query_geom||') AS row
+	) AS features
+	' INTO v_result;
 
-		v_result_polygon := concat ('{"geometryType":"MultiPolygon", "features":',v_result,'}');
+	v_result_polygon := v_result;
 
 	END IF;
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) ORDER BY criticity DESC, id ASC) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info := concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info := concat ('{"values":',v_result, '}');
 
 
 	-- return

@@ -79,7 +79,7 @@ BEGIN
         ''layerName'', ''Graphanalytics tstep process'',
         ''features'', jsonb_agg(jsonb_build_object(
             ''type'', ''Feature'',
-            ''geometry'', ST_AsGeoJSON(a.the_geom)::jsonb,
+            ''geometry'', ST_AsGeoJSON(ST_Transform(a.the_geom, 4326))::jsonb,
             ''properties'', jsonb_build_object(
                 ''arc_id'', a.arc_id,
                 ''start_vid'', c.start_vid,

@@ -543,7 +543,7 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_info = concat ('{"values":',v_result, '}');
 
 		-- geometry (the boundary of mincut using arcs and valves)
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincut_id||

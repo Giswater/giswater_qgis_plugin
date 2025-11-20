@@ -73,7 +73,7 @@ BEGIN
 	--Execute the process only if admin_raster_dem is true
 	IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS FALSE THEN
 
-		
+
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message": "3630", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}}$$)';
 
@@ -122,11 +122,11 @@ BEGIN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"2110", "fid":"442", "criticity":"4", "is_process":true, "separator_id":"2025"}}$$)';
-					
+
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3628", "function":"2760", "fid":"168", "result_id":"elevation from raster", "is_process":true}}$$)';
 				END IF;
-			
+
 			end if;
 
 			--loop over selected nodes, intersect node with raster
@@ -163,12 +163,12 @@ BEGIN
 			END LOOP;
 
 		END IF;
-	
+
 	END IF;
 
 	--count updated elements
 	select count(*) from audit_check_data where fid = 168 and error_message like 'ELEVATION UPDATED%' and tstamp = now() into v_count;
-	
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
     	"data":{"function":"2760", "fid":"168", "is_process":true, "separator_id":"2030"}}$$)';
 
@@ -183,14 +183,23 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=168 order by id desc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, node_id AS feature_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=168) row;
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+			'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT id, node_id AS feature_id, state, expl_id, descript, ST_Transform(the_geom, 4326) as the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=168) row) features;
 	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = v_result;
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');
@@ -221,5 +230,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-

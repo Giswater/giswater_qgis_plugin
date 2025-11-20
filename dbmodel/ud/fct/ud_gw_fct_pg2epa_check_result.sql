@@ -111,7 +111,7 @@ BEGIN
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
 		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_info = concat ('{"values":',v_result, '}');
 		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"No result found"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}, "data":{"info":'||v_result_info||'}}}')::json;
 	END IF;
@@ -616,45 +616,51 @@ BEGIN
 	FROM (SELECT error_message as message FROM t_audit_check_data WHERE cur_user="current_user"() AND fid = v_fid
 	order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	IF v_graphiclog THEN
 
 		--points
 		v_result = null;
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
 		SELECT jsonb_build_object(
-		 'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
-		) AS feature FROM
-		(SELECT node_id as id, 228 as fid, 'ERROR-228: Orphan node' as descript, the_geom FROM t_anl_node WHERE cur_user="current_user"() AND fid IN (228,107)
-		  UNION
-		SELECT node_id as id, 396 as fid, 'ERROR-396: Node used on more than one scenario' as descript, the_geom FROM t_anl_node WHERE cur_user="current_user"() AND fid = 396)
-		 row) features;
+			'type', 'FeatureCollection',
+			'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
+		FROM (
+			SELECT jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+				'properties', to_jsonb(row) - 'the_geom'
+			) AS feature FROM
+			(SELECT node_id as id, 228 as fid, 'ERROR-228: Orphan node' as descript, ST_Transform(the_geom, 4326) as the_geom FROM t_anl_node WHERE cur_user="current_user"() AND fid IN (228,107)
+			UNION
+			SELECT node_id as id, 396 as fid, 'ERROR-396: Node used on more than one scenario' as descript, ST_Transform(the_geom, 4326) as the_geom FROM t_anl_node WHERE cur_user="current_user"() AND fid = 396)
+		row) features;
 
-		v_result := COALESCE(v_result, '[]');
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+		v_result := COALESCE(v_result, '{}');
+		v_result_point = v_result::text;
 
 		-- arcs
 		v_result = null;
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
 		SELECT jsonb_build_object(
-		    'type',       'Feature',
-		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		   'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM  (SELECT arc_id as id, fid, 'ERROR: Disconnected arc'::text as descript, the_geom FROM t_anl_arc WHERE cur_user="current_user"() AND fid = 139
-				UNION
-			   SELECT arc_id as id, fid, 'ERROR-427: Flow regulator length do not fits with target arc', the_geom FROM t_anl_arc WHERE cur_user="current_user"() AND fid = 427
-				UNION
-			   SELECT arc_id as id, fid, 'ERROR-396: Arc used on more than one scenario', the_geom FROM t_anl_arc WHERE cur_user="current_user"() AND fid = 396
-		) row) features;
+			'type', 'FeatureCollection',
+			'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
+		FROM (
+			SELECT jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+				'properties', to_jsonb(row) - 'the_geom'
+			) AS feature
+			FROM  (SELECT arc_id as id, fid, 'ERROR: Disconnected arc'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM t_anl_arc WHERE cur_user="current_user"() AND fid = 139
+					UNION
+				SELECT arc_id as id, fid, 'ERROR-427: Flow regulator length do not fits with target arc', ST_Transform(the_geom, 4326) as the_geom FROM t_anl_arc WHERE cur_user="current_user"() AND fid = 427
+					UNION
+				SELECT arc_id as id, fid, 'ERROR-396: Arc used on more than one scenario', ST_Transform(the_geom, 4326) as the_geom FROM t_anl_arc WHERE cur_user="current_user"() AND fid = 396
+			) row) features;
 
 		v_result := COALESCE(v_result, '{}');
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+		v_result_line = v_result::text;
 
 	END IF;
 

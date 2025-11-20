@@ -1161,7 +1161,7 @@ BEGIN
 	END IF;
 
 	v_result_info := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	v_status := COALESCE(v_status, '{}');
 	v_level := COALESCE(v_level, '0');

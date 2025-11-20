@@ -157,13 +157,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid = 140  order by id) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
-
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--Control nulls
 	v_version := COALESCE(v_version, '{}');

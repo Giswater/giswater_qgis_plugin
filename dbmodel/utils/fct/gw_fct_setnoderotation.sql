@@ -94,7 +94,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT id, error_message AS message 
 	FROM audit_check_data WHERE cur_user="current_user"() AND ( fid=516)) row;
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 
 	-- control nulls

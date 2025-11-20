@@ -180,28 +180,24 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM t_audit_check_data WHERE cur_user="current_user"() AND
 	fid=211 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--points
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
   	SELECT jsonb_build_object(
      'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom
+  	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
   	FROM  t_anl_node WHERE cur_user="current_user"() AND fid IN (176,180,181,182,208,209)) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-
-
-	IF v_result = '{}' THEN
-		v_result_point = '{"geometryType":"", "values":[]}';
-	ELSE
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
-	END IF;
+	v_result_point = v_result;
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');
@@ -227,4 +223,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

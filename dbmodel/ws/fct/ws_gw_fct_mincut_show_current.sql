@@ -59,27 +59,30 @@ BEGIN
 	-- get results
 	--lines
 	v_result = null;
-  EXECUTE 'SELECT jsonb_agg(features.feature) 
+  EXECUTE 'SELECT jsonb_build_object(
+        ''type'', ''FeatureCollection'',
+        ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+    ) 
  	FROM (
     SELECT jsonb_build_object(
     ''type'',       ''Feature'',
-    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-    ''properties'', to_jsonb(row) - ''the_geom''
+    ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+    ''properties'', to_jsonb(row) - ''the_geom'' - ''srid''
     ) AS feature
     FROM
-		(SELECT
-		om_mincut_arc.id,
-		om_mincut_arc.result_id,
-		m.work_order,
-		om_mincut_arc.arc_id,
-		om_mincut_arc.the_geom
-		FROM om_mincut m
-		JOIN om_mincut_arc ON result_id = m.id
-		where mincut_state = 1 and expl_id ='||v_expl_id||')row)features'
+	(SELECT
+	om_mincut_arc.id,
+	om_mincut_arc.result_id,
+	m.work_order,
+	om_mincut_arc.arc_id,
+	om_mincut_arc.the_geom,
+	ST_SRID(om_mincut_arc.the_geom) as srid
+	FROM om_mincut m
+	JOIN om_mincut_arc ON result_id = m.id
+	where mincut_state = 1 and expl_id ='||v_expl_id||')row)features'
  		INTO v_result;
 
-  	v_result := COALESCE(v_result, '{}');
-  	v_result_line = concat ('{"geometryType":"Linestring", "features":',v_result, '}');
+  	v_result_line = COALESCE(v_result, '{}');
 
 	SELECT count(*) INTO v_count FROM om_mincut WHERE expl_id =v_expl_id and mincut_state = 1;
 
@@ -102,7 +105,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');
@@ -120,4 +123,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

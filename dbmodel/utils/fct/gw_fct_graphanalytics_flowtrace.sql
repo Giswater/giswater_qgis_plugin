@@ -176,22 +176,24 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- arcs
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
   	SELECT jsonb_build_object(
      'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM ve_arc WHERE arc_id::text IN
+  	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, ST_Transform(the_geom, 4326) as the_geom FROM ve_arc WHERE arc_id::text IN
 	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+	v_result_line := COALESCE(v_result, '{}');
 
 
 	-- Control nulls

@@ -213,7 +213,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result := COALESCE(v_result, '{}');
 
-	v_result = concat ('{"geometryType":"", "values":',to_json(v_result), '}');
+	v_result = concat ('{"values":',to_json(v_result), '}');
 
 	--  Return
 	RETURN ('{"status":"Accepted", "message":{"level":'||v_level||', "text":"'||v_result_info||'"}, "version":"'||v_version||'"'||

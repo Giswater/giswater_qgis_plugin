@@ -64,17 +64,19 @@ BEGIN
 	-- calculate response json
 	v_result = null;
 	EXECUTE'
-	SELECT jsonb_agg(features.feature) 
+	SELECT jsonb_build_object(
+	    ''type'', ''FeatureCollection'',
+	    ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+	)
 	FROM (
-	SELECT json_build_object
-	(''type'', ''Feature'',
+	SELECT jsonb_build_object(
+	''type'', ''Feature'',
 	''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
 	''properties'', to_jsonb(row) - ''the_geom'') as feature
-	FROM (SELECT '||v_idname||', the_geom FROM '||v_layer||' WHERE st_contains($1, '||v_layer||'.the_geom))row)features'
+	FROM (SELECT '||v_idname||', ST_Transform(the_geom, 4326) as the_geom FROM '||v_layer||' WHERE st_contains($1, '||v_layer||'.the_geom))row)features'
 	INTO v_result
 	USING v_polygon;
 
-	v_result = concat ('{"geometryType":"',v_geometrytype,'", "features":',v_result,'}');
 	v_result := COALESCE(v_result, '{}');
 
 	-- return

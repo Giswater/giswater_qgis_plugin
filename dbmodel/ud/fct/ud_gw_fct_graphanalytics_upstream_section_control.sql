@@ -163,26 +163,27 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}');
 		v_result_info := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+		v_result_info = concat ('{"values":',v_result_info, '}');
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-	  SELECT jsonb_build_object(
-	    'type',       'Feature',
-	   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	   'properties', to_jsonb(row) - 'the_geom',
-	   'crs',concat('EPSG:',ST_SRID(the_geom))
-	  ) AS feature
-	  FROM (SELECT distinct arc_id, arccat_id, expl_id, fid, the_geom, descript as geom1
-	  FROM anl_arc WHERE fid=v_fid and cur_user="current_user"()) row) features;
+		v_result_line := jsonb_build_object(
+			'type', 'FeatureCollection',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type',       'Feature',
+						'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (SELECT distinct arc_id, arccat_id, expl_id, fid, ST_Transform(the_geom, 4326) as the_geom, descript as geom1
+					FROM anl_arc WHERE fid=v_fid and cur_user="current_user"()) row
+				) features
+			), '[]'::jsonb)
+		)::text;
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+		v_result_point = '{}';
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
-
-		v_result_polygon = '{"geometryType":"", "features":[]}';
+		v_result_polygon = '{}';
 
 		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 

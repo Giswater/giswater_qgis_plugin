@@ -195,7 +195,7 @@ BEGIN
 
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 	v_action = concat('[{"funcName": "add_query_layer", "params":', v_action_params, '}]');
 
 	-- Control nulls
@@ -213,4 +213,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

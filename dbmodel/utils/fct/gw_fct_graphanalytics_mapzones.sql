@@ -277,7 +277,7 @@ BEGIN
 		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity > 1 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_info = concat ('{"values":',v_result, '}');
 
 		-- Control nulls
 		v_result_info := COALESCE(v_result_info, '{}');
@@ -298,7 +298,7 @@ BEGIN
 		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity > 1 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_info = concat ('{"values":',v_result, '}');
 
 		-- Control nulls
 		v_result_info := COALESCE(v_result_info, '{}');
@@ -1242,70 +1242,74 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	IF v_floodonlymapzone IS NULL THEN
 
 		v_result = null;
 		IF v_commitchanges IS TRUE THEN
-			-- disconnected arcs
-			SELECT jsonb_agg(features.feature) INTO v_result
-			FROM (
-			SELECT jsonb_build_object(
-			     'type',       'Feature',
-			    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			    'properties', to_jsonb(row) - 'the_geom'
-			) AS feature
-			FROM
-			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
-			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
-			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-			) row) features;
-
-			-- Execute the query and check if it returns any rows
-			SELECT EXISTS (
-				SELECT 1
-				FROM (
-					SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom
-					FROM temp_t_arc
-					JOIN temp_t_anlgraph USING (arc_id)
-					WHERE water = -1
-					GROUP BY (arc_id, arccat_id, state, expl_id, the_geom)
-					HAVING COUNT(arc_id) = 2
-				) sub_query
-			) INTO v_has_conflicts;
-
-			v_result := COALESCE(v_result, '{}');
-			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
-		END IF;
-
-		-- disconnected connecs
-		v_result = null;
-
-		SELECT jsonb_agg(features.feature) INTO v_result
+		-- disconnected arcs
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(
 		     'type',       'Feature',
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
-		group by (arc_id, connec_id, conneccat_id, state, expl_id, the_geom) having count(arc_id)=2
+		FROM
+		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
+		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
 		UNION
-		SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
-		group by (arc_id, connec_id, conneccat_id, state, expl_id, the_geom) having count(arc_id)=2
-		UNION
-		(SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM temp_t_connec c WHERE arc_id IS NULL
-		EXCEPT
-		SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Orphan'::text as descript, c.the_geom FROM temp_t_connec c
-		JOIN temp_t_node a ON a.node_id=c.pjoint_id
-		WHERE c.pjoint_type = 'NODE')
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
+		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
 		) row) features;
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+		-- Execute the query and check if it returns any rows
+		SELECT EXISTS (
+			SELECT 1
+			FROM (
+				SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom
+				FROM temp_t_arc
+				JOIN temp_t_anlgraph USING (arc_id)
+				WHERE water = -1
+				GROUP BY (arc_id, arccat_id, state, expl_id, the_geom)
+				HAVING COUNT(arc_id) = 2
+			) sub_query
+		) INTO v_has_conflicts;
+
+		v_result_line = v_result;
+		END IF;
+
+	-- disconnected connecs
+	v_result = null;
+
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Disconnected'::text as descript, ST_Transform(c.the_geom, 4326) as the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
+	group by (arc_id, connec_id, conneccat_id, state, expl_id, the_geom) having count(arc_id)=2
+	UNION
+	SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Conflict'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
+	group by (arc_id, connec_id, conneccat_id, state, expl_id, the_geom) having count(arc_id)=2
+	UNION
+	(SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Orphan'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM temp_t_connec c WHERE arc_id IS NULL
+	EXCEPT
+	SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Orphan'::text as descript, ST_Transform(c.the_geom, 4326) as the_geom FROM temp_t_connec c
+	JOIN temp_t_node a ON a.node_id=c.pjoint_id
+	WHERE c.pjoint_type = 'NODE')
+	) row) features;
+
+	v_result_point = v_result;
 	END IF;
 
 	IF v_audit_result is null THEN
@@ -1330,11 +1334,14 @@ BEGIN
 
 		-- arc elements
 		IF v_floodonlymapzone IS NULL THEN
-			EXECUTE 'SELECT jsonb_agg(features.feature) 
+			EXECUTE 'SELECT jsonb_build_object(
+			        ''type'', ''FeatureCollection'',
+			        ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+			    )
 			FROM (
 			SELECT jsonb_build_object(
 			    ''type'',       ''Feature'',
-			    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+			    ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 			    ''properties'', to_jsonb(row) - ''the_geom''
 			) AS feature
 			FROM 
@@ -1351,11 +1358,14 @@ BEGIN
 			) row ) features'
 			INTO v_result;
 		ELSE
-			EXECUTE 'SELECT jsonb_agg(features.feature) 
+			EXECUTE 'SELECT jsonb_build_object(
+			        ''type'', ''FeatureCollection'',
+			        ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+			    )
 			FROM (
 			SELECT jsonb_build_object(
 			    ''type'',       ''Feature'',
-			    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+			    ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 			    ''properties'', to_jsonb(row) - ''the_geom''
 			) AS feature
 			FROM 
@@ -1367,24 +1377,25 @@ BEGIN
 		END IF;
 
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+		v_result_line = v_result;
 
 		v_result = null;
 
-		-- polygons
-		EXECUTE 'SELECT jsonb_agg(features.feature) 
-		FROM (
-	  	SELECT jsonb_build_object(
-	    ''type'',       ''Feature'',
-	    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-	    ''properties'', to_jsonb(row) - ''the_geom''
-	  	) AS feature
-	  	FROM (SELECT  t.'||v_field||' as mapzone_id, m.name  as descript, '||v_fid||' as fid, t.expl_id, t.the_geom FROM temp_'||v_table||' t JOIN '||v_table||' m USING ('||v_field||')) row) features'
-		INTO v_result;
+	-- polygons
+	EXECUTE 'SELECT jsonb_build_object(
+	        ''type'', ''FeatureCollection'',
+	        ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+	    )
+	FROM (
+  	SELECT jsonb_build_object(
+    ''type'',       ''Feature'',
+    ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+    ''properties'', to_jsonb(row) - ''the_geom''
+  	) AS feature
+  	FROM (SELECT  t.'||v_field||' as mapzone_id, m.name  as descript, '||v_fid||' as fid, t.expl_id, t.the_geom FROM temp_'||v_table||' t JOIN '||v_table||' m USING ('||v_field||')) row) features'
+	INTO v_result;
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
+	v_result_polygon = v_result;
 
 		-- moving to anl tables
 		DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
@@ -1586,4 +1597,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

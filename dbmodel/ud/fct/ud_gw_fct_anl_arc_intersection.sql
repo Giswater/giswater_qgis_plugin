@@ -83,18 +83,20 @@ BEGIN
 	-- get results
 	--lines
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
   	SELECT jsonb_build_object(
      'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT DISTINCT ON (arc_id,arc_id_aux) id, arc_id, arccat_id,arc_id_aux, state, expl_id, descript, the_geom, fid
+  	FROM (SELECT DISTINCT ON (arc_id,arc_id_aux) id, arc_id, arccat_id,arc_id_aux, state, expl_id, descript, ST_Transform(the_geom, 4326) as the_geom, fid
   	FROM  anl_arc WHERE cur_user="current_user"() AND fid=109) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+	v_result_line := COALESCE(v_result, '{}');
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
 
@@ -114,7 +116,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=109 order by  id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');

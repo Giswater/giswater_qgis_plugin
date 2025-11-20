@@ -51,7 +51,7 @@ SELECT gw_fct_lot_unit('{"data":{"parameters":{"lotId":10104, "arcBuffer":0.5, "
 SELECT gw_fct_lot_unit_order('{"data":{"parameters":{"lotId":10104, "step":1, "unitBuffer":2}}}');
 SELECT gw_fct_lot_unit_order('{"data":{"parameters":{"lotId":10104, "step":2, "unitBuffer":1}}}');
 
-SELECT gw_fct_lot_unit($${"client":{"device":"4", "infoType":"1", "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT gw_fct_lot_unit($${"client":{"device":"4", "infoType":"1", "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
 "parameters":{"action":"create", "lotId":"10034", "arcBuffer":"2", "linkBuffer":"1", "nodeBuffer":"5", "areaFactor":"1", "azimuthFactor":"1", "elevFactor":"0"}}}$$);
 
 insert into om_visit_lot values (9999) on conflict (id) do nothing;
@@ -247,7 +247,7 @@ BEGIN
 	IF v_maxlinklength IS NULL THEN v_maxlinklength = (SELECT value::json->>'maxLinkLength' FROM config_param_system WHERE parameter = 'om_lotmanage_units')::float; END IF;
 
 	-- select features that works as stopers
-	SELECT array_agg(id) INTO v_stopper FROM cat_feature_node where isprofilesurface is true; 
+	SELECT array_agg(id) INTO v_stopper FROM cat_feature_node where isprofilesurface is true;
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -265,24 +265,24 @@ BEGIN
 		UPDATE om_visit_lot_x_unit SET macrounit_id = null WHERE lot_id = v_lot;
 		UPDATE om_visit_lot_x_arc SET macrounit_id = null WHERE lot_id = v_lot;
 		UPDATE om_visit_lot_x_node SET macrounit_id = null WHERE lot_id = v_lot;
-		UPDATE om_visit_lot_x_gully SET macrounit_id = null WHERE lot_id = v_lot;       
+		UPDATE om_visit_lot_x_gully SET macrounit_id = null WHERE lot_id = v_lot;
 	END IF;
-	
+
 	-- reset graph & audit_log tables
 	TRUNCATE temp_anlgraph;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=134 AND cur_user=current_user;
-	  
+
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('UNIT DYNAMIC SECTORITZATION'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 
 	SELECT count(*) INTO v_count FROM cat_feature_node WHERE isprofilesurface IS TRUE;
 	IF v_count < 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message)	
+		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-',v_fid,': There are null values on cat_feature_node.graphdelimiter. Please fill it before continue'));
 	END IF;
-        
+
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
@@ -291,8 +291,8 @@ BEGIN
 	-- create graph
 	IF v_action = 'create' THEN
 		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf, trace, user_defined)
-		SELECT arc_id, node_1, node_2, 0, 0, 0, unit_id, False 
-		FROM ve_arc 
+		SELECT arc_id, node_1, node_2, 0, 0, 0, unit_id, False
+		FROM ve_arc
 		JOIN om_visit_lot_x_arc USING (arc_id)
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND lot_id = v_lot;
 	    ELSE
@@ -309,7 +309,7 @@ BEGIN
 
 	-- setting graph by usign isprofilesurface = true
 	UPDATE temp_anlgraph SET flag=1 FROM ve_node JOIN cat_feature_node ON id = node_type WHERE node_2 = node_id AND isprofilesurface =  true;
-	
+
 	LOOP
 	    -- starting engine
 	    -- checkf 1 it means that outlet node for unit is not profilesurface
@@ -325,7 +325,7 @@ BEGIN
 
 	-- setting graph by usign isprofilesurface = false those nodes that they are starting points
 	UPDATE temp_anlgraph SET flag=1 WHERE water = 0 AND node_2 NOT IN (SELECT node_1 FROM temp_anlgraph);
-    
+
 	LOOP
 	    -- starting engine
 	    -- checkf 2 it means that outlet node for unit is not profilesurface
@@ -334,12 +334,12 @@ BEGIN
 	    UPDATE temp_anlgraph SET flag=2, checkf=2 WHERE node_2::integer = v_node AND arc_id::integer = v_arc ;
 	    RAISE NOTICE '---------- INIT NODE SURFACE FALSE % -------------', v_node;
 	    PERFORM gw_fct_lot_unit_recursive(v_node, v_trace, v_node, v_areafactor, v_azimuthfactor, v_elevfactor, v_arc::integer);
-	    
+
 	END LOOP;
 
-	FOR rec IN (SELECT DISTINCT trace FROM temp_anlgraph) 
+	FOR rec IN (SELECT DISTINCT trace FROM temp_anlgraph)
 	LOOP
-		
+
 	    INSERT INTO om_visit_lot_x_unit(lot_id, unit_id, status, unit_type, trace_type, trace_id)
 	    SELECT v_lot, trace, 1, 'ARC', 'ARC', trace
 	    from temp_anlgraph where trace=rec.trace group by trace
@@ -479,7 +479,7 @@ BEGIN
 
 	raise notice 'end 5';
 
-	
+
 	-- create orderby based on proximity -initalize
 	INSERT INTO temp_data (fid, feature_type, feature_id, float_value, flag)
 	with query as (SELECT a.unit_id u1, b.unit_id u2, st_distance((a.the_geom), (b.the_geom)) d
@@ -490,11 +490,11 @@ BEGIN
 	JOIN query b ON a.u1=b.u1 order by d;
 
 	raise notice 'end 6';
-	
+
 	-- taking only headers
 	LOOP
 		-- get unit
-		SELECT feature_type INTO v_unit FROM temp_data 
+		SELECT feature_type INTO v_unit FROM temp_data
 		JOIN om_visit_lot_x_unit on unit_id = feature_type::INTEGER AND lot_id = v_lot WHERE node_1 IN
 		(
 		SELECT node_1 as n FROM(
@@ -510,7 +510,7 @@ BEGIN
 
 	-- taking disconnected objects
 	LOOP
-	
+
 		SELECT feature_type INTO v_unit FROM temp_data WHERE flag is not true LIMIT 1;
 		PERFORM  gw_fct_lot_unit_orderbydist_recursive (v_unit);
 		EXIT WHEN v_unit is null;
@@ -529,32 +529,29 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-		
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"values":',v_result, '}');
+
 	--points
 	v_result = null;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+	v_result_point = COALESCE(v_result, '{}');
 
 	--lines
 	v_result = null;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+	v_result_line = COALESCE(v_result, '{}');
 
 	--polygons
 	v_result = null;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
-		
+	v_result_polygon = COALESCE(v_result, '{}');
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
-		
+
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
 		     ',"body":{"form":{}'||

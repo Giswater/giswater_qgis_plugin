@@ -7,12 +7,12 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3186
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_setjunctionsoutlet(p_data json) RETURNS json AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_setjunctionsoutlet(p_data json) RETURNS json AS
 $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_epa_setjunctionsoutlet($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
+"form":{},"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"minDistance":"20.0"}}}$$)::text
 
@@ -23,7 +23,7 @@ fid: 484
 */
 
 DECLARE
-    
+
 v_id json;
 v_selectionmode text;
 v_mindistance float;
@@ -46,8 +46,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -58,8 +58,8 @@ BEGIN
 	raise notice '0 - Reset';
 	TRUNCATE temp_node;
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;		
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
 						"data":{"function":"3186","fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 
@@ -92,29 +92,32 @@ BEGIN
 	SELECT node_id, nodecat_id, expl_id,  the_geom, sector_id, state, 484, current_user FROM temp_node;
 
 	-- get results
-	-- info	
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"values":',v_result, '}');
+
  	--points
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
-  	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-  	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid) row) features;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
-	
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+			'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, ST_Transform(the_geom, 4326) as the_geom
+		FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid) row) features;
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = v_result::text;
+
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

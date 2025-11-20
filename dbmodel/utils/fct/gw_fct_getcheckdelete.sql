@@ -260,7 +260,7 @@ BEGIN
 
 
 	v_result_info := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	v_status = 'Accepted';
 
@@ -297,4 +297,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

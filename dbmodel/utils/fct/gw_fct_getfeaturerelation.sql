@@ -243,7 +243,7 @@ BEGIN
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 151) row;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}');

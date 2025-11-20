@@ -237,7 +237,7 @@ BEGIN
 	-- get variables
 	v_lot = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'lotId');
 	v_unitbuffer = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'unitBuffer');
-	v_step = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'step');		
+	v_step = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'step');
 	v_areafactor = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'areaFactor');
 	v_azimuthfactor = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'azimuthFactor');
 	v_elevfactor = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'elevFactor');
@@ -257,7 +257,7 @@ BEGIN
 	DELETE FROM temp_table;
 	DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid = v_fid AND cur_user=current_user; 
+	DELETE FROM anl_node WHERE fid = v_fid AND cur_user=current_user;
 
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -269,30 +269,30 @@ BEGIN
 		-- create graph of units
 		INSERT INTO temp_anlgraph ( arc_id, node_1, node_2, water, flag, checkf, orderby, trace)
 		SELECT  unit_id, node_1, node_2, 0, 0, 0, 0, macrounit_id FROM om_visit_lot_x_unit WHERE unit_type ='ARC' AND lot_id = v_lot;
-		
+
 		-- setting the outlet's for this macrounit (the starting element)
-		UPDATE temp_anlgraph t SET checkf = 1 FROM 
+		UPDATE temp_anlgraph t SET checkf = 1 FROM
 			(select node_2 FROM om_visit_lot_x_unit WHERE unit_type ='ARC' AND lot_id = v_lot
 			EXCEPT
 			select node_1 FROM om_visit_lot_x_unit WHERE unit_type ='ARC' AND lot_id = v_lot)a
 			WHERE t.node_2 = a.node_2;
-		
-		-- setting the dividers is profile true as stoppers
-		UPDATE temp_anlgraph t SET flag = 1 FROM 
 
-			(SELECT node_1 FROM temp_anlgraph 
+		-- setting the dividers is profile true as stoppers
+		UPDATE temp_anlgraph t SET flag = 1 FROM
+
+			(SELECT node_1 FROM temp_anlgraph
 			JOIN node ON node_1 =node_id
 			JOIN cat_feature_node f ON f.id = node_type
 			WHERE isprofilesurface IS TRUE
 			GROUP BY node_1 HAVING count(*) >1) a
 			WHERE t.node_1 = a.node_1;
-		
+
 		-- setting as non-stopper only one from divider is profile true (lower sys_elev1) in order to enable algorithm to flow upstream
-		UPDATE temp_anlgraph t SET flag = 0 FROM 
+		UPDATE temp_anlgraph t SET flag = 0 FROM
 
 			(SELECT b.node_1, unit_id FROM ve_arc a JOIN om_visit_lot_x_arc USING (arc_id)
-			JOIN   (SELECT node_1, min(sys_elev1) as sys_elev1 FROM ve_arc 
-				JOIN (SELECT node_1 FROM arc 
+			JOIN   (SELECT node_1, min(sys_elev1) as sys_elev1 FROM ve_arc
+				JOIN (SELECT node_1 FROM arc
 					JOIN node ON node_1 =node_id
 					JOIN cat_feature_node f ON f.id = node_type
 					WHERE isprofilesurface IS TRUE
@@ -303,7 +303,7 @@ BEGIN
 					WHERE lot_id = v_lot
 				order by 1) c
 			WHERE c.node_1 = t.node_1 AND unit_id = t.arc_id::integer;
-	
+
 		-- remove macrounits
 		DELETE FROM om_visit_lot_x_macrounit WHERE lot_id = v_lot;
 
@@ -434,13 +434,13 @@ BEGIN
 					RAISE NOTICE ' MACRO %, UNIT %, ARC % , NODE %', rec_macrounit.macrounit_id, v_unit, v_arc, v_node;
 					INSERT INTO temp_table (fid, text_column, sector_id, macrosector_id) VALUES (v_fid, v_arc, v_unit, rec_macrounit.macrounit_id);
 
-					PERFORM gw_fct_lot_unit_order_recursive(v_node, v_areafactor, v_azimuthfactor, v_elevfactor, v_lot, rec_macrounit.macrounit_id );	
+					PERFORM gw_fct_lot_unit_order_recursive(v_node, v_areafactor, v_azimuthfactor, v_elevfactor, v_lot, rec_macrounit.macrounit_id );
 				END IF;
 			END LOOP;
 
 			DELETE FROM temp_anlgraph;
 
-		END LOOP;			
+		END LOOP;
 
 		UPDATE om_visit_lot_x_unit SET orderby = null where lot_id = v_lot ;
 
@@ -448,8 +448,8 @@ BEGIN
 		UPDATE temp_table SET expl_id = od FROM (SELECT row_number() over (order by id desc) od, id FROM temp_table)a WHERE temp_table.id=a.id;
 
 		-- looking for paralelized arc
-		FOR v_paralel IN SELECT a.unit_id a, b.unit_id b, a.expl_id FROM 
-		(SELECT * FROM om_visit_lot_x_unit JOIN temp_table ON sector_id = unit_id WHERE lot_id = v_lot) a, 
+		FOR v_paralel IN SELECT a.unit_id a, b.unit_id b, a.expl_id FROM
+		(SELECT * FROM om_visit_lot_x_unit JOIN temp_table ON sector_id = unit_id WHERE lot_id = v_lot) a,
 		(SELECT * FROM om_visit_lot_x_unit JOIN temp_table ON sector_id = unit_id WHERE lot_id = v_lot) b
 		WHERE a.node_1 = b.node_1 AND a.node_2 = b.node_2 AND a.unit_id != b.unit_id
 		AND a.node_1 != a.node_2 AND a.expl_id > b.expl_id order by 2
@@ -466,7 +466,7 @@ BEGIN
 		SELECT row_number() over (order by expl_id asc) ob, unit_id FROM (SELECT DISTINCT ON (sector_id) id ,macroexpl_id, expl_id, sector_id as unit_id FROM temp_table)a
 		)b
 		WHERE b.unit_id::integer = u.unit_id AND lot_id = v_lot ;
-		
+
 	END IF;
 
 	-- update geometries
@@ -487,22 +487,19 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--points
 	v_result = null;
-	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+	v_result_point = COALESCE(v_result, '{}');
 
 	--lines
 	v_result = null;
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+	v_result_line = COALESCE(v_result, '{}');
 
 	--polygons
 	v_result = null;
-	v_result := COALESCE(v_result, '{}');
-	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
+	v_result_polygon = COALESCE(v_result, '{}');
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');

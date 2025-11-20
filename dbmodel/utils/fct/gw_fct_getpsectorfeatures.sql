@@ -52,7 +52,10 @@ BEGIN
     -- Points
     v_result = null;
     IF v_project_type = 'WS' THEN
-        SELECT jsonb_agg(features.feature) INTO v_result
+        SELECT jsonb_build_object(
+            'type', 'FeatureCollection',
+            'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+        ) INTO v_result
         FROM (
             SELECT jsonb_build_object(
                 'type', 'Feature',
@@ -60,19 +63,22 @@ BEGIN
                 'properties', to_jsonb(row) - 'the_geom_p'
             ) AS feature
             FROM (
-                SELECT pn.node_id AS feature_id, pn.psector_id, pn.state, 'NODE' AS feature_type, n.the_geom
+                SELECT pn.node_id AS feature_id, pn.psector_id, pn.state, 'NODE' AS feature_type, ST_Transform(n.the_geom, 4326) as the_geom
                 FROM plan_psector_x_node pn
                 JOIN node n ON n.node_id = pn.node_id
                 WHERE pn.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pc.link_id AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
+                SELECT pc.link_id AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, ST_Transform(c.the_geom, 4326) as the_geom
                 FROM plan_psector_x_connec pc
                 JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
             ) row
         ) features;
     ELSIF v_project_type = 'UD' THEN
-        SELECT jsonb_agg(features.feature) INTO v_result
+        SELECT jsonb_build_object(
+            'type', 'FeatureCollection',
+            'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+        ) INTO v_result
         FROM (
             SELECT jsonb_build_object(
                 'type', 'Feature',
@@ -80,17 +86,17 @@ BEGIN
                 'properties', to_jsonb(row) - 'the_geom_p'
             ) AS feature
             FROM (
-                SELECT pn.node_id AS feature_id, pn.psector_id, pn.state, 'NODE' AS feature_type, n.the_geom
+                SELECT pn.node_id AS feature_id, pn.psector_id, pn.state, 'NODE' AS feature_type, ST_Transform(n.the_geom, 4326) as the_geom
                 FROM plan_psector_x_node pn
                 JOIN node n ON n.node_id = pn.node_id
                 WHERE pn.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pc.link_id AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
+                SELECT pc.link_id AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, ST_Transform(c.the_geom, 4326) as the_geom
                 FROM plan_psector_x_connec pc
                 JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pg.gully_id AS feature_id, pg.psector_id, pg.state, 'GULLY' AS feature_type, g.the_geom
+                SELECT pg.gully_id AS feature_id, pg.psector_id, pg.state, 'GULLY' AS feature_type, ST_Transform(g.the_geom, 4326) as the_geom
                 FROM plan_psector_x_gully pg
                 JOIN gully g ON g.gully_id = pg.gully_id
                 WHERE pg.psector_id = ANY(v_psector_id_aux)
@@ -98,12 +104,14 @@ BEGIN
         ) features;
     END IF;
 
-    v_result := COALESCE(v_result, '{}');
-    v_result_point := concat('{"geometryType":"Point", "features":', v_result, '}');
+    v_result_point := v_result;
 
     -- Lines
     v_result = null;
-    SELECT jsonb_agg(features.feature) INTO v_result
+    SELECT jsonb_build_object(
+        'type', 'FeatureCollection',
+        'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+    ) INTO v_result
     FROM (
         SELECT jsonb_build_object(
             'type', 'Feature',
@@ -111,20 +119,19 @@ BEGIN
             'properties', to_jsonb(row) - 'the_geom'
         ) AS feature
         FROM (
-            SELECT pa.arc_id AS feature_id, pa.psector_id, pa.state, 'ARC' AS feature_type, a.the_geom
+            SELECT pa.arc_id AS feature_id, pa.psector_id, pa.state, 'ARC' AS feature_type, ST_Transform(a.the_geom, 4326) as the_geom
             FROM plan_psector_x_arc pa
             JOIN arc a ON a.arc_id = pa.arc_id
             WHERE pa.psector_id = ANY(v_psector_id_aux)
             UNION
-            SELECT ppxc.link_id AS feature_id, ppxc.psector_id, ppxc.state, 'LINK' AS feature_type, l.the_geom
+            SELECT ppxc.link_id AS feature_id, ppxc.psector_id, ppxc.state, 'LINK' AS feature_type, ST_Transform(l.the_geom, 4326) as the_geom
             FROM plan_psector_x_connec ppxc
             JOIN link l ON l.link_id = ppxc.link_id
             WHERE ppxc.psector_id = ANY(v_psector_id_aux)
         ) row
     ) features;
 
-    v_result := COALESCE(v_result, '{}');
-    v_result_line := concat('{"geometryType":"LineString", "features":', v_result, '}');
+    v_result_line := v_result;
 
     -- Control nulls
     v_result_point := COALESCE(v_result_point, '{}');

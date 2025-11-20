@@ -8,8 +8,8 @@ or (at your option) any later version.
 --FUNCTION CODE: 2212
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_topological_consistency(p_data json);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_topological_consistency(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_topological_consistency(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -37,7 +37,7 @@ v_selectionmode text;
 v_worklayer text;
 v_array text;
 v_error_context text;
-	
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -48,7 +48,7 @@ BEGIN
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=108;
 
-    -- getting input data 	
+    -- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -79,27 +79,29 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=108 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--points
 	v_result = null;
-  	SELECT jsonb_agg(features.feature) INTO v_result
+  	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
  	FROM (
     SELECT jsonb_build_object(
      'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
-    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
     FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
 
-  	v_result := COALESCE(v_result, '{}'); 
-  	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+  	v_result_point := COALESCE(v_result, '{}');
 
-	IF v_saveondatabase IS FALSE THEN 
+	IF v_saveondatabase IS FALSE THEN
 		-- delete previous results
 		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
 	ELSE
@@ -107,10 +109,10 @@ BEGIN
 		DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
 		INSERT INTO selector_audit (fid,cur_user) VALUES (108, current_user);
 	END IF;
-		
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
@@ -124,5 +126,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-  

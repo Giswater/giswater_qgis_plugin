@@ -293,18 +293,20 @@ SET search_path = "SCHEMA_NAME", public;
 	-- get results
 	--lines
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
 	 	SELECT jsonb_build_object(
 	  'type',       'Feature',
 	  'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	  'properties', to_jsonb(row) - 'the_geom'
+	  'properties', to_jsonb(row) - 'the_geom' - 'srid'
 	 	) AS feature
-		FROM (SELECT ST_Union(the_geom) as the_geom, node_1 as hydrant_id
-		FROM  temp_anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid) group by node_1) row) features;
+	FROM (SELECT ST_Transform(ST_Union(the_geom), 4326) as the_geom, ST_SRID(ST_Union(the_geom)) as srid, node_1 as hydrant_id
+	FROM  temp_anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid) group by node_1) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+	v_result_line = v_result;
 
 	IF v_use_propsal is true then
 		v_query='SELECT DISTINCT ON (node_id)  node_id::text, nodecat_id, expl_id,the_geom
@@ -316,24 +318,26 @@ SET search_path = "SCHEMA_NAME", public;
 	end if;
 	--points-hydrants
 	v_result = null;
-	EXECUTE 'SELECT jsonb_agg(features.feature) 
+	EXECUTE 'SELECT jsonb_build_object(
+	        ''type'', ''FeatureCollection'',
+	        ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+	    ) 
 	FROM (
 		SELECT jsonb_build_object(
 	  ''type'',       ''Feature'',
-	  ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-	  ''properties'', to_jsonb(row) - ''the_geom''
+	  ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+	  ''properties'', to_jsonb(row) - ''the_geom'' - ''srid''
 	 	) AS feature
-		FROM ('||v_query||')row) features'
+	FROM (SELECT *, ST_SRID(the_geom) as srid FROM ('||v_query||') sub)row) features'
 	 INTO v_result;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}');
+	v_result_point = v_result;
 
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- restore state selector (if it's needed)
 	IF v_use_psector IS NOT TRUE THEN
@@ -378,8 +382,8 @@ SET search_path = "SCHEMA_NAME", public;
 		END IF;
 
 		v_result_info := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
-		v_result_polygon = '{"geometryType":"", "features":[]}';
+		v_result_info = concat ('{"values":',v_result_info, '}');
+		v_result_polygon = '{}';
 
 		--return '{"status":"done"}';
 		--  Return

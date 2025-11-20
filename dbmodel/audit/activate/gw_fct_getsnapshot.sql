@@ -86,37 +86,39 @@ BEGIN
 		    FROM information_schema.columns
 		    WHERE table_name = v_table AND table_schema = v_schema_parent;
 
-		    -- Build features
-			EXECUTE format(
-			    'SELECT jsonb_agg(jsonb_build_object(
-			        ''type'', ''Feature'',
-			        ''geometry'', ST_AsGeoJSON(the_geom)::jsonb,
-			        ''properties'', to_jsonb(row) - ''the_geom'',
-			        ''color'', CASE
-			                    WHEN NOT EXISTS (SELECT 1 FROM %I.%I WHERE %I = row.%I) THEN ''red''
-			                    WHEN EXISTS (SELECT 1 FROM %I.%I WHERE %s) THEN ''blue''
-			                    ELSE ''yellow''
-			                  END
-			    )) 
-			    FROM (SELECT * FROM %I WHERE ST_Intersects(the_geom, %L)) row', v_schema_parent,
-			    v_table, v_idname, v_idname, v_schema_parent, v_table, v_columns, v_temp_table_name, v_polygon
-			) INTO v_features;
+		-- Get feature class
+		EXECUTE format('SELECT id FROM %I.cat_feature WHERE child_layer = ''%I''', v_schema_parent, v_table) INTO v_feature_class;
 
-			-- Get geometry type
-			v_geometry_type := CASE WHEN v_feature_type IN ('link','arc')
-							   THEN 'LineString' ELSE 'Point' END;
+	    -- Build features
+		EXECUTE format(
+		    'SELECT jsonb_build_object(
+		        ''type'', ''FeatureCollection'',
+				''layerName'', '''||initcap(lower(v_feature_class))||''',
+		        ''features'', COALESCE(jsonb_agg(jsonb_build_object(
+		            ''type'', ''Feature'',
+		            ''geometry'', ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+		            ''properties'', to_jsonb(row) - ''the_geom'',
+		            ''color'', CASE
+		                        WHEN NOT EXISTS (SELECT 1 FROM %I.%I WHERE %I = row.%I) THEN ''red''
+		                        WHEN EXISTS (SELECT 1 FROM %I.%I WHERE %s) THEN ''blue''
+		                        ELSE ''yellow''
+		                      END
+		        )), ''[]''::jsonb)
+		    )
+		    FROM (SELECT * FROM %I WHERE ST_Intersects(the_geom, %L)) row', v_schema_parent,
+		    v_table, v_idname, v_idname, v_schema_parent, v_table, v_columns, v_temp_table_name, v_polygon
+		) INTO v_features;
 
-			-- Get feature class
-			EXECUTE format('SELECT id FROM %I.cat_feature WHERE child_layer = ''%I''', v_schema_parent, v_table) INTO v_feature_class;
+		-- Get geometry type
+		v_geometry_type := CASE WHEN v_feature_type IN ('link','arc')
+						   THEN 'LineString' ELSE 'Point' END;
 
-			v_layer := COALESCE(v_layer, '[]'::jsonb) || jsonb_build_array(
-				    jsonb_build_object(
-			            'layerName', initcap(lower(v_feature_class)),
-			            'features', v_features,
-			            'geometryType', v_geometry_type,
-						'group', initcap(v_feature_type)
-				    )
-			);
+		v_layer := COALESCE(v_layer, '[]'::jsonb) || jsonb_build_array(
+			    jsonb_build_object(
+		            'features', v_features,
+					'group', initcap(v_feature_type)
+			    )
+		);
 
 			-- Delete temporal table
 			EXECUTE FORMAT('DROP TABLE IF EXISTS %I', v_temp_table_name);

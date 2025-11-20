@@ -326,7 +326,7 @@ BEGIN
     END IF;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 	v_result_point:=COALESCE(v_result_point,'{}');
 	v_result_line:=COALESCE(v_result_line,'{}');
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');

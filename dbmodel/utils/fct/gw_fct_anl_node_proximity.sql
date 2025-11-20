@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_proximity($${
 */
 
 DECLARE
-    
+
 v_id json;
 v_selectionmode text;
 v_nodeproximity	float;
@@ -46,7 +46,7 @@ BEGIN
   -- select version
   SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    -- getting input data   
+    -- getting input data
     v_id :=  ((p_data ->>'feature')::json->>'id')::json;
     v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
     v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -57,7 +57,7 @@ BEGIN
 
     -- Reset values
     DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=132;
-		
+
 
   -- Computing process
   IF v_selectionmode = 'previousSelection' THEN
@@ -74,30 +74,32 @@ BEGIN
         WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
   END IF;
 
-  
+
   	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=132 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--points
 v_result = null;
-  SELECT jsonb_agg(features.feature) INTO v_result
+  SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+  ) INTO v_result
   FROM (
     SELECT jsonb_build_object(
      'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
-    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
     FROM  anl_node WHERE cur_user="current_user"() AND fid=132) row) features;
 
-  v_result := COALESCE(v_result, '{}'); 
-  v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+  v_result_point := COALESCE(v_result, '{}');
 
-	IF v_saveondatabase IS FALSE THEN 
+	IF v_saveondatabase IS FALSE THEN
 		-- delete previous results
 		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=132;
 	ELSE
@@ -106,10 +108,10 @@ v_result = null;
 		INSERT INTO selector_audit (fid,cur_user) VALUES (132, current_user);
 	END IF;
 
- 
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
@@ -118,9 +120,8 @@ v_result = null;
 				'"point":'||v_result_point||
 			'}}'||
 	    '}')::json, 3228, null, null, null);
-		
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-  

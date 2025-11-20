@@ -651,51 +651,55 @@ v_queryhydro =
 			FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (441, 145) order by criticity desc, id asc) row;
 
 			v_result := COALESCE(v_result, '{}');
-			v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+			v_result_info = concat ('{"values":',v_result, '}');
 
-			-- disconnected arcs
-			SELECT jsonb_agg(features.feature) INTO v_result
-			FROM (
-			SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
-			) AS feature
-			FROM
-			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM ve_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM ve_arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
-			) row) features;
+		-- disconnected arcs
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM
+		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM ve_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
+		UNION
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM ve_arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
+		) row) features;
 
-			v_result := COALESCE(v_result, '{}');
-			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
+		v_result_line = v_result;
 
-			-- disconnected connecs
-			v_result = null;
+		-- disconnected connecs
+		v_result = null;
 
-			SELECT jsonb_agg(features.feature) INTO v_result
-			FROM (
-			SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
-			) AS feature
-			FROM (SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM ve_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
-			UNION
-			SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM ve_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
-			UNION
-			SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM ve_connec c WHERE dma_id = 0 AND arc_id IS NULL
-			) row) features;
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Disconnected'::text as descript, ST_Transform(c.the_geom, 4326) as the_geom FROM ve_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
+		UNION
+		SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Conflict'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM ve_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
+		UNION
+		SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Orphan'::text as descript, ST_Transform(the_geom, 4326) as the_geom FROM ve_connec c WHERE dma_id = 0 AND arc_id IS NULL
+		) row) features;
 
-			v_result := COALESCE(v_result, '{}');
-			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+		v_result_point = v_result;
 		ELSE
 
 			-- info
 			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 			FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) a order by  id asc) row;
 			v_result := COALESCE(v_result, '{}');
-			v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+			v_result_info = concat ('{"values":',v_result, '}');
 
 		END IF;
 

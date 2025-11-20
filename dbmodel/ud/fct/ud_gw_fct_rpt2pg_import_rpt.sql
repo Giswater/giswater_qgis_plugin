@@ -393,37 +393,43 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=140  order by id) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--points
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
-  	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-  	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=140) row) features;
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+			'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, ST_Transform(the_geom, 4326) as the_geom
+		FROM  anl_node WHERE cur_user="current_user"() AND fid=140) row) features;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+	v_result_point = v_result::text;
 
 	--lines
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
-  	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-  	) AS feature
-  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=140) row) features;
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+			'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, ST_Transform(the_geom, 4326) as the_geom
+		FROM  anl_arc WHERE cur_user="current_user"() AND fid=140) row) features;
 
 	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+	v_result_line = v_result::text;
 
 	--Control nulls
 	v_version := COALESCE(v_version, '{}');

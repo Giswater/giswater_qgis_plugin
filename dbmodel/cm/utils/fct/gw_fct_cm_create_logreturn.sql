@@ -49,51 +49,54 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM t_audit_check_data order by criticity desc, id asc) row;
 		v_result := COALESCE(v_result, '{}');
-		v_result := concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result := concat ('{"values":',v_result, '}');
 
 	ELSIF v_returntype = 'point' THEN
 
-		SELECT jsonb_agg(features.feature) INTO v_result
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(
 	     'type',       'Feature',
 	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	    'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT node_id, nodecat_id, expl_id, descript, fid, the_geom FROM t_cm_node
+		FROM (SELECT node_id, nodecat_id, expl_id, descript, fid, ST_Transform(the_geom, 4326) as the_geom FROM t_cm_node
 		UNION
-		SELECT connec_id, conneccat_id, expl_id, descript,fid, the_geom FROM t_cm_connec
+		SELECT connec_id, conneccat_id, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom FROM t_cm_connec
 		) row) features;
-		v_result := COALESCE(v_result, '{}');
-		v_result := concat ('{"geometryType":"Point", "features":',v_result,'}');
 
 	ELSIF v_returntype = 'line' THEN
 
-		SELECT jsonb_agg(features.feature) INTO v_result
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(
 	     'type',       'Feature',
 	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	    'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM t_anl_arc
+		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, ST_Transform(the_geom, 4326) as the_geom FROM t_anl_arc
 		) row) features;
-		v_result := COALESCE(v_result, '{}');
-		v_result = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	ELSIF v_returntype = 'polygon' THEN
 
-		SELECT jsonb_agg(features.feature) INTO v_result
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(
 		'type',       'Feature',
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT pol_id, descript, the_geom
+		FROM (SELECT pol_id, descript, ST_Transform(the_geom, 4326) as the_geom
 		FROM  t_anl_polygon WHERE cur_user="current_user"() AND fid=216) row) features;
-		v_result := COALESCE(v_result, '{}');
-		v_result := concat ('{"geometryType":"MultiPolygon", "features":',v_result,'}');
 
 	END IF;
 

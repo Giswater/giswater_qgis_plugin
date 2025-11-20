@@ -238,15 +238,15 @@ BEGIN
 	END IF;
 
 	v_result_info := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	v_status := COALESCE(v_status, '{}'); 
 	v_level := COALESCE(v_level, '0'); 
 	v_message := COALESCE(v_message, '{}'); 
 
-	v_result_point = '{"geometryType":"", "features":[]}';
-	v_result_line = '{"geometryType":"", "features":[]}';
-	v_result_polygon = '{"geometryType":"", "features":[]}';
+	v_result_point = '{}';
+	v_result_line = '{}';
+	v_result_polygon = '{}';
 
     	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
@@ -262,4 +262,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

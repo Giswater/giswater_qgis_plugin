@@ -433,7 +433,7 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND
 	fid = v_fid order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":"'||v_level||'", "text":"'||v_message||'"}, "version":"'||v_version||'"'||

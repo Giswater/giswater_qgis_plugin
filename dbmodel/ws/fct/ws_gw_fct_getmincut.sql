@@ -232,94 +232,100 @@ BEGIN
         -- build geojson
         IF v_device = 5 THEN
             --v_om_mincut
-            SELECT jsonb_agg(features.feature) INTO v_result
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+            ) INTO v_result
                 FROM (
             SELECT jsonb_build_object(
              'type',       'Feature',
             'geometry',   ST_AsGeoJSON(anl_the_geom)::jsonb,
-            'properties', to_jsonb(row) - 'anl_the_geom' - 'srid',
-            'crs',concat('EPSG:',srid)
+            'properties', to_jsonb(row) - 'anl_the_geom'
             ) AS feature
-            FROM (SELECT id, ST_AsText(anl_the_geom) as anl_the_geom, ST_SRID(anl_the_geom) as srid
+            FROM (SELECT id, ST_Transform(anl_the_geom, 4326) as anl_the_geom
             FROM  v_om_mincut) row) features;
 
-            v_result := COALESCE(v_result, '{}');
-            v_result_init = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_result_init = v_result;
 
             --v_om_mincut_valve proposed true
-            SELECT jsonb_agg(features.feature) INTO v_result
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+            ) INTO v_result
                 FROM (
             SELECT jsonb_build_object(
              'type',       'Feature',
             'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-            'properties', to_jsonb(row) - 'the_geom' - 'srid',
-            'crs',concat('EPSG:',srid)
+            'properties', to_jsonb(row) - 'the_geom'
             ) AS feature
-            FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+            FROM (SELECT id, ST_Transform(the_geom, 4326) as the_geom
             FROM  v_om_mincut_valve WHERE proposed = true) row) features;
 
-            v_result := COALESCE(v_result, '{}');
-            v_result_valve_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_result_valve_proposed = v_result;
 
             --v_om_mincut_valve proposed false
-            SELECT jsonb_agg(features.feature) INTO v_result
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+            ) INTO v_result
                 FROM (
             SELECT jsonb_build_object(
              'type',       'Feature',
             'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-            'properties', to_jsonb(row) - 'the_geom' - 'srid',
-            'crs',concat('EPSG:',srid)
+            'properties', to_jsonb(row) - 'the_geom'
             ) AS feature
-            FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+            FROM (SELECT id, ST_Transform(the_geom, 4326) as the_geom
             FROM  v_om_mincut_valve WHERE proposed = false) row) features;
 
-            v_result := COALESCE(v_result, '{}');
-            v_result_valve_not_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_result_valve_not_proposed = v_result;
 
             --v_om_mincut_node
-            SELECT jsonb_agg(features.feature) INTO v_result
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+            ) INTO v_result
                 FROM (
             SELECT jsonb_build_object(
              'type',       'Feature',
             'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-            'properties', to_jsonb(row) - 'the_geom' - 'srid',
-            'crs',concat('EPSG:',srid)
+            'properties', to_jsonb(row) - 'the_geom'
             ) AS feature
-            FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+            FROM (SELECT id, ST_Transform(the_geom, 4326) as the_geom
             FROM  v_om_mincut_node) row) features;
 
-            v_result := COALESCE(v_result, '{}');
-            v_result_node = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_result_node = v_result;
 
             --v_om_mincut_connec
-            SELECT jsonb_agg(features.feature) INTO v_result
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+            ) INTO v_result
                 FROM (
             SELECT jsonb_build_object(
              'type',       'Feature',
             'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-            'properties', to_jsonb(row) - 'the_geom' - 'srid',
-            'crs',concat('EPSG:',srid)
+            'properties', to_jsonb(row) - 'the_geom'
             ) AS feature
-            FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+            FROM (SELECT id, ST_Transform(the_geom, 4326) as the_geom
             FROM  v_om_mincut_connec) row) features;
 
-            v_result := COALESCE(v_result, '{}');
-            v_result_connec = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_result_connec = v_result;
 
             --v_om_mincut_arc
-            SELECT jsonb_agg(features.feature) INTO v_result
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+            ) INTO v_result
                 FROM (
             SELECT jsonb_build_object(
              'type',       'Feature',
             'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-            'properties', to_jsonb(row) - 'the_geom' - 'srid',
-            'crs',concat('EPSG:',srid)
+            'properties', to_jsonb(row) - 'the_geom'
             ) AS feature
-            FROM (SELECT id, arc_id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
+            FROM (SELECT id, arc_id, ST_Transform(the_geom, 4326) as the_geom
             FROM  v_om_mincut_arc) row) features;
 
-            v_result := COALESCE(v_result, '{}');
-            v_result_arc = concat('{"geometryType":"LineString", "features":',v_result, '}');
+            v_result_arc = v_result;
 
         END IF;
 
@@ -338,11 +344,11 @@ BEGIN
         -- mincut details
         SELECT * INTO v_mincutrec FROM om_mincut WHERE id::text = v_mincutid::text;
         DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
-        
+
         -- mincut details
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
 	    EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
-		
+
         -- Stats
         EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincutrec.output->'arcs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
         EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincutrec.output->'arcs'->>'length'), '0')||'"}, "cur_user":"current_user"}}$$)';
@@ -356,7 +362,7 @@ BEGIN
         SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
         FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
         v_result := COALESCE(v_result, '{}');
-        v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+        v_result_info = concat ('{"values":',v_result, '}');
 
         v_result_info := COALESCE(v_result_info, '{}');
 
@@ -388,11 +394,11 @@ BEGIN
     -- mincut details
     SELECT * INTO v_mincutrec FROM om_mincut WHERE id::text = v_mincutid::text;
     DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
-    
+
     -- mincut details
     EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2988", "fid":"216", "criticity":"4", "is_process":true, "cur_user":"current_user"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "cur_user":"current_user"}}$$)';
-    
+
     -- Stats
     EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincutrec.output->'arcs'->>'number'), '0')||'"}, "cur_user":"current_user"}}$$)';
     EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincutrec.output->'arcs'->>'length'), '0')||'"}, "cur_user":"current_user"}}$$)';
@@ -406,7 +412,7 @@ BEGIN
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
     v_result := COALESCE(v_result, '{}');
-    v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+    v_result_info = concat ('{"values":',v_result, '}');
 
     v_result_info := COALESCE(v_result_info, '{}');
 

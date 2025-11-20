@@ -107,7 +107,7 @@ BEGIN
 
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 				
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
@@ -127,4 +127,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

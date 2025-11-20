@@ -88,7 +88,7 @@ BEGIN
     FROM q_arc a, node n1 JOIN '||v_worklayer||' USING (node_id)
 	  JOIN (SELECT node_1 node_id from q_arc UNION select node_2 FROM q_arc) b USING (node_id)
     WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b';
-   
+
   END IF;
 
   SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=432;
@@ -107,22 +107,24 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=432 order by id) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
   	--points
   v_result = null;
-  SELECT jsonb_agg(features.feature) INTO v_result
+  SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+  ) INTO v_result
   FROM (
     SELECT jsonb_build_object(
     'type',       'Feature',
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
-    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
     FROM  anl_node WHERE cur_user="current_user"() AND fid=432) row) features;
 
-  v_result := COALESCE(v_result, '{}');
-  v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+  v_result_point := COALESCE(v_result, '{}');
 
   IF v_saveondatabase IS FALSE THEN
   	-- delete previous results
@@ -154,4 +156,3 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-

@@ -486,7 +486,7 @@ BEGIN
     UPDATE config_form_fields SET iseditable=false WHERE columnname='to_arc';
 
 	v_result_info := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}'||

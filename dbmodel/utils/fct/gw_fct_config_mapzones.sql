@@ -211,7 +211,7 @@ BEGIN
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid ORDER BY id) row;
 
     v_result := COALESCE(v_result, '{}');
-    v_result_info = concat('{"geometryType":"", "values":', v_result, '}');
+    v_result_info = concat('{"values":', v_result, '}');
     v_preview := COALESCE(v_preview, '{}');
 
     RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'", "body":{"form":{},"data":{"info":'||v_result_info||', "preview":'||v_preview||'}}}')::json, 3270, NULL, NULL, NULL);

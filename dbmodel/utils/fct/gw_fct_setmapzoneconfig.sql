@@ -143,11 +143,11 @@ BEGIN
 	END IF;
 
 	v_result_info := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
-	v_result_point = '{"geometryType":"", "features":[]}';
-	v_result_line = '{"geometryType":"", "features":[]}';
-	v_result_polygon = '{"geometryType":"", "features":[]}';
+	v_result_point = '{}';
+	v_result_line = '{}';
+	v_result_polygon = '{}';
 
 	v_status := COALESCE(v_status, '{}');
 	v_level := COALESCE(v_level, '0');

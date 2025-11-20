@@ -282,7 +282,7 @@ BEGIN
 	WHERE cur_user="current_user"() AND fid=143 ORDER BY criticity desc, id asc) row;
 
 	v_result_info := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	-- set return values
 	v_level = 1;

@@ -314,7 +314,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
-		
+
 		-- Stats
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincutrec.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincutrec.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -329,48 +329,54 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_info = concat ('{"values":',v_result, '}');
 
 		-- points
-		v_result = null;
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-		'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM (SELECT connec_id, descript, the_geom
-		FROM  temp_anl_connec WHERE cur_user="current_user"() AND fid=216) row) features;
-		v_result := COALESCE(v_result, '{}');
-		v_result_point = concat ('{"geometryType":"Point", "layerName":"Overlap affected connecs", "features":',v_result, '}');
+	v_result = null;
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+	'type',       'Feature',
+	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (SELECT connec_id, descript, ST_Transform(the_geom, 4326) as the_geom
+	FROM  temp_anl_connec WHERE cur_user="current_user"() AND fid=216) row) features;
+	v_result_point = v_result;
 
-		-- lines
-		v_result = null;
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-		'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM (SELECT arc_id, descript, the_geom
-		FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid=216) row) features;
-		v_result := COALESCE(v_result, '{}');
-		v_result_line = concat ('{"geometryType":"LineString", "layerName":"Overlap affected arcs", "features":',v_result, '}');
+	-- lines
+	v_result = null;
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+	'type',       'Feature',
+	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (SELECT arc_id, descript, ST_Transform(the_geom, 4326) as the_geom
+	FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid=216) row) features;
+	v_result_line = v_result;
 
-		-- polygon
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-		'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM (SELECT pol_id, descript, the_geom
-		FROM  temp_anl_polygon WHERE cur_user="current_user"() AND fid=216) row) features;
-		v_result := COALESCE(v_result, '{}');
-		v_result_pol = concat ('{"geometryType":"MultiPolygon", "layerName":"Other mincuts which overlaps", "features":',v_result, '}');
+	-- polygon
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+	'type',       'Feature',
+	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (SELECT pol_id, descript, ST_Transform(the_geom, 4326) as the_geom
+	FROM  temp_anl_polygon WHERE cur_user="current_user"() AND fid=216) row) features;
+	v_result_pol = v_result;
 
 		-- geometry (the boundary of mincut using arcs and valves)
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincutid||
@@ -471,12 +477,12 @@ BEGIN
 
 		-- creating log
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4406", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
-		
+
 		-- mincut details
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
-		
+
 		-- Stats
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincutrec.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincutrec.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -491,7 +497,7 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_info = concat ('{"values":',v_result, '}');
 
 		-- geometry (the boundary of mincut using arcs and valves)
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincutid||

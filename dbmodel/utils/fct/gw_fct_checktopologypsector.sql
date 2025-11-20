@@ -68,39 +68,39 @@ BEGIN
 		LEFT JOIN connec c USING (connec_id)
 		WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = '||v_psector||'
 		';
-	
+
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
-	
+
 		IF v_count > 0 THEN
-		
+
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 			VALUES (355, '355', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded connecs without link_id informed in this psector.'),v_count);
 			v_level = 1;
-		
+
 			EXECUTE 'INSERT INTO anl_connec (fid, connec_id, conneccat_id, descript, the_geom, state) '||v_query||'';
 			v_level = 1;
 
 		END IF;
 
 		IF v_project_type = 'UD' THEN
-				
+
 			v_query = 'SELECT 355, g.gully_id, g.gullycat_id, ''downgraded gully without link_id informed in this psector.'', g.the_geom, g.state FROM plan_psector_x_gully p 
 			JOIN link l ON feature_id = gully_id
 			LEFT JOIN gully g USING (gully_id)
 			WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = '||v_psector||'';
-	
+
 			EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
-	
+
 			IF v_count > 0 THEN
-			
+
 				INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 				VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded gullies without link_id informed in this psector.'),v_count);
 				v_level = 1;
 
-			
+
 				EXECUTE 'INSERT INTO anl_gully (fid, gully_id, gullycat_id, descript, the_geom, state) '||v_query||'';
 				v_level = 1;
-	
+
 			END IF;
 		END IF;
 
@@ -183,10 +183,10 @@ BEGIN
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
 
 	IF v_count > 0 THEN
-	
+
 		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 		VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs with wrong topology.'),v_count);
-		
+
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, state) '||v_query||'';
 		v_level = 1;
 
@@ -197,21 +197,21 @@ BEGIN
 	FROM arc a LEFT JOIN plan_psector_x_arc USING (arc_id) 
 	WHERE (node_1 IS NULL OR node_2 IS NULL) AND psector_id = '||v_psector||' AND a.state=2';
 
-	
+
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
 
 	IF v_count > 0 THEN
-	
+
 		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 		VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs with wrong topology.'),v_count);
-		
-		
+
+
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, state) '||v_query||'';
 		v_level = 1;
 
 	END IF;
 
-		
+
 	-- duplicated nodes
 	v_query = '
 	WITH mec AS ( -- operative nodes that ARE NOT inside the psector
@@ -221,16 +221,16 @@ BEGIN
 	)
 	SELECT 355 as fid, a.node_id, a.nodecat_id, ''duplicated nodes'' as descript, a.the_geom, a.expl_id, a.state FROM mec a JOIN moc b ON st_dwithin (a.the_geom, b.the_geom, 0.01)';
 
-	
+
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c' INTO v_count;
 
 
 	IF v_count > 0 THEN
-	
+
 		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 		VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' duplicated nodes'),v_count);
-		
-		
+
+
 		EXECUTE 'INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id, state) '||v_query||'';
 		v_level = 1;
 
@@ -239,21 +239,26 @@ BEGIN
 	-- get results
 	--lines
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
 	  	SELECT jsonb_build_object(
 	     'type',       'Feature',
 	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	    'properties', to_jsonb(row) - 'the_geom'
 	  	) AS feature
-	  	FROM (SELECT id, arc_id, arccat_id, state, descript, node_1, node_2, expl_id, fid, st_length(the_geom) as length, the_geom
+	  	FROM (SELECT id, arc_id, arccat_id, state, descript, node_1, node_2, expl_id, fid, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
 	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (354,355)) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+	v_result_line := COALESCE(v_result, '{}');
 
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
 	  	SELECT jsonb_build_object(
 	     'type',       'Feature',
@@ -261,12 +266,11 @@ BEGIN
 	    'properties', to_jsonb(row) - 'the_geom'
 	  	) AS feature
 	  	FROM (
-	  		SELECT node_id, nodecat_id, state, descript, expl_id, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (354,355) UNION
-			SELECT connec_id, conneccat_id, state, descript, expl_id, fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (354,355)
+	  		SELECT node_id, nodecat_id, state, descript, expl_id, fid, ST_Transform(the_geom, 4326) as the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (354,355) UNION
+			SELECT connec_id, conneccat_id, state, descript, expl_id, fid, ST_Transform(the_geom, 4326) as the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (354,355)
 	  		) row) features;
 
-	v_result := COALESCE(v_result, '{}');
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+	v_result_point := COALESCE(v_result, '{}');
 
 
 
@@ -274,7 +278,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (354, 355) order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');

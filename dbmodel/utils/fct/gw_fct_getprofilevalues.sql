@@ -736,41 +736,43 @@ BEGIN
 	END IF;
 
 	IF v_device = 5 THEN
-		SELECT jsonb_agg(features.feature) INTO v_result
+		SELECT jsonb_build_object(
+		    'type', 'FeatureCollection',
+		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
 		FROM (
 	  	SELECT jsonb_build_object(
 	     'type',       'Feature',
-	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom',
-	    'crs',concat('EPSG:',ST_SRID(the_geom))
+	    'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
 	  	) AS feature
-	  	FROM (SELECT arc_id, arccat_id, descript::json,expl_id, the_geom
+	  	FROM (SELECT arc_id, arccat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
 	  	FROM  temp_anl_arc WHERE fid=222 AND cur_user = current_user) row) features;
 
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+		v_result_line = v_result;
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-	  	SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom',
-			'crs',concat('EPSG:',ST_SRID(the_geom))
-	  	) AS feature
-	  	FROM (SELECT node_id, nodecat_id, descript::json,expl_id, the_geom
-	  	FROM  temp_anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id!='VNODE') row) features;
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+		'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT node_id, nodecat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
+  	FROM  temp_anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id!='VNODE') row) features;
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+	v_result_point = v_result;
 
-		v_result_polygon = '{"geometryType":"", "features":[]}';
+		v_result_polygon = '{}';
 
 	ELSE
-		v_result_polygon = '{"geometryType":"", "features":[]}';
-		v_result_line = '{"geometryType":"", "features":[]}';
-		v_result_point = '{"geometryType":"", "features":[]}';
+		v_result_polygon = '{}';
+		v_result_line = '{}';
+		v_result_point = '{}';
 
 	END IF;
 

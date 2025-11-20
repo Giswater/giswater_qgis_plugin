@@ -60,29 +60,29 @@ BEGIN
 	v_querytext = 'SELECT * FROM ve_node '||v_queryfilter;
 
 	DELETE FROM anl_node WHERE fid = v_fid and cur_user = current_user;
-		
+
 	FOR v_node IN EXECUTE v_querytext
 	LOOP
 		v_x = st_x(v_node.the_geom);
 		v_y = st_y(v_node.the_geom);
 
 		-- getting for node_1
-		SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL AND sys_elev IS NOT NULL 
+		SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL AND sys_elev IS NOT NULL
 		AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
 		IF v_node1 IS NULL THEN
 			SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL ORDER BY sys_elev asc limit 1;
 			IF v_node1 IS NOT NULL THEN
-				SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node1 AND node_1 IS NOT NULL AND sys_elev IS NOT NULL 
+				SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node1 AND node_1 IS NOT NULL AND sys_elev IS NOT NULL
 				AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
 			END IF;
 		END IF;
 
-		-- getting for node_2		
+		-- getting for node_2
 		SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
 		IF v_node2 IS NULL THEN
 			SELECT node_1 INTO v_node2  FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
 			IF v_node2 IS NOT NULL THEN
-				SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node2 AND node_2 IS NOT NULL AND sys_elev IS NOT NULL 
+				SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node2 AND node_2 IS NOT NULL AND sys_elev IS NOT NULL
 				AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
 			END IF;
 		END IF;
@@ -95,31 +95,33 @@ BEGIN
 
 		-- inserting log
 		INSERT INTO anl_node (node_id, fid, the_geom, descript, cur_user) VALUES (v_node.node_id, v_fid, v_node.the_geom, 'Node massively interpolated', current_user);
-		
+
 	END LOOP;
-	
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by
-	criticity desc, id asc) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result,'}');
+	criticity desc, id asc) row;
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"values":',v_result,'}');
 
 	--points
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	SELECT jsonb_build_object(
+	    'type', 'FeatureCollection',
+	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
 	FROM (
 	SELECT jsonb_build_object(
 	'type',       'Feature',
 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	v_result_point = v_result;
 
 	-- Control NULL's
 	v_version:=COALESCE(v_version,'{}');

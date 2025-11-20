@@ -20,7 +20,7 @@ WARNING: Using this function config_form_fields is modified hidden mapzone_id an
 
 */
 
-DECLARE 
+DECLARE
 rec record;
 v_mapzone_addfield text;
 v_graf_class text;
@@ -62,14 +62,14 @@ BEGIN
 		v_graf_class_list = '(''PRESSZONE'', ''SECTOR'')';
 	ELSIF v_graf_class = 'DMA' THEN
 		v_graf_class_list = '(''DMA'', ''SECTOR'')';
-	ELSIF v_graf_class = 'SECTOR' THEN 
+	ELSIF v_graf_class = 'SECTOR' THEN
 		v_graf_class_list =  '(''SECTOR'')';
 	END IF;
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Configure system to work with dynamic mapzone
-	
+
 	/*
 	-- put hidden mapzone_id name
 	EXECUTE 'UPDATE config_form_fields SET hidden = true WHERE columnname = '''||lower(v_graf_class)||'_id'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
@@ -95,16 +95,16 @@ BEGIN
 	--find delimiter node types
 	EXECUTE 'SELECT string_agg(quote_literal(id), '','') FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||''
 	INTO v_mapzone_nodetype;
-	
+
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
 
-	SELECT string_agg(child_layer,','), string_agg(quote_literal(cat_feature.id), ',') INTO v_arc_layers, v_cat_feature_arc  
-	FROM cat_feature JOIN sys_addfields ON cat_feature.id = cat_feature_id 
+	SELECT string_agg(child_layer,','), string_agg(quote_literal(cat_feature.id), ',') INTO v_arc_layers, v_cat_feature_arc
+	FROM cat_feature JOIN sys_addfields ON cat_feature.id = cat_feature_id
 	WHERE feature_type = 'ARC' AND param_name =  v_mapzone_addfield;
 
-	
+
 	IF v_arc_layers IS NULL THEN
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -119,38 +119,38 @@ BEGIN
 
 	    FOR rec IN EXECUTE '(SELECT node_id::text FROM ve_node WHERE nodetype_id IN 
 	    	(SELECT id FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||'))' LOOP
-		
+
 			--find defined sector value of node
 			EXECUTE 'SELECT value_param FROM man_addfields_value 
 			JOIN sys_addfields on parameter_id = sys_addfields.id
 			WHERE feature_id = '||rec.node_id||'::text and param_name = '||quote_literal(v_mapzone_addfield)||''
 			INTO v_node_delimiter_mapzone;
 
-			
+
 			--check first direction
 			IF v_node_delimiter_mapzone IS NOT NULL AND v_node_delimiter_mapzone != '' THEN
-			
+
 				EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 = '||rec.node_id||'::text 
 				AND '||v_mapzone_addfield||' = '||v_node_delimiter_mapzone||'::text'
 				into v_arc_id1;
-				
-				
-			ELSIF v_node_delimiter_mapzone = '' THEN 
+
+
+			ELSIF v_node_delimiter_mapzone = '' THEN
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
 				VALUES (249, 2, concat('There is no mapzone defined for delimiter: ', rec.node_id,'.'));
-			END IF;	
+			END IF;
 
 			IF v_arc_id1 IS NOT NULL THEN
 				--find final node of the first arc
 				EXECUTE 'SELECT node_2 FROM '||v_arc_layers||' WHERE arc_id ='||v_arc_id1||'::text'
 				INTO v_final_node_id;
-				
+
 				--find arc_id of the next arc
 				EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
 				AND arc_id != '''||v_arc_id1||''''
 				INTO v_next_arc_id;
 
-				
+
 				IF v_next_arc_id IS NOT NULL THEN
 					--find mapzone value of the next arc
 					EXECUTE 'SELECT value_param FROM man_addfields_value 
@@ -160,7 +160,7 @@ BEGIN
 
 					--configure mapzone if next arc mapzone is the same as delimiter mapzone
 					IF v_node_delimiter_mapzone = v_arc_1_mapzone THEN
-						v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id1,']}], "ignore":[]}'); 
+						v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id1,']}], "ignore":[]}');
 
 						EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
 						WHERE '||v_graf_class||'_id::text = '||v_node_delimiter_mapzone||'::text;';
@@ -187,7 +187,7 @@ BEGIN
 					EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
 					AND arc_id != '''||v_arc_id2||''''
 					INTO v_next_arc_id;
-				
+
 					IF v_next_arc_id IS NOT NULL THEN
 						--find mapzone value of the next arc
 						EXECUTE 'SELECT value_param FROM man_addfields_value 
@@ -197,7 +197,7 @@ BEGIN
 
 						IF v_node_delimiter_mapzone = v_arc_2_mapzone THEN
 							--configure mapzone if next arc mapzone is the same as delimiter mapzone
-							v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id2,']}], "ignore":[]}'); 
+							v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id2,']}], "ignore":[]}');
 
 							EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
 							WHERE '||v_graf_class||'_id::text = '||v_node_delimiter_mapzone||'::text;';
@@ -218,36 +218,36 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (249, 2, concat('Mapzone not configured for : ', rec.undone_mapzone_id,' - ',rec.undone_mapzone_name,'.'));
 		END LOOP;
-		END IF;	
+		END IF;
 
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM audit_check_data 
+		FROM (SELECT id, error_message as message FROM audit_check_data
 		WHERE cur_user="current_user"() AND fid=249 ORDER BY criticity desc, id asc) row;
-		
+
 		IF v_audit_result is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
 		v_message = 'Mapzone config done successfully';
 	ELSE
 
-		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
 	END IF;
 
-	v_result_info := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	v_result_info := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"values":',v_result_info, '}');
 
-	v_status := COALESCE(v_status, '{}'); 
-	v_level := COALESCE(v_level, '0'); 
-	v_message := COALESCE(v_message, '{}'); 
-	v_hide_form := COALESCE(v_hide_form, true); 
+	v_status := COALESCE(v_status, '{}');
+	v_level := COALESCE(v_level, '0');
+	v_message := COALESCE(v_message, '{}');
+	v_hide_form := COALESCE(v_hide_form, true);
 
 
-	v_result_point = '{"geometryType":"", "features":[]}';
-	v_result_line = '{"geometryType":"", "features":[]}';
-	v_result_polygon = '{"geometryType":"", "features":[]}';
+	v_result_point = '{}';
+	v_result_line = '{}';
+	v_result_polygon = '{}';
 
     	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
@@ -268,4 +268,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

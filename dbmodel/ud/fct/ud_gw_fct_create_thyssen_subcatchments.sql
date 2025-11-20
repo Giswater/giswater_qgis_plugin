@@ -164,7 +164,7 @@ BEGIN
 	) row;
 
 	v_result := COALESCE(v_result, '[]'::json);
-	v_result_info := concat('{"geometryType":"", "values":', v_result, '}');
+	v_result_info := concat('{"values":', v_result, '}');
 	v_version := COALESCE(v_version,'{}');
 	v_result_info := COALESCE(v_result_info,'{}');
 
