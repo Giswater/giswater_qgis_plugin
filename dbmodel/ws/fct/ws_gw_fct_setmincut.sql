@@ -198,6 +198,17 @@ BEGIN
 		SELECT arc_id INTO v_arc_id FROM v_temp_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 	END IF;
 
+	-- get node_id from coordinates
+	IF v_valve_node_id IS NULL AND v_xcoord IS NOT NULL THEN
+		v_sensibility_f := (SELECT (value::json->>'web')::float FROM config_param_system WHERE parameter = 'basic_info_sensibility_factor');
+		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
+
+		-- Make point
+		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+
+		SELECT node_id INTO v_valve_node_id FROM ve_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+	END IF;
+
 	-- CHECK
 	-- check if use psectors is active with minsector version
 	IF v_use_plan_psectors AND v_mincut_version = '6.1' THEN
