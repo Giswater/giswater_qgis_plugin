@@ -622,9 +622,7 @@ UPDATE config_form_fields
 -- 18/11/24
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
 
--- 19/11/24
-ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET NOT NULL;
-ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET DEFAULT false;
+
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
 VALUES (3346, 'gw_trg_mantypevalue_fk', 'utils', 'trigger', NULL, NULL, 'Control foreign keys created in man_type_* tables', 'role_edit', 'core');

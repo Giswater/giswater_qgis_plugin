@@ -18,3 +18,9 @@ ALTER TABLE doc_x_connec ADD CONSTRAINT doc_x_connec_doc_id_fkey FOREIGN KEY (do
 
 DROP RULE IF EXISTS insert_plan_psector_x_arc ON arc;
 DROP RULE IF EXISTS insert_plan_psector_x_node ON node;
+
+-- 19/11/24
+UPDATE rpt_cat_result SET iscorporate = false WHERE iscorporate IS NULL;
+
+ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET NOT NULL;
+ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET DEFAULT false;
