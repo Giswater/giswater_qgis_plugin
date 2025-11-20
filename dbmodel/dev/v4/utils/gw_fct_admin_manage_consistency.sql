@@ -164,9 +164,9 @@ BEGIN
 			FOR rec IN 		
 				
 				WITH mec AS (
-					SELECT * FROM ud._bkp_views WHERE view_schema = v_ref_schema
+					SELECT * FROM _bkp_views WHERE view_schema = v_ref_schema -- REF views
 				), moc AS (
-					SELECT * FROM ud._bkp_views WHERE view_schema = v_target_schema
+					SELECT * FROM _bkp_views WHERE view_schema = v_target_schema AND view_name NOT IN (SELECT id FROM sys_table) -- ext views
 				), mic AS (
 				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
 				FROM moc WHERE view_name NOT IN (SELECT view_name FROM mec) AND (view_name NOT ILIKE 'v_%' OR view_name NOT ILIKE 've_%') 
@@ -174,7 +174,7 @@ BEGIN
 				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
 				FROM mec
 				)
-				SELECT*FROM mic ORDER BY exec_order
+				SELECT*FROM mic ORDER BY exec_order, view_name
 	
 			LOOP
 			
