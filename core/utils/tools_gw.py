@@ -17,6 +17,7 @@ from typing import Literal, Dict, Optional, Union
 import webbrowser
 import xml.etree.ElementTree as ET
 from qgis.PyQt.sip import isdeleted
+from osgeo import gdal
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -3535,7 +3536,6 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
             }
         }
 
-    srid = lib_vars.data_epsg
     try:
         margin = None
         opacity = 100
@@ -3576,13 +3576,17 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         continue
 
                     # Get values for create and populate layer
-                    counter = len(json_result['body']['data'][key]['features'])
-                    geometry_type = json_result['body']['data'][key].get('geometryType')
-                    if not geometry_type and 'features' in json_result['body']['data'][key]:
-                        first_feature = json_result['body']['data'][key]['features'][0]
-                        geometry_type = first_feature.get('geometry', {}).get('type')
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                    fill_layer_temp(v_layer, json_result['body']['data'], key, counter, sort_val=i)
+                    geojson_str = json.dumps(json_result['body']['data'][key])
+                    vsipath = f"/vsimem/{layer_name}.geojson"
+                    gdal.FileFromMemBuffer(vsipath, geojson_str)
+                    v_layer = QgsVectorLayer(vsipath, layer_name, 'ogr')
+                    geometry_type = v_layer.geometryType()
+                    QgsProject.instance().addMapLayer(v_layer, False)
+                    root = QgsProject.instance().layerTreeRoot()
+                    my_group = root.findGroup('GW Temporal Layers')
+                    if my_group is None:
+                        my_group = root.insertGroup(0, 'GW Temporal Layers')
+                    my_group.insertLayer(i, v_layer)
 
                     # Increase iterator
                     i = i + 1
