@@ -144,9 +144,9 @@ BEGIN
 					
 					EXECUTE rec.exec_constr;
 					
-					EXCEPTION WHEN OTHERS THEN 
-					RAISE NOTICE '[ERR] % -> %: % ', rec.table_name, rec.constraint_name, SQLERRM;
-					v_errs_constr := array_append(v_errs_constr, concat(rec.table_name, ' - ', SQLERRM));
+				EXCEPTION WHEN OTHERS THEN 
+					RAISE NOTICE '[ERR] % -> %: %', rec.table_name, rec.constraint_name, SQLERRM;
+					v_errs_constr := array_append(v_errs_constr, concat(rec.exec_constr, ' - ', SQLERRM));
 				
 				END;
 			
@@ -161,9 +161,21 @@ BEGIN
 		
 			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built all views ---------- --';
 			-- todas las que son del esquema de ref + childs
-			FOR rec IN 
-				SELECT view_name, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view
-				FROM _bkp_views WHERE view_schema = v_ref_schema ORDER BY exec_order ASC
+			FOR rec IN 		
+				
+				WITH mec AS (
+					SELECT * FROM ud._bkp_views WHERE view_schema = v_ref_schema
+				), moc AS (
+					SELECT * FROM ud._bkp_views WHERE view_schema = v_target_schema
+				), mic AS (
+				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
+				FROM moc WHERE view_name NOT IN (SELECT view_name FROM mec) AND (view_name NOT ILIKE 'v_%' OR view_name NOT ILIKE 've_%') 
+				UNION
+				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
+				FROM mec
+				)
+				SELECT*FROM mic ORDER BY exec_order
+	
 			LOOP
 			
 				BEGIN
@@ -192,10 +204,9 @@ BEGIN
 					
 					EXECUTE rec.exec_trg;
 				
-					EXCEPTION WHEN OTHERS THEN
+				EXCEPTION WHEN OTHERS THEN
 					RAISE NOTICE '[ERR] % -> %: % ', rec.table_name, rec.trigger_name, SQLERRM;
-					v_errs_trgs := array_append(v_errs_trgs, concat(rec.table_name, ' - ', SQLERRM));
-					
+					v_errs_trgs := array_append(v_errs_trgs, concat(rec.table_name, '(', rec.trigger_name, ')', ' - ', SQLERRM));
 				END;
 				
 				RAISE NOTICE '[OK] % - % ', rec.table_name, rec.trigger_name;
