@@ -110,36 +110,36 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"CHECKPROJECT"}}}$$)';
 
 	-- Header log
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3236", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3010", "separator_id":"2030", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2794", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "label_id":"3010", "separator_id":"2030", "tempTable":"t_"}}$$)';
 	IF v_show_versions THEN
 		--check plugin and db version and other system parameters
 		IF v_qgis_version = v_version THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4100", "function":"3236", "fid":"'||v_fid||'", "result_id":"null", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4100", "function":"2794", "fid":"'||v_fid||'", "result_id":"null", "fcount":"0", 
 			"parameters":{"version":"'||v_version||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4102", "function":"3236", "fid":"'||v_fid||'", "result_id":"349", "fcount":"1", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4102", "function":"2794", "fid":"'||v_fid||'", "result_id":"349", "fcount":"1", 
 			"parameters":{"version":"'||v_version||'", "qgis_version":"'||v_qgisversion||'"}, "prefix_id":"1003", "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4104", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4104", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"version":"'||(SELECT version())||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4106", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4106", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"postgis_version":"'||(SELECT postgis_version())||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4108", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4108", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"qgis_version":"'||v_qgisversion||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4110", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4110", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"os_version":"'||v_osversion||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3236", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "separator_id":"2000", "fcount":"0", "tempTable":"t_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2794", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "separator_id":"2000", "fcount":"0", "tempTable":"t_"}}$$)';
 	END IF;
 
 	IF v_show_qgis_project THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4112", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4112", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"logfoldervolume":"'||v_logfoldervolume||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4114", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4114", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"v_qgis_project_type":"'||quote_nullable(v_qgis_project_type)||'", "v_infotype":"'||quote_nullable(v_infotype)||'", "v_projectrole":"'||quote_nullable(v_projectrole)||'", 
 		"v_mainschema":"'||quote_nullable(v_mainschema)||'", "v_addschema":"'||quote_nullable(v_addschema)||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4116", "function":"3236", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4116", "function":"2794", "fid":"'||v_fid||'",  "result_id":"null", "fcount":"0", 
 		"parameters":{"current_user":"'||current_user||'", "now":"'||now()||'"}, "criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 
 
@@ -162,10 +162,10 @@ BEGIN
 		FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
 
 		IF v_count>0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4118", "function":"3236", "fid":"'||v_fid||'", "result_id":"350", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4118", "function":"2794", "fid":"'||v_fid||'", "result_id":"350", "fcount":"0", 
 			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4120", "function":"3236", "fid":"'||v_fid||'", "result_id":"350", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4120", "function":"2794", "fid":"'||v_fid||'", "result_id":"350", "fcount":"0", 
 			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 
@@ -174,10 +174,10 @@ BEGIN
 		FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
 
 		IF v_count>0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4122", "function":"3236", "fid":"'||v_fid||'", "result_id":"351", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4122", "function":"2794", "fid":"'||v_fid||'", "result_id":"351", "fcount":"0", 
 			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4124", "function":"3236", "fid":"'||v_fid||'", "result_id":"351", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4124", "function":"2794", "fid":"'||v_fid||'", "result_id":"351", "fcount":"0", 
 			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 
@@ -186,10 +186,10 @@ BEGIN
 		FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
 
 		IF v_count>0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4126", "function":"3236", "fid":"'||v_fid||'", "result_id":"352", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4126", "function":"2794", "fid":"'||v_fid||'", "result_id":"352", "fcount":"0", 
 			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4128", "function":"3236", "fid":"'||v_fid||'", "result_id":"352", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4128", "function":"2794", "fid":"'||v_fid||'", "result_id":"352", "fcount":"0", 
 			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 
@@ -198,10 +198,10 @@ BEGIN
 		FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
 
 		IF v_count>0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4130", "function":"3236", "fid":"'||v_fid||'", "result_id":"353", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4130", "function":"2794", "fid":"'||v_fid||'", "result_id":"353", "fcount":"0", 
 			"parameters":{"v_count":"'||v_count||'", "v_layer_list":"'||v_layer_list||'"}, "criticity":"3", "prefix_id":"1003", "is_process":true, "tempTable":"t_"}}$$)';
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4132", "function":"3236", "fid":"'||v_fid||'", "result_id":"353", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4132", "function":"2794", "fid":"'||v_fid||'", "result_id":"353", "fcount":"0", 
 			"criticity":"1", "prefix_id":"1001", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 	END IF;
@@ -212,7 +212,7 @@ BEGIN
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN
 			INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4134", "function":"3236", "fid":"'||v_fid||'", "result_id":"null", "fcount":"0", 
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4134", "function":"2794", "fid":"'||v_fid||'", "result_id":"null", "fcount":"0", 
 			"criticity":"4", "is_process":true, "tempTable":"t_"}}$$)';
 		END IF;
 		SET search_path = 'SCHEMA_NAME';
