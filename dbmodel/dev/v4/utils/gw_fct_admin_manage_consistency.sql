@@ -78,6 +78,13 @@ BEGIN
 		ORDER BY nsp.nspname, rel.relname;
 	
 	
+		-- TO DO: RULES
+	
+	
+		-- TO DO: INDEXES
+	
+	
+	
 		RAISE NOTICE 'Crear meta-tabla de vistes de TOTA la BASE DE DADES';
 		
 		EXECUTE format($sql$
@@ -122,6 +129,27 @@ BEGIN
 		WHERE NOT tg.tgisinternal;
 
 
+	
+	ELSIF v_action = 'DROP-ALL-VIEWS' THEN
+	
+		RAISE NOTICE 'v_action %', v_action;
+
+		FOR rec IN 
+			SELECT view_name FROM _bkp_views 
+			WHERE view_schema = v_target_schema ORDER BY exec_order ASC
+					
+		LOOP 
+		
+			RAISE NOTICE 'Drop view %', rec.view_name;
+			
+			 EXECUTE format(
+		        'DROP VIEW IF EXISTS %I.%I CASCADE',
+		        rec.view_schema,
+		        rec.view_name
+		    );
+			
+		END LOOP;
+			
 
 	ELSIF v_action = 'POST-UPDATE' THEN -- recrear DDLs y ejecutarlo desde un schema_source a un schema_target.
 	
@@ -163,10 +191,12 @@ BEGIN
 			-- todas las que son del esquema de ref + childs
 			FOR rec IN 		
 				
-				WITH mec AS (
+				WITH mec AS ( -- gw views
 					SELECT * FROM _bkp_views WHERE view_schema = v_ref_schema -- REF views
-				), moc AS (
-					SELECT * FROM _bkp_views WHERE view_schema = v_target_schema AND view_name NOT IN (SELECT id FROM sys_table) -- ext views
+				), moc AS ( -- ext views
+					SELECT * FROM _bkp_views WHERE view_schema = v_target_schema 
+					AND view_name IN (SELECT id FROM sys_table WHERE ("source" IS NULL OR "source" != 'core'))
+					AND view_name NOT IN (SELECT DISTINCT child_layer FROM cat_feature) 
 				), mic AS (
 				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
 				FROM moc WHERE view_name NOT IN (SELECT view_name FROM mec) AND (view_name NOT ILIKE 'v_%' OR view_name NOT ILIKE 've_%') 
