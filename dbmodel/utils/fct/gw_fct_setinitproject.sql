@@ -183,6 +183,7 @@ BEGIN
 
 	-- Force sector selector for 0 values
 	INSERT INTO selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
+	INSERT INTO selector_sector VALUES (-1, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 	-- Force muni selector for 0 values
 	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
