@@ -60,7 +60,8 @@ v_init_aux integer;
 v_mid text;
 v_end text;
 v_end_aux integer;
-v_query_dijkstra text;
+v_nodes integer[];
+v_query_pgrouting text;
 v_i json;
 v_hs float;
 v_vs float;
@@ -178,6 +179,14 @@ BEGIN
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'vnodeStatus') INTO v_vnode_status FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
+	DROP TABLE IF EXISTS temp_anl_arc;
+	DROP TABLE IF EXISTS temp_anl_node;
+	DROP TABLE IF EXISTS temp_ve_arc;
+	DROP TABLE IF EXISTS temp_vnode;
+	DROP TABLE IF EXISTS temp_link;
+	DROP TABLE IF EXISTS temp_link_x_arc;
+	DROP TABLE IF EXISTS temp_pgr_dijkstra;
+
 	CREATE TEMP TABLE temp_vnode (
 		id serial NOT NULL,
 		l1 integer,
@@ -225,17 +234,79 @@ BEGIN
 		exit_elev numeric(12,3),
 		CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id)
 	);
+
+	CREATE TEMP TABLE temp_pgr_dijkstra(
+		seq INTEGER NOT NULL,
+		path_id INTEGER NOT NULL,
+		path_seq INTEGER NOT NULL,
+		start_vid INTEGER NULL,
+		end_vid INTEGER NULL,
+		node INTEGER NULL,
+		edge INTEGER NULL,
+		"cost" FLOAT8 NULL,
+		agg_cost FLOAT8 NULL,
+		route_agg_cost FLOAT8 NULL,
+		CONSTRAINT temp_pgr_dijkstra_pkey PRIMARY KEY (seq)
+	);
+	CREATE INDEX IF NOT EXISTS temp_pgr_dijkstra_node_idx ON temp_pgr_dijkstra USING btree (node);
+	CREATE INDEX IF NOT EXISTS temp_pgr_dijkstra_edge_idx ON temp_pgr_dijkstra USING btree (edge);
+	
 	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_ve_arc (LIKE SCHEMA_NAME.ve_arc INCLUDING ALL);
 
-	insert into temp_ve_arc select * from ve_arc;
-
+	/*
+	IF v_project_type = 'UD' THEN
+		INSERT INTO temp_ve_arc (arc_id, node_1, node_2, sys_elev1, sys_elev2, sys_y1, sys_y2, state) 
+		SELECT arc_id, node_1, node_2, sys_elev1, sys_elev2, sys_y1, sys_y2, state
+		FROM ve_arc
+		WHERE state > 0 
+		AND node_1 IS NOT NULL
+		AND node_2 IS NOT NULL
+		;
+	ELSE
+		INSERT INTO temp_ve_arc (arc_id, node_1, node_2, sys_elev1, sys_elev2, sys_y1, sys_y2, state, state_type, gis_length) 
+		SELECT arc_id, node_1, node_2, elevation1, elevation2, depth1, depth2, state, state_type, gis_length
+		FROM ve_arc
+		WHERE state > 0 
+		AND node_1 IS NOT NULL
+		AND node_2 IS NOT NULL
+	END IF;
 
   	-- set value to v_linksdistance if null
 	IF v_linksdistance IS NULL OR v_linksdistance < 0 THEN
 		v_linksdistance = 0;
 	END IF;
+	*/
+
+	v_query_pgrouting := '
+		SELECT arc_id AS id, node_1 as source, node_2 as target, 1 as cost 
+		FROM ve_arc
+		WHERE state > 0
+		AND node_1 IS NOT NULL
+		AND node_2 IS NOT NULL;
+	';
+
+	EXECUTE format('
+		WITH 
+			connectedcomponents AS (
+				SELECT component, node FROM pgr_connectedcomponents($q$ %s $q$)
+			),
+			component AS (
+				SELECT c.component
+				FROM connectedcomponents c
+				WHERE c.node = %s
+				GROUP BY c.component
+			)
+		INSERT INTO temp_ve_arc 
+		SELECT v.* 
+		FROM connectedcomponents cc
+		JOIN ve_arc v ON cc.node = v.node_1 
+		WHERE EXISTS (SELECT 1 FROM component c WHERE c.component = cc.component) 
+		AND v.state > 0
+		AND v.node_1 IS NOT NULL
+		AND v.node_2 IS NOT NULL;
+	', v_query_pgrouting, v_init);
 
 	SELECT json_extract_path_text(value::json,'state_type') INTO v_nonpriority_statetype
 	FROM config_param_system WHERE parameter = 'om_profile_nonpriority_statetype';
@@ -243,7 +314,10 @@ BEGIN
 	IF v_nonpriority_statetype IS NULL or v_nonpriority_statetype='' THEN
 		 v_cost_string = 'gis_length::float ';
 	ELSE
-		v_cost_string = concat('case when state_type = ',v_nonpriority_statetype::integer,' THEN -1 ELSE gis_length::float END ');
+		v_cost_string := format(
+			'CASE WHEN state_type = %s THEN -1 ELSE gis_length::float END',
+			v_nonpriority_statetype::integer
+		);
 	END IF;
 
 	-- Check start-end nodes
@@ -310,67 +384,50 @@ BEGIN
 			v_y2 = 'case when node_1=node_id then depth2 else depth1 end';
 		END IF;
 
+		-- pgr_dijkstra
+		v_query_pgrouting := format(
+			'SELECT arc_id AS id,
+					node_1 AS source,
+					node_2 AS target,
+					(%s) AS cost
+			FROM temp_ve_arc',
+			v_cost_string
+		);
 
-		v_query_dijkstra := 'SELECT edge AS arc_id, node AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
-					'||v_cost_string||' as cost, '||v_cost_string||' as reverse_cost FROM ve_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||')';
+		v_nodes := ARRAY [v_init] || (SELECT array_agg(value::integer) FROM json_array_elements_text(v_mid::json)) || ARRAY [v_end::integer];
 
-		IF v_mid IS NOT NULL THEN
-			v_query_dijkstra = '';
-			v_init_aux = v_init;
-			FOR v_i IN SELECT * FROM json_array_elements(v_mid::json)
-			LOOP
-				-- Get starting point
-				v_end_aux = v_i;
-
-				-- DIJKSTRA v_init_aux -> v_end_aux
-				v_query_dijkstra = 'SELECT edge AS arc_id, node AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
-				FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||' as cost, 
-					'||v_cost_string||' as reverse_cost FROM ve_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
-
-				-- We need to insert values each dijkstra for the total_length to keep accumulating
-				-- insert edge values on temp_anl_arc table
-				EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
-					SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', 
-					gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-					||v_elev1||', '||v_elev2||', expl_id, the_geom FROM ve_arc b JOIN cat_arc ON arccat_id = id JOIN 
-					('|| v_query_dijkstra ||')a
-					USING (arc_id)
-					WHERE b.state > 0';
-
-				-- insert node values on temp_anl_node table
-				EXECUTE 'INSERT INTO temp_anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance, expl_id, the_geom)
-					SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length, expl_id, the_geom
-					FROM ve_node n JOIN cat_node ON nodecat_id = id JOIN
-					('|| v_query_dijkstra ||')a
-					USING (node_id)';
-
-				-- Get end point
-				v_init_aux = v_end_aux;
-			END LOOP;
-
-			-- Last DIJKSTRA
-			v_query_dijkstra = concat('SELECT edge AS arc_id, node AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
-			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
-			 '||v_cost_string||' as cost, '||v_cost_string||' as reverse_cost 
-			FROM ve_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
-
-		END IF;
+        INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
+		SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
+		FROM pgr_dijkstraVia (v_query_pgrouting, v_nodes, strict => TRUE);
 
 		-- insert edge values on temp_anl_arc table
-		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
-			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
-			'||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-			||v_elev1||', '||v_elev2||', expl_id, the_geom FROM ve_arc b JOIN cat_arc ON arccat_id = id JOIN 
-			('|| v_query_dijkstra ||')a
-			USING (arc_id)
-			WHERE b.state > 0';
+		EXECUTE '
+			WITH 
+				edges AS (
+					SELECT  edge, node AS node_id, LEAD (node) OVER () AS next_node_id, LEAD (route_agg_cost) OVER () AS total_length
+					FROM temp_pgr_dijkstra
+				)
+			INSERT INTO temp_anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
+			SELECT  222, arc_id, code, e.node_id, e.next_node_id, sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
+			'||v_fslope||', e.total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+			||v_elev1||', '||v_elev2||', expl_id, the_geom 
+			FROM edges e
+			JOIN temp_ve_arc b ON e.edge = b.arc_id
+			JOIN cat_arc ON arccat_id = id';
 
 		-- insert node values on temp_anl_node table
-		EXECUTE 'INSERT INTO temp_anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance, expl_id, the_geom)
-			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length, expl_id, the_geom
-			FROM ve_node n JOIN cat_node ON nodecat_id = id JOIN
-			('|| v_query_dijkstra ||')a
-			USING (node_id)';
+		EXECUTE '
+			WITH 
+				edges AS (
+					SELECT  edge, node as node_id, LEAD (route_agg_cost) OVER () AS total_length
+					FROM temp_pgr_dijkstra
+				)
+			INSERT INTO temp_anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance, expl_id, the_geom)
+			SELECT  222, e.node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, e.edge, 0, e.total_length, n.expl_id, n.the_geom
+			FROM edges e
+			JOIN ve_node n ON e.node_id = n.node_id
+			JOIN cat_node ON nodecat_id = id 
+			WHERE e.edge > 0';
 
 		-- looking for null values (in case of exists links graph will be disabled as below)
 		IF v_project_type = 'UD' THEN
@@ -407,7 +464,7 @@ BEGIN
 					    ve_arc.sys_elev1 + ve_arc.sys_y1 AS top_elev1,
 					    ve_arc.sys_elev2 + ve_arc.sys_y2 AS top_elev2
 					   FROM temp_ve_arc ve_arc, temp_link t
-					    WHERE st_dwithin(ve_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND ve_arc.state > 0 AND t.state > 0 AND exit_type ='ARC'
+					    WHERE st_dwithin(ve_arc.the_geom, t.the_geom_endpoint, 0.01::double precision)
 					    and arc_id::integer in (select arc_id::integer from temp_anl_arc) ) a)b
 					    ORDER BY arc_id, node_2 DESC;
 
@@ -425,11 +482,11 @@ BEGIN
 					END AS exit_topelev,
 				    (a.depth1 - a.locate * (a.depth1 - a.depth2))::numeric(12,3) AS exit_ymax,
 				    (a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3) AS exit_elev
-				   FROM ( SELECT t.link_id, t.vnode_id, v_arc.arc_id, t.feature_type, t.feature_id,  t.exit_topelev,  st_length(v_arc.the_geom) AS length,
-					    st_linelocatepoint(v_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate, v_arc.node_1, v_arc.node_2, v_arc.elevation1,
-					    v_arc.elevation2,  v_arc.depth1,  v_arc.depth2, v_arc.elevation1 - v_arc.depth1 AS elev1,  v_arc.elevation2 - v_arc.depth2 AS elev2
-					   FROM temp_ve_arc v_arc, temp_link t
-					  WHERE st_dwithin(v_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_arc.state > 0 AND t.state > 0
+				   FROM ( SELECT t.link_id, t.vnode_id, ve_arc.arc_id, t.feature_type, t.feature_id,  t.exit_topelev,  st_length(ve_arc.the_geom) AS length,
+					    st_linelocatepoint(ve_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate, ve_arc.node_1, ve_arc.node_2, ve_arc.elevation1,
+					    ve_arc.elevation2,  ve_arc.depth1,  ve_arc.depth2, ve_arc.elevation1 - ve_arc.depth1 AS elev1,  ve_arc.elevation2 - ve_arc.depth2 AS elev2
+					   FROM temp_ve_arc ve_arc, temp_link t
+					  WHERE st_dwithin(ve_arc.the_geom, t.the_geom_endpoint, 0.01::double precision)
  					   and arc_id in (select arc_id from temp_anl_arc)) a)b
 				  ORDER BY arc_id, node_2 DESC;
 			END IF;
@@ -446,7 +503,7 @@ BEGIN
 					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 					JOIN connec c ON c.connec_id::integer = temp_link_x_arc.feature_id::integer
 					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer
-				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
+				'||v_querytext1||'-- connec on same sense (pg_routing & arc)
 				UNION
 				-- connec on reverse sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
@@ -454,7 +511,7 @@ BEGIN
 					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 					JOIN connec c ON c.connec_id::integer = temp_link_x_arc.feature_id::integer
 					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer
-				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
+				'||v_querytext2||' -- connec on reverse sense (pg_routing & arc)
 				)a
 			)b 
 			ORDER BY b.arc_id, dist';
@@ -791,13 +848,6 @@ BEGIN
 	v_arc := COALESCE(v_arc, '{}');
 	v_node := COALESCE(v_node, '{}');
 	v_terrain := COALESCE(v_terrain, '{}');
-
-	DROP TABLE IF EXISTS temp_anl_arc;
-	DROP TABLE IF EXISTS temp_anl_node;
-	DROP TABLE IF EXISTS temp_ve_arc;
-	DROP TABLE IF EXISTS temp_vnode;
-	DROP TABLE IF EXISTS temp_link;
-	DROP TABLE IF EXISTS temp_link_x_arc;
 
 	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||

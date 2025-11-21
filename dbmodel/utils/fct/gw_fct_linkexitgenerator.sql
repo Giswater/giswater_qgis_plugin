@@ -48,7 +48,7 @@ BEGIN
 	INSERT INTO temp_link (link_id, vnode_id, vnode_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
 	sector_id, exit_topelev, exit_elev, the_geom, the_geom_endpoint, flag) 
 	SELECT link_id, link_id, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
-	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM ve_link where exit_type = 'ARC';
+	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM ve_link where exit_type = 'ARC' AND state > 0;
 
 	IF v_project_type = 'WS' THEN
 		UPDATE temp_link SET omzone_id=l.omzone_id, dma_id = l.dma_id, supplyzone_id = l.supplyzone_id FROM ve_link l WHERE temp_link.link_id = l.link_id AND l.exit_type = 'ARC';
