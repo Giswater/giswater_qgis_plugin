@@ -56,7 +56,7 @@ BEGIN
 
 	INSERT INTO temp_link (link_id, vnode_id, vnode_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
 	sector_id, exit_topelev, exit_elev, the_geom, the_geom_endpoint, flag) 
-	SELECT link_id, exit_id::integer, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
+	SELECT link_id, exit_id, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id,
 	sector_id, top_elev2, elevation2, the_geom, st_endpoint(the_geom), false FROM ve_link where exit_type IN ('NODE', 'CONNEC');
 
 	IF v_project_type = 'WS' THEN
@@ -68,21 +68,22 @@ BEGIN
 		INSERT INTO temp_vnode (l1,v1,l2,v2)
 		SELECT n1.link_id AS l1, n1.vnode_id AS v1, n2.link_id AS l2, n2.vnode_id AS v2 FROM temp_link n1, temp_link n2
 		WHERE st_dwithin(n1.the_geom_endpoint, n2.the_geom_endpoint, 0.02)
-		AND n1.link_id != n2.link_id AND n1.exit_id = n2.exit_id ORDER BY 1;
+		AND n1.link_id < n2.link_id AND n1.exit_id = n2.exit_id ORDER BY 1;
 	ELSIF p_input = 2 THEN -- only those links wich are on arcs present on temp_anl_arc and nodes present temp_anl_node
 		INSERT INTO temp_vnode (l1,v1,l2,v2)
 		SELECT n1.link_id AS l1, n1.vnode_id AS v1, n2.link_id AS l2, n2.vnode_id AS v2 FROM temp_link n1, temp_link n2
 		WHERE st_dwithin(n1.the_geom_endpoint, n2.the_geom_endpoint, 0.02)
-		AND n1.link_id != n2.link_id
+		AND n1.link_id < n2.link_id
 		AND n1.feature_id IN (SELECT arc_id FROM temp_anl_arc UNION SELECT node_id FROM temp_anl_node)
 		AND n1.exit_id = n2.exit_id ORDER BY 1;
 	END IF;
 
 	-- harmonize those links with same endpoint
-	FOR v_links IN SELECT * FROM temp_vnode order by 1
-	LOOP
-		UPDATE temp_link a SET vnode_id = t.vnode_id, flag=true FROM temp_link t WHERE a.link_id = v_links.l1 AND t.link_id = v_links.l2 AND a.flag IS false;
-	END LOOP;
+	UPDATE temp_link a 
+	SET vnode_id = t.vnode_id, flag=true
+	FROM temp_vnode v
+	JOIN temp_link t ON t.link_id = v.l2
+	WHERE a.link_id = v.l1; 
 
 	truncate temp_vnode;
 	INSERT INTO temp_vnode (l1,v1,l2,v2)
@@ -95,10 +96,10 @@ BEGIN
 
 
 	-- harmonize those links with same endpoint whith node
-	FOR v_links IN SELECT l1,v1, v2 FROM temp_vnode ORDER BY 1
-	LOOP
-		UPDATE temp_link a SET vnode_id = v_links.v2, vnode_type = 'NODE' WHERE link_id::integer = v_links.l1::integer;
-	END LOOP;
+	UPDATE temp_link a 
+	SET vnode_id = v.v2, vnode_type = 'NODE'
+	FROM temp_vnode v
+	WHERE a.link_id = v.l1;
 
 	--  Return
 	RETURN 0;
