@@ -179,14 +179,6 @@ BEGIN
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'vnodeStatus') INTO v_vnode_status FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
-	CREATE TEMP TABLE temp_vnode (
-		id serial NOT NULL,
-		l1 integer,
-		v1 integer,
-		l2 integer,
-		v2 integer,
-		CONSTRAINT temp_vnode_pkey PRIMARY KEY (id)
-	);
 
 	CREATE TEMP TABLE temp_link(
 		link_id integer NOT NULL,
@@ -843,7 +835,6 @@ BEGIN
 	DROP TABLE IF EXISTS temp_anl_arc;
 	DROP TABLE IF EXISTS temp_anl_node;
 	DROP TABLE IF EXISTS temp_ve_arc;
-	DROP TABLE IF EXISTS temp_vnode;
 	DROP TABLE IF EXISTS temp_link;
 	DROP TABLE IF EXISTS temp_link_x_arc;
 	DROP TABLE IF EXISTS temp_pgr_dijkstra;
