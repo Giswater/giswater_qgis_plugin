@@ -342,17 +342,16 @@ BEGIN
 
 			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1, total_length
 				FROM temp_link_x_arc 
-				JOIN anl_arc ON temp_link_x_arc.arc_id::integer = anl_arc.arc_id::integer
+				JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
-				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1::integer = temp_link_x_arc.node_1::integer';
+				WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer';
 
 			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2, total_length
 				FROM temp_link_x_arc 
-				JOIN anl_arc ON temp_link_x_arc.arc_id::integer = anl_arc.arc_id::integer
+				JOIN temp_anl_arc
+				ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
-				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1::integer = temp_link_x_arc.node_2::integer';
+				WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer';
 
 			v_elev1 = 'case when node_1=node_id then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node_id then sys_elev2 else sys_elev1 end';
