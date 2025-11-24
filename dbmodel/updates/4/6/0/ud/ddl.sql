@@ -69,7 +69,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"xyz_date", "dataType":"date", "isUtils":"False"}}$$);
 
 -- 12/11/2025
+-- Drop constraints to avoid errors
 ALTER TABLE IF EXISTS rtc_hydrometer_x_connec DROP CONSTRAINT IF EXISTS rtc_hydrometer_x_connec_hydrometer_id_fkey;
+
+-- Drop views to avoid errors
 DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
 DROP VIEW IF EXISTS v_ui_hydroval;
 DROP VIEW IF EXISTS ve_rtc_hydro_data_x_connec;
@@ -77,37 +80,63 @@ DROP VIEW IF EXISTS v_rtc_hydrometer;
 DROP VIEW IF EXISTS v_ui_hydrometer;
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
 
+-- Add link column to ext_rtc_hydrometer table
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
 
-INSERT INTO ext_rtc_hydrometer (id, link)
-SELECT hydrometer_id, link FROM rtc_hydrometer
-ON CONFLICT (id) DO UPDATE SET link = EXCLUDED.link;
+-- Create sequence and add constraint to ext_rtc_hydrometer table
+CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
+ALTER TABLE ext_rtc_hydrometer ADD CONSTRAINT ext_rtc_hydrometer_code_unique UNIQUE (code);
 
+-- Update code column to id column
+UPDATE ext_rtc_hydrometer SET code = id;
+
+-- Create constraints to autoupdate the hydrometer_id column
+ALTER TABLE ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rtc_hydrometer_x_connec ADD CONSTRAINT rtc_hydrometer_x_connec_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Update id column to the new sequence
+UPDATE ext_rtc_hydrometer SET id = concat(id, '_temp');
+UPDATE ext_rtc_hydrometer SET id = nextval('ext_rtc_hydrometer_hydrometer_id_seq');
+
+-- Insert new records into ext_rtc_hydrometer table
+INSERT INTO ext_rtc_hydrometer (id, code, link)
+SELECT nextval('ext_rtc_hydrometer_hydrometer_id_seq'), hydrometer_id, link FROM rtc_hydrometer
+ON CONFLICT (code) DO UPDATE SET link = EXCLUDED.link;
+
+-- Drop rtc_hydrometer table
 DROP TABLE IF EXISTS rtc_hydrometer;
 
+-- Insert new records into rtc_hydrometer_x_connec table
 ALTER TABLE rtc_hydrometer_x_connec
-    ADD CONSTRAINT rtc_hydrometer_x_connec_unique
-    UNIQUE (connec_id, hydrometer_id);
+ADD CONSTRAINT rtc_hydrometer_x_connec_unique
+UNIQUE (connec_id, hydrometer_id);
 
 INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
 SELECT id, connec.connec_id
 FROM ext_rtc_hydrometer
 	JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
-ON CONFLICT (hydrometer_id, connec_id) DO NOTHING;
+ON CONFLICT (hydrometer_id) DO UPDATE SET connec_id = EXCLUDED.connec_id;
 
+-- Drop connec_id column from ext_rtc_hydrometer table
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_hydrometer", "column":"connec_id", "isUtils":"False"}}$$);
 
+-- Rename id column to hydrometer_id
 ALTER TABLE IF EXISTS ext_rtc_hydrometer RENAME COLUMN id TO hydrometer_id;
 
+-- Drop constraints to avoid errors
+ALTER TABLE ext_rtc_hydrometer_x_data DROP CONSTRAINT IF EXISTS ext_rtc_hydrometer_x_data_hydrometer_id_fkey;
+ALTER TABLE rtc_hydrometer_x_connec DROP CONSTRAINT IF EXISTS rtc_hydrometer_x_connec_hydrometer_id_fkey;
+
+-- Alter columns to int4
 ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 ALTER TABLE ext_rtc_hydrometer_x_data ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 ALTER TABLE rtc_hydrometer_x_connec ALTER COLUMN hydrometer_id TYPE int4 USING hydrometer_id::integer;
 
-CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
-  
+-- Set default value to the new sequence
 ALTER TABLE ext_rtc_hydrometer ALTER COLUMN hydrometer_id SET DEFAULT nextval('ext_rtc_hydrometer_hydrometer_id_seq');
-ALTER TABLE ext_rtc_hydrometer ADD CONSTRAINT ext_rtc_hydrometer_code_unique UNIQUE (code);
 
+-- Create constraints to autoupdate the hydrometer_id column
+ALTER TABLE IF EXISTS ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Drop selector_hydrometer table
 DROP TABLE IF EXISTS selector_hydrometer;
-
-ALTER TABLE IF EXISTS ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE RESTRICT;
