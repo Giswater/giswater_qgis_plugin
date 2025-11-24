@@ -405,7 +405,7 @@ BEGIN
 				ELSE b.node_1
 				END AS node_2,
 				sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
-				'||v_fslope||', e.cost + e.route_agg_cost, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+				'||v_fslope||', e.route_agg_cost, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 				||v_elev1||', '||v_elev2||', expl_id, the_geom 
 			FROM temp_pgr_dijkstra e
 			JOIN temp_ve_arc b ON e.edge = b.arc_id
@@ -418,11 +418,11 @@ BEGIN
 				arc_id, arc_distance, total_distance, expl_id, the_geom)
 			SELECT  
 				222, e.node, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, 
-				e.edge, 0, e.cost + e.route_agg_cost, n.expl_id, n.the_geom
+				e.edge, 0, e.route_agg_cost, n.expl_id, n.the_geom
 			FROM temp_pgr_dijkstra e
 			JOIN ve_node n ON e.node = n.node_id
 			JOIN cat_node ON nodecat_id = id 
-			WHERE e.edge > 0';
+			WHERE e.edge <> -1';
 
 		-- looking for null values (in case of exists links graph will be disabled as below)
 		IF v_project_type = 'UD' THEN
