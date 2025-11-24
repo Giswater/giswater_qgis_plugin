@@ -353,12 +353,12 @@ BEGIN
 				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
 				WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer';
 
-			v_elev1 = 'case when node_1=node_id then sys_elev1 else sys_elev2 end';
-			v_elev2 = 'case when node_1=node_id then sys_elev2 else sys_elev1 end';
-			v_z1 = 'case when node_1=node_id then b.z1 else b.z2 end';
-			v_z2 = 'case when node_1=node_id then b.z2 else b.z1 end';
-			v_y1 = 'case when node_1=node_id then sys_y1 else sys_y2 end';
-			v_y2 = 'case when node_1=node_id then sys_y2 else sys_y1 end';
+			v_elev1 = 'case when node_1=node then sys_elev1 else sys_elev2 end';
+			v_elev2 = 'case when node_1=node then sys_elev2 else sys_elev1 end';
+			v_z1 = 'case when node_1=node then b.z1 else b.z2 end';
+			v_z2 = 'case when node_1=node then b.z2 else b.z1 end';
+			v_y1 = 'case when node_1=node then sys_y1 else sys_y2 end';
+			v_y2 = 'case when node_1=node then sys_y2 else sys_y1 end';
 
 		ELSIF v_project_type = 'WS' THEN
 
@@ -367,12 +367,12 @@ BEGIN
 			v_querytext = '';
 			v_querytext1 = '';
 			v_querytext2 = '';
-			v_elev1 = 'case when node_1=node_id then elevation1 else elevation2 end';
-			v_elev2 = 'case when node_1=node_id then elevation2 else elevation1 end';
+			v_elev1 = 'case when node_1=node then elevation1 else elevation2 end';
+			v_elev2 = 'case when node_1=node then elevation2 else elevation1 end';
 			v_z1 = '0::integer';
 			v_z2 = '0::integer';
-			v_y1 = 'case when node_1=node_id then depth1 else depth2 end';
-			v_y2 = 'case when node_1=node_id then depth2 else depth1 end';
+			v_y1 = 'case when node_1=node then depth1 else depth2 end';
+			v_y2 = 'case when node_1=node then depth2 else depth1 end';
 		END IF;
 
 		-- pgr_dijkstra
@@ -389,34 +389,38 @@ BEGIN
 
         INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
 		SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
-		FROM pgr_dijkstraVia (v_query_pgrouting, v_nodes, strict => TRUE);
+		FROM pgr_dijkstraVia (v_query_pgrouting, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
 
 		-- insert edge values on temp_anl_arc table
 		EXECUTE '
-			WITH 
-				edges AS (
-					SELECT  edge, node AS node_id, LEAD (node) OVER () AS next_node_id, LEAD (route_agg_cost) OVER () AS total_length
-					FROM temp_pgr_dijkstra
-				)
-			INSERT INTO temp_anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
-			SELECT  222, arc_id, code, e.node_id, e.next_node_id, sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
-			'||v_fslope||', e.total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-			||v_elev1||', '||v_elev2||', expl_id, the_geom 
-			FROM edges e
+			INSERT INTO temp_anl_arc (
+				fid, arc_id, code, node_1, 
+				node_2, 
+				sys_type, arccat_id, cat_geom1, length, 
+				slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom
+			)
+			SELECT  
+				222, arc_id, code, e.node, 
+				CASE WHEN e.node = b.node_1 THEN b.node_2
+				ELSE b.node_1
+				END AS node_2,
+				sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
+				'||v_fslope||', e.cost + e.route_agg_cost, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+				||v_elev1||', '||v_elev2||', expl_id, the_geom 
+			FROM temp_pgr_dijkstra e
 			JOIN temp_ve_arc b ON e.edge = b.arc_id
 			JOIN cat_arc ON arccat_id = id';
 
 		-- insert node values on temp_anl_node table
 		EXECUTE '
-			WITH 
-				edges AS (
-					SELECT  edge, node as node_id, LEAD (route_agg_cost) OVER () AS total_length
-					FROM temp_pgr_dijkstra
-				)
-			INSERT INTO temp_anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance, expl_id, the_geom)
-			SELECT  222, e.node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, e.edge, 0, e.total_length, n.expl_id, n.the_geom
-			FROM edges e
-			JOIN ve_node n ON e.node_id = n.node_id
+			INSERT INTO temp_anl_node (
+				fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, 
+				arc_id, arc_distance, total_distance, expl_id, the_geom)
+			SELECT  
+				222, e.node, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, 
+				e.edge, 0, e.cost + e.route_agg_cost, n.expl_id, n.the_geom
+			FROM temp_pgr_dijkstra e
+			JOIN ve_node n ON e.node = n.node_id
 			JOIN cat_node ON nodecat_id = id 
 			WHERE e.edge > 0';
 
