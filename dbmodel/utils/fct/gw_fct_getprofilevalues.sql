@@ -116,10 +116,8 @@ v_initpoint json;
 
 -- field variables to work with UD/WS
 v_fcatgeom text;
-v_ftopelev text;
 v_fymax text;
 v_fslope text;
-v_fsystopelev text;
 v_fsyselev text;
 v_fsysymax text;
 v_querytext text;
@@ -296,10 +294,10 @@ BEGIN
 	IF v_project_type = 'UD' THEN
 		IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
 			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) > 0
-			THEN
+		THEN
 			IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
 				WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_end::integer) = 0
-				THEN
+			THEN
 				v_level = 2;
 				v_message = v_nodemessage;
 			END IF;
@@ -314,10 +312,10 @@ BEGIN
 		-- define variables in function of the project type
 		IF v_project_type = 'UD' THEN
 			v_fcatgeom = 'cat_geom1';
-			v_ftopelev = 'top_elev';
 			v_fymax = 'ymax';
 			v_fslope = 'slope';
-			v_fsystopelev = 'sys_top_elev';	v_fsyselev = 'sys_elev'; v_fsysymax = 'sys_ymax';
+			v_fsyselev = 'sys_elev'; 
+			v_fsysymax = 'sys_ymax';
 			v_elev1 = 'case when node_1=node then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node then sys_elev2 else sys_elev1 end';
 			v_z1 = 'case when node_1=node then b.z1 else b.z2 end';
@@ -327,8 +325,16 @@ BEGIN
 
 		ELSIF v_project_type = 'WS' THEN
 
-			v_fcatgeom = 'cat_dnom::float*0.001'; v_ftopelev = 'top_elev'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
-			v_fsyselev = 'top_elev - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax;
+			v_fcatgeom = 'cat_dnom::float*0.001';  
+			v_fymax = 'depth'; 
+			v_fslope = '
+				case 
+				when node_1=node then 100*(elevation1 - depth1 - elevation2 + depth2)/gis_length 
+				else 100*(elevation2 - depth2 - elevation1 + depth1)/gis_length 
+				end
+			';
+			v_fsyselev = 'top_elev - depth'; 
+			v_fsysymax = 'depth';
 			v_elev1 = 'case when node_1=node then elevation1 else elevation2 end';
 			v_elev2 = 'case when node_1=node then elevation2 else elevation1 end';
 			v_z1 = '0::integer';
@@ -376,10 +382,10 @@ BEGIN
 		-- insert node values on temp_anl_node table
 		EXECUTE '
 			INSERT INTO temp_anl_node (
-				fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, 
+				fid, node_id, code, top_elev, '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, 
 				arc_id, arc_distance, total_distance, expl_id, the_geom)
 			SELECT  
-				222, e.node, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, 
+				222, e.node, n.code, sys_top_elev, '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, 
 				e.edge, 0, e.route_agg_cost, n.expl_id, n.the_geom
 			FROM temp_pgr_dijkstra e
 			JOIN ve_node n ON e.node = n.node_id
@@ -446,7 +452,7 @@ BEGIN
 
 
 			-- get vnode-connec values
-			EXECUTE 'INSERT INTO temp_anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
+			EXECUTE 'INSERT INTO temp_anl_node (fid, sys_type, node_id, code, top_elev, '||v_fymax||', elev, arc_id , arc_distance, total_distance)
 				SELECT 222, feature_type, feature_id, link_id, exit_topelev, exit_ymax, exit_elev, arc_id, dist, dist+total_length
 				FROM (SELECT DISTINCT ON (dist) * FROM 
 				(
@@ -470,7 +476,7 @@ BEGIN
 			-- get vnode-gully values
 			IF v_project_type = 'UD' THEN
 
-				EXECUTE 'INSERT INTO temp_anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
+				EXECUTE 'INSERT INTO temp_anl_node (fid, sys_type, node_id, code, top_elev, '||v_fymax||', elev, arc_id , arc_distance, total_distance)
 				SELECT 222, feature_type, feature_id, link_id, exit_topelev, exit_ymax, exit_elev, arc_id, dist, dist+total_length
 				FROM (SELECT DISTINCT ON (dist) * FROM 
 				(
@@ -515,7 +521,7 @@ BEGIN
 		EXECUTE 'UPDATE temp_anl_arc SET descript = a.descript, code=a.code 
 		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id::text = temp_anl_arc.arc_id';
 		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
-					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::text else code end as code, 
+					(SELECT node_id, top_elev as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::text else code end as code, 
 					total_distance FROM temp_anl_node)row)a
 					WHERE a.node_id::integer = temp_anl_node.node_id::integer';
 
@@ -537,7 +543,7 @@ BEGIN
 
 		-- update node table when node has not values and need to be interpolated
 		v_dist = (SELECT array_agg(total_distance) FROM (SELECT total_distance FROM temp_anl_node order by total_distance, arc_id)a);
-		EXECUTE '(SELECT array_agg(top_elev) FROM (SELECT '||v_ftopelev||' as top_elev FROM temp_anl_node order by total_distance, arc_id)a)' INTO v_telev;
+		EXECUTE '(SELECT array_agg(top_elev) FROM (SELECT top_elev as top_elev FROM temp_anl_node order by total_distance, arc_id)a)' INTO v_telev;
 		v_elev = (SELECT array_agg(elev) FROM (SELECT elev FROM temp_anl_node order by total_distance, arc_id)a);
 		v_nid = (SELECT array_agg(node_id) FROM (SELECT node_id FROM temp_anl_node order by total_distance, arc_id)a);
 
@@ -550,22 +556,22 @@ BEGIN
 			IF v_telev[i] IS NULL THEN
 
 				IF v_telev[i+1] IS NOT NULL AND v_telev[i-1] IS NOT NULL THEN
-					v_querytext = 'UPDATE temp_anl_node SET '||v_ftopelev||' = ('||v_telev[i-1]||'+ (('||v_dist[i]||'-'||v_dist[i-1]||')*('||v_telev[i+1]||'-'||v_telev[i-1]||')/('||v_dist[i+1]||'-'||v_dist[i-1]||')))::numeric(12,3) 
+					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-1]||'+ (('||v_dist[i]||'-'||v_dist[i-1]||')*('||v_telev[i+1]||'-'||v_telev[i-1]||')/('||v_dist[i+1]||'-'||v_dist[i-1]||')))::numeric(12,3) 
 						       WHERE node_id::integer = '||v_nid[i];
 					EXECUTE v_querytext;
 
 				ELSIF v_telev[i+1] IS NOT NULL AND v_telev[i-2] IS NOT NULL THEN
-					v_querytext = 'UPDATE temp_anl_node SET '||v_ftopelev||' = ('||v_telev[i-2]||'+ (('||v_dist[i]||'-'||v_dist[i-2]||')*('||v_telev[i+1]||'-'||v_telev[i-2]||')/('||v_dist[i+1]||'-'||v_dist[i-2]||')))::numeric(12,3) 
+					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-2]||'+ (('||v_dist[i]||'-'||v_dist[i-2]||')*('||v_telev[i+1]||'-'||v_telev[i-2]||')/('||v_dist[i+1]||'-'||v_dist[i-2]||')))::numeric(12,3) 
 						       WHERE node_id::integer = '||v_nid[i];
 					EXECUTE v_querytext;
 
 				ELSIF v_telev[i+2] IS NOT NULL AND v_telev[i-1] IS NOT NULL THEN
-					v_querytext = 'UPDATE temp_anl_node SET '||v_ftopelev||' = ('||v_telev[i-1]||'+ (('||v_dist[i]||'-'||v_dist[i-1]||')*('||v_telev[i+2]||'-'||v_telev[i-1]||')/('||v_dist[i+2]||'-'||v_dist[i-1]||')))::numeric(12,3) 
+					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-1]||'+ (('||v_dist[i]||'-'||v_dist[i-1]||')*('||v_telev[i+2]||'-'||v_telev[i-1]||')/('||v_dist[i+2]||'-'||v_dist[i-1]||')))::numeric(12,3) 
 						       WHERE node_id::integer = '||v_nid[i];
 					EXECUTE v_querytext;
 
 				ELSIF v_telev[i+2] IS NOT NULL AND v_telev[i-2] IS NOT NULL THEN
-					v_querytext = 'UPDATE temp_anl_node SET '||v_ftopelev||' = ('||v_telev[i-2]||'+ (('||v_dist[i]||'-'||v_dist[i-2]||')*('||v_telev[i+2]||'-'||v_telev[i-2]||')/('||v_dist[i+2]||'-'||v_dist[i-2]||')))::numeric(12,3) 
+					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-2]||'+ (('||v_dist[i]||'-'||v_dist[i-2]||')*('||v_telev[i+2]||'-'||v_telev[i-2]||')/('||v_dist[i+2]||'-'||v_dist[i-2]||')))::numeric(12,3) 
 						       WHERE node_id::integer = '||v_nid[i];
 					EXECUTE v_querytext;
 				ELSE
@@ -600,7 +606,7 @@ BEGIN
 		END LOOP;
 
 		-- update node table those ymax nulls
-		EXECUTE 'UPDATE temp_anl_node SET descript = gw_fct_json_object_set_key(descript::json, ''ymax'', ''None''::text),  '||v_fymax||' = '||v_ftopelev||' - elev 
+		EXECUTE 'UPDATE temp_anl_node SET descript = gw_fct_json_object_set_key(descript::json, ''ymax'', ''None''::text),  '||v_fymax||' = top_elev - elev 
 			WHERE '||v_fymax||' IS NULL';
 
 		-- update node catalog
@@ -615,7 +621,7 @@ BEGIN
 		UPDATE temp_anl_node SET result_id = null where result_id is not null ;
 
 		-- get profile dimensions
-		EXECUTE 'SELECT max('||v_ftopelev||')-min(elev) FROM temp_anl_node '
+		EXECUTE 'SELECT max(top_elev)-min(elev) FROM temp_anl_node '
 		INTO v_elevation;
 		v_distance = (SELECT max(total_distance) FROM temp_anl_node);
 
@@ -708,15 +714,14 @@ BEGIN
 		END IF;
 
 		UPDATE temp_anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs ;
-		EXECUTE 'UPDATE temp_anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
+		EXECUTE 'UPDATE temp_anl_node SET cat_geom1 = cat_geom1*'||v_vs||', top_elev = top_elev*'||v_vs||', elev = elev*'||v_vs||', '||
 		v_fymax||' = '||v_fymax||'*'||v_vs||' ';
 
 		-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
 		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM temp_anl_arc ORDER BY total_length) row;
 
-		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, '||
-				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM temp_anl_node WHERE nodecat_id != ''VNODE'' ORDER BY total_distance) row'
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM temp_anl_node WHERE nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
 				/*
 				SELECT node_id, nodecat_id as surface_type, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM temp_anl_node WHERE nodecat_id != 'VNODE' ORDER BY total_distance
@@ -726,7 +731,7 @@ BEGIN
 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
 				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM temp_anl_node ORDER by total_distance)
-				select row_number() over (order by a.total_distance) as rid, a.'||v_ftopelev||' as top_n1, b.'||v_ftopelev||' as top_n2, (b.'||v_ftopelev||'-a.'||v_ftopelev||')::numeric(12,3) as delta_y, 
+				select row_number() over (order by a.total_distance) as rid, a.top_elev as top_n1, b.top_elev as top_n2, (b.top_elev-a.top_elev)::numeric(12,3) as delta_y, 
 				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
 				left join querytext b ON a.rid = b.rid-1 
 				left join (select * from temp_anl_arc) c ON a.arc_id::text = c.arc_id::text) row'
