@@ -15436,21 +15436,6 @@
 		</message>
 	</context>
 	<context>
-		<name>visit</name>
-		<message>
-			<source>title</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Data:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
 		<name>workcat_manager</name>
 		<message>
 			<source>title</source>
@@ -20148,7 +20133,7 @@
 		</message>
 		<message>
 			<source>label</source>
-			<translation>Tipus de característica:</translation>
+			<translation>Tipus d'objecte:</translation>
 		</message>
 		<message>
 			<source>tooltip_label</source>
@@ -20188,7 +20173,7 @@
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Tipus de característica:</translation>
+			<translation>Tipus d'objecte:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -22919,7 +22904,7 @@
 		</message>
 		<message>
 			<source>label</source>
-			<translation>Tipus de característica:</translation>
+			<translation>Tipus d'objecte</translation>
 		</message>
 		<message>
 			<source>tooltip_label</source>
