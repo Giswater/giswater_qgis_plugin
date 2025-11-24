@@ -559,10 +559,10 @@ BEGIN
 
 		-- update descript and code field
 		EXECUTE 'UPDATE temp_anl_arc SET descript = a.descript, code=a.code 
-		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id::text = temp_anl_arc.arc_id AND fid=222';
+		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id::text = temp_anl_arc.arc_id';
 		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
 					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::text else code end as code, 
-					total_distance FROM temp_anl_node WHERE fid=222 AND cur_user = current_user)row)a
+					total_distance FROM temp_anl_node)row)a
 					WHERE a.node_id::integer = temp_anl_node.node_id::integer';
 
 		EXECUTE 'UPDATE temp_anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
@@ -639,15 +639,15 @@ BEGIN
 				END IF;
 
 				UPDATE temp_anl_node SET  result_id = 'interpolated', descript = gw_fct_json_object_set_key(descript::json, 'elev', 'None'::text)
-				WHERE fid=222 AND cur_user = current_user AND node_id::integer = v_nid[i];
+				WHERE node_id::integer = v_nid[i];
 			END IF;
 
-			UPDATE 	temp_anl_node SET nodecat_id = 'VNODE' WHERE fid=222 AND cur_user = current_user AND node_id::integer = v_nid[i] AND nodecat_id IS NULL;
+			UPDATE 	temp_anl_node SET nodecat_id = 'VNODE' WHERE node_id::integer = v_nid[i] AND nodecat_id IS NULL;
 		END LOOP;
 
 		-- update node table those ymax nulls
 		EXECUTE 'UPDATE temp_anl_node SET descript = gw_fct_json_object_set_key(descript::json, ''ymax'', ''None''::text),  '||v_fymax||' = '||v_ftopelev||' - elev 
-			WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
+			WHERE '||v_fymax||' IS NULL';
 
 		-- update node catalog
 		UPDATE temp_anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n JOIN cat_feature cf ON cf.id = n.id WHERE cf.feature_class = sys_type
@@ -765,9 +765,9 @@ BEGIN
 				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM temp_anl_node WHERE nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
 				/*
-				SELECT node_id, nodecat_id as surface_type, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM temp_anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
-				select * from temp_anl_arc WHERE fid=222 AND cur_user = current_user order by total_length
-				select * from temp_anl_node WHERE fid=222 AND cur_user = current_user ORDER BY total_distance
+				SELECT node_id, nodecat_id as surface_type, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM temp_anl_node WHERE nodecat_id != 'VNODE' ORDER BY total_distance
+				select * from temp_anl_arc ORDER by total_length
+				select * from temp_anl_node ORDER BY total_distance
 				*/
 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
@@ -775,14 +775,14 @@ BEGIN
 				select row_number() over (order by a.total_distance) as rid, a.'||v_ftopelev||' as top_n1, b.'||v_ftopelev||' as top_n2, (b.'||v_ftopelev||'-a.'||v_ftopelev||')::numeric(12,3) as delta_y, 
 				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
 				left join querytext b ON a.rid = b.rid-1 
-				left join (select * from temp_anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id::text = c.arc_id::text) row'
+				left join (select * from temp_anl_arc) c ON a.arc_id::text = c.arc_id::text) row'
 				INTO v_terrain;
 				/*
-				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM temp_anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)
+				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM temp_anl_node ORDER by total_distance)
 				select row_number() over (order by a.total_distance) as rid, a.top_elev as top_n1, b.top_elev as top_n2, (b.top_elev-a.top_elev)::numeric(12,3) as delta_y,
 				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
 				left join querytext b ON a.rid = b.rid-1
-				left join (select * from temp_anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id = c.arc_id
+				left join (select * from temp_anl_arc ) c ON a.arc_id = c.arc_id
 				*/
 
 	END IF;
@@ -799,7 +799,7 @@ BEGIN
 	    'properties', to_jsonb(row) - 'the_geom'
 	  	) AS feature
 	  	FROM (SELECT arc_id, arccat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-	  	FROM  temp_anl_arc WHERE fid=222 AND cur_user = current_user) row) features;
+	  	FROM  temp_anl_arc) row) features;
 
 
 		v_result_line = v_result;
@@ -815,7 +815,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT node_id, nodecat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-  	FROM  temp_anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id!='VNODE') row) features;
+  	FROM  temp_anl_node WHERE nodecat_id!='VNODE') row) features;
 
 	v_result_point = v_result;
 
