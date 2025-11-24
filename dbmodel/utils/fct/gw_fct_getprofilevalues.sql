@@ -247,30 +247,6 @@ BEGIN
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_ve_arc (LIKE SCHEMA_NAME.ve_arc INCLUDING ALL);
 
-	/*
-	IF v_project_type = 'UD' THEN
-		INSERT INTO temp_ve_arc (arc_id, node_1, node_2, sys_elev1, sys_elev2, sys_y1, sys_y2, state) 
-		SELECT arc_id, node_1, node_2, sys_elev1, sys_elev2, sys_y1, sys_y2, state
-		FROM ve_arc
-		WHERE state > 0 
-		AND node_1 IS NOT NULL
-		AND node_2 IS NOT NULL
-		;
-	ELSE
-		INSERT INTO temp_ve_arc (arc_id, node_1, node_2, sys_elev1, sys_elev2, sys_y1, sys_y2, state, state_type, gis_length) 
-		SELECT arc_id, node_1, node_2, elevation1, elevation2, depth1, depth2, state, state_type, gis_length
-		FROM ve_arc
-		WHERE state > 0 
-		AND node_1 IS NOT NULL
-		AND node_2 IS NOT NULL
-	END IF;
-
-  	-- set value to v_linksdistance if null
-	IF v_linksdistance IS NULL OR v_linksdistance < 0 THEN
-		v_linksdistance = 0;
-	END IF;
-	*/
-
 	v_query_pgrouting := '
 		SELECT arc_id AS id, node_1 as source, node_2 as target, 1 as cost 
 		FROM ve_arc
@@ -299,6 +275,11 @@ BEGIN
 		AND v.node_1 IS NOT NULL
 		AND v.node_2 IS NOT NULL;
 	', v_query_pgrouting, v_init);
+
+	-- set value to v_linksdistance if null
+	IF v_linksdistance IS NULL OR v_linksdistance < 0 THEN
+		v_linksdistance = 0;
+	END IF;
 
 	SELECT json_extract_path_text(value::json,'state_type') INTO v_nonpriority_statetype
 	FROM config_param_system WHERE parameter = 'om_profile_nonpriority_statetype';
@@ -804,20 +785,20 @@ BEGIN
 
 		v_result_line = v_result;
 
-	SELECT jsonb_build_object(
-	    'type', 'FeatureCollection',
-	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-	) INTO v_result
-	FROM (
-  	SELECT jsonb_build_object(
-		'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
-  	) AS feature
-  	FROM (SELECT node_id, nodecat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-  	FROM  temp_anl_node WHERE nodecat_id!='VNODE') row) features;
+		SELECT jsonb_build_object(
+			'type', 'FeatureCollection',
+			'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+			'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT node_id, nodecat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
+		FROM  temp_anl_node WHERE nodecat_id!='VNODE') row) features;
 
-	v_result_point = v_result;
+		v_result_point = v_result;
 
 		v_result_polygon = '{}';
 
