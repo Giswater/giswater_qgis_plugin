@@ -132,8 +132,6 @@ v_y2 text;
 v_papersize integer;
 v_count integer;
 v_nodemessage text;
-v_querytext1 text;
-v_querytext2 text;
 v_count_int integer;
 object_rec record;
 v_vnode_status boolean;
@@ -320,20 +318,6 @@ BEGIN
 			v_fymax = 'ymax';
 			v_fslope = 'slope';
 			v_fsystopelev = 'sys_top_elev';	v_fsyselev = 'sys_elev'; v_fsysymax = 'sys_ymax';
-
-			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1, total_length
-				FROM temp_link_x_arc 
-				JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
-				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
-				WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer';
-
-			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2, total_length
-				FROM temp_link_x_arc 
-				JOIN temp_anl_arc
-				ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
-				JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
-				WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer';
-
 			v_elev1 = 'case when node_1=node then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node then sys_elev2 else sys_elev1 end';
 			v_z1 = 'case when node_1=node then b.z1 else b.z2 end';
@@ -345,9 +329,6 @@ BEGIN
 
 			v_fcatgeom = 'cat_dnom::float*0.001'; v_ftopelev = 'top_elev'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
 			v_fsyselev = 'top_elev - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax;
-			v_querytext = '';
-			v_querytext1 = '';
-			v_querytext2 = '';
 			v_elev1 = 'case when node_1=node then elevation1 else elevation2 end';
 			v_elev2 = 'case when node_1=node then elevation2 else elevation1 end';
 			v_z1 = '0::integer';
@@ -419,8 +400,6 @@ BEGIN
 
 			-- generate arc_x_link values
 			IF v_project_type = 'UD' THEN
-
-				DELETE FROM temp_link_x_arc;
 				INSERT INTO temp_link_x_arc
 				select * FROM (
 				 SELECT DISTINCT ON (link_id) a.link_id, a.vnode_id, a.arc_id, a.feature_type,a.feature_id, a.node_1,  a.node_2,
@@ -445,8 +424,6 @@ BEGIN
 					    ORDER BY arc_id, node_2 DESC;
 
 			ELSIF v_project_type = 'WS' THEN
-
-				DELETE FROM temp_link_x_arc;
 				INSERT INTO temp_link_x_arc
 				select * FROM (
 				SELECT DISTINCT ON (link_id) a.link_id, a.vnode_id,  a.arc_id, a.feature_type, a.feature_id, a.node_1, a.node_2,
@@ -479,7 +456,6 @@ BEGIN
 					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 					JOIN connec c ON c.connec_id::integer = temp_link_x_arc.feature_id::integer
 					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer
-				'||v_querytext1||'-- connec on same sense (pg_routing & arc)
 				UNION
 				-- connec on reverse sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
@@ -487,7 +463,6 @@ BEGIN
 					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 					JOIN connec c ON c.connec_id::integer = temp_link_x_arc.feature_id::integer
 					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer
-				'||v_querytext2||' -- connec on reverse sense (pg_routing & arc)
 				)a
 			)b 
 			ORDER BY b.arc_id, dist';
@@ -505,7 +480,6 @@ BEGIN
 					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 					JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
 					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_1::integer
-				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
 				UNION
 				-- gully on reverse sense (pg_routing & arc)
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, gully_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
@@ -513,7 +487,6 @@ BEGIN
 					JOIN temp_anl_arc ON temp_link_x_arc.arc_id::integer = temp_anl_arc.arc_id::integer
 					JOIN gully c ON c.gully_id::integer = temp_link_x_arc.feature_id::integer
 					WHERE temp_anl_arc.node_1::integer = temp_link_x_arc.node_2::integer
-				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
 				)a
 				)b 
 				ORDER BY b.arc_id, dist';
