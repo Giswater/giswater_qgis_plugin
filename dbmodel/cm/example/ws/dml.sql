@@ -77,13 +77,14 @@ BEGIN
         RETURN;
     END IF;
 
-    INSERT INTO om_visitclass (idval, pschema_id, feature_type, descript, active)
-    VALUES ('WS NODE VISIT', 'PARENT_SCHEMA', v_feature_id, 'Sample node visit class', TRUE)
-    ON CONFLICT (idval) DO NOTHING
-    RETURNING id INTO v_visitclass_id;
+    SELECT id INTO v_visitclass_id
+    FROM om_visitclass
+    WHERE idval = 'WS NODE VISIT';
 
     IF v_visitclass_id IS NULL THEN
-        SELECT id INTO v_visitclass_id FROM om_visitclass WHERE idval = 'WS NODE VISIT';
+        INSERT INTO om_visitclass (idval, pschema_id, feature_type, descript, active)
+        VALUES ('WS NODE VISIT', 'PARENT_SCHEMA', v_feature_id, 'Sample node visit class', TRUE)
+        RETURNING id INTO v_visitclass_id;
     END IF;
 
     INSERT INTO om_campaign_visit (campaign_id, visitclass_id)

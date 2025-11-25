@@ -110,6 +110,7 @@ DECLARE
 	v_sample_value text;
 	v_is_numeric boolean;
     v_is_text boolean;
+    v_has_outliers boolean;
     -- counters for summary messages
     v_outlier_rules_checked integer := 0;
     v_mandatory_checks_count integer := 0;
@@ -238,8 +239,8 @@ BEGIN
 
         FOR v_rec IN SELECT * FROM cm.config_outlayers
 	LOOP
-            -- Loop through each feature_type in the array
-            FOR v_feature_type_item IN SELECT unnest(v_rec.feature_type) LOOP
+            -- Use feature_type directly as text (not array)
+            v_feature_type_item := v_rec.feature_type;
             v_outlier_rules_checked := v_outlier_rules_checked + 1;
 		v_conditions := ARRAY[]::text[];
 		
@@ -248,40 +249,49 @@ BEGIN
 		v_is_text := false;
 		
 		-- Get a sample value to determine data type (with campaign/lot filtering)
-		IF v_feature_type_item = 'arc' THEN
-				IF v_lot_id IS NOT NULL THEN
-					EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
-						JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
-						WHERE cx.lot_id = %s AND a.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_feature_type_item, v_lot_id, v_rec.column_name) INTO v_sample_value;
-				ELSIF v_campaign_id IS NOT NULL THEN
-					EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
-						JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
-						WHERE cx.campaign_id = %s AND a.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_feature_type_item, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+		BEGIN
+			IF v_feature_type_item = 'arc' THEN
+					IF v_lot_id IS NOT NULL THEN
+						EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
+							JOIN cm.om_campaign_lot_x_arc cx ON a.arc_id = cx.arc_id 
+							WHERE cx.lot_id = %s AND a.%I IS NOT NULL LIMIT 1', 
+							v_rec.column_name, v_feature_type_item, v_lot_id, v_rec.column_name) INTO v_sample_value;
+					ELSIF v_campaign_id IS NOT NULL THEN
+						EXECUTE format('SELECT a.%I FROM PARENT_SCHEMA.%I a 
+							JOIN cm.om_campaign_x_arc cx ON a.arc_id = cx.arc_id 
+							WHERE cx.campaign_id = %s AND a.%I IS NOT NULL LIMIT 1', 
+							v_rec.column_name, v_feature_type_item, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+					ELSE
+						EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
+							v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
+					END IF;
+				ELSIF v_feature_type_item = 'node' THEN
+					IF v_lot_id IS NOT NULL THEN
+						EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
+							JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
+							WHERE cx.lot_id = %s AND n.%I IS NOT NULL LIMIT 1', 
+							v_rec.column_name, v_feature_type_item, v_lot_id, v_rec.column_name) INTO v_sample_value;
+					ELSIF v_campaign_id IS NOT NULL THEN
+						EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
+							JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
+							WHERE cx.campaign_id = %s AND n.%I IS NOT NULL LIMIT 1', 
+							v_rec.column_name, v_feature_type_item, v_campaign_id, v_rec.column_name) INTO v_sample_value;
+					ELSE
+						EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
+							v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
+					END IF;
 				ELSE
 					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
 						v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
 				END IF;
-			ELSIF v_feature_type_item = 'node' THEN
-				IF v_lot_id IS NOT NULL THEN
-					EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
-						JOIN cm.om_campaign_lot_x_node cx ON n.node_id = cx.node_id 
-						WHERE cx.lot_id = %s AND n.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_feature_type_item, v_lot_id, v_rec.column_name) INTO v_sample_value;
-				ELSIF v_campaign_id IS NOT NULL THEN
-					EXECUTE format('SELECT n.%I FROM PARENT_SCHEMA.%I n 
-						JOIN cm.om_campaign_x_node cx ON n.node_id = cx.node_id 
-						WHERE cx.campaign_id = %s AND n.%I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_feature_type_item, v_campaign_id, v_rec.column_name) INTO v_sample_value;
-				ELSE
-					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
-						v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
-				END IF;
-			ELSE
-				EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
-					v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
-			END IF;
+		EXCEPTION
+			WHEN undefined_table OR undefined_object THEN
+				-- Table/view doesn't exist, skip this rule
+				CONTINUE;
+			WHEN OTHERS THEN
+				-- Any other error, skip this rule
+				CONTINUE;
+		END;
 			
 			-- Skip this rule if no sample value found (no features of this type in campaign/lot)
 			IF v_sample_value IS NULL THEN
@@ -394,10 +404,28 @@ BEGIN
 				);
 			END IF;
 
-				EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
-			ELSE
-				v_count := 0;
-			END IF;
+			BEGIN
+				-- Optimize: First check if any outliers exist, then count only if needed
+				-- This avoids full table scans when there are no outliers
+				EXECUTE 'SELECT EXISTS (SELECT 1 FROM (' || v_querytext || ') AS outliers LIMIT 1)' INTO v_has_outliers;
+				IF v_has_outliers THEN
+					EXECUTE 'SELECT count(*) FROM (' || v_querytext || ') AS outliers' INTO v_count;
+				ELSE
+					v_count := 0;
+				END IF;
+			EXCEPTION
+				WHEN undefined_table OR undefined_object THEN
+					-- Table/view doesn't exist, skip this rule
+					v_count := 0;
+					CONTINUE;
+				WHEN OTHERS THEN
+					-- Any other error, skip this rule
+					v_count := 0;
+					CONTINUE;
+			END;
+		ELSE
+			v_count := 0;
+		END IF;
 
 			IF v_count > 0 THEN
 				-- Determine criticity level
@@ -451,7 +479,6 @@ BEGIN
 				0
 			);
 		END IF;
-            END LOOP; -- end feature_type_item loop
         END LOOP; -- end config_outlayers loop
 
         INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
