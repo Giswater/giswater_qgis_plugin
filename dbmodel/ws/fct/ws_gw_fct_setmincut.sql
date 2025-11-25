@@ -601,7 +601,17 @@ BEGIN
 				'text', 'Mincut cancelled.',
 				'level', 1
 			);
+			
 		END IF;
+		-- manage null values
+		v_message = COALESCE(v_message, '{}');
+
+		v_response = json_build_object(
+			'status', 'Accepted',
+			'message', v_message,
+			'version', v_version
+		);
+		RETURN v_response;
 	ELSIF v_action = 'mincutDelete' THEN
 		v_message = json_build_object(
 			'text', 'Mincut to delete not found.',
