@@ -202,7 +202,7 @@
 		</message>
 		<message>
 			<source>GwAmPriorityButton</source>
-			<translation>Cálculo de prioridades y selección</translation>
+			<translation>Cálculo de prioridad por selección</translation>
 		</message>
 		<message>
 			<source>GwArcAddButton</source>
@@ -15437,21 +15437,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 	</context>
 	<context>
-		<name>visit</name>
-		<message>
-			<source>title</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Fecha:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
 		<name>workcat_manager</name>
 		<message>
 			<source>title</source>
@@ -20149,7 +20134,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>label</source>
-			<translation>Tipo de característica:</translation>
+			<translation>Tipo de objeto:</translation>
 		</message>
 		<message>
 			<source>tooltip_label</source>
@@ -20189,7 +20174,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Tipo de característica:</translation>
+			<translation>Tipo de objeto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -22920,7 +22905,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>label</source>
-			<translation>Feature type:</translation>
+			<translation>Tipo de objeto:</translation>
 		</message>
 		<message>
 			<source>tooltip_label</source>
