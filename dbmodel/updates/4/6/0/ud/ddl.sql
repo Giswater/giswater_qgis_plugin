@@ -11,36 +11,37 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"omunit_id", "dataType":"int4", "isUtils":"False"}}$$);
 ALTER TABLE link ALTER COLUMN omunit_id SET DEFAULT 0;
 
-
-CREATE TABLE IF NOT EXISTS macroomunit (
+DROP TABLE IF EXISTS macroomunit;
+CREATE TABLE macroomunit (
     macroomunit_id serial4 NOT NULL,
-    node_1 int4 NOT NULL,
-    node_2 int4 NOT NULL,
-    is_way_in bool NOT NULL,
-    is_way_out bool NOT NULL,
-    the_geom geometry(linestring, SRID_VALUE) NOT NULL,
-    expl_id _int4 NOT NULL,
-    muni_id _int4 NOT NULL,
-    sector_id _int4 NOT NULL,
-    --mapzones_id int4 NOT NULL,
+    node_1 int4,
+    node_2 int4,
+    is_way_in bool,
+    is_way_out bool,
+    the_geom geometry(linestring, SRID_VALUE),
+    expl_id _int4,
+    muni_id _int4,
+    sector_id _int4,
+    catchment_node integer,
+    order_number INTEGER DEFAULT 0,
     CONSTRAINT macroomunit_pkey PRIMARY KEY (macroomunit_id),
     CONSTRAINT macroomunit_node_1_fkey FOREIGN KEY (node_1) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT macroomunit_node_2_fkey FOREIGN KEY (node_2) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS omunit (
+DROP TABLE IF EXISTS omunit;
+CREATE TABLE omunit (
     omunit_id serial4 NOT NULL,
-    node_1 int4 NOT NULL,
-    node_2 int4 NOT NULL,
-    is_way_in bool NOT NULL,
-    is_way_out bool NOT NULL,
-    macroomunit_id int4 NOT NULL,
-    order_id int4 NOT NULL,
-    the_geom geometry(linestring, SRID_VALUE) NOT NULL,
-    expl_id _int4 NOT NULL,
-    muni_id _int4 NOT NULL,
-    sector_id _int4 NOT NULL,
-    --mapzones_id int4 NOT NULL,
+    node_1 int4,
+    node_2 int4,
+    is_way_in bool,
+    is_way_out bool,
+    macroomunit_id integer DEFAULT 0,
+    order_number integer DEFAULT 0,
+    the_geom geometry(linestring, SRID_VALUE),
+    expl_id _int4,
+    muni_id _int4,
+    sector_id _int4,
     CONSTRAINT omunit_pkey PRIMARY KEY (omunit_id),
     CONSTRAINT omunit_node_1_fkey FOREIGN KEY (node_1) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT omunit_node_2_fkey FOREIGN KEY (node_2) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,

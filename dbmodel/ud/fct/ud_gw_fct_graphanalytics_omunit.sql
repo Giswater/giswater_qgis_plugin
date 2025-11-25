@@ -145,7 +145,7 @@ BEGIN
     -- END IF;
 
     --------------------------------------------------
-    -- SECTION: Create omunits and macrounits
+    -- SECTION: Create omunits and macroomunits
     --------------------------------------------------
 
     -- fill table temp_pgr_linegraph using pgr_lineGraph for oriented graphs 
@@ -186,9 +186,9 @@ BEGIN
     SET graph_delimiter = 'CATCHMENT'
     WHERE NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.seq = l.seq);
 
-    -- MACROUNITS
-    -- choose the best candidate among SOURCE arcs; the ones that are not the best candidate will have graph_delimiter = 'MACROUNIT'; 
-    -- every macrounit will be a chain, the relation between arcs-in and arcs-out of a node is 1:1
+    -- MACROOMUNITS
+    -- choose the best candidate among SOURCE arcs; the ones that are not the best candidate will have graph_delimiter = 'MACROOMUNIT'; 
+    -- every macroomunit will be a chain, the relation between arcs-in and arcs-out of a node is 1:1
     -- TODO improve the condition, add section and elevation - if it's needed
     WITH 
         pair_arcs AS (
@@ -212,7 +212,7 @@ BEGIN
             ORDER BY target, initoverflowpath, azimuth_difference, source
         )
     UPDATE temp_pgr_linegraph l
-    SET graph_delimiter = 'MACROUNIT'
+    SET graph_delimiter = 'MACROOMUNIT'
     WHERE l.graph_delimiter = 'NONE'
     AND NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.seq = l.seq);
 
@@ -229,7 +229,7 @@ BEGIN
             AND a.pgr_node_2 = n.pgr_node_id   
         );
 
-    -- generate omunit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'OMUNIT', 'MACROUNIT' AND 'CATCHMENT'
+    -- generate omunit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'OMUNIT', 'MACROOMUNIT' AND 'CATCHMENT'
     TRUNCATE temp_pgr_connectedcomponents;
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node 
@@ -237,7 +237,7 @@ BEGIN
         'SELECT seq AS id, source, target, cost 
         FROM temp_pgr_linegraph
         WHERE graph_delimiter <> ''OMUNIT'' 
-            AND graph_delimiter <> ''MACROUNIT'' 
+            AND graph_delimiter <> ''MACROOMUNIT'' 
             AND graph_delimiter <> ''CATCHMENT'' 
         '
     );
@@ -262,7 +262,7 @@ BEGIN
                 SELECT seq AS id, source, target, cost, reverse_cost 
                 FROM temp_pgr_linegraph 
                 WHERE graph_delimiter <> ''OMUNIT'' 
-                    AND graph_delimiter <> ''MACROUNIT'' 
+                    AND graph_delimiter <> ''MACROOMUNIT'' 
                     AND graph_delimiter <> ''CATCHMENT'' 
             ')
         )
@@ -279,7 +279,7 @@ BEGIN
                 SELECT seq AS id, source, target, cost, reverse_cost 
                 FROM temp_pgr_linegraph 
                 WHERE graph_delimiter <> ''OMUNIT'' 
-                    AND graph_delimiter <> ''MACROUNIT'' 
+                    AND graph_delimiter <> ''MACROOMUNIT'' 
                     AND graph_delimiter <> ''CATCHMENT'' 
             ')
         )
@@ -300,43 +300,43 @@ BEGIN
     SET mapzone_id = arc_id
     WHERE mapzone_id = 0;
 
-    -- MACROUNITS
+    -- MACROOMUNITS
     -- =======================
-    -- generate macrounit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'MACROUNIT' and 'CATCHMENT'
+    -- generate macroomunit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'MACROOMUNIT' and 'CATCHMENT'
     TRUNCATE temp_pgr_connectedcomponents;
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node 
     FROM pgr_connectedcomponents(
         'SELECT seq AS id, source, target, cost 
         FROM temp_pgr_linegraph
-        WHERE graph_delimiter <> ''MACROUNIT''
+        WHERE graph_delimiter <> ''MACROOMUNIT''
         AND graph_delimiter <> ''CATCHMENT'' 
         '
     );
 
-    -- Update the macrounit_id  for arcs
+    -- Update the macroomunit_id  for arcs
     UPDATE temp_pgr_arc a
     SET
         macromapzone_id = c.component
     FROM temp_pgr_connectedcomponents c
     WHERE a.arc_id = c.node;
 
-    -- update macrounit_id for the isolated arcs
+    -- update macroomunit_id for the isolated arcs
     UPDATE temp_pgr_arc a
     SET macromapzone_id = arc_id
     WHERE macromapzone_id = 0;
 
-     -- Update the macrounit_id for omunit_id
+     -- Update the macroomunit_id for omunit_id
     UPDATE temp_pgr_omunit o
     SET
-        macrounit_id = a.macrounit_id
+        macroomunit_id = a.macroomunit_id
     FROM 
-        (SELECT DISTINCT mapzone_id as omunit_id, macromapzone_id AS macrounit_id
+        (SELECT DISTINCT mapzone_id as omunit_id, macromapzone_id AS macroomunit_id
         FROM  temp_pgr_arc
         ) a
     WHERE o.omunit_id = a.omunit_id;
 
-    INSERT INTO temp_pgr_macrounit (macrounit_id)
+    INSERT INTO temp_pgr_macroomunit (macroomunit_id)
     SELECT DISTINCT macromapzone_id
     FROM temp_pgr_arc;
 
@@ -372,7 +372,7 @@ BEGIN
         v_root_vids, directed => true)
     );
 
-    -- order macrounits and update their catchment_node
+    -- order macroomunits and update their catchment_node
     WITH 
 	root_vids AS (
 		SELECT DISTINCT start_vid 
@@ -383,41 +383,41 @@ BEGIN
 		FROM root_vids v
 		JOIN temp_pgr_arc a ON v.start_vid = a.arc_id
 	),
-	macrounits AS (
-		SELECT n.node_2 AS catchment_node, a.macromapzone_id AS macrounit_id, min(d.seq) AS min_seq
+	macroomunits AS (
+		SELECT n.node_2 AS catchment_node, a.macromapzone_id AS macroomunit_id, min(d.seq) AS min_seq
 		FROM temp_pgr_drivingdistance d
 		JOIN root_nodes n ON d.start_vid = n.start_vid
 		JOIN temp_pgr_arc a ON d.node = a.arc_id
 		GROUP BY n.node_2, a.macromapzone_id
 	),
-	macrounits_ordered AS (
-		SELECT  catchment_node, macrounit_id, ROW_NUMBER() OVER (PARTITION BY catchment_node ORDER BY catchment_node, min_seq desc) AS order_number
-	FROM macrounits
+	macroomunits_ordered AS (
+		SELECT  catchment_node, macroomunit_id, ROW_NUMBER() OVER (PARTITION BY catchment_node ORDER BY catchment_node, min_seq desc) AS order_number
+	FROM macroomunits
 	)
-	UPDATE temp_pgr_macrounit m
+	UPDATE temp_pgr_macroomunit m
 	SET 
 		catchment_node = mo.catchment_node,
 		order_number = mo.order_number
-	FROM macrounits_ordered mo 
-	WHERE m.macrounit_id = mo.macrounit_id;
+	FROM macroomunits_ordered mo 
+	WHERE m.macroomunit_id = mo.macroomunit_id;
 
     --update catchment_node and order_number for isolated arcs
-    UPDATE temp_pgr_macrounit m
+    UPDATE temp_pgr_macroomunit m
     SET catchment_node = a.node_2, order_number = 1
     FROM temp_pgr_arc a 
     WHERE m.order_number = 0 
-    AND m.macrounit_id = a.arc_id;
+    AND m.macroomunit_id = a.arc_id;
 
     -- order omunits
     WITH 
 	omunits AS (
-		SELECT a.macromapzone_id AS macrounit_id, a.mapzone_id as omunit_id, min(d.seq) AS min_seq
+		SELECT a.macromapzone_id AS macroomunit_id, a.mapzone_id as omunit_id, min(d.seq) AS min_seq
 		FROM temp_pgr_drivingdistance d
 		JOIN temp_pgr_arc a ON d.node = a.arc_id
 		GROUP BY a.macromapzone_id, a.mapzone_id
 	),
 	omunits_ordered AS (
-		SELECT  macrounit_id, omunit_id, ROW_NUMBER() OVER (PARTITION BY macrounit_id ORDER BY macrounit_id, min_seq desc) AS order_number
+		SELECT  macroomunit_id, omunit_id, ROW_NUMBER() OVER (PARTITION BY macroomunit_id ORDER BY macroomunit_id, min_seq desc) AS order_number
 	FROM omunits
 	)
 	UPDATE temp_pgr_omunit o
