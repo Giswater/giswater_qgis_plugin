@@ -32,10 +32,13 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, QVBoxLayout, QHeaderView
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, \
+    QVBoxLayout, QHeaderView
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
-    QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, QgsEditFormConfig
+    QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, \
+    QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, QgsCoordinateTransformContext, \
+    QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, \
+    QgsEditFormConfig, QgsSymbolLayer, QgsProperty, QgsSimpleLineSymbolLayer, QgsSimpleMarkerSymbolLayer
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -774,8 +777,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
 
-    auth_id = tools_db.get_srid('ve_node', schema_name) if auth_id is None else auth_id
-    extent = _get_extent_parameters(schema_name) if extent is None else extent
+    auth_id = tools_db.get_srid(tablename if schema_name == "am" else "ve_node", schema_name) if auth_id is None else auth_id
+    extent = _get_extent_parameters(schema_name, tablename if schema_name == "am" else "node") if extent is None else extent
 
     field_id = field_id.replace(" ", "")
     uri, status = tools_db.get_uri(tablename, the_geom, schema_name)
@@ -816,7 +819,16 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
         # Apply styles to layer
         if style_id in (None, "-1") and schema_name != 'cm':
-            set_layer_styles(tablename_og, layer, schema_name)
+            set_layer_styles(tablename_og, layer, schema_name if schema_name != "am" else None)
+            # Get addparam from sys_table
+            sql = f"SELECT addparam FROM sys_table WHERE id = '{tablename_og}'"
+            row = tools_db.get_row(sql)
+            if row:
+                addparam = row[0]
+                if addparam and addparam.get('refreshSymbology'):
+                    renderer = layer.renderer()
+                    if isinstance(renderer, QgsCategorizedSymbolRenderer):
+                        refresh_categorized_layer_symbology_classes(layer, addparam)
 
         if tablename and schema != 'am' and schema != 'cm':
             # Set layer config
@@ -852,6 +864,102 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if create_project is False:
         global_vars.iface.mapCanvas().refresh()
+
+
+def refresh_categorized_layer_symbology_classes(layer, addparam=None):
+    """
+    Refresh categorized symbology classes of a layer
+        :param layer: Layer to refresh (QgsVectorLayer)
+        :param addparam: Addparams of the layer (dict)
+    """
+
+    renderer = layer.renderer()
+
+    # Symbology type must be categorized
+    if renderer is None or renderer.type() != 'categorizedSymbol':
+        return
+
+    field_name = renderer.classAttribute()
+    if not field_name:
+        return
+
+    # Lookup the field index
+    fni = layer.fields().indexFromName(field_name)
+    if fni == -1:
+        return
+
+    # Get existing symbology sources
+    src_symbol = renderer.sourceSymbol()
+    if src_symbol is None:
+        # Try to get symbol from first class
+        try:
+            classes = renderer.categories()
+            if classes:
+                src_symbol = classes[0].symbol()
+            else:
+                src_symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+        except Exception as e:
+            print(f"Error getting source symbol: {e}")
+            src_symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+
+    # Configure dnom symbol if it exists
+    if addparam:
+        dnom_symbol = addparam.get('dnomSymbol')
+        if dnom_symbol not in layer.fields().names():
+            dnom_symbol = None
+    if dnom_symbol and src_symbol.symbolLayerCount() > 0:
+        sl = src_symbol.symbolLayer(0)
+        # Support only layers with width (line symbols)
+        if sl and hasattr(sl, "setDataDefinedProperty"):
+            expression = f'case when {dnom_symbol} is not null then -4.862 + 0.977 * ln("{dnom_symbol}" + 159.243) else 0.25 end'
+            sl.setDataDefinedProperty(
+                QgsSymbolLayer.PropertyStrokeWidth,
+                QgsProperty.fromExpression(expression)
+            )
+
+    src_color_ramp = renderer.sourceColorRamp()
+
+    # Get unique values of the field
+    unique_vals = list(layer.uniqueValues(fni))
+
+    # Create new categories
+    new_cats = QgsCategorizedSymbolRenderer.createCategories(
+        values=unique_vals,
+        symbol=src_symbol.clone(),
+        layer=layer,
+        fieldName=field_name
+    )
+
+    # Filter out NULL values
+    new_cats_true = []
+    for cat in list(new_cats):
+        if cat.value() is not None:
+            new_cats_true.append(cat)
+    # Order by value
+    new_cats_true.sort(key=lambda x: x.value())
+
+    # Create a new renderer
+    new_renderer = QgsCategorizedSymbolRenderer(field_name, new_cats_true)
+
+    if src_color_ramp:
+        new_renderer.updateColorRamp(src_color_ramp.clone())
+
+    # Add "all others" category
+    all_others_symbol = src_symbol.clone()
+    s = all_others_symbol.symbolLayer(0)
+    if isinstance(s, QgsSimpleLineSymbolLayer):
+        s.setPenStyle(Qt.PenStyle.DashLine)
+        s.setColor(QColor("red"))
+    elif isinstance(s, QgsSimpleMarkerSymbolLayer):
+        s.setColor(QColor("red"))
+    elif isinstance(s, QgsSimpleFillSymbolLayer):
+        s.setFillColor(QColor("red"))
+    all_others_cat = QgsRendererCategory(None, all_others_symbol, "All Others")
+    new_renderer.addCategory(all_others_cat)
+
+    # Replace renderer entirely
+    layer.setRenderer(new_renderer)
+    layer.triggerRepaint()
 
 
 def hide_layer_from_toc(layer):
@@ -914,7 +1022,6 @@ def set_layer_styles(tablename, layer, schema_name):
 
             if qml is None:
                 continue
-
             valid_qml, error_message = validate_qml(qml)
             if not valid_qml:
                 msg = "The QML file is invalid."
@@ -6764,12 +6871,10 @@ def _get_parser_from_filename(filename):
     return filepath, parser
 
 
-def _get_extent_parameters(schema_name):
+def _get_extent_parameters(schema_name, table_name="node", geom_name="the_geom"):
     """ Get extent parameters for a given schema """
 
     rectangle = None
-    table_name = "node"
-    geom_name = "the_geom"
     sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
             f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
             f"FROM "

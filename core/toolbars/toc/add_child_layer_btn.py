@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt, lib_vars
+from ....libs import tools_qgis, tools_qt, lib_vars, tools_db
 
 
 class GwAddChildLayerButton(GwAction):
@@ -59,6 +59,13 @@ class GwAddChildLayerButton(GwAction):
             if field['context'] is not None:
                 context = json.loads(field['context'])
                 levels = context.get(tools_qt.tr('levels')) or context.get('levels')
+
+                # Check if schema exists for am and cm
+                if levels[0] == "AM" or levels[0] == "CM":
+                    if tools_db.get_row(f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{levels[0].lower()}'") is None:
+                        # Skip group if schema does not exist
+                        continue
+
                 if len(levels) > 0 and levels[0] and levels[0] not in dict_menu:
                     menu_level_1 = main_menu.addMenu(f"{levels[0]}")
                     dict_menu[levels[0]] = menu_level_1
@@ -156,8 +163,8 @@ class GwAddChildLayerButton(GwAction):
                 if lib_vars.project_vars['current_style'] is not None:
                     style_id = lib_vars.project_vars['current_style']
                 schema = None
-                if group == "AM":
-                    schema = "am"
+                if group == "AM" or group == "CM":
+                    schema = "am" if group == "AM" else "cm"
                 tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id=style_id, alias=alias, sub_sub_group=sub_sub_group, schema=schema)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)

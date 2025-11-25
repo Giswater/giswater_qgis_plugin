@@ -26,7 +26,7 @@ from qgis.PyQt.QtWidgets import (
 
 from .... import global_vars
 
-from ....libs import tools_qgis, tools_os, tools_qt, lib_vars
+from ....libs import tools_qgis, tools_os, tools_qt, lib_vars, tools_db
 from ...utils import tools_gw
 from ..dialog import GwAction
 
@@ -419,3 +419,22 @@ class GwAmBreakageButton(GwAction):
         dlg.buttonBox.rejected.connect(dlg.reject)
         dlg.executing = False
         self.timer.stop()
+
+        try:
+            # Update symbology of layers currently loaded in the project
+            target_layers = []
+            sql = "SELECT id, addparam FROM sys_table WHERE source = 'am' AND addparam ->> 'refreshSymbology' = 'true'"
+            rows = tools_db.get_rows(sql)
+            for row in rows:
+                target_layer = tools_qgis.get_layer_by_tablename(row[0], schema_name="am")
+                if target_layer is None:
+                    continue
+                target_layers.append((target_layer, row[1]))
+
+            if len(target_layers) > 0:
+                result = tools_qt.show_question("Do you want to update the symbology of the layers currently loaded in the project?", "Update AM Layers Symbology", force_action=True)
+                if result:
+                    for layer, addparam in target_layers:
+                        tools_gw.refresh_categorized_layer_symbology_classes(layer, addparam)
+        except Exception:
+            pass
