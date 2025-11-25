@@ -60,8 +60,10 @@ BEGIN
     v_formname := 've_'||lower(v_feature_type);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
-        INSERT INTO sys_table(id, descript, sys_role)
-        VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit') ON CONFLICT (id) DO NOTHING;
+		
+        INSERT INTO sys_table(id, context, descript, sys_role)
+        VALUES (v_view_name, (SELECT context FROM sys_table WHERE id = concat('ve_', v_feature_type)),
+		concat('Custom editable view for ',v_cat_feature), 'role_edit') ON CONFLICT (id) DO NOTHING;
 
 	    PERFORM gw_fct_admin_role_permissions();
 
