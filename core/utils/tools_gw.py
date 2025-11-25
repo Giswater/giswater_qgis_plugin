@@ -826,48 +826,6 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             json_result = execute_procedure('gw_fct_getinfofromid', body, schema_name=schema_name)
             config_layer_attributes(json_result, layer, alias)
 
-            # Manage valueRelation
-            valueRelation = None
-            sql = f"SELECT addparam FROM sys_table WHERE id = '{tablename_og}'"
-            row = tools_db.get_row(sql)
-            if row:
-                valueRelation = row[0]
-                if valueRelation:
-                    valueRelation = valueRelation.get('valueRelation')
-            if valueRelation:
-                for vr in valueRelation:
-                    # Get required keys with safe defaults
-                    vr_layer = tools_qgis.get_layer_by_tablename(vr.get('targerLayer', ''))  # Get 'Layer' with default
-
-                    # Check if layer exists before proceeding
-                    if vr_layer is None:
-                        continue
-
-                    field_index = vr_layer.fields().indexFromName(vr.get('targetColumn', 'id'))   # Get 'Column' index with default
-
-                    # Check if field exists before proceeding
-                    if field_index == -1:
-                        continue
-                    # Get required keys with safe defaults
-                    vr_key_column = vr.get('keyColumn', 'id')  # Get 'Key' with default
-                    vr_value_column = vr.get('valueColumn', 'idval')  # Get 'Value' with default
-                    vr_allow_nullvalue = vr.get('nullValue', 'False')  # Get null values with default
-                    vr_filter_expression = vr.get('filterExpression', '')  # Get 'FilterExpression' with default
-                    if vr_filter_expression is None:
-                        vr_filter_expression = ''
-                    vr_allow_multi = vr.get('allowMulti', 'False')  # Get 'AllowMulti' with default
-                    vr_nof_columns = vr.get('nofColumns', '0')  # Get 'NofColumns' with default
-
-                    # Create and apply ValueRelation config
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
-                                                                                 'Key': f'{vr_key_column}',
-                                                                                 'Value': f'{vr_value_column}',
-                                                                                 'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                 'FilterExpression': f'{vr_filter_expression}',
-                                                                                 'AllowMulti': f'{vr_allow_multi}',
-                                                                                 'NofColumns': f'{vr_nof_columns}'})
-                    vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-
     if visibility is not None:
         if visibility is False:
             tools_qgis.set_layer_visible(layer, recursive=False, visible=False)
@@ -1234,44 +1192,40 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
 
         if use_vr:
             value_relation = field['widgetcontrols']['valueRelation']
-            if value_relation.get('activated'):
-                try:
-                    vr_layer = value_relation.get('layer', '')
-                    layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
-                    if layer_obj is None:
-                        raise Exception(f"Layer '{vr_layer}' not found")
-                    vr_layer = layer_obj.id()  # Get layer id
-                    # Get required keys with safe defaults
-                    vr_key_column = value_relation.get('keyColumn', 'id')  # Get 'Key' with default
-                    vr_value_column = value_relation.get('valueColumn', 'idval')  # Get 'Value' with default
-                    vr_allow_nullvalue = value_relation.get('nullValue', 'False')  # Get null values with default
-                    vr_filter_expression = value_relation.get('filterExpression', '')  # Get 'FilterExpression' with default
-                    if vr_filter_expression is None:
-                        vr_filter_expression = ''
-                    vr_allow_multi = value_relation.get('allowMulti', 'False')  # Get 'AllowMulti' with default
-                    vr_nof_columns = value_relation.get('nofColumns', '0')  # Get 'NofColumns' with default
+            try:
+                vr_layer = value_relation.get('targetLayer', '')
+                layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
+                if layer_obj is None:
+                    raise Exception(f"Layer '{vr_layer}' not found")
+                vr_layer = layer_obj.id()  # Get layer id
+                # Get required keys with safe defaults
+                vr_key_column = value_relation.get('keyColumn', 'id')  # Get 'Key' with default
+                vr_value_column = value_relation.get('valueColumn', 'idval')  # Get 'Value' with default
+                vr_allow_nullvalue = value_relation.get('nullValue', 'False')  # Get null values with default
+                vr_filter_expression = value_relation.get('filterExpression', '')  # Get 'FilterExpression' with default
+                if vr_filter_expression is None:
+                    vr_filter_expression = ''
+                vr_allow_multi = value_relation.get('allowMulti', 'False')  # Get 'AllowMulti' with default
+                vr_nof_columns = value_relation.get('nofColumns', '0')  # Get 'NofColumns' with default
 
-                    # Create and apply ValueRelation config
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
-                                                                                 'Key': f'{vr_key_column}',
-                                                                                 'Value': f'{vr_value_column}',
-                                                                                 'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                 'FilterExpression': f'{vr_filter_expression}',
-                                                                                 'AllowMulti': f'{vr_allow_multi}',
-                                                                                 'NofColumns': f'{vr_nof_columns}'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                # Create and apply ValueRelation config
+                editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                'Key': f'{vr_key_column}',
+                                                                                'Value': f'{vr_value_column}',
+                                                                                'AllowNull': f'{vr_allow_nullvalue}',
+                                                                                'FilterExpression': f'{vr_filter_expression}',
+                                                                                'AllowMulti': f'{vr_allow_multi}',
+                                                                                'NofColumns': f'{vr_nof_columns}'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
-                except Exception as e:
-                    if thread:
-                        thread.exception = e
-                        thread.vr_errors.add(layer_name)
-                        if 'layer' in value_relation:
-                            thread.vr_missing.add(value_relation['layer'])
-                        thread.message = f"ValueRelation for {thread.vr_errors} switched to ValueMap because " \
-                                         f"layers {thread.vr_missing} are not present on QGIS project"
-                    use_vr = False
-            else:
-                use_vr = False
+            except Exception as e:
+                if thread:
+                    thread.exception = e
+                    thread.vr_errors.add(layer_name)
+                    if 'layer' in value_relation:
+                        thread.vr_missing.add(value_relation['layer'])
+                    thread.message = f"ValueRelation for {thread.vr_errors} switched to ValueMap because " \
+                                        f"layers {thread.vr_missing} are not present on QGIS project"
 
         if not use_vr:
             # Manage new values in ValueMap
