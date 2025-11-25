@@ -871,11 +871,13 @@ class GwVisit(QObject):
         """ Set parameter_id combo basing on current selections """
 
         dialog.parameter_id.clear()
+        parameter_type_id = tools_qt.get_combo_value(self.dlg_add_visit, "parameter_type_id", index=0)
+        feature_type = tools_qt.get_combo_value(self.dlg_add_visit, "cmb_feature_type", index=0, add_quote=True)
         sql = (f"SELECT id, descript "
                f"FROM config_visit_parameter "
-               f"WHERE UPPER(parameter_type) = '{self.parameter_type_id.currentText().upper()}' ")
-        if self.cmb_feature_type.currentText() != '':
-            sql += f"AND UPPER(feature_type) = '{self.cmb_feature_type.currentText().upper()}' "
+               f"WHERE UPPER(parameter_type) = '{parameter_type_id.upper()}' ")
+        if feature_type != '':
+            sql += f"AND UPPER(feature_type) = '{feature_type.upper()}' "
         sql += "ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -1228,7 +1230,7 @@ class GwVisit(QObject):
         sql = ("SELECT id, descript "
                "FROM config_visit_parameter ")
         where = None
-        parameter_type_id = tools_qt.get_text(self.dlg_add_visit, "parameter_type_id")
+        parameter_type_id = tools_qt.get_combo_value(self.dlg_add_visit, "parameter_type_id", index=0)
         if parameter_type_id:
             where = f"WHERE parameter_type = '{parameter_type_id}' "
         if self.feature_type:
