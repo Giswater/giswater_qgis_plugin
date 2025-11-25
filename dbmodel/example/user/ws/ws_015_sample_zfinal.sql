@@ -53,7 +53,7 @@ WHERE parameter = 'epa_automatic_man2graph_values';
 
 
 UPDATE config_param_system SET value =
-'{"status":true, "values":[
+'{"status":false, "values":[
 {"sourceTable":"ve_node_tank", "query":"UPDATE inp_inlet t SET maxlevel = hmax, diameter=sqrt(4*area/3.14159) FROM ve_node_tank s "},
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE inp_valve t SET setting = pressure_exit FROM ve_node_pr_reduc_valve s "}]}'
 WHERE parameter = 'epa_automatic_man2inp_values';
