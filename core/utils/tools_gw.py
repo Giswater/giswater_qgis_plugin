@@ -913,7 +913,7 @@ def refresh_categorized_layer_symbology_classes(layer, addparam=None):
         if sl and hasattr(sl, "setDataDefinedProperty"):
             expression = f'case when {dnom_symbol} is not null then -4.862 + 0.977 * ln("{dnom_symbol}" + 159.243) else 0.25 end'
             sl.setDataDefinedProperty(
-                QgsSymbolLayer.PropertyStrokeWidth,
+                QgsSymbolLayer.Property.PropertyStrokeWidth,
                 QgsProperty.fromExpression(expression)
             )
 
