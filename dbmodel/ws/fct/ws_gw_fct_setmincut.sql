@@ -390,7 +390,10 @@ BEGIN
 			v_core_mincut := TRUE;
 		END IF;
 	ELSIF v_action = 'mincutStart' THEN
-		v_message = '{"text": "Start mincut", "level": 3}';
+		v_message = json_build_object(
+			'text', 'Start mincut',
+			'level', 3
+		);
 		IF v_device = 5 THEN
 			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) IN (v_mincut_plannified_state, v_mincut_on_planning_state) THEN
 				UPDATE om_mincut SET mincut_state = 1 WHERE id = v_mincut_id;
@@ -429,7 +432,10 @@ BEGIN
 	ELSIF v_action IN ('mincutAccept', 'endMincut') THEN
 
 		-- call setfields
-		v_message = '{"text": "Mincut accepted.", "level": 1}';
+		v_message = json_build_object(
+			'text', 'Mincut accepted.',
+			'level', 1
+		);
 		IF v_device = 5 THEN
 			IF v_action = 'mincutAccept' THEN
 				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
@@ -563,7 +569,10 @@ BEGIN
 			'}}'||
 			'}')::json, 2244,null,null,null);
 	ELSIF v_action = 'mincutCancel' THEN
-		v_message = '{"text": "Mincut to cancel not found.", "level": 2}';
+		v_message = json_build_object(
+			'text', 'Mincut to cancel not found.',
+			'level', 2
+		);
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			WITH groups_conflict AS (
 				SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id
@@ -588,14 +597,33 @@ BEGIN
 			ELSE
 				UPDATE om_mincut SET mincut_state = v_mincut_cancel_state WHERE id = v_mincut_id;
 			END IF;
-			v_message = '{"text": "Mincut cancelled.", "level": 1}';
+			v_message = json_build_object(
+				'text', 'Mincut cancelled.',
+				'level', 1
+			);
 		END IF;
 	ELSIF v_action = 'mincutDelete' THEN
-		v_message = '{"text": "Mincut to delete not found.", "level": 2}';
+		v_message = json_build_object(
+			'text', 'Mincut to delete not found.',
+			'level', 2
+		);
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			DELETE FROM om_mincut WHERE id = v_mincut_id;
-			v_message = '{"text": "Mincut deleted.", "level": 1}';
+			v_message = json_build_object(
+				'text', 'Mincut deleted.',
+				'level', 1
+			);
 		END IF;
+
+		-- manage null values
+		v_message = COALESCE(v_message, '{}');
+
+		v_response = json_build_object(
+			'status', 'Accepted',
+			'message', v_message,
+			'version', v_version
+		);
+		RETURN v_response;
 	END IF;
 
 	-- CORE MINCUT CODE
@@ -1619,7 +1647,7 @@ BEGIN
 	      }
 	    }
 	}');
-	return v_response;
+	RETURN v_response;
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
