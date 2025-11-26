@@ -316,5 +316,5 @@ update node set verified=2 where node_id in ('1084', '113957', '114227', '114230
 INSERT INTO man_pipelink (link_id) SELECT link_id FROM link l;
 
 -- 01/10/2025
-UPDATE config_param_system SET value = '{"version": 6, "usePgrouting": true}'
+UPDATE config_param_system SET value = '{"version": 6, "usePgrouting": true, "bufferType": 2, "geomParamUpdate":10}'
 WHERE parameter = 'om_mincut_config';

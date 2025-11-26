@@ -180,3 +180,10 @@ ALTER TABLE om_mincut_hydrometer ADD CONSTRAINT om_mincut_hydrometer_hydrometer_
 
 -- Drop selector_hydrometer table
 DROP TABLE IF EXISTS selector_hydrometer;
+
+-- 26/11/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"polygon_the_geom", "dataType":"geometry(multipolygon,SRID_VALUE)", "isUtils":"False"}}$$);
+
+ALTER TABLE om_mincut_polygon DROP CONSTRAINT IF EXISTS om_mincut_polygon_result_id_fkey;
+DROP VIEW IF EXISTS v_om_mincut_polygon;
+ALTER TABLE om_mincut_polygon RENAME TO _om_mincut_polygon;

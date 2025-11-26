@@ -136,11 +136,17 @@ v_mode text;
 v_temp_arc_table regclass;
 v_temp_node_table regclass;
 
+v_update_map_zone integer := 0;
+v_concave_hull float = 0.9;
+v_srid integer;
+v_geom_param_update float := 10;
+v_geom_param_update_divide float;
+
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
+	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by id desc limit 1;
 
 	--return current_user;
 	-- get input parameters
@@ -167,6 +173,8 @@ BEGIN
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_client_epsg := p_data->'client'->>'epsg';
 	v_zoomratio := p_data->'data'->'coordinates'->>'zoomRatio';
+	v_update_map_zone := (SELECT value::json->>'bufferType' FROM config_param_system WHERE parameter = 'om_mincut_config');
+	v_geom_param_update := (SELECT value::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'om_mincut_config');
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 	IF v_cur_user IS NULL THEN v_cur_user = current_user; END IF;
@@ -833,7 +841,6 @@ BEGIN
 
 		DELETE FROM om_mincut_node where result_id=v_mincut_id;
 		DELETE FROM om_mincut_arc where result_id=v_mincut_id;
-		DELETE FROM om_mincut_polygon where result_id=v_mincut_id;
 		DELETE FROM om_mincut_connec where result_id=v_mincut_id;
 		DELETE FROM om_mincut_hydrometer where result_id=v_mincut_id;
 		DELETE FROM om_mincut_valve where result_id=v_mincut_id;
@@ -916,12 +923,87 @@ BEGIN
 			', v_mincut_id, v_temp_arc_table);
 		END IF;
 
-		INSERT INTO om_mincut_polygon (result_id, polygon_id, the_geom)
-		SELECT v_mincut_id, p.pol_id, p.the_geom
-		FROM om_mincut_node omn
-		JOIN v_temp_node vtn ON vtn.node_id = omn.node_id
-		JOIN polygon p ON p.feature_id = vtn.node_id
-		WHERE omn.result_id = v_mincut_id;
+		IF v_update_map_zone = 0 THEN
+			-- do nothing
+
+		ELSIF  v_update_map_zone = 1 THEN
+
+			-- concave polygon
+			v_query_text := '
+				UPDATE om_mincut m SET polygon_the_geom = ST_Multi(a.the_geom)
+				FROM (
+					WITH polygon AS (
+						SELECT ST_Collect(a.the_geom) AS g
+						FROM om_mincut_arc a
+						WHERE result_id = '||v_mincut_id||'
+					)
+					SELECT
+					CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concave_hull||')) = ''ST_Polygon''::text THEN
+						ST_Buffer(ST_ConcaveHull(g, '||v_concave_hull||'), 2)::geometry(Polygon,'||(v_srid)||')
+						ELSE ST_Expand(ST_Buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||')
+						END AS the_geom
+					FROM polygon
+					)a
+				WHERE m.id = '||v_mincut_id||';';
+			EXECUTE v_query_text;
+
+		ELSIF  v_update_map_zone = 2 THEN
+
+			-- pipe buffer
+			v_query_text := '
+				UPDATE om_mincut m SET polygon_the_geom = the_geom
+				FROM (
+					SELECT ST_Multi(ST_Buffer(ST_Collect(a.the_geom),'||v_geom_param_update||')) AS the_geom
+					FROM om_mincut_arc a
+					WHERE result_id = '||v_mincut_id||'
+				) a
+				WHERE m.id = '||v_mincut_id||';';
+			EXECUTE v_query_text;
+
+		ELSIF  v_update_map_zone = 3 THEN
+
+			-- use plot and pipe buffer
+			v_query_text := '
+				UPDATE om_mincut m SET polygon_the_geom = the_geom FROM (
+					SELECT ST_Multi(ST_Buffer(ST_Collect(the_geom),0.01)) AS the_geom FROM (
+						SELECT ST_Buffer(ST_Collect(a.the_geom), '||v_geom_param_update||') AS the_geom 
+						FROM om_mincut_arc a
+						WHERE result_id = '||v_mincut_id||'
+						UNION
+						SELECT ST_Collect(ep.the_geom) AS the_geom 
+						FROM om_mincut_arc a
+						JOIN connec c ON a.arc_id = c.arc_id
+						LEFT JOIN ext_plot ep ON c.plot_code = ep.plot_code 
+							AND ST_DWithin(c.the_geom, ep.the_geom, 0.001)
+						WHERE a.result_id = '||v_mincut_id||'
+					) a
+				) b
+				WHERE m.id = '||v_mincut_id||';';
+			EXECUTE v_query_text;
+
+		ELSIF  v_update_map_zone = 4 THEN
+
+			v_geom_param_update_divide := v_geom_param_update / 2;
+
+			-- use link and pipe buffer
+			v_query_text := '
+				UPDATE om_mincut m SET polygon_the_geom = the_geom FROM (
+					SELECT ST_Multi(ST_Buffer(ST_Collect(c.the_geom),0.01)) AS the_geom FROM (
+						SELECT ST_Buffer(ST_Collect(a.the_geom), '||v_geom_param_update||') AS the_geom
+						FROM om_mincut_arc a
+						WHERE result_id = '||v_mincut_id||'
+						UNION
+						SELECT (ST_Buffer(ST_Collect(l.the_geom),'||v_geom_param_update_divide||',''endcap=flat join=round'')) AS the_geom
+						FROM om_mincut_arc a
+						JOIN link l ON a.arc_id = l.exit_id
+						WHERE l.exit_type = ''ARC''
+						AND a.result_id = '||v_mincut_id||'
+					) c
+				) b
+				WHERE m.id = '||v_mincut_id||';';
+
+			EXECUTE v_query_text;
+		END IF;
 
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 		SELECT v_mincut_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
@@ -1406,13 +1488,6 @@ BEGIN
 							v_mincut_conflict_record.component, v_mincut_conflict_record.component,
 							v_mincut_id, v_mincut_group_record.mincut_group);
 						END IF;
-
-						INSERT INTO om_mincut_polygon (result_id, polygon_id, the_geom)
-						SELECT v_mincut_affected_id, p.pol_id, p.the_geom
-						FROM om_mincut_node omn
-						JOIN v_temp_node vtn ON vtn.node_id = omn.node_id
-						JOIN polygon p ON p.feature_id = vtn.node_id
-						WHERE omn.result_id = v_mincut_affected_id;
 
 						INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 						SELECT v_mincut_affected_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
