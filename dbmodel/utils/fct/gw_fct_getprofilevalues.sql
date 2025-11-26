@@ -353,9 +353,9 @@ BEGIN
 		FROM pgr_dijkstraVia (v_query_pgrouting, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
 
 		INSERT INTO temp_ve_arc
-		SELECT a.* 
-		FROM temp_pgr_dijkstra d
-		JOIN ve_arc a ON d.edge = a.arc_id;
+		SELECT * 
+		FROM ve_arc a 
+		WHERE EXISTS (SELECT 1 FROM temp_pgr_dijkstra d WHERE d.edge = a.arc_id);
 
 		-- insert edge values on temp_anl_arc table
 		EXECUTE '
