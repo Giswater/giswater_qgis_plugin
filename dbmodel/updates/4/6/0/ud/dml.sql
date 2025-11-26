@@ -80,3 +80,6 @@ UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_mate
 -- 26/11/2025
 UPDATE config_param_system SET value='{"sys_table_id":"ve_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"conneccat_id","orderby":"3","search_type":"connec"}'
 WHERE "parameter"='basic_search_network_connec';
+
+INSERT INTO sys_table(id, sys_role, source) VALUES ('omunit', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, sys_role, source) VALUES ('macroomunit', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
