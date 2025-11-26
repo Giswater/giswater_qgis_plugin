@@ -61,7 +61,6 @@ v_mid text;
 v_end text;
 v_end_aux integer;
 v_nodes integer[];
-v_query_pgrouting text;
 v_i json;
 v_hs float;
 v_vs float;
@@ -121,6 +120,7 @@ v_fslope text;
 v_fsyselev text;
 v_fsysymax text;
 v_querytext text;
+v_query_pgrouting text;
 v_elev1 text;
 v_elev2 text;
 v_z1 text;
@@ -243,35 +243,6 @@ BEGIN
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_ve_arc (LIKE SCHEMA_NAME.ve_arc INCLUDING ALL);
 
-	v_query_pgrouting := '
-		SELECT arc_id AS id, node_1 as source, node_2 as target, 1 as cost 
-		FROM ve_arc
-		WHERE state > 0
-		AND node_1 IS NOT NULL
-		AND node_2 IS NOT NULL;
-	';
-
-	EXECUTE format('
-		WITH 
-			connectedcomponents AS (
-				SELECT component, node FROM pgr_connectedcomponents($q$ %s $q$)
-			),
-			component AS (
-				SELECT c.component
-				FROM connectedcomponents c
-				WHERE c.node = %s
-				GROUP BY c.component
-			)
-		INSERT INTO temp_ve_arc 
-		SELECT v.* 
-		FROM connectedcomponents cc
-		JOIN ve_arc v ON cc.node = v.node_1 
-		WHERE EXISTS (SELECT 1 FROM component c WHERE c.component = cc.component) 
-		AND v.state > 0
-		AND v.node_1 IS NOT NULL
-		AND v.node_2 IS NOT NULL;
-	', v_query_pgrouting, v_init);
-
 	-- set value to v_linksdistance if null
 	IF v_linksdistance IS NULL OR v_linksdistance < 0 THEN
 		v_linksdistance = 0;
@@ -343,21 +314,48 @@ BEGIN
 			v_y2 = 'case when node_1=node then depth2 else depth1 end';
 		END IF;
 
-		-- pgr_dijkstra
-		v_query_pgrouting := format(
-			'SELECT arc_id AS id,
+		v_nodes := ARRAY [v_init] || (SELECT array_agg(value::integer) FROM json_array_elements_text(v_mid::json)) || ARRAY [v_end::integer];
+
+		v_querytext := '
+			SELECT arc_id AS id, node_1 as source, node_2 as target, 1 as cost 
+			FROM ve_arc
+			WHERE state > 0
+			AND node_1 IS NOT NULL
+			AND node_2 IS NOT NULL;
+		';
+
+		v_query_pgrouting := format($sql$
+			WITH 
+				connectedcomponents AS (
+					SELECT component, node
+					FROM pgr_connectedcomponents($q$ %s $q$)
+				),
+				component AS (
+					SELECT c.component
+					FROM connectedcomponents c
+					WHERE c.node = %s
+					GROUP BY c.component
+				)
+			SELECT  arc_id AS id,
 					node_1 AS source,
 					node_2 AS target,
 					(%s) AS cost
-			FROM temp_ve_arc',
-			v_cost_string
-		);
-
-		v_nodes := ARRAY [v_init] || (SELECT array_agg(value::integer) FROM json_array_elements_text(v_mid::json)) || ARRAY [v_end::integer];
+			FROM connectedcomponents cc
+			JOIN ve_arc v ON cc.node = v.node_1 
+			WHERE EXISTS (SELECT 1 FROM component c WHERE c.component = cc.component) 
+			AND v.state > 0
+			AND v.node_1 IS NOT NULL
+			AND v.node_2 IS NOT NULL;
+		$sql$, v_querytext, v_init, v_cost_string);
 
         INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
 		SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
 		FROM pgr_dijkstraVia (v_query_pgrouting, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
+
+		INSERT INTO temp_ve_arc
+		SELECT a.* 
+		FROM temp_pgr_dijkstra d
+		JOIN ve_arc a ON d.edge = a.arc_id;
 
 		-- insert edge values on temp_anl_arc table
 		EXECUTE '
@@ -507,7 +505,7 @@ BEGIN
 				EXIT WHEN v_nid[i] IS NULL;
 
 				--distance values
-				IF ((v_dist[i] < (v_dist[i-1]+ v_linksdistance)) OR (v_dist[i] > (v_dist[i+1]+ v_linksdistance))) AND v_systype[i] = 'LINK' THEN
+				IF v_dist[i] < (v_dist[i-1] + v_linksdistance) AND v_systype[i] = 'LINK' THEN
 					DELETE FROM temp_anl_node WHERE node_id::integer = v_nid[i]::integer;
 				END IF;
 			END LOOP;
