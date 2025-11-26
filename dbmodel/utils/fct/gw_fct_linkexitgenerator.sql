@@ -108,13 +108,16 @@ BEGIN
 	END IF;
 
 	-- harmonize those links with same endpoint
-	UPDATE temp_link a 
-	SET vnode_id = t.vnode_id, flag=true
-	FROM temp_vnode v
-	JOIN temp_link t ON t.link_id = v.l2
-	WHERE a.link_id = v.l1; 
+	FOR v_links IN SELECT * FROM temp_vnode order by 1
+    LOOP
+        UPDATE temp_link a SET vnode_id = t.vnode_id, flag=true 
+		FROM temp_link t 
+		WHERE a.link_id = v_links.l1 
+		AND t.link_id = v_links.l2 
+		AND a.flag IS false;
+    END LOOP;
 
-	truncate temp_vnode;
+	TRUNCATE temp_vnode;
 	
 	v_query_text := format($sql$
 		INSERT INTO temp_vnode (l1, v1, l2, v2)
@@ -147,10 +150,11 @@ BEGIN
 	$sql$, v_temp_node_table); 
 
 	-- harmonize those links with same endpoint whith node
-	UPDATE temp_link a 
-	SET vnode_id = v.v2, vnode_type = 'NODE'
-	FROM temp_vnode v
-	WHERE a.link_id = v.l1;
+	FOR v_links IN SELECT l1,v1, v2 FROM temp_vnode ORDER BY 1
+    LOOP
+        UPDATE temp_link a SET vnode_id = v_links.v2, vnode_type = 'NODE' 
+		WHERE link_id::integer = v_links.l1::integer;
+    END LOOP;
 
 	--  Return
 	RETURN 0;
