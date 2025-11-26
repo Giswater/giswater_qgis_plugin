@@ -25,7 +25,7 @@ SELECT columns_are(
         'anl_user', 'anl_descript', 'anl_feature_id', 'anl_feature_type', 'anl_the_geom', 'forecast_start',
         'forecast_end', 'assigned_to', 'exec_start', 'exec_end', 'exec_user', 'exec_descript',
         'exec_the_geom', 'exec_from_plot', 'exec_depth', 'exec_appropiate', 'notified', 'output',
-        'modification_date', 'chlorine', 'turbidity', 'minsector_id', 'reagent_lot', 'equipment_code'
+        'modification_date', 'chlorine', 'turbidity', 'minsector_id', 'reagent_lot', 'equipment_code', 'polygon_the_geom'
     ],
     'Table om_mincut should have the correct columns'
 );
