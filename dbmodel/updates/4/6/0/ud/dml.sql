@@ -76,3 +76,7 @@ WHERE id=3424;
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname ilike 've_connec%' AND formtype='form_feature' AND columnname='matcat_id';
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname ilike 've_arc%' AND formtype='form_feature' AND columnname='matcat_id';
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname ilike 've_node%' AND formtype='form_feature' AND columnname='matcat_id';
+
+-- 26/11/2025
+UPDATE config_param_system SET value='{"sys_table_id":"ve_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"conneccat_id","orderby":"3","search_type":"connec"}'
+WHERE "parameter"='basic_search_network_connec';
