@@ -72,7 +72,7 @@ class GwAdminMarkdownGenerator:
         """ Path changed """
         directory = QFileDialog.getExistingDirectory(None, "Select Directory")
         if directory:
-            self.path = directory
+            self.path = f"{directory}/docs/giswater/for-users/dialogs"
             tools_qt.set_widget_text(self.dlg_qm, 'txt_path', self.path)
 
     def _populate_data_schema_name(self, widget):
@@ -266,27 +266,41 @@ class GwAdminMarkdownGenerator:
             # Introduction
             file.write(f"\n\n{descript}\n\n")
 
-            # Create toctree structure for tabs
+            # Create toctree structure for tabs (local to this feature)
             file.write(".. toctree::\n\t:maxdepth: 1\n\t:caption: Tabs\n\n")
 
+            done_tabs = set()
             for row in rows_cft:
+                tabname_raw = row['tabname']
+                if tabname_raw in done_tabs:
+                    continue
+                done_tabs.add(tabname_raw)
+
                 # Check if this is the "Data" tab to link to the dynamic tab_data file
-                if row['tabname'] == 'tab data':
-                    file.write(f"\ttab_data\n")
-                    self.create_dinamic_tab(f've_{feature_type}', feature_cat, f'{self.project_type}/{feature_type}/{feature_cat}/tab_data.rst', row['tooltip'])
-                elif row['tabname'] == 'tab epa':
-                    file.write(f"\ttab_epa\n")
+                if tabname_raw == 'tab data':
+                    file.write("\ttab_data\n")
+                    self.create_dinamic_tab(
+                        f"ve_{feature_type}",
+                        feature_cat,
+                        f"{self.project_type}/{feature_type}/{feature_cat}/tab_data.rst",
+                        row['tooltip'],
+                    )
+                elif tabname_raw == 'tab epa':
+                    file.write("\ttab_epa/index\n")
                     self.create_index_tab_epa(feature_cat, feature_type, row['tooltip'])
                 else:
-                    file.write(f"\t../../{row['tabname'].replace(' ', '_')}\n")
-                    self.create_other_tab(row)
+                    tab_slug = tabname_raw.replace(' ', '_')
+                    file.write(f"\t{tab_slug}\n")
+                    self.create_other_tab(row, feature_cat, feature_type)
 
     def create_index_tab_epa(self, feature_cat, feature_type, descript):
         """ Create dinamic tab_epa """
         sql = f"SELECT * FROM {self.schema}.sys_feature_epa_type WHERE feature_type = '{feature_type.upper()}'"
+        sql += f" ORDER BY CASE WHEN id = (SELECT epa_default FROM {self.schema}.cat_feature_node"
+        sql += f" WHERE id = '{feature_cat.upper()}') THEN 1 ELSE 2 END, id;"
         rows_sfet = tools_db.get_rows(sql)
 
-        tab_epa_path = f"{self.path}/info_feature/{self.project_type}/{feature_type}/{feature_cat}/tab_epa.rst"
+        tab_epa_path = f"{self.path}/info_feature/{self.project_type}/{feature_type}/{feature_cat}/tab_epa/index.rst"
 
         if not os.path.exists(tab_epa_path):
             os.makedirs(os.path.dirname(tab_epa_path), exist_ok=True)
@@ -296,30 +310,72 @@ class GwAdminMarkdownGenerator:
             file.write(f".. _index-epa-{feature_cat}\n\n")
             self.title(file, f"EPA", 1)
             file.write(f"\n\nLos tipos de EPA que puede tener el objeto {feature_cat} son:\n\n")
-            file.write(f".. toctree::\n\t:maxdepth: 1\n\t:caption: EPA Types\n\n")
+            file.write(".. toctree::\n")
+            file.write("\t:maxdepth: 1\n")
+            file.write("\t:caption: EPA Types\n\n")
 
             if rows_sfet:
-                for row in rows_sfet:
+                for i, row in enumerate(rows_sfet):
                     epa_type = row['id'].lower()
                     if epa_type == 'undefined':
                         continue
-                    file.write(f"\t../tab_epa/{epa_type}\n")
-                    self.create_dinamic_tab('ve_epa', epa_type, f'{self.project_type}/{feature_type}/tab_epa/{epa_type}.rst', descript)
+                    
+                    # Create wrapper file with include
+                    wrapper_path = f"{self.path}/info_feature/{self.project_type}/{feature_type}/{feature_cat}/tab_epa/{epa_type}.rst"
+                    with open(wrapper_path, 'w') as wfile:
+                        wfile.write(f".. _tab-epa-{epa_type}-{feature_cat}:\n\n")
+                        wfile.write(f".. include:: ../../tab_epa/{epa_type}.rst\n")
 
-    def create_other_tab(self, row):
-        """ Create other tab """
+                    if i == 0:
+                        file.write(f"\tDefault: {epa_type.title()} <{epa_type}>\n")
+                    else:
+                        file.write(f"\t{epa_type}\n")
+                    
+                    self.create_dinamic_tab(
+                        've_epa',
+                        epa_type,
+                        f'{self.project_type}/{feature_type}/tab_epa/{epa_type}.rst',
+                        descript,
+                        add_label=False
+                    )
 
-        tabname = row['tabname'].split(' ')[1]
-        tab_path = f"{self.path}/info_feature/{self.project_type}/tab_{tabname}.rst"
-        if not os.path.exists(tab_path):
-            os.makedirs(os.path.dirname(tab_path), exist_ok=True)
+    def create_other_tab(self, row, feature_cat, feature_type):
+        """ Create other tab with shared content strategy """
 
-        with open(tab_path, 'w') as file:
-            file.write(f".. _tab-{tabname}\n\n")
-            self.title(file, f"{tabname.title()}", 1)
-            file.write(f"\n\n{row['tooltip']}\n\n")
+        try:
+            tabname = row['tabname'].split(' ')[1]
+        except IndexError:
+            tabname = row['tabname']
 
-    def create_dinamic_tab(self, prefix, feature, extra_path, descript):
+        # Shared file path (e.g. info_feature/ws/tab_documents.rst)
+        shared_filename = f"tab_{tabname}.rst"
+        shared_path = f"{self.path}/info_feature/{self.project_type}/{shared_filename}"
+
+        # Create shared file if it doesn't exist (centralized content)
+        if not os.path.exists(shared_path):
+            os.makedirs(os.path.dirname(shared_path), exist_ok=True)
+            with open(shared_path, 'w') as file:
+                # Title
+                self.title(file, f"{tabname.title()}", 1)
+                # Content/Tooltip
+                file.write(f"\n\n{row['tooltip']}\n\n")
+
+        # Wrapper file path (e.g. info_feature/ws/chamber/outfall/tab_documents.rst)
+        wrapper_path = (
+            f"{self.path}/info_feature/{self.project_type}/"
+            f"{feature_type}/{feature_cat}/tab_{tabname}.rst"
+        )
+        
+        if not os.path.exists(wrapper_path):
+            os.makedirs(os.path.dirname(wrapper_path), exist_ok=True)
+
+        with open(wrapper_path, 'w') as file:
+            # Unique label for this feature's tab instance
+            file.write(f".. _tab-{tabname}-{feature_cat}:\n\n")
+            # Include the shared file
+            file.write(f".. include:: ../../{shared_filename}\n")
+
+    def create_dinamic_tab(self, prefix, feature, extra_path, descript, add_label=True):
         """ Create dinamic tab_data """
 
         # Get rows from config_form_fields
@@ -342,7 +398,7 @@ class GwAdminMarkdownGenerator:
 
         with open(tab_data_path, 'w') as file:
             # Header
-            file.write(f".. _tab-{tabname.split('_')[1]}-{feature}\n\n")
+            file.write(f".. _tab-{tabname.split('_')[1]}-{feature}\n\n") if add_label else None
             if tabname == 'tab_data':
                 self.title(file, f"{tabname.split('_')[1].title()}", 1)
             else:
