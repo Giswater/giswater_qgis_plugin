@@ -101,12 +101,6 @@ BEGIN
 	WHERE n1.link_id < n2.link_id AND n1.exit_id = n2.exit_id
 	ORDER BY 1;
 
-	IF p_input = 1 THEN 
-		v_temp_node_table := 'temp_node';
-	ELSIF p_input = 2 THEN 
-		v_temp_node_table := 'temp_anl_node';
-	END IF;
-
 	-- harmonize those links with same endpoint
 	FOR v_links IN SELECT * FROM temp_vnode order by 1
     LOOP
@@ -118,6 +112,12 @@ BEGIN
     END LOOP;
 
 	TRUNCATE temp_vnode;
+
+	IF p_input = 1 THEN 
+		v_temp_node_table := 'temp_node';
+	ELSIF p_input = 2 THEN 
+		v_temp_node_table := 'temp_anl_node';
+	END IF;
 	
 	v_query_text := format($sql$
 		INSERT INTO temp_vnode (l1, v1, l2, v2)
@@ -134,6 +134,8 @@ BEGIN
 		ORDER BY 3;
 	$sql$, v_temp_node_table); 
 
+	EXECUTE v_query_text;
+
 	v_query_text := format($sql$
 		INSERT INTO temp_vnode (l1, v1, l2, v2)
 		SELECT 
@@ -149,12 +151,13 @@ BEGIN
 		ORDER BY 3;
 	$sql$, v_temp_node_table); 
 
+	EXECUTE v_query_text;
+
 	-- harmonize those links with same endpoint whith node
-	FOR v_links IN SELECT l1,v1, v2 FROM temp_vnode ORDER BY 1
-    LOOP
-        UPDATE temp_link a SET vnode_id = v_links.v2, vnode_type = 'NODE' 
-		WHERE link_id::integer = v_links.l1::integer;
-    END LOOP;
+	UPDATE temp_link a 
+    SET vnode_id = v.v2, vnode_type = 'NODE'
+    FROM temp_vnode v
+    WHERE a.link_id = v.l1;
 
 	--  Return
 	RETURN 0;
