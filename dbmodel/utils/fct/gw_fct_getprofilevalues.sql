@@ -471,25 +471,19 @@ BEGIN
 			ORDER BY a.arc_id, dist';
 
 			-- delete links overlaped with nodes using the user's parameter
-			-- start with initNode
+			-- initNode
 			SELECT node_id FROM temp_anl_node WHERE total_distance = 0 INTO v_last_nid;
-			v_last_systype := 'REAL'; 
+			SELECT sys_type FROM temp_anl_node WHERE total_distance = 0 INTO v_last_systype;
 			v_last_dist := 0; 			
 
+			-- start with the second node_id from temp_anl_node
 			FOR object_rec IN 
 				SELECT node_id, sys_type, total_distance 
 				FROM temp_anl_node 
 				WHERE total_distance > 0 
 				ORDER BY total_distance
 			LOOP
-				IF object_rec.sys_type = 'REAL' THEN
-					IF v_last_systype = 'LINK' AND v_last_dist < (object_rec.total_distance - v_linksdistance) THEN
-						DELETE FROM temp_anl_node WHERE node_id = v_last_nid;
-					END IF;
-					v_last_nid := object_rec.node_id;
-					v_last_systype:= object_rec.sys_type;
-					v_last_dist := object_rec.total_distance;
-				ELSE -- object_rec.sys_type = 'LINK'
+				IF object_rec.sys_type = 'LINK' THEN
 					IF object_rec.total_distance < (v_last_dist + v_linksdistance) THEN
 						DELETE FROM temp_anl_node WHERE node_id = object_rec.node_id;
 					ELSE 
@@ -497,6 +491,13 @@ BEGIN
 						v_last_systype:= object_rec.sys_type;
 						v_last_dist := object_rec.total_distance;
 					END IF;
+				ELSE -- object_rec.node_id - NODE REAL
+					IF v_last_systype = 'LINK' AND v_last_dist > (object_rec.total_distance - v_linksdistance) THEN
+						DELETE FROM temp_anl_node WHERE node_id = v_last_nid;
+					END IF;
+					v_last_nid := object_rec.node_id;
+					v_last_systype:= object_rec.sys_type;
+					v_last_dist := object_rec.total_distance;
 				END IF;
 			END LOOP;
 
