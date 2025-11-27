@@ -15437,21 +15437,6 @@
 		</message>
 	</context>
 	<context>
-		<name>visit</name>
-		<message>
-			<source>title</source>
-			<translation>訪問</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Date:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
 		<name>workcat_manager</name>
 		<message>
 			<source>title</source>

@@ -369,9 +369,9 @@ class GwSchemaI18NManager:
         """Insert and update rows in a classical translation table."""
 
         # Get the rows to update
-        diff_rows, columns_i18n = self._rows_to_update(table_i18n, table_org)
+        diff_rows, columns_i18n, rows_org = self._rows_to_update(table_i18n, table_org)
 
-        if not diff_rows:
+        if not diff_rows and table_i18n != "i18n.dbstyle":
             return ""
 
         # Get the columns to insert
@@ -379,7 +379,7 @@ class GwSchemaI18NManager:
         columns_to_insert = ", ".join(columns_i18n)
 
         # Get the primary keys
-        pk_columns = [col for col in columns_i18n if not col.endswith("_en_us")]
+        pk_columns = [col for col in columns_i18n if col not in self.values_en_us]
         if "su_feature" in table_i18n:
             pk_columns.append("lb_en_us")
         pk_columns_str = ", ".join(pk_columns)
@@ -404,6 +404,31 @@ class GwSchemaI18NManager:
                 update_values_str = ", ".join(update_values)
                 query_insert += f"""INSERT INTO {table_i18n} ({columns_to_insert}) VALUES ({values_str})
                                 ON CONFLICT ({pk_columns_str}) DO UPDATE SET {update_values_str};\n"""
+
+        if table_i18n == "i18n.dbstyle":
+            pk_column_org = ["styleconfig_id", "layername"]
+            pk_column_i18n = ["source", "layername"]
+
+            # Group rows_org by styleconfig_id to collect all valid hints per id
+            hints_per_id = defaultdict(set)
+            rows_per_id = {}
+            for row in rows_org:
+                sid = f"{row['layername']}_{row['styleconfig_id']}"
+                hints_per_id[sid].add(row['hint'])
+                rows_per_id[sid] = row # Keep one row to access other columns if needed
+
+            # Check each id
+            for sid, valid_hints in hints_per_id.items():
+                row = rows_per_id[sid]
+                # Get existing hints from DB
+                existing_hints = self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n)
+
+                # Calculate hints to delete
+                hints_to_delete = existing_hints - valid_hints
+
+                if hints_to_delete:
+                    query_insert += self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete)
+
         return query_insert
 
 
@@ -495,6 +520,10 @@ class GwSchemaI18NManager:
             columns_i18n = ["parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
             columns_org = ["parameter", "method", "label", "descript", "placeholder"]
 
+        elif 'dbstyle' in table_i18n:
+            columns_i18n = ["source", "layername", "org_text", "hint", "lb_en_us"]
+            columns_org = ["styleconfig_id", "layername", "stylevalue"]
+
         columns_i18n = columns_i18n + ["project_type", "source_code", "context"]
 
         return columns_i18n, columns_org
@@ -512,13 +541,20 @@ class GwSchemaI18NManager:
         columns_i18n, columns_org = self._get_columns_to_compare(table_i18n, table_org)
         rows_i18n, rows_org = self._get_rows_to_compare(table_i18n, columns_i18n, columns_org, table_org)
 
+        if table_i18n == "i18n.dbstyle":
+            rows_org = self._get_dbstyle_rows(rows_org)
+            self.values_en_us.extend(["org_text"]) # Important because we extract the en_us values from the org_text, so it is needed to control a correct behaivor
+            columns_org.extend(["hint", "lb_en_us"])
+
         # Rewrite the columns to get the name. Also determine diferent kinds of columns useful in the future
         for i, column in enumerate(columns_i18n):
             if "CAST(" in column:
                 columns_i18n[i] = column[5:].split(" ")[0]
             if column not in ["project_type"]:
                 self.conflict_project_type.append(columns_i18n[i])
-                if "en_us" not in columns_i18n[i]:
+                if columns_i18n[i] in self.values_en_us:
+                    continue
+                elif "en_us" not in columns_i18n[i]:
                     self.primary_keys_no_project_type_i18n.append(columns_i18n[i])
                 else:
                     self.values_en_us.append(columns_i18n[i])
@@ -563,7 +599,7 @@ class GwSchemaI18NManager:
         # Efficient diff using set of tuples
         diff_rows = self._set_operation_on_dict(rows_org, rows_i18n, op='-', compare='values')
 
-        return diff_rows, columns_i18n
+        return diff_rows, columns_i18n, rows_org
 
 
     def _get_rows_to_compare(self, table_i18n, columns_i18n, columns_org, table_org):
@@ -600,7 +636,7 @@ class GwSchemaI18NManager:
             pk_column_i18n = ["source"]
 
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
-        self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
+        self.values_en_us = [column for column in self.conflict_project_type if ("en_us" in column or column in ["text"])]
 
         # Set the column to update in the table_org (filterparam, inputparams, widgetcontrols)
         column = ""
@@ -746,6 +782,38 @@ class GwSchemaI18NManager:
         return hints_i18n_set
 
     # endregion
+
+
+    # region Dbstyle
+
+    def _get_dbstye_values(self, stylevalue) -> dict:
+        """ Get the lines of the dbstyle """
+        result = {}
+        i = 1
+        for line in stylevalue.split('\n'):
+            match = re.search(r'rule.*label="([^"]*)"', line)
+            if match:
+                lb_en_us = match.group(1)
+                result[f"label_{i}"] = lb_en_us
+                i += 1
+        return result
+
+    def _get_dbstyle_rows(self, rows_org):
+        """ Update the table with the dbstyle format """
+        result = []
+
+        for row in rows_org:
+            value = self._get_dbstye_values(row['stylevalue'])
+            if value:
+                for hint, lb_en_us in value.items():
+                    new_row = row.copy()
+                    new_row['hint'] = hint
+                    new_row['lb_en_us'] = lb_en_us
+                    result.append(new_row)
+                    
+        return result
+
+    # endregion
     # region Config_form_fields_feat
 
     def _dbconfig_form_fields_feat_update(self, table_i18n):
@@ -753,7 +821,7 @@ class GwSchemaI18NManager:
 
         self.conflict_project_type = ["feature_type", "source_code", "context", "formtype", "tabname", "source", "lb_en_us", "tt_en_us"]
         self.primary_keys_no_project_type_i18n = [column for column in self.conflict_project_type if "en_us" not in column]
-        self.values_en_us = [column for column in self.conflict_project_type if "en_us" in column]
+        self.values_en_us = [column for column in self.conflict_project_type if ("en_us" in column or column in ["text", "hint"])]
 
         schema = table_i18n.split('.')[0]
         table_org = f"{schema}.dbconfig_form_fields"
@@ -1620,6 +1688,8 @@ class GwSchemaI18NManager:
             tables_org = ["config_report", "config_toolbox"]
         elif "dbplan_price" in table_i18n:
             tables_org = ["plan_price"]
+        elif "dbstyle" in table_i18n:
+            tables_org = ["sys_style"]
         elif "dbconfig_form_fields_json" in table_i18n or "dbconfig_form_fields_feat" in table_i18n:
             tables_org = ["config_form_fields"]
         elif "dbconfig_engine" in table_i18n:
@@ -1797,7 +1867,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbplan_price"],
+                "dbtables": ["dbstyle"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1806,7 +1876,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbplan_price"],
+                "dbtables": ["dbstyle"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {

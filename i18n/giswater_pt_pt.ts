@@ -202,7 +202,7 @@
 		</message>
 		<message>
 			<source>GwAmPriorityButton</source>
-			<translation>Priority selection and Calculation</translation>
+			<translation>Priority Calculation by Selection</translation>
 		</message>
 		<message>
 			<source>GwArcAddButton</source>
@@ -282,7 +282,7 @@
 		</message>
 		<message>
 			<source>GwFeatureTypeChangeButton</source>
-			<translation>Change feature class</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>GwFlowExitButton</source>
@@ -15370,11 +15370,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
@@ -15433,21 +15433,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_node_type</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit</name>
-		<message>
-			<source>title</source>
-			<translation>Visit</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Date:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -26410,11 +26395,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>

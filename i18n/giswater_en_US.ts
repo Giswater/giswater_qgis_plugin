@@ -282,7 +282,7 @@
 		</message>
 		<message>
 			<source>GwFeatureTypeChangeButton</source>
-			<translation>Change feature class</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>GwFlowExitButton</source>
@@ -15370,11 +15370,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
@@ -26395,11 +26395,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Change feature type</translation>
+			<translation>Change object type</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>

@@ -10,6 +10,7 @@ import re
 import subprocess
 from functools import partial
 import json
+from collections import defaultdict
 import ast
 
 import psycopg2
@@ -417,6 +418,8 @@ class GwI18NGenerator:
             else:
                 if "json" in dbtable:
                     text_error += self._write_dbjson_values(dbtable_rows, cfg_path + file_name, file_type)
+                elif "dbstyle" in dbtable:
+                    text_error += self._write_dbstyle_values(dbtable_rows, cfg_path + file_name, file_type)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)
         if text_error != "":
@@ -549,6 +552,11 @@ class GwI18NGenerator:
             lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"tx_{self.lower_lang}", f"auto_tx_{self.lower_lang}", f"va_auto_tx_{self.lower_lang}", f"pr_{self.lower_lang}", f"auto_pr_{self.lower_lang}", f"va_auto_pr_{self.lower_lang}"]
             order_by.extend(['source_code', 'project_type', 'context', 'source'])
 
+        elif table == 'dbstyle':
+            print(f"dbstyle: {table}")
+            colums = ["CAST(source AS INTEGER)", "layername", "project_type", "context", "org_text", "hint", "lb_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            order_by.extend(['source_code', 'context', 'layername', 'source', 'hint'])
         # Make the query
         sql=""
         try:
@@ -728,7 +736,7 @@ class GwI18NGenerator:
 
                 elif "dbplan_price" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")           
         del file
 
     # endregion
@@ -810,6 +818,50 @@ class GwI18NGenerator:
 
             if closing:
                 file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
+        return ""
+    # endregion
+    # region Write dbstyle values
+    def _write_dbstyle_values(self, rows, path, file_type):
+        print("aaaaaaaaaaaaaaa")
+        updates = defaultdict(list)
+
+        for row in rows:
+            if row['project_type'] not in self.path_dic[file_type]["project_type"]:
+                continue
+            
+            key = (row["source"], row["layername"], row["context"], row["org_text"].replace("'", "''"))
+            updates[key].append(row)
+
+        for key, related_rows in updates.items():
+            source, layername, context, stylevalue = key
+            new_stylevalue = stylevalue
+            do_style_update = False
+
+            for row in related_rows:
+                default_text = row.get("lb_en_us", "")
+                translated = (
+                    row.get(f"lb_{self.lower_lang}") or
+                    row.get(f"auto_lb_{self.lower_lang}") or
+                    default_text
+                )
+
+                if not default_text or not translated or default_text == translated:
+                    continue
+                
+                # Replace exact label string: label="Original" -> label="Translated"
+                if translated != default_text:
+                    old_str = f'label="{default_text}"'
+                    new_str = f'label="{translated}"'
+                    
+                    # Simple string replacement is robust for this purpose
+                    new_stylevalue = new_stylevalue.replace(old_str, new_str)
+                    do_style_update = True
+
+            if do_style_update:
+                values_str = ",\n\t".join([f"('{source}', '{layername}', '{new_stylevalue}')"])
+                with open(path, "a", encoding="utf-8") as file:
+                    text = f"UPDATE {context} AS t\nSET stylevalue = v.stylevalue\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(styleconfig_id, layername, stylevalue)\nWHERE t.styleconfig_id::text = v.styleconfig_id AND t.layername = v.layername;\n\n"
+                    file.write(text)
         return ""
     # endregion
     # region Extra functions
@@ -997,7 +1049,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "su_basic_tables", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
@@ -1008,7 +1060,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "su_basic_tables", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle", "su_basic_tables", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "i18n_utils": {
@@ -1019,7 +1071,7 @@ class GwI18NGenerator:
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "su_basic_tables", "su_feature", "dbjson",
+                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle", "su_basic_tables", "su_feature", "dbjson",
                     "dbconfig_form_fields_json"]
             },
             "am": {
