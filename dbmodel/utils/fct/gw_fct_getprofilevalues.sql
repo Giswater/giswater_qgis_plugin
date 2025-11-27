@@ -488,14 +488,14 @@ BEGIN
 					END IF;
 					v_last_nid := object_rec.node_id;
 					v_last_systype:= object_rec.sys_type;
-					v_last_dist := v-record.total_distance;
+					v_last_dist := object_rec.total_distance;
 				ELSE -- object_rec.sys_type = 'LINK'
 					IF object_rec.total_distance < (v_last_dist + v_linksdistance) THEN
 						DELETE FROM temp_anl_node WHERE node_id = object_rec.node_id;
 					ELSE 
 						v_last_nid := object_rec.node_id;
 						v_last_systype:= object_rec.sys_type;
-						v_last_dist := v-record.total_distance;
+						v_last_dist := object_rec.total_distance;
 					END IF;
 				END IF;
 			END LOOP;
