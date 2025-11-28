@@ -19019,7 +19019,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tooltip_actionCustomMincut</source>
-			<translation>None</translation>
+			<translation>Polígono de corte a medida</translation>
 		</message>
 		<message>
 			<source>actionExportHydroCsv</source>
@@ -24046,7 +24046,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>grb_system</source>
-			<translation>Aceptar</translation>
+			<translation>Sistema</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_system</source>

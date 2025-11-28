@@ -33,7 +33,7 @@ class GwCatalog:
         if json_result is None:
             return
 
-        group_box_1 = QGroupBox("Filter")
+        group_box_1 = QGroupBox(tools_qt.tr("Filter"))
         self.filter_form = QGridLayout()
 
         self.dlg_catalog = GwInfoCatalogUi(self)

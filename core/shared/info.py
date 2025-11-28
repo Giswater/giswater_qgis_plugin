@@ -2463,7 +2463,7 @@ class GwInfo(QObject):
                         action = dialog.findChild(QAction, act['actionName'])
                         if action is not None and act['actionName'] != "actionAudit":
                             if 'actionTooltip' in act:
-                                action.setToolTip(act['actionTooltip'])
+                                action.setToolTip(tools_qt.tr(act['actionTooltip']))
                             action.setVisible(True)
 
         if enable_actions:

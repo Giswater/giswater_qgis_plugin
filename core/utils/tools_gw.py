@@ -47,6 +47,7 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
+from ...libs import tools_qt
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ... import global_vars
@@ -1896,7 +1897,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
                     if action:
                         action.setVisible(True)
                         if 'actionTooltip' in act:
-                            action.setToolTip(act['actionTooltip'])
+                            action.setToolTip(tools_qt.tr(act['actionTooltip']))
 
     # Enable/Disable actions based on global and static rules
     static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
