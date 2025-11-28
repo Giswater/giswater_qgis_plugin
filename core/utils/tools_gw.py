@@ -47,7 +47,6 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
-from ...libs import tools_qt
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ... import global_vars
