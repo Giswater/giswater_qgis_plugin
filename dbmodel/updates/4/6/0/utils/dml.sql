@@ -153,3 +153,7 @@ $$;
 
 UPDATE sys_fprocess SET except_msg = 'registers on arc''s catalog with null values on dint column.' WHERE fid=283;
 UPDATE sys_message SET error_message = 'No node was found at these coordinates' WHERE id=3694;
+
+-- 24/11/2025
+UPDATE config_form_fields SET dv_querytext='SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE '
+WHERE formname ilike 've_%' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
