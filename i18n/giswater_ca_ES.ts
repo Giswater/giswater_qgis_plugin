@@ -19018,7 +19018,7 @@
 		</message>
 		<message>
 			<source>tooltip_actionCustomMincut</source>
-			<translation>None</translation>
+			<translation>Polígon de tall personalitzat</translation>
 		</message>
 		<message>
 			<source>actionExportHydroCsv</source>
