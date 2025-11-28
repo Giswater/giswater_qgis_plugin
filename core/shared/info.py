@@ -429,7 +429,9 @@ class GwInfo(QObject):
                     msg = "Widget {0} is not configured or have a bad config"
                     msg_params = (field['columnname'],)
                     tools_qgis.show_message(msg, dialog=dialog, msg_params=msg_params)
-            if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
+            if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                if str(widget.property('columnname')) != 'sector_id' and str(value) == '-1':
+                    continue
                 if widget.property('saveValue') is None:
                     self.my_json[str(widget.property('columnname'))] = str(value)
 
