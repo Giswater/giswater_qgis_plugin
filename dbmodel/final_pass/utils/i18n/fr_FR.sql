@@ -11430,7 +11430,7 @@ FROM (
 ('gullycat_id', '%_gully%', 'form_feature', 'tab_data', 'Gullycat id:', 'Gullycat_id'),
 ('gully_id', '%_gully%', 'form_feature', 'tab_data', 'Gully id:', 'Gully_id'),
 ('gully_type', '%_gully%', 'form_feature', 'tab_data', 'Gully type:', 'Gully_type'),
-('initoverflowpath', '%_arc%', 'form_feature', 'tab_data', 'Inicio flujos derivados:', 'Este campo es de suma importancia puesto que identifica aquellos tramos de red que son inicio de de flujo de caudales en tiempo de lluvia. Esta propiedad les convierte en ser frontera entre las DWFzones y la Drainzones'),
+('initoverflowpath', '%_arc%', 'form_feature', 'tab_data', 'Init overflow path:', 'Este campo es de suma importancia puesto que identifica aquellos tramos de red que son inicio de de flujo de caudales en tiempo de lluvia. Esta propiedad les convierte en ser frontera entre las DWFzones y la Drainzones'),
 ('inlet', '%_node%', 'form_feature', 'tab_data', 'Inlet:', 'Inlet'),
 ('inlet_medium', '%_node%', 'form_feature', 'tab_data', 'Inlet medium:', 'Inlet_medium'),
 ('inlet_offset', '%_arc%', 'form_feature', 'tab_data', 'Inlet offset:', 'Inlet_offset'),
