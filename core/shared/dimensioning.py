@@ -180,8 +180,6 @@ class GwDimensioning:
                     return
                 else:
                     feature_type.setCurrentText('')
-                
-
 
     def _cancel_dimensioning(self, action_snapping, action_orientation):
 
