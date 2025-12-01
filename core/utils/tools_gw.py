@@ -3641,6 +3641,9 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                     vsipath = f"/vsimem/{layer_name}.geojson"
                     gdal.FileFromMemBuffer(vsipath, geojson_str)
                     v_layer = QgsVectorLayer(vsipath, layer_name, 'ogr')
+                    if not v_layer.crs().isValid():
+                        v_layer.setCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
+                    v_layer.updateExtents()
                     geometry_type = v_layer.geometryType()
                     QgsProject.instance().addMapLayer(v_layer, False)
                     root = QgsProject.instance().layerTreeRoot()
