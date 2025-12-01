@@ -189,7 +189,7 @@ DROP VIEW IF EXISTS v_om_mincut_polygon;
 ALTER TABLE om_mincut_polygon RENAME TO _om_mincut_polygon;
 
 -- 01/12/2025
-CREATE INDEX IF NOT EXISTS idx_minsector_graph_minsector_1 ON minsector_graph USING btree (minsector_1);
-CREATE INDEX IF NOT EXISTS idx_minsector_graph_minsector_2 ON minsector_graph USING btree (minsector_2);
+CREATE INDEX IF NOT EXISTS minsector_graph_minsector_1_idx ON minsector_graph USING btree ("minsector_1");
+CREATE INDEX IF NOT EXISTS minsector_graph_minsector_2_idx ON minsector_graph USING btree ("minsector_2");
 
-CREATE INDEX IF NOT EXISTS idx_minsector_mincut_mincut_minsector_id ON minsector_mincut USING btree (mincut_minsector_id);
+CREATE INDEX IF NOT EXISTS minsector_mincut_mincut_minsector_id_idx ON minsector_mincut USING btree ("mincut_minsector_id");

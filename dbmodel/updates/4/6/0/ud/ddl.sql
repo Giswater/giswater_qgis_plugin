@@ -143,9 +143,10 @@ ALTER TABLE IF EXISTS ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydromete
 DROP TABLE IF EXISTS selector_hydrometer;
 
 -- 01/12/2025
-CREATE INDEX IF NOT EXISTS idx_omunit_node_1 ON omunit USING btree (node_1);
-CREATE INDEX IF NOT EXISTS idx_omunit_node_2 ON omunit USING btree (node_2);
-CREATE INDEX IF NOT EXISTS idx_omunit_macroomunit_id ON omunit USING btree (macroomunit_id);
+CREATE INDEX IF NOT EXISTS omunit_node_1_idx ON omunit USING btree ("node_1");
+CREATE INDEX IF NOT EXISTS omunit_node_2_idx ON omunit USING btree ("node_2");
+CREATE INDEX IF NOT EXISTS omunit_macroomunit_id_idx ON omunit USING btree ("macroomunit_id");
 
-CREATE INDEX IF NOT EXISTS idx_macroomunit_node_1 ON macroomunit USING btree (node_1);
-CREATE INDEX IF NOT EXISTS idx_macroomunit_node_2 ON macroomunit USING btree (node_2);
+CREATE INDEX IF NOT EXISTS macroomunit_node_1_idx ON macroomunit USING btree ("node_1");
+CREATE INDEX IF NOT EXISTS macroomunit_node_2_idx ON macroomunit USING btree ("node_2");
+CREATE INDEX IF NOT EXISTS macroomunit_catchment_node_idx ON macroomunit USING btree ("catchment_node");

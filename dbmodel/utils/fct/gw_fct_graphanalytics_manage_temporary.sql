@@ -193,12 +193,7 @@ BEGIN
                 CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_target_idx ON temp_pgr_linegraph USING btree ("target");
                 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_omunit (LIKE SCHEMA_NAME.omunit INCLUDING ALL);
-                CREATE INDEX IF NOT EXISTS temp_pgr_omunit_node_1_idx ON temp_pgr_omunit USING btree ("node_1");
-                CREATE INDEX IF NOT EXISTS temp_pgr_omunit_node_2_idx ON temp_pgr_omunit USING btree ("node_2");
-                CREATE INDEX IF NOT EXISTS temp_pgr_omunit_macroomunit_id_idx ON temp_pgr_omunit USING btree ("macroomunit_id");
-
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_macroomunit (LIKE SCHEMA_NAME.macroomunit INCLUDING ALL);
-                CREATE INDEX IF NOT EXISTS temp_pgr_macroomunit_catchment_node_idx ON temp_pgr_macroomunit USING btree ("catchment_node");
 
             END IF;
         END IF;
