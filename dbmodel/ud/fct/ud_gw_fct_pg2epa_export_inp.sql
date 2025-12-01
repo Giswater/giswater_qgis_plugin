@@ -496,7 +496,7 @@ BEGIN
 	    temp_t_node_other.base,
 	    temp_t_node_other.pattern_id
 	   FROM temp_t_node_other
-	  WHERE temp_t_node_other.type::text = 'FLOW'::text
+	  WHERE temp_t_node_other.type::text = 'FLOW'::text AND active
 	UNION
 	 SELECT temp_t_node_other.node_id,
 	    temp_t_node_other.poll_id AS type,
@@ -507,7 +507,7 @@ BEGIN
 	    temp_t_node_other.base,
 	    temp_t_node_other.pattern_id
 	   FROM temp_t_node_other
-	  WHERE temp_t_node_other.type::text = 'POLLUTANT'::text
+	  WHERE temp_t_node_other.type::text = 'POLLUTANT'::text  AND active
 	  ORDER BY 1;
 
 
