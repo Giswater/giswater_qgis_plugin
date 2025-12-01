@@ -42,7 +42,9 @@ class GwDimensioning:
         # Set layers dimensions, node and connec
         self.layer_dimensions = tools_qgis.get_layer_by_tablename("ve_dimensions")
         self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
         self.layer_connec = tools_qgis.get_layer_by_tablename("ve_connec")
+        self.layer_gully = tools_qgis.get_layer_by_tablename("ve_gully")
 
         feature = None
         if qgis_feature is None:
@@ -99,6 +101,10 @@ class GwDimensioning:
         self.dlg_dim.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(rubber_band.reset)
         self.dlg_dim.dlg_closed.connect(self.layer_node.removeSelection)
+        if self.layer_arc:
+            self.dlg_dim.dlg_closed.connect(self.layer_arc.removeSelection)
+        if self.layer_gully:
+            self.dlg_dim.dlg_closed.connect(self.layer_gully.removeSelection)
         if self.layer_connec:
             self.dlg_dim.dlg_closed.connect(self.layer_connec.removeSelection)
 
@@ -258,6 +264,9 @@ class GwDimensioning:
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
+        self.iface.setActiveLayer(self.layer_arc)
+        self.iface.setActiveLayer(self.layer_connec)
+        self.iface.setActiveLayer(self.layer_gully)
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move,
                                 'dimensioning', 'snapping_xyCoordinates_mouse_move')
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._click_button_snapping, action, emit_point),
@@ -274,7 +283,7 @@ class GwDimensioning:
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            if layer == self.layer_node or layer == self.layer_connec:
+            if layer == self.layer_node or layer == self.layer_connec or layer == self.layer_arc or layer == self.layer_gully:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def _click_button_snapping(self, action, emit_point, point, btn):
@@ -306,8 +315,17 @@ class GwDimensioning:
                 feat_type = 'node'
             elif layer == self.layer_connec:
                 feat_type = 'connec'
+            elif layer == self.layer_arc:
+                feat_type = 'arc'
+            elif layer == self.layer_gully:
+                feat_type = 'gully'
             else:
                 return
+
+            if self.layer_node: self.layer_node.removeSelection()
+            if self.layer_arc: self.layer_arc.removeSelection()
+            if self.layer_connec: self.layer_connec.removeSelection()
+            if self.layer_gully: self.layer_gully.removeSelection()
 
             # Get the point
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
@@ -435,6 +453,10 @@ class GwDimensioning:
                 self.map_tip_node.showMapTip(self.layer_node, point_qgs, point_qt, self.canvas)
             if self.layer_connec:
                 self.map_tip_connec.showMapTip(self.layer_connec, point_qgs, point_qt, self.canvas)
+            if self.layer_arc:
+                self.map_tip_arc.showMapTip(self.layer_arc, point_qgs, point_qt, self.canvas)
+            if self.layer_gully:
+                self.map_tip_gully.showMapTip(self.layer_gully, point_qgs, point_qt, self.canvas)
             self.timer_map_tips_clear.start(1000)
 
     def _clear_map_tip(self):
