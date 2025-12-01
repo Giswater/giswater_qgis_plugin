@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
+from qgis.PyQt.QtWidgets import QWidget, QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
@@ -152,10 +152,36 @@ class GwDimensioning:
         tools_qt.hide_void_groupbox(self.dlg_dim)
         self.iface.actionPan().trigger()
 
+        self.dlg_dim.findChild(QWidget, "feature_id").textChanged.connect(partial(self._feature_id_changed, self.dlg_dim))
+
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning')
         return False, False
 
     # region private functions
+
+    def _feature_id_changed(self, dialog, text: str) -> None:
+        feature_type = dialog.findChild(QComboBox, "feature_type")
+        text = int(text) if text.isdigit() else None
+        if not text:
+            feature_type.setCurrentText('')
+            return
+
+        layer_feature_map = {
+            self.layer_node: 'NODE',
+            self.layer_arc: 'ARC',
+            self.layer_connec: 'CONNEC',
+            self.layer_gully: 'GULLY'
+        }
+
+        for layer, feature_type_text in layer_feature_map.items():
+            if layer:
+                if layer.getFeature(text).isValid():
+                    feature_type.setCurrentText(feature_type_text)
+                    return
+                else:
+                    feature_type.setCurrentText('')
+                
+
 
     def _cancel_dimensioning(self, action_snapping, action_orientation):
 
@@ -322,10 +348,14 @@ class GwDimensioning:
             else:
                 return
 
-            if self.layer_node: self.layer_node.removeSelection()
-            if self.layer_arc: self.layer_arc.removeSelection()
-            if self.layer_connec: self.layer_connec.removeSelection()
-            if self.layer_gully: self.layer_gully.removeSelection()
+            if self.layer_node:
+                self.layer_node.removeSelection()
+            if self.layer_arc:
+                self.layer_arc.removeSelection()
+            if self.layer_connec:
+                self.layer_connec.removeSelection()
+            if self.layer_gully:
+                self.layer_gully.removeSelection()
 
             # Get the point
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
