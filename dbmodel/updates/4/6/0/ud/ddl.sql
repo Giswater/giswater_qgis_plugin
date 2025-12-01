@@ -153,4 +153,4 @@ CREATE INDEX IF NOT EXISTS macroomunit_catchment_node_idx ON macroomunit USING b
 
 ALTER TABLE inp_dscenario_inflows ADD active boolean NULL;
 ALTER TABLE inp_dscenario_inflows ALTER COLUMN active SET DEFAULT true;
-ALTER TABLE temp_node ADD active boolean NULL;
+ALTER TABLE temp_node_other ADD active boolean NULL;
