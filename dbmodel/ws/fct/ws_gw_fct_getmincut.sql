@@ -332,13 +332,12 @@ BEGIN
         -- get v_bbox for geometry
       	SELECT
 		    jsonb_build_object(
-		      'x1', ST_XMin(the_geom),
-		      'y1', ST_YMin(the_geom),
-		      'x2', ST_XMax(the_geom),
-		      'y2', ST_YMax(the_geom)
+		      'x1', ST_XMin(ST_Extent(the_geom)),
+		      'y1', ST_YMin(ST_Extent(the_geom)),
+		      'x2', ST_XMax(ST_Extent(the_geom)),
+		      'y2', ST_YMax(ST_Extent(the_geom))
 		    )
 		FROM v_om_mincut_arc
-		limit 1
 		into v_bbox;
 
         -- mincut details
