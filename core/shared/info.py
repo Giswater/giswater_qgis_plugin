@@ -605,10 +605,11 @@ class GwInfo(QObject):
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
 
-        self._show_actions(self.dlg_cf, 'tab_data')
+        
         if self.new_feature_id is not None:
             self._enable_action(self.dlg_cf, "actionCentered", False)
             self._enable_action(self.dlg_cf, "actionSetToArc", False)
+        self._show_actions(self.dlg_cf, 'tab_data')
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
