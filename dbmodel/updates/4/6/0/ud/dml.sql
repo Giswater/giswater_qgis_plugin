@@ -83,3 +83,26 @@ WHERE "parameter"='basic_search_network_connec';
 
 INSERT INTO sys_table(id, sys_role, source) VALUES ('omunit', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table(id, sys_role, source) VALUES ('macroomunit', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+-- 01/12/2025
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='btn_doc_delete' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='btn_doc_insert' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='btn_doc_new' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='doc_name' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL,tooltip=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='hspacer_document_1' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='open_doc' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL,tooltip=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='tbl_documents' AND tabname='tab_documents';

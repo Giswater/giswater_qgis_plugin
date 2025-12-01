@@ -1066,3 +1066,26 @@ $$;
 -- 24/11/2025
 UPDATE config_form_fields SET dv_querytext='SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE '
 WHERE formname ilike 've_%' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+
+-- 01/12/2025
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='btn_doc_delete' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='btn_doc_insert' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='btn_doc_new' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='doc_name' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL,tooltip=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='hspacer_document_1' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='open_doc' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET "label"=NULL,tooltip=NULL
+	WHERE formname='element' AND formtype='form_feature' AND columnname='tbl_documents' AND tabname='tab_documents';
