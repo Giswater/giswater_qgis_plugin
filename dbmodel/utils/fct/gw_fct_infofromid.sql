@@ -629,7 +629,7 @@ BEGIN
            ) as rn
     FROM config_form_tabs
     WHERE (formname ='||quote_nullable(v_table_parent)||' OR formname ='||quote_nullable(v_table_class)||' OR formname ='||quote_nullable(v_table_child)||' OR formname ='||quote_nullable(v_tablename)||' OR formname IS NULL)
-          AND 4 = ANY(device)
+          AND '||quote_nullable(v_device)||' = ANY(device)
 	) AS subquery
 	WHERE rn = 1
 	ORDER BY orderby)a');
