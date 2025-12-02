@@ -301,22 +301,22 @@ BEGIN
 		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
 
 		-- insertar inflows
-		INSERT INTO temp_t_node_other (node_id, type, timser_id, other, sfactor, base, pattern_id)
-		SELECT node_id, 'FLOW', timser_id, 'FLOW', sfactor, base, pattern_id FROM inp_dscenario_inflows d
+		INSERT INTO temp_t_node_other (node_id, type, timser_id, other, sfactor, base, pattern_id, active)
+		SELECT node_id, 'FLOW', timser_id, order_id, sfactor, base, pattern_id, active FROM inp_dscenario_inflows d
 		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
-		ON CONFLICT (node_id, type) DO NOTHING;
+		ON CONFLICT (node_id, other, type) DO NOTHING;
 
 		-- insertar inflows poll
 		INSERT INTO temp_t_node_other (node_id, type, poll_id, timser_id, other,  mfactor, sfactor, base, pattern_id)
 		SELECT node_id, 'POLLUTANT', poll_id, timser_id, form_type, mfactor, sfactor, base, pattern_id FROM inp_dscenario_inflows_poll d
 		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
-		ON CONFLICT (node_id, type) DO NOTHING;
+		ON CONFLICT (node_id, other, type) DO NOTHING;
 
 		-- insertar treatment
 		INSERT INTO temp_t_node_other (node_id, poll_id, other)
 		SELECT node_id, poll_id, function FROM inp_dscenario_treatment d
 		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
-		ON CONFLICT (node_id, type) DO NOTHING;
+		ON CONFLICT (node_id, other, type) DO NOTHING;
 	END IF;
 
 
