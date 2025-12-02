@@ -3716,8 +3716,10 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         color = QColor(color[0], color[1], color[2])
                         if key == 'point':
                             v_layer.renderer().symbol().setSize(size)
-                        elif key in ('line', 'polygon'):
+                        elif key == 'line':
                             v_layer.renderer().symbol().setWidth(size)
+                        elif key == 'polygon':
+                            pass
                         v_layer.renderer().symbol().setColor(color)
                         v_layer.renderer().symbol().setOpacity(opacity)
 
