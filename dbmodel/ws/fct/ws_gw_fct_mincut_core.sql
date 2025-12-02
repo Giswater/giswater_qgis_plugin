@@ -353,14 +353,6 @@ BEGIN
                 );',
                 v_temp_arc_table, v_temp_node_table
             );
-
-            UPDATE temp_pgr_arc a set mapzone_id = 2
-            WHERE a.mapzone_id = 0
-            AND EXISTS (
-                SELECT  1 FROM temp_pgr_node n
-                WHERE n.mapzone_id = 2
-                AND n.pgr_node_id  IN (a.pgr_node_1, a.pgr_node_2)
-            );
         END IF;
     END IF;
 
