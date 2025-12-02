@@ -1089,3 +1089,29 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET "label"=NULL,tooltip=NULL
 	WHERE formname='element' AND formtype='form_feature' AND columnname='tbl_documents' AND tabname='tab_documents';
+
+-- 02/12/2025
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
