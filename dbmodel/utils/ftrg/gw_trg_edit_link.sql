@@ -124,7 +124,7 @@ BEGIN
 
 	-- topology control
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		IF OLD.linkcat_id != NEW.linkcat_id AND NEW.linkcat_id NOT IN (SELECT id FROM cat_link WHERE link_type = NEW.link_type) THEN
+		IF NEW.linkcat_id NOT IN (SELECT id FROM cat_link WHERE link_type = NEW.link_type) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	       		"data":{"message":"4464", "function":"1116","parameters":null, "is_process":true}}$$);';
 		END IF;

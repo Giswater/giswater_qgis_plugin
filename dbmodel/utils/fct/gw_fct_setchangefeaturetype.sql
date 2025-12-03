@@ -111,14 +111,9 @@ BEGIN
 	END IF;
 
 
-	IF v_project_type = 'WS' THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'
-		WHERE '||v_id_column||'='''||v_feature_id||''';';
-	ELSE
-		EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_feature_type||'_type='||quote_literal(v_feature_type_new)||',
-		'||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'
-		WHERE '||v_id_column||'='''||v_feature_id||''';';
-	END IF;
+	EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_feature_type||'_type='||quote_literal(v_feature_type_new)||',
+	'||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'
+	WHERE '||v_id_column||'='''||v_feature_id||''';';
 
 	IF EXISTS (
         SELECT 1
