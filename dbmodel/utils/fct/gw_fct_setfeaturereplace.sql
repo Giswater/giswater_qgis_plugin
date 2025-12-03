@@ -114,6 +114,7 @@ v_code_prefix text;
 v_code_autofill_bool boolean;
 v_link text;
 v_nodetype text;
+v_check_featurecat_id boolean;
 
 BEGIN
 
@@ -141,6 +142,12 @@ BEGIN
 	v_keep_elements = ((p_data ->>'data')::json->>'keep_elements')::text;
 	v_feature_type_new = ((p_data ->>'data')::json->>'feature_type_new')::text;
 	v_featurecat_id_new = ((p_data ->>'data')::json->>'featurecat_id')::text;
+
+	EXECUTE format('SELECT 1 FROM cat_%I WHERE %I_type = %L AND id = %L', v_feature_type, v_feature_type, v_feature_type_new, v_featurecat_id_new) INTO v_check_featurecat_id;
+	IF v_check_featurecat_id IS NOT TRUE THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"4464", "function":"2714","parameters":null, "is_process":true}}$$);';
+	END IF;
 
 	--deactivate connec proximity control
 	IF v_feature_type='connec' THEN
