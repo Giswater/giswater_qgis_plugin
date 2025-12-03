@@ -53,7 +53,7 @@ BEGIN
             id SERIAL NOT NULL,
             component INTEGER,
             mapzone_id INTEGER[],
-            name VARCHAR(50),
+            name VARCHAR(100),
             the_geom geometry(Geometry, SRID_VALUE),
             CONSTRAINT temp_pgr_mapzone_pkey PRIMARY KEY (id)
         );
