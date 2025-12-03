@@ -94,7 +94,7 @@ BEGIN
 	END IF;
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
+	v_version := COALESCE(v_version, ''); 
 	v_layerColumns = COALESCE(v_layerColumns, '{}');
 
 	-- Return

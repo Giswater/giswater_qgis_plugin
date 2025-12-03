@@ -64,7 +64,7 @@ BEGIN
 	END IF;
 			
 	--    Control nulls
-	v_version := COALESCE(v_version, '{}'); 
+	v_version := COALESCE(v_version, ''); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 	--  Return

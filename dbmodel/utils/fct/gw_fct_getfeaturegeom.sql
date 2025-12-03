@@ -80,7 +80,7 @@ BEGIN
 
 	END LOOP;
 
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_return := COALESCE(v_return, '{}');
 
 	-- Return

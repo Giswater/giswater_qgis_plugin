@@ -260,7 +260,7 @@ BEGIN
 	-- returning
 	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"values":',v_result, '}');
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_geometry := COALESCE(v_geometry, '{}');
 	v_mincutdetails := COALESCE(v_mincutdetails, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');

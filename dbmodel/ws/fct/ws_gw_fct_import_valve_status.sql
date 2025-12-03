@@ -107,7 +107,7 @@ BEGIN
 	v_result_info = concat ('{"values":',v_result, '}');
 				
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
+	v_version := COALESCE(v_version, ''); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	
 	-- Return

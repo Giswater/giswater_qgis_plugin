@@ -248,7 +248,7 @@ BEGIN
     PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"UD", "action":"DROP", "group":"LOG"}}}')::json);
 
     --Control nulls
-    v_version := COALESCE(v_version, '{}');
+    v_version := COALESCE(v_version, '');
     v_result_info := COALESCE(v_result_info, '{}');
 
     -- Return

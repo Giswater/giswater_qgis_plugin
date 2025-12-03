@@ -27,8 +27,8 @@ SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang"
 		"feature":{"featureType":"lot", "tableName":"om_visit_lot", "id":44, "idName": "id"}}')
 
 psector:
-  SELECT SCHEMA_NAME.gw_fct_setdelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-  "feature":{"id":["1"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", "idName":"psector_id"}, 
+  SELECT SCHEMA_NAME.gw_fct_setdelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+  "feature":{"id":["1"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", "idName":"psector_id"},
   "data":{"filterFields":{}, "pageInfo":{}}}$$);
 */
 
@@ -39,7 +39,7 @@ v_id  character varying;
 v_querytext varchar;
 v_featuretype text;
 v_idname text;
-v_psector_array text; 
+v_psector_array text;
 rec_type record;
 rec text;
 v_count integer;
@@ -59,10 +59,10 @@ BEGIN
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
-	
+
 	--  get api version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-     
+
 	-- Get input parameters:
 	v_feature := (p_data ->> 'feature');
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
@@ -80,22 +80,22 @@ BEGIN
 			EXECUTE 'SELECT array_agg('||rec_type.id||'_id) FROM plan_psector_x_'||rec_type.id||' 
 			WHERE  psector_id::text IN ('||v_psector_array||')'
 			INTO v_feature_array;
-		
+
 			IF v_feature_array IS NOT NULL THEN
-	
+
 					FOREACH rec IN ARRAY(v_feature_array) LOOP
-						
+
 						EXECUTE 'SELECT count(psector_id) FROM plan_psector_x_'||rec_type.id||' 
 						JOIN '||rec_type.id||' n USING ('||rec_type.id||'_id) 
 						WHERE n.state = 2 AND '||rec_type.id||'_id = '||quote_literal(rec)||''
 						INTO v_count;
-						
+
 						IF v_count = 1 THEN
 							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 							"feature":{"type":"'||rec_type.id||'"}, 
 							"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||rec||'"}}$$);';
 						END IF;
-					 
+
 					END LOOP;
 			END IF;
 		END LOOP;
@@ -105,7 +105,7 @@ BEGIN
 		iNTO v_result ;
 
 		v_id=replace(v_psector_array::text,'''','');
-		
+
 		IF v_result IS NOT NULL THEN
 			EXECUTE 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' IN ('||v_psector_array||')';
 			v_message = concat('"Psector ',v_id,' has been deleted."');
@@ -125,17 +125,17 @@ BEGIN
 			ELSIF v_tablename = 'om_visit_event_photo' THEN
 				v_featuretype ='file';
 			ELSIF v_tablename = 'om_visit' THEN
-				v_featuretype ='visit';	
+				v_featuretype ='visit';
 		END IF;
 		*/
-			
+
 		-- check if feature exists
 		v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
 		EXECUTE v_querytext INTO v_result ;
 
 		-- if exists
 		IF v_result IS NOT NULL THEN
-			
+
 			-- exception for lots with related visits. Show Warning message
 			IF v_tablename='om_visit_lot' THEN
 				SELECT count(*) INTO v_count FROM om_visit WHERE lot_id=v_id::integer;
@@ -143,13 +143,13 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3201", "function":"2608","parameters":null, "is_process":true}}$$);'INTO v_message2;
 					v_message2 = (((v_message2->>'body')::json->>'data')::json->>'info')::json;
-					RETURN ('{"status":"Accepted", "message":'||v_message2||', "apiVersion":'|| v_version ||',
-					"body": {}}')::json; 
-				END IF;				   
+					RETURN ('{"status":"Accepted", "message":'||v_message2||', "version":"'|| v_version ||'",
+					"body": {}}')::json;
+				END IF;
 			END IF;
-		
+
 			v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
-			
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3114", "function":"2608","parameters":null, "is_process":true}}$$)'
 			INTO v_message;
@@ -162,10 +162,10 @@ BEGIN
 	END IF;
 	-- Return
     RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'|| v_version ||'"'||
-	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;    
+	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
     RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 END;
 $BODY$

@@ -136,7 +136,7 @@ BEGIN
 	v_featureinfo := COALESCE(v_featureinfo, '{}');
 	v_fields := COALESCE(v_fields, '{}');
 	v_message := COALESCE(v_message, '{}');
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_fields_json := COALESCE(v_fields_json, '{}');
 
     -- Create return

@@ -432,7 +432,7 @@ BEGIN
 	v_result_line = v_result::text;
 
 	--Control nulls
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_point := COALESCE(v_result_point, '{}');
 	v_result_line := COALESCE(v_result_line, '{}');

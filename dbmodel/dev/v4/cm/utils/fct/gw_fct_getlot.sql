@@ -75,10 +75,10 @@ BEGIN
 	--v_active:= TRUE;
 
 	v_columntype = 'integer';
-	
-	--  Create tabs array	
+
+	--  Create tabs array
 	v_formtabs := '[';
-       
+
 		-- Data tab
 		-----------
 		SELECT gw_fct_getformfields( 'lot', 'form_lot', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
@@ -89,10 +89,10 @@ BEGIN
 			EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM (SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_idname, v_columntype)
 				INTO v_values
 				USING v_id;
-				
+
 			-- setting values
-			FOREACH aux_json IN ARRAY v_fields 
-			LOOP          
+			FOREACH aux_json IN ARRAY v_fields
+			LOOP
 				array_index := array_index + 1;
 				v_fieldvalue := (v_values->>(aux_json->>'columnname'));
 				IF (aux_json->>'columnname') = 'lot_id' THEN
@@ -100,13 +100,13 @@ BEGIN
 				ELSIF (aux_json->>'columnname') IN ('team_id', 'visitclass_id', 'descript') THEN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', TRUE);
 				END IF;
-				
-				IF (aux_json->>'widgettype')='combo' THEN 
+
+				IF (aux_json->>'widgettype')='combo' THEN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
-				ELSE 
+				ELSE
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
 				END IF;
-			END LOOP;	
+			END LOOP;
 
 			-- getting geometry
 			EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id='||v_id||')a'
@@ -120,11 +120,11 @@ BEGIN
 			v_id= (select MAX(id)+1 from om_visit_lot);
 
 			-- building header
-			v_formheader :=concat('NOU LOT - ', v_id);							
+			v_formheader :=concat('NOU LOT - ', v_id);
 
 			-- setting values
-			FOREACH aux_json IN ARRAY v_fields 
-			LOOP          
+			FOREACH aux_json IN ARRAY v_fields
+			LOOP
 				array_index := array_index + 1;
 				IF (aux_json->>'columnname') = 'id' THEN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_id, ''));
@@ -134,18 +134,18 @@ BEGIN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 				END IF;
 			END LOOP;
-										
-		END IF;	
-	
+
+		END IF;
+
 		v_fields_json = array_to_json (v_fields);
-		v_fields_json := COALESCE(v_fields_json, '{}');	
-				
+		v_fields_json := COALESCE(v_fields_json, '{}');
+
 		-- building
 		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tab_data' and device = v_device LIMIT 1;
-		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tab_data' LIMIT 1;			
+		IF v_tab IS NULL THEN
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tab_data' LIMIT 1;
 		END IF;
-		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 
+		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip,
 		'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
 
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
@@ -154,24 +154,24 @@ BEGIN
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
 
-           
+
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabs::json);
-	
+
 
 	--  Control NULL's
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	raise notice' 1 % 2 % 3 % 4 % 5 % ', v_message, v_version, v_tablename, v_id, v_geometry;
-  
+
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_version||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'||v_version||'"'||
              ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"id", "id":"'||v_id||'"}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"geometry":'|| v_geometry ||'}}'||

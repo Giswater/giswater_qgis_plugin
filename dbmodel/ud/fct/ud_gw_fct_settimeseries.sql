@@ -68,7 +68,7 @@ BEGIN
 	where cur_user = current_user and parameter = 'inp_options_report_start_time';
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
+	v_version := COALESCE(v_version, ''); 
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_return_status||'", "message":{"level":'||v_return_level||', "text":"'||v_return_msg||'"}, "version":"'||v_version||'"'||

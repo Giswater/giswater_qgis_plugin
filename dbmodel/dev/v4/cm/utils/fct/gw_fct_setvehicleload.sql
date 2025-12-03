@@ -51,14 +51,14 @@ BEGIN
 
     EXECUTE 'SELECT project_type FROM sys_version'
 	INTO v_version;
-	
+
 	--  get input values
     v_client = (p_data ->>'client')::json;
-    v_vehicle_name = ((p_data ->>'data')::json->>'fields')::json->>'vehicle_id';	
-    v_load = ((p_data ->>'data')::json->>'fields')::json->>'load';	
+    v_vehicle_name = ((p_data ->>'data')::json->>'fields')::json->>'vehicle_id';
+    v_load = ((p_data ->>'data')::json->>'fields')::json->>'load';
     v_hash = ((p_data ->>'data')::json->>'fields')::json->>'hash';
     v_photo_url = ((p_data ->>'data')::json->>'fields')::json->>'photo_url';
-		
+
 	-- Get vehicle id
 	--EXECUTE 'SELECT id FROM ext_cat_vehicle WHERE idval = '''|| v_vehicle_name ||'''' INTO v_vehicle_id;
 
@@ -72,25 +72,25 @@ BEGIN
 		-- Inserting data (Without started lot)
 		EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, lot_id, team_id, image, load, cur_user, tstamp) VALUES('''||COALESCE(v_vehicle_name, '')||''','||v_record.lot_id||','||v_record.team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
 	END IF;
-		
+
 	-- message
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;		
+	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;
 
 	--  Control NULL's
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_message := COALESCE(v_message, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_version ||',
-	"body": {}, "data":{}}')::json; 
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'|| v_version ||'",
+	"body": {}, "data":{}}')::json;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-	
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -199,7 +199,7 @@ BEGIN
 	v_action = concat('[{"funcName": "add_query_layer", "params":', v_action_params, '}]');
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return

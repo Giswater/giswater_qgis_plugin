@@ -452,7 +452,7 @@ BEGIN
 		UNION SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');

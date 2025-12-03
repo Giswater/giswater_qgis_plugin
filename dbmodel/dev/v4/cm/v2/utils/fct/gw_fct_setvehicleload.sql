@@ -41,37 +41,37 @@ BEGIN
 	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
-	
+
 	--  get input values
     v_client = (p_data ->>'client')::json;
     v_vehicle_id = ((p_data ->>'data')::json->>'fields')::json->>'vehicle_id';
     v_team_id = ((p_data ->>'data')::json->>'fields')::json->>'team_id';
-    v_load = ((p_data ->>'data')::json->>'fields')::json->>'load';	
+    v_load = ((p_data ->>'data')::json->>'fields')::json->>'load';
     v_hash = ((p_data ->>'data')::json->>'fields')::json->>'hash';
     v_photo_url = ((p_data ->>'data')::json->>'fields')::json->>'photo_url';
-   
+
 	-- don't allow to add a load without related photo
 	IF v_hash IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3199", "function":"2912","debug_msg":""}}$$);'INTO v_message;
 		v_message = (((v_message->>'body')::json->>'data')::json->>'info')::json;
-		RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_version ||',
-		"body": {}}')::json; 
-		
+		RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'|| v_version ||'",
+		"body": {}}')::json;
+
 	END IF;
-		
+
 	-- Inserting data (doesn't matter if lot is started or not)
 	EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, team_id, image, load, cur_user, tstamp) 
 	VALUES('''||v_vehicle_id||''','||v_team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
 
 	-- message
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;	
-	
+	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;
+
 	v_message = (((v_message->>'body')::json->>'data')::json->>'info')::json;
 
 	--  Control NULL's
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_message := COALESCE(v_message, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
@@ -89,7 +89,7 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-	
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

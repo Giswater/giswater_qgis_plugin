@@ -160,7 +160,7 @@ BEGIN
 	v_status := coalesce(v_status, 'Accepted');
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '{}');
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 

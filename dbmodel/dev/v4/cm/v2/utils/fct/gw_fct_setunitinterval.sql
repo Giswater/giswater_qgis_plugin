@@ -23,7 +23,7 @@ SELECT SCHEMA_NAME.gw_fct_setunitinterval($${
 "form":{"tabData":{"active":true},"tabFiles":{"active":false},"navigation":{"currentActiveTab":"tab_data"}},
 "data":{"relatedFeature":{"type":"unit", "id":"1032", "tableName":"ve_lot_x_unit_web"},
 "fields":{"class_id":"15","startdate":"2022-04-01 15:26","lot_id":"1010","unit_id":"1032","arc_id":"4736","tram_exec_visit":0,"status":"4"},"pageInfo":null}}$$) AS result
-                    
+
 */
 DECLARE
 
@@ -44,15 +44,15 @@ BEGIN
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
-		
+
 --  get parameters from input
 	v_unit_id = (((p_data ->>'data')::json->>'fields')::json->>'unit_id')::integer;
 	v_lot_id = (((p_data ->>'data')::json->>'fields')::json->>'lot_id')::integer;
-	
+
 	-- Manage interval
 	v_querystring = 'SELECT * FROM om_unit_intervals WHERE unit_id = ' || v_unit_id || ' AND lot_id = '|| v_lot_id ||' ORDER BY startdate DESC LIMIT 1';
-	EXECUTE v_querystring INTO v_rec;	
-	
+	EXECUTE v_querystring INTO v_rec;
+
 	IF v_rec.unit_id IS NULL OR v_rec.enddate IS NOT NULL THEN
 		EXECUTE ('INSERT INTO  om_unit_intervals (unit_id, startdate, lot_id, user_name) VALUES ($1, $2, $3, current_user);')
 		USING v_unit_id, now()::timestamp, v_lot_id;
@@ -60,16 +60,16 @@ BEGIN
 		v_data = gw_fct_json_object_set_key((p_data->>'data')::json,'fields', v_data);
 		p_data = gw_fct_json_object_set_key(p_data,'data', v_data);
 	ELSIF v_rec.enddate IS NULL THEN
-		EXECUTE ('UPDATE om_unit_intervals SET enddate = $1 WHERE unit_id = $2 AND enddate is NULL AND lot_id = $3 AND user_name = current_user;') 
+		EXECUTE ('UPDATE om_unit_intervals SET enddate = $1 WHERE unit_id = $2 AND enddate is NULL AND lot_id = $3 AND user_name = current_user;')
 		USING now()::timestamp, v_unit_id, v_lot_id;
-	END IF;	
-	
+	END IF;
+
 	-- Return Get visit setting activitat id
 	RETURN gw_api_getvisit(p_data);
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$;

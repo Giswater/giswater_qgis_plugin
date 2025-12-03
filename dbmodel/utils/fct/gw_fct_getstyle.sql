@@ -84,7 +84,7 @@ BEGIN
 	END IF;
 
 	-- Ensure version and return JSON are initialized
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_styles := COALESCE(v_styles, '{}');
 
 	-- Return the final JSON structure

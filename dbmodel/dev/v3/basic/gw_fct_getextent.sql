@@ -43,12 +43,12 @@ BEGIN
     -- if v_tiled_filter is sent as null, default tiles will be used
 		v_tiled_filter = 'null';
 	--END IF;
-	
+
 -- getting from expl_x_user variable to setup v_filterfrominput
 
 	v_filterfrominput = ' WHERE expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)';
 
-	
+
 -- get envelope
 	EXECUTE 'SELECT row_to_json (a) 
 	FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
@@ -68,8 +68,8 @@ BEGIN
 
 
 -- Exception handling
---	EXCEPTION WHEN OTHERS THEN 
-		--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+--	EXCEPTION WHEN OTHERS THEN
+		--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":"'|| v_version || '","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
