@@ -19,39 +19,42 @@ VALUES(9997, 'gw_fct_cso_calculation', 'ud', 'function', 'json', 'json', 'CSO Al
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) 
 VALUES(9997, 'CSO Algorithm', '{"featureType":[]}'::json, '[
   {
-    "widgetname": "macroexplId",
-    "label": "Macroexploitation",
-    "widgettype": "combo",
-    "datatype": "integer",
-    "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.",
+    "label": "Exploitation:",
+    "value": null,
+    "datatype": "text",
     "layoutname": "grl_option_parameters",
-    "layoutorder": 15,
-    "isMandatory": false,
-    "dvQueryText":"SELECT id, idval FROM ( SELECT -901 AS id, ''User selected macroexpl'' AS idval, ''a'' AS sort_order UNION SELECT macroexpl_id AS id, concat(macroexpl_id, '' - '', name) AS idval, ''c'' AS sort_order FROM macroexploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC",
-    "selectedId": ""
+    "selectedId": null,
+    "widgetname": "exploitation",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id AS id, concat(expl_id, ' - ', name) AS idval FROM exploitation e WHERE length(expl_id::text) <3 AND expl_id>0 ORDER BY 1",
+    "layoutorder": 1
   },
   {
     "widgetname": "drainzoneId",
-    "label": "Drainzone id",
+    "label": "Drainzone",
     "widgettype": "text",
     "datatype": "text",
-    "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.",
+    "tooltip": "1234, 529857, 478374",
     "layoutname": "grl_option_parameters",
-    "layoutorder": 16,
-    "isMandatory": false,
-    "placeholder": "5,456,589 - Leave null to use all drainzones of the selected macroexpl",
-    "value": ""
+    "layoutorder": 2
+  },
+  {
+    "label": "Mode:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "mode",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT 'CALIBRATION' as id, 'CALIBRATION' as idval UNION SELECT 'EXECUTION' as id, 'EXECUTION' as idval",
+    "layoutorder": 3
   },
   {
     "widgetname": "inflowsDscenarioName",
-    "label": "Create Inflow dscenario: ",
+    "label": "Inflows dscenario name (OPTIONAL):",
     "widgettype": "text",
     "datatype": "text",
-    "tooltip": "Type the name of the dscenario of inflows",
+    "placeholder": "Leave null to not create an inflows dscenario",
     "layoutname": "grl_option_parameters",
-    "layoutorder": 17,
-    "isMandatory": false,
-    "placeholder": " Leave null to not create an inflow dscenario",
-    "value": ""
+    "layoutorder": 4
   }
-]'::json, NULL, true);
+]'::json, NULL, true;

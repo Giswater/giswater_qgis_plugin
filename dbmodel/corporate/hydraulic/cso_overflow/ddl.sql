@@ -8,6 +8,9 @@ or (at your option) any later version.
 
 SET search_path = "SCHEMA_NAME", public;
 
+
+-- ANCHOR Tables
+
 CREATE TABLE cso_inp_system_subc (
 	node_id varchar NOT NULL,
 	drainzone_id integer NULL,
@@ -21,37 +24,28 @@ CREATE TABLE cso_inp_system_subc (
 	kb numeric NULL,
 	active bool NULL,
 	vret_imperv numeric NULL,
+	muni_name text NULL,
+	macroexpl_name text NULL,
+	expl_name text NULL,
+	calib_coeff_runoff numeric NULL,
+	calib_imperv_area numeric NULL,
 	CONSTRAINT cso_inp_system_subc_pkey PRIMARY KEY (node_id),
 	CONSTRAINT unique_node_id_drainzone_id UNIQUE (node_id, drainzone_id)
 );
 
-CREATE TABLE cso_out_vol (
-	rowid serial4 NOT NULL PRIMARY KEY,
-	node_id text NOT NULL,
-	drainzone_id text NULL,
-	rf_name text NULL,
-	rf_tstep text NULL,
-	rf_volume numeric(10,3) NULL,
-	vol_residual numeric(10,3) NULL,
-	vol_max_epi numeric(10,3) NULL,
-	vol_res_epi numeric(10,3) NULL,
-	vol_rainfall numeric(10,3) NULL,
-	vol_total numeric(10,3) NULL,
-	vol_runoff numeric(10,3) NULL,
-	vol_infiltr numeric(10,3) NULL,
-	vol_circ numeric(10,3) NULL,
-	vol_circ_dep numeric(10,3) NULL,
-	vol_circ_red numeric(10,3) NULL,
-	vol_non_leaked numeric(10,3) NULL,
-	vol_leaked numeric(10,3) NULL,
-	vol_wwtp numeric(10,3) NULL,
-	vol_treated numeric(10,3) NULL,
-	efficiency numeric(10,3) NULL,
-	rf_intensity numeric(10,3) NULL
+CREATE TABLE cso_subc_dwf_all (
+	id int4 NOT NULL DEFAULT nextval('cso_subc_id_seq'::regclass),
+	node_type text NULL,
+	drainzone_id int4 NULL,
+	consumption numeric(10, 3) NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	node_id text NULL,
+	macroexpl_id int4 NULL,
+	CONSTRAINT cso_subc_dwf_all_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE cso_subc_wwf (
-	node_id text NULL,
+CREATE TABLE cso_subc_wwf_all (
+	id int4 NOT NULL DEFAULT nextval('cso_subc_id_seq'::regclass),
 	node_type text NULL,
 	drainzone_id int4 NULL,
 	lito_reclass text NULL,
@@ -63,22 +57,73 @@ CREATE TABLE cso_subc_wwf (
 	c_value numeric(10,3) NULL,
 	ci_value numeric(10,3) NULL,
 	the_geom public.geometry(MULTIPOLYGON, SRID_VALUE) NULL
-	CONSTRAINT cso_subc_wwf_pkey PRIMARY KEY (node_id)
+	node_id text NULL,
+	macroexpl_id int4 NULL,
+	CONSTRAINT id_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE cso_subc_dwf (
-	node_id text NOT NULL,
-	node_type text NULL,
-	drainzone_id int4 NULL,
-	consumption numeric(10,3) NULL,
-	the_geom public.geometry(MULTIPOLYGON, SRID_VALUE) NULL
-	CONSTRAINT cso_subc_dwf_pkey PRIMARY KEY (node_id)
+CREATE TABLE cso_zone_type_plv (
+	id int4 NOT NULL DEFAULT nextval('cso_area_type_id_seq'::regclass),
+	area_type text NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	expl_id int4 NOT NULL,
+	thy_plv bool NULL,
+	thy_res bool NULL,
+	active bool NULL,
+	CONSTRAINT cso_area_type_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE cso_zone_type_res (
+	id int4 NOT NULL DEFAULT nextval('cso_area_type_id_seq'::regclass),
+	area_type text NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	expl_id int4 NOT NULL,
+	active bool NULL,
+	CONSTRAINT cso_area_type_res_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE cso_calibration (
+	drainzone_id int4 NOT NULL,
+	calib_imperv_area numeric NULL,
+	CONSTRAINT cso_calibration_pkey PRIMARY KEY (drainzone_id)
+);
+
+CREATE TABLE cso_out_vol (
+	rowid int4 NULL,
+	node_id text NULL,
+	drainzone_id int4 NOT NULL,
+	rf_name text NOT NULL,
+	rf_tstep text NOT NULL,
+	rf_volume float4 NULL,
+	vol_residual float4 NULL,
+	vol_max_epi float4 NULL,
+	vol_res_epi float4 NULL,
+	vol_rainfall float4 NULL,
+	vol_total float4 NULL,
+	vol_runoff float4 NULL,
+	vol_infiltr float4 NULL,
+	vol_circ float4 NULL,
+	vol_circ_dep float4 NULL,
+	vol_circ_red float4 NULL,
+	vol_non_leaked float4 NULL,
+	vol_leaked float4 NULL,
+	vol_wwtp float4 NULL,
+	vol_treated float4 NULL,
+	efficiency float4 NULL,
+	rf_intensity float4 NULL,
+	lastupdate timestamp NULL,
+	CONSTRAINT pkey PRIMARY KEY (drainzone_id, rf_name, rf_tstep)
 );
 
 
-ALTER TABLE cso_out_vol ADD CONSTRAINT cso_out_vol_rf_name_fkey FOREIGN KEY (rf_name) REFERENCES inp_timeseries(id);
-ALTER TABLE cso_out_vol ADD CONSTRAINT node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id);
+-- ANCHOR Foreign keys
+ALTER TABLE cso_calibration ADD CONSTRAINT cso_calibration_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE cso_out_vol ADD CONSTRAINT drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id);
+ALTER TABLE cso_out_vol ADD CONSTRAINT rf_name_fkey FOREIGN KEY (rf_name) REFERENCES inp_timeseries(id);
+
+
+-- ANCHOR Index
 
 CREATE INDEX cso_out_vol_node_id ON cso_out_vol USING btree (node_id);
 CREATE INDEX cso_out_vol_rf_name ON cso_out_vol USING btree (rf_name);
