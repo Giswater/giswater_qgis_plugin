@@ -174,9 +174,11 @@ class GwAuxPointAddButton(GwMaptool):
             for tablename, alias in rows:
                 lyr = tools_qgis.get_layer_by_tablename(tablename)
                 if not lyr:
-                    geom = f'geom_{alias.lower()}'
                     if tablename == 've_cad_auxcircle':
-                        geom = 'geom_polygon'
+                        geom = 'geom_multicurve'
+                    else:
+                        geom_type = tablename.replace('ve_cad_aux', '')
+                        geom = f'geom_{geom_type.lower()}'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 
     def _init_create_point_form(self, point_1=None, point_2=None):
