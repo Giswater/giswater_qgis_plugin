@@ -73,7 +73,10 @@ BEGIN
 
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-
+		IF OLD.conneccat_id != NEW.conneccat_id AND NEW.conneccat_id NOT IN (SELECT id FROM cat_connec WHERE connec_type = NEW.connec_type) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	       		"data":{"message":"4464", "function":"1204","parameters":null, "is_process":true}}$$);';
+		END IF;
 		-- managing matcat
 		IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.conneccat_id) IS NOT NULL THEN
 			v_matfromcat = true;

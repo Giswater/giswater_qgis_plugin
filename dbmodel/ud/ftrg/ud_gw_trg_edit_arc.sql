@@ -63,6 +63,11 @@ BEGIN
 	SELECT value::boolean into v_auto_sander FROM config_param_system WHERE parameter='edit_node_automatic_sander';
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+
+		IF OLD.arccat_id != NEW.arccat_id AND NEW.arccat_id NOT IN (SELECT id FROM cat_arc WHERE arc_type = NEW.arc_type) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	       		"data":{"message":"4464", "function":"1202","parameters":null, "is_process":true}}$$);';
+		END IF;
 		-- managing matcat
 		IF (SELECT matcat_id FROM cat_arc WHERE id = NEW.arccat_id) IS NOT NULL THEN
 			v_matfromcat = true;

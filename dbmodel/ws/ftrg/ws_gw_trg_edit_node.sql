@@ -118,6 +118,10 @@ BEGIN
 		-- man2inp_values
 		SELECT child_layer, feature_class INTO v_man_view, v_feature_class FROM cat_feature f JOIN cat_node c ON c.node_type = f.id WHERE c.id = NEW.nodecat_id;
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
+		IF OLD.nodecat_id != NEW.nodecat_id AND NEW.nodecat_id NOT IN (SELECT id FROM cat_node WHERE node_type = NEW.node_type) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	       		"data":{"message":"4464", "function":"1320","parameters":null, "is_process":true}}$$);';
+		END IF;
 	END IF;
 
 	-- Control insertions ID

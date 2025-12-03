@@ -91,7 +91,10 @@ BEGIN
 			    = 'plan_psector_current'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-
+		IF OLD.conneccat_id != NEW.conneccat_id AND NEW.conneccat_id NOT IN (SELECT id FROM cat_connec WHERE connec_type = NEW.connec_type) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	       		"data":{"message":"4464", "function":"1304","parameters":null, "is_process":true}}$$);';
+		END IF;
 		-- check arc exploitation
 		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
 			IF (SELECT expl_id FROM arc WHERE arc_id = NEW.arc_id) != NEW.expl_id THEN

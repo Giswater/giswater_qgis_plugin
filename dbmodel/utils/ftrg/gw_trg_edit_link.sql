@@ -124,7 +124,10 @@ BEGIN
 
 	-- topology control
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-
+		IF OLD.linkcat_id != NEW.linkcat_id AND NEW.linkcat_id NOT IN (SELECT id FROM cat_link WHERE link_type = NEW.link_type) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	       		"data":{"message":"4464", "function":"1116","parameters":null, "is_process":true}}$$);';
+		END IF;
 		-- temporary disable linktonetwork
 		UPDATE config_param_user SET value='TRUE' WHERE parameter = 'edit_connec_disable_linktonetwork' AND cur_user = current_user;
 

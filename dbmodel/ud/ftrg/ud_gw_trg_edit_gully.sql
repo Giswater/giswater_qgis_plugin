@@ -112,7 +112,10 @@ BEGIN
 	= 'plan_psector_current'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-
+		IF OLD.gullycat_id != NEW.gullycat_id AND NEW.gullycat_id NOT IN (SELECT id FROM cat_gully WHERE gully_type = NEW.gully_type) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	       		"data":{"message":"4464", "function":"1206","parameters":null, "is_process":true}}$$);';
+		END IF;
 		-- managing matcat
 		IF (SELECT matcat_id FROM cat_gully WHERE id = NEW.gullycat_id) IS NOT NULL THEN
 			v_matfromcat = true;

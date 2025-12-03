@@ -128,6 +128,11 @@ BEGIN
 			v_man_view  = (SELECT child_layer FROM cat_feature WHERE id = NEW.node_type);
 			v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
+			IF OLD.nodecat_id != NEW.nodecat_id AND NEW.nodecat_id NOT IN (SELECT id FROM cat_node WHERE node_type = NEW.node_type) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4464", "function":"1220","parameters":null, "is_process":true}}$$);';
+			END IF;
+
 			--check if feature is double geom
 			EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
 			FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''

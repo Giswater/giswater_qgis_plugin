@@ -210,3 +210,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",
 	VALUES ('om_visit_cat','form_feature','tab_none','feature_type','string','combo','Feature Type:','feature_type',false,true,'SELECT DISTINCT feature_type as id, feature_type as idval FROM cat_feature',false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
 	VALUES ('om_visit_cat','form_feature','tab_none','alias','string','text','Alias:','alias',false,true,false);
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES (4464, 'The selected catalog is not available for the feature type selected', 'Select another catalog', 2, true, 'utils', 'core');
