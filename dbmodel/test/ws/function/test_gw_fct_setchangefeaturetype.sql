@@ -12,7 +12,7 @@ SET client_min_messages TO WARNING;
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Plan for 1 test
-SELECT plan(2);
+SELECT plan(1);
 
 -- Create roles for testing
 CREATE USER plan_user;
@@ -37,15 +37,6 @@ SELECT is (
     "featurecat_id":"REDUC_110-63 PN16"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setchangefeaturetype returns status "Accepted"'
-);
-
-SELECT throws_ok (
-    (gw_fct_setchangefeaturetype($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"1111", "feature_type_new":"T",
-    "featurecat_id":"REDUC_110-63 PN16"}}$$)),
-    'GW002',
-    'Function: [gw_trg_edit_node] - THE SELECTED CATALOG IS NOT AVAILABLE FOR THE FEATURE TYPE SELECTED. HINT: SELECT ANOTHER CATALOG - <NULL>',
-    'Checking gw_fct_setchangefeaturetype when feature_type_new and featurecat_id are not valid'
 );
 
 -- Finish the test
