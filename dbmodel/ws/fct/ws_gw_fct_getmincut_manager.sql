@@ -30,7 +30,7 @@ DECLARE
 
   v_fields_array json[];
   v_fieldsjson jsonb := '[]';
-  v_version json;
+  v_version text;
   v_response json;
   v_error_context text;
 
@@ -38,9 +38,7 @@ BEGIN
   -- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	  -- Get api version
-  v_version := row_to_json(row) FROM (
-    SELECT value FROM config_param_system WHERE parameter='admin_version'
-  ) row;
+  SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
   SELECT gw_fct_getformfields(
     'mincut_manager',
@@ -132,7 +130,7 @@ BEGIN
 
   v_response := '{
     "status": "Accepted",
-    "version": '|| v_version ||',
+    "version": "'|| v_version ||'",
     "body": {
       "data": {
         "fields": '|| v_fieldsjson ||'

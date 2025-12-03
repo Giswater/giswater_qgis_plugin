@@ -41,7 +41,7 @@ SELECT SCHEMA_NAME.gw_fct_setfeaturedelete(CONCAT('
 
 DECLARE
 
-v_version json;
+v_version text;
 v_feature_type text;
 v_feature_id integer;
 v_arc_id text;
@@ -70,8 +70,7 @@ BEGIN
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 		--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
  	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
@@ -364,7 +363,7 @@ BEGIN
 	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 
     RETURN ('{"status":"Accepted", "version":'||v_version||

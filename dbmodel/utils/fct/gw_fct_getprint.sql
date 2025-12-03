@@ -34,7 +34,7 @@ table_pkey varchar;
 schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
-v_version json;
+v_version text;
 v_value_vdef character varying;
 formTabs text;
 formTabs_inittab json;
@@ -54,8 +54,7 @@ BEGIN
     schemas_array := current_schemas(FALSE);
 
     -- Get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_device = ((p_data ->>'client')::json->>'device')::integer;
 	v_activecomposer = ((p_data ->>'data')::json->>'composers');
@@ -101,7 +100,7 @@ BEGIN
       formInfo := json_build_object('formId','F41','formName','Impressio');
 
 	-- check null
-      v_version := COALESCE(v_version, '[]');
+      v_version := COALESCE(v_version, '');
       formInfo := COALESCE(formInfo, '[]'); 
       formTabs := COALESCE(formTabs, '[]');      
 

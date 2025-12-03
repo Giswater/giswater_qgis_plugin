@@ -30,7 +30,7 @@ schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
 formtodisplay text;
-v_version json;
+v_version text;
 v_force_formrefresh text = 'FALSE';
 v_force_canvasrefresh text = 'FALSE';
 v_enable_editgeom text = 'TRUE';
@@ -47,8 +47,7 @@ BEGIN
     schemas_array := current_schemas(FALSE);
 
 	--  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	--  Control of null values
     IF id='NULL' or id='' THEN id=null;

@@ -38,7 +38,7 @@ combo_json json;
 fieldsJson json;
 formSearch json;
 formPsector json;
-v_version json;
+v_version text;
 formAddress json;
 formVisit json;
 
@@ -93,8 +93,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api values
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- get values from input
     v_addschema = (p_data ->>'data')::json->>'addSchema';
@@ -199,15 +198,14 @@ BEGIN
 		v_form := COALESCE(v_form, '[]');
 
 		-- Return
-		RETURN (concat('{"status":"Accepted", "version":', v_version, ', "body":{"data":{"searchResults":', to_json(v_result_array), '}}}'))::json;
+		RETURN (concat('{"status":"Accepted", "version":"', v_version, '", "body":{"data":{"searchResults":', to_json(v_result_array), '}}}'))::json;
 
 	else
 		-- Set search path to local schema
 		SET search_path = "SCHEMA_NAME", public;
 
 		--  get api values
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	        INTO v_version;
+		SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	    -- get values from input
 	    v_singletab = (p_data ->>'form')::json->>'singleTab';
@@ -671,11 +669,11 @@ BEGIN
 		-- Return
 		IF v_firsttab IS FALSE THEN
 			-- Return not implemented
-			RETURN (concat('{"status":"Accepted", "version":', v_version, ', "enabled":false}'))::json;
+			RETURN (concat('{"status":"Accepted", "version":"', v_version, '", "enabled":false}'))::json;
 		ELSE
 
 			-- Return
-			RETURN (concat('{"status":"Accepted", "version":', v_version, ', "enabled":true,"form":', v_form, '}'))::json;
+			RETURN (concat('{"status":"Accepted", "version":"', v_version, '", "enabled":true,"form":', v_form, '}'))::json;
 		END IF;
 
 	end if;

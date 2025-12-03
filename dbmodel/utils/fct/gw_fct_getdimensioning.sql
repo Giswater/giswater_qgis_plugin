@@ -24,7 +24,7 @@ DECLARE
 
 v_status text ='Accepted';
 v_message json;
-v_version json;
+v_version text;
 v_forminfo json;
 v_featureinfo json;
 v_linkpath json;
@@ -58,8 +58,7 @@ BEGIN
 	v_epsg = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
     
 	-- Get values from config
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 		
 	-- Get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -124,7 +123,7 @@ BEGIN
 	-- Control NULL's
 	v_status := COALESCE(v_status, '{}');    
 	v_message := COALESCE(v_message, '{}');    
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_featureinfo := COALESCE(v_featureinfo, '{}');
 	v_linkpath := COALESCE(v_linkpath, '{}');
@@ -132,7 +131,7 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}');
 
 	-- Return
-    RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
+    RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":"' || v_version || '"' ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||

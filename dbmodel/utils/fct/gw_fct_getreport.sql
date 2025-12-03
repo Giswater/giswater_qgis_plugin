@@ -70,8 +70,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input parameter
 	v_list_id := json_extract_path_text(p_data,'data','listId');

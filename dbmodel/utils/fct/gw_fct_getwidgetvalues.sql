@@ -23,7 +23,7 @@ v_project_type text;
 v_noderecord1 record;
 v_noderecord2 record;
 v_return json;
-v_version json;
+v_version text;
 v_min double precision = 0;
 v_max double precision = 999;
 v_min1 double precision = 0;

@@ -37,8 +37,7 @@ BEGIN
     p_type := p_params->>'name';
 
     -- Get version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
-    INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     v_prev_search_path := current_setting('search_path');
     PERFORM set_config('search_path', 'cm,public', true);

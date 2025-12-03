@@ -129,8 +129,7 @@ BEGIN
     v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -518,7 +517,7 @@ BEGIN
 	EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_pkey USING v_tablename;
 
 	-- Control NULL's
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_featuretype := COALESCE(v_featuretype, '');
 	v_tablename := COALESCE(v_tablename, '');
 	v_idname := COALESCE(v_idname, '');
@@ -542,7 +541,7 @@ BEGIN
     END IF;
 
 	-- Return
-    RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||
+    RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{"table":' || v_table_params ||', "headers":' || v_headers_json|| '}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","addparams":'|| v_pkey ||'}'||
 		     ',"data":{"fields":' || v_fields_json ||

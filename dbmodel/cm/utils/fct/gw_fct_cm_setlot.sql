@@ -82,9 +82,7 @@ BEGIN
 	PERFORM cm.gw_fct_cm_polygon_geom(json_build_object('id', COALESCE(v_existing_id, v_record.lot_id), 'name', 'lot'));
 
     -- Retrieve admin version if defined
-    SELECT value INTO v_version
-    FROM config_param_system
-    WHERE parameter = 'admin_version';
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Build successful return JSON
     v_result := json_build_object(

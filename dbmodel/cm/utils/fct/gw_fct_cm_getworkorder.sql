@@ -40,9 +40,7 @@ BEGIN
     v_prev_search_path := current_setting('search_path');
     PERFORM set_config('search_path', 'cm,public', true);
 
-    EXECUTE
-      'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
-    INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     p_data := REPLACE(p_data::text, '"NULL"', 'null')::json;
     p_data := REPLACE(p_data::text, '"null"', 'null')::json;
@@ -123,7 +121,7 @@ BEGIN
 	v_featureinfo := COALESCE(v_featureinfo, '{}');
 	v_fields := COALESCE(v_fields, '{}');
 	v_message := COALESCE(v_message, '{}');
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_fields_json := COALESCE(v_fields_json, '{}');
 
     PERFORM set_config('search_path', v_prev_search_path, true);
@@ -131,7 +129,7 @@ BEGIN
       (
         '{"status":"Accepted",'
        ||'"message":'||v_message||','
-       ||'"version":'||v_version||','
+       ||'"version":"'||v_version||'",'
        ||'"body":{"form":'||v_forminfo
        ||',"feature":'||v_featureinfo
        ||',"data":{"fields":'||v_fields_json||'}}}'

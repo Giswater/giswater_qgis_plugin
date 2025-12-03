@@ -60,8 +60,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT value FROM config_param_system WHERE parameter=''admin_version'''
-	INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	--set current process as users parameter

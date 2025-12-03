@@ -35,7 +35,7 @@ v_x2 double precision;
 v_y2 double precision;
 v_epsg integer;
 v_client_epsg integer;
-v_version json;
+v_version text;
 
 
 BEGIN
@@ -53,7 +53,7 @@ BEGIN
 	v_y2 := (((p_data ->>'data')::json->>'coordinates')::json->>'y2')::float;
 	
 	--  get system values
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row' iNTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_epsg = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);	
 
 	-- set geometry column (in this case is not need to transform using the client_epsg because qgis client sends the original geometry data 

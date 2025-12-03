@@ -47,7 +47,7 @@ v_idarg varchar;
 v_searchtext varchar;
 v_tab varchar;
 v_editable varchar;
-v_version json;
+v_version text;
 v_projecttype character varying;
  
 -- Street
@@ -73,8 +73,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  get project type
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;

@@ -77,8 +77,7 @@ BEGIN
 	SELECT project_type, epsg INTO v_project_type,v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--	getting input data
 	v_device := ((p_data ->>'client')::json->>'device')::text;
@@ -210,10 +209,10 @@ BEGIN
 
 	-- Control nulls
 	fields := COALESCE(fields, '[]');
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 
 	--  Return
-	RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
 	      ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 		      ',"form":'||(p_data->>'form')::json||
 		      ',"feature":'||(p_data->>'feature')::json||

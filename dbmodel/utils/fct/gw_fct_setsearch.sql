@@ -49,7 +49,7 @@ v_textarg varchar;
 v_tab varchar;
 v_combo json;
 v_edittext json;
-v_version json;
+v_version text;
 v_projecttype character varying;
 v_count integer;
 v_querytext text;
@@ -152,8 +152,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	-- Set api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get project type
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;

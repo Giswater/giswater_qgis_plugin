@@ -41,8 +41,7 @@ BEGIN
 	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get project type
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -102,7 +101,7 @@ BEGIN
 	END IF;
 	
 	-- Control NULL's
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_feature := COALESCE(v_feature, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 

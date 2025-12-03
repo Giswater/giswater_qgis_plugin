@@ -18,7 +18,7 @@ $BODY$
 
 DECLARE
 
-v_version json;
+v_version text;
 v_permissions json;
 v_permissions_array json[];
 schemas_array name[];
@@ -32,8 +32,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -57,7 +56,7 @@ BEGIN
 
     v_permissions = array_to_json (v_permissions_array);
 
-    v_version := COALESCE(v_version, '{}');
+    v_version := COALESCE(v_version, '');
     v_permissions := COALESCE(v_permissions, '{}');
  
 	-- Return

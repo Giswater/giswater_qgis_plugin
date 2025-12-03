@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_getgo2epa($${
 
 DECLARE
 
-v_version json;
+v_version text;
 v_formname text;
 v_fields  json[];
 v_fields_json json;
@@ -32,8 +32,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	-- get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input parameters
 	v_formname := (p_data ->> 'form')::json->> 'formName';
@@ -46,10 +45,10 @@ BEGIN
 
 	-- Control NULL's
 	v_fields := COALESCE(v_fields, '{}');
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 		
 	-- Return
-    RETURN ('{"status":"Accepted", "version":'||v_version||
+    RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'||
 			',"data":{"fields":' || v_fields_json ||

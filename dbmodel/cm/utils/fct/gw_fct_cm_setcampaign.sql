@@ -14,7 +14,7 @@ $BODY$
 DECLARE
     v_status TEXT := 'Accepted';
     v_message JSON;
-    v_version JSON;
+    v_version TEXT;
     v_fields JSON;
     v_client JSON;
     v_campaign_type INT;
@@ -38,8 +38,7 @@ BEGIN
     v_schemaname = 'cm';
 
     -- Get version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
-    INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Parse input
     v_client := (p_data ->> 'client')::json;

@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":5, "lang":"es_ES", "cur
 
 DECLARE
 
-v_version json;
+v_version text;
 v_device integer;
 v_feature_type text;
 column_type text;
@@ -92,7 +92,7 @@ BEGIN
 
 
 	-- Get api version
-	v_version := row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter='admin_version') row;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  Get parameters from input
 	v_device = ((p_data ->>'client')::json->>'device')::integer;
@@ -396,7 +396,7 @@ BEGIN
 	-- Return
 	return ('{
 	"status": "Accepted",
-	"version": '|| v_version ||',
+	"version": "'|| v_version ||'",
 	"body": {
 	  "data": {
 		"form": '|| v_forminfo ||',

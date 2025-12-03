@@ -27,7 +27,7 @@ v_fields_array text[];
 v_field text;
 v_json_array json[];
 schemas_array name[];
-v_version json;
+v_version text;
 v_tablename text;
 v_feature_id integer;
 i integer = 0;
@@ -47,8 +47,7 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  get parameters from input
 	v_tablename = ((p_data ->>'feature')::json->>'tableName')::text;
@@ -80,7 +79,7 @@ BEGIN
 	v_fields := array_to_json(v_json_array);
 
 	-- Control NULL's
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 	v_fields := COALESCE(v_fields, '[]');   
 	    
 	-- Return

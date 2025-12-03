@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfocrossection($${
 DECLARE
 
 v_id integer;
-v_version json;
+v_version text;
 v_fields json;
 v_currency_symbol varchar;
 v_shape varchar;
@@ -34,8 +34,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::integer;
@@ -78,7 +77,7 @@ BEGIN
 	v_fields := COALESCE(v_fields, '[]');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{}, "version":'||v_version||
+	RETURN ('{"status":"Accepted", "message":{}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"shapepng":"' || v_shape ||'"'||

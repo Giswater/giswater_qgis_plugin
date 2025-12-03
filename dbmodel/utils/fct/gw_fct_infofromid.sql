@@ -93,7 +93,7 @@ v_featuretype text;
 v_featureclass text;
 column_type text;
 v_schemaname text;
-v_version json;
+v_version text;
 v_geometry json;
 v_the_geom text;
 v_table_parent varchar;
@@ -200,8 +200,7 @@ BEGIN
 	END IF;
 
 	-- Get values from config
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 

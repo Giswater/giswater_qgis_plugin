@@ -29,7 +29,7 @@ rec_tab record;
 
 v_formTabsAux  json;
 v_formTabs text;
-v_version json;
+v_version text;
 v_active boolean=false;
 v_firsttab boolean=false;
 v_selector_list text;
@@ -109,8 +109,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get system values
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 

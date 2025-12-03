@@ -37,8 +37,7 @@ BEGIN
     v_schemaname = 'SCHEMA_NAME';
 
 	-- get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
        
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';

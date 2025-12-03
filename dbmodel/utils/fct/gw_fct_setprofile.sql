@@ -13,7 +13,7 @@ $BODY$
 DECLARE
 
 /*
- 
+
 SELECT "SCHEMA_NAME".gw_fct_setprofile($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
@@ -25,12 +25,12 @@ SELECT "SCHEMA_NAME".gw_fct_setprofile($${
 "form":{},
 "feature":{},
 "data":{"profile_id":"1",} "action":"delete"}$$)
-*/  
-    
-	
+*/
+
+
 --    Variables
     schemas_array name[];
-    v_version json;
+    v_version text;
     v_fields json [];
     v_device integer;
     v_profile text;
@@ -52,7 +52,7 @@ SELECT "SCHEMA_NAME".gw_fct_setprofile($${
     v_scale_ev integer;
     v_values text;
     v_action text;
-    
+
 
 BEGIN
 
@@ -79,11 +79,10 @@ BEGIN
 	v_scale_eh := (((p_data ->>'data')::json->>'scale')::json->>'eh')::integer;
 	v_scale_ev := (((p_data ->>'data')::json->>'scale')::json->>'ev')::integer;
 	v_action := ((p_data ->>'data')::json->>'action')::text;
-	
+
 
 	-- Get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 	IF v_action = 'delete' THEN
@@ -96,7 +95,7 @@ BEGIN
 			-- Populate values
 			v_values = '{"initNode":'||v_init_node||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'","linksDistance":'||COALESCE(v_linksDistance::text, '""')||', "legendFactor":'||COALESCE(v_legendFactor::text, '""')||', "papersize":{"id":'||COALESCE(v_papersize_id::text, '""')||', "customDim":{"xdim":'||COALESCE(v_papersize_xdim::text, '""')||', "ydim":'||COALESCE(v_papersize_ydim::text, '""')||'}}, "title":"'||COALESCE(v_title, '""')||'","date":"'||COALESCE(v_date::text, '""')||'", "scale":{"scaleToFit":'||COALESCE(v_scaletofit::text, '""')||', "eh":'||COALESCE(v_scale_eh::text,'""')||', "ev":'||COALESCE(v_scale_ev::text, '""')||'}}';
 			EXECUTE 'INSERT INTO om_profile (profile_id, values) VALUES ('''||v_profile_id||''', '''||v_values||''')';
-			
+
 			v_message := 'Values has been updated';
 		ELSE
 			v_message := 'Selected ''profile_id'' already exist in database';
@@ -104,9 +103,9 @@ BEGIN
 	END IF;
 
 	-- Check null
-	v_version := COALESCE(v_version, '[]');    
-	v_fields := COALESCE(v_fields, '{}'); 
-		
+	v_version := COALESCE(v_version, '');
+	v_fields := COALESCE(v_fields, '{}');
+
 	--    Return
 	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":' || v_version ||
 	      ',"body":{"data":{}'||
@@ -114,7 +113,7 @@ BEGIN
 		'}')::json;
 
 	--    Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
+	--EXCEPTION WHEN OTHERS THEN
 	--RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 

@@ -95,9 +95,7 @@ BEGIN
   END IF;
 
   -- fetch new version
-  SELECT value INTO v_version
-    FROM config_param_system
-   WHERE parameter = 'admin_version';
+  SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
   -- prepare return payload
   v_result := json_build_object(

@@ -70,9 +70,6 @@ BEGIN
 
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
-
 	-- manage log (fid: 518)
 	DELETE FROM audit_check_data WHERE fid=518 AND cur_user=current_user;
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -361,7 +358,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"values":',v_result, '}');
 	v_result_info := COALESCE(v_result_info, '{}');
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 
 	-- return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||

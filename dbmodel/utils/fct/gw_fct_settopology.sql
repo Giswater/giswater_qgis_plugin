@@ -24,7 +24,7 @@ DECLARE
 v_device integer;
 v_infotype integer;
 v_id  character varying;
-v_version json;
+v_version text;
 v_text text[];
 text text;
 i integer=1;
@@ -51,8 +51,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
         -- get project type
         v_projecttype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
@@ -95,7 +94,7 @@ BEGIN
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 	
 	-- Control NULL's
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||

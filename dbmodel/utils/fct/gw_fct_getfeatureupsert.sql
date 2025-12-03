@@ -57,7 +57,7 @@ combo_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
-v_version json;
+v_version text;
 v_vdefault text;
 v_numnodes integer;
 v_feature_type text;
@@ -189,8 +189,7 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	iNTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -1193,7 +1192,7 @@ BEGIN
 	v_fields := array_to_json(v_fields_array);
 
 	-- Control NULL's
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 	v_fields := COALESCE(v_fields, '[]');
 	v_message := COALESCE(v_message, '[]');
 

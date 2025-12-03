@@ -20,12 +20,12 @@ SELECT "SCHEMA_NAME".gw_fct_getprofile($${
 "feature":{},
 "data":{}}$$)
 
-*/  
-    
-	
+*/
+
+
 --    Variables
     schemas_array name[];
-    v_version json;
+    v_version text;
     v_device integer;
     v_profile integer;
     v_message text;
@@ -33,7 +33,7 @@ SELECT "SCHEMA_NAME".gw_fct_getprofile($${
     v_load_result json;
     v_load_result_array json[];
 
-    
+
 
 BEGIN
 
@@ -44,28 +44,27 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- Get json parameters
-	v_device := ((p_data ->>'client')::json->>'device')::text;	
+	v_device := ((p_data ->>'client')::json->>'device')::text;
 
 	-- Get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT profile_id ,values FROM om_profile ORDER BY profile_id)a' INTO v_load_result_array;
 	v_message := 'Load profiles successfully';
-	
+
 	-- Check null
-	v_version := COALESCE(v_version, '[]');    
-	v_load_result_array := COALESCE(v_load_result_array, '{}'); 
+	v_version := COALESCE(v_version, '');
+	v_load_result_array := COALESCE(v_load_result_array, '{}');
 	v_load_result := array_to_json(v_load_result_array);
-	
+
 	-- Return
-	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":' || v_version ||
+	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":"' || v_version || '"' ||
 	      ',"body":{"data":'||v_load_result||''||
 			'}'||
 		'}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
 	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 

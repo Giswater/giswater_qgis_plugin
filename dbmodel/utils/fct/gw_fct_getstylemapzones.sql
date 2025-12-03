@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_getstylemapzones($${"client":{"device":4, "infoType":1
 
 DECLARE
 
-v_version json;
+v_version text;
 v_sector json;
 v_dma json;
 v_presszone json;
@@ -77,8 +77,7 @@ BEGIN
 
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-    INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	IF 	v_graphclass IS NOT NULL THEN -- called after getgraphinundation
 

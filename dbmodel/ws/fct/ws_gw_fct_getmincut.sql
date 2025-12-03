@@ -28,7 +28,7 @@ DECLARE
     v_mincutid text;
     v_response json;
     v_values jsonb;
-    v_version json;
+    v_version text;
     aux_json json;
     array_index integer DEFAULT 0;
     field_value character varying;
@@ -73,9 +73,7 @@ BEGIN
     v_mincutid := ((p_data ->>'data')::json->>'mincutId')::integer;
 
     -- Get api version
-    v_version := row_to_json(row) FROM (
-    SELECT value FROM config_param_system WHERE parameter='admin_version'
-    ) row;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     IF v_device = 5 THEN
 
@@ -371,7 +369,7 @@ BEGIN
         v_result_node = COALESCE(v_result_node, '{}');
         v_result_connec = COALESCE(v_result_connec, '{}');
         v_result_arc = COALESCE(v_result_arc, '{}');
-        v_response := concat('{"status":"Accepted", "version":',v_version::text,',"body":{"form":{}',
+        v_response := concat('{"status":"Accepted", "version":"',v_version,'","body":{"form":{}',
             ',"feature":{}',
             ',"data":{ "info":',v_result_info::text,
               ',"mincutId":',v_mincutid::text,
@@ -416,7 +414,7 @@ BEGIN
     v_result_info := COALESCE(v_result_info, '{}');
 
     -- return
-    RETURN ('{"status":"Accepted", "version":'||v_version||',"body":{"form":{}'||
+    RETURN ('{"status":"Accepted", "version":"'||v_version||'","body":{"form":{}'||
             ',"data":{ "info":'||v_result_info||'}'||
             '}}')::json;
     END IF;

@@ -31,7 +31,7 @@ DECLARE
 v_formtabs text;
 combo_json json;
 fieldsJson json;
-v_version json;
+v_version text;
 rec_tab record;
 v_firsttab boolean;
 v_active boolean;
@@ -76,8 +76,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input parameters
 	v_formname := (p_data ->> 'form')::json->> 'formName';
@@ -390,11 +389,11 @@ BEGIN
 
 
 	-- Check null
-    v_version := COALESCE(v_version, '[]');
+    v_version := COALESCE(v_version, '');
     v_formtabs := COALESCE(v_formtabs, '[]');
 
 	-- Return
-    RETURN ('{"status":"Accepted", "version":'||v_version||
+    RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'||
 				',"formTabs":'||v_formtabs||

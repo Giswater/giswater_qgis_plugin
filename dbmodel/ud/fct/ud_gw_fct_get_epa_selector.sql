@@ -47,7 +47,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Get API version
-    SELECT value INTO v_version FROM config_param_system WHERE parameter = 'admin_version';
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get current user
 	v_cur_user = ((p_data ->>'client')::json->>'cur_user');

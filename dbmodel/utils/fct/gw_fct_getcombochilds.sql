@@ -30,7 +30,7 @@ v_combo_rows_child json[];
 v_aux_json_child json;
 combo_json_child json;
 schemas_array name[];
-v_version json;
+v_version text;
 query_text text;
 v_current_value text;
 v_column_type varchar;
@@ -47,8 +47,7 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 		
 	-- get column type of idname
     EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
@@ -160,12 +159,12 @@ BEGIN
     v_fields := array_to_json(v_fields_array);
 
 	-- Control NULL's
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
     v_fields := COALESCE(v_fields, '[]');    
     
 	-- Return
     RETURN ('{"status":"Accepted"' ||
-       ', "version":'|| v_version ||
+       ', "version":"'|| v_version ||'"' ||
         ', "fields":' || v_fields ||
         '}')::json;
 

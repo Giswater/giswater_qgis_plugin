@@ -70,7 +70,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Get api version
-    SELECT value INTO v_version FROM config_param_system WHERE parameter='admin_version';
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Get parameters from input
     v_device = ((p_data ->>'client')::json->>'device')::integer;

@@ -52,7 +52,7 @@ v_fields json;
 v_columntype character varying;
 v_querytext varchar;
 v_columntype_id character varying;
-v_version json;
+v_version text;
 v_text text[];
 v_jsonfield json;
 text text;
@@ -85,8 +85,7 @@ BEGIN
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM sys_version' INTO v_epsg;
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');

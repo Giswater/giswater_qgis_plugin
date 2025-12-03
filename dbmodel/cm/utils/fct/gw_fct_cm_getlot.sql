@@ -49,8 +49,7 @@ BEGIN
     PERFORM set_config('search_path', 'cm,public', true);
 
     -- Get version (similar to campaign version)
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM cm.config_param_system WHERE parameter=''admin_version'') row'
-    INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Clean JSON null formats
     p_data := REPLACE(p_data::text, '"NULL"', 'null');
@@ -162,12 +161,12 @@ BEGIN
     v_featureinfo := COALESCE(v_featureinfo, '{}');
     v_fields := COALESCE(v_fields, '{}');
     v_message := COALESCE(v_message, '{}');
-    v_version := COALESCE(v_version, '{}');
+    v_version := COALESCE(v_version, '');
     v_fields_json := COALESCE(v_fields_json, '{}');
 
     -- Create return JSON
     PERFORM set_config('search_path', v_prev_search_path, true);
-    RETURN PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
+    RETURN PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version || '"' ||
       ',"body":{"form":' || v_forminfo ||
          ', "feature":'|| v_featureinfo ||
           ',"data":{"fields":' || v_fields_json ||'}'||

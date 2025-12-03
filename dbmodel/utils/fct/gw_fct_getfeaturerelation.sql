@@ -51,7 +51,7 @@ v_visit text;
 v_doc text;
 v_psector text;
 v_connect_arc text;
-v_version json;
+v_version text;
 v_result_id text= 'feature relations';
 v_result_info text;
 v_result text;
@@ -71,8 +71,7 @@ BEGIN
                        "data":{"function":"2725", "fid":"151", "result_id":"'||quote_nullable(v_result_id)||'", "is_process":true, "is_header":"true"}}$$)';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
@@ -246,7 +245,7 @@ BEGIN
 	v_result_info = concat ('{"values":',v_result, '}');
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}');
+	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 
 	RETURN ('{"status":"Accepted", "version":'||v_version||

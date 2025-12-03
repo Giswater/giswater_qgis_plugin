@@ -31,7 +31,7 @@ select * from SCHEMA_NAME.anl_arc
 
 DECLARE
 
-v_version json;
+v_version text;
 v_tabname text;
 v_tablename text;
 v_columnname text;
@@ -88,8 +88,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get system variables
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');

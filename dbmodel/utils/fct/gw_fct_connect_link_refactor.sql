@@ -31,9 +31,6 @@ BEGIN
 	-- get input parameters
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
-
 	-- new connecs with new link
 	FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_connec WHERE state=1' LOOP
 		INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom) 
@@ -103,10 +100,10 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"values":',v_result, '}');
 	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 
 	-- return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":"'||v_version||'"'||
             ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json, 3184, null, null, null);
 END;
 $BODY$

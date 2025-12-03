@@ -45,7 +45,7 @@ rec text;
 v_count integer;
 v_feature_array text[];
 
-v_version json;
+v_version text;
 v_schemaname text;
 v_message text;
 v_result text;
@@ -61,8 +61,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 	
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
      
 	-- Get input parameters:
 	v_feature := (p_data ->> 'feature');

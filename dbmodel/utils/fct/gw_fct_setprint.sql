@@ -80,8 +80,7 @@ BEGIN
     p_data = REPLACE (p_data::text, '''''', 'null');
 	
     --  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- get data from input
     v_composer := (p_data ->> 'data')::json->> 'composer';
@@ -151,7 +150,7 @@ BEGIN
    v_extent = '"[' || v_xmin || ',' || v_ymin || ',' || v_xmax || ',' || v_ymax || ']"';
 
 	-- Control NULL's
-    v_version := COALESCE(v_version, '{}');
+    v_version := COALESCE(v_version, '');
     v_geometry := COALESCE(v_geometry, '{}');
     v_mapcomposer_name := COALESCE(v_mapcomposer_name, '{}');
     v_extent := COALESCE(v_extent, '{}');

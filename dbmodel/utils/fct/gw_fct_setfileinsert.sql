@@ -22,7 +22,7 @@ SELECT SCHEMA_NAME.gw_fct_setfileinsert($${"client":{"device":4, "infoType":1, "
 DECLARE
 
 v_id int8;
-v_version json;
+v_version text;
 v_outputparameter json;
 v_insertresult json;
 v_message json;
@@ -40,8 +40,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 	--get input parameter

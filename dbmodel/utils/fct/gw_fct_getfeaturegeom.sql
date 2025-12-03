@@ -14,10 +14,10 @@ $BODY$
 /*
  SELECT SCHEMA_NAME.gw_fct_getfeaturegeom($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"feature_type":"gully", "ids":"[1,2,3,4]"}}$$);
 */
- 
+
 DECLARE
 v_return json;
-v_version json;
+v_version text;
 v_feature_type text;
 v_ids text;
 v_ids_aux text[];
@@ -30,24 +30,24 @@ v_count integer = 0;
 v_error_context text;
 
 BEGIN
-	
+
 
 	-- Search path
 	SET search_path = 'SCHEMA_NAME', public;
 
 	v_feature_type = ((p_data ->>'data')::json->>'feature_type');
 	v_ids =  ((p_data ->>'data')::json->>'ids');
-	
+
 	v_idname = v_feature_type || '_id';
 
 	v_ids = replace(v_ids, '[', '');
 	v_ids = replace(v_ids, ']', '');
 	v_ids = replace(v_ids, '''', '');
-	
+
 	SELECT string_to_array(v_ids, ',') into v_ids_aux;
 
 
-	IF v_feature_type IN ('arc','node','connec', 'gully') THEN 
+	IF v_feature_type IN ('arc','node','connec', 'gully') THEN
 		v_the_geom = 'the_geom';
 	ELSE
 		EXECUTE 'SELECT attname FROM pg_attribute a        
@@ -62,22 +62,22 @@ BEGIN
 			LIMIT 1'
 			INTO v_the_geom
 			USING v_feature_type;
-	END IF;	
-		
+	END IF;
+
 	FOR v_id IN SELECT * FROM json_array_elements(array_to_json(v_ids_aux))
 	LOOP
-		
+
 		v_id = replace(v_id::text, '"', '');
 		v_id = replace(v_id::text, ' ', '');
-		
+
 		IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_feature_type)||' WHERE '||quote_ident(v_idname)||' = '||quote_nullable(v_id)||')row'
 			INTO v_geometry;
-			
+
 			fields_array[v_count] := gw_fct_json_object_set_key(fields_array[v_count], v_id::text, v_geometry);
-			
+
 		END IF;
-		
+
 	END LOOP;
 
 	v_version := COALESCE(v_version, '{}');

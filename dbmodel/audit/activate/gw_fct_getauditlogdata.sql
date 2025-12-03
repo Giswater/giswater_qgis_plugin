@@ -37,7 +37,7 @@ BEGIN
 
 	v_schema_parent := (p_data->'schema'->>'parent_schema');
 	-- Get api version
-	EXECUTE format('SELECT value FROM %I.config_param_system WHERE parameter = ''admin_version''', v_schema_parent) INTO v_version;
+	EXECUTE format('SELECT giswater FROM %I.sys_version ORDER BY id DESC LIMIT 1', v_schema_parent) INTO v_version;
 
 	v_log_id = ((p_data ->>'form')::json->>'logId');
 	v_date = ((p_data ->>'form')::json->>'date');
@@ -116,7 +116,7 @@ BEGIN
 	-- Return JSON
 	RETURN jsonb_build_object(
 	        'status', 'Accepted',
-	        'version', to_jsonb(v_version),
+	        'version', v_version,
 	        'olddata', COALESCE(v_olddata, '{}'),
 			'newdata', COALESCE(v_newdata, '{}')
 	    );
