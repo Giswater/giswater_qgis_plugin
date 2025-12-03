@@ -106,7 +106,7 @@ BEGIN
 
 	-- Return
     RETURN ('{"status":"Accepted"' ||
-        ', "version":'|| v_version ||
+        ', "version":"'|| v_version ||'"'||
         ', "formInfo":'|| formInfo || 
         ', "formTabs":' || formTabs ||
         '}')::json;

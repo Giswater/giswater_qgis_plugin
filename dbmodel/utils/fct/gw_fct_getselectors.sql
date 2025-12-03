@@ -518,7 +518,7 @@ BEGIN
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
 		RETURN ('{"status":"Accepted"' ||
-		', "version":'|| v_version ||
+		', "version":"'|| v_version ||'"'||
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE
@@ -536,7 +536,7 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_mincut;
 		DROP TABLE IF EXISTS temp_network;
 		-- Return formtabs
-		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":"'||v_version||'"'||
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||

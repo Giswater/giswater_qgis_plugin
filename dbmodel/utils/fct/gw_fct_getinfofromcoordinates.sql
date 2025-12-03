@@ -314,8 +314,8 @@ BEGIN
 
 	-- Control NULL's
 	IF v_id IS NULL THEN
-		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version
-		||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":"'|| v_version ||'"'||
+		', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 	END IF;
 
 	IF v_toolbar IS NULL THEN

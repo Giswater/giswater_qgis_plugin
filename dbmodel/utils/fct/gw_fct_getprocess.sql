@@ -267,7 +267,7 @@ BEGIN
 	v_process := COALESCE(v_process, '[]');
 
 	-- make return
-	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
+	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'","body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":'|| v_fields ||'}}';
 

@@ -155,7 +155,7 @@ BEGIN
 	v_uservalues := COALESCE(v_uservalues, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||

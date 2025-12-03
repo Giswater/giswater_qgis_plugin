@@ -90,7 +90,7 @@ BEGIN
 	RAISE NOTICE '--- RETURTING FROM gw_fct_setfileinsert WITH MESSAGE: % ---', v_message;
 
 	--    Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'|| v_version ||'"'||
 		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;
 
 END;

@@ -1202,7 +1202,7 @@ BEGIN
 	ELSE
 		RETURN ('{"status":"Failed" '||
 			',"message":{"level":2, "text":"'||v_message||'"}'||
-			',"version":'||v_version||
+			',"version":"'||v_version||'"'||
 			',"body":{'||
 				'"form":{}'||
 				',"feature":{}'||

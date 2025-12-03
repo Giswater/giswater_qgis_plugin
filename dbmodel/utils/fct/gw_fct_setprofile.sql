@@ -107,7 +107,7 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}');
 
 	--    Return
-	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":' || v_version ||
+	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":"' || v_version || '"'||
 	      ',"body":{"data":{}'||
 			'}'||
 		'}')::json;

@@ -273,7 +273,7 @@ BEGIN
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
         "status": "Accepted",
-        "version": ' || to_json(v_version) || ',
+        "version": "' || v_version || '",
         "body": {
 			"form":{' || v_form || '
 			},

@@ -157,7 +157,7 @@ BEGIN
     
 	--Return
     RETURN ('{"status":"Accepted",'||
-     '"version":'|| v_version ||
+     '"version":"'|| v_version ||'"'||
      ',"data":{'||
          '"geometry":'|| v_geometry ||
         ',"map":"' || v_mapcomposer_name || '"'

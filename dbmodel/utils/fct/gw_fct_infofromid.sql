@@ -236,8 +236,8 @@ BEGIN
 
 		IF v_idname_array IS NULL THEN
 			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
-			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version
-			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":"'|| v_version ||'"'||
+			', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 
 		END IF;
 
@@ -925,7 +925,7 @@ BEGIN
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
 	--    Return
-	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":"' || v_version || '"'||
       ',"body":{"form":' || v_forminfo ||
 	     ', "feature":'|| v_featureinfo ||
 	      ',"data":{"editable":' || v_editable ||

@@ -67,7 +67,7 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}'); 
 
 	-- Return
-	RETURN ('{"status":"Accepted"' ||', "version":'|| v_version ||
+	RETURN ('{"status":"Accepted"' ||', "version":"'|| v_version ||'"'||
 		/*', "columns":' || v_columns ||*/
 		/*', "layoutname":"price_layout"'||||*/
 		', "fields":' || v_fields ||

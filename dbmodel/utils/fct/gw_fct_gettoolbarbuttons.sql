@@ -56,7 +56,7 @@ BEGIN
 	v_buttons := COALESCE(v_buttons, '{}');
 	
 	-- Return
-    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||
+    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"buttons":' || v_buttons ||

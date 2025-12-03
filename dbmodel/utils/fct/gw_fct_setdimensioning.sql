@@ -146,7 +146,7 @@ BEGIN
 	EXECUTE v_querytext; 
 	
 	-- Return
-    RETURN ('{"status":"Accepted", "message":"Dimensioning update succesfully", "version":'|| v_version ||
+    RETURN ('{"status":"Accepted", "message":"Dimensioning update succesfully", "version":"'|| v_version ||'"'||
 	    ', "body": {"feature":{}}}')::json; 
 
 	-- Exception handling

@@ -131,7 +131,7 @@ BEGIN
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted"' ||
-		', "version":'|| v_version ||
+		', "version":"'|| v_version ||'"'||
 		', "data":' || v_response ||    
 		'}')::json, 2620, null, null, null);
 

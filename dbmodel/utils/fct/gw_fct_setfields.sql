@@ -348,7 +348,7 @@ BEGIN
 	v_version := COALESCE(v_version, '');
 	v_columnfromid := COALESCE(v_columnfromid, '{}');
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version || '"'||
 	      ',"body":{"data":{"fields":' || v_columnfromid || '}'||
 	      '}'||'}')::json;
 

@@ -126,7 +126,7 @@ BEGIN
 	formTabs := COALESCE(formTabs, '[]');
 
 	-- Return
-    RETURN ('{"status":"Accepted", "version":'||v_version||
+    RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
              ',"body":{"message":{}'||
 			',"form":'||(p_data ->>'form')||
 			',"feature":'||(p_data ->>'feature')||

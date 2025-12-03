@@ -61,7 +61,7 @@ BEGIN
  
 	-- Return
 	RETURN ('{"status":"Accepted"' ||
-		', "version":'|| v_version ||
+		', "version":"'|| v_version ||'"'||
 		', "tableName":"'|| v_table ||'"'||
 		', "isEditable":' || v_iseditable ||
 		', "permissions":'|| v_permissions||

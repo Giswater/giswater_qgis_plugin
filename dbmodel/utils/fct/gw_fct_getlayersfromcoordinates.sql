@@ -335,7 +335,7 @@ BEGIN
 	v_valve_text_netscenario := COALESCE(v_valve_text_netscenario, '');
 
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":"'||v_version||'"'||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||

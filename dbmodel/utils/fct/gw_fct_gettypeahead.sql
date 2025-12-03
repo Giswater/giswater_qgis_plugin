@@ -108,8 +108,8 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
-    	    ', "body": {"data":'|| v_response || '}}')::json;
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'|| v_version ||
+    	    '", "body": {"data":'|| v_response || '}}')::json;
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

@@ -444,7 +444,7 @@ BEGIN
 		-- Return not implemented
 		PERFORM set_config('search_path', v_prev_search_path, true);
 		RETURN ('{"status":"Accepted"' ||
-		', "version":'|| v_version ||
+		', "version":"'|| v_version ||'"'||
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE

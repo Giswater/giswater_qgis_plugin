@@ -97,7 +97,7 @@ BEGIN
 		v_mode  := COALESCE(v_mode, '{}');
 
 		--    Return
-		RETURN ('{"status":"Accepted", "version":'||v_version||
+		RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
 				 ',"body":{"message":{}'||
 				',"data":{"mapzones":
 					[{"name":"graphinundation",  "mode": "'||v_mode||'", "layer":"'||v_templayer||'", "idname": "'||v_idname||'", "transparency":'||v_transparency||', "values":' || v_stylesheet ||'}'||
@@ -195,7 +195,7 @@ BEGIN
 
 
 		--    Return
-		RETURN ('{"status":"Accepted", "version":'||v_version||
+		RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
 					',"body":{"message":{}'||
 				',"data":{"mapzones":
 					[{"name":"sector", "mode": "'||v_modesector||'", "idname": "'||v_colsector||'", "layer":"ve_sector", "transparency":'||v_trasector||', "values":' || v_sector ||'}'||

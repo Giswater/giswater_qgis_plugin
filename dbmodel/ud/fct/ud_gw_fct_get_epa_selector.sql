@@ -124,7 +124,7 @@ BEGIN
 
 	    v_response = ('{
 	        "status": "Accepted",
-	        "version": ' || to_json(v_version) || ',
+	        "version": "' || v_version || '",
 	        "body": {
 				"form":' || v_form || ',
 	            "data": {

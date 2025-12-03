@@ -161,7 +161,7 @@ BEGIN
 		END IF;
 	END IF;
 	-- Return
-    RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
+    RETURN ('{"status":"Accepted", "message":'||v_message||', "version":"'|| v_version ||'"'||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;    
 
 	-- Exception handling

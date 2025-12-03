@@ -174,7 +174,7 @@ BEGIN
 
 	--  Return
     RETURN ('{"status":"Accepted"' ||
-        ', "version":'|| v_version ||
+        ', "version":"'|| v_version ||'"'||
         ', "formToDisplay":"' || formtodisplay || '"' ||
     ', "forceFormRefresh":"' || v_force_formrefresh || '"' ||
     ', "forceCanvasRefresh":"' || v_force_canvasrefresh || '"' ||

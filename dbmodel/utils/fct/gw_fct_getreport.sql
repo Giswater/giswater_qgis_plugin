@@ -192,7 +192,7 @@ BEGIN
 
 	v_fields := COALESCE(v_fields, '{}');
 
-	RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
 	      ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 		      ',"form":{}'||
 		      ',"feature":{}'||

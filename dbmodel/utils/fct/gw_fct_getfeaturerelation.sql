@@ -248,7 +248,7 @@ BEGIN
 	v_version := COALESCE(v_version, '');
 	v_result_info := COALESCE(v_result_info, '{}');
 
-	RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":"'||v_version||'"'||
             ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	-- Exception control

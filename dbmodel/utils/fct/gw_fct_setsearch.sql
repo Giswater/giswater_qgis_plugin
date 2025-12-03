@@ -253,7 +253,7 @@ BEGIN
 		v_response = gw_fct_json_object_set_key (v_response, 'funcValue', v_filter_value);
 
 		-- Return
-		RETURN gw_fct_json_create_return(('{"status":"Accepted"' || ', "version":'|| v_version ||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted"' || ', "version":"'|| v_version ||'"'||
 			', "data":' || v_response ||      
 			'}')::json, 2618, null, null, null);
 		
@@ -571,7 +571,7 @@ BEGIN
 		v_response := COALESCE(v_response, '{}');
 
 		-- Return
-		RETURN gw_fct_json_create_return(('{"status":"Accepted"' || ', "version":'|| v_version ||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted"' || ', "version":"'|| v_version ||'"'||
 			', "data":' || v_response ||      
 			'}')::json, 2618, null, null, null);
 			
