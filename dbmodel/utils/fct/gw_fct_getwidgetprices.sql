@@ -33,9 +33,12 @@ v_error_context text;
 
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
+
+	-- Get API version
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Getting variables
 	v_tablename = (p_data->>'data')::json->>'tableName';
@@ -55,16 +58,16 @@ BEGIN
 		measurement, observ, 
 		gw_fct_set_currency_config(total_budget::numeric(12,2)) as total 
 		FROM '||v_tablename||' WHERE psector_id = '||v_psector_id||'
-	)a ' 
+	)a '
 	INTO v_fields_array;
 
 	v_columns := array_to_json(v_columns_array);
 	v_fields := array_to_json(v_fields_array);
-	
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '""'); 
-	v_columns := COALESCE(v_columns, '{}'); 
-	v_fields := COALESCE(v_fields, '{}'); 
+	v_version := COALESCE(v_version, '');
+	v_columns := COALESCE(v_columns, '{}');
+	v_fields := COALESCE(v_fields, '{}');
 
 	-- Return
 	RETURN ('{"status":"Accepted"' ||', "version":"'|| v_version ||'"'||
