@@ -162,3 +162,51 @@ WHERE formname ilike 've_%' AND formtype='form_feature' AND columnname='sector_i
 UPDATE config_form_fields
 SET iseditable=false
 WHERE formname='ve_dimensions' AND formtype='form_feature' AND columnname='feature_type' AND tabname='tab_none';
+
+-- 03/12/2025
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','id','string','text','Id:','id',true,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','code','string','text','Code:','code',true,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','parameter_type','string','text','Parameter type:','parameter_type',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,dv_querytext,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','feature_type','string','combo','Feature type:','feature_type',false,true,'SELECT DISTINCT feature_type as id, feature_type as idval FROM cat_feature',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','data_type','string','text','Data type:','data_type',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','critcity','integer','text','Critcity:','critcity',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','descript','string','text','Descript:','descript',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','form_type','string','text','Form type:','form_type',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','vdefault','string','text','Default:','vdefault',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','ismultifeature','boolean','check','Is multifeature:','ismultifeature',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','short_descript','string','text','Short descript:','short_descript',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('config_visit_parameter','form_feature','tab_none','active','boolean','check','Active:','active',false,true,false);
+
+-- Om_visit_type
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','id','string','text','Id:','id',true,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','name','string','text','Name:','name',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','startdate','datetime','text','Start date:','startdate',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','enddate','datetime','text','End date:','enddate',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','descript','string','text','Descript:','descript',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','active','boolean','check','Active:','active',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','extusercat_id','integer','text','Extsuercat id:','extusercat_id',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','duration','string','text','Duration:','duration',false,true,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,dv_querytext,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','feature_type','string','combo','Feature Type:','feature_type',false,true,'SELECT DISTINCT feature_type as id, feature_type as idval FROM cat_feature',false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden)
+	VALUES ('om_visit_cat','form_feature','tab_none','alias','string','text','Alias:','alias',false,true,false);
