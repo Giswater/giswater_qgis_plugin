@@ -40,24 +40,26 @@ BEGIN
     END IF;
 
     -- Get GeoJSON from rpt_inp_node (Point)
-    SELECT json_build_object(
+    SELECT jsonb_build_object(
         'type', 'FeatureCollection',
         'layerName', 'Rpt INP Node',
-        'features', json_agg(ST_AsGeoJSON(t.*)::json)
-    )
-    INTO v_node
-    FROM rpt_inp_node t
-    WHERE result_id = ANY(result_ids);
+        'features', jsonb_agg(jsonb_build_object(
+            'type', 'Feature',
+            'geometry', ST_AsGeoJSON(ST_Transform(t.the_geom, 4326))::jsonb,
+            'properties', to_jsonb(t) - 'the_geom'
+        ))
+    ) INTO v_node FROM rpt_inp_node t WHERE result_id = ANY(result_ids);
 
     -- Get GeoJSON from rpt_inp_arc (LineString)
-    SELECT json_build_object(
+    SELECT jsonb_build_object(
         'type', 'FeatureCollection',
         'layerName', 'Rpt INP Arc',
-        'features', json_agg(ST_AsGeoJSON(t.*)::json)
-    )
-    INTO v_result_line
-    FROM rpt_inp_arc t
-    WHERE result_id = ANY(result_ids);
+        'features', jsonb_agg(jsonb_build_object(
+            'type', 'Feature',
+            'geometry', ST_AsGeoJSON(ST_Transform(t.the_geom, 4326))::jsonb,
+            'properties', to_jsonb(t) - 'the_geom'
+        ))
+    ) INTO v_result_line FROM rpt_inp_arc t WHERE result_id = ANY(result_ids);
 
     -- Construct the JSON
     RETURN gw_fct_json_create_return(
