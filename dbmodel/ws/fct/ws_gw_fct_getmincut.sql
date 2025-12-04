@@ -54,7 +54,7 @@ DECLARE
     v_result_connec json;
     v_result_arc json;
     v_point_geom public.geometry;
-    v_bbox json;
+    v_bbox jsonb;
     address_array text[];
     aux_combo text[];
     aux_street_id text[];
@@ -369,6 +369,7 @@ BEGIN
         v_result_node = COALESCE(v_result_node, '{}');
         v_result_connec = COALESCE(v_result_connec, '{}');
         v_result_arc = COALESCE(v_result_arc, '{}');
+        v_bbox = COALESCE(v_bbox, '{}'::jsonb);
         v_response := concat('{"status":"Accepted", "version":"',v_version,'","body":{"form":{}',
             ',"feature":{}',
             ',"data":{ "info":',v_result_info::text,
@@ -381,7 +382,7 @@ BEGIN
               ',"mincutNode":',v_result_node::text,
               ',"mincutConnec":',v_result_connec::text,
               ',"mincutArc":',v_result_arc::text,
-              ',"geometry":',COALESCE(v_bbox::text, 'null'),
+              ',"geometry":{"bbox":',v_bbox::text,'}',
             '}}}'
         );
 

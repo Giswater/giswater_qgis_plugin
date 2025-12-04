@@ -37,7 +37,6 @@ DECLARE
 -- Parameters
 v_cur_user text;
 v_device integer;
-v_tiled boolean;
 v_action text;
 v_mincut_id integer;
 v_mincut_class integer;
@@ -55,10 +54,20 @@ v_minsector_id integer;
 v_action_aux text;
 
 -- dialog parameters
-v_dialog_mincut_type text;
-v_dialog_forecast_start timestamp;
-v_dialog_forecast_end timestamp;
-
+v_mincut_type text;
+v_forecast_start timestamp;
+v_forecast_end timestamp;
+v_anl_cause text;
+v_anl_descript text;
+v_received_date timestamp;
+v_exec_start timestamp;
+v_exec_end timestamp;
+v_exec_descript text;
+v_exec_user text;
+v_exec_from_plot float;
+v_exec_depth float;
+v_exec_appropiate boolean;
+v_exec_the_geom public.geometry;
 
 v_xcoord double precision;
 v_ycoord double precision;
@@ -89,7 +98,7 @@ v_num_valve_closed integer;
 v_priority json;
 v_mincut_conflict_array text;
 v_mincut_conflict_count integer;
-v_geometry text;
+v_bbox jsonb;
 v_count_unselected_psectors integer;
 v_default_key text;
 v_default_value text;
@@ -101,7 +110,7 @@ v_mincut_affected_id integer;
 v_mincut_affected_ids text;
 v_mincut_conflict_group_id uuid;
 v_arc_count integer;
-v_overlap_status text := 'Ok'; -- Ok, Conflict
+v_has_overlap boolean := FALSE;
 
 v_mincut_plannified_state integer := 0; -- Plannified mincut state
 v_mincut_in_progress_state integer := 1; -- In progress mincut state
@@ -116,11 +125,6 @@ v_query_text text;
 v_data json;
 v_result json;
 v_result_info json;
-v_result_init json;
-v_result_valve json;
-v_result_node json;
-v_result_connec json;
-v_result_arc json;
 
 v_response json;
 v_message text;
@@ -148,11 +152,11 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by id desc limit 1;
 
-	--return current_user;
 	-- get input parameters
 	v_cur_user := p_data->'client'->>'cur_user';
 	v_device := p_data->'client'->>'device';
-	v_tiled := p_data->'client'->>'tiled';
+	v_client_epsg := p_data->'client'->>'epsg';
+
 	v_action := p_data->'data'->>'action';
 	v_mincut_id := p_data->'data'->>'mincutId';
 	v_mincut_class := p_data->'data'->>'mincutClass';
@@ -160,26 +164,38 @@ BEGIN
 	v_arc_id := p_data->'data'->>'arcId';
 	v_use_plan_psectors := p_data->'data'->>'usePsectors';
 	-- get dialog parameters (IMPORTANT to execute mincut with dialog data)
-	v_dialog_mincut_type := p_data->'data'->>'dialogMincutType';
-	v_dialog_forecast_start := p_data->'data'->>'dialogForecastStart';
-	v_dialog_forecast_end := p_data->'data'->>'dialogForecastEnd';
+	v_mincut_type := p_data->'data'->>'mincutType';
+	v_anl_cause := p_data->'data'->>'anlCause';
+	v_anl_descript := p_data->'data'->>'anlDescript';
+	v_forecast_start := p_data->'data'->>'forecastStart';
+	v_forecast_end := p_data->'data'->>'forecastEnd';
+	v_received_date := p_data->'data'->>'receivedDate';
+
+	v_exec_start := p_data->'data'->>'execStart';
+	v_exec_end := p_data->'data'->>'execEnd';
+	v_exec_descript := p_data->'data'->>'execDescript';
+	v_exec_user := p_data->'data'->>'execUser';
+	v_exec_from_plot := p_data->'data'->>'execFromPlot';
+	v_exec_depth := p_data->'data'->>'execDepth';
+	v_exec_appropiate := p_data->'data'->>'execAppropiate';
+	v_exec_the_geom := p_data->'data'->>'execTheGeom';
+
+	v_xcoord := p_data->'data'->'coordinates'->>'xcoord';
+	v_ycoord := p_data->'data'->'coordinates'->>'ycoord';
+	v_zoomratio := p_data->'data'->'coordinates'->>'zoomRatio';
+
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
 	v_vdefault := (SELECT value::json FROM config_param_system WHERE parameter = 'om_mincut_vdefault');
 	v_ignore_check_valves := (SELECT value::boolean FROM config_param_system WHERE parameter = 'ignoreCheckValvesMincut');
-
-	v_xcoord := p_data->'data'->'coordinates'->>'xcoord';
-	v_ycoord := p_data->'data'->'coordinates'->>'ycoord';
-	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
-	v_client_epsg := p_data->'client'->>'epsg';
-	v_zoomratio := p_data->'data'->'coordinates'->>'zoomRatio';
 	v_update_map_zone := (SELECT value::json->>'bufferType' FROM config_param_system WHERE parameter = 'om_mincut_config');
 	v_geom_param_update := (SELECT value::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'om_mincut_config');
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 	IF v_cur_user IS NULL THEN v_cur_user = current_user; END IF;
 
-	
+
 	-- Create temporary tables if not exists
 	-- =======================
 	v_data := jsonb_build_object(
@@ -239,7 +255,7 @@ BEGIN
 	END IF;
 
 	IF (SELECT count(*) FROM v_temp_arc WHERE arc_id = v_arc_id) = 0 THEN
-		SELECT a.arc_id INTO v_arc_id 
+		SELECT a.arc_id INTO v_arc_id
 		FROM v_temp_arc a
 		WHERE EXISTS (SELECT 1 FROM om_mincut om WHERE om.id = v_mincut_id AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1))
 		LIMIT 1;
@@ -247,14 +263,14 @@ BEGIN
 		IF v_arc_id IS NULL THEN
 			RETURN ('{"status":"Failed", "message":{"level":2, "text":"Arc not found."}}')::json;
 		ELSE
-			UPDATE om_mincut SET 
+			UPDATE om_mincut SET
 				anl_feature_id = v_arc_id,
 				anl_feature_type = 'ARC',
 				anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
 			WHERE id = v_mincut_id;
 		END IF;
 	END IF;
-	
+
 	IF v_mincut_version = '6.1' THEN
 		v_minsector_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
@@ -280,7 +296,7 @@ BEGIN
 			-- false: init and refresh mincut
 		IF v_mincut_version = '6.1' THEN
 			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-		ELSE 
+		ELSE
 			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 		END IF;
 		IF v_row_count = 0 THEN
@@ -313,14 +329,14 @@ BEGIN
 			);
 			EXECUTE v_query_text;
 		END IF;
-	
-	ELSIF v_action = 'mincutRefresh' THEN 
+
+	ELSIF v_action = 'mincutRefresh' THEN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
 		IF v_mincut_version = '6.1' THEN
 			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-		ELSE 
+		ELSE
 			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 		END IF;
 		IF v_row_count = 0 THEN
@@ -333,12 +349,12 @@ BEGIN
 		v_core_mincut := TRUE;
 
 	ELSIF v_action = 'mincutValveUnaccess' THEN
-		UPDATE om_mincut_valve 
-		SET unaccess = 
-			CASE 
-				WHEN proposed = TRUE THEN TRUE 
-				WHEN unaccess = TRUE THEN FALSE 
-				ELSE unaccess 
+		UPDATE om_mincut_valve
+		SET unaccess =
+			CASE
+				WHEN proposed = TRUE THEN TRUE
+				WHEN unaccess = TRUE THEN FALSE
+				ELSE unaccess
 			END
 		WHERE node_id = v_valve_node_id
 			AND result_id = v_mincut_id;
@@ -350,10 +366,10 @@ BEGIN
 			v_init_mincut := FALSE;
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
-		ELSE 
+		ELSE
 			IF v_mincut_version = '6.1' THEN
 				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-			ELSE 
+			ELSE
 				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 			END IF;
 			IF v_row_count = 0 THEN
@@ -368,10 +384,10 @@ BEGIN
 	ELSIF v_action = 'mincutChangeValveStatus' THEN
 		UPDATE om_mincut_valve
 		SET changestatus =
-			CASE 
-				WHEN changestatus = TRUE THEN FALSE 
-				WHEN closed = TRUE AND broken = FALSE AND to_arc IS NULL THEN TRUE 
-				ELSE changestatus 
+			CASE
+				WHEN changestatus = TRUE THEN FALSE
+				WHEN closed = TRUE AND broken = FALSE AND to_arc IS NULL THEN TRUE
+				ELSE changestatus
 			END
 		WHERE node_id = v_valve_node_id
 			AND result_id = v_mincut_id;
@@ -382,10 +398,10 @@ BEGIN
 			v_init_mincut := FALSE;
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
-		ELSE 
+		ELSE
 			IF v_mincut_version = '6.1' THEN
 				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-			ELSE 
+			ELSE
 				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
 			END IF;
 			IF v_row_count = 0 THEN
@@ -415,9 +431,9 @@ BEGIN
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
 				IF v_mincut_version = '6.1' THEN
 					EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-				ELSE 
+				ELSE
 					EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
-				END IF;				
+				END IF;
 				IF v_row_count = 0 THEN
 					v_init_mincut := TRUE;
 					v_prepare_mincut := FALSE;
@@ -442,7 +458,7 @@ BEGIN
 		-- call setfields
 		v_message = json_build_object(
 			'text', 'Mincut accepted.',
-			'level', 1
+			'level', 3
 		);
 		IF v_device = 5 THEN
 			IF v_action = 'mincutAccept' THEN
@@ -466,18 +482,18 @@ BEGIN
 		SELECT id INTO v_mincut_conflict_group_id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id;
 
 		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-		SELECT omc.mincut_id, current_user, 'conflict' 
+		SELECT omc.mincut_id, current_user, 'conflict'
 		FROM om_mincut_conflict omc
-		JOIN om_mincut om ON om.id = omc.mincut_id 
+		JOIN om_mincut om ON om.id = omc.mincut_id
 		WHERE omc.id = v_mincut_conflict_group_id
 		AND omc.mincut_id <> v_mincut_id
 		AND om.mincut_state  <> v_mincut_conflict_state
 		ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-		SELECT omc.mincut_id, current_user, 'affected' 
+		SELECT omc.mincut_id, current_user, 'affected'
 		FROM om_mincut_conflict omc
-		JOIN om_mincut om ON om.id = omc.mincut_id 
+		JOIN om_mincut om ON om.id = omc.mincut_id
 		WHERE omc.id = v_mincut_conflict_group_id
 		AND omc.mincut_id <> v_mincut_id
 		AND om.mincut_state = v_mincut_conflict_state
@@ -491,7 +507,7 @@ BEGIN
 
         DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
 		IF v_mincut_conflict_group_id IS NOT NULL THEN
-			v_overlap_status = 'Conflict';
+			v_has_overlap = TRUE;
 
 			-- creating log
 			SELECT string_agg(result_id::text, ',') INTO v_mincut_affected_ids FROM selector_mincut_result WHERE cur_user = current_user AND result_type = 'affected';
@@ -502,7 +518,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
-			
+
 			-- Stats
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -511,7 +527,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4372", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"total":"'||COALESCE((v_mincut_record.output->'connecs'->'hydrometers'->>'total'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4374", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"classified":"'||COALESCE(replace((v_mincut_record.output->'connecs'->'hydrometers'->>'classified'), '"', '\"'), '[]')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 
-			
+
 			FOR v_mincut_affected_id IN SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user AND result_type = 'affected' LOOP
 				-- mincut extra details
 				SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_affected_id;
@@ -519,7 +535,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4420", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
-				
+
 				-- Extra details
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4424", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"id":"'||v_mincut_affected_id||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4418", "function":"2244", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"array":"'||COALESCE((v_mincut_record.output->'conflicts'->>'array'), '')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -536,12 +552,12 @@ BEGIN
 			END LOOP;
 
 		ELSE
-			v_overlap_status = 'Ok';
+			v_has_overlap = FALSE;
 
 			-- mincut details
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2030", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
-			
+
 			-- Stats
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4364", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"number":"'||COALESCE((v_mincut_record.output->'arcs'->>'number'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4366", "function":"2988", "fid":"216", "criticity":"1", "is_process":true, "parameters":{"length":"'||COALESCE((v_mincut_record.output->'arcs'->>'length'), '0')||'"}, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -559,34 +575,66 @@ BEGIN
 		v_result := COALESCE(v_result, '{}');
 		v_result_info = concat ('{"values":',v_result, '}');
 
-		-- geometry (the boundary of mincut using arcs and valves)
-		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincut_id||
-		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||v_mincut_id||') a'
-		INTO v_geometry;
+		-- bbox (the boundary of mincut using arcs and valves)
+		SELECT jsonb_build_object(
+			'x1', ST_XMin(ST_Extent(st_buffer(the_geom, 20))),
+			'y1', ST_YMin(ST_Extent(st_buffer(the_geom, 20))),
+			'x2', ST_XMax(ST_Extent(st_buffer(the_geom, 20))),
+			'y2', ST_YMax(ST_Extent(st_buffer(the_geom, 20)))
+		)
+		FROM (
+			SELECT the_geom FROM om_mincut_arc WHERE result_id = v_mincut_id
+			UNION
+			SELECT the_geom FROM om_mincut_valve WHERE result_id = v_mincut_id
+		) a
+		INTO v_bbox;
 
 		-- Control nulls
 		v_result_info := COALESCE(v_result_info, '{}');
-		v_geometry := COALESCE(v_geometry, '{}');
+		v_bbox := COALESCE(v_bbox, '{}'::jsonb);
+
+		-- Set message based on overlap status
+		IF v_has_overlap THEN
+			v_message = json_build_object(
+				'level', 1,
+				'text', 'Mincut has overlapping conflicts'
+			);
+		ELSE
+			v_message = json_build_object(
+				'level', 3,
+				'text', 'Analysis done successfully'
+			);
+		END IF;
 
 		-- return
-		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-			',"body":{"form":{}'||
-			',"overlapStatus":"'||v_overlap_status||'"'||
-			',"data":{ "info":'||v_result_info||','||
-				  '"geometry":"'||v_geometry||'"'||
-			'}}'||
-			'}')::json, 2244,null,null,null);
+		RETURN gw_fct_json_create_return(
+			jsonb_build_object(
+				'status', 'Accepted',
+				'message', v_message::jsonb,
+				'version', v_version,
+				'body', jsonb_build_object(
+					'form', jsonb_build_object(),
+					'data', jsonb_build_object(
+						'info', v_result_info::jsonb,
+						'geometry', jsonb_build_object(
+							'bbox', v_bbox
+						)
+					)
+				)
+			)::json, 2244, null, null, null
+		);
+
 	ELSIF v_action = 'mincutCancel' THEN
 		v_message = json_build_object(
 			'text', 'Mincut to cancel not found.',
-			'level', 2
+			'level', 1
 		);
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			WITH groups_conflict AS (
 				SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id
 			),
 			mincuts_to_delete AS (
-				SELECT omc.mincut_id 
+				SELECT omc.mincut_id
 				FROM om_mincut_conflict omc
 				JOIN om_mincut om ON om.id = omc.mincut_id
 				WHERE om.mincut_state = v_mincut_conflict_state
@@ -607,9 +655,9 @@ BEGIN
 			END IF;
 			v_message = json_build_object(
 				'text', 'Mincut cancelled.',
-				'level', 1
+				'level', 0
 			);
-			
+
 		END IF;
 		-- manage null values
 		v_message = COALESCE(v_message, '{}');
@@ -623,13 +671,13 @@ BEGIN
 	ELSIF v_action = 'mincutDelete' THEN
 		v_message = json_build_object(
 			'text', 'Mincut to delete not found.',
-			'level', 2
+			'level', 1
 		);
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			DELETE FROM om_mincut WHERE id = v_mincut_id;
 			v_message = json_build_object(
 				'text', 'Mincut deleted.',
-				'level', 1
+				'level', 0
 			);
 		END IF;
 
@@ -683,7 +731,7 @@ BEGIN
 		IF v_response->>'status' <> 'Accepted' THEN
 			RETURN v_response;
 		END IF;
-		
+
 		-- the broken valves
 		EXECUTE format('
 			UPDATE %I a
@@ -720,7 +768,7 @@ BEGIN
 				AND a.closed = FALSE 
 				AND a.cost <> a.reverse_cost
 			', v_temp_arc_table);
-		ELSE 
+		ELSE
 			EXECUTE format('
 				UPDATE %I a
 				SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
@@ -732,7 +780,7 @@ BEGIN
 	END IF;
 
 	IF v_prepare_mincut THEN
-		-- prepare mincut 
+		-- prepare mincut
 		EXECUTE format('
 			UPDATE %I 
 			SET mapzone_id = 0 
@@ -809,7 +857,7 @@ BEGIN
 		EXECUTE format('SELECT count(*)::int FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
 		IF v_mincut_version = '6.1' THEN
 			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_pgr_node_id;
-		ELSE 
+		ELSE
 			EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
 		END IF;
 
@@ -831,7 +879,7 @@ BEGIN
 			AND tpa.changestatus = TRUE;
 		', v_temp_arc_table, v_mincut_id);
 
-		-- if a valve with changestatus = TRUE is proposed, remove changestatus 
+		-- if a valve with changestatus = TRUE is proposed, remove changestatus
 		EXECUTE format('
 			UPDATE %I tpa
 			SET changestatus = FALSE, cost = -1, reverse_cost = -1
@@ -851,7 +899,7 @@ BEGIN
 			SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id
 		),
 		mincuts_to_delete AS (
-			SELECT omc.mincut_id 
+			SELECT omc.mincut_id
 			FROM om_mincut_conflict omc
 			JOIN om_mincut om ON om.id = omc.mincut_id
 			WHERE om.mincut_state = v_mincut_conflict_state
@@ -1007,81 +1055,81 @@ BEGIN
 
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 		SELECT v_mincut_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
-		FROM om_mincut_arc oma 
+		FROM om_mincut_arc oma
 		JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
 		WHERE oma.result_id = v_mincut_id;
 
 		-- insert hydrometer from connec
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT v_mincut_id, rhxc.hydrometer_id 
+		SELECT v_mincut_id, rhxc.hydrometer_id
 		FROM rtc_hydrometer_x_connec rhxc
-		JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
+		JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id
 		JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.hydrometer_id
-		WHERE result_id = v_mincut_id 
+		WHERE result_id = v_mincut_id
 			AND rhxc.connec_id = omc.connec_id
 			AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 		-- insert hydrometer from node
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
-		JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
+		JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id
 		JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.hydrometer_id
-		WHERE result_id = v_mincut_id 
+		WHERE result_id = v_mincut_id
 			AND rhxn.node_id = omn.node_id
 			AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 		-- fill connnec & hydrometer details on om_mincut.output
 		-- count arcs
 		SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
-		FROM om_mincut_arc 
-		JOIN arc USING (arc_id) 
-		WHERE result_id = v_mincut_id 
+		FROM om_mincut_arc
+		JOIN arc USING (arc_id)
+		WHERE result_id = v_mincut_id
 		GROUP BY result_id;
 
 		SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
-		FROM om_mincut_arc 
-		JOIN arc USING (arc_id) 
+		FROM om_mincut_arc
+		JOIN arc USING (arc_id)
 		JOIN cat_arc ON arccat_id = cat_arc.id
 		WHERE result_id = v_mincut_id;
 
 		-- count valves
-		SELECT count(node_id) INTO v_num_valve_proposed 
-		FROM om_mincut_valve 
-		WHERE result_id = v_mincut_id 
+		SELECT count(node_id) INTO v_num_valve_proposed
+		FROM om_mincut_valve
+		WHERE result_id = v_mincut_id
 			AND proposed IS TRUE;
 
-		SELECT count(node_id) INTO v_num_valve_closed 
-		FROM om_mincut_valve 
-		WHERE result_id = v_mincut_id 
+		SELECT count(node_id) INTO v_num_valve_closed
+		FROM om_mincut_valve
+		WHERE result_id = v_mincut_id
 			AND closed IS TRUE AND changestatus = FALSE;
 
 		-- count connec
-		SELECT count(connec_id) INTO v_num_connecs 
-		FROM om_mincut_connec 
+		SELECT count(connec_id) INTO v_num_connecs
+		FROM om_mincut_connec
 		WHERE result_id = v_mincut_id;
 
 		-- count hydrometers
-		SELECT count(*) INTO v_num_hydrometer 
-		FROM om_mincut_hydrometer 
+		SELECT count(*) INTO v_num_hydrometer
+		FROM om_mincut_hydrometer
 		WHERE result_id = v_mincut_id;
 
 		-- priority hydrometers
 		v_priority := (
 			SELECT array_to_json(array_agg(b))
 			FROM (
-				SELECT 
+				SELECT
 					json_build_object(
 						'category', hc.observ,
 						'number', count(rtc_hydrometer_x_connec.hydrometer_id)
 					) AS b
 				FROM rtc_hydrometer_x_connec
-				JOIN om_mincut_connec 
+				JOIN om_mincut_connec
 					ON rtc_hydrometer_x_connec.connec_id = om_mincut_connec.connec_id
-				JOIN v_rtc_hydrometer 
+				JOIN v_rtc_hydrometer
 					ON v_rtc_hydrometer.hydrometer_id = rtc_hydrometer_x_connec.hydrometer_id
-				LEFT JOIN ext_hydrometer_category hc 
+				LEFT JOIN ext_hydrometer_category hc
 					ON hc.id::text = v_rtc_hydrometer.category_id::text
-				JOIN connec 
+				JOIN connec
 					ON connec.connec_id = v_rtc_hydrometer.feature_id
 				WHERE result_id = v_mincut_id
 				GROUP BY hc.observ
@@ -1116,61 +1164,55 @@ BEGIN
 		UPDATE om_mincut SET output = v_mincut_details WHERE id = v_mincut_id;
 
 
-		-- calculate the boundary of mincut using arcs and valves
-		v_query_text := format(
-			$fmt$
-			SELECT ST_AsText(
-				ST_Envelope(
-					ST_Extent(
-						ST_Buffer(the_geom, 20)
-					)
-				)
-			)
-			FROM (
-				SELECT the_geom FROM om_mincut_arc WHERE result_id = %s
-				UNION
-				SELECT the_geom FROM om_mincut_valve WHERE result_id = %s
-			) a
-			$fmt$,
-			v_mincut_id, v_mincut_id
-		);
-		EXECUTE v_query_text INTO v_geometry;
+		-- calculate the bbox of mincut using arcs and valves
+		SELECT jsonb_build_object(
+			'x1', ST_XMin(ST_Extent(st_buffer(the_geom, 20))),
+			'y1', ST_YMin(ST_Extent(st_buffer(the_geom, 20))),
+			'x2', ST_XMax(ST_Extent(st_buffer(the_geom, 20))),
+			'y2', ST_YMax(ST_Extent(st_buffer(the_geom, 20)))
+		)
+		FROM (
+			SELECT the_geom FROM om_mincut_arc WHERE result_id = v_mincut_id
+			UNION
+			SELECT the_geom FROM om_mincut_valve WHERE result_id = v_mincut_id
+		) a
+		INTO v_bbox;
 
 		-- FIRST MINCUT FINISHED
 
-		IF v_dialog_forecast_start IS NOT NULL AND v_dialog_forecast_end IS NOT NULL THEN
+		IF v_forecast_start IS NOT NULL AND v_forecast_end IS NOT NULL THEN
 
 			v_query_text := format($fmt$
 				WITH mincut_conflicts AS (
-					SELECT o.id, o.anl_feature_type, o.anl_feature_id, 
+					SELECT o.id, o.anl_feature_type, o.anl_feature_id,
 						tsrange(o.forecast_start, o.forecast_end, '[]') * tsrange(%L, %L, '[]') AS seg_mincut
 					FROM om_mincut o
-					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
+					JOIN om_mincut_cat_type c ON o.mincut_type = c.id
 					WHERE o.mincut_state IN (%s, %s)
 						AND o.mincut_class = %s
-						AND c.virtual = FALSE 
-						AND o.forecast_start <= o.forecast_end 
+						AND c.virtual = FALSE
+						AND o.forecast_start <= o.forecast_end
 						AND tsrange(o.forecast_start, o.forecast_end, '[]') && tsrange(%L, %L, '[]')
 						AND o.id <> %s
-				), 
+				),
 				mincut_times AS (
 					-- put togther all the limits of all the intervals for mincuts in conflict
 					SELECT LOWER(seg_mincut) AS forecast_date
 					FROM mincut_conflicts
-					UNION 
+					UNION
 					SELECT UPPER(seg_mincut) AS forecast_date
 					FROM mincut_conflicts
-				), 
+				),
 				mincut_times_before AS (
 					-- generate the previous limit time
-					SELECT 
-						LAG(forecast_date) OVER (ORDER BY forecast_date) AS forecast_date_before, 
-						forecast_date 
+					SELECT
+						LAG(forecast_date) OVER (ORDER BY forecast_date) AS forecast_date_before,
+						forecast_date
 					FROM mincut_times
 				),
 				mincut_segments AS (
 					-- create all the atomic intervals of all the intervals [prev, actual)
-					SELECT  
+					SELECT
 						tsrange(forecast_date_before, forecast_date, '()') AS seg
 					FROM mincut_times_before
 					WHERE forecast_date_before IS NOT NULL
@@ -1189,18 +1231,18 @@ BEGIN
 				SELECT g.seg, g.mincut_group
 				FROM mincut_groups g
 				WHERE NOT EXISTS (
-					SELECT 1 FROM mincut_groups g1 
+					SELECT 1 FROM mincut_groups g1
 					WHERE g.mincut_group <@ g1.mincut_group
 					AND g.mincut_group <> g1.mincut_group
 				);
-			$fmt$, 
-			v_dialog_forecast_start, v_dialog_forecast_end,
+			$fmt$,
+			v_forecast_start, v_forecast_end,
 			v_mincut_plannified_state, v_mincut_in_progress_state,
 			v_mincut_network_class,
-			v_dialog_forecast_start, v_dialog_forecast_end,
+			v_forecast_start, v_forecast_end,
 			v_mincut_id,
 			v_temp_arc_table,
-			v_dialog_forecast_start, v_dialog_forecast_end
+			v_forecast_start, v_forecast_end
 			);
 
 			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
@@ -1280,7 +1322,7 @@ BEGIN
 						'mode', v_mode
 					)
 				)::text;
-				
+
 				v_response := gw_fct_mincut_core(v_data);
 
 				IF v_response->>'status' <> 'Accepted' THEN
@@ -1316,7 +1358,7 @@ BEGIN
 				END IF;
 
 				IF v_arc_count > 0 THEN
-					v_overlap_status = 'Conflict';
+					v_has_overlap = TRUE;
 
 					IF v_mincut_version = '6.1' THEN
 						v_query_text := format($fmt$
@@ -1366,7 +1408,7 @@ BEGIN
 						AND c1.component = c2.component
 					', v_temp_arc_table);
 
-					
+
 					FOR v_mincut_conflict_record IN EXECUTE v_query_text LOOP
 						-- create the new mincut virtual: [onPlanning and Conflict]
 						INSERT INTO om_mincut (mincut_class, mincut_state)
@@ -1420,7 +1462,7 @@ BEGIN
 											) 
 											AND om.node_id = tpa.arc_id 
 										);
-							', v_mincut_affected_id, v_temp_arc_table, 
+							', v_mincut_affected_id, v_temp_arc_table,
 							v_mincut_conflict_record.component, v_mincut_conflict_record.component,
 							v_mincut_id, v_mincut_group_record.mincut_group);
 						ELSE
@@ -1455,7 +1497,7 @@ BEGIN
 											AND n.node_id = om.node_id
 										);
 							', v_mincut_affected_id, v_temp_node_table,
-							v_mincut_conflict_record.component, 
+							v_mincut_conflict_record.component,
 							v_mincut_id, v_mincut_group_record.mincut_group);
 
 							EXECUTE format('
@@ -1484,33 +1526,33 @@ BEGIN
 											) 
 											AND om.node_id = COALESCE(a.node_1, a.node_2) 
 										);
-							', v_mincut_affected_id, v_temp_arc_table, 
+							', v_mincut_affected_id, v_temp_arc_table,
 							v_mincut_conflict_record.component, v_mincut_conflict_record.component,
 							v_mincut_id, v_mincut_group_record.mincut_group);
 						END IF;
 
 						INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 						SELECT v_mincut_affected_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
-						FROM om_mincut_arc oma 
+						FROM om_mincut_arc oma
 						JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
 						WHERE oma.result_id = v_mincut_affected_id;
 
 						-- insert hydrometer from connec
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-						SELECT v_mincut_affected_id, rhxc.hydrometer_id 
+						SELECT v_mincut_affected_id, rhxc.hydrometer_id
 						FROM rtc_hydrometer_x_connec rhxc
-						JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
+						JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id
 						JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.hydrometer_id
-						WHERE result_id = v_mincut_affected_id 
+						WHERE result_id = v_mincut_affected_id
 							AND rhxc.connec_id = omc.connec_id
 							AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
 						-- insert hydrometer from node
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 						SELECT v_mincut_affected_id, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
-						JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
+						JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id
 						JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.hydrometer_id
-						WHERE result_id = v_mincut_affected_id 
+						WHERE result_id = v_mincut_affected_id
 							AND rhxn.node_id = omn.node_id
 							AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 
@@ -1560,9 +1602,9 @@ BEGIN
 
 						-- update forecast_start and forecast_end for the affected zone mincut
 						WITH forecast_time AS (
-							SELECT 
-								GREATEST(MAX (forecast_start),v_dialog_forecast_start)  AS forecast_start, 
-								LEAST(MIN (forecast_end), v_dialog_forecast_end) AS forecast_end
+							SELECT
+								GREATEST(MAX (forecast_start),v_forecast_start)  AS forecast_start,
+								LEAST(MIN (forecast_end), v_forecast_end) AS forecast_end
 							FROM om_mincut om
 							WHERE EXISTS (
 								SELECT 1 FROM om_mincut_conflict omc
@@ -1571,8 +1613,8 @@ BEGIN
 								AND omc.mincut_id <> v_mincut_id
 								AND omc.mincut_id = om.id
 							)
-						) 
-						UPDATE om_mincut om SET 
+						)
+						UPDATE om_mincut om SET
 							forecast_start = ft.forecast_start,
 							forecast_end = ft.forecast_end
 						FROM forecast_time ft
@@ -1581,55 +1623,55 @@ BEGIN
 						-- fill connnec & hydrometer details on om_mincut.output
 						-- count arcs
 						SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
-						FROM om_mincut_arc 
-						JOIN arc USING (arc_id) 
-						WHERE result_id = v_mincut_affected_id 
+						FROM om_mincut_arc
+						JOIN arc USING (arc_id)
+						WHERE result_id = v_mincut_affected_id
 						GROUP BY result_id;
 
 						SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
-						FROM om_mincut_arc 
-						JOIN arc USING (arc_id) 
+						FROM om_mincut_arc
+						JOIN arc USING (arc_id)
 						JOIN cat_arc ON arccat_id = cat_arc.id
 						WHERE result_id = v_mincut_affected_id;
 
 						-- count valves
-						SELECT count(node_id) INTO v_num_valve_proposed 
-						FROM om_mincut_valve 
-						WHERE result_id = v_mincut_affected_id 
+						SELECT count(node_id) INTO v_num_valve_proposed
+						FROM om_mincut_valve
+						WHERE result_id = v_mincut_affected_id
 							AND proposed IS TRUE;
 
-						SELECT count(node_id) INTO v_num_valve_closed 
-						FROM om_mincut_valve 
-						WHERE result_id = v_mincut_affected_id 
+						SELECT count(node_id) INTO v_num_valve_closed
+						FROM om_mincut_valve
+						WHERE result_id = v_mincut_affected_id
 							AND closed IS TRUE AND changestatus IS FALSE;
 
 						-- count connec
-						SELECT count(connec_id) INTO v_num_connecs 
-						FROM om_mincut_connec 
+						SELECT count(connec_id) INTO v_num_connecs
+						FROM om_mincut_connec
 						WHERE result_id = v_mincut_affected_id;
 
 						-- count hydrometers
-						SELECT count(*) INTO v_num_hydrometer 
-						FROM om_mincut_hydrometer 
+						SELECT count(*) INTO v_num_hydrometer
+						FROM om_mincut_hydrometer
 						WHERE result_id = v_mincut_affected_id;
 
 						-- priority hydrometers
 						v_priority := (
 							SELECT array_to_json(array_agg(b))
 							FROM (
-								SELECT 
+								SELECT
 									json_build_object(
 										'category', hc.observ,
 										'number', count(rtc_hydrometer_x_connec.hydrometer_id)
 									) AS b
 								FROM rtc_hydrometer_x_connec
-								JOIN om_mincut_connec 
+								JOIN om_mincut_connec
 									ON rtc_hydrometer_x_connec.connec_id = om_mincut_connec.connec_id
-								JOIN v_rtc_hydrometer 
+								JOIN v_rtc_hydrometer
 									ON v_rtc_hydrometer.hydrometer_id = rtc_hydrometer_x_connec.hydrometer_id
-								LEFT JOIN ext_hydrometer_category hc 
+								LEFT JOIN ext_hydrometer_category hc
 									ON hc.id::text = v_rtc_hydrometer.category_id::text
-								JOIN connec 
+								JOIN connec
 									ON connec.connec_id = v_rtc_hydrometer.feature_id
 								WHERE result_id = v_mincut_affected_id
 								GROUP BY hc.observ
@@ -1638,8 +1680,8 @@ BEGIN
 						);
 
 						-- mincut conflict array
-						SELECT count(*), string_agg(omc.mincut_id::text, ',' ORDER BY omc.mincut_id) 
-						INTO v_mincut_conflict_count, v_mincut_conflict_array 
+						SELECT count(*), string_agg(omc.mincut_id::text, ',' ORDER BY omc.mincut_id)
+						INTO v_mincut_conflict_count, v_mincut_conflict_array
 						FROM om_mincut_conflict omc
 						WHERE omc.id = v_mincut_conflict_group_id
 						AND omc.mincut_id <> v_mincut_id
@@ -1677,7 +1719,7 @@ BEGIN
 						VALUES (v_mincut_affected_id, current_user, 'affected') ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 						INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
-						SELECT omc.mincut_id, current_user, 'conflict' 
+						SELECT omc.mincut_id, current_user, 'conflict'
 						FROM om_mincut_conflict omc
 						WHERE omc.id = v_mincut_conflict_group_id
 						AND omc.mincut_id <> v_mincut_id
@@ -1687,7 +1729,7 @@ BEGIN
 					END LOOP;
 
 				ELSE
-					v_overlap_status = 'Ok';
+					v_has_overlap = FALSE;
 				END IF;
 
 			END LOOP;
@@ -1705,14 +1747,15 @@ BEGIN
 		RETURN gw_fct_getmincut(p_data);
 	END IF;
 
-	-- manage null values
-	v_message = COALESCE(v_message, '{}');
-	v_result_init := COALESCE(v_result_init, '{}');
-	v_result_valve := COALESCE(v_result_valve, '{}');
-	v_result_node := COALESCE(v_result_node, '{}');
-	v_result_connec := COALESCE(v_result_connec, '{}');
-	v_result_arc := COALESCE(v_result_arc, '{}');
-	v_tiled := COALESCE(v_tiled, 'false');
+	-- Set message based on overlap status
+	IF v_has_overlap THEN
+		v_message = json_build_object(
+			'level', 1,
+			'text', 'Mincut has overlapping conflicts'
+		);
+	ELSE
+		v_message = COALESCE(v_message, '{}');
+	END IF;
 
 	v_response = ('{
 	    "status": "Accepted",
@@ -1721,17 +1764,11 @@ BEGIN
 	    "body": {
 	      "form": {},
 	      "feature": {},
-		  "overlapStatus":"'||v_overlap_status|| '",
 	      "data": {
-	        "mincutId": ' || v_mincut_id ||','||
-			  '"mincutInit":'||v_result_init||','||
-			  '"valve":'||v_result_valve||','||
-			  '"mincutNode":'||v_result_node||','||
-			  '"mincutConnec":'||v_result_connec||','||
-			  '"mincutArc":'||v_result_arc|| '
+	        "mincutId": ' || v_mincut_id ||'
 	      }
 	    }
-	}');
+}');
 	RETURN v_response;
 
 	--  Exception handling
