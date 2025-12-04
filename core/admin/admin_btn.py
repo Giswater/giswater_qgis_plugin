@@ -615,28 +615,34 @@ class GwAdminButton:
         lang = lang or self.locale
         project_type = 'utils' if utils else project_type
         folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
+        folder_cff = os.path.join(folder_final_pass, 'config_form_fields')
+        folder_i18n = os.path.join(folder_final_pass, 'i18n', lang)
         folders = sorted(os.listdir(folder_final_pass))
 
-        if self._process_folder(folder_final_pass) is False:
+        if self._process_folder(folder_cff) is False:
             msg = '{0} folder not found'
-            msg_params = ("Final_pass",)
+            msg_params = ("Final_pass/config_form_fields",)
             tools_log.log_info(msg, msg_params)
             return False
+        
+        status = self._execute_files(folder_cff, set_progress_bar=True)
+        if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+            return False
 
-        for folder in folders:
-            folder_path = os.path.join(folder_final_pass, folder)
+        if self._process_folder(folder_i18n) is False:
+            msg = '{0} folder not found, executing en_US folder'
+            msg_params = ("Final_pass/i18n/" + lang,)
+            tools_log.log_info(msg, msg_params)
+            folder_i18n = os.path.join(folder_final_pass, 'i18n', 'en_US')
+            if self._process_folder(folder_i18n) is False:
+                msg = '{0} folder not found'
+                msg_params = ("Final_pass/i18n/en_US",)
+                tools_log.log_info(msg, msg_params)
+                return False
 
-            if folder == 'i18n' and utils:
-                continue
-            if self._process_folder(folder_path) is False:
-                if folder == 'i18n' and lang != 'en_US':
-                    self.load_final_pass(lang='en_US')
-                else:
-                    return False
-            else:
-                status = self._execute_files(folder_path, set_progress_bar=True, do_schema_model_i18n=False)
-                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                    return False
+        status = self._execute_files(folder_i18n, set_progress_bar=True)
+        if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+            return False
 
         return True
 
@@ -2158,7 +2164,7 @@ class GwAdminButton:
         self.dlg_readsql_rename.schema_rename_copy.setText(schema)
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
-    def _execute_files(self, filedir, no_ct=False, utils_schema_name=None, set_progress_bar=False, do_schema_model_i18n=True):
+    def _execute_files(self, filedir, no_ct=False, utils_schema_name=None, set_progress_bar=False):
         """"""
 
         if not os.path.exists(filedir):
@@ -2185,28 +2191,15 @@ class GwAdminButton:
             msg = "There is no project selected or it is not valid. Please check the first tab..."
             tools_qgis.show_warning(msg)
 
-        # Manage folders 'i18n'
-        if 'i18n' in filedir:
-            files_to_execute = [f"{self.locale}.sql"]
-
-            for file in files_to_execute:
-                status = True
-                if file in filelist:
+        # Manage files
+        for file in filelist:
+            if ".sql" in file:
+                if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                     tools_log.log_info(os.path.join(filedir, file))
                     self.current_sql_file += 1
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
-                if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-                    return False
-
-        else:
-            for file in filelist:
-                if ".sql" in file:
-                    if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
-                        tools_log.log_info(os.path.join(filedir, file))
-                        self.current_sql_file += 1
-                        status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
-                        if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
-                            return False
+                    if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
+                        return False
 
         return status
 
