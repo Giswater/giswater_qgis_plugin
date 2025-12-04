@@ -32,7 +32,7 @@ SELECT col_is_pk('sys_fprocess', ARRAY['fid'], 'Column fid should be primary key
 
 -- Check column types
 SELECT col_type_is('sys_fprocess', 'fid', 'integer', 'Column fid should be integer');
-SELECT col_type_is('sys_fprocess', 'fprocess_name', 'character varying(100)', 'Column fprocess_name should be character varying(100)');
+SELECT col_type_is('sys_fprocess', 'fprocess_name', 'character varying(250)', 'Column fprocess_name should be character varying(250)');
 SELECT col_type_is('sys_fprocess', 'project_type', 'character varying(6)', 'Column project_type should be character varying(6)');
 SELECT col_type_is('sys_fprocess', 'parameters', 'json', 'Column parameters should be json');
 SELECT col_type_is('sys_fprocess', 'source', 'text', 'Column source should be text');
