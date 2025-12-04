@@ -66,6 +66,7 @@ BEGIN
             'version', v_version,
             'body', jsonb_build_object(
                 'form', jsonb_build_object(),
+                'feature', jsonb_build_object(),
                 'data', jsonb_build_object()
             )
         );
@@ -312,7 +313,7 @@ BEGIN
         EXECUTE format('
             INSERT INTO %I (old_arc_id, pgr_node_1, pgr_node_2, node_1, graph_delimiter, cost, reverse_cost, to_arc)
             VALUES (%L, %L, %L, %L, %L, %L, %L, %L);
-        ', v_temp_arc_table, v_record.arc_id, v_record.pgr_node_1, v_pgr_node_id, v_record.node_1, 
+        ', v_temp_arc_table, v_record.arc_id, v_record.pgr_node_1, v_pgr_node_id, v_record.node_1,
         v_record.n_graph_delimiter, v_cost, v_reverse_cost, v_record.to_arc);
     END LOOP;
 
@@ -384,7 +385,7 @@ BEGIN
                 AND a.closed = FALSE
                 AND a.to_arc IS NOT NULL;
                 ', v_temp_arc_table);
-        ELSE 
+        ELSE
             EXECUTE format('
                 UPDATE %I a
                 SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
@@ -438,7 +439,7 @@ BEGIN
         ', v_temp_arc_table, v_graph_delimiter)
         INTO v_count;
 
-        IF v_count > 0 THEN 
+        IF v_count > 0 THEN
             v_query_text := format('
                 SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
                 FROM %I
@@ -482,9 +483,9 @@ BEGIN
                 SET to_arc = array[n.old_arc_id]
                 FROM nodes_to_update n
                 WHERE t.pgr_node_id = n.pred;
-            ', 
-            v_temp_node_table, v_graph_delimiter, 
-            v_temp_arc_table, v_graph_delimiter, 
+            ',
+            v_temp_node_table, v_graph_delimiter,
+            v_temp_arc_table, v_graph_delimiter,
             v_temp_node_table);
 
             EXECUTE format('
@@ -515,7 +516,7 @@ BEGIN
                 WHERE a.graph_delimiter = %L
                 AND a.old_arc_id <> ALL (a.to_arc);
             ', v_temp_arc_table, v_graph_delimiter);
-        END IF; 
+        END IF;
     END IF;
 
     RETURN jsonb_build_object(
@@ -527,6 +528,7 @@ BEGIN
         'version', v_version,
         'body', jsonb_build_object(
             'form', jsonb_build_object(),
+            'feature', jsonb_build_object(),
             'data', jsonb_build_object()
         )
     );

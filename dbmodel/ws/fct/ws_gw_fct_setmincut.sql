@@ -614,6 +614,7 @@ BEGIN
 				'version', v_version,
 				'body', jsonb_build_object(
 					'form', jsonb_build_object(),
+					'feature', jsonb_build_object(),
 					'data', jsonb_build_object(
 						'info', v_result_info::jsonb,
 						'geometry', jsonb_build_object(
@@ -665,7 +666,12 @@ BEGIN
 		v_response = json_build_object(
 			'status', 'Accepted',
 			'message', v_message,
-			'version', v_version
+			'version', v_version,
+			'body', jsonb_build_object(
+				'form', jsonb_build_object(),
+				'feature', jsonb_build_object(),
+				'data', jsonb_build_object()
+			)
 		);
 		RETURN v_response;
 	ELSIF v_action = 'mincutDelete' THEN
@@ -687,7 +693,12 @@ BEGIN
 		v_response = json_build_object(
 			'status', 'Accepted',
 			'message', v_message,
-			'version', v_version
+			'version', v_version,
+			'body', jsonb_build_object(
+				'form', jsonb_build_object(),
+				'feature', jsonb_build_object(),
+				'data', jsonb_build_object()
+			)
 		);
 		RETURN v_response;
 	END IF;
