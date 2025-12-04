@@ -82,16 +82,18 @@ BEGIN
 		v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
 
 		-- get state_type default values
-		SELECT value::integer INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
-		IF v_statetype_obsolete IS NULL THEN
-				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3134", "function":"2446","parameters":null}}$$);';
-		END IF;
+		IF (OLD.status != NEW.status) THEN
+			SELECT value::integer INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+			IF v_statetype_obsolete IS NULL THEN
+					EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3134", "function":"2446","parameters":null}}$$);';
+			END IF;
 
-		SELECT value::integer INTO v_statetype_onservice FROM config_param_user WHERE parameter='edit_statetype_1_vdefault' AND cur_user=current_user;
-		IF v_statetype_onservice IS NULL THEN
-				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3136", "function":"2446","parameters":null}}$$);';
+			SELECT value::integer INTO v_statetype_onservice FROM config_param_user WHERE parameter='edit_statetype_1_vdefault' AND cur_user=current_user;
+			IF v_statetype_onservice IS NULL THEN
+					EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3136", "function":"2446","parameters":null}}$$);';
+			END IF;
 		END IF;
 
 		UPDATE plan_psector
@@ -104,15 +106,15 @@ BEGIN
 		-- update psector status to MADE OPERATIONAL (Archived)
 		IF (OLD.status != NEW.status) AND (NEW.status = 5) THEN
 
-		-- get workcat id
-		IF NEW.workcat_id IS NULL THEN
-			NEW.workcat_id = (SELECT value FROM config_param_user WHERE parameter= 'edit_workcat_vdefault' AND cur_user=current_user);
-
+			-- get workcat id
 			IF NEW.workcat_id IS NULL THEN
-				EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"4456", "function":"2446","parameters":null}}$$);';
+				NEW.workcat_id = (SELECT value FROM config_param_user WHERE parameter= 'edit_workcat_vdefault' AND cur_user=current_user);
+
+				IF NEW.workcat_id IS NULL THEN
+					EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"4456", "function":"2446","parameters":null}}$$);';
+				END IF;
 			END IF;
-		END IF;
 
 
 			-- get psector geometry
