@@ -373,6 +373,8 @@ class GwSchemaI18NManager:
 
         if not diff_rows and table_i18n != "i18n.dbstyle":
             return ""
+        if table_i18n == "i18n.dbstyle":
+            print('aaaaa')
 
         # Get the columns to insert
         columns_org = diff_rows[0].keys()
@@ -501,6 +503,10 @@ class GwSchemaI18NManager:
         elif 'dbplan_price' in table_i18n:
             columns_i18n = ["source", "ds_en_us", "tx_en_us", "pr_en_us"]
             columns_org = ["id", "descript", "text", "price"]
+
+        elif 'dbconfig_visit_parameter' in table_i18n:
+            columns_i18n = ["source", "ds_en_us"]
+            columns_org = ["id", "descript"]
 
         # Update the su_basic_tables table (It has a different format, more than one table_org)
         elif 'su_basic_tables' in table_i18n:
@@ -1864,19 +1870,19 @@ class GwSchemaI18NManager:
             "ws": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbconfig_visit_parameter",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbstyle"],
+                "dbtables": ["dbconfig_visit_parameter"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbconfig_visit_parameter",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbstyle"],
+                "dbtables": ["dbconfig_visit_parameter"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
@@ -2025,3 +2031,4 @@ class GwSchemaI18NManager:
         message = "Parent ID does not exist."
         message = "The start date must be before the end date"
         message = "The start date real must be before the end date real"
+        message = "Filter"

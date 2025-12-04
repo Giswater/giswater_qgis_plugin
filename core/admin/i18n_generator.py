@@ -386,26 +386,27 @@ class GwI18NGenerator:
     def _create_all_db_files(self, cfg_path, file_type):
         """ Read the values of the database and update the i18n files """
 
-        file_name = f"{self.path_dic[file_type]['name']}"
         self.project_type = self.path_dic[file_type]["project_type"][0]
         text_error = ""
 
         # Check if file exist
-        if os.path.exists(cfg_path + file_name) and not self.multiple_languages:
-            msg = "Are you sure you want to overwrite this file?"
+        if os.path.exists(cfg_path) and not self.multiple_languages:
+            msg = "Are you sure you want to overwrite this folder?"
             title = "Overwrite"
-            answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}{file_name}")
+            answer = tools_qt.show_question(msg, title, parameter=f"\n\n{cfg_path}")
             if not answer:
                 return None, "Translation canceled"
-        elif not os.path.exists(cfg_path + file_name):
+        elif not os.path.exists(cfg_path):
             os.makedirs(cfg_path, exist_ok=True)
 
-        # Get All table values
-        self._write_header(cfg_path + file_name, file_type)
         dbtables = self.path_dic[file_type]['tables']
         if self.language == 'no_TR':
             return True, f"{file_type}, not translated"
         for dbtable in dbtables:
+            file_name = f"{dbtable}.sql"
+
+            # Get All table values
+            self._write_header(cfg_path + file_name, file_type)
             result = self._get_table_values(dbtable)
             
             # Handle case where _get_table_values returns unexpected format
@@ -422,6 +423,8 @@ class GwI18NGenerator:
                     text_error += self._write_dbstyle_values(dbtable_rows, cfg_path + file_name, file_type)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name, file_type)
+            
+            self._write_footer(cfg_path + file_name, file_type)
         if text_error != "":
             return False, text_error
         return True, ""
@@ -551,6 +554,11 @@ class GwI18NGenerator:
             colums = ["source", "project_type", "context", "ds_en_us", "tx_en_us", "pr_en_us"]
             lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"tx_{self.lower_lang}", f"auto_tx_{self.lower_lang}", f"va_auto_tx_{self.lower_lang}", f"pr_{self.lower_lang}", f"auto_pr_{self.lower_lang}", f"va_auto_pr_{self.lower_lang}"]
             order_by.extend(['source_code', 'project_type', 'context', 'source'])
+        
+        elif table == 'dbconfig_visit_parameter':
+            colums = ["source", "project_type", "context", "ds_en_us"]
+            lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbstyle':
             print(f"dbstyle: {table}")
@@ -644,46 +652,46 @@ class GwI18NGenerator:
                                     values_str += f"('{row['source']}', '%_{row['feature_type'].lower()}%', '{row['formtype'].lower()}', '{row['tabname']}', {txt[0]}, {txt[1]})"
                                     k = 1
                                     break
-                        file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, tabname, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
+                        file.write(f"UPDATE {context} AS t SET label = v.label, tooltip = v.tooltip FROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname LIKE v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
                     else:
                         values_str = ",\n    ".join([f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                        file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, tabname, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
+                        file.write(f"UPDATE {context} AS t SET label = v.label, tooltip = v.tooltip FROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, label, tooltip)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
 
                 elif "dbparam_user" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, label, descript)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET label = v.label, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, label, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "dbconfig_param_system" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, label, descript)\nWHERE t.parameter = v.parameter;\n\n")
+                    file.write(f"UPDATE {context} AS t SET label = v.label, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(parameter, label, descript)\nWHERE t.parameter = v.parameter;\n\n")
 
                 elif 'dbconfig_typevalue' in table:
                     values_str = ",\n    ".join([f"('{row['source']}', '{row['formname']}', {txt[0]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET idval = v.idval\nFROM (\n    VALUES\n    {values_str}\n) AS v(source, formname, idval)\nWHERE t.id = v.source AND t.typevalue = v.formname;\n\n")
+                    file.write(f"UPDATE {context} AS t SET idval = v.idval FROM (\n\tVALUES\n\t{values_str}\n) AS v(source, formname, idval)\nWHERE t.id = v.source AND t.typevalue = v.formname;\n\n")
 
                 elif "dbmessage" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET error_message = v.error_message, hint_message = v.hint_message\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, error_message, hint_message)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET error_message = v.error_message, hint_message = v.hint_message FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, error_message, hint_message)\nWHERE t.id = v.id;\n\n")
 
                 elif "dbfprocess" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name\nFROM (\n    VALUES\n    {values_str}\n) AS v(fid, except_msg, info_msg, fprocess_name)\nWHERE t.fid = v.fid;\n\n")
+                    file.write(f"UPDATE {context} AS t SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name FROM (\n\tVALUES\n\t{values_str}\n) AS v(fid, except_msg, info_msg, fprocess_name)\nWHERE t.fid = v.fid;\n\n")
 
                 elif "dbconfig_csv" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET alias = v.alias, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(fid, alias, descript)\nWHERE t.fid = v.fid;\n\n")
+                    file.write(f"UPDATE {context} AS t SET alias = v.alias, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(fid, alias, descript)\nWHERE t.fid = v.fid;\n\n")
 
                 elif "dbconfig_toolbox" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET alias = v.alias, observ = v.observ\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, alias, observ)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET alias = v.alias, observ = v.observ FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, alias, observ)\nWHERE t.id = v.id;\n\n")
 
                 elif "dbconfig_report" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET alias = v.alias, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, alias, descript)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET alias = v.alias, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, alias, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "dbtypevalue" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', '{row['typevalue']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET idval = v.idval, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, typevalue, idval, descript)\nWHERE t.id = v.id AND t.typevalue = v.typevalue;\n\n")
+                    file.write(f"UPDATE {context} AS t SET idval = v.idval, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, typevalue, idval, descript)\nWHERE t.id = v.id AND t.typevalue = v.typevalue;\n\n")
 
                 elif "dbtable" in table:
                     values_str = ""
@@ -691,59 +699,62 @@ class GwI18NGenerator:
                         values_str = ",\n    ".join([f"('%_{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data if row['source'] != '0'])
                     else:
                         values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data if row])
-                    file.write(f"UPDATE {context} AS t\nSET alias = v.alias, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, alias, descript)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET alias = v.alias, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, alias, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "su_basic_tables" in table:
                     if file_type == "am":
                         values_str = ",\n    ".join([f"('{row['source']}', {txt[0]})" for row, txt in data])
-                        file.write(f"UPDATE {context} AS t\nSET idval = v.idval\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, idval)\nWHERE t.id = v.id;\n\n")
+                        file.write(f"UPDATE {context} AS t SET idval = v.idval FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, idval)\nWHERE t.id = v.id;\n\n")
 
                     elif context == "value_state_type":
                         values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
-                        file.write(f"UPDATE {context} AS t\nSET name = v.name\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, name)\nWHERE t.id = v.id;\n\n")
+                        file.write(f"UPDATE {context} AS t SET name = v.name FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, name)\nWHERE t.id = v.id;\n\n")
 
                     elif context == "value_state":
                         values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
-                        file.write(f"UPDATE {context} AS t\nSET name = v.name, observ = v.observ\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, name, observ)\nWHERE t.id = v.id;\n\n")
+                        file.write(f"UPDATE {context} AS t SET name = v.name, observ = v.observ FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, name, observ)\nWHERE t.id = v.id;\n\n")
 
                     elif context == "config_param_system":
                         values_str = ",\n    ".join([f"('{row['source']}', {txt[0]})" for row, txt in data])
-                        file.write(f"UPDATE {context} AS t\nSET value = v.value\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, value)\nWHERE t.parameter = v.parameter;\n\n")
+                        file.write(f"UPDATE {context} AS t SET value = v.value FROM (\n\tVALUES\n\t{values_str}\n) AS v(parameter, value)\nWHERE t.parameter = v.parameter;\n\n")
                     
                 elif "dbfunction" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "dbconfig_form_tabs" in table:
                     values_str = ",\n    ".join([f"('{row['formname']}', '{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET label = v.label, tooltip = v.tooltip\nFROM (\n    VALUES\n    {values_str}\n) AS v(formname, tabname, label, tooltip)\nWHERE t.formname = v.formname AND t.tabname = v.tabname;\n\n")
+                    file.write(f"UPDATE {context} AS t SET label = v.label, tooltip = v.tooltip FROM (\n\tVALUES\n\t{values_str}\n) AS v(formname, tabname, label, tooltip)\nWHERE t.formname = v.formname AND t.tabname = v.tabname;\n\n")
 
                 elif "dbconfig_form_tableview" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', '{row['columnname']}', {txt[0]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET alias = v.alias\nFROM (\n    VALUES\n    {values_str}\n) AS v(objectname, columnname, alias)\nWHERE t.objectname = v.objectname AND t.columnname = v.columnname;\n\n")
+                    file.write(f"UPDATE {context} AS t SET alias = v.alias FROM (\n\tVALUES\n\t{values_str}\n) AS v(objectname, columnname, alias)\nWHERE t.objectname = v.objectname AND t.columnname = v.columnname;\n\n")
 
                 elif "su_feature" in table:
                     values_str = ",\n    ".join([f"('{row['lb_en_us']}', '{row['feature_class']}', '{row['feature_type']}', {txt[0]}, {txt[1]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET id = v.idval, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(lb_en_us, feature_class, feature_type, idval, descript)\nWHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;\n\n")
+                    file.write(f"UPDATE {context} AS t SET id = v.idval, descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(lb_en_us, feature_class, feature_type, idval, descript)\nWHERE t.id = v.lb_en_us AND t.feature_class = v.feature_class AND t.feature_type = v.feature_type;\n\n")
 
                 elif "dblabel" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET idval = v.idval\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, idval)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET idval = v.idval FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, idval)\nWHERE t.id = v.id;\n\n")
+
+                elif "dbconfig_visit_parameter" in table:
+                    values_str = ",\n    ".join([f"('{row['source']}', {txt[0]})" for row, txt in data])
+                    file.write(f"UPDATE {context} AS t SET descript = v.descript FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, descript)\nWHERE t.id = v.id;\n\n")
 
                 elif "dbconfig_engine" in table:
                     values_str = ",\n    ".join([f"('{row['parameter']}', '{row['method']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript, placeholder = v.placeholder\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, method, label, descript, placeholder)\nWHERE t.parameter = v.parameter AND t.method = v.method;\n\n")
+                    file.write(f"UPDATE {context} AS t SET label = v.label, descript = v.descript, placeholder = v.placeholder FROM (\n\tVALUES\n\t{values_str}\n) AS v(parameter, method, label, descript, placeholder)\nWHERE t.parameter = v.parameter AND t.method = v.method;\n\n")
 
                 elif "dbplan_price" in table:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]}, {txt[2]})" for row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")           
+                    file.write(f"UPDATE {context} AS t SET descript = v.descript, text = v.text, price = REPLACE(v.price, ',', '.')::numeric FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, descript, text, price)\nWHERE t.id = v.id;\n\n")           
         del file
 
     # endregion
     # region Generate from Json
 
     def _write_dbjson_values(self, rows, path, file_type):
-        closing = False
         values_by_context = {}
 
         updates = {}
@@ -753,7 +764,6 @@ class GwI18NGenerator:
             text = json.dumps(row["text"]).replace("'", "''")
             # Set key depending on context
             if row["context"] == "config_form_fields":
-                closing = True
                 key = (row["source"], row["context"], text, row["formname"], row["formtype"], row["tabname"])
             else:
                 key = (row["source"], row["context"], text)
@@ -816,13 +826,10 @@ class GwI18NGenerator:
                     ])
                     file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
-            if closing:
-                file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
         return ""
     # endregion
     # region Write dbstyle values
     def _write_dbstyle_values(self, rows, path, file_type):
-        print("aaaaaaaaaaaaaaa")
         updates = defaultdict(list)
 
         for row in rows:
@@ -850,8 +857,8 @@ class GwI18NGenerator:
                 
                 # Replace exact label string: label="Original" -> label="Translated"
                 if translated != default_text:
-                    old_str = f'label="{default_text}"'
-                    new_str = f'label="{translated}"'
+                    old_str = f'label="{default_text.replace("'", "''")}"'
+                    new_str = f'label="{translated.replace("'", "''")}"'
                     
                     # Simple string replacement is robust for this purpose
                     new_stylevalue = new_stylevalue.replace(old_str, new_str)
@@ -881,7 +888,8 @@ class GwI18NGenerator:
                   '*/\n\n\n')
         if file_type in ["i18n_ws", "i18n_ud", "i18n_utils"] and "no_tr.sql" not in path.lower():
             header += 'SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
-            header += "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n"
+            if "config_form_fields" in path:
+                header += "UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n"
         elif file_type == "am":
             header += 'SET search_path = am, public;\n'
         elif file_type == "cm":
@@ -893,6 +901,17 @@ class GwI18NGenerator:
         file.write(header)
         file.close()
         del file
+    
+    def _write_footer(self, path, file_type):
+        """
+        Write the file footer
+            :param path: Full destination path (String)
+        """
+        if "config_form_fields" in path:
+            file = open(path, "a", encoding="utf-8")
+            file.write("UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';\n")
+            file.close()
+            del file
 
     def _save_user_values(self):
         """ Save selected user values """
@@ -1042,37 +1061,37 @@ class GwI18NGenerator:
 
         self.path_dic = {
             "i18n_ws": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ws{os.sep}i18n{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ws{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["ws", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle", "su_basic_tables", "dbjson",
-                    "dbconfig_form_fields_json"]
+                    "dbconfig_visit_parameter", "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle",
+                    "su_basic_tables", "dbjson", "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ud{os.sep}i18n{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ud{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["ud", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle", "su_basic_tables", "dbjson",
-                    "dbconfig_form_fields_json"]
+                    "dbconfig_visit_parameter", "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle",
+                    "su_basic_tables", "dbjson", "dbconfig_form_fields_json"]
             },
             "i18n_utils": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}utils{os.sep}i18n{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}utils{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["utils", "ud", "ws"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
                 "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle", "su_basic_tables", "su_feature", "dbjson",
-                    "dbconfig_form_fields_json"]
+                    "dbconfig_visit_parameter", "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle",
+                    "su_basic_tables", "su_feature", "dbjson", "dbconfig_form_fields_json"]
             },
             "am": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}{self.language}{os.sep}",
