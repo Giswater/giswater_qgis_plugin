@@ -857,8 +857,10 @@ class GwI18NGenerator:
                 
                 # Replace exact label string: label="Original" -> label="Translated"
                 if translated != default_text:
-                    old_str = f'label="{default_text.replace("'", "''")}"'
-                    new_str = f'label="{translated.replace("'", "''")}"'
+                    escaped_default = default_text.replace("'", "''")
+                    escaped_translated = translated.replace("'", "''")
+                    old_str = f'label="{escaped_default}"'
+                    new_str = f'label="{escaped_translated}"'
                     
                     # Simple string replacement is robust for this purpose
                     new_stylevalue = new_stylevalue.replace(old_str, new_str)
