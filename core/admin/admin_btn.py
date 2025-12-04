@@ -617,7 +617,6 @@ class GwAdminButton:
         folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
         folder_cff = os.path.join(folder_final_pass, 'config_form_fields')
         folder_i18n = os.path.join(folder_final_pass, 'i18n', lang)
-        folders = sorted(os.listdir(folder_final_pass))
 
         if self._process_folder(folder_cff) is False:
             msg = '{0} folder not found'
