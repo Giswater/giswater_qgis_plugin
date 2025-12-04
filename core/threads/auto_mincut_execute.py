@@ -62,9 +62,9 @@ class GwAutoMincutTask(GwTask):
             forecast_end_predict = date_end_predict.toString('yyyy-MM-dd') + " " + time_end_predict.toString('HH:mm:ss')
 
             extras = (f'"action":"{self.mincut_action}", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
-                      f'"usePsectors":"{use_planified}", "dialogMincutType":"{mincut_result_type}", '
-                      f'"dialogForecastStart":"{forecast_start_predict}", '
-                      f'"dialogForecastEnd":"{forecast_end_predict}"')
+                      f'"usePsectors":"{use_planified}", "mincutType":"{mincut_result_type}", '
+                      f'"forecastStart":"{forecast_start_predict}", '
+                      f'"forecastEnd":"{forecast_end_predict}"')
             self.body = tools_gw.create_body(extras=extras)
             msg = "Task 'Mincut execute' execute procedure '{0}' with parameters: '{1}', '{2}', '{3}'"
             msg_params = ("gw_fct_setmincut", self.body, f"aux_conn={self.aux_conn}", "is_thread=True",)

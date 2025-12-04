@@ -683,20 +683,20 @@ class GwMincut:
 
     def _mincut_cleanup_only(self, result_mincut_id):
         """ Perform mincut cleanup without closing the dialog (for state 4 replacement) """
-        
+
         # Restore user layer
         tools_qgis.restore_user_layer('ve_node', self.user_current_layer)
-        
+
         # Remove selections
         self._remove_selection()
-        
+
         # Reset rubber band
         tools_qgis.reset_rubber_band(self.search.rubber_band)
-        
+
         # Disconnect snapping
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
-        
+
         # Delete from DB (including conflicts)
         mincut_conflict_state = 5
         sql = (
@@ -723,7 +723,7 @@ class GwMincut:
         tools_db.execute_sql(sql)
         sql = f"DELETE FROM om_mincut WHERE id = {result_mincut_id};"
         tools_db.execute_sql(sql)
-        
+
         # Refresh map
         self._remove_selection()
         tools_qgis.refresh_map_canvas()
@@ -1087,17 +1087,17 @@ class GwMincut:
         self.dlg_mincut.mincutCanceled = True
 
         if self.mincut_class == 1:
-            polygon = result['body']['data'].get('geometry')
-            if polygon:
-                polygon = polygon[9:len(polygon) - 2]
-                polygon = polygon.split(',')
-                if polygon[0] == '':
+            try:
+                bbox = result['body']['data']['geometry']['bbox']
+            except KeyError:
+                bbox = None
+            if bbox:
+                x1, y1, x2, y2 = bbox.get('x1'), bbox.get('y1'), bbox.get('x2'), bbox.get('y2')
+                if None in (x1, y1, x2, y2):
                     message = "Error on create auto mincut, you need to review data"
                     tools_qgis.show_warning(message)
                     tools_qgis.restore_cursor()
                     return
-                x1, y1 = polygon[0].split(' ')
-                x2, y2 = polygon[2].split(' ')
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
         self.dlg_mincut.btn_accept.hide()
@@ -2075,19 +2075,20 @@ class GwMincut:
                     tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['body']['data'].get('geometry')
-            if polygon:
-                polygon = polygon[9:len(polygon) - 2]
-                polygon = polygon.split(',')
-                if polygon[0] == '':
+            try:
+                bbox = complet_result['body']['data']['geometry']['bbox']
+            except KeyError:
+                bbox = None
+
+            if bbox:
+                x1, y1, x2, y2 = bbox.get('x1'), bbox.get('y1'), bbox.get('x2'), bbox.get('y2')
+                if None in (x1, y1, x2, y2):
                     message = "Error on create auto mincut, you need to review data"
                     tools_qgis.show_warning(message)
                     tools_qgis.restore_cursor()
                     self.action_mincut.setChecked(False)
                     return
 
-                x1, y1 = polygon[0].split(' ')
-                x2, y2 = polygon[2].split(' ')
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
             sql = (f"UPDATE om_mincut"
@@ -2187,10 +2188,14 @@ class GwMincut:
 
         if signal[1]:
             complet_result = signal[1]
-            mincutOverlap = complet_result.get('mincutOverlap')
-            if mincutOverlap not in (None, ""):
-                msg = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(msg, parameter=mincutOverlap)
+            try:
+                has_overlap = complet_result['body']['data']['hasOverlap']
+            except KeyError:
+                has_overlap = False
+
+            if has_overlap:
+                msg = "Mincut done, but has conflict and overlaps with other mincuts"
+                tools_qt.show_info_box(msg)
             else:
                 msg = complet_result.get('message')
                 if not msg:
@@ -2200,18 +2205,19 @@ class GwMincut:
                     tools_qgis.show_message(msg.get('text'), Qgis.MessageLevel(msg.get('level')))
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['body']['data'].get('geometry')
-            if polygon and zoom:
-                polygon = polygon[9:len(polygon) - 2]
-                polygon = polygon.split(',')
-                if polygon[0] == '':
+            try:
+                bbox = complet_result['body']['data']['geometry']['bbox']
+            except KeyError:
+                bbox = None
+
+            if bbox and zoom:
+                x1, y1, x2, y2 = bbox.get('x1'), bbox.get('y1'), bbox.get('x2'), bbox.get('y2')
+                if None in (x1, y1, x2, y2):
                     message = "Error on create auto mincut, you need to review data"
                     tools_qgis.show_warning(message)
                     tools_qgis.restore_cursor()
                     return
 
-                x1, y1 = polygon[0].split(' ')
-                x2, y2 = polygon[2].split(' ')
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
             # Refresh map canvas
@@ -2311,8 +2317,8 @@ class GwMincut:
 
         if result_mincut_id != 'null':
             extras = (f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}", '
-                      f'"dialogMincutType":"{mincut_result_type}", "dialogForecastStart":"{forecast_start_predict}", '
-                      f'"dialogForecastEnd":"{forecast_end_predict}"')
+                      f'"mincutType":"{mincut_result_type}", "forecastStart":"{forecast_start_predict}", '
+                      f'"forecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
@@ -2651,8 +2657,8 @@ class GwMincut:
 
         if result_mincut_id != 'null':
             extras = (f'"action":"mincutChangeValveStatus", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}", '
-                      f'"dialogMincutType":"{mincut_result_type}", "dialogForecastStart":"{forecast_start_predict}", '
-                      f'"dialogForecastEnd":"{forecast_end_predict}"')
+                      f'"mincutType":"{mincut_result_type}", "forecastStart":"{forecast_start_predict}", '
+                      f'"forecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
