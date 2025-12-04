@@ -453,7 +453,7 @@ BEGIN
 				v_core_mincut := FALSE;
 			END IF;
 		END IF;
-	ELSIF v_action IN ('mincutAccept', 'endMincut') THEN
+	ELSIF v_action IN ('mincutAccept', 'mincutEnd') THEN
 
 		-- call setfields
 		v_message = json_build_object(
@@ -467,7 +467,7 @@ BEGIN
 				IF (select mincut_state from om_mincut where id = v_mincut_id) = v_mincut_on_planning_state THEN
 					UPDATE om_mincut SET mincut_state = v_mincut_plannified_state WHERE id = v_mincut_id;
 				END IF;
-			ELSIF v_action = 'endMincut' THEN
+			ELSIF v_action = 'mincutEnd' THEN
 				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_in_progress_state THEN
 					UPDATE om_mincut SET mincut_state = v_mincut_finished_state WHERE id = v_mincut_id;
 				END IF;
