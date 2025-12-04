@@ -213,3 +213,8 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES (4464, 'The selected catalog is not available for the feature type selected', 'Select another catalog', 2, true, 'utils', 'core');
+
+-- 4/12/2025
+ALTER TABLE sys_fprocess 
+ALTER COLUMN fprocess_name TYPE VARCHAR(250);
+
