@@ -157,10 +157,3 @@ ALTER TABLE temp_node_other ADD active boolean NULL;
 
 ALTER TABLE temp_node_other drop CONSTRAINT temp_node_other_unique;
 ALTER TABLE temp_node_other ADD CONSTRAINT temp_node_other_unique UNIQUE (node_id, other, type);
-
-
--- 02/12/2025
-DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON arc;
-CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER
-UPDATE OF arc_id ON arc FOR EACH ROW WHEN (OLD.arc_id IS DISTINCT FROM NEW.arc_id) EXECUTE FUNCTION gw_trg_array_fk_id_table('arc_id',
-'{"man_frelem":"to_arc"}');

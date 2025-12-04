@@ -38,3 +38,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('EDIT');
 
 CREATE TRIGGER gw_trg_v_edit_macrodqa INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_macrodqa 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodqa('EDIT');
+
+-- 02/12/2025
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON arc;
+CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER
+UPDATE OF arc_id ON arc FOR EACH ROW WHEN (OLD.arc_id IS DISTINCT FROM NEW.arc_id) EXECUTE FUNCTION gw_trg_array_fk_id_table('arc_id',
+'{"man_source":"inlet_arc", "man_tank":"inlet_arc", "man_wtp":"inlet_arc", "man_waterwell":"inlet_arc", "man_valve":"to_arc", "man_pump":"to_arc", "man_meter":"to_arc", "man_frelem":"to_arc"}');
