@@ -1265,22 +1265,22 @@ class GwPsector:
 
     def _get_widget_value_for_insert(self, widget_name: str) -> Optional[str]:
         """Get widget value formatted for SQL INSERT"""
-
-        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, widget_name)
-        if widget_type is None:
+            
+        widget = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
+        if widget is None:
             return None
+        if widget_name == 'tab_general_creation_date':
+            print(type(widget))
 
         value = None
-        if widget_type is QCheckBox:
-            value = str(tools_qt.is_checked(self.dlg_plan_psector, widget_name)).upper()
-        elif widget_type is QDateEdit:
-            date = self.dlg_plan_psector.findChild(QDateEdit, str(widget_name))
-            return f"'{date.dateTime().toString('yyyy-MM-dd HH:mm:ss')}'"
-        elif isinstance(widget_type, QComboBox) or widget_type is tools_gw.CustomQComboBox:
-            combo = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
-            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
+        if isinstance(widget, QCheckBox):
+            value = str(tools_qt.is_checked(self.dlg_plan_psector, widget)).upper()
+        elif isinstance(widget, (QDateEdit, tools_gw.CustomQgsDateTimeEdit)):
+            value = widget.dateTime().toString('yyyy-MM-dd HH:mm:ss')
+        elif isinstance(widget, (QComboBox, tools_gw.CustomQComboBox)):
+            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, widget))
         else:
-            value = tools_qt.get_text(self.dlg_plan_psector, widget_name)
+            value = tools_qt.get_text(self.dlg_plan_psector, widget)
 
         if value in (None, 'null', 'NULL', ''):
             return "null"
