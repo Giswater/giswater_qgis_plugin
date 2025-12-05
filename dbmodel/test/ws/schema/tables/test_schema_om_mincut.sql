@@ -25,7 +25,7 @@ SELECT columns_are(
         'anl_user', 'anl_descript', 'anl_feature_id', 'anl_feature_type', 'anl_the_geom', 'forecast_start',
         'forecast_end', 'assigned_to', 'exec_start', 'exec_end', 'exec_user', 'exec_descript',
         'exec_the_geom', 'exec_from_plot', 'exec_depth', 'exec_appropiate', 'notified', 'output',
-        'modification_date', 'chlorine', 'turbidity', 'minsector_id', 'reagent_lot', 'equipment_code', 'polygon_the_geom'
+        'modification_date', 'chlorine', 'turbidity', 'minsector_id', 'reagent_lot', 'equipment_code', 'polygon_the_geom', 'modification_user'
     ],
     'Table om_mincut should have the correct columns'
 );
@@ -46,6 +46,7 @@ SELECT col_type_is('om_mincut', 'notified', 'json', 'Column notified should be j
 SELECT col_type_is('om_mincut', 'output', 'json', 'Column output should be json');
 SELECT col_type_is('om_mincut', 'reagent_lot', 'varchar(100)', 'Column reagent_lot should be varchar(100)');
 SELECT col_type_is('om_mincut', 'equipment_code', 'varchar(50)', 'Column equipment_code should be varchar(50)');
+SELECT col_type_is('om_mincut', 'modification_user', 'varchar(50)', 'Column modification_user should be varchar(50)');
 
 -- Check foreign keys
 SELECT has_fk('om_mincut', 'Table om_mincut should have foreign keys');
