@@ -193,3 +193,7 @@ CREATE INDEX IF NOT EXISTS minsector_graph_minsector_1_idx ON minsector_graph US
 CREATE INDEX IF NOT EXISTS minsector_graph_minsector_2_idx ON minsector_graph USING btree ("minsector_2");
 
 CREATE INDEX IF NOT EXISTS minsector_mincut_mincut_minsector_id_idx ON minsector_mincut USING btree ("mincut_minsector_id");
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"modification_user", "dataType":"varchar(50)", "isUtils":"False"}}$$);
+
+ALTER TABLE om_mincut ALTER COLUMN modification_date TYPE timestamp;
