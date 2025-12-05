@@ -156,6 +156,9 @@ class GwMincut:
         if message:
             tools_qgis.show_warning(message)
 
+        self._store_original_values()
+        self._connect_change_signals()
+
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
         if self.current_state == '0':
@@ -466,9 +469,6 @@ class GwMincut:
 
         self._load_widgets_values()
 
-        self._store_original_values()
-        self._connect_change_signals()
-
     def set_id_val(self):
 
         # Show future id of mincut
@@ -511,6 +511,9 @@ class GwMincut:
 
         # Disabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(False)
+
+        self._store_original_values()
+        self._connect_change_signals()
 
         # Show form in docker?
         self.manage_docker()
