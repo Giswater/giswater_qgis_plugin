@@ -1,11 +1,4 @@
-/*
-This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU
-General Public License as published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
-*/
-
-CREATE OR REPLACE FUNCTION gw_fct_cso_calculation(p_data json)
+CREATE OR REPLACE FUNCTION ud.gw_fct_cso_calculation(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -13,23 +6,23 @@ AS $function$
 /*
 
 --modo calculo
-SELECT gw_fct_cso_calculation($${"client":{"device":4, "lang":"es_ES", "epsg":25830}, "form":{}, "feature":{}, 
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mode":"EXECUTION", "inflowsDscenarioName": "inf_gaikao", "exploitation":"14", "drainzoneId":null}}}$$);
+SELECT ud.gw_fct_cso_calculation($${"client":{"device":4, "lang":"es_ES", "epsg":25830}, "form":{}, "feature":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mode":"EXECUTION", "inflowsDscenarioRootName": "inf_gaikao", "exploitation":"14", "drainzoneId":null}}}$$);
 
-SELECT gw_fct_cso_calculation(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{},"parameters":{"mode":"EXECUTION", "inflowsDscenarioName": "inf_gaikao", "exploitation":"14", "drainzoneId":', drainzone_id, '}}}')::json);
+SELECT ud.gw_fct_cso_calculation(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+"data":{"filterFields":{}, "pageInfo":{},"parameters":{"mode":"EXECUTION", "inflowsDscenarioRootName": "inf_gaikao", "exploitation":"14", "drainzoneId":', drainzone_id, '}}}')::json);
 
 --modo calibración
-SELECT gw_fct_cso_calculation($${"client":{"device":4, "lang":"es_ES", "epsg":25830}, "form":{}, "feature":{}, 
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mode":"CALIBRATION", "inflowsDscenarioName": "inf_gaikao", "exploitation":"14", "drainzoneId":null}}}$$);
+SELECT ud.gw_fct_cso_calculation($${"client":{"device":4, "lang":"es_ES", "epsg":25830}, "form":{}, "feature":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mode":"CALIBRATION", "inflowsDscenarioRootName": "inf_gaikao", "exploitation":"14", "drainzoneId":null}}}$$);
 
 
 
-SELECT gw_fct_cso_calculation(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
+SELECT ud.gw_fct_cso_calculation(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{},"parameters":{"exploitation":"14", "drainzoneId":', d.drainzone_id, '}}}')::json)
-FROM drainzone d
-LEFT JOIN node n ON REPLACE((d.graphconfig->'use'->0->'nodeParent')::TEXT, '"', '') = n.node_id
-LEFT JOIN exploitation e ON n.expl_id = e.expl_id
+FROM ud.drainzone d
+LEFT JOIN ud.node n ON REPLACE((d.graphconfig->'use'->0->'nodeParent')::TEXT, '"', '') = n.node_id
+LEFT JOIN ud.exploitation e ON n.expl_id = e.expl_id
 WHERE e.macroexpl_id = 6
 AND d.link IS NOT NULL;
 
@@ -38,31 +31,42 @@ AND d.link IS NOT NULL;
 */
 
 DECLARE
--- input params
-v_returncoeff NUMERIC;
-v_daily_supply NUMERIC;
-v_expl_id INTEGER;
-v_drainzone_id text;
-v_tstep NUMERIC;
-
--- 
-v_drainzone_array text;
-v_filter_drainzone TEXT;
-v_timeseries_list TEXT;
-v_inflows_dscenario TEXT;
-v_dscenario_id INTEGER;
--- 
 rec_rainfall record;
 rec_subc record;
-v_count INTEGER;
+rec record;
+
+v_returncoeff numeric;
+v_daily_supply numeric;
+
+
+
+v_count integer;
 v_sql text;
--- calc
-v_non_leaked_vol NUMERIC;
-v_leaked_vol NUMERIC;
-v_cur_vol NUMERIC;
-v_last_vol NUMERIC;
+
+v_tstep numeric;
+
+v_expl_id integer;
+
+v_drainzone_id text;
+v_drainzone_array text;
+
+v_filter_macroexpl text;
+v_filter_drainzone TEXT;
+
+v_timeseries_list TEXT;
+v_inflows_dscenario TEXT;
+
+v_dscenario_id integer;
+
+v_non_leaked_vol NUMERIC; --
+v_leaked_vol NUMERIC; -- volum que sobresurt
+
+v_cur_vol NUMERIC; -- volum actual de l'arqueta
+v_last_vol NUMERIC; --volum del pas anterior
 v_delta_vol NUMERIC;
+
 v_vol_circ NUMERIC;
+v_vol_circ_dep NUMERIC;
 v_vol_max_epi NUMERIC;
 
 -- return
@@ -72,19 +76,23 @@ v_result_info JSON;
 v_result_polygon JSON;
 
 v_calib_imperv_area NUMERIC = 0;
+
 v_mode TEXT;
 v_filtercal TEXT;
+v_residual_pattern NUMERIC = 0;
+
+v_i integer;
 
 
 BEGIN
 	
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud", public;
 
 	-- input params
 	v_tstep = 10; -- tstep of the timeseries (every 10 mins, 5 mins., etc.)
 	v_expl_id := (((p_data ->>'data')::json->>'parameters')::json->>'exploitation')::integer;
 	v_drainzone_id := (((p_data ->>'data')::json->>'parameters')::json->>'drainzoneId')::text;
-	v_inflows_dscenario := (((p_data ->>'data')::json->>'parameters')::json->>'inflowsDscenarioName')::text;
+	v_inflows_dscenario := (((p_data ->>'data')::json->>'parameters')::json->>'inflowsDscenarioRootName')::text;
 	v_mode:= (((p_data ->>'data')::json->>'parameters')::json->>'mode')::text;
 
 	-- config variables
@@ -130,7 +138,7 @@ BEGIN
 		EXECUTE 'UPDATE cso_subc_dwf_all t SET consumption = a.su FROM (
 			SELECT c.id, sum(consumo) AS su FROM ws.man_connec_acometida a
 			LEFT JOIN ws.connec b USING (connec_id)
-			LEFT JOIN cso_subc_dwf_all c ON st_intersects(c.the_geom, b.the_geom)
+			LEFT JOIN ud.cso_subc_dwf_all c ON st_intersects(c.the_geom, b.the_geom)
 			WHERE consumo IS NOT NULL AND drainzone_id = '||rec.drainzone_id||'
 			GROUP BY id
 		)a WHERE t.id = a.id';
@@ -141,10 +149,10 @@ BEGIN
 	-- ===================================================
 
 	EXECUTE '
-	UPDATE cso_subc_dwf_all t SET drainzone_id = a.drainzone_id FROM (
+	UPDATE ud.cso_subc_dwf_all t SET drainzone_id = a.drainzone_id FROM (
 		SELECT a.id, b.drainzone_id
-		FROM cso_subc_dwf_all a
-		LEFT JOIN node b USING (node_id)
+		FROM ud.cso_subc_dwf_all a
+		LEFT JOIN ud.node b USING (node_id)
 		WHERE (a.drainzone_id > 0 OR b.drainzone_id >0) 
 		AND a.drainzone_id<>b.drainzone_id AND b.drainzone_id > 0 
 		AND b.drainzone_id in ('||v_drainzone_array||')
@@ -152,10 +160,10 @@ BEGIN
 	';
 
 	EXECUTE '
-	UPDATE cso_subc_wwf_all t SET drainzone_id = a.drainzone_id FROM (
+	UPDATE ud.cso_subc_wwf_all t SET drainzone_id = a.drainzone_id FROM (
 	SELECT a.id, b.drainzone_id
-		FROM cso_subc_wwf_all a
-		LEFT JOIN node b USING (node_id)
+		FROM ud.cso_subc_wwf_all a
+		LEFT JOIN ud.node b USING (node_id)
 		WHERE (a.drainzone_id > 0 OR b.drainzone_id >0) 
 		AND a.drainzone_id<>b.drainzone_id AND b.drainzone_id > 0 
 		AND b.drainzone_id in ('||v_drainzone_array||')
@@ -255,7 +263,7 @@ BEGIN
 		CREATE TEMP table cso_inp_rainfall as
 		select timser_id as rf_name, 60*v_tstep as rf_length, value as rf_volume, (value*6)::numeric as rf_intensity, "time" as rf_tstep
 		from inp_timeseries_value a 
-		JOIN inp_timeseries b ON a.timser_id = b.id
+		JOIN ud.inp_timeseries b ON a.timser_id = b.id
 		WHERE timser_type = 'Rainfall' AND active AND addparam IS NULL AND expl_id = v_expl_id ORDER BY 1, 5;
 	
 		v_filtercal = ' AND c.addparam is null ';
@@ -265,16 +273,14 @@ BEGIN
 		create TEMP table cso_inp_rainfall as
 		select timser_id as rf_name, 60*v_tstep as rf_length, value as rf_volume, (value*6)::numeric as rf_intensity, "time" as rf_tstep
 		from inp_timeseries_value a 
-		JOIN inp_timeseries b ON a.timser_id = b.id
+		JOIN ud.inp_timeseries b ON a.timser_id = b.id
 		WHERE timser_type = 'Rainfall' AND active AND addparam->>'mode'='CALIBRATION' AND expl_id = v_expl_id ORDER BY 1, 5;
 	
 		v_filtercal = ' AND c.addparam->>''mode''=''CALIBRATION''';
 	
 	ELSE
 		return '{"status": "Failed", "message":{"level":1, "text":"It is mandatory to select a MODE"}}'::json;
-
 	END IF;
-	
 	
 	IF (SELECT EXISTS(SELECT 1 FROM cso_inp_rainfall)) IS FALSE THEN
 		return '{"status": "Failed", "message":{"level":1, "text":"La expl seleccioanda no tiene lluvias en la inp_timeseries"}}'::json;
@@ -317,12 +323,13 @@ BEGIN
 	--RAISE EXCEPTION '% ', v_sql;
 	EXECUTE v_sql;
 	
+/*
 	-- delete EDAR from cso calculation
 	DELETE FROM cso_out_vol WHERE node_id IN (
-	SELECT DISTINCT a.node_id FROM cso_out_vol a JOIN node b USING (node_id) 
+	SELECT DISTINCT a.node_id FROM ud.cso_out_vol a JOIN ud.node b USING (node_id) 
 	WHERE b.node_type = 'EDAR'
 	);
-
+*/
 	-- for each subcatchment
 	FOR rec_subc in execute 'select * from cso_inp_system_subc where drainzone_id in ('||v_drainzone_array||') 
 	and thyssen_plv_area is not null'
@@ -335,17 +342,19 @@ BEGIN
 		RAISE NOTICE 'rec_subc.kb % rec_subc.thyssen_plv_area %', rec_subc.kb ,  rec_subc.thyssen_plv_area;
 		
 		-- for each rainfall that have volume:
-		FOR rec_rainfall in EXECUTE 'select * from cso_inp_rainfall order by rf_name, rf_tstep'
+		FOR rec_rainfall in EXECUTE 'select *, (LEFT(rf_tstep,2)::integer +1)::INTEGER AS hourly from cso_inp_rainfall order by rf_name, rf_tstep'
 		LOOP	
 					
 			RAISE NOTICE 'rainfall %', rec_rainfall;
+								
+			EXECUTE 'SELECT factor_'||rec_rainfall.hourly||' FROM inp_pattern_value JOIN inp_pattern USING (pattern_id) WHERE expl_id = '||v_expl_id
+			INTO v_residual_pattern;
 			
 			-- fill table cso_out_vol
 			update cso_out_vol
 				set 
-				vol_residual = round((coalesce(rec_subc.demand,0) * v_returncoeff *  rec_rainfall.rf_length / 1000)::NUMERIC,3),
+				vol_residual = round((coalesce(rec_subc.demand,0) * v_returncoeff *  rec_rainfall.rf_length*v_residual_pattern / 1000)::NUMERIC,3),
 				vol_max_epi = round((rec_subc.q_max * rec_rainfall.rf_length / 1000)::NUMERIC,3),
-				vol_res_epi = round(((coalesce(rec_subc.demand,0) * rec_rainfall.rf_length) / 1000)::NUMERIC,3), 
 				vol_rainfall = round((1000 * rec_subc.kb * rec_rainfall.rf_volume * rec_subc.thyssen_plv_area/(1000*1000))::NUMERIC,3)
 				where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
 			
@@ -402,8 +411,7 @@ BEGIN
 				vol_non_leaked = round(v_non_leaked_vol::numeric,3),
 				vol_leaked = round(v_leaked_vol::numeric,3),
 				vol_wwtp = round(v_non_leaked_vol::NUMERIC,3),
-				vol_treated = round((vol_infiltr + v_non_leaked_vol)::NUMERIC, 3),
-				efficiency = CASE WHEN vol_total > 0 THEN round(((vol_infiltr + v_non_leaked_vol)/vol_total)::NUMERIC, 3) ELSE 1 END
+				vol_treated = round((vol_infiltr + v_non_leaked_vol)::NUMERIC, 3)
 			where node_id = rec_subc.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;	
 							
 			RAISE NOTICE 'curVol: %, lastVol: %, leak: %, nonLeak: %',  v_cur_vol, v_last_vol, v_leaked_vol, v_non_leaked_vol;
@@ -440,29 +448,58 @@ BEGIN
 		FROM cso_out_vol WHERE drainzone_id in ('||v_drainzone_array||')
 		order by concat(rf_name, ''_'', node_id), to_timestamp(rf_tstep, ''HH24:MI'')
 		';
-	
+		
 		UPDATE inp_timeseries_value SET value=0 WHERE value IS null;
 	
 	  	-- create an inflows dscenario if the name doesn't exists
-		IF v_inflows_dscenario NOT IN (SELECT name FROM cat_dscenario) THEN 
+		IF concat (v_inflows_dscenario, '_EP1') NOT IN (SELECT name FROM cat_dscenario) THEN 
 	
-			EXECUTE '
-			INSERT INTO cat_dscenario ("name", dscenario_type, expl_id) 
-			VALUES('||QUOTE_LITERAL(v_inflows_dscenario)||', ''INFLOWS'', '||v_expl_id||'::integer)
-			ON CONFLICT (dscenario_id) do nothing
-			';
+			v_inflows_dscenario = concat(v_inflows_dscenario,'_EP');
+		
+			FOR v_i IN 1..10
+			LOOP
+				v_inflows_dscenario = concat(v_inflows_dscenario, v_i);
+			
+				RAISE NOTICE 'v_inflows_dscenario %', v_inflows_dscenario;
+				
+				INSERT INTO cat_dscenario ("name", dscenario_type, expl_id) 
+				VALUES(v_inflows_dscenario, 'INFLOWS', v_expl_id::integer)
+				RETURNING dscenario_id INTO v_dscenario_id;
+			
+				INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
+				SELECT v_dscenario_id, node_id, v_i, concat(rf_name, '_', node_id) AS lluvia, 1, 0, true
+				FROM cso_out_vol WHERE drainzone_id::text IN (v_drainzone_array) AND RIGHT(rf_name, 2)::integer = v_i 
+				ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING;
+
+				v_inflows_dscenario = REVERSE(SUBSTRING(REVERSE(v_inflows_dscenario::TEXT), 2));
+			END LOOP;
+		ELSE
+
+			v_inflows_dscenario = concat(v_inflows_dscenario,'_EP');		
+		
+			FOR v_i IN 1..10
+			LOOP			
+				v_inflows_dscenario = concat(v_inflows_dscenario, v_i);
+				SELECT dscenario_id INTO v_dscenario_id FROM cat_dscenario WHERE "name" = v_inflows_dscenario;
+			
+				RAISE NOTICE 'v_inflows_dscenario %, v_dscenario_id %', v_inflows_dscenario, v_dscenario_id;
+				v_sql ='
+				INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
+				SELECT '||v_dscenario_id||', node_id, '||v_i||', concat(rf_name, ''_'', node_id) AS lluvia, 1, 0, true
+				FROM cso_out_vol WHERE drainzone_id IN ('||v_drainzone_array||') AND RIGHT(rf_name, 2)::integer = '||v_i||' ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING;';
+			
+				RAISE NOTICE 'v_sql %', v_sql;
+			
+				EXECUTE v_sql;
+
+				v_inflows_dscenario = REVERSE(SUBSTRING(REVERSE(v_inflows_dscenario::TEXT), 2));
+
+			END LOOP;			
 		END IF;
 	
 		SELECT dscenario_id INTO v_dscenario_id FROM cat_dscenario WHERE "name" = v_inflows_dscenario;
-	
+		INSERT INTO selector_inp_dscenario VALUES (v_dscenario_id, current_user) ON CONFLICT (dscenario_id, cur_user) DO NOTHING;
 
-		EXECUTE '
-		INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
-		SELECT '||v_dscenario_id||', node_id, RIGHT(rf_name, 2)::INTEGER, concat(rf_name, ''_'', node_id) AS lluvia, 1, 0, false
-		FROM cso_out_vol WHERE drainzone_id IN ('||v_drainzone_array||') 
-		ORDER BY RIGHT(rf_name, 2)
-		ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING
-		';	
 	END IF;
 
 	EXECUTE 'UPDATE cso_out_vol SET lastupdate = now() WHERE drainzone_id IN ('||v_drainzone_array||')';
@@ -504,7 +541,7 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 		    ) AS feature
-		    FROM (SELECT drainzone_id AS id, drainzone_name, NULL AS descript, expl_id, efficiency, the_geom FROM v_cso_drainzone) 
+		    FROM (SELECT drainzone_id AS id, drainzone, NULL AS descript, expl_id, efficiency, the_geom FROM v_cso_drainzone) 
 	   	row) features;
 	
 	  v_result := COALESCE(v_result, '{}'); 
@@ -512,9 +549,8 @@ BEGIN
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-    ',"body":{"form":{}, "data":{"info":'||v_result_info||',"polygon":'||v_result_polygon||'}}}')::json, 9997, null, null, null);
-
-
+             ',"body":{"form":{}, "data":{"info":'||v_result_info||',"polygon":'||v_result_polygon||'}}}')::json, 9997, null, null, null);
+            
 END;
 $function$
 ;

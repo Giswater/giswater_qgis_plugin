@@ -2630,3 +2630,55 @@ AS SELECT ext_rtc_hydrometer_x_data.id,
      LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
      LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
   ORDER BY ext_rtc_hydrometer_x_data.id;
+  
+
+-- create multiresult views to analyze results envelope   
+CREATE OR REPLACE VIEW v_rpt_multi_arcflow_sum
+AS SELECT rpt_inp_arc.id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.result_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom,
+    rpt_arcflow_sum.arc_type AS swarc_type,
+    max(rpt_arcflow_sum.max_flow) AS max_flow,
+    max(rpt_arcflow_sum.time_days) AS time_days,
+    max(rpt_arcflow_sum.time_hour) AS time_hour,
+    max(rpt_arcflow_sum.max_veloc) AS max_veloc,
+    max(COALESCE(rpt_arcflow_sum.mfull_flow, 0::numeric(12,4))) AS mfull_flow,
+    max(COALESCE(rpt_arcflow_sum.mfull_dept, 0::numeric(12,4))) AS mfull_dept,
+    max(rpt_arcflow_sum.max_shear) AS max_shear,
+    max(rpt_arcflow_sum.max_hr) AS max_hr,
+    max(rpt_arcflow_sum.max_slope) AS max_slope,
+    max(rpt_arcflow_sum.day_max) AS day_max,
+    max(rpt_arcflow_sum.time_max) AS time_max,
+    max(rpt_arcflow_sum.min_shear) AS min_shear,
+    max(rpt_arcflow_sum.day_min) AS day_min,
+    max(rpt_arcflow_sum.time_min) AS swartime_minc_type
+   FROM selector_rpt_main ,  rpt_inp_arc
+     JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id::text
+  WHERE rpt_arcflow_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text 
+ AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT
+ GROUP BY 1,2,3,4,5,6,7,8;
+
+ 
+CREATE OR REPLACE VIEW v_rpt_multi_nodeflooding_sum
+AS SELECT rpt_inp_node.id,
+    rpt_nodeflooding_sum.node_id,
+    selector_rpt_main.result_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    max(rpt_nodeflooding_sum.hour_flood) AS hour_flood,
+    max(rpt_nodeflooding_sum.max_rate) AS max_rate,
+    max(rpt_nodeflooding_sum.time_days) AS time_days,
+    max(rpt_nodeflooding_sum.time_hour) AS time_hour,
+    max(rpt_nodeflooding_sum.tot_flood) AS tot_flood,
+    max(rpt_nodeflooding_sum.max_ponded) AS max_ponded,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node
+     JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT
+  GROUP BY 1,2,3,4,5,12,13;

@@ -9,16 +9,15 @@ or (at your option) any later version.
 SET search_path = "SCHEMA_NAME", public;
 
 
-CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep
+DROP VIEW IF EXISTS v_cso_drainzone_rainfall_tstep;
+CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep;
 AS SELECT rowid,
     drainzone_id,
-    node_id AS ouftall_id,
+    node_id AS outfall_id,
     rf_name AS rainfall,
     rf_tstep,
     round(rf_volume::numeric, 3) AS rf_intensity,
-    round(vol_residual::numeric, 3) AS vol_residual,
-    round(vol_max_epi::numeric, 3) AS vol_max_epi,
-    round(vol_res_epi::numeric, 3) AS vol_res_epi,
+    round(vol_residual::numeric, 3) AS vol_dwf,
     round(vol_rainfall::numeric, 3) AS vol_rainfall,
     round(vol_total::numeric, 3) AS vol_total,
     round(vol_runoff::numeric, 3) AS vol_runoff,
@@ -29,47 +28,132 @@ AS SELECT rowid,
     round(vol_non_leaked::numeric, 3) AS vol_non_leaked,
     round(vol_leaked::numeric, 3) AS vol_leaked,
     round(vol_wwtp::numeric, 3) AS vol_wwtp,
-    round(vol_treated::numeric, 3) AS vol_treated,
-    round(efficiency::numeric, 3) AS efficiency
+    round(vol_treated::numeric, 3) AS vol_treated
    FROM cso_out_vol
   ORDER BY drainzone_id, rf_name, (rf_tstep::time without time zone);
 
-CREATE OR REPLACE VIEW v_cso_drainzone_rainfall
-AS SELECT cso_out_vol.drainzone_id,
-    cso_out_vol.node_id AS outfall_id,
-    cso_out_vol.rf_name AS rainfall,
-        CASE
-            WHEN (sum(cso_out_vol.vol_treated) + sum(cso_out_vol.vol_leaked)) = 0::double precision THEN 0::numeric
-            ELSE (sum(cso_out_vol.vol_treated) / (sum(cso_out_vol.vol_treated) + sum(cso_out_vol.vol_leaked)))::numeric(12,3)
-        END AS efficiency,
-    drainzone.expl_id
-   FROM cso_out_vol
-     JOIN drainzone USING (drainzone_id)
-  GROUP BY cso_out_vol.node_id, cso_out_vol.rf_name, cso_out_vol.drainzone_id, drainzone.expl_id
-  ORDER BY cso_out_vol.node_id, cso_out_vol.rf_name;
 
-CREATE OR REPLACE VIEW v_cso_drainzone
-AS SELECT d.drainzone_id,
-    cov.outfall_id,
-    d.name AS drainzone_name,
-    e.name AS muni_name,
-    m.macroexpl_id,
-    m.name AS macro_name,
-    n.expl_id,
-    ex.name AS expl_name,
+DROP VIEW IF EXISTS v_cso_drainzone_rainfall;
+CREATE OR REPLACE VIEW v_cso_drainzone_rainfall AS
+SELECT 
+    m.name AS macroexplotation,
+    ex.name AS exploitation,
+	e.name AS municipality,
+	d.name AS drainzone,
+	d.expl_id,
+	d.drainzone_id,
+	outfall_id,
+    rainfall,
+    sum(vol_dwf) AS vol_dwf,
+    sum(vol_rainfall) AS vol_rainfall,
+    sum(vol_total) AS vol_total,
+    sum(vol_runoff) AS vol_runoff,
+    sum(vol_infiltr) AS vol_infiltr,
+    sum(vol_circ) AS vol_circ,
+    sum(vol_circ_dep) AS vol_circ_dep,
+    sum(vol_circ_red) AS vol_circ_red,
+    sum(vol_non_leaked) AS vol_non_leaked,
+    sum(vol_leaked) AS vol_leaked,
+    sum(vol_wwtp) AS vol_wwtp,
+    sum(vol_treated) AS vol_treated,
+    (sum(vol_treated)/sum(vol_total))::NUMERIC(12,3) AS efficiency 
+FROM v_cso_drainzone_rainfall_tstep dr
+	 LEFT JOIN drainzone d ON d.drainzone_id = dr.drainzone_id
+	 LEFT JOIN vu_node n ON n.node_id = dr.outfall_id
+     LEFT JOIN exploitation ex ON ex.expl_id = d.expl_id
+     LEFT JOIN macroexploitation m ON m.macroexpl_id = ex.macroexpl_id
+     LEFT JOIN ext_municipality e ON n.muni_id = e.muni_id
+     JOIN selector_expl se ON d.expl_id = se.expl_id
+     WHERE cur_user = current_user
+     GROUP BY m.name, ex.name, d.name, e.name, d.drainzone_id, outfall_id, rainfall 
+     ORDER BY 1, 2, 4
+ 
+     SELECT gw_fct_graphanalytics_mapzones_advanced('{"client":{"device":4, "lang":"", "infoType":1, "epsg":25830}, 
+"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"DRAINZONE", 
+"exploitation":"-999", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", 
+"commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"20"}, "aux_params":null}}')
+     
+     
+DROP VIEW IF EXISTS v_cso_drainzone;
+CREATE OR REPLACE VIEW v_cso_drainzone AS 
+SELECT
+	macroexplotation,
+	exploitation,
+	municipality,
+	drainzone, 
+	d.expl_id,
+	d.drainzone_id,
+	outfall_id,
     cso.thyssen_plv_area::numeric(12,3) AS total_area,
     cso.imperv_area::numeric(12,3) AS imperv_area,
     cso.mean_coef_runoff::numeric(12,3) AS runoffc,
-    cso.demand::numeric(12,3) AS demand,
+    CASE WHEN calib_imperv_area IS NULL THEN cso.imperv_area::numeric(12,3) ELSE calib_imperv_area::numeric(12,3) END AS calib_imperv_area,
+    CASE WHEN calib_imperv_area IS NOT NULL THEN (calib_imperv_area/cso.thyssen_plv_area)::numeric(12,3) ELSE mean_coef_runoff::numeric(12,3) END AS calib_runoffc,
+    (d.addparam->>'kmLength')::numeric(12,3) AS kmlength,
+    sum(vol_dwf) AS vol_dwf,
+    sum(vol_wwtp) AS vol_wwtp,
+    ((sum(vol_leaked))/(10*24*3600))::numeric(12,3) AS q_leaked_p80,
+    ((sum(vol_non_leaked))/(10*24*3600))::numeric(12,3) AS q_nonleaked_p80,
     cso.eq_inhab::integer AS eq_inhab,
+    ((sum(vol_dwf)/sum(vol_runoff))*100)::numeric(12,3) AS dwf_p80_percent,
     avg(cov.efficiency)::numeric(12,3) AS efficiency,
     d.the_geom
-   FROM v_cso_drainzone_rainfall cov
+   FROM v_cso_drainzone_rainfall cov 
      LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id = cov.drainzone_id
-     LEFT JOIN drainzone d ON d.drainzone_id = cov.drainzone_id
-     LEFT JOIN vu_node n ON cov.outfall_id = n.node_id::text
-     LEFT JOIN macroexploitation m ON m.macroexpl_id = n.macroexpl_id
-     LEFT JOIN exploitation ex ON ex.expl_id = n.expl_id
-     LEFT JOIN ext_municipality e ON n.muni_id = e.muni_id
-  GROUP BY d.drainzone_id, cov.outfall_id, e.name, m.macroexpl_id, m.name, n.expl_id, ex.name, (cso.thyssen_plv_area::numeric(12,3)), (cso.imperv_area::numeric(12,3)), (cso.mean_coef_runoff::numeric(12,3)), (cso.demand::numeric(12,3)), (cso.eq_inhab::integer)
-  ORDER BY e.name;
+     LEFT JOIN drainzone d ON d.drainzone_id =cov.drainzone_id 
+     GROUP BY macroexplotation,	exploitation,	municipality,	drainzone, d.drainzone_id,cov.outfall_id, d.addparam->>'kmLength', cso.eq_inhab, d.the_geom, cso.thyssen_plv_area, cso.imperv_area, cso.mean_coef_runoff, calib_imperv_area, cso.thyssen_plv_area
+  ORDER BY 1,2,4;
+ 
+
+CREATE OR REPLACE VIEW v_rpt_multi_arcflow_sum
+AS SELECT rpt_inp_arc.id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.result_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom,
+    rpt_arcflow_sum.arc_type AS swarc_type,
+    max(rpt_arcflow_sum.max_flow) AS max_flow,
+    max(rpt_arcflow_sum.time_days) AS time_days,
+    max(rpt_arcflow_sum.time_hour) AS time_hour,
+    max(rpt_arcflow_sum.max_veloc) AS max_veloc,
+    max(COALESCE(rpt_arcflow_sum.mfull_flow, 0::numeric(12,4))) AS mfull_flow,
+    max(COALESCE(rpt_arcflow_sum.mfull_dept, 0::numeric(12,4))) AS mfull_dept,
+    max(rpt_arcflow_sum.max_shear) AS max_shear,
+    max(rpt_arcflow_sum.max_hr) AS max_hr,
+    max(rpt_arcflow_sum.max_slope) AS max_slope,
+    max(rpt_arcflow_sum.day_max) AS day_max,
+    max(rpt_arcflow_sum.time_max) AS time_max,
+    max(rpt_arcflow_sum.min_shear) AS min_shear,
+    max(rpt_arcflow_sum.day_min) AS day_min,
+    max(rpt_arcflow_sum.time_min) AS swartime_minc_type
+   FROM selector_rpt_main ,  rpt_inp_arc
+     JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id::text
+  WHERE rpt_arcflow_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text 
+ AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT
+ GROUP BY 1,2,3,4,5,6,7,8;
+
+ 
+ 
+ CREATE OR REPLACE VIEW v_rpt_multi_nodeflooding_sum
+AS SELECT rpt_inp_node.id,
+    rpt_nodeflooding_sum.node_id,
+    selector_rpt_main.result_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    max(rpt_nodeflooding_sum.hour_flood) AS hour_flood,
+    max(rpt_nodeflooding_sum.max_rate) AS max_rate,
+    max(rpt_nodeflooding_sum.time_days) AS time_days,
+    max(rpt_nodeflooding_sum.time_hour) AS time_hour,
+    max(rpt_nodeflooding_sum.tot_flood) AS tot_flood,
+    max(rpt_nodeflooding_sum.max_ponded) AS max_ponded,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node
+     JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT
+  GROUP BY 1,2,3,4,5,12,13;
+
+
