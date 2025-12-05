@@ -245,6 +245,8 @@ BEGIN
                         a.minsector_id,
                         a.arccat_id,
                         a.state,
+                        a.state_type,
+                        vst.is_operative,
                         a.the_geom
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
