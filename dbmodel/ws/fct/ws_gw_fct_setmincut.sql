@@ -230,7 +230,11 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT node_id INTO v_valve_node_id FROM ve_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		SELECT vn.node_id INTO v_valve_node_id 
+		FROM ve_node vn 
+		JOIN cat_feature_node cfn ON vn.node_type = cfn.id 
+		WHERE ST_DWithin(vn.the_geom, v_point,v_sensibility) 
+		AND 'MINSECTOR' = ANY(cfn.graph_delimiter) LIMIT 1;
 	END IF;
 
 	-- CHECK
