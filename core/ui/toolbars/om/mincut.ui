@@ -982,7 +982,7 @@
       <item row="0" column="2">
        <widget class="QPushButton" name="btn_accept">
         <property name="text">
-         <string>OK</string>
+         <string>Accept</string>
         </property>
        </widget>
       </item>

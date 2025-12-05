@@ -2030,6 +2030,10 @@
 			<translation>Dibuje un punto en el mapa dentro de las zonas del mapa creadas</translation>
 		</message>
 		<message>
+			<source>Draw Profile</source>
+			<translation>Dibujar Perfil</translation>
+		</message>
+		<message>
 			<source>Dscenario manager</source>
 			<translation>Escenarios dinámicos</translation>
 		</message>
@@ -19047,7 +19051,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>OK</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>

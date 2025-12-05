@@ -2030,6 +2030,10 @@
 			<translation>Draw a point on the map inside created map zones</translation>
 		</message>
 		<message>
+			<source>Draw Profile</source>
+			<translation>Draw Profile</translation>
+		</message>
+		<message>
 			<source>Dscenario manager</source>
 			<translation>Dscenario manager</translation>
 		</message>
@@ -19047,7 +19051,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>OK</translation>
+			<translation>Accept</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
