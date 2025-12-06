@@ -344,7 +344,7 @@ BEGIN
                 FROM (
                     SELECT ' || v_mapzone_field || ' AS mapzone_id,
                    	(use_item->>''nodeParent'')::int AS node_id
-                    FROM ' || v_table_name || ' 
+                    FROM ' || v_table_name || ', 
 						LATERAL jsonb_array_elements((graphconfig->''use'')::jsonb) AS use_item
 						WHERE (use_item->>''nodeParent'') <> ''''
 						AND graphconfig IS NOT NULL AND active
