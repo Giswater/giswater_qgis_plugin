@@ -82,7 +82,7 @@ BEGIN
 	IF 	v_graphclass IS NOT NULL THEN -- called after getgraphinundation
 
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||lower(concat(v_graphclass,'_id'))||' as id, stylesheet::json FROM '||lower(v_graphclass)||'
-				 WHERE '||lower(concat(v_graphclass,'_id'))||' > 0 and active IS TRUE) row'
+				 WHERE '||lower(concat(v_graphclass,'_id'))||' <> 0 and active IS TRUE) row'
 		INTO v_stylesheet;
 
 		EXECUTE 'SELECT (value::json->>'''||upper(v_graphclass)||''')::json->>''transparency'' FROM config_param_system WHERE parameter=''utils_graphanalytics_style'';'
