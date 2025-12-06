@@ -48,52 +48,47 @@ BEGIN
                         WHEN CARDINALITY (mapzone_id) = 1 THEN name
                         ELSE ''Conflict''
                     END AS descript
-            FROM temp_pgr_mapzone
-            ),
-            drivingdistance AS (
-                SELECT n.mapzone_id AS component, n.node_id AS nodeparent, a.arc_id, d.edge, d.node, d.agg_cost
-                FROM temp_pgr_drivingdistance d
-                JOIN temp_pgr_arc a ON d.edge = a.pgr_arc_id 
-                JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id 
+                FROM temp_pgr_mapzone
             ),
             arcs_drivingdistance AS (
-                SELECT component, nodeparent, arc_id, agg_cost
-                FROM drivingdistance
+                SELECT start_vid,a.mapzone_id, a.arc_id, d.agg_cost
+                FROM temp_pgr_drivingdistance d
+                JOIN temp_pgr_arc a ON d.edge = a.pgr_arc_id 
                 WHERE arc_id IS NOT NULL
             ),
             arcs_add_node1_node2 AS (
-                SELECT dn.component, dn.nodeparent, a.arc_id, dn.agg_cost + a.COST AS agg_cost
+                SELECT dn.start_vid,a.mapzone_id, a.arc_id, dn.agg_cost + a.COST AS agg_cost
                 FROM temp_pgr_arc a
-                JOIN drivingdistance dn ON a.pgr_node_1 = dn.node
+                JOIN temp_pgr_drivingdistance dn ON a.pgr_node_1 = dn.node
                 WHERE a.arc_id IS NOT NULL 
                 AND a.COST > 0
                 AND NOT EXISTS (
-                    SELECT 1 FROM drivingdistance da 
-                    WHERE da.nodeparent = dn.nodeparent
+                    SELECT 1 FROM temp_pgr_drivingdistance da 
+                    WHERE da.start_vid = dn.start_vid
                     AND da.edge = a.pgr_arc_id
                 )
                 UNION ALL
-                SELECT dn.component, dn.nodeparent, a.arc_id, dn.agg_cost + a.reverse_cost AS agg_cost
+                SELECT dn.start_vid, a.mapzone_id, a.arc_id, dn.agg_cost + a.reverse_cost AS agg_cost
                 FROM temp_pgr_arc a
-                JOIN drivingdistance dn ON a.pgr_node_2 = dn.node
+                JOIN temp_pgr_drivingdistance dn ON a.pgr_node_2 = dn.node
                 WHERE a.arc_id IS NOT NULL 
                 AND a.reverse_cost > 0
                 AND NOT EXISTS (
-                    SELECT 1 FROM drivingdistance da 
-                    WHERE da.nodeparent = dn.nodeparent
+                    SELECT 1 FROM temp_pgr_drivingdistance da 
+                    WHERE da.start_vid = dn.start_vid
                     AND da.edge = a.pgr_arc_id
                 )
             ),
             arcs_add AS (
-                SELECT component, nodeparent, arc_id, min(agg_cost) AS agg_cost
+                SELECT start_vid, mapzone_id, arc_id, min(agg_cost) AS agg_cost
                 FROM arcs_add_node1_node2
-                GROUP BY component, nodeparent, arc_id
+                GROUP BY start_vid, mapzone_id, arc_id
             ),
             connected_arcs AS (
-                SELECT component, nodeparent, arc_id, agg_cost 
+                SELECT start_vid, mapzone_id AS component, arc_id, agg_cost 
                 FROM arcs_drivingdistance
                 UNION ALL 
-                SELECT component, nodeparent, arc_id, agg_cost 
+                SELECT start_vid, mapzone_id AS component,arc_id, agg_cost 
                 FROM arcs_add
             )
         SELECT jsonb_build_object(
@@ -104,7 +99,7 @@ BEGIN
                 ''geometry'', ST_AsGeoJSON(ST_Transform(va.the_geom, 4326))::jsonb,
                 ''properties'', jsonb_build_object(
                     ''arc_id'', ca.arc_id,
-                    ''nodeparent'', ca.nodeparent,
+                    ''start_vid'', ca.start_vid,
                     ''node_1'', va.node_1,
                     ''node_2'', va.node_2,
                     ''arc_type'', c.arc_type,
