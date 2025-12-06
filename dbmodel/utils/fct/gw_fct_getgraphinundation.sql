@@ -94,22 +94,24 @@ BEGIN
         SELECT jsonb_build_object(
             ''type'', ''FeatureCollection'',
             ''layerName'', ''Graphanalytics tstep process'',
-            ''features'', jsonb_agg(jsonb_build_object(
-                ''type'', ''Feature'',
-                ''geometry'', ST_AsGeoJSON(ST_Transform(va.the_geom, 4326))::jsonb,
-                ''properties'', jsonb_build_object(
-                    ''arc_id'', ca.arc_id,
-                    ''start_vid'', ca.start_vid,
-                    ''node_1'', va.node_1,
-                    ''node_2'', va.node_2,
-                    ''arc_type'', c.arc_type,
-                    ''state'', va.state,
-                    ''state_type'', va.state_type,
-                    ''is_operative'', va.is_operative,
-                    ''mapzone_id'', m.mapzone_id,
-                    ''mapzone_name'', array_to_string(m.name, '',''),
-                    ''mapzone_descript'', m.descript,
-                    ''timestep'', (concat(''2001-01-01 01:'', floor(ca.agg_cost)::integer / 60, '':'', floor(ca.agg_cost)::integer % 60))::timestamp)
+            ''features'', jsonb_agg(
+                jsonb_build_object(
+                    ''type'', ''Feature'',
+                    ''geometry'', ST_AsGeoJSON(ST_Transform(va.the_geom, 4326))::jsonb,
+                    ''properties'', jsonb_build_object(
+                        ''arc_id'', ca.arc_id,
+                        ''start_vid'', ca.start_vid,
+                        ''node_1'', va.node_1,
+                        ''node_2'', va.node_2,
+                        ''arc_type'', c.arc_type,
+                        ''state'', va.state,
+                        ''state_type'', va.state_type,
+                        ''is_operative'', va.is_operative,
+                        ''mapzone_id'', m.mapzone_id,
+                        ''mapzone_name'', array_to_string(m.name, '',''),
+                        ''mapzone_descript'', m.descript,
+                        ''timestep'', (date_trunc(''day'', now()) + ca.agg_cost * interval ''1 second'')::timestamp
+                    )
                 )
             )
         )
