@@ -35,72 +35,94 @@ BEGIN
     v_mapzone_field = v_mapzone || '_id';
 
     v_querytext = '
-        WITH connected_arcs AS (
-            SELECT d1.start_vid,
-            a.pgr_arc_id,
-            d1.edge AS edge1,
-            d2.edge AS edge2,
-            CASE
-                WHEN a.pgr_arc_id = d1.edge THEN d1.agg_cost
-                WHEN a.pgr_arc_id = d2.edge THEN d2.agg_cost
-                ELSE
-                LEAST(
-                    CASE WHEN a.cost >= 0 THEN d1.agg_cost + a.cost ELSE NULL END,
-                    CASE WHEN a.reverse_cost>=0 THEN d2.agg_cost + a.reverse_cost ELSE NULL END
+        WITH
+            mapzone AS (
+                SELECT 
+                    component, 
+                    CASE 
+                        WHEN CARDINALITY (mapzone_id) = 1 THEN mapzone_id[1]
+                        ELSE -1
+                    END AS mapzone_id,
+                    mapzone_id as name,
+                    CASE 
+                        WHEN CARDINALITY (mapzone_id) = 1 THEN name
+                        ELSE ''Conflict''
+                    END AS descript
+            FROM temp_pgr_mapzone
+            ),
+            drivingdistance AS (
+                SELECT n.mapzone_id AS component, n.node_id AS nodeparent, a.arc_id, d.edge, d.node, d.agg_cost
+                FROM temp_pgr_drivingdistance d
+                JOIN temp_pgr_arc a ON d.edge = a.pgr_arc_id 
+                JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id 
+            ),
+            arcs_drivingdistance AS (
+                SELECT component, nodeparent, arc_id, agg_cost
+                FROM drivingdistance
+                WHERE arc_id IS NOT NULL
+            ),
+            arcs_add_node1_node2 AS (
+                SELECT dn.component, dn.nodeparent, a.arc_id, dn.agg_cost + a.COST AS agg_cost
+                FROM temp_pgr_arc a
+                JOIN drivingdistance dn ON a.pgr_node_1 = dn.node
+                WHERE a.arc_id IS NOT NULL 
+                AND a.COST > 0
+                AND NOT EXISTS (
+                    SELECT 1 FROM drivingdistance da 
+                    WHERE da.nodeparent = dn.nodeparent
+                    AND da.edge = a.pgr_arc_id
                 )
-            END AS agg_cost,
-            d1.depth AS depth1,
-            d2.depth AS depth2,
-            d1.agg_cost AS agg_cost1,
-            d2.agg_cost AS agg_cost2,
-            a.arc_id,
-            a.node_1,
-            a.node_2,
-            a.mapzone_id,
-            a.cost,
-            a.reverse_cost
-            FROM temp_pgr_arc a
-            JOIN temp_pgr_drivingdistance d1 ON a.pgr_node_1 = d1.node
-            JOIN temp_pgr_drivingdistance d2 ON a.pgr_node_2 = d2.node
-            WHERE d1.start_vid = d2.start_vid
-            AND (
-                a.cost >= 0 OR a.reverse_cost >= 0
+                UNION ALL
+                SELECT dn.component, dn.nodeparent, a.arc_id, dn.agg_cost + a.reverse_cost AS agg_cost
+                FROM temp_pgr_arc a
+                JOIN drivingdistance dn ON a.pgr_node_2 = dn.node
+                WHERE a.arc_id IS NOT NULL 
+                AND a.reverse_cost > 0
+                AND NOT EXISTS (
+                    SELECT 1 FROM drivingdistance da 
+                    WHERE da.nodeparent = dn.nodeparent
+                    AND da.edge = a.pgr_arc_id
+                )
+            ),
+            arcs_add AS (
+                SELECT component, nodeparent, arc_id, min(agg_cost) AS agg_cost
+                FROM arcs_add_node1_node2
+                GROUP BY component, nodeparent, arc_id
+            ),
+            connected_arcs AS (
+                SELECT component, nodeparent, arc_id, agg_cost 
+                FROM arcs_drivingdistance
+                UNION ALL 
+                SELECT component, nodeparent, arc_id, agg_cost 
+                FROM arcs_add
             )
-        ), relation AS (
-            SELECT start_vid, start_vid_mapzone_id, start_vid_mapzone_name
-            FROM connected_arcs c
-            JOIN (
-                SELECT dma_id AS start_vid_mapzone_id, name AS start_vid_mapzone_name, ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer AS node_id
-                FROM dma WHERE graphconfig IS NOT NULL AND active IS TRUE
-            ) s ON c.node_1 = s.node_id
-        )
         SELECT jsonb_build_object(
-        ''type'', ''FeatureCollection'',
-        ''layerName'', ''Graphanalytics tstep process'',
-        ''features'', jsonb_agg(jsonb_build_object(
-            ''type'', ''Feature'',
-            ''geometry'', ST_AsGeoJSON(ST_Transform(a.the_geom, 4326))::jsonb,
-            ''properties'', jsonb_build_object(
-                ''arc_id'', a.arc_id,
-                ''start_vid'', c.start_vid,
-                ''node_1'', a.node_1,
-                ''node_2'', a.node_2,
-                ''arc_type'', ca.arc_type,
-                ''state'', a.state,
-                ''state_type'', a.state_type,
-                ''is_operative'', vst.is_operative,
-                ''mapzone_id'', r.start_vid_mapzone_id,
-                ''mapzone_name'', r.start_vid_mapzone_name,
-                ''timestep'', (concat(''2001-01-01 01:'', floor(c.agg_cost)::integer / 60, '':'', floor(c.agg_cost)::integer % 60))::timestamp
-
+            ''type'', ''FeatureCollection'',
+            ''layerName'', ''Graphanalytics tstep process'',
+            ''features'', jsonb_agg(jsonb_build_object(
+                ''type'', ''Feature'',
+                ''geometry'', ST_AsGeoJSON(ST_Transform(va.the_geom, 4326))::jsonb,
+                ''properties'', jsonb_build_object(
+                    ''arc_id'', ca.arc_id,
+                    ''nodeparent'', ca.nodeparent,
+                    ''node_1'', va.node_1,
+                    ''node_2'', va.node_2,
+                    ''arc_type'', c.arc_type,
+                    ''state'', va.state,
+                    ''state_type'', va.state_type,
+                    ''is_operative'', va.is_operative,
+                    ''mapzone_id'', m.mapzone_id,
+                    ''mapzone_name'', array_to_string(m.name, '',''),
+                    ''mapzone_descript'', m.descript,
+                    ''timestep'', (concat(''2001-01-01 01:'', floor(ca.agg_cost)::integer / 60, '':'', floor(ca.agg_cost)::integer % 60))::timestamp)
+                )
             )
-        ))
-    )
-    FROM connected_arcs c
-    JOIN arc a on c.arc_id = a.arc_id
-    JOIN cat_arc ca ON a.arccat_id::text = ca.id::text
-    JOIN value_state_type vst ON vst.id = a.state_type
-    JOIN relation r ON c.start_vid = r.start_vid;
+        )
+        FROM connected_arcs ca
+        JOIN mapzone m USING (component)
+        JOIN v_temp_arc va USING (arc_id)
+        JOIN cat_arc c ON va.arccat_id = c.id
+        ;
     ';
 
     EXECUTE v_querytext INTO geojson_result;
