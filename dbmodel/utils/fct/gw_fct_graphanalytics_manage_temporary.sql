@@ -245,9 +245,9 @@ BEGIN
                         a.minsector_id,
                         a.arccat_id,
                         a.state,
+                        a.the_geom,
                         a.state_type,
-                        vst.is_operative,
-                        a.the_geom
+                        vst.is_operative
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
                     JOIN value_state_type vst ON vst.id = a.state_type
@@ -443,9 +443,9 @@ BEGIN
                         a.minsector_id,
                         a.arccat_id,
                         a.state,
+                        a.the_geom,
                         a.state_type,
-                        vst.is_operative,
-                        a.the_geom
+                        vst.is_operative
                     FROM arc_selector
                     JOIN arc a USING (arc_id)
                     JOIN value_state_type vst ON vst.id = a.state_type
@@ -724,9 +724,9 @@ BEGIN
                     a.muni_id,
                     a.arccat_id,
                     a.state,
+                    a.the_geom,
                     a.state_type,
-                    vst.is_operative,
-                    a.the_geom
+                    vst.is_operative
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
                 WHERE a.state = 1 AND vst.is_operative = TRUE
@@ -813,9 +813,9 @@ BEGIN
                     a.minsector_id,
                     a.arccat_id,
                     a.state,
+                    a.the_geom,
                     a.state_type,
-                    vst.is_operative,
-                    a.the_geom
+                    vst.is_operative
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
                 WHERE a.state = 1 AND vst.is_operative = TRUE;
