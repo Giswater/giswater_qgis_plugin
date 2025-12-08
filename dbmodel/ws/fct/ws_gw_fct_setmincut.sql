@@ -275,7 +275,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	IF v_mincut_version = '6.1' THEN
+	IF v_mode = 'MINSECTOR' THEN
 		v_minsector_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
 		IF v_minsector_id IS NULL OR v_minsector_id = 0 THEN
@@ -298,7 +298,7 @@ BEGIN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
-		IF v_mincut_version = '6.1' THEN
+		IF v_mode = 'MINSECTOR' THEN
 			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 		ELSE
 			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
@@ -338,7 +338,7 @@ BEGIN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
-		IF v_mincut_version = '6.1' THEN
+		IF v_mode = 'MINSECTOR' THEN
 			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 		ELSE
 			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
@@ -371,7 +371,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			IF v_mincut_version = '6.1' THEN
+			IF v_mode = 'MINSECTOR' THEN
 				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 			ELSE
 				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
@@ -403,7 +403,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			IF v_mincut_version = '6.1' THEN
+			IF v_mode = 'MINSECTOR' THEN
 				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 			ELSE
 				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
@@ -433,7 +433,7 @@ BEGIN
 			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
 
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
-				IF v_mincut_version = '6.1' THEN
+				IF v_mode = 'MINSECTOR' THEN
 					EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
 				ELSE
 					EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
@@ -726,7 +726,13 @@ BEGIN
 
 		-- Generate new arcs and update to_arc, closed, broken and cost
 		-- =======================
-		IF v_mincut_version <> '6.1' THEN
+		IF v_mode = 'MINSECTOR' THEN
+			EXECUTE format('
+				UPDATE %I t
+				SET modif = TRUE
+				WHERE graph_delimiter = ''SECTOR'';
+			', v_temp_node_table);
+		ELSE
 			EXECUTE format('
 				UPDATE %I t
 				SET modif = TRUE
@@ -841,7 +847,7 @@ BEGIN
 	IF v_core_mincut THEN
 
 		-- update unaccess valves
-		IF v_mincut_version = '6.1' THEN
+		IF v_mode = 'MINSECTOR' THEN
 			v_query_text := 'tpa.arc_id';
 		ELSE
 			v_query_text := 'COALESCE(tpa.node_1, tpa.node_2)';
@@ -870,7 +876,7 @@ BEGIN
 
 		-- mincut
 		EXECUTE format('SELECT count(*)::int FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
-		IF v_mincut_version = '6.1' THEN
+		IF v_mode = 'MINSECTOR' THEN
 			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_pgr_node_id;
 		ELSE
 			EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
@@ -931,7 +937,7 @@ BEGIN
 
 		-- delete this rows, and for the mincut conflict delete it in the om_mincut table. CASCADE.
 
-		IF v_mincut_version = '6.1' THEN
+		IF v_mode = 'MINSECTOR' THEN
 			EXECUTE format('
 				INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
 				SELECT %L, vta.arc_id, vta.the_geom 
@@ -1296,7 +1302,7 @@ BEGIN
 						AND old_mapzone_id <> 0;
 				', v_temp_arc_table);
 
-				IF v_mincut_version = '6.1' THEN
+				IF v_mode = 'MINSECTOR' THEN
 					v_query_text := 'tpa.arc_id';
 				ELSE
 					v_query_text := 'COALESCE(tpa.node_1, tpa.node_2)';
@@ -1344,7 +1350,7 @@ BEGIN
 					RETURN v_response;
 				END IF;
 
-				IF v_mincut_version = '6.1' THEN
+				IF v_mode = 'MINSECTOR' THEN
 					EXECUTE format('
 						SELECT count(*)
 						FROM %I tpn
@@ -1375,7 +1381,7 @@ BEGIN
 				IF v_arc_count > 0 THEN
 					v_has_overlap = TRUE;
 
-					IF v_mincut_version = '6.1' THEN
+					IF v_mode = 'MINSECTOR' THEN
 						v_query_text := format($fmt$
 							SELECT tpa.pgr_arc_id AS id, tpa.pgr_node_1 AS source, tpa.pgr_node_2 AS target, 1 as cost
 							FROM %I tpa
@@ -1430,7 +1436,7 @@ BEGIN
 						VALUES (v_mincut_network_class, v_mincut_conflict_state)
 						RETURNING id INTO v_mincut_affected_id;
 
-						IF v_mincut_version = '6.1' THEN
+						IF v_mode = 'MINSECTOR' THEN
 							EXECUTE format('
 								INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
 								SELECT %L, vta.arc_id, vta.the_geom
@@ -1582,7 +1588,7 @@ BEGIN
 						VALUES (v_mincut_conflict_group_id, v_mincut_id);
 
 						-- insert conflict mincut
-						IF v_mincut_version = '6.1' THEN
+						IF v_mode = 'MINSECTOR' THEN
 							v_query_text := 'a.arc_id';
 						ELSE
 							v_query_text := 'COALESCE(a.node_1, a.node_2)';

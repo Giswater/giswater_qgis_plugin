@@ -602,7 +602,11 @@ BEGIN
 			RETURN v_response;
 		END IF;
 
-        --UPDATE to_arc, closed, broken and cost
+        --UPDATE to_arc, closed, broken and cost, new arcs when the node is SECTOR
+		UPDATE temp_pgr_node_minsector t
+		SET modif = TRUE
+		WHERE graph_delimiter = 'SECTOR';
+
         v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'mapzone_name', 'MINCUT',
@@ -617,7 +621,8 @@ BEGIN
 
         -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut)
         UPDATE temp_pgr_arc_minsector a
-        SET cost_mincut = -1, reverse_cost_mincut = -1;
+        SET cost_mincut = -1, reverse_cost_mincut = -1
+        WHERE a.graph_delimiter IN ('MINSECTOR', 'SECTOR');
 
         -- the broken open valves
         IF v_ignore_broken_valves THEN

@@ -397,23 +397,6 @@ BEGIN
         END IF;
 
         -- for mapzone graph_delimiter and the watersources (SECTOR) - the inlet arcs behave like checkvalves
-        IF v_mode = 'MINSECTOR' THEN
-            EXECUTE format('
-				UPDATE %I a
-                SET to_arc = n.to_arc
-                FROM %I n 
-                WHERE a.graph_delimiter = ''SECTOR''
-                AND n.graph_delimiter = ''SECTOR''
-                AND (n.node_id = a.node_1 OR n.node_id = a.node_2);
-                ', v_temp_arc_table, v_temp_node_table);
-            EXECUTE format('
-				UPDATE %I a
-                SET cost = CASE WHEN EXISTS (SELECT 1 FROM %I n WHERE n.graph_delimiter  = ''SECTOR'' AND a.node_1 = n.node_id) THEN -1 ELSE a.cost END,
-                    reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM %I n WHERE n.graph_delimiter  = ''SECTOR'' AND a.node_2 = n.node_id) THEN -1 ELSE a.reverse_cost END
-                WHERE a.graph_delimiter = ''SECTOR''
-                AND a.arc_id <> ALL (a.to_arc);
-                ', v_temp_arc_table, v_temp_node_table, v_temp_node_table);
-        ELSE
             EXECUTE format('
                 UPDATE %I a
                 SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
@@ -421,7 +404,6 @@ BEGIN
                 WHERE a.graph_delimiter IN (%L, ''SECTOR'')
                 AND a.old_arc_id <> ALL (a.to_arc);
             ', v_temp_arc_table, v_graph_delimiter);
-        END IF;
     END IF;
 
     -- FORCECLOSED

@@ -87,7 +87,6 @@ v_mincut_id INTEGER;
 
 -- general variables
 v_query_text TEXT;
-v_query_text_aux TEXT;
 v_mode TEXT;
 
 -- parameters
@@ -175,19 +174,13 @@ BEGIN
     -- STEP 2 flood with DIRECT cost/reverse_cost without considering the checkvalves (using pgr_drivingdistance with UNDIRECTED GRAPH, a check valve is an open valve)
     IF cardinality(v_root_vids) >0 THEN
 
-        IF v_mode = 'MINSECTOR' THEN
-            v_query_text_aux := '';
-        ELSE
-            v_query_text_aux := 'AND a.graph_delimiter <> ''SECTOR''';
-        END IF;
-
         v_query_text = format(
             'SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, 
             cost, reverse_cost
             FROM %I a 
             WHERE a.mapzone_id = 0
-            %s;',
-            v_temp_arc_table, v_query_text_aux
+            AND a.graph_delimiter <> ''SECTOR'';',
+            v_temp_arc_table
         );
 
         TRUNCATE temp_pgr_drivingdistance;
@@ -280,20 +273,14 @@ BEGIN
         -- STEP 3 INVERTED flood with cost/reverse_cost for the borders that have wet zones with checkvalves inside
         IF  cardinality (v_root_vids) > 0 THEN
 
-             IF v_mode = 'MINSECTOR' THEN
-                v_query_text_aux := '';
-            ELSE
-                v_query_text_aux := 'AND a.graph_delimiter <> ''SECTOR''';
-            END IF;
-
             -- query pgr_drivingdistance
             v_query_text = format(
                 'SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, 
                 reverse_cost AS cost, cost as reverse_cost
                 FROM %I a 
                 WHERE a.mapzone_id = 0
-                %s;',
-                v_temp_arc_table, v_query_text_aux
+                AND a.graph_delimiter <> ''SECTOR'';',
+                v_temp_arc_table
             );
 
             TRUNCATE temp_pgr_drivingdistance;
