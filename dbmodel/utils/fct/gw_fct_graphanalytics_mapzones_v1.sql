@@ -705,23 +705,13 @@ BEGIN
 		GROUP BY m.name, arcs, nodes, connecs, gullies';
 		EXECUTE v_query_text;
 	ELSE
-		IF v_netscenario IS NOT NULL THEN
-			v_query_text = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			SELECT '||v_fid||', 0, concat(m.'||LOWER(v_class)||'_name,'' with '', arcs, '' Arcs, '', nodes, '' Nodes and '', CASE WHEN connecs IS NULL THEN 0 ELSE connecs END, '' Connecs'')
-			FROM (SELECT mapzone_id, count(*) AS arcs FROM temp_pgr_arc ta WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) a
-			LEFT JOIN (SELECT mapzone_id, count(*) AS nodes FROM temp_pgr_node tn WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) b USING (mapzone_id)
-			LEFT JOIN (SELECT mapzone_id, count(*) AS connecs FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) c USING (mapzone_id)
-			JOIN '||(v_table_name)||' m ON a.mapzone_id = m.'||(v_mapzone_field)||'
-			GROUP BY m.'||LOWER(v_class)||'_name, arcs, nodes, connecs';
-		ELSE
-			v_query_text = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			SELECT '||v_fid||', 0, concat(m.name,'' with '', arcs, '' Arcs, '', nodes, '' Nodes and '', CASE WHEN connecs IS NULL THEN 0 ELSE connecs END, '' Connecs'')
-			FROM (SELECT mapzone_id, count(*) AS arcs FROM temp_pgr_arc ta WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) a
-			LEFT JOIN (SELECT mapzone_id, count(*) AS nodes FROM temp_pgr_node tn WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) b USING (mapzone_id)
-			LEFT JOIN (SELECT mapzone_id, count(*) AS connecs FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) c USING (mapzone_id)
-			JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
-			GROUP BY m.name, arcs, nodes, connecs';
-		END IF;
+		v_query_text = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+		SELECT '||v_fid||', 0, concat(m.name,'' with '', arcs, '' Arcs, '', nodes, '' Nodes and '', CASE WHEN connecs IS NULL THEN 0 ELSE connecs END, '' Connecs'')
+		FROM (SELECT mapzone_id, count(*) AS arcs FROM temp_pgr_arc ta WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) a
+		LEFT JOIN (SELECT mapzone_id, count(*) AS nodes FROM temp_pgr_node tn WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) b USING (mapzone_id)
+		LEFT JOIN (SELECT mapzone_id, count(*) AS connecs FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE mapzone_id::integer > 0 GROUP BY mapzone_id) c USING (mapzone_id)
+		JOIN temp_pgr_mapzone m ON a.mapzone_id = m.component
+		GROUP BY m.name, arcs, nodes, connecs';
 		EXECUTE v_query_text;
 	END IF;
 
