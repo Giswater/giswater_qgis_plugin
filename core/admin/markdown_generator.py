@@ -113,7 +113,7 @@ class GwAdminMarkdownGenerator:
         self.add_feature_to_index(rows)
 
         for row in rows:
-            descript = row['descript'] if row['descript'] else f'El objeto {row["id"]} no tiene descripción.'
+            descript = row['descript'] if row['descript'] else f'The object {row["id"]} has no description.'
 
             msg = "Generating markdown for {0}."
             msg_params = (row['id'],)
@@ -143,10 +143,10 @@ class GwAdminMarkdownGenerator:
             file.write(f".. _info-feature-index\n\n")
 
             # Title
-            self.title(file, f"Objetos de Giswater", 1)
+            self.title(file, f"Giswater Objects", 1)
 
             # Introduction
-            file.write(f"\n\nEn un proyecto de Giswater se pueden crear y editar los siguientes objetos:\n\n")
+            file.write(f"\n\nIn a Giswater project, the following objects can be created and edited:\n\n")
 
             # Create sections for both project types
             for proj_type in ['ws', 'ud']:
@@ -168,7 +168,7 @@ class GwAdminMarkdownGenerator:
         project_type_title = "Water Supply" if proj_type == "ws" else "Urban Drainage"
 
         # Define the section markers
-        start_marker = f'''<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>'''
+        start_marker = f'''<summary><strong class="info_feture_project_type">{project_type_title} Objects ({proj_type.upper()})</strong></summary>'''
         end_marker = "</details>"
 
         # Find the start and end positions of the current project type section
@@ -200,7 +200,7 @@ class GwAdminMarkdownGenerator:
         # Start HTML toggle for this project type
         file.write(f".. raw:: html\n\n")
         file.write(f"\t<details class='toggle-details'>\n")
-        file.write(f'''\t\t<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n\n''')
+        file.write(f'''\t\t<summary><strong class="info_feture_project_type">{project_type_title} Objects ({proj_type.upper()})</strong></summary>\n\n''')
 
         # Create toctree structure for this project type inside the toggle
         file.write(f".. toctree::\n")
@@ -222,13 +222,13 @@ class GwAdminMarkdownGenerator:
         """ Write a placeholder section for the other project type """
         file.write(f".. raw:: html\n\n")
         file.write(f"\t<details class='toggle-details'>\n")
-        file.write(f'''\t\t<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n''')
-        file.write(f"\t\t<p>Contenido será generado cuando se procese un proyecto de tipo {proj_type.upper()}.</p>\n")
+        file.write(f'''\t\t<summary><strong class="info_feture_project_type">{project_type_title} Objects ({proj_type.upper()})</strong></summary>\n''')
+        file.write(f"\t\t<p>Content will be generated when a {proj_type.upper()} project is processed.</p>\n")
         file.write(f"\t</details>\n\n")
 
     def _generate_project_section_content(self, proj_type, project_type_title, rows):
         """ Generate the content for a project type section """
-        content = f'''<summary><strong class="info_feture_project_type">Objetos {project_type_title} ({proj_type.upper()})</strong></summary>\n\n'''
+        content = f'''<summary><strong class="info_feture_project_type">{project_type_title} Objects ({proj_type.upper()})</strong></summary>\n\n'''
         content += f".. toctree::\n"
         content += f"\t:maxdepth: 1\n"
         content += f"\t:numbered: 4\n\n"
@@ -309,7 +309,7 @@ class GwAdminMarkdownGenerator:
             # Header
             file.write(f".. _index-epa-{feature_cat}\n\n")
             self.title(file, f"EPA", 1)
-            file.write(f"\n\nLos tipos de EPA que puede tener el objeto {feature_cat} son:\n\n")
+            file.write(f"\n\nThe EPA types that the object {feature_cat} can have are:\n\n")
             file.write(".. toctree::\n")
             file.write("\t:maxdepth: 1\n")
             file.write("\t:caption: EPA Types\n\n")
@@ -406,7 +406,7 @@ class GwAdminMarkdownGenerator:
 
             if tabname == 'tab_data':
                 file.write(f"\n\n{descript}\n\n")
-                file.write(f"\n\nSi quieres consultar la distribución de los layouts puedes ir a :ref:`Partes del formulario <partes-del-formulario>`\n\n")
+                file.write(f"\n\nIf you want to check the layout distribution, you can go to :ref:`Form Parts <partes-del-formulario>`\n\n")
             else:
                 file.write(f"\n\n{descript}\n\n")
 
@@ -418,7 +418,7 @@ class GwAdminMarkdownGenerator:
                 if row['layoutname'] not in done_layouts:
                     done_layouts.append(row['layoutname'])
                     file.write(f".. raw:: html\n\n")
-                    file.write(f"\t<p class='layout-header'>Los campos en el layout {row['layoutname']} son:</p>\n\n")
+                    file.write(f"\t<p class='layout-header'>The fields in the layout {row['layoutname']} are:</p>\n\n")
                 # Define variables
                 mandatory = 'No' if not row['ismandatory'] else 'Sí'
                 editable = 'No' if not row['iseditable'] else 'Sí'
@@ -458,14 +458,14 @@ class GwAdminMarkdownGenerator:
                 file.write(f"\t\t\t<li><strong>Mandatory:</strong> {mandatory}.</li>\n")
                 file.write(f"\t\t\t<li><strong>Editable:</strong> {editable}.</li>\n")
                 if dv_querytext:
-                    file.write(f"\t\t\t<li><strong>Dvquerytext:</strong> Los valores de este desplegable estan determinados por la consulta:\n")
+                    file.write(f"\t\t\t<li><strong>Dvquerytext:</strong> The values of this dropdown are determined by the query:\n")
                     file.write(f"\t\t\t\t<code>\n")
                     file.write(f"\t\t\t\t\t{dv_querytext.replace(chr(10), ' ').replace(chr(13), ' ')}\n")
                     file.write(f"\t\t\t\t</code>\n")
                     file.write(f"\t\t\t</li>\n")
 
                 if dv_querytext_filterc:
-                    file.write(f"\t\t\t<li><strong>Filterc:</strong> La consulta anterior esta filtrada por:\n")
+                    file.write(f"\t\t\t<li><strong>Filterc:</strong> The previous query is filtered by:\n")
                     file.write(f"\t\t\t\t<code>\n")
                     file.write(f"\t\t\t\t\t{dv_querytext_filterc}\n")
                     file.write(f"\t\t\t\t</code>\n")
@@ -475,7 +475,7 @@ class GwAdminMarkdownGenerator:
                 if style:
                     file.write(f"\t\t\t<li>\n")
                     file.write(f"\t\t\t\t<details class='no-square'>\n")
-                    file.write(f"\t\t\t\t\t<summary><strong>Stylesheet:</strong> Modificaciones esteticas del campo</summary>\n")
+                    file.write(f"\t\t\t\t\t<summary><strong>Stylesheet:</strong> Aesthetic modifications of the field</summary>\n")
                     file.write(f"\t\t\t\t\t<ul>\n")
                     for key, item in style.items():
                         self._write_item_with_nested_toggle(file, key, item, "\t\t\t\t\t\t", False)
@@ -486,7 +486,7 @@ class GwAdminMarkdownGenerator:
                     self._write_widgetcontrols_dict()
                     file.write(f"\t\t\t<li>\n")
                     file.write(f"\t\t\t\t<details class='no-square'>\n")
-                    file.write(f"\t\t\t\t\t<summary><strong>Widgetcontrols:</strong> Controles del campo</summary>\n")
+                    file.write(f"\t\t\t\t\t<summary><strong>Widgetcontrols:</strong> Field controls</summary>\n")
                     file.write(f"\t\t\t\t\t<ul>\n")
                     for key, item in widgetcontrols.items():
                         self._write_item_with_nested_toggle(file, key, item, "\t\t\t\t\t\t", True)
@@ -697,18 +697,18 @@ class GwAdminMarkdownGenerator:
 
     def _write_widgetcontrols_dict(self):
         self.widgetcontrols_simple = {
-            "autoupdateReloadFields": "Recarga al momento otros campos en caso de que uno sea modificado. Actua en combinación con isautoupdate",
-            "enableWhenParent": "Habilita un combo solo en caso que el campo parent tenga ciertos valores",
-            "regexpControl": "Control de lo que puede escribir usuario mediante expresion regular en widgets tipo texto libre",
-            "maxMinValues": "Establece un valor máximo para campos numéricos en widgets de texto libre",
-            "setMultiline": "Establece la posibilidad de campos multilinea para escritura con enter",
-            "spinboxDecimals": "Establece numero decimales concretos para el widget spinbox (vdef 2)",
-            "widgetdim": "Dimensiones para el widget",
-            "vdefault_value": "Valor por defecto del widget. Tiene sentido para aquellos widgets que no pertenecen a datos de un feature, puesto que los valores por defecto se definen en los que el usuario ya tiene establecidos en config_param_user. De especial interés para los widgets filtro.",
-            "vdefault_querytext": "Valor por defecto del widget a partir del resultado de la query. Tiene sentido para aquellos widgets que no pertenecen a datos de un feature, puesto que los valores por defecto se definen en los que el usuario ya tiene establecidos en config_param_user. De especial interés para los widgets filtro.",
-            "listFilterSign": "Signo (LIKE, ILIKE, =, >, < ) para los campos tipo filtro. En caso de omisión se usará ILIKE para listas tipo tableview e = para listas tipo tab",
-            "skipSaveValue": "Si se define este valor como true, no se guardaran los cambios realizados en el widget correspondiente. Por defecto no hace falta poner nada porque se sobreentiende true.",
-            "labelPosition": "Si se define este valor [top, left, none], el label ocupará la posición relativa respecto al widget. Por defecto se sobreentiende left. Si el campo label está vacío, labelPosition se omite."
+            "autoupdateReloadFields": "Instantly reloads other fields if one is modified. Acts in combination with isautoupdate",
+            "enableWhenParent": "Enables a combo only if the parent field has certain values",
+            "regexpControl": "Control of what the user can write using a regular expression in free text widgets",
+            "maxMinValues": "Sets a maximum value for numeric fields in free text widgets",
+            "setMultiline": "Sets the possibility of multiline fields for writing with enter",
+            "spinboxDecimals": "Sets specific decimal numbers for the spinbox widget (default 2)",
+            "widgetdim": "Dimensions for the widget",
+            "vdefault_value": "Default value of the widget. It makes sense for those widgets that do not belong to feature data, since default values are defined in those that the user has already established in config_param_user. Of special interest for filter widgets.",
+            "vdefault_querytext": "Default value of the widget from the query result. It makes sense for those widgets that do not belong to feature data, since default values are defined in those that the user has already established in config_param_user. Of special interest for filter widgets.",
+            "listFilterSign": "Sign (LIKE, ILIKE, =, >, < ) for filter fields. If omitted, ILIKE will be used for tableview lists and = for tab lists",
+            "skipSaveValue": "If this value is defined as true, changes made to the corresponding widget will not be saved. By default, it is not necessary to put anything because it is understood as true.",
+            "labelPosition": "If this value is defined [top, left, none], the label will occupy the relative position with respect to the widget. By default, left is understood. If the label field is empty, labelPosition is omitted."
         }
 
     def _save_user_values(self):
