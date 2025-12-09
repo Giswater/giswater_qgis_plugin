@@ -1379,7 +1379,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
-        if field['widgettype'] == 'text' and not use_vr:
+        if field['widgettype'] == 'text':
             if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit',
                                                            {'IsMultiline': field['widgetcontrols']['setMultiline']})
