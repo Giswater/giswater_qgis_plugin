@@ -562,7 +562,8 @@ class GwProfileButton(GwAction):
         # Set window name
         self.win = plt.gcf()
         # FIXME: this doesn't work, but it doesn't crash either
-        self.win.canvas.setWindowTitle('Draw Profile')
+        title = tools_qt.tr("Draw Profile")
+        self.win.canvas.setWindowTitle(title)
 
         # Hide axes
         self.axes = plt.gca()
