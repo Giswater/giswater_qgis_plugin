@@ -171,6 +171,11 @@ class GwNetscenarioManagerButton(GwAction):
         netscenario_id = model.index(row, col_id).data()
         active = model.index(row, col_active).data()
 
+        # Check if the current netscenario is already set, and skip toggle if so
+        row_current_netscenario = tools_gw.get_config_value('plan_netscenario_current')
+        if row_current_netscenario and row_current_netscenario[0] == netscenario_id:
+            return
+
         # Check if the netscenario is active
         if not active:
             msg = "Cannot set the current netscenario of an inactive scenario. Please activate it first."
