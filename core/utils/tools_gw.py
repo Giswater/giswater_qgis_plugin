@@ -1300,32 +1300,44 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         if use_vr:
             value_relation = field['widgetcontrols']['valueRelation']
             try:
-                vr_layer = value_relation.get('targetLayer', '')
+                vr_layer = value_relation.get('layer', '')
                 layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
                 if layer_obj is None:
+                    layer_obj = load_layer_in_hidden_group(vr_layer)
+
+                if layer_obj is None:
                     raise Exception(f"Layer '{vr_layer}' not found")
+
                 vr_layer = layer_obj.id()  # Get layer id
                 # Get required keys with safe defaults
                 vr_key_column = value_relation.get('keyColumn', 'id')  # Get 'Key' with default
                 vr_value_column = value_relation.get('valueColumn', 'idval')  # Get 'Value' with default
-                vr_allow_nullvalue = value_relation.get('nullValue', 'False')  # Get null values with default
+                vr_allow_nullvalue = tools_os.set_boolean(value_relation.get('nullValue'), False)
                 vr_filter_expression = value_relation.get('filterExpression', '')  # Get 'FilterExpression' with default
                 if vr_filter_expression is None:
                     vr_filter_expression = ''
-                vr_allow_multi = value_relation.get('allowMulti', 'False')  # Get 'AllowMulti' with default
-                vr_nof_columns = value_relation.get('nofColumns', '0')  # Get 'NofColumns' with default
+                vr_allow_multi = tools_os.set_boolean(value_relation.get('allowMulti'), False)
+                vr_use_completer = tools_os.set_boolean(value_relation.get('useCompleter'), False)
+                try:
+                    vr_nof_columns = int(value_relation.get('nofColumns', 1))
+                except (ValueError, TypeError):
+                    vr_nof_columns = 1
 
                 # Create and apply ValueRelation config
-                editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
-                                                                                'Key': f'{vr_key_column}',
-                                                                                'Value': f'{vr_value_column}',
-                                                                                'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                'FilterExpression': f'{vr_filter_expression}',
-                                                                                'AllowMulti': f'{vr_allow_multi}',
-                                                                                'NofColumns': f'{vr_nof_columns}'})
+                editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': str(vr_layer),
+                                                                             'Key': str(vr_key_column),
+                                                                             'Value': str(vr_value_column),
+                                                                             'AllowNull': vr_allow_nullvalue,
+                                                                             'FilterExpression': str(vr_filter_expression),
+                                                                             'AllowMulti': vr_allow_multi,
+                                                                             'UseCompleter': vr_use_completer,
+                                                                             'NofColumns': vr_nof_columns})
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
             except Exception as e:
+                msg = "Failed to set ValueRelation for field '{0}': {1}"
+                msg_params = (field.get('columnname'), e)
+                tools_log.log_warning(msg, msg_params=msg_params)
                 if thread:
                     thread.exception = e
                     thread.vr_errors.add(layer_name)
@@ -1367,7 +1379,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
-        if field['widgettype'] == 'text':
+        if field['widgettype'] == 'text' and not use_vr:
             if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit',
                                                            {'IsMultiline': field['widgetcontrols']['setMultiline']})
@@ -1396,6 +1408,26 @@ def load_missing_layers(filter, group="GW Layers", sub_group=None):
                 if addparam and addparam.get('geom'):
                     the_geom = addparam.get('geom')
                 add_layer_database(tablename, the_geom=the_geom, alias=alias, group=group, sub_group=sub_group)
+
+
+def load_layer_in_hidden_group(layer_name):
+    """ Load a layer into the 'Hidden' group """
+    # Resolve schema and table name
+    if '.' in layer_name:
+        schema, table = layer_name.split('.', 1)
+    else:
+        schema = lib_vars.schema_name
+        table = layer_name
+
+    uri, _ = tools_db.get_uri(tablename=table)
+    if uri:
+        uri.setDataSource(schema, table, None, "", "")
+        layer = QgsVectorLayer(uri.uri(False), layer_name, "postgres")
+        if layer.isValid():
+            tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True)
+            return layer
+
+    return tools_qgis.get_layer_by_tablename(layer_name)
 
 
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True, end="\n"):
