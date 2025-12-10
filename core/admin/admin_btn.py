@@ -187,7 +187,7 @@ class GwAdminButton:
         tools_log.log_info(msg, msg_params=msg_params)
 
         if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
-            if self.locale not in ('en_US', 'no_TR', 'es_CR') or str(self.project_epsg) != '25831':
+            if self.locale not in ('en_US', 'no_TR', 'es_CR', 'es_ES') or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
                 title = "Info Message"
