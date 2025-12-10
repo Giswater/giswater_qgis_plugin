@@ -293,7 +293,7 @@ BEGIN
 	IF v_netscenario IS NOT NULL THEN
 		-- closed valves
 		UPDATE temp_pgr_node n
-		SET modif = TRUE, graph_delimiter = 'FORCECLOSED'
+		SET closed = TRUE, broken = FALSE, graph_delimiter = 'MINSECTOR', modif = TRUE
 		FROM plan_netscenario_valve v
 		WHERE n.node_id = v.node_id
 		AND v.netscenario_id = v_netscenario
@@ -301,7 +301,7 @@ BEGIN
 
 		-- open valves
 		UPDATE temp_pgr_node n
-		SET modif = FALSE, graph_delimiter = 'IGNORE'
+		SET closed = FALSE, broken = FALSE, to_arc = NULL, graph_delimiter = 'MINSECTOR', modif = FALSE
 		FROM plan_netscenario_valve v
 		WHERE n.node_id = v.node_id
 		AND v.netscenario_id = v_netscenario
