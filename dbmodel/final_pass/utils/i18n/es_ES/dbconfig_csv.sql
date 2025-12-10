@@ -7,12 +7,12 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_csv AS t SET alias = v.alias, descript = v.descript FROM (
 	VALUES
-	(385, 'Import inp timeseries', 'Function to assist the import of timeseries for inp models. The csv file must containts next columns on same position: timseries, timser_type, times_type, descript, expl_id, date, hour, time, value (fill date/hour for ABSOLUTE or time for RELATIVE)'),
-    (408, 'Import istram nodes', NULL),
-    (409, 'Import istram arcs', NULL),
-    (447, 'Import cat_feature_gully', 'The csv file must contain the following columns in the exact same order:  id, system_id, epa_default, code_autofill, double_geom, shortcut_key, link_path, descript, active'),
-    (451, 'Import cat_grate', 'The csv file must contain the following columns in the exact same order:  id, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type'),
-    (527, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4'),
+	(385, 'Importar series temporales inp', 'Función de ayuda a la importación de series temporales para modelos inp. El archivo csv debe contener las siguientes columnas en la misma posición: timeseries, type, mode, date, hour, time, value (fecha/hora para ABSOLUTO o hora para RELATIVO)'),
+    (408, 'Importar nodos istram', NULL),
+    (409, 'Importar arcos istram', NULL),
+    (447, 'Importar cat_feature_gully', 'El archivo csv debe contener las siguientes columnas en el mismo orden: id, system_id, epa_default, code_autofill, double_geom, shortcut_key, link_path, descript, active'),
+    (451, 'Importar cat_grate', 'El archivo csv debe contener las siguientes columnas en el mismo orden: id, matcat_id, longitud, anchura, área_total, área_efectiva, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type'),
+    (527, 'Importar DWF', 'Función para importar valores DWF. El archivo CSV debe contener las siguientes columnas en el mismo orden: dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4'),
     (234, 'Precios db importación', 'El archivo csv debe contener las siguientes columnas en la misma posición: id, unidad, descripción, texto, precio. - La columna precio debe ser numérica con dos decimales. - Puede elegir un nombre de catálogo para estos precios estableciendo una etiqueta de importación. '),
     (235, 'Importar elementos', 'El archivo csv debe contener las siguientes columnas en la misma posición: Id (arc_id, node_id, connec_id), code, elementcat_id, observ, comment, num_elements, state type (id), workcat_id, verified (elegir entre edit_typevalue>value_verified). - Los campos observaciones y comentarios son opcionales - ¡ATENCIÓN! La etiqueta de importación debe rellenarse con el tipo de elemento (nodo, arco, conexión).'),
     (238, 'Importación en visita', 'Para utilizar este parámetro de la función import csv es necesario configurar antes de ejecutarla el parámetro del sistema ''utils_csv2pg_om_visit_parameters''. También recomendamos leer antes las anotaciones dentro de la función para trabajar lo mejor posible con'),

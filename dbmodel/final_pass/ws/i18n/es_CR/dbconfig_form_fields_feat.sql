@@ -361,7 +361,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
 ('cat_dnom', '%_arc%', 'form_feature', 'tab_data', 'Diámetro nominal:', 'Cat_dnom - Diámetro nominal del elemento en mm. No puede rellenarse. Se utiliza el que tiene el campo dnom en el catálogo correspondiente'),
 ('cat_dnom', '%_connec%', 'form_feature', 'tab_data', 'Cat dnom:', 'Cat_dnom'),
 ('cat_dnom', '%_node%', 'form_feature', 'tab_data', 'Cat dnom:', 'Cat_dnom'),
-('category_type', '%_node%', 'form_feature', 'tab_data', 'Category type:', 'Category_type - id of the category type related to node.'),
+('category_type', '%_node%', 'form_feature', 'tab_data', 'Tipo de categoría:', 'Tipo_categoría - id del tipo de categoría relacionada con el nodo.'),
 ('cat_matcat_id', '%_arc%', 'form_feature', 'tab_data', 'Cat matcat id:', 'Cat_matcat_id'),
 ('cat_matcat_id', '%_connec%', 'form_feature', 'tab_data', 'Cat matcat id:', 'Cat_matcat_id'),
 ('cat_matcat_id', '%_node%', 'form_feature', 'tab_data', 'Cat matcat id:', 'Cat_matcat_id'),

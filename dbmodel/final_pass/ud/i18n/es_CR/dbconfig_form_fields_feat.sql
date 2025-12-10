@@ -23,7 +23,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
 ('brand_id', '%_gully%', 'form_feature', 'tab_data', 'Marca:', 'Marca_id'),
 ('builtdate', '%_gully%', 'form_feature', 'tab_data', 'Fecha de construcción:', 'Builtdate - id de la fecha de construcción relacionada con el sumidero.'),
 ('category_type', '%_gully%', 'form_feature', 'tab_data', 'Tipo categoría:', 'Tipo_categoría'),
-('category_type', '%_node%', 'form_feature', 'tab_data', 'Category type:', 'Category type'),
+('category_type', '%_node%', 'form_feature', 'tab_data', 'Tipo de categoría:', 'Tipo_categoría'),
 ('cat_geom1', '%_arc%', 'form_feature', 'tab_data', 'Cat geom1:', 'Cat_geom1'),
 ('cat_geom2', '%_arc%', 'form_feature', 'tab_data', 'Medida interior horizontal:', 'Medida interior horizontal'),
 ('cat_grate_matcat', '%_gully%', 'form_feature', 'tab_data', 'Material:', 'Material'),
