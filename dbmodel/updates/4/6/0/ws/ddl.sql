@@ -197,3 +197,6 @@ CREATE INDEX IF NOT EXISTS minsector_mincut_mincut_minsector_id_idx ON minsector
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"modification_user", "dataType":"varchar(50)", "isUtils":"False"}}$$);
 
 ALTER TABLE om_mincut ALTER COLUMN modification_date TYPE timestamp;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"invert_level", "dataType":"numeric", "isUtils":"False"}}$$);
+

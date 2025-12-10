@@ -97,7 +97,11 @@ BEGIN
 			AND selector_sector.cur_user = "current_user"()::text '
 			||v_statetype;
 	END IF;
-
+	
+	-- set bottom elevation as elev for tanks in case invert_level is not null
+	UPDATE temp_t_node SET elev = invert_level FROM man_tank WHERE invert_level IS NOT NULL AND temp_t_node.node_id = man_tank.node_id
+	AND epa_type IN ('INLET', 'TANK');
+	
 	-- update child param for inp_reservoir
 	UPDATE temp_t_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id::text;
 

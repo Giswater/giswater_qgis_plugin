@@ -569,8 +569,8 @@ BEGIN
 
 
 		IF v_man_table='man_tank' THEN
-			INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, automated, length, width, shape, fence_type, fence_length, inlet_arc)
-			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.automated, NEW.length, NEW.width, NEW.shape, NEW.fence_type, NEW.fence_length, NEW.inlet_arc);
+			INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, automated, length, width, shape, fence_type, fence_length, inlet_arc, invert_level)
+			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.automated, NEW.length, NEW.width, NEW.shape, NEW.fence_type, NEW.fence_length, NEW.inlet_arc, NEW.invert_level);
 
 		ELSIF v_man_table='man_hydrant' THEN
 			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, customer_code, hydrant_type, security_cover)
@@ -975,7 +975,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_tank' THEN
-			UPDATE man_tank SET vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name,
+			UPDATE man_tank SET vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name, invert_level = NEW.invert_level,
 			hmax=NEW.hmax, automated=NEW.automated, length=NEW.length, width=NEW.width, shape=NEW.shape, fence_type=NEW.fence_type, fence_length=NEW.fence_length, inlet_arc=NEW.inlet_arc
 			WHERE node_id=OLD.node_id;
 
