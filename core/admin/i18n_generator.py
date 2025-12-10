@@ -35,6 +35,7 @@ class GwI18NGenerator:
         self.path_dic = None
         self.dlg_qm = None
         self.project_type = None
+        self._column_cache = {}
 
     def init_dialog(self):
         """ Constructor """
@@ -101,6 +102,7 @@ class GwI18NGenerator:
         """ Check the translation options selected by the user """
 
         self.dlg_qm.lbl_info.clear()
+        self._column_cache = {}
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.schema_i18n = "i18n"
@@ -182,18 +184,101 @@ class GwI18NGenerator:
     # endregion
     # region PY files
 
+    def _get_matching_columns(self, table, key):
+        """ Get columns matching the language of the key """
+
+        if table not in self._column_cache:
+            sql = f"SELECT column_name FROM information_schema.columns WHERE table_schema = '{self.schema_i18n}' AND table_name = '{table}'"
+            rows = self._get_rows(sql, commit=False)
+            self._column_cache[table] = [row['column_name'] for row in rows] if rows else []
+
+        columns = self._column_cache[table]
+        parts = key.split('_')
+        if len(parts) < 2:
+            return []
+
+        prefix = f"{parts[0]}_{parts[1]}_"
+
+        extra_cols = []
+        if columns:
+            for name in columns:
+                if name.startswith(prefix) and name != key:
+                    extra_cols.append(name)
+                    extra_cols.append(f"auto_{name}")
+                    extra_cols.append(f"va_auto_{name}")
+
+        return extra_cols
+
+    def _generate_lang_columns(self, table: str, prefixes: list[str]) -> list[str]:
+        """ Generate language columns list for given prefixes """
+
+        lang_columns = []
+        extra_cols = []
+        for prefix in prefixes:
+            key = f"{prefix}_{self.lower_lang}"
+            lang_columns.extend([key, f"auto_{key}", f"va_auto_{key}"])
+            extra_cols.extend(self._get_matching_columns(table, key))
+        
+        lang_columns.extend(extra_cols)
+        return lang_columns
+
+    def _get_translation(self, row, key, fallback_en, return_source=False):
+        """
+        Get translation with fallback:
+        1. Specific Key (e.g. lb_es_cr)
+        2. Auto Specific Key (e.g. auto_lb_es_cr)
+        3. Other regional keys (e.g. lb_es_mx, auto_lb_es_mx)
+        4. English (e.g. lb_en_us)
+        5. Source
+        """
+        # 1. Target Key
+        val = row.get(key)
+        if val:
+            return val
+
+        # 2. Auto Target Key
+        val = row.get(f'auto_{key}')
+        if val:
+            return val
+
+        relative_langs = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_relative_langs)
+        if relative_langs:
+            # 3. Other regional keys
+            parts = key.split('_')
+            if len(parts) >= 3:
+                prefix = f"{parts[0]}_{parts[1]}_"
+                
+                candidates = []
+                # Convert to dict to ensure iteration works for all cursor types
+                row_dict = dict(row)
+                for k, v in row_dict.items():
+                    if not v: continue
+                    if k == key or k == f'auto_{key}': continue
+                    
+                    if k.startswith(prefix):
+                        candidates.append((1, v))
+                    elif k.startswith(f"auto_{prefix}"):
+                        candidates.append((2, v))
+                
+                candidates.sort(key=lambda x: x[0])
+                if candidates:
+                    return candidates[0][1]
+
+        # 4. English
+        val = row.get(fallback_en)
+        if val:
+            return val
+
+        # 5. Source
+        if return_source:
+            return row.get('source')
+        return None
+
     def _create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
 
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
-
-        # Update the part the of the program in process
-        self.dlg_qm.lbl_info.clear()
-        msg = "{0} ({1}) - python - Updating python files..."
-        msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}")
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
-        QApplication.processEvents()
 
         key_label = f'lb_{self.lower_lang}'
         key_tooltip = f'tt_{self.lower_lang}'
@@ -203,25 +288,35 @@ class GwI18NGenerator:
 
         # Get python toolbars and buttons values
         if self.lower_lang == 'en_us':
-            sql = "SELECT source, ms_en_us FROM i18n.pymessage ORDER BY source_code, source, id;"  # ADD new columns
-            py_messages = self._get_rows(sql)
-            sql = "SELECT source, lb_en_us FROM i18n.pytoolbar ORDER BY source_code, source, id;"
-            py_toolbars = self._get_rows(sql)
+            sql = "SELECT source, ms_en_us FROM i18n.pymessage;"  # ADD new columns
+            py_messages = self._get_rows(sql, self.cursor_i18n)
+            sql = "SELECT source, lb_en_us FROM i18n.pytoolbar;"
+            py_toolbars = self._get_rows(sql, self.cursor_i18n)
+            print(py_toolbars)
             # Get python dialog values
             sql = ("SELECT dialog_name, source, lb_en_us, tt_en_us"
                 " FROM i18n.pydialog"
-                " ORDER BY source_code, project_type, toolbar_name, dialog_name, source, id;")
-            py_dialogs = self._get_rows(sql)
+                " ORDER BY dialog_name;")
+            py_dialogs = self._get_rows(sql, self.cursor_i18n)
         else:
-            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage ORDER BY source_code, source, id;"  # ADD new columns
-            py_messages = self._get_rows(sql)
-            sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar ORDER BY source_code, source, id;"
-            py_toolbars = self._get_rows(sql)
+            extra_ms = self._get_matching_columns('pymessage', key_message)
+            extra_ms_str = ", " + ", ".join(extra_ms) if extra_ms else ""
+            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message}{extra_ms_str} FROM i18n.pymessage;"  # ADD new columns
+            py_messages = self._get_rows(sql, self.cursor_i18n)
+
+            extra_lb = self._get_matching_columns('pytoolbar', key_label)
+            extra_lb_str = ", " + ", ".join(extra_lb) if extra_lb else ""
+            sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label}{extra_lb_str} FROM i18n.pytoolbar;"
+            py_toolbars = self._get_rows(sql, self.cursor_i18n)
             # Get python dialog values
-            sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}, tt_en_us, {key_tooltip}, auto_{key_tooltip}"
-                f" FROM i18n.pydialog"
-                f" ORDER BY source_code, project_type, toolbar_name, dialog_name, source, id;")
-            py_dialogs = self._get_rows(sql)
+            extra_dlg_lb = self._get_matching_columns('pydialog', key_label)
+            extra_dlg_lb_str = ", " + ", ".join(extra_dlg_lb) if extra_dlg_lb else ""
+            extra_dlg_tt = self._get_matching_columns('pydialog', key_tooltip)
+            extra_dlg_tt_str = ", " + ", ".join(extra_dlg_tt) if extra_dlg_tt else ""
+            sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}{extra_dlg_lb_str}, tt_en_us,"
+                f" {key_tooltip}, auto_{key_tooltip}{extra_dlg_tt_str} FROM i18n.pydialog"
+                f" ORDER BY dialog_name;")
+            py_dialogs = self._get_rows(sql, self.cursor_i18n)
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
 
@@ -250,14 +345,10 @@ class GwI18NGenerator:
         for py_tlb in py_toolbars:
             line = "\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[key_label] is None:  # Afegir aqui l'auto amb un if
-                py_tlb[key_label] = py_tlb[f'auto_{key_label}']
-                if py_tlb[f'auto_{key_label}'] is None:
-                    py_tlb[key_label] = py_tlb['lb_en_us']
-                    if py_tlb['lb_en_us'] is None:
-                        py_tlb[key_label] = py_tlb['source']
-
-            line += f"\t\t\t<translation>{py_tlb[key_label]}</translation>\n"
+            
+            translation = self._get_translation(dict(py_tlb), key_label, 'lb_en_us', return_source=True)
+            
+            line += f"\t\t\t<translation>{translation}</translation>\n"
             line += "\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -269,11 +360,10 @@ class GwI18NGenerator:
         for py_msg in py_messages:
             line = "\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[key_message] is None:  # Afegir aqui l'auto amb un if
-                py_msg[key_message] = py_msg[f'auto_{key_message}']
-                if py_msg[f'auto_{key_message}'] is None:
-                    py_msg[key_message] = py_msg['source']
-            line += f"\t\t\t<translation>{py_msg[key_message]}</translation>\n"
+            
+            translation = self._get_translation(dict(py_msg), key_message, 'ms_en_us', return_source=True)
+            
+            line += f"\t\t\t<translation>{translation}</translation>\n"
             line += "\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -304,24 +394,19 @@ class GwI18NGenerator:
             # Create child for labels
             line += "\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
-            if py_dlg[key_label] is None:  # Afegir aqui l'auto amb un if
-                if self.lower_lang != 'en_us':
-                    py_dlg[key_label] = py_dlg[f'auto_{key_label}']
-                if py_dlg[key_label] is None:
-                    py_dlg[key_label] = py_dlg['lb_en_us']
+            
+            translation = self._get_translation(dict(py_dlg), key_label, 'lb_en_us')
 
-            line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
+            line += f"\t\t\t<translation>{translation}</translation>\n"
             line += "\t\t</message>\n"
 
             # Create child for tooltip
             line += "\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
-            if py_dlg[key_tooltip] is None:  # Afegir aqui l'auto amb un if
-                if self.lower_lang != 'en_us':
-                    py_dlg[key_tooltip] = py_dlg[f'auto_{key_tooltip}']
-                if not py_dlg[key_tooltip]:  # Afegir aqui l'auto amb un if
-                    py_dlg[key_tooltip] = py_dlg['tt_en_us']
-            line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
+            
+            translation = self._get_translation(dict(py_dlg), key_tooltip, 'tt_en_us')
+            
+            line += f"\t\t\t<translation>{translation}</translation>\n"
             line += "\t\t</message>\n"
 
         # Close last context and TS
@@ -370,14 +455,7 @@ class GwI18NGenerator:
         title = None
         for py in py_dialogs:
             if py['source'] == f'dlg_{name}':
-                title = py[key_label]
-                if not title:  # Afegir aqui l'auto amb un if
-                    if self.lower_lang != 'en_us':
-                        title = py[f'auto_{key_label}']
-                    if not title:
-                        title = py['lb_en_us']
-                    return title
-                return title
+                return self._get_translation(dict(py), key_label, 'lb_en_us')
         return title
 
     # endregion
@@ -441,139 +519,138 @@ class GwI18NGenerator:
         msg_params = (self.language, f"{self.languages.index(self.language) + 1}/{len(self.languages)}", self.project_type, table)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg, msg_params)
         QApplication.processEvents()
-        colums = []
-        lang_colums = []
+        columns = []
+        lang_columns = []
         order_by = []   
 
         if table == 'dbconfig_form_fields':
-            colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            columns = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbparam_user':
-            colums = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbconfig_param_system':
-            colums = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_typevalue':
-            colums = ["source", "formname", "project_type", "context", "source_code", "tt_en_us"]
-            lang_colums = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            columns = ["source", "formname", "project_type", "context", "source_code", "tt_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbmessage':
-            colums = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
-            lang_colums = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['ms', 'ht'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'log_level', 'id'])
 
         elif table == 'dbfprocess':
-            colums = ["project_type", "context", "source", "ex_en_us", "in_en_us", "na_en_us"]
-            lang_colums = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
+            columns = ["project_type", "context", "source", "ex_en_us", "in_en_us", "na_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['ex', 'in', 'na'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_csv':
-            colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['al', 'ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_form_tabs':
-            colums = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            columns = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbconfig_report':
-            colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['al', 'ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_toolbox':
-            colums = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['al', 'ob'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbfunction':
-            colums = ["source", "project_type", "context", "ds_en_us"]
-            lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbtypevalue':
-            colums = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
-            lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['vl', 'ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'typevalue', 'source', 'id'])
 
         elif table == 'dbconfig_form_tableview':
-            colums = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
+            columns = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['al'])
             order_by.extend(['source_code', 'project_type', 'context', 'columnname', 'location_type', 'source', 'id'])
 
         elif table == 'dbjson':
-            colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'hint'])
 
         elif table == 'dbconfig_form_fields_json':
-            colums = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "hint", "text", "lb_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            columns = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "hint", "text", "lb_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb'])
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbconfig_form_fields_feat':
-            colums = ["feature_type","source", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            columns = ["feature_type","source", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbtable':
-            colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
-            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['al', 'ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dblabel':
-            colums = ["source", "project_type", "context", "vl_en_us"]
-            lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "vl_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['vl'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'su_basic_tables':
-            colums = ["source", "project_type", "context", "na_en_us", "ob_en_us"]
-            lang_colums = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "na_en_us", "ob_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['na', 'ob'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'su_feature':
-            colums = ["project_type", "context", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["project_type", "context", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'feature_class', 'feature_type', 'lb_en_us', 'id'])
 
         elif table == 'dbconfig_engine':
-            colums = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
+            columns = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb', 'ds', 'pl'])
             order_by.extend(['source_code', 'project_type', 'context', 'parameter', 'method', 'id'])
         
         elif table == 'dbplan_price':
-            colums = ["source", "project_type", "context", "ds_en_us", "tx_en_us", "pr_en_us"]
-            lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"tx_{self.lower_lang}", f"auto_tx_{self.lower_lang}", f"va_auto_tx_{self.lower_lang}", f"pr_{self.lower_lang}", f"auto_pr_{self.lower_lang}", f"va_auto_pr_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "ds_en_us", "tx_en_us", "pr_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['ds', 'tx', 'pr'])
             order_by.extend(['source_code', 'project_type', 'context', 'source'])
         
         elif table == 'dbconfig_visit_parameter':
-            colums = ["source", "project_type", "context", "ds_en_us"]
-            lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+            columns = ["source", "project_type", "context", "ds_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['ds'])
             order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbstyle':
-            print(f"dbstyle: {table}")
-            colums = ["CAST(source AS INTEGER)", "layername", "project_type", "context", "org_text", "hint", "lb_en_us"]
-            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            columns = ["CAST(source AS INTEGER)", "layername", "project_type", "context", "org_text", "hint", "lb_en_us"]
+            lang_columns = self._generate_lang_columns(table, ['lb'])
             order_by.extend(['source_code', 'context', 'layername', 'source', 'hint'])
         # Make the query
         sql=""
         try:
             if self.lower_lang == 'en_us':
-                sql = (f"SELECT {', '.join(colums)} "
+                sql = (f"SELECT {', '.join(columns)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY {', '.join(order_by)};")
             else:
-                sql = (f"SELECT {', '.join(colums)}, {', '.join(lang_colums)} "
+                sql = (f"SELECT {', '.join(columns)}, {', '.join(lang_columns)} "
                 f"FROM {self.schema_i18n}.{table} "
                 f"ORDER BY {', '.join(order_by)};")
             rows = self._get_rows(sql, self.cursor_i18n)
@@ -581,14 +658,12 @@ class GwI18NGenerator:
             msg = "Error getting table values: {0}"
             msg_params = (e,)
             tools_log.log_error(msg, msg_params=msg_params)
-            return False, colums
-
-
+            return False, columns
 
         # Return the corresponding information
         if not rows:
             return False, False
-        return rows, colums
+        return rows, columns
 
     def _write_table_values(self, rows, columns, table, path, file_type):
         """
@@ -607,18 +682,14 @@ class GwI18NGenerator:
 
             texts = []
             for forename in forenames:
-                value = row.get(f'{forename}_{self.lower_lang}')
+                key = f'{forename}_{self.lower_lang}'
+                fallback_en = f'{forename}_en_us'
+                value = self._get_translation(row, key, fallback_en)
 
-                if not value and self.lower_lang != 'en_us':
-                    value = row.get(f'auto_{forename}_{self.lower_lang}')
-
-                if not value:
-                    value = row.get(f'{forename}_en_us')
-
-                if not value and forename == 'tt' and table in [
+                if (not value or value == row.get('source')) and forename == 'tt' and table in [
                     "dbconfig_form_fields", "dbconfig_param_system",
                     "dbparam_user", "dbconfig_form_fields_feat"]:
-                    value = row.get('lb_en_us')
+                    value = row.get('lb_en_us') or value
 
                 if not value:
                     texts.append('NULL')
@@ -790,11 +861,8 @@ class GwI18NGenerator:
             for row in related_rows:
                 key_hint = row["hint"].rsplit('_', 1)[0]
                 default_text = row.get("lb_en_us", "")
-                translated = (
-                    row.get(f"lb_{self.lower_lang}") or
-                    row.get(f"auto_lb_{self.lower_lang}") or
-                    default_text
-                )
+                
+                translated = self._get_translation(row, f"lb_{self.lower_lang}", "lb_en_us")
 
                 text_json = self.replace_transaltions(text_json, default_text, key_hint, translated)
 
@@ -818,13 +886,13 @@ class GwI18NGenerator:
                         f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{row['tabname']}', '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
+                    file.write(f"UPDATE {context} AS t SET {column} = v.text::json FROM (\n\tVALUES\n\t{values_str}\n) AS v(columnname, formname, formtype, tabname, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype AND t.tabname = v.tabname;\n\n")
                 else:
                     values_str = ",\n    ".join([
                         f"({source}, '{txt}')"
                         for source, row, txt, col in data
                     ])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
+                    file.write(f"UPDATE {context} AS t SET {column} = v.text::json FROM (\n\tVALUES\n\t{values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
         return ""
     # endregion
