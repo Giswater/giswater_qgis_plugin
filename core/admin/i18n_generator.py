@@ -1152,17 +1152,6 @@ class GwI18NGenerator:
                     "dbconfig_visit_parameter", "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle",
                     "su_basic_tables", "dbjson", "dbconfig_form_fields_json"]
             },
-            "i18n_utils": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}utils{os.sep}i18n{os.sep}{self.language}{os.sep}",
-                "name": f"{self.language}.sql",
-                "project_type": ["utils", "ud", "ws"],
-                "checkbox": self.dlg_qm.chk_i18n_files,
-                "tables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
-                    "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_tableview",
-                    "dbconfig_visit_parameter", "dbtable", "dbconfig_form_fields_feat", "dbplan_price", "dbstyle",
-                    "su_basic_tables", "su_feature", "dbjson", "dbconfig_form_fields_json"]
-            },
             "am": {
                 "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
