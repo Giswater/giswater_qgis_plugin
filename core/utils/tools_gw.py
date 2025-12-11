@@ -1461,6 +1461,9 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
                     text += end
 
     tools_qt.set_widget_text(dialog, 'tab_log_txt_infolog', text + end)
+    infolog_widget = dialog.findChild(QTextEdit, 'tab_log_txt_infolog')
+    if infolog_widget:
+        infolog_widget.setReadOnly(True)
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
