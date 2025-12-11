@@ -74,21 +74,21 @@ BEGIN
 				WHERE top_elev*ymax*elev IS NOT NULL ORDER BY node_id ) a';
 	END IF;
 
-	-- Computing process - check custom_top_elev*custom_ymax*custom_elev
+	-- Computing process - check custom_top_elev*ymax*custom_elev
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
 				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, custom_top_elev, custom_elev, custom_ymax, 
-				''Values on custom_top_elev, custom_elev, custom_ymax''
+				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, custom_top_elev, custom_elev, ymax, 
+				''Values on custom_top_elev, custom_elev, ymax''
 				FROM '||v_worklayer||'
-				WHERE custom_top_elev*custom_ymax*custom_elev IS NOT NULL AND node_id IN ('||v_array||') ORDER BY node_id ) a';
+				WHERE custom_top_elev*ymax*custom_elev IS NOT NULL AND node_id IN ('||v_array||') ORDER BY node_id ) a';
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
 				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, custom_top_elev, custom_elev, custom_ymax,
-				''Values on custom_top_elev, custom_elev, custom_ymax''
+				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, custom_top_elev, custom_elev, ymax,
+				''Values on custom_top_elev, custom_elev, ymax''
 				FROM '||v_worklayer||'
-				WHERE custom_top_elev*custom_ymax*custom_elev IS NOT NULL ORDER BY node_id ) a';
+				WHERE custom_top_elev*ymax*custom_elev IS NOT NULL ORDER BY node_id ) a';
 	END IF;
 
 	-- Computing process - check custom_top_elev*ymax*elev
@@ -108,22 +108,6 @@ BEGIN
 				WHERE custom_top_elev*ymax*elev IS NOT NULL ORDER BY node_id ) a';
 	END IF;
 
-	-- Computing process - check top_elev*custom_ymax*elev
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
-				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, top_elev, elev, custom_ymax,
-				''Values on top_elev, elev, custom_ymax''
-				FROM '||v_worklayer||'
-				WHERE top_elev*custom_ymax*elev IS NOT NULL AND node_id IN ('||v_array||') ORDER BY node_id ) a';
-	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
-				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, top_elev, elev, custom_ymax,
-				''Values on top_elev, elev, custom_ymax''
-				FROM '||v_worklayer||'
-				WHERE top_elev*custom_ymax*elev IS NOT NULL ORDER BY node_id ) a';
-	END IF;
 	-- Computing process - check top_elev*ymax*custom_elev
 		IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
@@ -141,23 +125,6 @@ BEGIN
 				WHERE top_elev*ymax*custom_elev IS NOT NULL ORDER BY node_id ) a';
 	END IF;
 
-		-- Computing process - check custom_top_elev*custom_ymax*elev
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
-				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, custom_top_elev, elev, custom_ymax,
-				''Values on custom_top_elev, elev, custom_ymax''
-				FROM '||v_worklayer||'
-				WHERE custom_top_elev*custom_ymax*elev IS NOT NULL AND node_id IN ('||v_array||') ORDER BY node_id ) a';
-	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
-				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, custom_top_elev, elev, custom_ymax,
-				''Values on custom_top_elev, elev, custom_ymax''
-				FROM '||v_worklayer||'
-				WHERE custom_top_elev*custom_ymax*elev IS NOT NULL ORDER BY node_id ) a';
-	END IF;
-
 		-- Computing process - check custom_top_elev*ymax*custom_elev
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
@@ -173,23 +140,6 @@ BEGIN
 				''Values on custom_top_elev, custom_elev, ymax''
 				FROM '||v_worklayer||'
 				WHERE custom_top_elev*ymax*custom_elev IS NOT NULL ORDER BY node_id ) a';
-	END IF;
-
-	-- Computing process - check top_elev*custom_ymax*custom_elev
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
-				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, top_elev, custom_elev, custom_ymax,
-				''Values on top_elev, custom_elev, custom_ymax,''
-				FROM '||v_worklayer||'
-				WHERE top_elev*custom_ymax*custom_elev IS NOT NULL AND node_id IN ('||v_array||') ORDER BY node_id ) a';
-	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, fid, the_geom, top_elev, elev, ymax, descript)
-				SELECT * FROM (
-				SELECT DISTINCT node_id, nodecat_id, state, expl_id, 389, the_geom, top_elev, custom_elev, custom_ymax,
-				''Values on top_elev, custom_elev, custom_ymax,''
-				FROM '||v_worklayer||'
-				WHERE top_elev*custom_ymax*custom_elev IS NOT NULL ORDER BY node_id ) a';
 	END IF;
 
 	-- set selector
