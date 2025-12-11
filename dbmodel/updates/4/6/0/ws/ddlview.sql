@@ -3018,7 +3018,7 @@ SELECT
     a.the_geom,
     COALESCE(pp.state, a.state) AS p_state,
     a.uuid,
-    a.uncertain,
+    a.uncertain
 FROM arc a
 LEFT JOIN LATERAL (
     SELECT pp.state
@@ -3355,7 +3355,7 @@ SELECT
     exploitation.macroexpl_id,
     c.muni_id,
     c.sector_id,
-    sector_table.macrosector_id
+    sector_table.macrosector_id,
     sector_table.sector_type,
     supplyzone_table.supplyzone_id,
     supplyzone_table.supplyzone_type,
@@ -3364,7 +3364,7 @@ SELECT
     presszone_table.presszone_head,
     dma_table.dma_id,
     dma_table.macrodma_id,
-    dma_table.dma_type,
+    dma_table.dma_type::character varying,
     dqa_table.dqa_id,
     dqa_table.macrodqa_id,
     dqa_table.dqa_type,
