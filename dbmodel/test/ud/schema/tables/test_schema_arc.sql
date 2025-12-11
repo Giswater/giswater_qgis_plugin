@@ -23,7 +23,7 @@ SELECT columns_are(
     ARRAY[
         'arc_id', 'code', 'sys_code', 'node_1', 'nodetype_1', 'node_top_elev_1', 'node_custom_top_elev_1', 'node_elev_1', 'node_custom_elev_1', 'elev1',
         'custom_elev1', 'y1', 'node_2', 'nodetype_2', 'node_top_elev_2', 'node_custom_top_elev_2', 'node_elev_2', 'node_custom_elev_2',
-        'elev2', 'custom_elev2', 'sys_elev2', 'y2', 'feature_type', 'arc_type', 'matcat_id', 'arccat_id',
+        'elev2', 'custom_elev2', 'y2', 'feature_type', 'arc_type', 'matcat_id', 'arccat_id',
         'epa_type', 'state', 'state_type', 'parent_id', 'expl_id', 'muni_id', 'sector_id', 'dma_id',
         'drainzone_outfall', 'dwfzone_id', 'dwfzone_outfall', 'omzone_id', 'omunit_id', 'minsector_id', 'pavcat_id',
         'soilcat_id', 'function_type', 'category_type', 'location_type', '_fluid_type', 'fluid_type', 'treatment_type',

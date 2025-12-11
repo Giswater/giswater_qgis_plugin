@@ -1115,8 +1115,8 @@ BEGIN
 
 						-- set y1/y2 to null for those values related to new node
 						update config_param_system set value = false WHERE parameter='edit_state_topocontrol' ;
-						UPDATE arc SET y2=null, custom_y2=null WHERE arc_id = rec_aux1.arc_id;
-						UPDATE arc SET y1=null, custom_y1=null WHERE arc_id = rec_aux2.arc_id;
+						UPDATE arc SET y2=null WHERE arc_id = rec_aux1.arc_id;
+						UPDATE arc SET y1=null WHERE arc_id = rec_aux2.arc_id;
 						update config_param_system set value = true WHERE parameter='edit_state_topocontrol' ;
 					END IF;
 					
