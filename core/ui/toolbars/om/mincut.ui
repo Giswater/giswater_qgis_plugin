@@ -1062,10 +1062,10 @@
      <normaloff>../../../../icons/dialogs/123.png</normaloff>../../../../icons/dialogs/123.png</iconset>
    </property>
    <property name="text">
-    <string>Custom Mincut</string>
+    <string>Inaccessible valve</string>
    </property>
    <property name="toolTip">
-    <string>Custom Mincut</string>
+    <string>Inaccessible valve</string>
    </property>
   </action>
   <action name="actionAddConnec">
