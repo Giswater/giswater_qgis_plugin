@@ -125,7 +125,7 @@ UPDATE sys_param_user
 	SET layoutorder=8
 	WHERE id='inp_options_pressure_exponent';
 UPDATE sys_param_user
-	SET layoutorder=10, SET layoutname='lyt_general_1'
+	SET layoutorder=10, layoutname='lyt_general_1'
 	WHERE id='inp_options_node_id';
 
 -- Confi_form_fields
