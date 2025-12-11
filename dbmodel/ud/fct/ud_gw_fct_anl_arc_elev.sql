@@ -77,69 +77,25 @@
 		 			FROM '||v_worklayer||' WHERE y2*elev2 IS NOT NULL';
 		END IF;
 
-	-- Computing process - check custom_y1*custom_elev1
-		IF v_selectionmode = 'previousSelection' THEN
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
-		 			FROM '||v_worklayer||' WHERE custom_y1*custom_elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
-		ELSE
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
-		 			FROM '||v_worklayer||' WHERE custom_y1*custom_elev1 IS NOT NULL';
-		END IF;
-
-		-- Computing process - check custom_y2*custom_elev2
-		IF v_selectionmode = 'previousSelection' THEN
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
-		 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL  AND arc_id IN ('||v_array||');';
-		ELSE
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
-		 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL';
-		END IF;
-
-	-- Computing process - check custom_y1*elev1
-		IF v_selectionmode = 'previousSelection' THEN
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, elev1, ''Values on custom_y1 and elev1''  
-		 			FROM '||v_worklayer||' WHERE custom_y1*elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
-		ELSE
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, elev1, ''Values on custom_y1 and elev1''  
-		 			FROM '||v_worklayer||' WHERE custom_y1*elev1 IS NOT NULL';
-		END IF;
-
-		-- Computing process - check custom_y2*elev2
-		IF v_selectionmode = 'previousSelection' THEN
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, elev2, ''Values on custom_y2 and elev2'' 
-		 			FROM '||v_worklayer||' WHERE custom_y2*elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
-		ELSE
-			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, elev2, ''Values on custom_y2 and elev2''  
-		 			FROM '||v_worklayer||' WHERE custom_y2*elev2 IS NOT NULL';
-		END IF;
-
 	-- Computing process - check y1*custom_elev1
 		IF v_selectionmode = 'previousSelection' THEN
 			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on y1 and custom_elev1''  
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y1, custom_elev1, ''Values on y1 and custom_elev1''  
 		 			FROM '||v_worklayer||' WHERE y1*custom_elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
 		ELSE
 			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on y1 and custom_elev1''  
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y1, custom_elev1, ''Values on y1 and custom_elev1''  
 		 			FROM '||v_worklayer||' WHERE y1*custom_elev1 IS NOT NULL';
 		END IF;
 
 		-- Computing process - check y2*custom_elev2
 		IF v_selectionmode = 'previousSelection' THEN
 			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on y2 and custom_elev2''  
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y2, custom_elev2, ''Values on y2 and custom_elev2''  
 		 			FROM '||v_worklayer||' WHERE y2*custom_elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
 		ELSE
 			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on y2 and custom_elev2''  
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y2, custom_elev2, ''Values on y2 and custom_elev2''  
 		 			FROM '||v_worklayer||' WHERE y2*custom_elev2 IS NOT NULL';
 		END IF;
 
