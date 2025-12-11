@@ -73,3 +73,201 @@ BEGIN
     END IF;
 END;
 $$;
+
+-- 11/12/2025
+-- sys_parama_user
+UPDATE sys_param_user
+	SET layoutorder=3
+	WHERE id='inp_options_demandtype';
+UPDATE sys_param_user
+	SET layoutname='lyt_general_2',layoutorder=1
+	WHERE id='inp_options_selecteddma';
+UPDATE sys_param_user
+	SET layoutorder=2
+	WHERE id='inp_options_patternmethod';
+UPDATE sys_param_user
+	SET layoutorder=4
+	WHERE id='inp_options_units';
+UPDATE sys_param_user
+	SET layoutorder=5
+	WHERE id='inp_options_demand_multiplier';
+UPDATE sys_param_user
+	SET layoutorder=6
+	WHERE id='inp_options_demand_model';
+UPDATE sys_param_user
+	SET layoutorder=7
+	WHERE id='inp_options_buildup_mode';
+UPDATE sys_param_user
+	SET layoutorder=8
+	WHERE id='inp_options_required_pressure';
+UPDATE sys_param_user
+	SET layoutorder=9
+	WHERE id='inp_options_quality_mode';
+UPDATE sys_param_user
+	SET layoutorder=3
+	WHERE id='inp_options_nodarc_length';
+UPDATE sys_param_user
+	SET layoutorder=4
+	WHERE id='inp_options_rtc_period_id';
+UPDATE sys_param_user
+	SET layoutorder=2
+	WHERE id='inp_options_pattern';
+UPDATE sys_param_user
+	SET layoutorder=5
+	WHERE id='inp_options_headloss';
+UPDATE sys_param_user
+	SET layoutorder=6
+	WHERE id='inp_options_dscenario_priority';
+UPDATE sys_param_user
+	SET layoutorder=7
+	WHERE id='inp_options_minimum_pressure';
+UPDATE sys_param_user
+	SET layoutorder=8
+	WHERE id='inp_options_pressure_exponent';
+UPDATE sys_param_user
+	SET layoutorder=10, SET layoutname='lyt_general_1'
+	WHERE id='inp_options_node_id';
+
+-- Confi_form_fields
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_fountain' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_greentap' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_tap' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_wjoin' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_adaptation' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_air_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_bypass_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_check_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_clorinathor' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_control_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_curve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_endline' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_expantank' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_filter' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_fl_contr_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_flexunion' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_flowmeter' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_gen_purp_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_green_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_hydrant' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_junction' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_manhole' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_netelement' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_netsamplepoint' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_outfall_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pr_break_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pr_reduc_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pressure_meter' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pump' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_reduction' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_source' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_t' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_tank' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_valve_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_water_connection' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_waterwell' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_x' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+
+UPDATE config_form_fields
+	SET "label"='Scale:',tooltip='Scale'
+	WHERE formname='print' AND formtype='form_print' AND columnname='scale' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET tooltip='Scale'
+	WHERE formname='ve_plan_psector' AND formtype='form_feature' AND columnname='scale' AND tabname='tab_none';
