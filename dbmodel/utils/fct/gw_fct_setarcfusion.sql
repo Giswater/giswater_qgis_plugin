@@ -263,15 +263,14 @@ BEGIN
 				IF v_project_type = 'UD' THEN
 
 					v_new_record.y1 := (SELECT y1 FROM arc WHERE arc_id = v_record1.arc_id);
-					v_new_record.custom_y1 := (SELECT custom_y1 FROM arc WHERE arc_id = v_record1.arc_id);
 					v_new_record.elev1 := (SELECT elev1 FROM arc WHERE arc_id = v_record1.arc_id);
 					v_new_record.custom_elev1 := (SELECT custom_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
-					v_new_record.sys_elev1 := (SELECT sys_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
+					-- v_new_record.sys_elev1 := (SELECT sys_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
 
 					v_new_record.y2 := (SELECT y2 FROM arc WHERE arc_id = v_record2.arc_id);
-					v_new_record.custom_y2 := (SELECT custom_y2 FROM arc where arc_id = v_record2.arc_id);
 					v_new_record.elev2 := (SELECT elev2 FROM arc WHERE arc_id = v_record2.arc_id);
-					v_new_record.sys_elev2 := (SELECT sys_elev2 FROM arc where arc_id = v_record2.arc_id);
+					v_new_record.custom_elev2 := (SELECT custom_elev2 FROM arc WHERE arc_id = v_record2.arc_id);
+					-- v_new_record.sys_elev2 := (SELECT sys_elev2 FROM arc where arc_id = v_record2.arc_id);
 
 				END IF;
 
@@ -295,17 +294,15 @@ BEGIN
 				-- remove duplicated vertex on new arc because of the fusion
 				UPDATE arc SET the_geom=ST_RemoveRepeatedPoints(the_geom) WHERE arc_id=v_new_record.arc_id;
 
-				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
+				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 WHERE arc_id=v_new_record.arc_id;
 
 				IF v_project_type = 'UD' THEN
 
-					UPDATE arc SET sys_elev1=v_new_record.sys_elev1, y1 = v_new_record.y1, 	custom_y1 = v_new_record.custom_y1 ,
-					elev1 = v_new_record.elev1, custom_elev1 = v_new_record.custom_elev1
-					where arc_id=v_new_record.arc_id;
+					UPDATE arc SET y1 = v_new_record.y1, elev1 = v_new_record.elev1, custom_elev1 = v_new_record.custom_elev1
+					WHERE arc_id=v_new_record.arc_id;
 
-					UPDATE arc SET sys_elev2=v_new_record.sys_elev2, y2 = v_new_record.y2, 	custom_y2 = v_new_record.custom_y2 ,
-					elev2 = v_new_record.elev2, custom_elev2 = v_new_record.custom_elev2
-					where arc_id=v_new_record.arc_id;
+					UPDATE arc SET y2 = v_new_record.y2, elev2 = v_new_record.elev2, custom_elev2 = v_new_record.custom_elev2
+					WHERE arc_id=v_new_record.arc_id;
 
 				END IF;
 
