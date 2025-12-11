@@ -43,15 +43,13 @@ BEGIN
 			-- Update of topocontrol fields only when one if it has changed in order to prevent to be triggered the topocontrol without changes
 			IF (NEW.y1 != OLD.y1) OR (NEW.y1 IS NULL AND OLD.y1 IS NOT NULL) OR (NEW.y1 IS NOT NULL AND OLD.y1 IS NULL) OR
 			   (NEW.y2 != OLD.y2) OR (NEW.y2 IS NULL AND OLD.y2 IS NOT NULL) OR (NEW.y2 IS NOT NULL AND OLD.y2 IS NULL) OR
-			   (NEW.custom_y1 != OLD.custom_y1) OR (NEW.custom_y1 IS NULL AND OLD.custom_y1 IS NOT NULL) OR (NEW.custom_y1 IS NOT NULL AND OLD.custom_y1 IS NULL) OR
-			   (NEW.custom_y2 != OLD.custom_y2) OR (NEW.custom_y2 IS NULL AND OLD.custom_y2 IS NOT NULL) OR (NEW.custom_y2 IS NOT NULL AND OLD.custom_y2 IS NULL) OR
 			   (NEW.elev1 != OLD.elev1) OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) OR
 			   (NEW.elev2 != OLD.elev2) OR (NEW.elev2 IS NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) OR
 			   (NEW.custom_elev1 != OLD.custom_elev1) OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) OR
 			   (NEW.custom_elev2 != OLD.custom_elev2) OR (NEW.custom_elev2 IS NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) OR
 			   (NEW.inverted_slope::text != OLD.inverted_slope::text)
 			   THEN  
-				UPDATE arc SET y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2,
+				UPDATE arc SET y1=NEW.y1, y2=NEW.y2, elev1=NEW.elev1, elev2=NEW.elev2,
 						custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, inverted_slope=NEW.inverted_slope
 						WHERE arc_id=NEW.arc_id;
 			END IF;

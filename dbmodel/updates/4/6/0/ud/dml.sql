@@ -136,3 +136,9 @@ WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='cust
 INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('edit_node_topelev_options', '0', 'ELEV');
 INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('edit_node_topelev_options', '1', 'YMAX');
 INSERT INTO sys_param_user VALUES ('edit_node_topelev_options', 'config', 'If elev, ymax is recalculated when node top_elev is changed. If ymax, elev is recalculated when node elev is changed.', 'role_edit', NULL, 'Auto-update elevation/ymax:', 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''edit_node_topelev_options'' AND id IS NOT NULL', NULL, true, 1, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', true, NULL, NULL, 'lyt_inventory', true, NULL, NULL, NULL, NULL, 'core');
+
+UPDATE sys_fprocess
+SET query_text = 'SELECT node_id, nodecat_id, the_geom, expl_id FROM t_node WHERE (ymax is not null) 
+and (top_elev is not null or custom_top_elev is not null) and (elev is not null or custom_elev is not null)'
+WHERE fid = 461;
+
