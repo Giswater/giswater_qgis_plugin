@@ -198,5 +198,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut",
 
 ALTER TABLE om_mincut ALTER COLUMN modification_date TYPE timestamp;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"invert_level", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"invert_level", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 

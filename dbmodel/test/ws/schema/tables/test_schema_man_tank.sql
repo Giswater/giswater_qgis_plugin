@@ -21,7 +21,7 @@ SELECT columns_are(
     'man_tank',
     ARRAY[
         'node_id', 'vmax', 'vutil', 'area', 'chlorination', 'name', 'hmax', 'automated',
-        'length', 'width', 'shape', 'fence_type', 'fence_length', 'inlet_arc'
+        'length', 'width', 'shape', 'fence_type', 'fence_length', 'inlet_arc', 'invert_level'
     ],
     'Table man_tank should have the correct columns'
 );
@@ -44,6 +44,7 @@ SELECT col_type_is('man_tank', 'shape', 'integer', 'Column shape should be integ
 SELECT col_type_is('man_tank', 'fence_type', 'integer', 'Column fence_type should be integer');
 SELECT col_type_is('man_tank', 'fence_length', 'double precision', 'Column fence_length should be double precision');
 SELECT col_type_is('man_tank', 'inlet_arc', 'integer[]', 'Column inlet_arc should be integer[]');
+SELECT col_type_is('man_tank', 'invert_level', 'numeric(12,3)', 'Column invert_level should be numeric(12,3)');
 
 -- Check foreign keys
 SELECT has_fk('man_tank', 'Table man_tank should have foreign keys');
