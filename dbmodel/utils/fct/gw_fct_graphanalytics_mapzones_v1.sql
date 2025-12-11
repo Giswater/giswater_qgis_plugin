@@ -325,39 +325,53 @@ BEGIN
 			';
 		EXECUTE v_query_text;
 	ELSE
+		-- netscenario query
+		IF v_netscenario IS NOT NULL THEN
+			v_query_text_aux := ' AND netscenario_id = ' || v_netscenario;
+		ELSE 
+			v_query_text_aux := '';
+		END IF;
+
 		IF v_project_type = 'WS' THEN
 			v_query_text :=
-				'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
-				FROM (
-					SELECT 
+				'
+				WITH 
+					graphconfig AS (
+						SELECT DISTINCT 
 						' || v_mapzone_field || ' AS mapzone_id,
-						ARRAY(SELECT value::int FROM jsonb_array_elements_text(use_item->''toArc'') AS elem(value)) AS to_arc,
-						(use_item->>''nodeParent'')::int AS node_id
-					FROM ' || v_table_name || ',
-						LATERAL jsonb_array_elements((graphconfig->''use'')::jsonb) AS use_item
+						(use_item->>''nodeParent'')::int AS node_id,
+						elem_to_arc.value::int AS to_arc  
+						FROM ' || v_table_name || ',
+						LATERAL json_array_elements(graphconfig->''use'') AS use_item,
+						LATERAL json_array_elements_text(use_item->''toArc'') AS elem_to_arc(value)
 						WHERE (use_item->>''nodeParent'') <> ''''
 						AND graphconfig IS NOT NULL AND active
+						AND json_array_length(use_item->''toArc'') > 0
+						' || v_query_text_aux || '
+					) 
+				UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
+				FROM (
+					SELECT mapzone_id, node_id, array_agg(to_arc)::int[] AS to_arc 
+					FROM graphconfig
+					GROUP BY mapzone_id, node_id 
+				) s
+				WHERE n.node_id = s.node_id;		
 				';
 		ELSE
 			v_query_text :=
                 'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id
                 FROM (
-                    SELECT ' || v_mapzone_field || ' AS mapzone_id,
-                   	(use_item->>''nodeParent'')::int AS node_id
-                    FROM ' || v_table_name || ', 
-						LATERAL jsonb_array_elements((graphconfig->''use'')::jsonb) AS use_item
-						WHERE (use_item->>''nodeParent'') <> ''''
-						AND graphconfig IS NOT NULL AND active
+					SELECT ' || v_mapzone_field || ' AS mapzone_id,
+						(use_item->>''nodeParent'')::int AS node_id
+					FROM ' || v_table_name || ', 
+					LATERAL json_array_elements(graphconfig->''use'') AS use_item
+					WHERE (use_item->>''nodeParent'') <> ''''
+					AND graphconfig IS NOT NULL AND active
+					' || v_query_text_aux || '
+				) AS s WHERE n.node_id = s.node_id;
 				';
 		END IF;
 
-		-- netscenario query
-		IF v_netscenario IS NOT NULL THEN
-			v_query_text := v_query_text || 'AND netscenario_id = ' || v_netscenario;
-		END IF;
-
-		-- common query
-		v_query_text := v_query_text || ') AS s WHERE n.node_id = s.node_id';
 		EXECUTE v_query_text;
 
 		-- Nodes forceClosed acording init parameters - for ws; for ud forceClosed are arcs
