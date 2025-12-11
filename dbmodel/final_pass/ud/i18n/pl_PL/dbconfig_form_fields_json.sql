@@ -7,9 +7,7 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';
 
-UPDATE config_form_fields AS t
-SET widgetcontrols = v.text::json
-FROM (
+UPDATE config_form_fields AS t SET widgetcontrols = v.text::json FROM (
 	VALUES
 	('btn_accept', 'generic', 'form_visit', 'tab_data', '{"text": "Akceptuj", "setMultiline": false}'),
     ('btn_apply', 'generic', 'form_visit', 'tab_file', '{"text": "Zastosuj", "setMultiline": false}'),

@@ -146,7 +146,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (197, 'arcs amb estat = 1 utilitzant nodes extrems amb estat = 2. Si us plau, comproveu les vostres dades abans de continuar.', 'No s''han trobat arcs amb estat=1 utilitzant nodes amb estat=0.', 'Arcs amb estat=1 utilitzant nodes a estat=2'),
     (198, 'tancs amb valors nuls almenys a les columnes obligatòries per al tanc (nivell inicial, nivell mínim, nivell màxim, diàmetre, minvol). Fes una ullada a la taula temporal per als detalls.', 'Tancs revisats.No s''ha perdut cap valor obligatori.', 'Dipòsits amb valors obligatoris nuls'),
     (199, NULL, NULL, 'Fals procés'),
-    (-2, NULL, NULL, 'N''hi ha'),
+    (-2, NULL, NULL, 'Hi ha'),
     (200, NULL, NULL, 'Estableix els valors to_arc per als delimitadors de gràfics'),
     (201, 'connecta codi de client duplicat.Si us plau, comproveu les vostres dades abans de continuar.', 'No s''ha duplicat cap connexió amb el codi de client.', 'Es connecta amb el codi_client duplicat'),
     (203, NULL, NULL, 'Nodes finals amb arc_id'),

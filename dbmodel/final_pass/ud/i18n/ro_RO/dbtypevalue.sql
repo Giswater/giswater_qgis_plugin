@@ -263,7 +263,7 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('HORTON', 'inp_value_options_in', 'HORTON', NULL),
     ('MODIFIED_GREEN_AMPT', 'inp_value_options_in', 'MODIFICAT_AMPT_VERDE', NULL),
     ('MODIFIED_HORTON', 'inp_value_options_in', 'MODIFIED_HORTON', NULL),
-    ('DEPTH', 'inp_value_options_lo', 'PROFUNZIME', NULL),
+    ('DEPTH', 'inp_value_options_lo', 'DEPTH', NULL),
     ('ELEVATION', 'inp_value_options_lo', 'ELEVARE', NULL),
     ('BOTH', 'inp_value_options_nfl', 'AMBELE', NULL),
     ('FROUDE', 'inp_value_options_nfl', 'FROUDE', NULL),

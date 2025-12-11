@@ -175,7 +175,7 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('TRANSVERSE', 'inp_typevalue_weir', 'TRANSVERSAL', 'RECT_OPEN'),
     ('TRAPEZOIDAL', 'inp_typevalue_weir', 'TRAPEZOIDAL', 'TRAPEZOIDAL'),
     ('V-NOTCH', 'inp_typevalue_weir', 'V-NOTCH', 'TRIANGULAR'),
-    ('ALL', 'inp_value_allnone', 'TODOS', NULL),
+    ('ALL', 'inp_value_allnone', 'ALL', NULL),
     ('NONE', 'inp_value_allnone', 'NONE', NULL),
     ('EXP', 'inp_value_buildup', 'EXP', NULL),
     ('EXT', 'inp_value_buildup', 'EXT', NULL),
@@ -257,17 +257,17 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('MLD', 'inp_value_options_fu', 'LDM', NULL),
     ('FULL', 'inp_value_options_id', 'FULL', NULL),
     ('NONE', 'inp_value_options_id', 'NONE', NULL),
-    ('PARTIAL', 'inp_value_options_id', 'PARCIAL', NULL),
+    ('PARTIAL', 'inp_value_options_id', 'PARTIAL', NULL),
     ('CURVE_NUMBER', 'inp_value_options_in', 'CURVA_NÚMERO', NULL),
     ('GREEN_AMPT', 'inp_value_options_in', 'GREEN_AMPT', NULL),
     ('HORTON', 'inp_value_options_in', 'HORTON', NULL),
     ('MODIFIED_GREEN_AMPT', 'inp_value_options_in', 'MODIFICADO_VERDE_AMPT', NULL),
     ('MODIFIED_HORTON', 'inp_value_options_in', 'MODIFICADO_HORTON', NULL),
-    ('DEPTH', 'inp_value_options_lo', 'PROFUNDIDAD', NULL),
-    ('ELEVATION', 'inp_value_options_lo', 'ELEVACIÓN', NULL),
-    ('BOTH', 'inp_value_options_nfl', 'AMBOS', NULL),
+    ('DEPTH', 'inp_value_options_lo', 'DEPTH', NULL),
+    ('ELEVATION', 'inp_value_options_lo', 'ELEVATION', NULL),
+    ('BOTH', 'inp_value_options_nfl', 'BOTH', NULL),
     ('FROUDE', 'inp_value_options_nfl', 'FROUDE', NULL),
-    ('SLOPE', 'inp_value_options_nfl', 'PENDIENTE', NULL),
+    ('SLOPE', 'inp_value_options_nfl', 'SLOPE', NULL),
     ('CIRCULAR', 'inp_value_orifice', 'CIRCULAR', NULL),
     ('RECT_CLOSED', 'inp_value_orifice', 'RECT_CLOSED', NULL),
     ('#/L', 'inp_value_pollutants', '#/L', NULL),
@@ -315,7 +315,7 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('MONTHLY', 'inp_typevalue_pattern', 'MENSUAL', NULL),
     ('WEEKEND', 'inp_typevalue_pattern', 'FIN DE SEMANA', NULL),
     ('NO', 'inp_value_yesno', 'NO', NULL),
-    ('YES', 'inp_value_yesno', 'SÍ', NULL)
+    ('YES', 'inp_value_yesno', '	YES', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 

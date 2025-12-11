@@ -255,19 +255,19 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('LPS', 'inp_value_options_fu', 'LPS', NULL),
     ('MGD', 'inp_value_options_fu', 'MGD', NULL),
     ('MLD', 'inp_value_options_fu', 'MLD', NULL),
-    ('FULL', 'inp_value_options_id', 'COMPLET', NULL),
-    ('NONE', 'inp_value_options_id', 'CAP', NULL),
-    ('PARTIAL', 'inp_value_options_id', 'PARCIAL', NULL),
+    ('FULL', 'inp_value_options_id', 'FULL', NULL),
+    ('NONE', 'inp_value_options_id', 'NONE', NULL),
+    ('PARTIAL', 'inp_value_options_id', 'PARTIAL', NULL),
     ('CURVE_NUMBER', 'inp_value_options_in', 'CURVE_NUMBER', NULL),
     ('GREEN_AMPT', 'inp_value_options_in', 'GREEN_AMPT', NULL),
     ('HORTON', 'inp_value_options_in', 'HORTON', NULL),
     ('MODIFIED_GREEN_AMPT', 'inp_value_options_in', 'MODIFIED_GREEN_AMPT', NULL),
     ('MODIFIED_HORTON', 'inp_value_options_in', 'MODIFIED_HORTON', NULL),
-    ('DEPTH', 'inp_value_options_lo', 'PROFUNDITAT', NULL),
-    ('ELEVATION', 'inp_value_options_lo', 'ELEVACIÓ', NULL),
-    ('BOTH', 'inp_value_options_nfl', 'Tots dos', NULL),
+    ('DEPTH', 'inp_value_options_lo', 'DEPTH', NULL),
+    ('ELEVATION', 'inp_value_options_lo', 'ELEVATION', NULL),
+    ('BOTH', 'inp_value_options_nfl', 'BOTH', NULL),
     ('FROUDE', 'inp_value_options_nfl', 'FROUDE', NULL),
-    ('SLOPE', 'inp_value_options_nfl', 'PENDENT', NULL),
+    ('SLOPE', 'inp_value_options_nfl', 'SLOPE', NULL),
     ('CIRCULAR', 'inp_value_orifice', 'CIRCULAR', NULL),
     ('RECT_CLOSED', 'inp_value_orifice', 'RECT_TANCAT', NULL),
     ('#/L', 'inp_value_pollutants', '#/L', NULL),
@@ -315,7 +315,7 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('MONTHLY', 'inp_typevalue_pattern', 'MENSUALMENT', NULL),
     ('WEEKEND', 'inp_typevalue_pattern', 'CAP DE SETMANA', NULL),
     ('NO', 'inp_value_yesno', 'NO', NULL),
-    ('YES', 'inp_value_yesno', 'SÍ', NULL)
+    ('YES', 'inp_value_yesno', 'YES', NULL)
 ) AS v(id, typevalue, idval, descript)
 WHERE t.id = v.id AND t.typevalue = v.typevalue;
 
