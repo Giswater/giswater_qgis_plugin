@@ -5,432 +5,204 @@
 	<context>
 		<name>giswater</name>
 		<message>
-			<source>Manage Campaign</source>
-			<translation>Gestor de campanyas</translation>
-		</message>
-		<message>
-			<source>Manage Lot</source>
-			<translation>Gestor de lots</translation>
-		</message>
-		<message>
-			<source>Manage Workorder</source>
-			<translation>Gestor d'ordres de treball</translation>
-		</message>
-		<message>
-			<source>18_text</source>
-			<translation>Connexió amb comercial</translation>
-		</message>
-		<message>
-			<source>19_text</source>
-			<translation>Caixa d'eines</translation>
-		</message>
-		<message>
-			<source>24_text</source>
-			<translation>Anar a EPA express</translation>
-		</message>
-		<message>
-			<source>301_text</source>
-			<translation>Planificador anual</translation>
-		</message>
-		<message>
-			<source>302_text</source>
-			<translation>Planificador mensual</translation>
-		</message>
-		<message>
-			<source>303_text</source>
-			<translation>Generador de preus</translation>
-		</message>
-		<message>
-			<source>304_text</source>
-			<translation>Afegir visita</translation>
-		</message>
-		<message>
-			<source>305_text</source>
-			<translation>Planificador unitari</translation>
-		</message>
-		<message>
-			<source>309_text</source>
-			<translation>Gestor d'incidencies</translation>
-		</message>
-		<message>
-			<source>36_text</source>
-			<translation>Giswater</translation>
-		</message>
-		<message>
-			<source>38_text</source>
-			<translation>Nou cost de la xarxa</translation>
-		</message>
-		<message>
-			<source>47_text</source>
-			<translation>Selector de sector de planificació</translation>
-		</message>
-		<message>
-			<source>74_text</source>
-			<translation>Afegir nou lot</translation>
-		</message>
-		<message>
-			<source>75_text</source>
-			<translation>Gestor de lots</translation>
-		</message>
-		<message>
-			<source>76_text</source>
-			<translation>Filtre de lots</translation>
-		</message>
-		<message>
-			<source>81_text</source>
-			<translation>Nou sector de planificació OM</translation>
-		</message>
-		<message>
-			<source>82_text</source>
-			<translation>Gestor de sector de planificació OM</translation>
-		</message>
-		<message>
-			<source>98_text</source>
-			<translation>Editor de configuració</translation>
-		</message>
-		<message>
-			<source>Actions</source>
-			<translation>Accions</translation>
-		</message>
-		<message>
-			<source>Add drain GPKG project</source>
-			<translation>Afegeix el projecte GPKG de drenatge</translation>
-		</message>
-		<message>
-			<source>Additional demand check</source>
-			<translation>Comprovació addicional de la demanda</translation>
-		</message>
-		<message>
-			<source>Advanced</source>
-			<translation>Avançat</translation>
-		</message>
-		<message>
-			<source>AmBreakage</source>
-			<translation>Eina d'administració</translation>
-		</message>
-		<message>
-			<source>AmPriority</source>
-			<translation>Càlcul de prioritats i selecció</translation>
-		</message>
-		<message>
-			<source>Analytics</source>
-			<translation>Analítica</translation>
-		</message>
-		<message>
-			<source>ARC</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>Breakdown Assignation</source>
-			<translation>Asignació de fugues</translation>
+			<source>CONNEC</source>
+			<translation>Connexió</translation>
 		</message>
 		<message>
 			<source>Calibration</source>
 			<translation>Calibració</translation>
 		</message>
 		<message>
-			<source>Closest arcs</source>
-			<translation>Arcs més propers</translation>
-		</message>
-		<message>
-			<source>CONNEC</source>
-			<translation>Connexió</translation>
-		</message>
-		<message>
-			<source>DRAG-DROP</source>
-			<translation>Arrossegar i deixar anar</translation>
-		</message>
-		<message>
-			<source>Dscenario</source>
-			<translation>Escenaris dinàmics</translation>
-		</message>
-		<message>
-			<source>DWF scenario</source>
-			<translation>Escenaris DWF</translation>
-		</message>
-		<message>
-			<source>Emitter calibration</source>
-			<translation>Calibració de l'emissor</translation>
-		</message>
-		<message>
-			<source>EPA multi calls</source>
-			<translation>Trucades múltiples de l'EPA</translation>
-		</message>
-		<message>
-			<source>Export</source>
-			<translation>Exporta</translation>
-		</message>
-		<message>
-			<source>Fast print</source>
-			<translation>Impresió ràpida</translation>
-		</message>
-		<message>
-			<source>Forced arcs</source>
-			<translation>Arcs forçats</translation>
-		</message>
-		<message>
-			<source>Forced arcs (selecting only arcs)</source>
-			<translation>Arcs forçats (seleccionar només arcs)</translation>
-		</message>
-		<message>
-			<source>Get help</source>
-			<translation>Ajuda</translation>
-		</message>
-		<message>
-			<source>Go2IBER</source>
-			<translation>Go2IBER</translation>
-		</message>
-		<message>
-			<source>GULLY</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>GwAddCampaignButton</source>
-			<translation>Afegeix una campanya</translation>
-		</message>
-		<message>
-			<source>GwAddChildLayerButton</source>
-			<translation>Carregar capa Giswater</translation>
-		</message>
-		<message>
-			<source>GwAddLotButton</source>
-			<translation>Afegeix Lot</translation>
-		</message>
-		<message>
-			<source>GwAmBreakageButton</source>
-			<translation>Eina d'administració</translation>
-		</message>
-		<message>
-			<source>GwAmPriorityButton</source>
-			<translation>Càlcul de prioritat per selecció</translation>
-		</message>
-		<message>
-			<source>GwArcAddButton</source>
-			<translation>Inserir arc</translation>
-		</message>
-		<message>
-			<source>GwArcDivideButton</source>
-			<translation>Dividir arc</translation>
-		</message>
-		<message>
-			<source>GwArcFusionButton</source>
-			<translation>Fusionar arc</translation>
-		</message>
-		<message>
-			<source>GwAuxCircleAddButton</source>
-			<translation>Crear circle</translation>
-		</message>
-		<message>
-			<source>GwAuxPointAddButton</source>
-			<translation>Crear punt</translation>
-		</message>
-		<message>
-			<source>GwConfigButton</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>GwConnectLinkButton</source>
-			<translation>Conectar a la xarxa</translation>
-		</message>
-		<message>
-			<source>GwCSVButton</source>
-			<translation>Importar CSV</translation>
-		</message>
-		<message>
-			<source>GwDateSelectorButton</source>
-			<translation>Selector de data</translation>
-		</message>
-		<message>
-			<source>GwDimensioningButton</source>
-			<translation>Acotacions</translation>
-		</message>
-		<message>
-			<source>GwDocumentButton</source>
-			<translation>Afegir document</translation>
-		</message>
-		<message>
-			<source>GwDocumentManagerButton</source>
-			<translation>Gestor de documents</translation>
-		</message>
-		<message>
-			<source>GwDscenarioManagerButton</source>
-			<translation>Gestor d'escenaris dinàmics</translation>
-		</message>
-		<message>
-			<source>GwElementButton</source>
-			<translation>Afegir element</translation>
-		</message>
-		<message>
-			<source>GwElementManagerButton</source>
-			<translation>Gestor d'elements</translation>
-		</message>
-		<message>
-			<source>GwEpaTools</source>
-			<translation>Eines EPA</translation>
-		</message>
-		<message>
-			<source>GwFeatureDeleteButton</source>
-			<translation>Eliminar objecte de xarxa</translation>
-		</message>
-		<message>
-			<source>GwFeatureEndButton</source>
-			<translation>Donar de baixa</translation>
-		</message>
-		<message>
-			<source>GwFeatureReplaceButton</source>
-			<translation>Reemplaçar objecte</translation>
-		</message>
-		<message>
-			<source>GwFeatureTypeChangeButton</source>
-			<translation>Canvia el tipus d'objecte</translation>
-		</message>
-		<message>
-			<source>GwFlowExitButton</source>
-			<translation>Sortida de flux</translation>
-		</message>
-		<message>
 			<source>GwFlowTraceButton</source>
 			<translation>Rastreig del flux</translation>
 		</message>
 		<message>
-			<source>GwGo2EpaButton</source>
-			<translation>Anar a EPA</translation>
-		</message>
-		<message>
-			<source>GwGo2EpaManagerButton</source>
-			<translation>Gestor de resultats EPA</translation>
-		</message>
-		<message>
-			<source>GwGo2EpaSelectorButton</source>
-			<translation>Selector de resultats EPA</translation>
-		</message>
-		<message>
-			<source>GwInfoButton</source>
-			<translation>Info Giswater</translation>
-		</message>
-		<message>
-			<source>GwLayerStyleChangeButton</source>
-			<translation>Estils Giswater</translation>
-		</message>
-		<message>
-			<source>GwLotResourceManagementButton</source>
-			<translation>Gestió dels recursos del lot</translation>
-		</message>
-		<message>
-			<source>GwManageCampaignLotButton</source>
-			<translation>Gestionar el lot de campanya</translation>
-		</message>
-		<message>
-			<source>GwMincutButton</source>
-			<translation>Nou polígon de tall</translation>
-		</message>
-		<message>
-			<source>GwMincutManagerButton</source>
-			<translation>Gestor de polígons de tall</translation>
-		</message>
-		<message>
-			<source>GwNetscenarioManagerButton</source>
-			<translation>Gestor de netscenaris</translation>
-		</message>
-		<message>
-			<source>GwNonVisualManagerButton</source>
-			<translation>Gestor d'objectes no visuals</translation>
-		</message>
-		<message>
-			<source>GwPointAddButton</source>
-			<translation>Inserir punt</translation>
-		</message>
-		<message>
-			<source>GwPriceManagerButton</source>
-			<translation>Gestionar cost de la xarxa</translation>
-		</message>
-		<message>
-			<source>GwPrintButton</source>
-			<translation>Impresió ràpida</translation>
+			<source>Actions</source>
+			<translation>Accions</translation>
 		</message>
 		<message>
 			<source>GwProfileButton</source>
 			<translation>Eina de perfil</translation>
 		</message>
 		<message>
-			<source>GwProjectCheckButton</source>
-			<translation>Verificar projecte</translation>
-		</message>
-		<message>
-			<source>GwPsectorButton</source>
-			<translation>Nou sector de planificacions</translation>
-		</message>
-		<message>
-			<source>GwPsectorManagerButton</source>
-			<translation>Gestor de sectors de planificació</translation>
-		</message>
-		<message>
 			<source>GwResultManagerButton</source>
 			<translation>Gestor de resultats</translation>
 		</message>
 		<message>
-			<source>GwResultSelectorButton</source>
-			<translation>Selector de resultats</translation>
+			<source>Emitter calibration</source>
+			<translation>Calibració de l'emissor</translation>
 		</message>
 		<message>
-			<source>GwSearchButton</source>
-			<translation>Cercador</translation>
+			<source>NODE</source>
+			<translation>Node</translation>
 		</message>
 		<message>
-			<source>GwSelectorButton</source>
-			<translation>Selectors</translation>
+			<source>toolbar_plan_name</source>
+			<translation>Giswater - Masterplan</translation>
 		</message>
 		<message>
-			<source>GwSnapshotViewButton</source>
-			<translation>Vista d'instantània</translation>
-		</message>
-		<message>
-			<source>GwToolBoxButton</source>
-			<translation>Caixa d'eines</translation>
-		</message>
-		<message>
-			<source>GwUtilsManagerButton</source>
-			<translation>Gestor d'utilitats</translation>
-		</message>
-		<message>
-			<source>GwVisitButton</source>
-			<translation>Afegir visita</translation>
-		</message>
-		<message>
-			<source>GwVisitManagerButton</source>
-			<translation>Gestor de visites</translation>
-		</message>
-		<message>
-			<source>GwWorkspaceManagerButton</source>
-			<translation>Espais de treball</translation>
-		</message>
-		<message>
-			<source>Hydrology scenario</source>
-			<translation>Escenaris hidrològics</translation>
-		</message>
-		<message>
-			<source>Import</source>
-			<translation>Importar</translation>
-		</message>
-		<message>
-			<source>Import CSV</source>
-			<translation>Importar CSV</translation>
-		</message>
-		<message>
-			<source>Import INP file</source>
-			<translation>Importa el fitxer INP</translation>
-		</message>
-		<message>
-			<source>Manage Campaign</source>
-			<translation>Gestor de campanyas</translation>
+			<source>ARC</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
 			<source>Manage Lot</source>
 			<translation>Gestor de lots</translation>
 		</message>
 		<message>
-			<source>Mapzones manager</source>
-			<translation>Gestor de Mapzones</translation>
+			<source>74_text</source>
+			<translation>Afegir nou lot</translation>
+		</message>
+		<message>
+			<source>Manage Campaign</source>
+			<translation>Gestor de campanyas</translation>
+		</message>
+		<message>
+			<source>GwElementManagerButton</source>
+			<translation>Gestor d'elements</translation>
+		</message>
+		<message>
+			<source>Get help</source>
+			<translation>Ajuda</translation>
+		</message>
+		<message>
+			<source>Forced arcs (selecting only arcs)</source>
+			<translation>Arcs forçats (seleccionar només arcs)</translation>
+		</message>
+		<message>
+			<source>38_text</source>
+			<translation>Nou cost de la xarxa</translation>
+		</message>
+		<message>
+			<source>GULLY</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>36_text</source>
+			<translation>Giswater</translation>
+		</message>
+		<message>
+			<source>EPA multi calls</source>
+			<translation>Trucades múltiples de l'EPA</translation>
+		</message>
+		<message>
+			<source>GwAddChildLayerButton</source>
+			<translation>Carregar capa Giswater</translation>
+		</message>
+		<message>
+			<source>GwFeatureTypeChangeButton</source>
+			<translation>Canvia el tipus d'objecte</translation>
+		</message>
+		<message>
+			<source>Closest arcs</source>
+			<translation>Arcs més propers</translation>
+		</message>
+		<message>
+			<source>GwSearchButton</source>
+			<translation>Cercador</translation>
+		</message>
+		<message>
+			<source>GwSnapshotViewButton</source>
+			<translation>Vista d'instantània</translation>
+		</message>
+		<message>
+			<source>Dscenario</source>
+			<translation>Escenaris dinàmics</translation>
+		</message>
+		<message>
+			<source>toolbar_custom_name</source>
+			<translation>Giswater - Custom</translation>
+		</message>
+		<message>
+			<source>GwNonVisualManagerButton</source>
+			<translation>Gestor d'objectes no visuals</translation>
+		</message>
+		<message>
+			<source>toolbar_om_name</source>
+			<translation>Giswater - OM</translation>
+		</message>
+		<message>
+			<source>DRAG-DROP</source>
+			<translation>Arrossegar i deixar anar</translation>
+		</message>
+		<message>
+			<source>toolbar_cm_name</source>
+			<translation>Giswater - Gestor de Campanyes</translation>
+		</message>
+		<message>
+			<source>GwFeatureEndButton</source>
+			<translation>Donar de baixa</translation>
+		</message>
+		<message>
+			<source>Manage Workorder</source>
+			<translation>Gestor d'ordres de treball</translation>
+		</message>
+		<message>
+			<source>Go2IBER</source>
+			<translation>Go2IBER</translation>
+		</message>
+		<message>
+			<source>Analytics</source>
+			<translation>Analítica</translation>
+		</message>
+		<message>
+			<source>302_text</source>
+			<translation>Planificador mensual</translation>
+		</message>
+		<message>
+			<source>Static calibration</source>
+			<translation>Calibració estàtica</translation>
+		</message>
+		<message>
+			<source>Multi psector print</source>
+			<translation>Impresió ràpida</translation>
+		</message>
+		<message>
+			<source>GwPriceManagerButton</source>
+			<translation>Gestionar cost de la xarxa</translation>
+		</message>
+		<message>
+			<source>Quantized demands</source>
+			<translation>Demandes quantificades</translation>
+		</message>
+		<message>
+			<source>GwFeatureDeleteButton</source>
+			<translation>Eliminar objecte de xarxa</translation>
+		</message>
+		<message>
+			<source>SELECT</source>
+			<translation>Seleccioneu</translation>
+		</message>
+		<message>
+			<source>Manage Lot</source>
+			<translation>Gestor de lots</translation>
+		</message>
+		<message>
+			<source>Hydrology scenario</source>
+			<translation>Escenaris hidrològics</translation>
+		</message>
+		<message>
+			<source>GwInfoButton</source>
+			<translation>Info Giswater</translation>
+		</message>
+		<message>
+			<source>GwDscenarioManagerButton</source>
+			<translation>Gestor d'escenaris dinàmics</translation>
+		</message>
+		<message>
+			<source>GwUtilsManagerButton</source>
+			<translation>Gestor d'utilitats</translation>
+		</message>
+		<message>
+			<source>Fast print</source>
+			<translation>Impresió ràpida</translation>
+		</message>
+		<message>
+			<source>DWF scenario</source>
+			<translation>Escenaris DWF</translation>
+		</message>
+		<message>
+			<source>GwAuxCircleAddButton</source>
+			<translation>Crear circle</translation>
 		</message>
 		<message>
 			<source>Massive composer</source>
@@ -441,118 +213,778 @@
 			<translation>Giswater</translation>
 		</message>
 		<message>
-			<source>Multi psector print</source>
-			<translation>Impresió ràpida</translation>
+			<source>19_text</source>
+			<translation>Caixa d'eines</translation>
 		</message>
 		<message>
-			<source>NODE</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>Open plugin folder</source>
-			<translation>Obrir carpeta del plugin</translation>
-		</message>
-		<message>
-			<source>Open user folder</source>
-			<translation>Obrir carpeta d'usuari</translation>
-		</message>
-		<message>
-			<source>Priority Calculation (Global)</source>
-			<translation>Càlcul de prioritat (Global)</translation>
-		</message>
-		<message>
-			<source>Quantized demands</source>
-			<translation>Demandes quantificades</translation>
-		</message>
-		<message>
-			<source>Reset dialogs</source>
-			<translation>Reiniciar dialegs</translation>
-		</message>
-		<message>
-			<source>Reset plugin</source>
-			<translation>Reiniciar plugin</translation>
-		</message>
-		<message>
-			<source>ResultManager</source>
-			<translation>Gestor de resultats</translation>
-		</message>
-		<message>
-			<source>ResultSelector</source>
-			<translation>Selector de resultats</translation>
-		</message>
-		<message>
-			<source>Review</source>
-			<translation>Revisió</translation>
-		</message>
-		<message>
-			<source>SELECT</source>
-			<translation>Seleccioneu</translation>
-		</message>
-		<message>
-			<source>Show current selectors</source>
-			<translation>Mostrar selectors actuals</translation>
-		</message>
-		<message>
-			<source>Static calibration</source>
-			<translation>Calibració estàtica</translation>
-		</message>
-		<message>
-			<source>Style manager</source>
-			<translation>Gestor d'estils</translation>
-		</message>
-		<message>
-			<source>Toggle Log DB</source>
-			<translation>Activar/Desactivar registres de BD</translation>
-		</message>
-		<message>
-			<source>toolbar_am_name</source>
-			<translation>Giswater - Asset Manager</translation>
+			<source>GwPsectorManagerButton</source>
+			<translation>Gestor de sectors de planificació</translation>
 		</message>
 		<message>
 			<source>toolbar_basic_name</source>
 			<translation>Giswater - Basic</translation>
 		</message>
 		<message>
-			<source>toolbar_cm_name</source>
-			<translation>Giswater - Gestor de Campanyes</translation>
+			<source>Show current selectors</source>
+			<translation>Mostrar selectors actuals</translation>
 		</message>
 		<message>
-			<source>toolbar_custom_name</source>
-			<translation>Giswater - Custom</translation>
+			<source>GwArcAddButton</source>
+			<translation>Inserir arc</translation>
 		</message>
 		<message>
-			<source>toolbar_edit_name</source>
-			<translation>Giswater - Edit</translation>
+			<source>18_text</source>
+			<translation>Connexió amb comercial</translation>
 		</message>
 		<message>
-			<source>toolbar_epa_name</source>
-			<translation>Giswater - Epa</translation>
+			<source>Import INP file</source>
+			<translation>Importa el fitxer INP</translation>
 		</message>
 		<message>
-			<source>toolbar_om_name</source>
-			<translation>Giswater - OM</translation>
+			<source>Reset dialogs</source>
+			<translation>Reiniciar dialegs</translation>
 		</message>
 		<message>
-			<source>toolbar_plan_name</source>
-			<translation>Giswater - Masterplan</translation>
+			<source>301_text</source>
+			<translation>Planificador anual</translation>
+		</message>
+		<message>
+			<source>Mapzones manager</source>
+			<translation>Gestor de Mapzones</translation>
+		</message>
+		<message>
+			<source>Open user folder</source>
+			<translation>Obrir carpeta d'usuari</translation>
+		</message>
+		<message>
+			<source>Workcat manager</source>
+			<translation>Gestor de Workat</translation>
+		</message>
+		<message>
+			<source>GwDimensioningButton</source>
+			<translation>Acotacions</translation>
+		</message>
+		<message>
+			<source>Style manager</source>
+			<translation>Gestor d'estils</translation>
+		</message>
+		<message>
+			<source>GwDocumentButton</source>
+			<translation>Afegir document</translation>
+		</message>
+		<message>
+			<source>ResultSelector</source>
+			<translation>Selector de resultats</translation>
+		</message>
+		<message>
+			<source>98_text</source>
+			<translation>Editor de configuració</translation>
+		</message>
+		<message>
+			<source>Reset plugin</source>
+			<translation>Reiniciar plugin</translation>
+		</message>
+		<message>
+			<source>GwPsectorButton</source>
+			<translation>Nou sector de planificacions</translation>
+		</message>
+		<message>
+			<source>GwNetscenarioManagerButton</source>
+			<translation>Gestor de netscenaris</translation>
+		</message>
+		<message>
+			<source>Forced arcs</source>
+			<translation>Arcs forçats</translation>
+		</message>
+		<message>
+			<source>Open plugin folder</source>
+			<translation>Obrir carpeta del plugin</translation>
+		</message>
+		<message>
+			<source>GwToolBoxButton</source>
+			<translation>Caixa d'eines</translation>
+		</message>
+		<message>
+			<source>GwProjectCheckButton</source>
+			<translation>Verificar projecte</translation>
+		</message>
+		<message>
+			<source>GwArcFusionButton</source>
+			<translation>Fusionar arc</translation>
+		</message>
+		<message>
+			<source>303_text</source>
+			<translation>Generador de preus</translation>
+		</message>
+		<message>
+			<source>Add drain GPKG project</source>
+			<translation>Afegeix el projecte GPKG de drenatge</translation>
+		</message>
+		<message>
+			<source>GwGo2EpaManagerButton</source>
+			<translation>Gestor de resultats EPA</translation>
+		</message>
+		<message>
+			<source>82_text</source>
+			<translation>Gestor de sector de planificació OM</translation>
+		</message>
+		<message>
+			<source>Toggle Log DB</source>
+			<translation>Activar/Desactivar registres de BD</translation>
 		</message>
 		<message>
 			<source>toolbar_utilities_name</source>
 			<translation>Giswater - Utilitats</translation>
 		</message>
 		<message>
-			<source>Valve operation check</source>
-			<translation>Comprovació del funcionament de la vàlvula</translation>
+			<source>ResultManager</source>
+			<translation>Gestor de resultats</translation>
+		</message>
+		<message>
+			<source>GwSelectorButton</source>
+			<translation>Selectors</translation>
+		</message>
+		<message>
+			<source>GwFlowExitButton</source>
+			<translation>Sortida de flux</translation>
+		</message>
+		<message>
+			<source>GwDocumentManagerButton</source>
+			<translation>Gestor de documents</translation>
+		</message>
+		<message>
+			<source>Priority Calculation (Global)</source>
+			<translation>Càlcul de prioritat (Global)</translation>
+		</message>
+		<message>
+			<source>GwDateSelectorButton</source>
+			<translation>Selector de data</translation>
+		</message>
+		<message>
+			<source>GwConfigButton</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>GwLayerStyleChangeButton</source>
+			<translation>Estils Giswater</translation>
+		</message>
+		<message>
+			<source>Review</source>
+			<translation>Revisió</translation>
+		</message>
+		<message>
+			<source>GwMincutButton</source>
+			<translation>Nou polígon de tall</translation>
+		</message>
+		<message>
+			<source>GwMincutManagerButton</source>
+			<translation>Gestor de polígons de tall</translation>
+		</message>
+		<message>
+			<source>toolbar_edit_name</source>
+			<translation>Giswater - Edit</translation>
+		</message>
+		<message>
+			<source>GwEpaTools</source>
+			<translation>Eines EPA</translation>
+		</message>
+		<message>
+			<source>81_text</source>
+			<translation>Nou sector de planificació OM</translation>
+		</message>
+		<message>
+			<source>GwWorkspaceManagerButton</source>
+			<translation>Espais de treball</translation>
+		</message>
+		<message>
+			<source>47_text</source>
+			<translation>Selector de sector de planificació</translation>
+		</message>
+		<message>
+			<source>AmPriority</source>
+			<translation>Càlcul de prioritats i selecció</translation>
+		</message>
+		<message>
+			<source>304_text</source>
+			<translation>Afegir visita</translation>
+		</message>
+		<message>
+			<source>GwConnectLinkButton</source>
+			<translation>Conectar a la xarxa</translation>
+		</message>
+		<message>
+			<source>AmBreakage</source>
+			<translation>Eina d'administració</translation>
+		</message>
+		<message>
+			<source>GwCSVButton</source>
+			<translation>Importar CSV</translation>
+		</message>
+		<message>
+			<source>Import CSV</source>
+			<translation>Importar CSV</translation>
+		</message>
+		<message>
+			<source>GwArcDivideButton</source>
+			<translation>Dividir arc</translation>
+		</message>
+		<message>
+			<source>Import</source>
+			<translation>Importar</translation>
+		</message>
+		<message>
+			<source>Advanced</source>
+			<translation>Avançat</translation>
+		</message>
+		<message>
+			<source>GwFeatureReplaceButton</source>
+			<translation>Reemplaçar objecte</translation>
+		</message>
+		<message>
+			<source>Export</source>
+			<translation>Exporta</translation>
+		</message>
+		<message>
+			<source>Breakdown Assignation</source>
+			<translation>Asignació de fugues</translation>
+		</message>
+		<message>
+			<source>GwVisitButton</source>
+			<translation>Afegir visita</translation>
+		</message>
+		<message>
+			<source>75_text</source>
+			<translation>Gestor de lots</translation>
+		</message>
+		<message>
+			<source>Additional demand check</source>
+			<translation>Comprovació addicional de la demanda</translation>
+		</message>
+		<message>
+			<source>GwElementButton</source>
+			<translation>Afegir element</translation>
+		</message>
+		<message>
+			<source>GwAddCampaignButton</source>
+			<translation>Afegeix una campanya</translation>
+		</message>
+		<message>
+			<source>GwVisitManagerButton</source>
+			<translation>Gestor de visites</translation>
+		</message>
+		<message>
+			<source>GwPointAddButton</source>
+			<translation>Inserir punt</translation>
+		</message>
+		<message>
+			<source>Manage Campaign</source>
+			<translation>Gestor de campanyas</translation>
+		</message>
+		<message>
+			<source>toolbar_epa_name</source>
+			<translation>Giswater - Epa</translation>
+		</message>
+		<message>
+			<source>GwAddLotButton</source>
+			<translation>Afegeix Lot</translation>
+		</message>
+		<message>
+			<source>309_text</source>
+			<translation>Gestor d'incidencies</translation>
+		</message>
+		<message>
+			<source>GwAuxPointAddButton</source>
+			<translation>Crear punt</translation>
+		</message>
+		<message>
+			<source>305_text</source>
+			<translation>Planificador unitari</translation>
+		</message>
+		<message>
+			<source>GwResultSelectorButton</source>
+			<translation>Selector de resultats</translation>
+		</message>
+		<message>
+			<source>GwAmBreakageButton</source>
+			<translation>Eina d'administració</translation>
+		</message>
+		<message>
+			<source>GwGo2EpaButton</source>
+			<translation>Anar a EPA</translation>
 		</message>
 		<message>
 			<source>Visit</source>
 			<translation>Visita</translation>
 		</message>
 		<message>
-			<source>Workcat manager</source>
-			<translation>Gestor de Workat</translation>
+			<source>24_text</source>
+			<translation>Anar a EPA express</translation>
+		</message>
+		<message>
+			<source>GwPrintButton</source>
+			<translation>Impresió ràpida</translation>
+		</message>
+		<message>
+			<source>Valve operation check</source>
+			<translation>Comprovació del funcionament de la vàlvula</translation>
+		</message>
+		<message>
+			<source>toolbar_am_name</source>
+			<translation>Giswater - Asset Manager</translation>
+		</message>
+		<message>
+			<source>GwLotResourceManagementButton</source>
+			<translation>Gestió dels recursos del lot</translation>
+		</message>
+		<message>
+			<source>GwManageCampaignLotButton</source>
+			<translation>Gestionar el lot de campanya</translation>
+		</message>
+		<message>
+			<source>GwGo2EpaSelectorButton</source>
+			<translation>Selector de resultats EPA</translation>
+		</message>
+		<message>
+			<source>76_text</source>
+			<translation>Filtre de lots</translation>
+		</message>
+		<message>
+			<source>GwAmPriorityButton</source>
+			<translation>Càlcul de prioritat per selecció</translation>
 		</message>
 		<!-- PYTHON MESSAGES -->
+		<message>
+			<source>Campaign saved successfully.</source>
+			<translation>Campanya desada amb èxit.</translation>
+		</message>
+		<message>
+			<source>Failed to save campaign</source>
+			<translation>Error en desar la campanya</translation>
+		</message>
+		<message>
+			<source>Invalid campaign mode</source>
+			<translation>Mode de campanya invàlid</translation>
+		</message>
+		<message>
+			<source>Real end date</source>
+			<translation>Data de fi real</translation>
+		</message>
+		<message>
+			<source>Planned end date</source>
+			<translation>Data final prevista</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} workorder(s)?</source>
+			<translation>Esteu segur que voleu eliminar {0} ordre(s) de treball?</translation>
+		</message>
+		<message>
+			<source>Custom mincut executed successfully</source>
+			<translation>Polígon de tall personalitzat executat amb èxit</translation>
+		</message>
+		<message>
+			<source>IVI</source>
+			<translation>IVI</translation>
+		</message>
+		<message>
+			<source>English locale not found</source>
+			<translation>No s'ha trobat la configuració regional en anglès</translation>
+		</message>
+		<message>
+			<source>Key container</source>
+			<translation>Contenidor de claus</translation>
+		</message>
+		<message>
+			<source>Atlas ID must be an integer.</source>
+			<translation>L’ID de l’Atles ha de ser un nombre enter.</translation>
+		</message>
+		<message>
+			<source>Failed to retrieve GeoJSON data.</source>
+			<translation>No s'han pogut recuperar les dades de GeoJSON.</translation>
+		</message>
+		<message>
+			<source>Context</source>
+			<translation>Context</translation>
+		</message>
+		<message>
+			<source>Current node is not located over an arc. Please, select option 'DRAG-DROP'</source>
+			<translation>El node actual no es troba sobre un arc.Si us plau, seleccioneu l'opció "ARROSSEGAR-DEIXAR"</translation>
+		</message>
+		<message>
+			<source>No listValues for</source>
+			<translation>No hi ha valors de llista per a</translation>
+		</message>
+		<message>
+			<source>Material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>{0}</source>
+			<translation>{0}</translation>
+		</message>
+		<message>
+			<source>AUXILIAR</source>
+			<translation>ASSISTENT</translation>
+		</message>
+		<message>
+			<source>Create example</source>
+			<translation>Crea un exemple</translation>
+		</message>
+		<message>
+			<source>Select a workorder to delete.</source>
+			<translation>Seleccioneu una ordre de treball per eliminar.</translation>
+		</message>
+		<message>
+			<source>Unhandled Error</source>
+			<translation>Error no gestionat</translation>
+		</message>
+		<message>
+			<source>Assign Team</source>
+			<translation>Assignar Equip</translation>
+		</message>
+		<message>
+			<source>Detail</source>
+			<translation>Detall</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lot(s) eliminat(s).</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} lot(s)?</source>
+			<translation>Esteu segurs que voleu eliminar {0} lot(s)?</translation>
+		</message>
+		<message>
+			<source>Delete Lot(s)</source>
+			<translation>Eliminar Lot(s)</translation>
+		</message>
+		<message>
+			<source>BASEMAP</source>
+			<translation>MAPA BASE</translation>
+		</message>
+		<message>
+			<source>{0} ({1}) - {2} - Updating {3}...</source>
+			<translation>{0} ({1}) - {2} - S'està actualitzant {3}...</translation>
+		</message>
+		<message>
+			<source>DOWNGRADE NODE</source>
+			<translation>DEGRADAR NODE</translation>
+		</message>
+		<message>
+			<source>A new style has been added to '{0}' for the layer '{1}' using the 'GwBasic' style information.</source>
+			<translation>S'ha afegit un estil nou a '{0}' per a la capa '{1}' utilitzant la informació d'estil 'GwBasic'.</translation>
+		</message>
+		<message>
+			<source>    year = {2024}</source>
+			<translation>any = {2024}</translation>
+		</message>
+		<message>
+			<source>Do you want to set this psector as current?</source>
+			<translation>Voleu establir aquest sector com a actual?</translation>
+		</message>
+		<message>
+			<source>Error type</source>
+			<translation>Tipus d'error</translation>
+		</message>
+		<message>
+			<source>Delete records</source>
+			<translation>Eliminar registres</translation>
+		</message>
+		<message>
+			<source>Exception in {0}</source>
+			<translation>Excepció a {0}</translation>
+		</message>
+		<message>
+			<source></source>
+			<translation></translation>
+		</message>
+		<message>
+			<source>Error creating or updating team</source>
+			<translation>Error en crear o actualitzar l'equip</translation>
+		</message>
+		<message>
+			<source>Document already exists</source>
+			<translation>El document ja existeix</translation>
+		</message>
+		<message>
+			<source>No campaign selected.</source>
+			<translation>No hi ha campanya seleccionada.</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
+		</message>
+		<message>
+			<source>Error</source>
+			<translation>Error</translation>
+		</message>
+		<message>
+			<source>Couldn't import swmm_api package. Try to reload the Giswater plugin. If the issue persists restart QGIS.</source>
+			<translation>No s'ha pogut importar el paquet swmm_api.Intenta tornar a carregar el connector Giswater.Si el problema persisteix, reinicieu QGIS.</translation>
+		</message>
+		<message>
+			<source>{0} is not a table name or {1}</source>
+			<translation>{0} no és un nom de taula ni {1}</translation>
+		</message>
+		<message>
+			<source>Column not found</source>
+			<translation>No s'ha trobat la columna</translation>
+		</message>
+		<message>
+			<source>No visit values</source>
+			<translation>Sense valors de visita</translation>
+		</message>
+		<message>
+			<source>Any record found</source>
+			<translation>Qualsevol registre trobat</translation>
+		</message>
+		<message>
+			<source>Alert</source>
+			<translation>Alerta</translation>
+		</message>
+		<message>
+			<source>Data retrieved and displayed successfully.</source>
+			<translation>Les dades s'han recuperat i s'han mostrat correctament.</translation>
+		</message>
+		<message>
+			<source>Error</source>
+			<translation>Error</translation>
+		</message>
+		<message>
+			<source>Error updating table</source>
+			<translation>Error en actualitzar la taula</translation>
+		</message>
+		<message>
+			<source>Dscenario manager</source>
+			<translation>Gestor d'escenaris</translation>
+		</message>
+		<message>
+			<source>Begin topologically simplifying the graph...</source>
+			<translation>Comenceu a simplificar topològicament el gràfic...</translation>
+		</message>
+		<message>
+			<source>Connection '{0}' not found in the file '{1}'</source>
+			<translation>No s'ha trobat la connexió '{0}' al fitxer '{1}'</translation>
+		</message>
+		<message>
+			<source>Initialize plugin</source>
+			<translation>Inicialitzar el connector</translation>
+		</message>
+		<message>
+			<source>Fill table</source>
+			<translation>Ompliu la taula</translation>
+		</message>
+		<message>
+			<source>{0} campaign(s) deleted.</source>
+			<translation>{0} campanya(es) eliminada(es).</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lot(s) eliminat(s).</translation>
+		</message>
+		<message>
+			<source>Arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>Missing Data</source>
+			<translation>Falten dades</translation>
+		</message>
+		<message>
+			<source>}</source>
+			<translation>}</translation>
+		</message>
+		<message>
+			<source>Advanced Menu</source>
+			<translation>Menú avançat</translation>
+		</message>
+		<message>
+			<source>End date</source>
+			<translation>Data final</translation>
+		</message>
+		<message>
+			<source>Start date</source>
+			<translation>Data inici</translation>
+		</message>
+		<message>
+			<source>Any document selected</source>
+			<translation>Qualsevol document seleccionat</translation>
+		</message>
+		<message>
+			<source>Diameter</source>
+			<translation>Diàmetre</translation>
+		</message>
+		<message>
+			<source>Note: You can force the import by activating the variable '{0}' on the {1} file. </source>
+			<translation>Nota: podeu forçar la importació activant la variable '{0}' al fitxer {1}.</translation>
+		</message>
+		<message>
+			<source>Profile deleted</source>
+			<translation>Perfil eliminat</translation>
+		</message>
+		<message>
+			<source>Print</source>
+			<translation>Impressió</translation>
+		</message>
+		<message>
+			<source>Canceling task...</source>
+			<translation>Cancel·lant tasca...</translation>
+		</message>
+		<message>
+			<source>(Error {}) </source>
+			<translation>(Error {})</translation>
+		</message>
+		<message>
+			<source>FAIL {0}</source>
+			<translation>FALL {0}</translation>
+		</message>
+		<message>
+			<source>Error deleting data</source>
+			<translation>Error en eliminar dades</translation>
+		</message>
+		<message>
+			<source>Created edges GeoDataFrame from graph</source>
+			<translation>S'han creat vores GeoDataFrame a partir del gràfic</translation>
+		</message>
+		<message>
+			<source>Add document</source>
+			<translation>Afegeix un document</translation>
+		</message>
+		<message>
+			<source>Overwrite file</source>
+			<translation>Sobreescriure el fitxer</translation>
+		</message>
+		<message>
+			<source>Activate water netowrk snapshot</source>
+			<translation>Activa la instantània de la xarxa d'aigua</translation>
+		</message>
+		<message>
+			<source>The team name already exists</source>
+			<translation>El nom de l'equip ja existeix</translation>
+		</message>
+		<message>
+			<source>Added grade attributes to all edges</source>
+			<translation>S'han afegit atributs de qualificació a totes les vores</translation>
+		</message>
+		<message>
+			<source>Error near line {0} -> {1}</source>
+			<translation>Error a prop de la línia {0} -> {1}</translation>
+		</message>
+		<message>
+			<source>Function {0} error: {1} from last function is invalid</source>
+			<translation>Error de funció {0}: {1} de l'última funció no és vàlid</translation>
+		</message>
+		<message>
+			<source>Function not found in database</source>
+			<translation>No s'ha trobat la funció a la base de dades</translation>
+		</message>
+		<message>
+			<source>Invalid lot ID.</source>
+			<translation>ID de lot invàlid.</translation>
+		</message>
+		<message>
+			<source>Not '{0}'</source>
+			<translation>No "{0}"</translation>
+		</message>
+		<message>
+			<source>ANALYTICS</source>
+			<translation>ANALÍTICA</translation>
+		</message>
+		<message>
+			<source>Create {project} schema</source>
+			<translation>Crea un esquema {projecte}</translation>
+		</message>
+		<message>
+			<source>ARC</source>
+			<translation>ARC</translation>
+		</message>
+		<message>
+			<source>Configuration file couldn't be imported:</source>
+			<translation>No s'ha pogut importar el fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>{0}: {1}</source>
+			<translation>{0}: {1}</translation>
+		</message>
+		<message>
+			<source>Python translation successful</source>
+			<translation>La traducció de Python ha estat correcta</translation>
+		</message>
+		<message>
+			<source>Create parent schema</source>
+			<translation>Crea un esquema pare</translation>
+		</message>
+		<message>
+			<source>Select one</source>
+			<translation>Seleccioni'n un</translation>
+		</message>
+		<message>
+			<source>Add translator ({0})</source>
+			<translation>Afegeix un traductor ({0})</translation>
+		</message>
+		<message>
+			<source>Calculating values</source>
+			<translation>Calculant valors</translation>
+		</message>
+		<message>
+			<source>SQL</source>
+			<translation>SQL</translation>
+		</message>
+		<message>
+			<source>Error translating: {0}</source>
+			<translation>Error en traduir: {0}</translation>
+		</message>
+		<message>
+			<source>Cannot create file, check if its open</source>
+			<translation>No es pot crear l'arxiu, verifiqui si està obert</translation>
+		</message>
+		<message>
+			<source>Node psector: {0}</source>
+			<translation>Sector de nodes: {0}</translation>
+		</message>
+		<message>
+			<source>Parameter not found</source>
+			<translation>No s'han trobat paràmetres</translation>
+		</message>
+		<message>
+			<source>Configuration file couldn't be imported:\n{0}</source>
+			<translation>No s'ha pogut importar el fitxer de configuració:\n{0}</translation>
+		</message>
+		<message>
+			<source>Some events have documents</source>
+			<translation>Alguns esdeveniments tenen documents</translation>
+		</message>
+		<message>
+			<source>Error during point selection: {0}</source>
+			<translation>Error durant la selecció de punts: {0}</translation>
+		</message>
+		<message>
+			<source>Cannot set inactive a current scenario. Please update current first.</source>
+			<translation>No es pot establir inactiu un escenari actual.Si us plau, actualitzeu l'actual primer.</translation>
+		</message>
+		<message>
+			<source>Couldn't add group.</source>
+			<translation>No s'ha pogut afegir el grup.</translation>
+		</message>
+		<message>
+			<source>Exception: {0}</source>
+			<translation>Excepció: {0}</translation>
+		</message>
+		<message>
+			<source>Language: {self.project_language}</source>
+			<translation>Idioma: {self.project_language}</translation>
+		</message>
+		<message>
+			<source>Do you want to open GIS project?</source>
+			<translation>Vol obrir el projecte SIG?</translation>
+		</message>
+		<message>
+			<source>{1}</source>
+			<translation>{1}</translation>
+		</message>
+		<message>
+			<source>{2}</source>
+			<translation>{2}</translation>
+		</message>
 		<message>
 			<source>For select on canvas is mandatory to load v_asset_arc_input layer</source>
 			<translation>Per seleccionar al llenç és obligatori carregar la capa v_asset_arc_input</translation>
@@ -564,10 +996,6 @@
 		<message>
 			<source>{0} campaign(s) deleted.</source>
 			<translation>{0} campanya(es) eliminada(es).</translation>
-		</message>
-		<message>
-			<source>{0} lot(s) deleted.</source>
-			<translation>{0} lot(s) eliminat(s).</translation>
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
@@ -582,14 +1010,6 @@
 			<translation>Esteu segurs que voleu assignar l'equip '{0}' a {1} usuari(s) seleccionat(s)?</translation>
 		</message>
 		<message>
-			<source>Are you sure you want to delete {0} campaign(s)?</source>
-			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
-		</message>
-		<message>
-			<source>Are you sure you want to delete {0} lot(s)?</source>
-			<translation>Esteu segurs que voleu eliminar {0} lot(s)?</translation>
-		</message>
-		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
 			<translation>Esteu segur que voleu eliminar {0} ordre(s) de treball?</translation>
 		</message>
@@ -602,36 +1022,12 @@
 			<translation>Esteu segurs que voleu eliminar l'assignació d'equip de {0} usuari(s) seleccionat(s)?</translation>
 		</message>
 		<message>
-			<source>Assign Team</source>
-			<translation>Assignar Equip</translation>
-		</message>
-		<message>
-			<source>Campaign saved successfully.</source>
-			<translation>Campanya desada amb èxit.</translation>
-		</message>
-		<message>
 			<source>CRITICAL ERROR in update_expl_sector_combos</source>
 			<translation>ERROR CRÍTIC en update_expl_sector_combos</translation>
 		</message>
 		<message>
-			<source>Delete Lot(s)</source>
-			<translation>Eliminar Lot(s)</translation>
-		</message>
-		<message>
-			<source>Delete records</source>
-			<translation>Eliminar registres</translation>
-		</message>
-		<message>
 			<source>Delete Workorder(s)</source>
 			<translation>Eliminar Ordre(s) de Treball</translation>
-		</message>
-		<message>
-			<source>End date</source>
-			<translation>Data final</translation>
-		</message>
-		<message>
-			<source>Error</source>
-			<translation>Error</translation>
 		</message>
 		<message>
 			<source>Error assigning team: {0}</source>
@@ -640,10 +1036,6 @@
 		<message>
 			<source>Error creating dynamic dialog: {0}</source>
 			<translation>Error en crear diàleg dinàmic: {0}</translation>
-		</message>
-		<message>
-			<source>Error creating or updating team</source>
-			<translation>Error en crear o actualitzar l'equip</translation>
 		</message>
 		<message>
 			<source>Error removing team assignment: {0}</source>
@@ -674,12 +1066,12 @@
 			<translation>Error en carregar la configuració del diàleg de creació d'equip. Verifiqueu la configuració de la base de dades.</translation>
 		</message>
 		<message>
-			<source>Failed to load workorder form.</source>
-			<translation>Error en carregar el formulari d'ordre de treball.</translation>
+			<source>Draw Profile</source>
+			<translation>Dibuixar perfil</translation>
 		</message>
 		<message>
-			<source>Failed to save campaign</source>
-			<translation>Error en desar la campanya</translation>
+			<source>Failed to load workorder form.</source>
+			<translation>Error en carregar el formulari d'ordre de treball.</translation>
 		</message>
 		<message>
 			<source>Info</source>
@@ -690,10 +1082,6 @@
 			<translation>ID de campanya invàlid.</translation>
 		</message>
 		<message>
-			<source>Invalid campaign mode</source>
-			<translation>Mode de campanya invàlid</translation>
-		</message>
-		<message>
 			<source>Invalid lot ID.</source>
 			<translation>ID de lot invàlid.</translation>
 		</message>
@@ -702,24 +1090,12 @@
 			<translation>ID d'ordre de treball invàlid.</translation>
 		</message>
 		<message>
-			<source>Missing Data</source>
-			<translation>Falten dades</translation>
-		</message>
-		<message>
 			<source>Missing required fields</source>
 			<translation>Falten camps obligatoris</translation>
 		</message>
 		<message>
-			<source>No campaign selected.</source>
-			<translation>No hi ha campanya seleccionada.</translation>
-		</message>
-		<message>
 			<source>No records selected</source>
 			<translation>No hi ha registres seleccionats</translation>
-		</message>
-		<message>
-			<source>Planned end date</source>
-			<translation>Data final prevista</translation>
 		</message>
 		<message>
 			<source>Planned start date</source>
@@ -754,10 +1130,6 @@
 			<translation>Si us plau seleccioneu una ordre de treball per obrir.</translation>
 		</message>
 		<message>
-			<source>Real end date</source>
-			<translation>Data de fi real</translation>
-		</message>
-		<message>
 			<source>Real start date</source>
 			<translation>Data d'inici real</translation>
 		</message>
@@ -774,20 +1146,12 @@
 			<translation>Seleccioneu un lot per eliminar.</translation>
 		</message>
 		<message>
-			<source>Select a workorder to delete.</source>
-			<translation>Seleccioneu una ordre de treball per eliminar.</translation>
-		</message>
-		<message>
 			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
 			<translation>Falten alguns camps obligatoris. Si us plau, completeu els camps requerits (marcats en vermell).</translation>
 		</message>
 		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
 			<translation>Falten alguns valors obligatoris. Verifiqueu els camps marcats en vermell.</translation>
-		</message>
-		<message>
-			<source>Start date</source>
-			<translation>Data inici</translation>
 		</message>
 		<message>
 			<source>Successfully assigned team '{0}' to {1} user(s).</source>
@@ -806,36 +1170,16 @@
 			<translation>Això també eliminarà el/los usuari(s) de la base de dades:</translation>
 		</message>
 		<message>
-			<source></source>
-			<translation></translation>
-		</message>
-		<message>
 			<source> </source>
 			<translation> </translation>
-		</message>
-		<message>
-			<source>}</source>
-			<translation>}</translation>
-		</message>
-		<message>
-			<source>{0}</source>
-			<translation>{0}</translation>
 		</message>
 		<message>
 			<source>{0} --> {1}</source>
 			<translation>{0} --> {1}</translation>
 		</message>
 		<message>
-			<source>{0}: {1}</source>
-			<translation>{0}: {1}</translation>
-		</message>
-		<message>
 			<source>{0} --> {1} --> {2}</source>
 			<translation>{0} --> {1} --> {2}</translation>
-		</message>
-		<message>
-			<source>{0} ({1}) - {2} - Updating {3}...</source>
-			<translation>{0} ({1}) - {2} - S'està actualitzant {3}...</translation>
 		</message>
 		<message>
 			<source>{0}: {1} Python function: tools_gw.set_widgets. WHERE columname='{2}' AND widgetname='{3}' AND widgettype='{4}'</source>
@@ -848,10 +1192,6 @@
 		<message>
 			<source>{0}: {1}. widgetname='{2}' AND widgettype='{3}'</source>
 			<translation>{0}: {1}.widgetname='{2}' AND widgettype='{3}'</translation>
-		</message>
-		<message>
-			<source>{0} campaign(s) deleted.</source>
-			<translation>{0} campanya(es) eliminada(es).</translation>
 		</message>
 		<message>
 			<source>{0}: Config file is not set</source>
@@ -894,16 +1234,8 @@
 			<translation>{0} id:</translation>
 		</message>
 		<message>
-			<source>{0} is not a table name or {1}</source>
-			<translation>{0} no és un nom de taula ni {1}</translation>
-		</message>
-		<message>
 			<source>{0} is not defined in table cat_feature</source>
 			<translation>{0} no està definit a la taula cat_feature</translation>
-		</message>
-		<message>
-			<source>{0} lot(s) deleted.</source>
-			<translation>{0} lot(s) eliminat(s).</translation>
 		</message>
 		<message>
 			<source>{0}: project type '{1}' not supported</source>
@@ -930,32 +1262,12 @@
 			<translation>{0} ordre(s) de treball eliminada(es).</translation>
 		</message>
 		<message>
-			<source>{1}</source>
-			<translation>{1}</translation>
-		</message>
-		<message>
-			<source>{2}</source>
-			<translation>{2}</translation>
-		</message>
-		<message>
 			<source>Action has no function!!</source>
 			<translation>L'acció no té cap funció!!</translation>
 		</message>
 		<message>
-			<source>Activate water netowrk snapshot</source>
-			<translation>Activa la instantània de la xarxa d'aigua</translation>
-		</message>
-		<message>
-			<source>Add document</source>
-			<translation>Afegeix un document</translation>
-		</message>
-		<message>
 			<source>Added elevation data from raster to all nodes</source>
 			<translation>S'han afegit dades d'elevació del ràster a tots els nodes</translation>
-		</message>
-		<message>
-			<source>Added grade attributes to all edges</source>
-			<translation>S'han afegit atributs de qualificació a totes les vores</translation>
 		</message>
 		<message>
 			<source>Added length attributes to graph edges</source>
@@ -974,10 +1286,6 @@
 			<translation>Afegeix un traductor</translation>
 		</message>
 		<message>
-			<source>Add translator ({0})</source>
-			<translation>Afegeix un traductor ({0})</translation>
-		</message>
-		<message>
 			<source>A diameter value is considered invalid if it is zero, negative, NULL or greater than the maximum diameter in the configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
 			<translation>Un valor de diàmetre es considera invàlid si és zero, negatiu, NULL o major que el diàmetre màxim de la taula de configuració. Com a resultat, a aquestes canonades NO se'ls hi assignarà un valor de prioritat.</translation>
 		</message>
@@ -988,14 +1296,6 @@
 		<message>
 			<source>Adress configuration. Field not found</source>
 			<translation>Configuració de la direcció. Camp no trobat</translation>
-		</message>
-		<message>
-			<source>Advanced Menu</source>
-			<translation>Menú avançat</translation>
-		</message>
-		<message>
-			<source>Alert</source>
-			<translation>Alerta</translation>
 		</message>
 		<message>
 			<source>All dialogs updated correctly</source>
@@ -1018,12 +1318,16 @@
 			<translation>Tots els valors de la columna 'atlas_id' de la taula 'plan_psector' han de ser INTEGER.Aquest no és el cas de la vostra taula, si us plau, solucioneu-ho abans de continuar.</translation>
 		</message>
 		<message>
-			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
-			<translation>Es considera que un material no és vàlid si no es troba en la taula de confuguració de materials.</translation>
+			<source>Are you sure you want to continue?</source>
+			<translation>Esteu segur que voleu continuar?</translation>
 		</message>
 		<message>
-			<source>ANALYTICS</source>
-			<translation>ANALÍTICA</translation>
+			<source>Import RPT file</source>
+			<translation>Importa el fitxer RPT</translation>
+		</message>
+		<message>
+			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
+			<translation>Es considera que un material no és vàlid si no es troba en la taula de confuguració de materials.</translation>
 		</message>
 		<message>
 			<source>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
@@ -1038,10 +1342,6 @@
 			<translation>S'ha produït un error en afegir l'estil per a la capa "{0}":\n{1}</translation>
 		</message>
 		<message>
-			<source>A new style has been added to '{0}' for the layer '{1}' using the 'GwBasic' style information.</source>
-			<translation>S'ha afegit un estil nou a '{0}' per a la capa '{1}' utilitzant la informació d'estil 'GwBasic'.</translation>
-		</message>
-		<message>
 			<source>A new style has been added to '{0}' for the layer '{1}' using the 'GwBasic' style information.\nYou can change it and use 'Update Style' to create a personalized version.</source>
 			<translation>S'ha afegit un estil nou a "{0}" per a la capa "{1}" mitjançant la informació d'estil "GwBasic".\nPodeu canviar-lo i utilitzar "Actualitzar estil" per crear una versió personalitzada.</translation>
 		</message>
@@ -1050,16 +1350,12 @@
 			<translation>Qualsevol connec_id trobat amb aquest customer_code</translation>
 		</message>
 		<message>
-			<source>Any document selected</source>
-			<translation>Qualsevol document seleccionat</translation>
-		</message>
-		<message>
 			<source>Any of the snapped features belong to selected layer</source>
 			<translation>Qualsevol dels elements de xarxa ajustats pertany a la capa seleccionada</translation>
 		</message>
 		<message>
-			<source>Any record found</source>
-			<translation>Qualsevol registre trobat</translation>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
 		</message>
 		<message>
 			<source>Any record found for current user in table</source>
@@ -1086,14 +1382,6 @@
 			<translation>Estils aplicats per al context</translation>
 		</message>
 		<message>
-			<source>Arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>ARC</source>
-			<translation>ARC</translation>
-		</message>
-		<message>
 			<source>Arc fusion</source>
 			<translation>Fusió d'arc</translation>
 		</message>
@@ -1118,20 +1406,12 @@
 			<translation>Està segur de que vol cancelar aquests polígons de tall?</translation>
 		</message>
 		<message>
-			<source>Are you sure you want to continue?</source>
-			<translation>Esteu segur que voleu continuar?</translation>
-		</message>
-		<message>
-			<source>Are you sure you want to delete {0} campaign(s)?</source>
-			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
+			<source>Exception error: {0}</source>
+			<translation>Error d'excepció: {0}</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} lot(s)?</source>
 			<translation>Esteu segurs que voleu eliminar {0} lot(s)?</translation>
-		</message>
-		<message>
-			<source>Are you sure you want to delete {0} workorder(s)?</source>
-			<translation>Esteu segur que voleu eliminar {0} ordre(s) de treball?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete the selected styles?</source>
@@ -1170,6 +1450,14 @@
 			<translation>Segur que vol desconectar aquests elements?</translation>
 		</message>
 		<message>
+			<source>As a result, the material of these pipes will be treated as the configured unknown material, {0}.</source>
+			<translation>Com a resultat, el material d'aquestes canonades es tractarà com el material desconegut configurat, {0}.</translation>
+		</message>
+		<message>
+			<source>Error connecting to database (settings)</source>
+			<translation>Error en connectar-se a la base de dades (configuració)</translation>
+		</message>
+		<message>
 			<source>Are you sure you want to override the configuration of this workspace?</source>
 			<translation>Esteu segur que voleu anul·lar la configuració d'aquest espai de treball?</translation>
 		</message>
@@ -1206,8 +1494,8 @@
 			<translation>Es farà una retrocés de l'esquema.</translation>
 		</message>
 		<message>
-			<source>As a result, the material of these pipes will be treated as the configured unknown material, {0}.</source>
-			<translation>Com a resultat, el material d'aquestes canonades es tractarà com el material desconegut configurat, {0}.</translation>
+			<source>Epa2data execution successful.</source>
+			<translation>Execució d'Epa2data amb èxit.</translation>
 		</message>
 		<message>
 			<source>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</source>
@@ -1222,28 +1510,12 @@
 			<translation>Ja existeix un estil per a la capa '{0}' al grup d'estils seleccionat.</translation>
 		</message>
 		<message>
-			<source>Atlas ID must be an integer.</source>
-			<translation>L’ID de l’Atles ha de ser un nombre enter.</translation>
-		</message>
-		<message>
 			<source>    author = {Boeing, Geoff},</source>
 			<translation>autor = {Boeing, Geoff},</translation>
 		</message>
 		<message>
-			<source>AUXILIAR</source>
-			<translation>ASSISTENT</translation>
-		</message>
-		<message>
-			<source>BASEMAP</source>
-			<translation>MAPA BASE</translation>
-		</message>
-		<message>
 			<source>Begin plotting the graph...</source>
 			<translation>Comenceu a dibuixar el gràfic...</translation>
-		</message>
-		<message>
-			<source>Begin topologically simplifying the graph...</source>
-			<translation>Comenceu a simplificar topològicament el gràfic...</translation>
 		</message>
 		<message>
 			<source>Boeing, G. (2024). Modeling and Analyzing Urban Networks and Amenities with OSMnx. Working paper. https://geoffboeing.com/publications/osmnx-paper/</source>
@@ -1258,10 +1530,6 @@
 			<translation>Calcular Prioritat</translation>
 		</message>
 		<message>
-			<source>Calculating values</source>
-			<translation>Calculant valors</translation>
-		</message>
-		<message>
 			<source>Campaign ID is missing.</source>
 			<translation>Falta l'identificador de campanya.</translation>
 		</message>
@@ -1274,20 +1542,20 @@
 			<translation>Campanya desada amb èxit.</translation>
 		</message>
 		<message>
-			<source>Canceling task...</source>
-			<translation>Cancel·lant tasca...</translation>
-		</message>
-		<message>
 			<source>Cancel mincuts</source>
 			<translation>Cancel·la les retallades</translation>
 		</message>
 		<message>
-			<source>Cannot create file</source>
-			<translation>No es pot crear el fitxer, comproveu si està obert</translation>
+			<source>EPA model finished. </source>
+			<translation>Model EPA acabat.</translation>
 		</message>
 		<message>
-			<source>Cannot create file, check if its open</source>
-			<translation>No es pot crear l'arxiu, verifiqui si està obert</translation>
+			<source>Epatools Plugin</source>
+			<translation>Connector d'Epatools</translation>
+		</message>
+		<message>
+			<source>Cannot create file</source>
+			<translation>No es pot crear el fitxer, comproveu si està obert</translation>
 		</message>
 		<message>
 			<source>Cannot create file, check if selected composer is the correct composer</source>
@@ -1318,12 +1586,16 @@
 			<translation>No es pot obtenir la versió menor de giswater des del registre de Windows</translation>
 		</message>
 		<message>
-			<source>Cannot get Java folder from windows registry</source>
-			<translation>No es pot obtenir la carpeta Java des del registre de Windows</translation>
+			<source>EPSG: {self.project_epsg}</source>
+			<translation>EPSG: {self.project_epsg}</translation>
 		</message>
 		<message>
-			<source>Cannot set inactive a current scenario. Please update current first.</source>
-			<translation>No es pot establir inactiu un escenari actual.Si us plau, actualitzeu l'actual primer.</translation>
+			<source>Event deleted</source>
+			<translation>Event eliminat</translation>
+		</message>
+		<message>
+			<source>Cannot get Java folder from windows registry</source>
+			<translation>No es pot obtenir la carpeta Java des del registre de Windows</translation>
 		</message>
 		<message>
 			<source>Cannot set the current {0} scenario of an inactive scenario. Please activate it first.</source>
@@ -1364,6 +1636,10 @@
 		<message>
 			<source>CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\nAre you sure you want to delete these records?</source>
 			<translation>ATENCIÓ!Si suprimiu un dscenario, se suprimiran les dades de les funcions relacionades amb el dscenario.\nEsteu segur que voleu suprimir aquests registres?</translation>
+		</message>
+		<message>
+			<source>EXCEPTION</source>
+			<translation>EXCEPCIÓ</translation>
 		</message>
 		<message>
 			<source>CAUTION! Deleting a netscenario will delete data from features related to the netscenario.</source>
@@ -1438,6 +1714,10 @@
 			<translation>Feu clic al node desconnectat, moveu el punter a la ubicació desitjada a la canonada per trencar-la</translation>
 		</message>
 		<message>
+			<source>Couldn't find layer to zoom to</source>
+			<translation>No s'ha pogut trobar la capa on fer zoom</translation>
+		</message>
+		<message>
 			<source>Click on disconnected node, move the pointer to the desired location on pipe to break it</source>
 			<translation>Seleccioni el node desconnectat fent clic en ell, mogui el punter a la ubicació desitjada dins d'una canonada i faci clic novament</translation>
 		</message>
@@ -1460,6 +1740,10 @@
 		<message>
 			<source>Click on node, that joins two pipes, in order to remove it</source>
 			<translation>Seleccioni el node dintre d'una canonada fent clic ell i s'eliminarà</translation>
+		</message>
+		<message>
+			<source>Exception: {0}.</source>
+			<translation>Excepció: {0}.</translation>
 		</message>
 		<message>
 			<source>Click on node, that joins two pipes, in order to remove it and merge pipes</source>
@@ -1492,10 +1776,6 @@
 		<message>
 			<source>Column name and Label fields are mandatory. Please set correct value.</source>
 			<translation>Els camps Nom de columna i Etiqueta són obligatoris. Definiu el valor correcte.</translation>
-		</message>
-		<message>
-			<source>Column not found</source>
-			<translation>No s'ha trobat la columna</translation>
 		</message>
 		<message>
 			<source>_compare failed in ControlBase because </source>
@@ -1538,14 +1818,6 @@
 			<translation>La tasca ConfigLayerFields ja està activa!</translation>
 		</message>
 		<message>
-			<source>Configuration file couldn't be imported:</source>
-			<translation>No s'ha pogut importar el fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>Configuration file couldn't be imported:\n{0}</source>
-			<translation>No s'ha pogut importar el fitxer de configuració:\n{0}</translation>
-		</message>
-		<message>
 			<source>Configuration file not found, please make sure it is located in the correct directory and try again</source>
 			<translation>Arxiu de configuració no trobat, si us plau asseguris que es troba en la direcció correcta i torni a intentar-ho.</translation>
 		</message>
@@ -1570,10 +1842,6 @@
 			<translation>Connectat a {0}</translation>
 		</message>
 		<message>
-			<source>Connection '{0}' not found in the file '{1}'</source>
-			<translation>No s'ha trobat la connexió '{0}' al fitxer '{1}'</translation>
-		</message>
-		<message>
 			<source>Connection '{0}' not found in the file '{1}'. Trying in '{2}'...</source>
 			<translation>No s'ha trobat la connexió '{0}' al fitxer '{1}'.S'està provant a "{2}"...</translation>
 		</message>
@@ -1586,16 +1854,16 @@
 			<translation>Connexió fallida. Si us plau, comproveu els paràmetres de connexió</translation>
 		</message>
 		<message>
+			<source>Error connecting to i18n dataabse</source>
+			<translation>Error en connectar-se a la base de dades i18n</translation>
+		</message>
+		<message>
 			<source>Connect link task is already active!</source>
 			<translation>La tasca d'enllaç de connexió ja està activa!</translation>
 		</message>
 		<message>
 			<source>Constructed place geometry polygon(s) to query Overpass</source>
 			<translation>S'han construït polígons de geometria de lloc per consultar el pas superior</translation>
-		</message>
-		<message>
-			<source>Context</source>
-			<translation>Context</translation>
 		</message>
 		<message>
 			<source>Converted MultiDiGraph to DiGraph</source>
@@ -1646,24 +1914,16 @@
 			<translation>No s'ha pogut recuperar la funció de la capa</translation>
 		</message>
 		<message>
-			<source>Couldn't add group.</source>
-			<translation>No s'ha pogut afegir el grup.</translation>
-		</message>
-		<message>
 			<source>Couldn't draw profile. You may need to select another exploitation.</source>
 			<translation>No s'ha pogut dibuixar el perfil. És possible que hagueu de seleccionar una altra explotació.</translation>
 		</message>
 		<message>
-			<source>Couldn't find layer to zoom to</source>
-			<translation>No s'ha pogut trobar la capa on fer zoom</translation>
+			<source>Did not save to cache because HTTP status code is not OK</source>
+			<translation>No s'ha desat a la memòria cau perquè el codi d'estat HTTP no és correcte</translation>
 		</message>
 		<message>
 			<source>Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version</source>
 			<translation>No s'ha pogut importar scipy/numpy, de manera que no es pot mostrar el gràfic.Instal·leu-lo manualment o proveu-ho amb una altra versió de QGIS</translation>
-		</message>
-		<message>
-			<source>Couldn't import swmm_api package. Try to reload the Giswater plugin. If the issue persists restart QGIS.</source>
-			<translation>No s'ha pogut importar el paquet swmm_api.Intenta tornar a carregar el connector Giswater.Si el problema persisteix, reinicieu QGIS.</translation>
 		</message>
 		<message>
 			<source>Counted undirected street segments incident on each node</source>
@@ -1678,28 +1938,12 @@
 			<translation>Crea un esquema base</translation>
 		</message>
 		<message>
-			<source>Created edges GeoDataFrame from graph</source>
-			<translation>S'han creat vores GeoDataFrame a partir del gràfic</translation>
-		</message>
-		<message>
 			<source>Created graph from node/edge GeoDataFrames</source>
 			<translation>S'ha creat un gràfic a partir de GeoDataFrames node/bord</translation>
 		</message>
 		<message>
 			<source>Created nodes GeoDataFrame from graph</source>
 			<translation>S'han creat nodes GeoDataFrame a partir del gràfic</translation>
-		</message>
-		<message>
-			<source>Create example</source>
-			<translation>Crea un exemple</translation>
-		</message>
-		<message>
-			<source>Create parent schema</source>
-			<translation>Crea un esquema pare</translation>
-		</message>
-		<message>
-			<source>Create {project} schema</source>
-			<translation>Crea un esquema {projecte}</translation>
 		</message>
 		<message>
 			<source>Create schema of type '{0}': '{1}'</source>
@@ -1734,6 +1978,14 @@
 			<translation>Les credencials s'emmagatzemaran al fitxer del projecte GIS com a text sense format i s'aplicaran tant a les capes existents com a les futures.Vols continuar?</translation>
 		</message>
 		<message>
+			<source>DRAIN plugin not found</source>
+			<translation>No s'ha trobat el connector DRAIN</translation>
+		</message>
+		<message>
+			<source>Error connecting to i18n database</source>
+			<translation>Error en connectar-se a la base de dades i18n</translation>
+		</message>
+		<message>
 			<source>CSV not generated. Check fields from table or view</source>
 			<translation>CSV no generat. Verifiqui els camps de la taula o vista</translation>
 		</message>
@@ -1758,10 +2010,6 @@
 			<translation>El node actual no està ubicat sobre un arc. Si us plau</translation>
 		</message>
 		<message>
-			<source>Current node is not located over an arc. Please, select option 'DRAG-DROP'</source>
-			<translation>El node actual no es troba sobre un arc.Si us plau, seleccioneu l'opció "ARROSSEGAR-DEIXAR"</translation>
-		</message>
-		<message>
 			<source>Current psector</source>
 			<translation>Sector actual</translation>
 		</message>
@@ -1774,10 +2022,6 @@
 			<translation>L'usuari actual no té 'plan_psector_current'.S'inserirà el valor del sector actual.</translation>
 		</message>
 		<message>
-			<source>Custom mincut executed successfully</source>
-			<translation>Polígon de tall personalitzat executat amb èxit</translation>
-		</message>
-		<message>
 			<source>Database connection error: {0}</source>
 			<translation>Error de connexió a la base de dades: {0}</translation>
 		</message>
@@ -1788,6 +2032,10 @@
 		<message>
 			<source>Database connection error (PgDao). Please open plugin log file to get more details</source>
 			<translation>Error de conecció a la base d dades (pgDao). Si us plau obri l'arxiu de registre del plugin per a obtenir més detalls</translation>
+		</message>
+		<message>
+			<source>Error: '{0}' or '{1}' field is missing in the result.</source>
+			<translation>Error: falta el camp "{0}" o "{1}" al resultat.</translation>
 		</message>
 		<message>
 			<source>Database connection error. Please check your connection parameters.</source>
@@ -1826,6 +2074,10 @@
 			<translation>Ha fallat l'execució de la base de dades</translation>
 		</message>
 		<message>
+			<source>Error connecting to database (layer)</source>
+			<translation>Error en connectar-se a la base de dades (capa)</translation>
+		</message>
+		<message>
 			<source>Database name contains special characters that are not supported</source>
 			<translation>El nom de la base de dades conté caràcters especials que no s'admeten</translation>
 		</message>
@@ -1852,10 +2104,6 @@
 		<message>
 			<source>Data is ok. You can try to generate the INP file</source>
 			<translation>Les dades estan bé. Pot intentar generar l'arxiu INP</translation>
-		</message>
-		<message>
-			<source>Data retrieved and displayed successfully.</source>
-			<translation>Les dades s'han recuperat i s'han mostrat correctament.</translation>
 		</message>
 		<message>
 			<source>Date</source>
@@ -1914,16 +2162,8 @@
 			<translation>Descripció</translation>
 		</message>
 		<message>
-			<source>Detail</source>
-			<translation>Detall</translation>
-		</message>
-		<message>
-			<source>Diameter</source>
-			<translation>Diàmetre</translation>
-		</message>
-		<message>
-			<source>Did not save to cache because HTTP status code is not OK</source>
-			<translation>No s'ha desat a la memòria cau perquè el codi d'estat HTTP no és correcte</translation>
+			<source>EXCEPTION: {0}, {1}</source>
+			<translation>EXCEPCIÓ: {0}, {1}</translation>
 		</message>
 		<message>
 			<source>Discarding the `gdf_nodes` 'geometry' column, though its values differ from the coordinates in the 'x' and 'y' columns.</source>
@@ -1939,10 +2179,6 @@
 		</message>
 		<message>
 			<source>Document already exist</source>
-			<translation>El document ja existeix</translation>
-		</message>
-		<message>
-			<source>Document already exists</source>
 			<translation>El document ja existeix</translation>
 		</message>
 		<message>
@@ -1964,10 +2200,6 @@
 		<message>
 			<source>Documents deleted successfully</source>
 			<translation>Document insertat correctament</translation>
-		</message>
-		<message>
-			<source>DOWNGRADE NODE</source>
-			<translation>DEGRADAR NODE</translation>
 		</message>
 		<message>
 			<source>Do you want change it and continue?</source>
@@ -1994,10 +2226,6 @@
 			<translation>Voleu inserir les característiques seleccionades?{0}</translation>
 		</message>
 		<message>
-			<source>Do you want to open GIS project?</source>
-			<translation>Vol obrir el projecte SIG?</translation>
-		</message>
-		<message>
 			<source>Do you want to overwrite custom values?</source>
 			<translation>Voleu sobreescriure els valors personalitzats?</translation>
 		</message>
@@ -2014,24 +2242,12 @@
 			<translation>Voleu desar els canvis a dscenario</translation>
 		</message>
 		<message>
-			<source>Do you want to set this psector as current?</source>
-			<translation>Voleu establir aquest sector com a actual?</translation>
-		</message>
-		<message>
-			<source>DRAIN plugin not found</source>
-			<translation>No s'ha trobat el connector DRAIN</translation>
-		</message>
-		<message>
 			<source>Draw a pipe connected to two nodes</source>
 			<translation>Dibuixi una canonada connectada a dos nodes</translation>
 		</message>
 		<message>
 			<source>Draw a point on the map inside created map zones</source>
 			<translation>Dibuixi un punt en el mapa dins de les zones del mapa creades</translation>
-		</message>
-		<message>
-			<source>Dscenario manager</source>
-			<translation>Gestor d'escenaris</translation>
 		</message>
 		<message>
 			<source>During task '{0}, function {1} returned False</source>
@@ -2082,56 +2298,8 @@
 			<translation>Error de codificació llegint el fitxer inp</translation>
 		</message>
 		<message>
-			<source>English locale not found</source>
-			<translation>No s'ha trobat la configuració regional en anglès</translation>
-		</message>
-		<message>
 			<source>Epa2data execution failed. See logs for more details...</source>
 			<translation>L'execució d'Epa2data ha fallat. Veure registres per a més detalls...</translation>
-		</message>
-		<message>
-			<source>Epa2data execution successful.</source>
-			<translation>Execució d'Epa2data amb èxit.</translation>
-		</message>
-		<message>
-			<source>EPA model finished. </source>
-			<translation>Model EPA acabat.</translation>
-		</message>
-		<message>
-			<source>Epatools Plugin</source>
-			<translation>Connector d'Epatools</translation>
-		</message>
-		<message>
-			<source>EPSG: {self.project_epsg}</source>
-			<translation>EPSG: {self.project_epsg}</translation>
-		</message>
-		<message>
-			<source>(Error {}) </source>
-			<translation>(Error {})</translation>
-		</message>
-		<message>
-			<source>Error</source>
-			<translation>Error</translation>
-		</message>
-		<message>
-			<source>Error: '{0}' or '{1}' field is missing in the result.</source>
-			<translation>Error: falta el camp "{0}" o "{1}" al resultat.</translation>
-		</message>
-		<message>
-			<source>Error connecting to database (layer)</source>
-			<translation>Error en connectar-se a la base de dades (capa)</translation>
-		</message>
-		<message>
-			<source>Error connecting to database (settings)</source>
-			<translation>Error en connectar-se a la base de dades (configuració)</translation>
-		</message>
-		<message>
-			<source>Error connecting to i18n dataabse</source>
-			<translation>Error en connectar-se a la base de dades i18n</translation>
-		</message>
-		<message>
-			<source>Error connecting to i18n database</source>
-			<translation>Error en connectar-se a la base de dades i18n</translation>
 		</message>
 		<message>
 			<source>Error connecting to origin database</source>
@@ -2170,10 +2338,6 @@
 			<translation>Error.La base de dades ha retornat nul.Comproveu la funció de postgres '{0}'</translation>
 		</message>
 		<message>
-			<source>Error deleting data</source>
-			<translation>Error en eliminar dades</translation>
-		</message>
-		<message>
 			<source>Error deleting profile</source>
 			<translation>Error en eliminar el perfil</translation>
 		</message>
@@ -2188,10 +2352,6 @@
 		<message>
 			<source>Error deleting row: {0} - Query: {1}</source>
 			<translation>Error en suprimir la fila: {0} - Consulta: {1}</translation>
-		</message>
-		<message>
-			<source>Error during point selection: {0}</source>
-			<translation>Error durant la selecció de punts: {0}</translation>
 		</message>
 		<message>
 			<source>Error executing gw_fct_create_dscenario_empty</source>
@@ -2282,10 +2442,6 @@
 			<translation>Error a prop de la línia</translation>
 		</message>
 		<message>
-			<source>Error near line {0} -> {1}</source>
-			<translation>Error a prop de la línia {0} -> {1}</translation>
-		</message>
-		<message>
 			<source>Error on create auto mincut</source>
 			<translation>S'ha produït un error en crear un mincut automàtic, heu de revisar les dades</translation>
 		</message>
@@ -2338,14 +2494,6 @@
 			<translation>Error en establir el node</translation>
 		</message>
 		<message>
-			<source>Error translating: {0}</source>
-			<translation>Error en traduir: {0}</translation>
-		</message>
-		<message>
-			<source>Error type</source>
-			<translation>Tipus d'error</translation>
-		</message>
-		<message>
 			<source>Error updating: {0}.</source>
 			<translation>Error en actualitzar: {0}.</translation>
 		</message>
@@ -2372,38 +2520,6 @@
 		<message>
 			<source>Error updating messages</source>
 			<translation>S'ha produït un error en actualitzar els missatges</translation>
-		</message>
-		<message>
-			<source>Error updating table</source>
-			<translation>Error en actualitzar la taula</translation>
-		</message>
-		<message>
-			<source>Event deleted</source>
-			<translation>Event eliminat</translation>
-		</message>
-		<message>
-			<source>EXCEPTION</source>
-			<translation>EXCEPCIÓ</translation>
-		</message>
-		<message>
-			<source>Exception: {0}</source>
-			<translation>Excepció: {0}</translation>
-		</message>
-		<message>
-			<source>Exception: {0}.</source>
-			<translation>Excepció: {0}.</translation>
-		</message>
-		<message>
-			<source>EXCEPTION: {0}, {1}</source>
-			<translation>EXCEPCIÓ: {0}, {1}</translation>
-		</message>
-		<message>
-			<source>Exception error: {0}</source>
-			<translation>Error d'excepció: {0}</translation>
-		</message>
-		<message>
-			<source>Exception in {0}</source>
-			<translation>Excepció a {0}</translation>
 		</message>
 		<message>
 			<source>Exception in {0} (executing {1} from {2}): {3}</source>
@@ -2498,10 +2614,6 @@
 			<translation>Error d'expressió</translation>
 		</message>
 		<message>
-			<source>FAIL {0}</source>
-			<translation>FALL {0}</translation>
-		</message>
-		<message>
 			<source>Failed to add feature</source>
 			<translation>No s'ha pogut afegir la funció</translation>
 		</message>
@@ -2564,10 +2676,6 @@
 		<message>
 			<source>Failed to rename user from '{0}' to '{1}'. The new name might already be in use in the database.</source>
 			<translation>No s'ha pogut canviar el nom de l'usuari de "{0}" a "{1}".És possible que el nou nom ja estigui en ús a la base de dades.</translation>
-		</message>
-		<message>
-			<source>Failed to retrieve GeoJSON data.</source>
-			<translation>No s'han pogut recuperar les dades de GeoJSON.</translation>
 		</message>
 		<message>
 			<source>Failed to retrieve graph configuration.</source>
@@ -2718,10 +2826,6 @@
 			<translation>Els fitxers definits a les variables d'entorn "{0}" i "{1}" no s'han trobat.</translation>
 		</message>
 		<message>
-			<source>Fill table</source>
-			<translation>Ompliu la taula</translation>
-		</message>
-		<message>
 			<source>Filter by code</source>
 			<translation>Filtra per codi</translation>
 		</message>
@@ -2736,6 +2840,10 @@
 		<message>
 			<source>First iteration</source>
 			<translation>Primera iteració</translation>
+		</message>
+		<message>
+			<source>GIS folder not set</source>
+			<translation>Carpeta GIS no establerta</translation>
 		</message>
 		<message>
 			<source>First node already selected with id: {0}. Select second one.</source>
@@ -2776,10 +2884,6 @@
 		<message>
 			<source>From {0}, updating {1}...</source>
 			<translation>Des de {0}, s'està actualitzant {1}...</translation>
-		</message>
-		<message>
-			<source>Function {0} error: {1} from last function is invalid</source>
-			<translation>Error de funció {0}: {1} de l'última funció no és vàlid</translation>
 		</message>
 		<message>
 			<source>Function {0} error: {1} returned null</source>
@@ -2830,6 +2934,10 @@
 			<translation>La funció gw_fct_psector_duplicate s'ha executat sense resultat</translation>
 		</message>
 		<message>
+			<source>Process finished.\n\n</source>
+			<translation>Procés acabat.\n\n</translation>
+		</message>
+		<message>
 			<source>Function gw_fct_setfeaturedelete executed with no result </source>
 			<translation>La funció gw_fct_setfeaturedelete s'ha executat sense cap resultat</translation>
 		</message>
@@ -2840,10 +2948,6 @@
 		<message>
 			<source>Function not found</source>
 			<translation>No s'ha trobat la funció</translation>
-		</message>
-		<message>
-			<source>Function not found in database</source>
-			<translation>No s'ha trobat la funció a la base de dades</translation>
 		</message>
 		<message>
 			<source>Function not found in database: {0}</source>
@@ -2894,6 +2998,10 @@
 			<translation>S'ha afegit geometria!</translation>
 		</message>
 		<message>
+			<source>Id already selected</source>
+			<translation>Id ja seleccionat</translation>
+		</message>
+		<message>
 			<source>Geometry must be a shapely Polygon or MultiPolygon.</source>
 			<translation>La geometria ha de ser un polígon o multipolígon ben format.</translation>
 		</message>
@@ -2940,10 +3048,6 @@
 		<message>
 			<source>GIS file name not set</source>
 			<translation>No s'ha definit el nom del fitxer GIS</translation>
-		</message>
-		<message>
-			<source>GIS folder not set</source>
-			<translation>Carpeta GIS no establerta</translation>
 		</message>
 		<message>
 			<source>Giswater executable file not found</source>
@@ -3074,10 +3178,6 @@
 			<translation>Projecte IBERGIS importat amb èxit</translation>
 		</message>
 		<message>
-			<source>Id already selected</source>
-			<translation>Id ja seleccionat</translation>
-		</message>
-		<message>
 			<source>Identify all</source>
 			<translation>Identifica-ho tot</translation>
 		</message>
@@ -3130,10 +3230,6 @@
 			<translation>Import OSM Streetaxis només per a projectes WS</translation>
 		</message>
 		<message>
-			<source>Import RPT file</source>
-			<translation>Importa el fitxer RPT</translation>
-		</message>
-		<message>
 			<source>Import rpt file........: {0}</source>
 			<translation>Importa el fitxer rpt........: {0}</translation>
 		</message>
@@ -3164,10 +3260,6 @@
 		<message>
 			<source>Information about exception</source>
 			<translation>Informació sobre l'excepció</translation>
-		</message>
-		<message>
-			<source>Initialize plugin</source>
-			<translation>Inicialitzar el connector</translation>
 		</message>
 		<message>
 			<source>In order to create a qgis project you have to create a schema first .</source>
@@ -3254,10 +3346,6 @@
 			<translation>Diàmetres no vàlids: {list}.</translation>
 		</message>
 		<message>
-			<source>Invalid lot ID.</source>
-			<translation>ID de lot invàlid.</translation>
-		</message>
-		<message>
 			<source>Invalid materials: {3}.</source>
 			<translation>Materials no vàlids: {3}.</translation>
 		</message>
@@ -3272,6 +3360,14 @@
 		<message>
 			<source>Invalid value for scenario_results in [OPTIONS] section.</source>
 			<translation>Valor no vàlid per a scenario_results a la secció [OPCIONS].</translation>
+		</message>
+		<message>
+			<source>Key on returned json from ddbb is missed</source>
+			<translation>Es perd la clau en json tornat de ddbb</translation>
+		</message>
+		<message>
+			<source>Python file</source>
+			<translation>Fitxer Python</translation>
 		</message>
 		<message>
 			<source>Invalid value for type of priority dialog. Please pass either 'GLOBAL' or 'SELECTION'. Value passed:</source>
@@ -3296,10 +3392,6 @@
 		<message>
 			<source>It will then show the log of the process in the last tab.</source>
 			<translation>A continuació, mostrarà el registre del procés a l'última pestanya.</translation>
-		</message>
-		<message>
-			<source>IVI</source>
-			<translation>IVI</translation>
 		</message>
 		<message>
 			<source>Java executable file not found</source>
@@ -3334,10 +3426,6 @@
 			<translation>No s'ha trobat la clau 'comboIds' o/i comboNames WHERE widgetname='{0}' AND widgettype='{1}'</translation>
 		</message>
 		<message>
-			<source>Key container</source>
-			<translation>Contenidor de claus</translation>
-		</message>
-		<message>
 			<source>Key not found</source>
 			<translation>No s'ha trobat la clau</translation>
 		</message>
@@ -3346,8 +3434,8 @@
 			<translation>No s'ha trobat la clau: "{0}"</translation>
 		</message>
 		<message>
-			<source>Key on returned json from ddbb is missed</source>
-			<translation>Es perd la clau en json tornat de ddbb</translation>
+			<source>MASTERPLAN</source>
+			<translation>PLA DIRECTOR</translation>
 		</message>
 		<message>
 			<source>Key on returned json from ddbb is missed.</source>
@@ -3356,10 +3444,6 @@
 		<message>
 			<source>Language</source>
 			<translation>Llengua</translation>
-		</message>
-		<message>
-			<source>Language: {self.project_language}</source>
-			<translation>Idioma: {self.project_language}</translation>
 		</message>
 		<message>
 			<source>Layer {0} does not found, therefore, not configured</source>
@@ -3420,6 +3504,14 @@
 		<message>
 			<source>Leaks assigned to any nearby pipes: {leaks}.</source>
 			<translation>Fugues assignades a qualsevol canonada propera:{leaks}.</translation>
+		</message>
+		<message>
+			<source>No current netscenario</source>
+			<translation>No hi ha escenari de xarxa actual</translation>
+		</message>
+		<message>
+			<source>Python function</source>
+			<translation>Funció Python</translation>
 		</message>
 		<message>
 			<source>Leaks within the indicated period: {leaks}.</source>
@@ -3506,14 +3598,6 @@
 			<translation>Els valors marcats han de ser superiors a 0</translation>
 		</message>
 		<message>
-			<source>MASTERPLAN</source>
-			<translation>PLA DIRECTOR</translation>
-		</message>
-		<message>
-			<source>Material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
 			<source>Matplotlib cannot be installed automatically. Please install Matplotlib manually.</source>
 			<translation>Matplotlib no es pot instal·lar automàticament.Instal·leu Matplotlib manualment.</translation>
 		</message>
@@ -3574,6 +3658,14 @@
 			<translation>Mincut fet, però té conflictes i se solapa amb</translation>
 		</message>
 		<message>
+			<source>No current psector selected</source>
+			<translation>No s'ha seleccionat cap sector actual</translation>
+		</message>
+		<message>
+			<source>Python translation canceled</source>
+			<translation>La traducció de Python s'ha cancel·lat</translation>
+		</message>
+		<message>
 			<source>Mincut done, but has conflict and overlaps with</source>
 			<translation>Poligon de tall fet, però té conflicte i se sobreposa amb</translation>
 		</message>
@@ -3620,6 +3712,10 @@
 		<message>
 			<source>More then one event selected. Select just one</source>
 			<translation>Més d'un esdeveniment seleccionat. Seleccioneu només un</translation>
+		</message>
+		<message>
+			<source>Only one record can be selected</source>
+			<translation>Només es pot seleccionar un registre</translation>
 		</message>
 		<message>
 			<source>Move node: Error updating geometry</source>
@@ -3698,14 +3794,6 @@
 			<translation>No s'han trobat compositors</translation>
 		</message>
 		<message>
-			<source>No current netscenario</source>
-			<translation>No hi ha escenari de xarxa actual</translation>
-		</message>
-		<message>
-			<source>No current psector selected</source>
-			<translation>No s'ha seleccionat cap sector actual</translation>
-		</message>
-		<message>
 			<source>No data elements in server response. Check query location/filters and log.</source>
 			<translation>No hi ha elements de dades a la resposta del servidor.Comproveu la ubicació/filtres de la consulta i registreu-lo.</translation>
 		</message>
@@ -3732,10 +3820,6 @@
 		<message>
 			<source>Node id:</source>
 			<translation>ID del node:</translation>
-		</message>
-		<message>
-			<source>Node psector: {0}</source>
-			<translation>Sector de nodes: {0}</translation>
 		</message>
 		<message>
 			<source>Node replaced successfully</source>
@@ -3776,10 +3860,6 @@
 		<message>
 			<source>No help file found</source>
 			<translation>No s'ha trobat cap fitxer d'ajuda</translation>
-		</message>
-		<message>
-			<source>No listValues for</source>
-			<translation>No hi ha valors de llista per a</translation>
 		</message>
 		<message>
 			<source>No matching features. Check query location, tags, and log.</source>
@@ -3863,14 +3943,6 @@
 			<translation>No hi ha context SQL disponible.</translation>
 		</message>
 		<message>
-			<source>Not '{0}'</source>
-			<translation>No "{0}"</translation>
-		</message>
-		<message>
-			<source>Note: You can force the import by activating the variable '{0}' on the {1} file. </source>
-			<translation>Nota: podeu forçar la importació activant la variable '{0}' al fitxer {1}.</translation>
-		</message>
-		<message>
 			<source>Not found: {0}</source>
 			<translation>No s'ha trobat: {0}</translation>
 		</message>
@@ -3889,10 +3961,6 @@
 		<message>
 			<source>No valid snapping result. Please select a valid point.</source>
 			<translation>No hi ha cap resultat d'ajustament vàlid.Seleccioneu un punt vàlid.</translation>
-		</message>
-		<message>
-			<source>No visit values</source>
-			<translation>Sense valors de visita</translation>
 		</message>
 		<message>
 			<source>No workcat values</source>
@@ -3939,10 +4007,6 @@
 			<translation>Només es pot afegir FRELEM a dscenario</translation>
 		</message>
 		<message>
-			<source>Only one record can be selected</source>
-			<translation>Només es pot seleccionar un registre</translation>
-		</message>
-		<message>
 			<source>Only rows with values are allowed to be deleted.</source>
 			<translation>Només es permeten suprimir files amb valors.</translation>
 		</message>
@@ -3987,10 +4051,6 @@
 			<translation>Sobreescriure</translation>
 		</message>
 		<message>
-			<source>Overwrite file</source>
-			<translation>Sobreescriure el fitxer</translation>
-		</message>
-		<message>
 			<source>Overwrite values</source>
 			<translation>Sobreescriu els valors</translation>
 		</message>
@@ -4017,10 +4077,6 @@
 		<message>
 			<source>Parameter functionName is null for check</source>
 			<translation>El paràmetre functionName és nul per a la comprovació</translation>
-		</message>
-		<message>
-			<source>Parameter not found</source>
-			<translation>No s'han trobat paràmetres</translation>
 		</message>
 		<message>
 			<source>Parameter not found: {parameter}</source>
@@ -4195,6 +4251,14 @@
 			<translation>Introduïu un Workcat_id per continuar amb aquesta importació.</translation>
 		</message>
 		<message>
+			<source>Please select a default raingage to proceed with this import.</source>
+			<translation>Si us plau, seleccioneu un valor predeterminat per procedir amb aquesta importació.</translation>
+		</message>
+		<message>
+			<source>Python translation failed</source>
+			<translation>La traducció de Python ha fallat</translation>
+		</message>
+		<message>
 			<source>Please enter the diameter range in this format: [minimum factor]-[maximum factor]. For example, 0.75-1.5</source>
 			<translation>Si us plau, introdueixi l'interval de diàmetre en aquest format:  [factor mínim]-[factor màxim]. Per exemple, 0.75-1.5</translation>
 		</message>
@@ -4235,8 +4299,8 @@
 			<translation>Si us plau, seleccioni una categoria per a actualitzar</translation>
 		</message>
 		<message>
-			<source>Please select a default raingage to proceed with this import.</source>
-			<translation>Si us plau, seleccioneu un valor predeterminat per procedir amb aquesta importació.</translation>
+			<source>Prob. of Failure</source>
+			<translation>Prov. d'error</translation>
 		</message>
 		<message>
 			<source>Please, select a diferent project name than current.</source>
@@ -4303,6 +4367,14 @@
 			<translation>Si us plau, seleccioni només un resultat abans de canviar el seu estat.</translation>
 		</message>
 		<message>
+			<source>Process completed</source>
+			<translation>Procés completat</translation>
+		</message>
+		<message>
+			<source>Process finished.</source>
+			<translation>Procés acabat.</translation>
+		</message>
+		<message>
 			<source>Please select rows to remove from the table</source>
 			<translation>Seleccioneu les files que voleu eliminar de la taula</translation>
 		</message>
@@ -4359,28 +4431,8 @@
 			<translation>PREUS</translation>
 		</message>
 		<message>
-			<source>Print</source>
-			<translation>Impressió</translation>
-		</message>
-		<message>
 			<source>Priority Calculation (Selection)</source>
 			<translation>Càlcul de prioritat (Selecció)</translation>
-		</message>
-		<message>
-			<source>Prob. of Failure</source>
-			<translation>Prov. d'error</translation>
-		</message>
-		<message>
-			<source>Process completed</source>
-			<translation>Procés completat</translation>
-		</message>
-		<message>
-			<source>Process finished.</source>
-			<translation>Procés acabat.</translation>
-		</message>
-		<message>
-			<source>Process finished.\n\n</source>
-			<translation>Procés acabat.\n\n</translation>
 		</message>
 		<message>
 			<source>Process finished successfully</source>
@@ -4401,10 +4453,6 @@
 		<message>
 			<source>Processing muni_id {0}</source>
 			<translation>S'està processant muni_id {0}</translation>
-		</message>
-		<message>
-			<source>Profile deleted</source>
-			<translation>Perfil eliminat</translation>
 		</message>
 		<message>
 			<source>Profile name is mandatory.</source>
@@ -4465,26 +4513,6 @@
 		<message>
 			<source>Psector values updated successfully</source>
 			<translation>Valors de psector actualitzats correctament</translation>
-		</message>
-		<message>
-			<source>Python file</source>
-			<translation>Fitxer Python</translation>
-		</message>
-		<message>
-			<source>Python function</source>
-			<translation>Funció Python</translation>
-		</message>
-		<message>
-			<source>Python translation canceled</source>
-			<translation>La traducció de Python s'ha cancel·lat</translation>
-		</message>
-		<message>
-			<source>Python translation failed</source>
-			<translation>La traducció de Python ha fallat</translation>
-		</message>
-		<message>
-			<source>Python translation successful</source>
-			<translation>La traducció de Python ha estat correcta</translation>
 		</message>
 		<message>
 			<source>QGIS project has more than one {0} layer coming from different schemas. If you are looking to manage two schemas, it is mandatory to define which is the master and which isn't. To do this, you need to configure the QGIS project setting this project's variables: {1} and {2}.</source>
@@ -4599,6 +4627,10 @@
 			<translation>Nom del resultat en ús, si us plau triï un nom diferent.</translation>
 		</message>
 		<message>
+			<source>The file selected is not an INP file</source>
+			<translation>El fitxer seleccionat no és un fitxer INP</translation>
+		</message>
+		<message>
 			<source>Result name not found. It's not possible to import RPT file into database</source>
 			<translation>No s'ha trobat el nom del resultat. No és possible importar un fitxer RPT a la base de dades</translation>
 		</message>
@@ -4673,6 +4705,10 @@
 		<message>
 			<source>Schema vacuum executed</source>
 			<translation>Esquema buit executat</translation>
+		</message>
+		<message>
+			<source>`X` and `Y` cannot contain nulls.</source>
+			<translation>"X" i "Y" no poden contenir valors nuls.</translation>
 		</message>
 		<message>
 			<source>(Schema version is higher than plugin version, please update plugin)</source>
@@ -4815,10 +4851,6 @@
 			<translation>Seleccioneu només una visita</translation>
 		</message>
 		<message>
-			<source>Select one</source>
-			<translation>Seleccioni'n un</translation>
-		</message>
-		<message>
 			<source>Selector help</source>
 			<translation>Ajuda del selector</translation>
 		</message>
@@ -4887,16 +4919,16 @@
 			<translation>Falten nodes a algunes vores, possiblement a causa d'un problema de retall de dades d'entrada.</translation>
 		</message>
 		<message>
-			<source>Some events have documents</source>
-			<translation>Alguns esdeveniments tenen documents</translation>
-		</message>
-		<message>
 			<source>Some layers of your role not found. Do you want to view them?</source>
 			<translation>No s'han trobat algunes capes de la seva fució. ¿Vol veure-les?</translation>
 		</message>
 		<message>
 			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
 			<translation>Falten alguns camps obligatoris. Si us plau, completeu els camps requerits (marcats en vermell).</translation>
+		</message>
+		<message>
+			<source>Year</source>
+			<translation>Any</translation>
 		</message>
 		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
@@ -4909,10 +4941,6 @@
 		<message>
 			<source>Some parameters are missing (Values Defaults used for)</source>
 			<translation>Falten alguns paràmetres (valors predeterminats utilitzats per a)</translation>
-		</message>
-		<message>
-			<source>SQL</source>
-			<translation>SQL</translation>
 		</message>
 		<message>
 			<source>SQL Context</source>
@@ -5057,6 +5085,10 @@
 		<message>
 			<source>task_completed</source>
 			<translation>tasca_completa</translation>
+		</message>
+		<message>
+			<source>The [SCENARIOS] section of the configuration file is empty.</source>
+			<translation>La secció [ESCENARIS] del fitxer de configuració està buida.</translation>
 		</message>
 		<message>
 			<source>Task 'Connect link' execute function '{0}' from '{1}' with parameters: '{2}'</source>
@@ -5215,8 +5247,8 @@
 			<translation>El fitxer seleccionat no és un fitxer GPKG</translation>
 		</message>
 		<message>
-			<source>The file selected is not an INP file</source>
-			<translation>El fitxer seleccionat no és un fitxer INP</translation>
+			<source>The schema ({0}) does not exists</source>
+			<translation>L'esquema ({0}) no existeix</translation>
 		</message>
 		<message>
 			<source>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</source>
@@ -5353,6 +5385,10 @@
 			<translation>Hi ha hagut errors en traduir:</translation>
 		</message>
 		<message>
+			<source>You are about to delete the result</source>
+			<translation>Esteu a punt d'esborrar el resultat</translation>
+		</message>
+		<message>
 			<source>There is an error in the configuration of the pgservice file, please check it or consult your administrator</source>
 			<translation>Hi ha un error en la configuració del fitxer pgservice, comproveu-lo o consulteu el vostre administrador</translation>
 		</message>
@@ -5387,6 +5423,10 @@
 		<message>
 			<source>The result cannot be deleted</source>
 			<translation>El resultat no es pot esborrar</translation>
+		</message>
+		<message>
+			<source>Work_id field is empty</source>
+			<translation>Work_id field is empty</translation>
 		</message>
 		<message>
 			<source>There was an error deleting object.</source>
@@ -5429,6 +5469,10 @@
 			<translation>S'ha produït un error en inserir la tapa.</translation>
 		</message>
 		<message>
+			<source>These links could not be located within the network: </source>
+			<translation>Aquests enllaços no s'han pogut localitzar a la xarxa:</translation>
+		</message>
+		<message>
 			<source>There was an error inserting pattern.</source>
 			<translation>S'ha produït un error en inserir el patró.</translation>
 		</message>
@@ -5457,6 +5501,14 @@
 			<translation>El fitxer rpt no és vàlid per importar.Com que les columnes del fitxer rpt es superposen, sembla que necessiteu millorar la vostra simulació.Comproveu-ho i solucioneu-lo abans de continuar.\n{0}</translation>
 		</message>
 		<message>
+			<source>The schema '{0}' is being used in production! It can't be deleted.</source>
+			<translation>L'esquema "{0}" s'està utilitzant en producció!No es pot esborrar.</translation>
+		</message>
+		<message>
+			<source>Triggers updated successfully</source>
+			<translation>Els activadors s'han actualitzat correctament</translation>
+		</message>
+		<message>
 			<source>The rpt file is not valid to import. Because columns on rpt file are overlapped, it seems you need to improve your simulation. Please check and fix it before continuing.</source>
 			<translation>El fitxer rpt no és vàlid per importar.Com que les columnes del fitxer rpt es superposen, sembla que necessiteu millorar la vostra simulació.Si us plau, comproveu-ho i solucioneu-lo abans de continuar.</translation>
 		</message>
@@ -5475,18 +5527,6 @@
 		<message>
 			<source>The rpt file is not valid to import. Because velocity has not numeric value (>50), it seems you need to improve your simulation. Please ckeck and fix it before continue. \nNote: You can force the import by activating the variable '{0}' on the {1} file. \n{2}</source>
 			<translation>El fitxer rpt no és vàlid per importar.Com que la velocitat no té un valor numèric (>50), sembla que necessiteu millorar la vostra simulació.Si us plau, comproveu i solucioneu-lo abans de continuar.\nNota: podeu forçar la importació activant la variable '{0}' al fitxer {1}.\n{2}</translation>
-		</message>
-		<message>
-			<source>The [SCENARIOS] section of the configuration file is empty.</source>
-			<translation>La secció [ESCENARIS] del fitxer de configuració està buida.</translation>
-		</message>
-		<message>
-			<source>The schema ({0}) does not exists</source>
-			<translation>L'esquema ({0}) no existeix</translation>
-		</message>
-		<message>
-			<source>The schema '{0}' is being used in production! It can't be deleted.</source>
-			<translation>L'esquema "{0}" s'està utilitzant en producció!No es pot esborrar.</translation>
 		</message>
 		<message>
 			<source>The schema version has to be updated to make rename</source>
@@ -5529,10 +5569,6 @@
 			<translation>El node seleccionat hauria de tenir exactament dos arcs enllaçats.</translation>
 		</message>
 		<message>
-			<source>These links could not be located within the network: </source>
-			<translation>Aquests enllaços no s'han pogut localitzar a la xarxa:</translation>
-		</message>
-		<message>
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
 			<translation>Aquestes canonades s'han assignat com a normatives per defecte, el que pot afectar al seu valor de prioritat.</translation>
 		</message>
@@ -5551,6 +5587,10 @@
 		<message>
 			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
 			<translation>A aquestes canonades NO se'ls hi ha assignat cap valor de prioritat perquè el material desconegut configurat, {unknown_material}, no està llistat en la pesntanya de configuració de materials.</translation>
+		</message>
+		<message>
+			<source>Truncated graph by bounding box</source>
+			<translation>Gràfic truncat per quadre delimitador</translation>
 		</message>
 		<message>
 			<source>These pipes received the maximum longevity value for their material.</source>
@@ -5585,8 +5625,8 @@
 			<translation>L'any objectiu ha d'estar entre {0} i {1}.</translation>
 		</message>
 		<message>
-			<source>The team name already exists</source>
-			<translation>El nom de l'equip ja existeix</translation>
+			<source>Truncated graph by polygon</source>
+			<translation>Gràfic truncat per polígon</translation>
 		</message>
 		<message>
 			<source>The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.</source>
@@ -5627,6 +5667,10 @@
 		<message>
 			<source>This arc has redundant data on both (elev  y) values. Review it and use only one.</source>
 			<translation>Aquest arc té dades redundants en els dos valors (elev i y).Reviseu-lo i utilitzeu-ne només un.</translation>
+		</message>
+		<message>
+			<source>Try again</source>
+			<translation>Tornar a intentar</translation>
 		</message>
 		<message>
 			<source>This area is {ratio:,} times your configured Overpass max query area size. It will automatically be divided up into multiple sub-queries accordingly. This may take a long time.</source>
@@ -5753,6 +5797,10 @@
 			<translation>Aquesta tasca pot pendre algún temps, ¿dessitja continuar?</translation>
 		</message>
 		<message>
+			<source>Typeahead '{0}' doesn't have neither a queryText nor comboIds/comboNames.</source>
+			<translation>Introduïu "{0}" no té ni queryText ni comboIds/comboNames.</translation>
+		</message>
+		<message>
 			<source>This tool is still in developement, it might not work as intended.</source>
 			<translation>Aquesta eina encara està en desenvolupament, és possible que no funcioni com es preveia.</translation>
 		</message>
@@ -5869,26 +5917,6 @@
 			<translation>S'ha intentat establir {0} com a "{1}", però no és un nombre enter.Per defecte, 4 fils.</translation>
 		</message>
 		<message>
-			<source>Triggers updated successfully</source>
-			<translation>Els activadors s'han actualitzat correctament</translation>
-		</message>
-		<message>
-			<source>Truncated graph by bounding box</source>
-			<translation>Gràfic truncat per quadre delimitador</translation>
-		</message>
-		<message>
-			<source>Truncated graph by polygon</source>
-			<translation>Gràfic truncat per polígon</translation>
-		</message>
-		<message>
-			<source>Try again</source>
-			<translation>Tornar a intentar</translation>
-		</message>
-		<message>
-			<source>Typeahead '{0}' doesn't have neither a queryText nor comboIds/comboNames.</source>
-			<translation>Introduïu "{0}" no té ni queryText ni comboIds/comboNames.</translation>
-		</message>
-		<message>
 			<source>    type = {Working paper},</source>
 			<translation>tipus = {Document de treball},</translation>
 		</message>
@@ -5919,10 +5947,6 @@
 		<message>
 			<source>Unexpected json_data structure!</source>
 			<translation>Estructura json_data inesperada!</translation>
-		</message>
-		<message>
-			<source>Unhandled Error</source>
-			<translation>Error no gestionat</translation>
 		</message>
 		<message>
 			<source>Unknown context: {0}, skipping.</source>
@@ -6033,6 +6057,10 @@
 			<translation>ADVERTIMENT</translation>
 		</message>
 		<message>
+			<source>widgettype is wrongly configured. Needs to be in </source>
+			<translation>El tipus de widget està mal configurat.Necessita estar dins</translation>
+		</message>
+		<message>
 			<source>Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing all strings defined on the config/dev.config file. Be sure your config file is OK before continue</source>
 			<translation>Avís: esteu segur de continuar?.Aquest botó actualitzarà el fitxer de plantilles qgis del connector substituint totes les cadenes definides al fitxer config/dev.config.Assegureu-vos que el vostre fitxer de configuració estigui bé abans de continuar</translation>
 		</message>
@@ -6055,6 +6083,26 @@
 		<message>
 			<source>WARNING: You have updated the status value to EXECUTED (Save Trace). If you click 'Accept' on  </source>
 			<translation>ADVERTÈNCIA: heu actualitzat el valor d'estat a EXECUTED (Desa la traça). Si feu clic a "Acceptar".</translation>
+		</message>
+		<message>
+			<source>widgettype not found. </source>
+			<translation>No s'ha trobat el tipus de widget.</translation>
+		</message>
+		<message>
+			<source>Without replacements</source>
+			<translation>Sense substitucions</translation>
+		</message>
+		<message>
+			<source>With replacements</source>
+			<translation>Amb substitucions</translation>
+		</message>
+		<message>
+			<source>Workcat created successfully.</source>
+			<translation>Workcat s'ha creat correctament.</translation>
+		</message>
+		<message>
+			<source>Write inp file........: {0}</source>
+			<translation>Escriviu fitxer d'entrada........: {0}</translation>
 		</message>
 		<message>
 			<source>WARNING: You have updated the status value to EXECUTED (Set OPERATIVE and Save Trace). If you  </source>
@@ -6121,50 +6169,6 @@
 			<translation>Widget no trobat</translation>
 		</message>
 		<message>
-			<source>widgettype is wrongly configured. Needs to be in </source>
-			<translation>El tipus de widget està mal configurat.Necessita estar dins</translation>
-		</message>
-		<message>
-			<source>widgettype not found. </source>
-			<translation>No s'ha trobat el tipus de widget.</translation>
-		</message>
-		<message>
-			<source>Without replacements</source>
-			<translation>Sense substitucions</translation>
-		</message>
-		<message>
-			<source>With replacements</source>
-			<translation>Amb substitucions</translation>
-		</message>
-		<message>
-			<source>Workcat created successfully.</source>
-			<translation>Workcat s'ha creat correctament.</translation>
-		</message>
-		<message>
-			<source>Work_id field is empty</source>
-			<translation>Work_id field is empty</translation>
-		</message>
-		<message>
-			<source>Write inp file........: {0}</source>
-			<translation>Escriviu fitxer d'entrada........: {0}</translation>
-		</message>
-		<message>
-			<source>`X` and `Y` cannot contain nulls.</source>
-			<translation>"X" i "Y" no poden contenir valors nuls.</translation>
-		</message>
-		<message>
-			<source>Year</source>
-			<translation>Any</translation>
-		</message>
-		<message>
-			<source>    year = {2024}</source>
-			<translation>any = {2024}</translation>
-		</message>
-		<message>
-			<source>You are about to delete the result</source>
-			<translation>Esteu a punt d'esborrar el resultat</translation>
-		</message>
-		<message>
 			<source>You are about to delete the result </source>
 			<translation>Està a punt d'esborrar el resultat</translation>
 		</message>
@@ -6201,6 +6205,14 @@
 			<translation>Perdràs la informació anterior!</translation>
 		</message>
 		<message>
+			<source>You can change it and use 'Update Style' to create a personalized version.</source>
+			<translation>Podeu canviar-lo i utilitzar "Actualitzar estil" per crear una versió personalitzada.</translation>
+		</message>
+		<message>
+			<source>You need to enter a workcat id</source>
+			<translation>Heu d'introduir un identificador de workcat</translation>
+		</message>
+		<message>
 			<source>You are going to make this result corporate. From now on the result values will appear on feature form. Do you want to continue?</source>
 			<translation>Faràs que aquest resultat sigui corporatiu. A partir d’ara, els valors del resultat apareixeran al formulari de l’element. Vols continuar?</translation>
 		</message>
@@ -6227,10 +6239,6 @@
 		<message>
 			<source>You are trying to enter different types</source>
 			<translation>Està intentant ingressar diferents tipus </translation>
-		</message>
-		<message>
-			<source>You can change it and use 'Update Style' to create a personalized version.</source>
-			<translation>Podeu canviar-lo i utilitzar "Actualitzar estil" per crear una versió personalitzada.</translation>
 		</message>
 		<message>
 			<source>You cannot change the status of a result with status 'FINISHED'.</source>
@@ -6265,6 +6273,10 @@
 			<translation>Heu tancat una vàlvula, això modificarà les zones de mapes actuals i pot trigar una mica de temps.</translation>
 		</message>
 		<message>
+			<source>You need to enter a psector name</source>
+			<translation>Heu d'introduir un nom de sector</translation>
+		</message>
+		<message>
 			<source>You closed a valve, this will modify the current mapzones and it may take a little bit of time.</source>
 			<translation>Heu tancat una vàlvula, això modificarà les zones de mapes actuals i pot trigar una mica de temps.</translation>
 		</message>
@@ -6295,6 +6307,10 @@
 		<message>
 			<source>You have selected multiple documents. In this case, name will be a sequential number for all selected documents and your name won't be used.</source>
 			<translation>Heu seleccionat diversos documents.En aquest cas, el nom serà un número seqüencial per a tots els documents seleccionats i el vostre nom no s'utilitzarà.</translation>
+		</message>
+		<message>
+			<source>You need to enter a visit ID</source>
+			<translation>Heu d'introduir un identificador de visita</translation>
 		</message>
 		<message>
 			<source>You have to fill in 'date'</source>
@@ -6359,18 +6375,6 @@
 		<message>
 			<source>You need to enter a feature id</source>
 			<translation>Ha d'ingressar una identificació de l'element de xarxa</translation>
-		</message>
-		<message>
-			<source>You need to enter a psector name</source>
-			<translation>Heu d'introduir un nom de sector</translation>
-		</message>
-		<message>
-			<source>You need to enter a visit ID</source>
-			<translation>Heu d'introduir un identificador de visita</translation>
-		</message>
-		<message>
-			<source>You need to enter a workcat id</source>
-			<translation>Heu d'introduir un identificador de workcat</translation>
 		</message>
 		<message>
 			<source>You need to enter hydrometer_id</source>
@@ -6488,25 +6492,1245 @@
 
 	<!-- UI TRANSLATION -->
 	<context>
-		<name>nonvisual_manager</name>
+		<name>add_campaign</name>
 		<message>
 			<source>title</source>
-			<translation>Gestor d’objectes no visuals</translation>
+			<translation>Campanya</translation>
 		</message>
 		<message>
-			<source>inp_lid</source>
-			<translation>Tapes</translation>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
-			<source>tooltip_inp_lid</source>
+			<source>tooltip_tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relació d'elemnts</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Elements relation</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Connec</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>Connec</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>dlg_add_campaign</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_campaign</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>ve_inp_timeseries</source>
-			<translation>sèries temporals</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel·la</translation>
 		</message>
 		<message>
-			<source>tooltip_ve_inp_timeseries</source>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·la</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_inventory</name>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Reixa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_review</name>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Connec</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_review_old</name>
+		<message>
+			<source>campaign_btn_export_rel</source>
+			<translation>Exportar a csv</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_export_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>active</source>
+			<translation>Actiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>action_selector</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_action_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_5</source>
+			<translation>Rotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_8</source>
+			<translation>Adreça:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_8</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_7</source>
+			<translation>Estatus:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_7</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_6</source>
+			<translation>Duració:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_6</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_5</source>
+			<translation>Organizació:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_4</source>
+			<translation>Fi real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_4</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_3</source>
+			<translation>Inici real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Exercici:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_campaign</source>
+			<translation>Campanya:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_path_rel</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_path_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>CampaignTab</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_CampaignTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_flexunion_code_5</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_flexunion_code_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>reviewclass_id</source>
+			<translation>Reviewclass:</translation>
+		</message>
+		<message>
+			<source>tooltip_reviewclass_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>RelationsTab</source>
+			<translation>Relació d'elements</translation>
+		</message>
+		<message>
+			<source>tooltip_RelationsTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_feature_type</source>
+			<translation>Tipus d'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_3</source>
+			<translation>Inici planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_2</source>
+			<translation>Final planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_visit</name>
+		<message>
+			<source>tab_connec</source>
+			<translation>Connec</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_visit_old</name>
+		<message>
+			<source>label</source>
+			<translation>Exercici:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_flexunion_code_5</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_flexunion_code_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>active</source>
+			<translation>Actiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>action_selector</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_action_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_export_rel</source>
+			<translation>Exportar a csv</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_export_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_path_rel</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_path_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>CampaignTab</source>
+			<translation>Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_CampaignTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_campaign</source>
+			<translation>Campanya:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_3</source>
+			<translation>Inici real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_4</source>
+			<translation>Fi real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_4</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_5</source>
+			<translation>Organizació:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_6</source>
+			<translation>Duració:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_6</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_7</source>
+			<translation>Estatus:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_7</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_8</source>
+			<translation>Adreça:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_8</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_feature_type</source>
+			<translation>Tipus d'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_2</source>
+			<translation>Final planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_3</source>
+			<translation>Inici planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_5</source>
+			<translation>Rotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>RelationsTab</source>
+			<translation>Relació d'elements</translation>
+		</message>
+		<message>
+			<source>tooltip_RelationsTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>visitclass_id</source>
+			<translation>Visitclass:</translation>
+		</message>
+		<message>
+			<source>tooltip_visitclass_id</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_demand_check</name>
+		<message>
+			<source>title</source>
+			<translation>Comprovació de la demanda addicional</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_config</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_nodes</source>
+			<translation>Utilitzar nodes de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_nodes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_database</source>
+			<translation>Base de dades</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_add_demand_check</source>
+			<translation>Comprovació de la demanda addicional</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_demand_check</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_lot</name>
+		<message>
+			<source>title</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>State:</translation>
+		</message>
+		<message>
+			<source>lbl_team</source>
+			<translation>Equip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_team</source>
+			<translation>Team:</translation>
+		</message>
+		<message>
+			<source>LotTab</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_LotTab</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Connec</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_rel</source>
+			<translation>Export to csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_rel</source>
+			<translation>Export to csv</translation>
+		</message>
+		<message>
+			<source>lbl_ot_type</source>
+			<translation>Tipus d'Ot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ot_type</source>
+			<translation>Ot type:</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>VisitsTab</source>
+			<translation>Visites</translation>
+		</message>
+		<message>
+			<source>tooltip_VisitsTab</source>
+			<translation>Visits</translation>
+		</message>
+		<message>
+			<source>add_lot</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_add_lot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_address</source>
+			<translation>Adreça:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_address</source>
+			<translation>Adreça:</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrar per id d'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>Filter by element id:</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>lbl_observations</source>
+			<translation>Observacions:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observations</source>
+			<translation>Observations:</translation>
+		</message>
+		<message>
+			<source>lbl_ot</source>
+			<translation>Ot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ot</source>
+			<translation>Ot:</translation>
+		</message>
+		<message>
+			<source>lbl_performance_type</source>
+			<translation>Tipus d'actuació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_performance_type</source>
+			<translation>Performance type:</translation>
+		</message>
+		<message>
+			<source>lbl_plan_end</source>
+			<translation>Fi planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_plan_end</source>
+			<translation>Planned end:</translation>
+		</message>
+		<message>
+			<source>lbl_plan_start</source>
+			<translation>Inici planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_plan_start</source>
+			<translation>Planned start:</translation>
+		</message>
+		<message>
+			<source>lbl_real_end</source>
+			<translation>Real end:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_real_end</source>
+			<translation>Real end:</translation>
+		</message>
+		<message>
+			<source>lbl_real_start</source>
+			<translation>Inici real:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_real_start</source>
+			<translation>Real start:</translation>
+		</message>
+		<message>
+			<source>RelationsTab</source>
+			<translation>Relació d'elements</translation>
+		</message>
+		<message>
+			<source>tooltip_RelationsTab</source>
+			<translation>Elements relation</translation>
+		</message>
+		<message>
+			<source>grb_ot</source>
+			<translation>Ordre de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_ot</source>
+			<translation>Work order</translation>
+		</message>
+		<message>
+			<source>label_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>label_data_event_to</source>
+			<translation>Fins:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_data_event_to</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>label_feature_type</source>
+			<translation>Tipus d'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_feature_type</source>
+			<translation>Element type:</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_description</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_visit</source>
+			<translation>Eliminar visita</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_visit</source>
+			<translation>Delete visit</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_user</source>
+			<translation>Usuari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user</source>
+			<translation>User:</translation>
+		</message>
+		<message>
+			<source>btn_export_visits</source>
+			<translation>Exportar a csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_visits</source>
+			<translation>Export to csv</translation>
+		</message>
+		<message>
+			<source>btn_open_photo</source>
+			<translation>Obrir foto</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_photo</source>
+			<translation>Open photo</translation>
+		</message>
+		<message>
+			<source>btn_open_visit</source>
+			<translation>Obrir visita</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_visit</source>
+			<translation>Open visit</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_validate_all</source>
+			<translation>Validar totes</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_validate_all</source>
+			<translation>Validate all</translation>
+		</message>
+		<message>
+			<source>dlg_add_lot</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_lot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_lot</source>
+			<translation>Lot:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_lot</source>
+			<translation>Lot:</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_workorder</name>
+		<message>
+			<source>title</source>
+			<translation>Ordre de treball</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_workorder</source>
+			<translation>Ordre de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_add_workorder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_add_workorder</source>
+			<translation>Ordre de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_workorder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Ordre de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6515,6 +7739,30 @@
 		<message>
 			<source>title</source>
 			<translation>Giswater</translation>
+		</message>
+		<message>
+			<source>btn_create_audit</source>
+			<translation>Creeu un esquema d'auditoria de base de dades</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_audit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_connection</source>
+			<translation>Nom connexió:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_custom_select_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_custom_select_file</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>action_create_sample</source>
@@ -6565,14 +7813,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_create_audit</source>
-			<translation>Creeu un esquema d'auditoria de base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_audit</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_create_cm</source>
 			<translation>Creeu un esquema DB cm</translation>
 		</message>
@@ -6610,14 +7850,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_custom_load_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_custom_select_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_custom_select_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6885,14 +8117,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_connection</source>
-			<translation>Nom connexió:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connection</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_name</source>
 			<translation>Nom:</translation>
 		</message>
@@ -6956,35 +8180,11 @@
 			<translation>Diàleg</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
 			<source>btn_open</source>
 			<translation>Obrir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_admin_addfields</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_admin_addfields</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7009,6 +8209,62 @@
 		</message>
 		<message>
 			<source>tooltip_grb_mandatory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_field_name</source>
+			<translation>Nom de camp:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_field_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editable</source>
+			<translation>Editable:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editable</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enabled</source>
+			<translation>Habilitat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enabled</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_field_length</source>
+			<translation>Longitud de camp:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_field_length</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>dlg_admin_addfields</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_admin_addfields</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7041,118 +8297,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_columnname</source>
-			<translation>Nom columna:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_columnname</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_type</source>
-			<translation>Tipus dada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_datatype</source>
-			<translation>Tipus dada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_datatype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dv_orderby</source>
-			<translation>Ordena per identificador:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dv_orderby</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dv_querynullvalue</source>
-			<translation>Consulta el valor nul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dv_querynullvalue</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dv_querytext</source>
-			<translation>Text de consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dv_querytext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_editability</source>
-			<translation>Editabilitat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_editability</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_editable</source>
-			<translation>Editable:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_editable</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enabled</source>
-			<translation>Habilitat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enabled</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_field_length</source>
-			<translation>Longitud de camp:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_field_length</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_field_name</source>
-			<translation>Nom de camp:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_field_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_form_type</source>
-			<translation>Tipus formulari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_form_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_formtype</source>
-			<translation>Tipus formulari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_formtype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_hidden</source>
-			<translation>Ocult</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_hidden</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7193,14 +8337,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_linkedobject</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mandatory</source>
-			<translation>Obligtori:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mandatory</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7268,6 +8404,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_data_type</source>
+			<translation>Tipus dada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_query_text</source>
 			<translation>Text de consulta:</translation>
 		</message>
@@ -7289,6 +8433,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_stylesheet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mandatory</source>
+			<translation>Obligtori:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mandatory</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7332,14 +8484,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_widgettype</source>
-			<translation>Tipus de widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgettype</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>stylesheet</source>
 			<translation>&lt;html&gt;&lt;cap/&gt;&lt;cos&gt;&lt;p&gt;{&amp;quot;etiqueta&amp;quot;:&amp;quot;color:verd;font-weight:bold;&amp;quot;,&quot;widget&amp;quot;:{&amp;quot;activat&amp;quot;:&amp;quot;color:negre;pes de la font:negreta;&amp;quot;,&amp;quot;desactivat&amp;quot;:&amp;quot;color:negre;font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
 		</message>
@@ -7372,11 +8516,91 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_widgettype</source>
+			<translation>Tipus de widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgettype</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_update</source>
 			<translation>Actualitzar</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hidden</source>
+			<translation>Ocult</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hidden</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_formtype</source>
+			<translation>Tipus formulari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_formtype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_form_type</source>
+			<translation>Tipus formulari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_form_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_columnname</source>
+			<translation>Nom columna:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_columnname</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_datatype</source>
+			<translation>Tipus dada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_datatype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dv_orderby</source>
+			<translation>Ordena per identificador:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dv_orderby</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dv_querynullvalue</source>
+			<translation>Consulta el valor nul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dv_querynullvalue</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dv_querytext</source>
+			<translation>Text de consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dv_querytext</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editability</source>
+			<translation>Editabilitat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editability</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7387,27 +8611,19 @@
 			<translation>Crea un esquema base</translation>
 		</message>
 		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_accept</source>
 			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel_task</source>
-			<translation>Cancel·la la tasca</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_task</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7427,11 +8643,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
+			<source>btn_cancel_task</source>
+			<translation>Cancel·la la tasca</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_btn_cancel_task</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7442,36 +8658,20 @@
 			<source>tooltip_lbl_project_name</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>admin_cm_create</name>
 		<message>
 			<source>title</source>
 			<translation>Crear esquema de projecte</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Crea una mostra</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crea una mostra de desenvolupament</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_base_schema</source>
@@ -7498,6 +8698,38 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_pschema_qgis_file</source>
+			<translation>Creeu un fitxer pschema qgis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_pschema_qgis_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample</source>
+			<translation>Crea una mostra</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crea una mostra de desenvolupament</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample_Dev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_example</source>
 			<translation>Crea un exemple</translation>
 		</message>
@@ -7511,14 +8743,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_parent_schema</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_pschema_qgis_file</source>
-			<translation>Creeu un fitxer pschema qgis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_pschema_qgis_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7553,14 +8777,6 @@
 			<translation>Credencials de connexió</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
 			<source>dlg_admin_credentials</source>
 			<translation>Credencials de connexió</translation>
 		</message>
@@ -7569,35 +8785,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_main_credentials</source>
-			<translation>Diàleg</translation>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_credentials</source>
-			<translation>None</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>label</source>
-			<translation>Mode SSL:</translation>
+			<source>lbl_user_name</source>
+			<translation>Nom d'usuari:</translation>
 		</message>
 		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_connec</source>
-			<translation>Connexió:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_connection_message</source>
-			<translation>No s'han pogut recuperar els paràmetres.</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connection_message</source>
+			<source>tooltip_lbl_user_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7609,11 +8809,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_user_name</source>
-			<translation>Nom d'usuari:</translation>
+			<source>lbl_connection_message</source>
+			<translation>No s'han pogut recuperar els paràmetres.</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_user_name</source>
+			<source>tooltip_lbl_connection_message</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_connec</source>
+			<translation>Connexió:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Mode SSL:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_credentials</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_credentials</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7624,67 +8848,27 @@
 			<translation>Crear esquema de projecte</translation>
 		</message>
 		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Crea una mostra</translation>
+			<source>lbl_locale</source>
+			<translation>Idioma:</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
+			<source>tooltip_lbl_locale</source>
+			<translation>Idioma esquema</translation>
 		</message>
 		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crea una mostra de desenvolupament</translation>
+			<source>lbl_filter</source>
+			<translation>Fliltrar SRID:</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
-			<translation>None</translation>
+			<source>tooltip_lbl_filter</source>
+			<translation>Identificador de referència espacial. Només es permeten els valors que es mostren en la taula</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel_task</source>
-			<translation>Cancel·la la tasca</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_task</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_push_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_admin_dbproject</source>
-			<translation>Crear esquema de projecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_admin_dbproject</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_main_dbproject</source>
-			<translation>Crear esquema de projecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_main_dbproject</source>
+			<source>tooltip_lbl_descript</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7696,60 +8880,60 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
+			<source>dlg_main_dbproject</source>
+			<translation>Crear esquema de projecte</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_dlg_main_dbproject</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_filter</source>
-			<translation>Fliltrar SRID:</translation>
+			<source>btn_cancel_task</source>
+			<translation>Cancel·la la tasca</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>Identificador de referència espacial. Només es permeten els valors que es mostren en la taula</translation>
-		</message>
-		<message>
-			<source>lbl_locale</source>
-			<translation>Idioma:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_locale</source>
-			<translation>Idioma esquema</translation>
-		</message>
-		<message>
-			<source>lbl_project_name</source>
-			<translation>Nom projecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_name</source>
-			<translation>Nom d'un esquema nou. El nom ha d'escriures en minúscules utilitzant les lletres de l'alfabet anglès y sense espais ni guions.</translation>
-		</message>
-		<message>
-			<source>lbl_project_type</source>
-			<translation>Tipus de projecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_type</source>
+			<source>tooltip_btn_cancel_task</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_source</source>
-			<translation>Font de dades:</translation>
+			<source>dlg_admin_dbproject</source>
+			<translation>Crear esquema de projecte</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_source</source>
+			<source>tooltip_dlg_admin_dbproject</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>rdb_empty</source>
-			<translation>Sense dades</translation>
+			<source>actionCreate_Sample</source>
+			<translation>Crea una mostra</translation>
 		</message>
 		<message>
-			<source>tooltip_rdb_empty</source>
+			<source>tooltip_actionCreate_Sample</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>rdb_inp</source>
@@ -7757,6 +8941,22 @@
 		</message>
 		<message>
 			<source>tooltip_rdb_inp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crea una mostra de desenvolupament</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample_Dev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_sample_inv</source>
+			<translation>Exemple inventari</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_sample_inv</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7768,12 +8968,36 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>rdb_sample_inv</source>
-			<translation>Exemple inventari</translation>
+			<source>rdb_empty</source>
+			<translation>Sense dades</translation>
 		</message>
 		<message>
-			<source>tooltip_rdb_sample_inv</source>
+			<source>tooltip_rdb_empty</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_source</source>
+			<translation>Font de dades:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_source</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_type</source>
+			<translation>Tipus de projecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_name</source>
+			<translation>Nom projecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_name</source>
+			<translation>Nom d'un esquema nou. El nom ha d'escriures en minúscules utilitzant les lletres de l'alfabet anglès y sense espais ni guions.</translation>
 		</message>
 	</context>
 	<context>
@@ -7781,6 +9005,46 @@
 		<message>
 			<source>title</source>
 			<translation>Crear un projecte GIS</translation>
+		</message>
+		<message>
+			<source>txt_roletype</source>
+			<translation>inventari</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_roletype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_gis_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_gis_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_gis_folder</source>
+			<translation>Carpeta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_gis_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_type</source>
+			<translation>Tipus de projecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_role</source>
+			<translation>Tipus rol:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_role</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>actionCreate_Sample</source>
@@ -7813,14 +9077,6 @@
 		<message>
 			<source>tooltip_btn_close</source>
 			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_gis_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_gis_folder</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>dlg_admin_gisproject</source>
@@ -7855,43 +9111,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_gis_folder</source>
-			<translation>Carpeta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_gis_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_project_type</source>
-			<translation>Tipus de projecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_role</source>
-			<translation>Tipus rol:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_role</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>statusbar</source>
 			<translation>Crea una mostra de desenvolupament</translation>
 		</message>
 		<message>
 			<source>tooltip_statusbar</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_roletype</source>
-			<translation>inventari</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_roletype</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7900,6 +9124,78 @@
 		<message>
 			<source>title</source>
 			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>dlg_admin_i18n_manager</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_admin_i18n_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_search</source>
+			<translation>Cerca</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_user</source>
+			<translation>Usuari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_port</source>
+			<translation>Port:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_port</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pass</source>
+			<translation>Contrasenya:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pass</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_host</source>
+			<translation>Host:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_host</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_database</source>
+			<translation>Base de dades:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grp_search_options</source>
+			<translation>Opcions de cerca</translation>
+		</message>
+		<message>
+			<source>tooltip_grp_search_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_i18n_conn</source>
+			<translation>Connexió i18n</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_i18n_conn</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -7915,14 +9211,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_connection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_search</source>
-			<translation>Cerca</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_search</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7981,70 +9269,6 @@
 			<source>tooltip_chk_py_messages</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>dlg_admin_i18n_manager</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_admin_i18n_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_i18n_conn</source>
-			<translation>Connexió i18n</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_i18n_conn</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grp_search_options</source>
-			<translation>Opcions de cerca</translation>
-		</message>
-		<message>
-			<source>tooltip_grp_search_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_database</source>
-			<translation>Base de dades:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_database</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_host</source>
-			<translation>Host:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_host</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pass</source>
-			<translation>Contrasenya:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_port</source>
-			<translation>Port:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_port</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_user</source>
-			<translation>Usuari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_importinp</name>
@@ -8096,27 +9320,19 @@
 			<translation>Diàleg</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Execuatr</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_admin_import_osm</source>
 			<translation>Diàleg</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_admin_import_osm</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_log</source>
+			<translation>Logs</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_log</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8128,11 +9344,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_log</source>
-			<translation>Logs</translation>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_log</source>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Execuatr</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -8143,6 +9367,14 @@
 			<translation>Diàleg</translation>
 		</message>
 		<message>
+			<source>lbl_schema_update</source>
+			<translation>Nom de l’esquema:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_schema_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Tancar</translation>
 		</message>
@@ -8151,11 +9383,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_generate</source>
-			<translation>Generar</translation>
+			<source>lb_path</source>
+			<translation>Camí del fitxer:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_generate</source>
+			<source>tooltip_lb_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8175,27 +9407,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_schema_update</source>
-			<translation>Nom de l’esquema:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_schema_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lb_path</source>
-			<translation>Camí del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lb_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>pushButton_2</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_pushButton_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_generate</source>
+			<translation>Generar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_generate</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -8204,6 +9428,14 @@
 		<message>
 			<source>title</source>
 			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>lb_path</source>
+			<translation>Camí del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lb_path</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -8277,14 +9509,6 @@
 			<source>tooltip_lbl_schema_update</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lb_path</source>
-			<translation>Camí del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lb_path</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_projectinfo</name>
@@ -8293,19 +9517,11 @@
 			<translation>Actualitzar SQL</translation>
 		</message>
 		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Crea una mostra</translation>
+			<source>btn_update</source>
+			<translation>Actualitzar</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crea una mostra de desenvolupament</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
+			<source>tooltip_btn_update</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8317,11 +9533,11 @@
 			<translation>Tancar</translation>
 		</message>
 		<message>
-			<source>btn_update</source>
-			<translation>Actualitzar</translation>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crea una mostra de desenvolupament</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_update</source>
+			<source>tooltip_actionCreate_Sample_Dev</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8333,27 +9549,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_main_projectinfo</source>
-			<translation>Actualitzar SQL</translation>
+			<source>actionCreate_Sample</source>
+			<translation>Crea una mostra</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_projectinfo</source>
+			<source>tooltip_actionCreate_Sample</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_info</source>
-			<translation>Informació sobre les noves actualitzacions:</translation>
+			<source>tab_main</source>
+			<translation>Principal</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>statusbar</source>
-			<translation>Crea una mostra de desenvolupament</translation>
-		</message>
-		<message>
-			<source>tooltip_statusbar</source>
+			<source>tooltip_tab_main</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8365,38 +9573,46 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_main</source>
-			<translation>Principal</translation>
+			<source>statusbar</source>
+			<translation>Crea una mostra de desenvolupament</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_main</source>
+			<source>tooltip_statusbar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Informació sobre les noves actualitzacions:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_projectinfo</source>
+			<translation>Actualitzar SQL</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_projectinfo</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
 		<name>admin_qtdialog</name>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
 			<source>btn_path</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Ruta UI</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8408,6 +9624,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
 			<source>lbl_formname</source>
 			<translation>Nom formulari:</translation>
 		</message>
@@ -8416,12 +9640,12 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_path</source>
-			<translation>Ruta UI</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_path</source>
-			<translation>None</translation>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
 		</message>
 	</context>
 	<context>
@@ -8429,30 +9653,6 @@
 		<message>
 			<source>title</source>
 			<translation>Canvia el nom</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Crea una mostra</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crea una mostra de desenvolupament</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -8463,19 +9663,19 @@
 			<translation>Cancel·lar</translation>
 		</message>
 		<message>
-			<source>dlg_admin_renameproj</source>
-			<translation>Canvia el nom</translation>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crea una mostra de desenvolupament</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_admin_renameproj</source>
+			<source>tooltip_actionCreate_Sample_Dev</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_readsq_rename</source>
-			<translation>Renombrar projecte</translation>
+			<source>statusbar</source>
+			<translation>Crea una mostra de desenvolupament</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_readsq_rename</source>
+			<source>tooltip_statusbar</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8487,16 +9687,112 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>statusbar</source>
-			<translation>Crea una mostra de desenvolupament</translation>
+			<source>dlg_readsq_rename</source>
+			<translation>Renombrar projecte</translation>
 		</message>
 		<message>
-			<source>tooltip_statusbar</source>
+			<source>tooltip_dlg_readsq_rename</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_admin_renameproj</source>
+			<translation>Canvia el nom</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_admin_renameproj</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample</source>
+			<translation>Crea una mostra</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 	</context>
 	<context>
 		<name>admin_sysfields</name>
+		<message>
+			<source>lbl_layout_name</source>
+			<translation>Nom de disseny:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_layout_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mandatory</source>
+			<translation>Obligtori:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mandatory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_placeholder</source>
+			<translation>Macador de posició:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_placeholder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_stylesheet</source>
+			<translation>Full d'estil:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_stylesheet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_tooltip</source>
+			<translation>Tooltip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_tooltip</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_widgetcontrols</source>
+			<translation>Controls del widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgetcontrols</source>
+			<translation>Exemple de configuració keys {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014", "filterSign": ">}</translation>
+		</message>
+		<message>
+			<source>tab_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Obrir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>btn_accept</source>
 			<translation>Acceptar</translation>
@@ -8514,14 +9810,6 @@
 			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>btn_open</source>
-			<translation>Obrir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_main_sysfields</source>
 			<translation>Diàleg</translation>
 		</message>
@@ -8530,19 +9818,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_additional_conf</source>
-			<translation>Configuració adicional</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_additional_conf</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>grb_basic_conf</source>
 			<translation>Configuració bàsica</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_basic_conf</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_additional_conf</source>
+			<translation>Configuració adicional</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_additional_conf</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8602,75 +9890,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_layout_name</source>
-			<translation>Nom de disseny:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_layout_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_layout_order</source>
 			<translation>Ordre de disseny:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_layout_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mandatory</source>
-			<translation>Obligtori:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mandatory</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_placeholder</source>
-			<translation>Macador de posició:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_placeholder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_stylesheet</source>
-			<translation>Full d'estil:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_stylesheet</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_tooltip</source>
-			<translation>Tooltip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_tooltip</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_widgetcontrols</source>
-			<translation>Controls del widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgetcontrols</source>
-			<translation>Exemple de configuració keys {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014", "filterSign": ">}</translation>
-		</message>
-		<message>
-			<source>tab_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_update</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -8679,6 +9903,14 @@
 		<message>
 			<source>title</source>
 			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>grb_info_connection</source>
+			<translation>Informació de la connexió</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info_connection</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -8758,14 +9990,6 @@
 		</message>
 		<message>
 			<source>tooltip_dlg_admin_translation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info_connection</source>
-			<translation>Informació de la connexió</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info_connection</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8852,6 +10076,174 @@
 	<context>
 		<name>admin_ui</name>
 		<message>
+			<source>grb_project_scin</source>
+			<translation>Informació de l'esquema del projecte</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_project_scin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_schema_manager</source>
+			<translation>Gestiói d'esquema</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_schema_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_general</source>
+			<translation>General</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_general</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_fields_manager</source>
+			<translation>Gestor de camps</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_fields_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_api_manager</source>
+			<translation>Administrador Api</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_api_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_advanced</source>
+			<translation>Avançat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_advanced</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_use_constrains</source>
+			<translation>Utilitzar restrinccions:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_use_constrains</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_update_all_sch</source>
+			<translation>Actualitzar tot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_update_all_sch</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create_field</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_field</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ui_path</source>
+			<translation>Rauta UI</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ui_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ui_form_name</source>
+			<translation>Nom del formulari</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ui_form_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_system_feature</source>
+			<translation>Nom de l'element</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_system_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reload_func_sch</source>
+			<translation>Recargar funcions:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reload_func_sch</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_type</source>
+			<translation>Tipus de projecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_type</source>
+			<translation>Tipus de giswater</translation>
+		</message>
+		<message>
+			<source>lbl_name</source>
+			<translation>Nom:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_name</source>
+			<translation>Nom de l'esquema de la base de dades</translation>
+		</message>
+		<message>
+			<source>lbl_connection</source>
+			<translation>Nom connexió:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connection</source>
+			<translation>Nom de la connexió de la base de dades definida en QGIS</translation>
+		</message>
+		<message>
+			<source>lbl_child_feature</source>
+			<translation>Nom de l'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_child_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_add_fields_feature</source>
+			<translation>Nom de l'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_add_fields_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_visit</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_visit</source>
+			<translation>Crear, configurar o eliminar la definició de visita relacionada amb un tipus d'entitat seleccionada o per tots els tipus d'elements definits en un projecte.</translation>
+		</message>
+		<message>
+			<source>tab_schema_manager</source>
+			<translation>Admionistrador d'esquema</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_schema_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_schema_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_schema_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Tancar</translation>
 		</message>
@@ -8876,14 +10268,6 @@
 			<translation>Copiar l'esquema de base de dades seleccionat</translation>
 		</message>
 		<message>
-			<source>btn_create_field</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_field</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_create_qgis_template</source>
 			<translation>Plantilles QGIS</translation>
 		</message>
@@ -8897,6 +10281,14 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create_view</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_schema_reload</source>
+			<translation>Recargar</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_schema_reload</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9099,180 +10491,20 @@
 			<source>tooltip_grb_manage_ui</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>grb_project_scin</source>
-			<translation>Informació de l'esquema del projecte</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_project_scin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_schema_manager</source>
-			<translation>Gestiói d'esquema</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_schema_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_schema_reload</source>
-			<translation>Recargar</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_schema_reload</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_schema_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_schema_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_visit</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_visit</source>
-			<translation>Crear, configurar o eliminar la definició de visita relacionada amb un tipus d'entitat seleccionada o per tots els tipus d'elements definits en un projecte.</translation>
-		</message>
-		<message>
-			<source>lbl_add_fields_feature</source>
-			<translation>Nom de l'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_add_fields_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_child_feature</source>
-			<translation>Nom de l'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_child_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_connection</source>
-			<translation>Nom connexió:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connection</source>
-			<translation>Nom de la connexió de la base de dades definida en QGIS</translation>
-		</message>
-		<message>
-			<source>lbl_name</source>
-			<translation>Nom:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_name</source>
-			<translation>Nom de l'esquema de la base de dades</translation>
-		</message>
-		<message>
-			<source>lbl_project_type</source>
-			<translation>Tipus de projecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_type</source>
-			<translation>Tipus de giswater</translation>
-		</message>
-		<message>
-			<source>lbl_reload_func_sch</source>
-			<translation>Recargar funcions:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_reload_func_sch</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_system_feature</source>
-			<translation>Nom de l'element</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_system_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ui_form_name</source>
-			<translation>Nom del formulari</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ui_form_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ui_path</source>
-			<translation>Rauta UI</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ui_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_update_all_sch</source>
-			<translation>Actualitzar tot:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_update_all_sch</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_use_constrains</source>
-			<translation>Utilitzar restrinccions:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_use_constrains</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_advanced</source>
-			<translation>Avançat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_advanced</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_api_manager</source>
-			<translation>Administrador Api</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_api_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_fields_manager</source>
-			<translation>Gestor de camps</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_fields_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_general</source>
-			<translation>General</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_general</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_schema_manager</source>
-			<translation>Admionistrador d'esquema</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_schema_manager</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_update_translation</name>
 		<message>
 			<source>title</source>
 			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>lbl_user</source>
+			<translation>Usuari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -9355,14 +10587,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_language</source>
-			<translation>Idioma:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_language</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_pass</source>
 			<translation>Contrasenya:</translation>
 		</message>
@@ -9395,11 +10619,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_user</source>
-			<translation>Usuari:</translation>
+			<source>lbl_language</source>
+			<translation>Idioma:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_user</source>
+			<source>tooltip_lbl_language</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -9408,14 +10632,6 @@
 		<message>
 			<source>title</source>
 			<translation>Gestionar clase de visita</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_class_cancel</source>
@@ -9474,83 +10690,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_main_visitclass</source>
-			<translation>Gestionar clase de visita</translation>
+			<source>lbl_viewname</source>
+			<translation>Vuere nom:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_visitclass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Classe</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Paràmetres</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_active</source>
-			<translation>Actiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_class_id</source>
-			<translation>Id clase:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_class_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_class_name</source>
-			<translation>Nom clase:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_class_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_type</source>
-			<translation>Tipus de característica:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_multi_event</source>
-			<translation>Event múltiple:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_multi_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_multi_feat</source>
-			<translation>Element múltiples:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_multi_feat</source>
+			<source>tooltip_lbl_viewname</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9562,11 +10706,59 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_viewname</source>
-			<translation>Vuere nom:</translation>
+			<source>lbl_multi_feat</source>
+			<translation>Element múltiples:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_viewname</source>
+			<source>tooltip_lbl_multi_feat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_multi_event</source>
+			<translation>Event múltiple:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_multi_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_type</source>
+			<translation>Tipus de característica:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_class_name</source>
+			<translation>Nom clase:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_class_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_class_id</source>
+			<translation>Id clase:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_class_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_active</source>
+			<translation>Actiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_active</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9577,12 +10769,100 @@
 			<source>tooltip_lbl_visit_type</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Paràmetres</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Classe</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_visitclass</source>
+			<translation>Gestionar clase de visita</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_visitclass</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
 	</context>
 	<context>
 		<name>admin_visitparam</name>
 		<message>
 			<source>title</source>
 			<translation>Gestionar paràmetre de visita</translation>
+		</message>
+		<message>
+			<source>lbl_form_type</source>
+			<translation>Tipus formulari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_form_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_name</source>
+			<translation>Nom paràmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_type</source>
+			<translation>Tipus paràmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_query_text</source>
+			<translation>Text de consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_query_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_short_descript</source>
+			<translation>Descripció curta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_short_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_widgettype</source>
+			<translation>Tipus de widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgettype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_code</source>
+			<translation>Codi:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -9622,14 +10902,6 @@
 		</message>
 		<message>
 			<source>tooltip_grb_params</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation>Codi:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9673,14 +10945,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_form_type</source>
-			<translation>Tipus formulari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_form_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_mandatory</source>
 			<translation>Obligtori:</translation>
 		</message>
@@ -9688,112 +10952,130 @@
 			<source>tooltip_lbl_mandatory</source>
 			<translation>None</translation>
 		</message>
+	</context>
+	<context>
+		<name>arc_divide</name>
 		<message>
-			<source>lbl_parameter_name</source>
-			<translation>Nom paràmetre:</translation>
+			<source>title</source>
+			<translation>Divisió d'arc</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_parameter_name</source>
-			<translation>None</translation>
+			<source>dlg_arc_divide</source>
+			<translation>Divisió d'arc</translation>
 		</message>
 		<message>
-			<source>lbl_parameter_type</source>
-			<translation>Tipus paràmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_query_text</source>
-			<translation>Text de consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_query_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_short_descript</source>
-			<translation>Descripció curta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_short_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_widgettype</source>
-			<translation>Tipus de widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgettype</source>
+			<source>tooltip_dlg_arc_divide</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>comp_x_pages</name>
+		<name>arc_fusion</name>
 		<message>
 			<source>title</source>
-			<translation>Impressió automàtica de Composer</translation>
+			<translation>Fusionar arc</translation>
 		</message>
 		<message>
-			<source>dlg_comp_x_pages</source>
-			<translation>Impressió automàtica de Composer</translation>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_comp_x_pages</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>main_dbproject</name>
-		<message>
-			<source>title</source>
-			<translation>Crear esquema de projecte</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>dlg_main_dbproject</source>
-			<translation>Projecte principal de base de dades:</translation>
+			<source>lbl_enddate</source>
+			<translation>Data de finalització:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_dbproject</source>
+			<source>tooltip_lbl_enddate</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
+			<source>lbl_new_cat</source>
+			<translation>Nou catàleg:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_lbl_new_cat</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>workspace_create</name>
 		<message>
-			<source>title</source>
-			<translation>Crear nou espais de treball</translation>
+			<source>lbl_nodeaction</source>
+			<translation>Acció sobre node:</translation>
 		</message>
 		<message>
-			<source>dlg_workspace_create</source>
-			<translation>Crear nou espais de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workspace_create</source>
+			<source>tooltip_lbl_nodeaction</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>workspace_manager</name>
 		<message>
-			<source>title</source>
-			<translation>Gestor d'espais de treball</translation>
+			<source>lbl_statetype</source>
+			<translation>Estat:</translation>
 		</message>
 		<message>
-			<source>dlg_workspace_manager</source>
-			<translation>Gestor d'espais de treball</translation>
+			<source>tooltip_lbl_statetype</source>
+			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_workspace_manager</source>
+			<source>lbl_workcat_id_end</source>
+			<translation>Expedient baixa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Fusió d'arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_arc_fusion</source>
+			<translation>Fusionar arc</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_arc_fusion</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_arc2cat</source>
+			<translation>Catàleg Arc 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_arc2cat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_arc1cat</source>
+			<translation>Catàleg Arc 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_arc1cat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>enddate</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_enddate</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -9802,6 +11084,70 @@
 		<message>
 			<source>title</source>
 			<translation>Assignació de fuites</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate_range</source>
+			<translation>Rang de data de construcció (anys):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate_range</source>
+			<translation>Interval de dates de construcció, en anys anteriors i posteriors a la tuberia inicial</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Filtrar per data d'instalació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>Utilitza només les tuberies que coincidexen amb l'interval de dates d'instalació de la inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Distància de buffer (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>Distància des d'una fuga a la qual es seleccionen les canonades per assignar aquesta fuga.</translation>
+		</message>
+		<message>
+			<source>lbl_cluster_length</source>
+			<translation>Longitud del cluster (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cluster_length</source>
+			<translation>Suma màxima de longituds de tuberia dintre d'un cluster, en metres.</translation>
+		</message>
+		<message>
+			<source>dlg_assignation</source>
+			<translation>Assignació de fuites</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_assignation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_all_leaks</source>
+			<translation>Utilitzar totes les fugues</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_all_leaks</source>
+			<translation>Calcula les fugues per kilòmetre i any utilitzant totes les dades disponibles, independentment del paramatre 'anys a calcular'.</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
@@ -9916,35 +11262,438 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
+			<source>lbl_leaks</source>
+			<translation>Fugues</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_infolog</source>
+			<source>tooltip_lbl_leaks</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Filtrar per material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>Utilitza només tuberies del mateix material que la inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter</source>
+			<translation>Filt6rar per diàmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter</source>
+			<translation>Utilitza només tuberies amb el rang de diàmetres de l'inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter_range</source>
+			<translation>Rang de diàmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter_range</source>
+			<translation>Rang de diàmetres basats en factors de la tuberia inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_years</source>
+			<translation>Anys a calcular</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_years</source>
+			<translation>Nombre d'anys de dades de fugues a tenir en compte, en funció de l'antiguitat.</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pipes</source>
+			<translation>Canonades</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_max_distance</source>
+			<translation>Distància màxima (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>Distància màxima, e metres, entre la tuberia inicial i altres tuberies incluides en el cluster. </translation>
+		</message>
+	</context>
+	<context>
+		<name>audit</name>
+		<message>
+			<source>title</source>
+			<translation>Auditoria</translation>
+		</message>
+		<message>
+			<source>dlg_info_audit</source>
+			<translation>Registre</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_audit</source>
+			<translation>Registre</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Valors actualitzats</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_audit</source>
+			<translation>Auditoria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_audit</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>priority</name>
+		<name>audit_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Càlcul de prioritat</translation>
+			<translation>Gestor d'auditoria</translation>
+		</message>
+		<message>
+			<source>dlg_audit_manager</source>
+			<translation>Gestor d'auditoria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_audit_manager</source>
+			<translation>Gestor d'auditoria</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Data a</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>Data a</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Logs</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>Registres</translation>
+		</message>
+	</context>
+	<context>
+		<name>auxcircle</name>
+		<message>
+			<source>title</source>
+			<translation>Dibuixar cercle CAD</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Corre</translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>radius</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_radius</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_again</source>
-			<translation>A continuació</translation>
+			<source>dlg_auxcircle</source>
+			<translation>Dibuixar cercle CAD</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_again</source>
+			<source>tooltip_dlg_auxcircle</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_delete_prev</source>
+			<translation>Eliminar cercles anteriors</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_delete_prev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ins_radius</source>
+			<translation>Inserir radi:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ins_radius</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>auxpoint</name>
+		<message>
+			<source>title</source>
+			<translation>Afegir punt CAD</translation>
+		</message>
+		<message>
+			<source>rb_right</source>
+			<translation>Punt final</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_right</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_disty</source>
+			<translation>Distància Y:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_disty</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_distx</source>
+			<translation>Distància X:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_distx</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_left</source>
+			<translation>Punt inicial</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_left</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_auxpoint</source>
+			<translation>Afegir punt CAD</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_auxpoint</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dist_y</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_dist_y</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dist_x</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_dist_x</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_delete_prev</source>
+			<translation>Eliminar punts anteriors</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_delete_prev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>grb_from</source>
+			<translation>Des de</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+	</context>
+	<context>
+		<name>campaign_management</name>
+		<message>
+			<source>title</source>
+			<translation>Administrador de Campañas</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>State:</translation>
+		</message>
+		<message>
+			<source>btn_campaign_selector</source>
+			<translation>Selector de campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_campaign_selector</source>
+			<translation>Selector de campanya</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_delete</source>
+			<translation>Eliminar Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_delete</source>
+			<translation>Delete campaign</translation>
+		</message>
+		<message>
+			<source>campaign_btn_open</source>
+			<translation>Obrir Campanya</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_open</source>
+			<translation>Open campaign</translation>
+		</message>
+		<message>
+			<source>campaign_chk_show_nulls</source>
+			<translation>Mostrar valors buits</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_chk_show_nulls</source>
+			<translation>Show empty values</translation>
+		</message>
+		<message>
+			<source>campaign_management</source>
+			<translation>Administrador de Campañas</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_campaign_management</source>
+			<translation>Administrador de Campañas</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_campaign_management</source>
+			<translation>Administrador de Campañas</translation>
+		</message>
+		<message>
+			<source>lbl_column_filter_dates</source>
+			<translation>Columna filtre dates:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_filter_dates</source>
+			<translation>Filter dates column:</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_to</source>
+			<translation>Fins:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_to</source>
+			<translation>To:</translation>
+		</message>
+	</context>
+	<context>
+		<name>check_project</name>
+		<message>
+			<source>title</source>
+			<translation>Comprovar projecte</translation>
+		</message>
+		<message>
+			<source>dlg_check_project</source>
+			<translation>Comprovar projecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_check_project</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>grb_system_check</source>
+			<translation>Verificació del sistema:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_system_check</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Base de dades log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_log</source>
+			<translation>Logs</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>brb_database_check</source>
+			<translation>Verificació de la base de dades:</translation>
+		</message>
+		<message>
+			<source>tooltip_brb_database_check</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Actualitzar</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -9954,68 +11703,502 @@
 			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
+	</context>
+	<context>
+		<name>check_project_cm</name>
 		<message>
-			<source>btn_save2file</source>
-			<translation>Desa els resultats en un fitxer Excel...</translation>
+			<source>title</source>
+			<translation>Revisar projecte</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_save2file</source>
+			<source>grb_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_snapping</source>
-			<translation>Seleccioneu les funcions del llenç</translation>
+			<source>grb_system_health_check</source>
+			<translation>Comprovació de l'estat del sistema</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_snapping</source>
+			<source>tooltip_grb_system_health_check</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_priority</source>
-			<translation>Càlcul de prioritat</translation>
+			<source>tab_data</source>
+			<translation>Log de la base de dades</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_priority</source>
+			<source>tooltip_tab_data</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_engine_1</source>
-			<translation>grb_engine_1</translation>
+			<source>tab_log</source>
+			<translation>Logs</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_engine_1</source>
+			<source>tooltip_tab_log</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_engine_2</source>
-			<translation>grb_engine_2</translation>
+			<source>grb_system_check</source>
+			<translation>Comprobació del estat del sistema:</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_engine_2</source>
+			<source>tooltip_grb_system_check</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_global</source>
-			<translation>Paràmetres de càlcul</translation>
+			<source>brb_database_check</source>
+			<translation>Revisió de seguretat de la BBDD:</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_global</source>
+			<source>tooltip_brb_database_check</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_selection</source>
-			<translation>Selecció d'elements</translation>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_selection</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_budget</source>
-			<translation>Pressupost anual:</translation>
+			<source>chk_manage_config</source>
+			<translation>Comproveu les configuracions de gestió</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_budget</source>
+			<source>tooltip_chk_manage_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_check_project_cm</source>
+			<translation>Revisar projecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_check_project_cm</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_database_health_check</source>
+			<translation>Comprovació de l'estat de la base de dades</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_database_health_check</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>common</name>
+		<message>
+			<source>btn_help</source>
+			<translation>Ajuda</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_help</source>
+			<translation>Ajuda</translation>
+		</message>
+	</context>
+	<context>
+		<name>comp_x_pages</name>
+		<message>
+			<source>title</source>
+			<translation>Impressió automàtica de Composer</translation>
+		</message>
+		<message>
+			<source>grb_comp</source>
+			<translation>Llista de compositors</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_comp</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>lbl_sleep</source>
+			<translation>Temps d’espera:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sleep</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>lbl_single</source>
+			<translation>Fitxer únic:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_single</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>lbl_prefix</source>
+			<translation>Prefix del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_prefix</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>lbl_folder</source>
+			<translation>Seleccionar carpeta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_folder</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>dlg_comp_x_pages</source>
+			<translation>Impressió automàtica de Composer</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_comp_x_pages</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>lbl_composers</source>
+			<translation>Seleccionar compositor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_composers</source>
+			<translation>Actualitzar</translation>
+		</message>
+	</context>
+	<context>
+		<name>config</name>
+		<message>
+			<source>title</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>grb_connec</source>
+			<translation>Connec</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_addfields</source>
+			<translation>Camps adicionals</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_addfields</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_admin_om</source>
+			<translation>O&amp;&amp;M</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_admin_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_admin_other</source>
+			<translation>Altres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_admin_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_basic</source>
+			<translation>Bàsic</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_basic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_category_type</source>
+			<translation>Tipus de categoria</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_category_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_epa</source>
+			<translation>Epa</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_epa</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_fluid_type</source>
+			<translation>Tipus de fluid</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_fluid_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_function_type</source>
+			<translation>Tipus de funció</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_function_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_inventory</source>
+			<translation>Inventari</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_inventory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_location_type</source>
+			<translation>Tipus de ubicació</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_location_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_masterplan</source>
+			<translation>MasterPlan</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_masterplan</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_om</source>
+			<translation>O&amp;&amp;M</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Altres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_system</source>
+			<translation>Sistema</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_system</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_topology</source>
+			<translation>Topologia</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_topology</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_utils</source>
+			<translation>Utilitats</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_utils</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_addfields</source>
+			<translation>Camps adicionals</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_addfields</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_admin</source>
+			<translation>Admin</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_admin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_basic</source>
+			<translation>Bàsic</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_basic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_featurecat</source>
+			<translation>Featurecat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_featurecat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_mantype</source>
+			<translation>Tipus de gestió</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_mantype</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>connect_link</name>
+		<message>
+			<source>title</source>
+			<translation>Connecteu-vos a la xarxa</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Configuració de l'enllaç</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Connecta</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_3</source>
+			<translation>Arcs</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connect</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_connect_link</source>
+			<translation>Connecteu-vos a la xarxa</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_connect_link</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>create_style_group</name>
+		<message>
+			<source>lbl_cat_id</source>
+			<translation>ID de categoria:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>sys_role</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_sys_role</source>
+			<translation>Rol que podrà utilitzar aquest estil</translation>
+		</message>
+		<message>
+			<source>lbl_role</source>
+			<translation>Rol:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_role</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10027,178 +12210,149 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_dnom</source>
-			<translation>Diàmetre:</translation>
+			<source>lbl_cat_name</source>
+			<translation>Nom de la categoria:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_dnom</source>
+			<source>tooltip_lbl_cat_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_expl_selection</source>
-			<translation>Explotació:</translation>
+			<source>btn_add</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_expl_selection</source>
+			<source>tooltip_btn_add</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>descript</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_material</source>
-			<translation>Material:</translation>
+			<source>tooltip_descript</source>
+			<translation>Descripció</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_material</source>
+			<source>feature_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_presszone</source>
-			<translation>Zona de pressió:</translation>
+			<source>tooltip_feature_id</source>
+			<translation>ID de categoria</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_presszone</source>
+			<source>idval</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_id</source>
-			<translation>Nom del resultat:</translation>
+			<source>tooltip_idval</source>
+			<translation>Nom de la categoria</translation>
+		</message>
+	</context>
+	<context>
+		<name>crm_trace</name>
+		<message>
+			<source>lbl_inst</source>
+			<translation>Instruccions:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_year</source>
-			<translation>Any horitzó:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_calc</source>
-			<translation>Càlcul</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_calc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_catalog</source>
-			<translation>Catàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_catalog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Motor de càlcul</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
+			<source>tooltip_lbl_inst</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>priority_manager</name>
+		<name>csv</name>
 		<message>
 			<source>title</source>
-			<translation>Gestor de resultats</translation>
+			<translation>Importar CSV</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
+			<source>lbl_ignore_header</source>
+			<translation>Ignorar capçaleres:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_lbl_ignore_header</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_corporate</source>
-			<translation>Establir corporatiu</translation>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_corporate</source>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>btn_file_csv</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_csv</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
+			<source>dlg_csv</source>
+			<translation>Importar CSV</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_dlg_csv</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicar</translation>
+			<source>lbl_decimal</source>
+			<translation>Separador decimal:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_duplicate</source>
+			<source>tooltip_lbl_decimal</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_edit</source>
-			<translation>Editar</translation>
+			<source>lbl_delimiter</source>
+			<translation>Delimitador:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_edit</source>
+			<source>tooltip_lbl_delimiter</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_status</source>
-			<translation>Canviar estat</translation>
+			<source>lbl_file</source>
+			<translation>Arxiu:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_status</source>
+			<source>tooltip_lbl_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_priority_manager</source>
-			<translation>Gestor de resultats</translation>
+			<source>lbl_import_label</source>
+			<translation>Importar etiqueta</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_priority_manager</source>
+			<source>tooltip_lbl_import_label</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_expl</source>
-			<translation>Explotació:</translation>
+			<source>lbl_import_type</source>
+			<translation>Importar tipus:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_expl</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrar per: Nom del resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
+			<source>tooltip_lbl_import_type</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10210,27 +12364,860 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_status</source>
+			<source>lbl_set_of_charac</source>
+			<translation>Conjunt de caràcters</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_set_of_charac</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_comma</source>
+			<translation>,</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_comma</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_dec_comma</source>
+			<translation>,</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_dec_comma</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_dec_period</source>
+			<translation>.</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_dec_period</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_semicolon</source>
+			<translation>;</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_semicolon</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_space</source>
+			<translation>Espai</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_space</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_preview</source>
+			<translation>Previsualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_preview</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dialog_table</name>
+		<message>
+			<source>title</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_add_row</source>
+			<translation>Afegir fila</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_row</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>dlg_dialog_table</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dialog_table</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dialog_text</name>
+		<message>
+			<source>title</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_dialog_text</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dialog_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+	</context>
+	<context>
+		<name>dimensioning</name>
+		<message>
+			<source>title</source>
+			<translation>Acotacions</translation>
+		</message>
+		<message>
+			<source>actionEdit</source>
+			<translation>Editar</translation>
+		</message>
+		<message>
+			<source>tooltip_actionEdit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Altres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
+			<translation>Altres</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>actionSnapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSnapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionOrientation</source>
+			<translation>Orientació</translation>
+		</message>
+		<message>
+			<source>tooltip_actionOrientation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_dimensioning</source>
+			<translation>Acotacions</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dimensioning</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_depth</source>
+			<translation>Amidaments</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_depth</source>
+			<translation>Amidaments</translation>
+		</message>
+		<message>
+			<source>grb_symbology</source>
+			<translation>Simbologia del cercle</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_symbology</source>
+			<translation>Simbologia del cercle</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>barra d'eines</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>doc</name>
+		<message>
+			<source>title</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>path</source>
+			<translation>Ruta</translation>
+		</message>
+		<message>
+			<source>tooltip_path</source>
+			<translation>Completar amb alguna ruta de carpeta accesible o ruta web.</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_add_geom</source>
+			<translation>Afegir geom</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>Afegir geometria</translation>
+		</message>
+		<message>
+			<source>btn_apply</source>
+			<translation>Aplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_apply</source>
+			<translation>Aplicar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Insertar</translation>
+		</message>
+		<message>
+			<source>btn_path_doc</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path_doc</source>
+			<translation>Ruta</translation>
+		</message>
+		<message>
+			<source>btn_path_url</source>
+			<translation>Web</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path_url</source>
+			<translation>Obri l'explorador per permetre la seecció de la ruta web. També és possible simplement enganzar la ruta en e quadrat d'enllaç de text</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccionar objecte</translation>
+		</message>
+		<message>
+			<source>date</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>_dlg_doc</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip__dlg_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_doc</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Data:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_doc_name</source>
+			<translation>Nom doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_doc_name</source>
+			<translation>Nom document</translation>
+		</message>
+		<message>
+			<source>lbl_doc_type</source>
+			<translation>Tipus doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_doc_type</source>
+			<translation>Tipus document</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Nom doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>Nom document</translation>
+		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Enllaç</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observacions:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_tab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>tab_doc</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_elem</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elem</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Reixa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_psector</source>
+			<translation>Psector</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_psector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_rel</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_visit</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_workcat</source>
+			<translation>Expedient</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_workcat</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>doc_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestor de documents</translation>
+		</message>
+		<message>
+			<source>dlg_doc_manager</source>
+			<translation>Gestor de documents</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_doc_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Filtrar per: Nom doc</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+	</context>
+	<context>
+		<name>dscenario</name>
+		<message>
+			<source>title</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>dlg_dscenario</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_properties</source>
+			<translation>Propietats</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_properties</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dscenario_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestor d'escenaris dinàmics</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toolbox</source>
+			<translation>Accions</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toolbox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update_dscenario</source>
+			<translation>Escenari actual</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>dlg_dscenario_manager</source>
+			<translation>Gestor d'escenaris dinàmics</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dscenario_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dscenario_name</source>
+			<translation>Filtrat per: Nom dscenari</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dscenario_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>element</name>
+		<message>
+			<source>title</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>Data de finalització</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl_id</source>
+			<translation>Explotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Enllaç</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>lbl_location_type</source>
+			<translation>Tipus ubicació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_location_type</source>
+			<translation>Ubicació</translation>
+		</message>
+		<message>
+			<source>lbl_lock_level</source>
+			<translation>TextLabel</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_lock_level</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_element</source>
+			<translation>Nombre d'element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_elements</source>
+			<translation>Núm.Element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_elements</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observacions:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ownercat_id</source>
+			<translation>Propietari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ownercat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
 			<translation>Estat:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_status</source>
+			<source>tooltip_lbl_state</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_type</source>
-			<translation>Tipus:</translation>
+			<source>lbl_state_type</source>
+			<translation>Tipus estat:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_type</source>
+			<source>tooltip_lbl_state_type</source>
+			<translation>Tipus estat</translation>
+		</message>
+		<message>
+			<source>lbl_verified</source>
+			<translation>Verificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_verified</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>result_selector</name>
 		<message>
-			<source>title</source>
-			<translation>Selector de resultats</translation>
+			<source>lbl_workcat_id</source>
+			<translation>ID Workcat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id</source>
+			<translation>Expedient alta:</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Expedient baixa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>Final d'identificació de Workcat</translation>
+		</message>
+		<message>
+			<source>rotation</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tab_element</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>undelete</source>
+			<translation>Restaurar</translation>
+		</message>
+		<message>
+			<source>tooltip_undelete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -10238,78 +13225,15 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_result_selector</source>
-			<translation>Selector de resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_result_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
-			<translation>Resultat per comparar</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_main</source>
-			<translation>Resultat per a mostrar</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_main</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>status_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de estado</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
 			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<source>btn_add_geom</source>
+			<translation>Afegir geom</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>Afegeix geometria</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -10317,46 +13241,1536 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_status_selector</source>
-			<translation>Selector de estado</translation>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_status_selector</source>
+			<source>btn_insert</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_new_status</source>
-			<translation>Nou estat:</translation>
+			<source>tooltip_btn_insert</source>
+			<translation>Insertar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_new_status</source>
+			<source>btn_snapping</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result</source>
-			<translation>result_id: nom_resultat</translation>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccionar objecte</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result</source>
+			<source>dlg_element</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_element</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>Està canviant l'estat del següent resultat:</translation>
+			<source>lbl_buildercat_id</source>
+			<translation>Fabricant:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_lbl_buildercat_id</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>info_catalog</name>
 		<message>
-			<source>title</source>
+			<source>lbl_builtdate</source>
+			<translation>Data construcció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>Data alta</translation>
+		</message>
+		<message>
+			<source>lbl_code</source>
+			<translation>Codi:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>Codi</translation>
+		</message>
+		<message>
+			<source>lbl_comment</source>
+			<translation>Comentari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_comment</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Reixa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_elementcat_id</source>
+			<translation>Id element catàleg:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_elementcat_id</source>
 			<translation>Catàleg</translation>
+		</message>
+		<message>
+			<source>lbl_element_id</source>
+			<translation>Id element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_element_type</source>
+			<translation>Tipus element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_type</source>
+			<translation>Tipus element</translation>
+		</message>
+	</context>
+	<context>
+		<name>element_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestor d'elements</translation>
+		</message>
+		<message>
+			<source>dlg_element_manager</source>
+			<translation>Gestor d'elements</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_element_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>lbl_element_id</source>
+			<translation>Filtrar per: Id element</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_id</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>emitter_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibració de l'emissor</translation>
+		</message>
+		<message>
+			<source>dlg_emitter_calibration</source>
+			<translation>Calibració de l'emissor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_emitter_calibration</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_filename</source>
+			<translation>Nom dels fitxers de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_add_demand_check</name>
+		<message>
+			<source>title</source>
+			<translation>Comprovació de la demanda addicional</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_add_demand_check</source>
+			<translation>Comprovació de la demanda addicional</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_add_demand_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_nodes</source>
+			<translation>Utilitzar nodes de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_nodes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_config</source>
+			<translation>Fitxer de configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_database</source>
+			<translation>Base de dades</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_emitter_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibració de l'emissor</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_emitter_calibration</source>
+			<translation>Calibració de l'emissor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_emitter_calibration</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_filename</source>
+			<translation>Nom dels fitxers de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_quantized_demands</name>
+		<message>
+			<source>title</source>
+			<translation>Demandes quantificades</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_quantized_demands</source>
+			<translation>Demandes quantificades</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_quantized_demands</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_recursive_go2epa</name>
+		<message>
+			<source>title</source>
+			<translation>Epa Multi Calls</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_recursive_go2epa</source>
+			<translation>Epa Multi Calls</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_recursive_go2epa</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_static_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibració estàtica</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dscenario</source>
+			<translation>Escenari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_inp_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save_dscenario</source>
+			<translation>Desa els canvis a dscenario</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_static_calibration</source>
+			<translation>Calibració estàtica</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_static_calibration</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_valve_operation_check</name>
+		<message>
+			<source>title</source>
+			<translation>Comprovació del funcionament de la vàlvula</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_valve_operation_check</source>
+			<translation>Comprovació del funcionament de la vàlvula</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_valve_operation_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_scenarios</source>
+			<translation>Utilitzar escenaris de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_scenarios</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_config</source>
+			<translation>Fitxer de configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_database</source>
+			<translation>Base de dades</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>fastprint</name>
+		<message>
+			<source>title</source>
+			<translation>Impressió ràpida</translation>
+		</message>
+		<message>
+			<source>dlg_fastprint</source>
+			<translation>Impressió ràpida</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_fastprint</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_map_options</source>
+			<translation>Opcions de mapa:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_map_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_option_values</source>
+			<translation>Valor opcionals</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_option_values</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_preview</source>
+			<translation>Vista prèvia</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_print</source>
+			<translation>Imprimir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_print</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_delete</name>
+		<message>
+			<source>title</source>
+			<translation>Esborrar element</translation>
+		</message>
+		<message>
+			<source>btn_relations</source>
+			<translation>Mostrar relacions de l'element</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccionar objecte</translation>
+		</message>
+		<message>
+			<source>dlg_feature_delete</source>
+			<translation>Esborrar element</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_id</source>
+			<translation>Id element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Tipus de característica:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_del_feature</source>
+			<translation>Esborrar element</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_del_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Esborrar element seleccionat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_delete_another</source>
+			<translation>Eliminar un altre element</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_another</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_end</name>
+		<message>
+			<source>title</source>
+			<translation>Donar de baixa</translation>
+		</message>
+		<message>
+			<source>lbl_state_type</source>
+			<translation>Tipus estat final:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_date</source>
+			<translation>Data epdte</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Expedient baixa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_elem</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elem</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Reixa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_workcat</source>
+			<translation>Expedient</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Insertar</translation>
+		</message>
+		<message>
+			<source>btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccionar objecte</translation>
+		</message>
+		<message>
+			<source>builtdate</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_end</source>
+			<translation>Donar de baixa</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>enddate</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_description</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>Data de finalització:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_end_connec</name>
+		<message>
+			<source>title</source>
+			<translation>Elements desconectats del tram</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Llista d'elements que quedarien desconectats quan els trams seleccionats siguin donats de baixa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>dlg_feature_end_connec</source>
+			<translation>Elements desconectats del tram</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_end_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_by</source>
+			<translation>Filtrar per id arc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_by</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_replace</name>
+		<message>
+			<source>title</source>
+			<translation>Remplaçar objecte</translation>
+		</message>
+		<message>
+			<source>lbl_new_catalog_id</source>
+			<translation>Nou identificador de catàleg:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_catalog_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_keep_epa_values</source>
+			<translation>Mantenir valors de l’EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_keep_epa_values</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_feature_type</source>
+			<translation>Nou tipus:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_replace</source>
+			<translation>Remplaçar objecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_replace</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>ID Workcat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>D'acord</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_replace</source>
+			<translation>Remplaçar objecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_replace</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>enddate</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_end_parameters</source>
+			<translation>Paràmetres de baixa</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_end_parameters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_feature_parameters</source>
+			<translation>Paràmetres de l'objecte</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_feature_parameters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_catalog_id</source>
+			<translation>ID de catàleg:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_catalog_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_current_catalog_id</source>
+			<translation>Identificador actual del catàleg:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_current_catalog_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_description</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>Data de substitució</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Tipus d'objecte actual</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_keep_asset_id</source>
+			<translation>Mantenir ID d’actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_keep_asset_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_keep_elements</source>
+			<translation>Mantenir elements</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_keep_elements</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>featuretype_change</name>
+		<message>
+			<source>title</source>
+			<translation>Canviar tipus d'objecte</translation>
+		</message>
+		<message>
+			<source>dlg_featuretype_change</source>
+			<translation>Canviar tipus d'objecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_featuretype_change</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_featuretype_change</source>
+			<translation>Canviar tipus d'objecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_featuretype_change</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa</name>
+		<message>
+			<source>title</source>
+			<translation>Anar a EPA</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Opcions de preprocessament</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_file_manager</source>
+			<translation>Gestor de fitxers</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_file_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_process_options</source>
+			<translation>Opcions de preprocessament</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_process_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Gestor de fitxers</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_counter</source>
+			<translation>Comptador</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_counter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_inp_file</source>
+			<translation>Arxiu INP</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_inp_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name</source>
+			<translation>Nom del resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rpt_file</source>
+			<translation>Arxiu RPT:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rpt_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_file_manager</source>
+			<translation>Gestor de fitxers</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_file_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_file_rpt</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_rpt</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -10375,19 +14789,194 @@
 			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>dlg_info_catalog</source>
-			<translation>Catàleg</translation>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_info_catalog</source>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_file_inp</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_inp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_hs_ds</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_hs_ds</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_options</source>
+			<translation>Opcions</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_exec</source>
+			<translation>Executar software EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_exec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_export</source>
+			<translation>Exportar software INP</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_export</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_export_subcatch</source>
+			<translation>Exporta subcaptacions UD</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_export_subcatch</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_import_result</source>
+			<translation>Importar resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_import_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_only_check</source>
+			<translation>Utilitzar la geometria de red resultant</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_only_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_recurrent</source>
+			<translation>utilitzar trucades iteratives</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_recurrent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa</source>
+			<translation>Anar a EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>info_crmvalue</name>
+		<name>go2epa_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Abonat</translation>
+			<translation>Gestor de resultats EPA</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_manager</source>
+			<translation>Gestor de resultats EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_corporate</source>
+			<translation>Alternar corporatiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_corporate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_show_inp_data</source>
+			<translation>Mostrar dades d entrada</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_show_inp_data</source>
+			<translation>Mostra dades INP</translation>
+		</message>
+		<message>
+			<source>btn_archive</source>
+			<translation>Alternar arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_archive</source>
+			<translation>Commuta arxiu</translation>
+		</message>
+		<message>
+			<source>lbl_result_id</source>
+			<translation>Filtrar per: Id resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_edit</source>
+			<translation>Editar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_edit</source>
+			<translation>Editar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_options</name>
+		<message>
+			<source>title</source>
+			<translation>Go2Epa - opccions</translation>
+		</message>
+		<message>
+			<source>grb_reactions</source>
+			<translation>Reaccions</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_reactions</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_inp</source>
+			<translation>Inp</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_inp</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -10398,12 +14987,407 @@
 			<translation>Acceptar</translation>
 		</message>
 		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_options</source>
+			<translation>Go2Epa - opccions</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_other</source>
+			<translation>Altres</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_energy</source>
+			<translation>Energia</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_energy</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_general</source>
+			<translation>General</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_general</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_hydraulics</source>
+			<translation>Hidràulica</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_hydraulics</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Altres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_reports</source>
+			<translation>Informes</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_reports</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_time_steps</source>
+			<translation>Intervals de data i hora</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_time_steps</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_result</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de resultats de EPA</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_compare</source>
+			<translation>Nom del resultat (per comparar):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_result</source>
+			<translation>Selector de resultats de EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compare_date</source>
+			<translation>Comparar data:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compare_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compare_time</source>
+			<translation>Comparar hora:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compare_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_time_to_compare</source>
+			<translation>Hora (per comparar):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_time_to_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_time_to_show</source>
+			<translation>Hora (per mostrar):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_time_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_datetime</source>
+			<translation>Dat i hora</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_datetime</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_time</source>
+			<translation>Hora</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_show</source>
+			<translation>Nom del resultat (per mostrar):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_selector_date</source>
+			<translation>Selector de data:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_selector_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_selector_time</source>
+			<translation>Hora del selector:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_selector_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_selector</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de comparació de resultats</translation>
+		</message>
+		<message>
+			<source>tab_time</source>
+			<translation>Dat i hora</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_selector</source>
+			<translation>Selector de comparació de resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2iber</name>
+		<message>
+			<source>title</source>
+			<translation>Go2Iber</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_iber_options</source>
+			<translation>Opcions de Iber</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_iber_options</source>
+			<translation>Opcions Iber</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_swmm_options</source>
+			<translation>Opcions de SWMM</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_swmm_options</source>
+			<translation>Opcions SWMM</translation>
+		</message>
+		<message>
+			<source>dlg_go2iber</source>
+			<translation>Go2Iber</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2iber</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Opcions</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mesh</source>
+			<translation>Malla:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mesh</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Ruta de la carpeta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name</source>
+			<translation>Nom del resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Registre</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>info_catalog</name>
+		<message>
+			<source>title</source>
+			<translation>Catàleg</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>dlg_info_catalog</source>
+			<translation>Catàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_catalog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_info_catalog</source>
+			<translation>Catàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_catalog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+	</context>
+	<context>
+		<name>info_crmvalue</name>
+		<message>
+			<source>title</source>
+			<translation>Abonat</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
 			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>lbl_hydrometer_id</source>
+			<translation>Id hidròmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hydrometer_id</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>dlg_info_crmvalue</source>
@@ -10414,12 +15398,12 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_hydrometer_id</source>
-			<translation>Id hidròmetre:</translation>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_hydrometer_id</source>
-			<translation>None</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 	</context>
 	<context>
@@ -10427,6 +15411,38 @@
 		<message>
 			<source>title</source>
 			<translation>Secció</translation>
+		</message>
+		<message>
+			<source>lbl_cost_trench</source>
+			<translation>Cost rasa</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_trench</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_width</source>
+			<translation>Amplada del cost</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_width</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_section_image</source>
+			<translation>Imatge de secció</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_section_image</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_y_param</source>
+			<translation>Paràmetre Y del cost</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_y_param</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -10500,44 +15516,20 @@
 			<source>tooltip_lbl_cost_fill</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_cost_trench</source>
-			<translation>Cost rasa</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_trench</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_width</source>
-			<translation>Amplada del cost</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_width</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_y_param</source>
-			<translation>Paràmetre Y del cost</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_y_param</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_section_image</source>
-			<translation>Imatge de secció</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_section_image</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>info_epa</name>
 		<message>
 			<source>title</source>
 			<translation>InfoEpa</translation>
+		</message>
+		<message>
+			<source>page_dwf</source>
+			<translation>Creixement</translation>
+		</message>
+		<message>
+			<source>tooltip_page_dwf</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -10588,14 +15580,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>page_dwf</source>
-			<translation>Creixement</translation>
-		</message>
-		<message>
-			<source>tooltip_page_dwf</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>page_inflows</source>
 			<translation>AFLUIX</translation>
 		</message>
@@ -10609,6 +15593,14 @@
 		<message>
 			<source>title</source>
 			<translation>Informació característica</translation>
+		</message>
+		<message>
+			<source>actionCentered</source>
+			<translation>Centrat</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCentered</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>actionAudit</source>
@@ -10627,11 +15619,219 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>actionCentered</source>
-			<translation>Centrat</translation>
+			<source>tab_data</source>
+			<translation>Dades</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCentered</source>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_documents</source>
+			<translation>Documents</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_documents</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_elements</source>
+			<translation>Elements</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elements</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_epa</source>
+			<translation>EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_epa</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_event</source>
+			<translation>Event</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_features</source>
+			<translation>Característiques</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_features</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Reixa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydrometer</source>
+			<translation>Abonats</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydrometer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydrometer_val</source>
+			<translation>Lectures abonats</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydrometer_val</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Node</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_om</source>
+			<translation>O&amp;&amp;M</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_orifice</source>
+			<translation>Orifici</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_orifice</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_outlet</source>
+			<translation>Outlet</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_outlet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_plan</source>
+			<translation>Plan</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_plan</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_pump</source>
+			<translation>Bomba</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_pump</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tab_rpt</source>
+			<translation>Rpt</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_rpt</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_shortpipe</source>
+			<translation>Shortpipe</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_shortpipe</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_valve</source>
+			<translation>Vàlvula</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_valve</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_visit</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_weir</source>
+			<translation>Weir</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_weir</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>barra d'eines</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionSetGeom</source>
+			<translation>Estableix Geom</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSetGeom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionSection</source>
+			<translation>Mostra la secció</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_gallery</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_gallery</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10728,22 +15928,6 @@
 		</message>
 		<message>
 			<source>tooltip_actionRotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSection</source>
-			<translation>Mostra la secció</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSetGeom</source>
-			<translation>Estableix Geom</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSetGeom</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10872,22 +16056,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_open_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_visit</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -11082,190 +16250,6 @@
 			<source>tooltip_tab_connections</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Dades</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_documents</source>
-			<translation>Documents</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_documents</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_elements</source>
-			<translation>Elements</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elements</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_epa</source>
-			<translation>EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_event</source>
-			<translation>Event</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_features</source>
-			<translation>Característiques</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_features</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Reixa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydrometer</source>
-			<translation>Abonats</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydrometer_val</source>
-			<translation>Lectures abonats</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydrometer_val</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_om</source>
-			<translation>O&amp;&amp;M</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_orifice</source>
-			<translation>Orifici</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_orifice</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_outlet</source>
-			<translation>Outlet</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_outlet</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_plan</source>
-			<translation>Plan</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_plan</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_pump</source>
-			<translation>Bomba</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_pump</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tab_rpt</source>
-			<translation>Rpt</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_rpt</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_shortpipe</source>
-			<translation>Shortpipe</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_shortpipe</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_valve</source>
-			<translation>Vàlvula</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_valve</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_visit</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_weir</source>
-			<translation>Weir</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_weir</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>barra d'eines</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>info_generic</name>
@@ -11297,12 +16281,148 @@
 			<source>tooltip_dlg_info_generic</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>dlg_info_generic</source>
+			<translation>Informació bàsica</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_generic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionEdit</source>
+			<translation>Editar</translation>
+		</message>
+		<message>
+			<source>tooltip_actionEdit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionSetToArc</source>
+			<translation>Establir a Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSetToArc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>barra d'eines</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>info_workcat</name>
 		<message>
 			<source>title</source>
 			<translation>Nou expedt</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_2</source>
+			<translation>ID de treball clau 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_id</source>
+			<translation>ID de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Data construcció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_2</source>
+			<translation>Clau de treball 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>builtdate</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Enllaç</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_info_workcat</source>
+			<translation>Nou expedt</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_1</source>
+			<translation>Clau de treball 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_1</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -11360,5678 +16480,20 @@
 			<source>tooltip_lbl_workid_key_1</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_workid_key_2</source>
-			<translation>ID de treball clau 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>search</name>
-		<message>
-			<source>title</source>
-			<translation>Cerca</translation>
-		</message>
-		<message>
-			<source>Check all</source>
-			<translation>Marcar tots</translation>
-		</message>
-		<message>
-			<source>tooltip_Check all</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_search</source>
-			<translation>Cerca</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_search</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Sense resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>search_workcat</name>
-		<message>
-			<source>title</source>
-			<translation>Bsucar expdte</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_to_csv</source>
-			<translation>Exportar a CSV</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_to_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_state0</source>
-			<translation>Activar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_state0</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_state1</source>
-			<translation>Activar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_state1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_search_workcat</source>
-			<translation>Bsucar expdte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_search_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_destination_path</source>
-			<translation>Ruta de destí</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_destination_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end</source>
-			<translation>Filtrar per:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_end</source>
-			<translation>Element donats de baixa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_ini</source>
-			<translation>Element donats d'alta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_ini</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_init</source>
-			<translation>Filtrar per:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_init</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total1</source>
-			<translation>Números totals:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total2</source>
-			<translation>Números totals:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_doc</source>
-			<translation>Documents</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_ended</source>
-			<translation>Donat d'ata</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_ended</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_init</source>
-			<translation>Donat d'alta</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_init</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign</name>
-		<message>
-			<source>title</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·la</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·la</translation>
-		</message>
-		<message>
-			<source>dlg_add_campaign</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Connec</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>Connec</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relació d'elemnts</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Elements relation</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_inventory</name>
-		<message>
-			<source>add_campaign</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Escomesa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Reixa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_review</name>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Connec</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_review_old</name>
-		<message>
-			<source>action_selector</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_action_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>active</source>
-			<translation>Actiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_export_rel</source>
-			<translation>Exportar a csv</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_export_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_path_rel</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_path_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>CampaignTab</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_CampaignTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_campaign</source>
-			<translation>Campanya:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Exercici:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_3</source>
-			<translation>Inici real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_4</source>
-			<translation>Fi real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_5</source>
-			<translation>Organizació:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_6</source>
-			<translation>Duració:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_7</source>
-			<translation>Estatus:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_8</source>
-			<translation>Adreça:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_8</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_feature_type</source>
-			<translation>Tipus d'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_flexunion_code_5</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_flexunion_code_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_2</source>
-			<translation>Final planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_3</source>
-			<translation>Inici planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_5</source>
-			<translation>Rotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>RelationsTab</source>
-			<translation>Relació d'elements</translation>
-		</message>
-		<message>
-			<source>tooltip_RelationsTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>reviewclass_id</source>
-			<translation>Reviewclass:</translation>
-		</message>
-		<message>
-			<source>tooltip_reviewclass_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_visit</name>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Connec</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_visit_old</name>
-		<message>
-			<source>action_selector</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_action_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>active</source>
-			<translation>Actiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_export_rel</source>
-			<translation>Exportar a csv</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_export_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_path_rel</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_path_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>CampaignTab</source>
-			<translation>Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_CampaignTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_campaign</source>
-			<translation>Campanya:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Exercici:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_3</source>
-			<translation>Inici real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_4</source>
-			<translation>Fi real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_5</source>
-			<translation>Organizació:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_6</source>
-			<translation>Duració:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_7</source>
-			<translation>Estatus:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_8</source>
-			<translation>Adreça:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_8</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_feature_type</source>
-			<translation>Tipus d'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_flexunion_code_5</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_flexunion_code_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_2</source>
-			<translation>Final planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_3</source>
-			<translation>Inici planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_5</source>
-			<translation>Rotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>RelationsTab</source>
-			<translation>Relació d'elements</translation>
-		</message>
-		<message>
-			<source>tooltip_RelationsTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>visitclass_id</source>
-			<translation>Visitclass:</translation>
-		</message>
-		<message>
-			<source>tooltip_visitclass_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_lot</name>
-		<message>
-			<source>title</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_lot</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_add_lot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_visit</source>
-			<translation>Eliminar visita</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_visit</source>
-			<translation>Delete visit</translation>
-		</message>
-		<message>
-			<source>btn_export_rel</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_rel</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>btn_export_visits</source>
-			<translation>Exportar a csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_visits</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>btn_open_photo</source>
-			<translation>Obrir foto</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_photo</source>
-			<translation>Open photo</translation>
-		</message>
-		<message>
-			<source>btn_open_visit</source>
-			<translation>Obrir visita</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_visit</source>
-			<translation>Open visit</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_validate_all</source>
-			<translation>Validar totes</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_validate_all</source>
-			<translation>Validate all</translation>
-		</message>
-		<message>
-			<source>dlg_add_lot</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_lot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_lot</source>
-			<translation>Lot:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_lot</source>
-			<translation>Lot:</translation>
-		</message>
-		<message>
-			<source>grb_ot</source>
-			<translation>Ordre de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_ot</source>
-			<translation>Work order</translation>
-		</message>
-		<message>
-			<source>label_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>label_data_event_to</source>
-			<translation>Fins:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_data_event_to</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>label_feature_type</source>
-			<translation>Tipus d'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_feature_type</source>
-			<translation>Element type:</translation>
-		</message>
-		<message>
-			<source>lbl_address</source>
-			<translation>Adreça:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_address</source>
-			<translation>Adreça:</translation>
-		</message>
-		<message>
-			<source>lbl_description</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrar per id d'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>Filter by element id:</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>lbl_observations</source>
-			<translation>Observacions:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observations</source>
-			<translation>Observations:</translation>
-		</message>
-		<message>
-			<source>lbl_ot</source>
-			<translation>Ot:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ot</source>
-			<translation>Ot:</translation>
-		</message>
-		<message>
-			<source>lbl_ot_type</source>
-			<translation>Tipus d'Ot:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ot_type</source>
-			<translation>Ot type:</translation>
-		</message>
-		<message>
-			<source>lbl_performance_type</source>
-			<translation>Tipus d'actuació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_performance_type</source>
-			<translation>Performance type:</translation>
-		</message>
-		<message>
-			<source>lbl_plan_end</source>
-			<translation>Fi planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_plan_end</source>
-			<translation>Planned end:</translation>
-		</message>
-		<message>
-			<source>lbl_plan_start</source>
-			<translation>Inici planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_plan_start</source>
-			<translation>Planned start:</translation>
-		</message>
-		<message>
-			<source>lbl_real_end</source>
-			<translation>Real end:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_real_end</source>
-			<translation>Real end:</translation>
-		</message>
-		<message>
-			<source>lbl_real_start</source>
-			<translation>Inici real:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_real_start</source>
-			<translation>Real start:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>State:</translation>
-		</message>
-		<message>
-			<source>lbl_team</source>
-			<translation>Equip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_team</source>
-			<translation>Team:</translation>
-		</message>
-		<message>
-			<source>lbl_user</source>
-			<translation>Usuari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user</source>
-			<translation>User:</translation>
-		</message>
-		<message>
-			<source>LotTab</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_LotTab</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>RelationsTab</source>
-			<translation>Relació d'elements</translation>
-		</message>
-		<message>
-			<source>tooltip_RelationsTab</source>
-			<translation>Elements relation</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Connec</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>VisitsTab</source>
-			<translation>Visites</translation>
-		</message>
-		<message>
-			<source>tooltip_VisitsTab</source>
-			<translation>Visits</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_workorder</name>
-		<message>
-			<source>title</source>
-			<translation>Ordre de treball</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_workorder</source>
-			<translation>Ordre de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_add_workorder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_add_workorder</source>
-			<translation>Ordre de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_workorder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Ordre de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>campaign_management</name>
-		<message>
-			<source>title</source>
-			<translation>Administrador de Campañas</translation>
-		</message>
-		<message>
-			<source>btn_campaign_selector</source>
-			<translation>Selector de campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_campaign_selector</source>
-			<translation>Selector de campanya</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_delete</source>
-			<translation>Eliminar Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_delete</source>
-			<translation>Delete campaign</translation>
-		</message>
-		<message>
-			<source>campaign_btn_open</source>
-			<translation>Obrir Campanya</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_open</source>
-			<translation>Open campaign</translation>
-		</message>
-		<message>
-			<source>campaign_chk_show_nulls</source>
-			<translation>Mostrar valors buits</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_chk_show_nulls</source>
-			<translation>Show empty values</translation>
-		</message>
-		<message>
-			<source>campaign_management</source>
-			<translation>Administrador de Campañas</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_campaign_management</source>
-			<translation>Administrador de Campañas</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_campaign_management</source>
-			<translation>Administrador de Campañas</translation>
-		</message>
-		<message>
-			<source>lbl_column_filter_dates</source>
-			<translation>Columna filtre dates:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_filter_dates</source>
-			<translation>Filter dates column:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_to</source>
-			<translation>Fins:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_to</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>State:</translation>
-		</message>
-	</context>
-	<context>
-		<name>check_project_cm</name>
-		<message>
-			<source>title</source>
-			<translation>Revisar projecte</translation>
-		</message>
-		<message>
-			<source>brb_database_check</source>
-			<translation>Revisió de seguretat de la BBDD:</translation>
-		</message>
-		<message>
-			<source>tooltip_brb_database_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_manage_config</source>
-			<translation>Comproveu les configuracions de gestió</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_manage_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_check_project_cm</source>
-			<translation>Revisar projecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_check_project_cm</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_database_health_check</source>
-			<translation>Comprovació de l'estat de la base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_database_health_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_system_check</source>
-			<translation>Comprobació del estat del sistema:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_system_health_check</source>
-			<translation>Comprovació de l'estat del sistema</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system_health_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Log de la base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_log</source>
-			<translation>Logs</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>lot_management</name>
-		<message>
-			<source>title</source>
-			<translation>Administrador de Lots</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Delete lot</translation>
-		</message>
-		<message>
-			<source>btn_export</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>btn_lot_selector</source>
-			<translation>Lots selector</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_lot_selector</source>
-			<translation>Lots selector</translation>
-		</message>
-		<message>
-			<source>btn_manage_load</source>
-			<translation>Registre de residus</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_manage_load</source>
-			<translation>Waste registration</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Obrir Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>Open lot</translation>
-		</message>
-		<message>
-			<source>btn_work_register</source>
-			<translation>Logs de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_work_register</source>
-			<translation>Work logs</translation>
-		</message>
-		<message>
-			<source>chk_assignacio</source>
-			<translation>Obres pendents asignadas a OT</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_assignacio</source>
-			<translation>Pendent assign works to OT</translation>
-		</message>
-		<message>
-			<source>chk_show_nulls</source>
-			<translation>Mostrar valors buits</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_show_nulls</source>
-			<translation>Show empty values</translation>
-		</message>
-		<message>
-			<source>dlg_lot_management</source>
-			<translation>Administrador de Lots</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_lot_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_address</source>
-			<translation>Adreça:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_address</source>
-			<translation>Adreça:</translation>
-		</message>
-		<message>
-			<source>lbl_column_filter</source>
-			<translation>Columna filtre dades:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_filter</source>
-			<translation>Columna filtre dates:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_to</source>
-			<translation>Fins:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_to</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>lbl_name</source>
-			<translation>Nom:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_performance_type</source>
-			<translation>Tipus d'actuació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_performance_type</source>
-			<translation>Performance type:</translation>
-		</message>
-		<message>
-			<source>lbl_serie</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_serie</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>State:</translation>
-		</message>
-		<message>
-			<source>lot_management</source>
-			<translation>Administrador de Lots</translation>
-		</message>
-		<message>
-			<source>tooltip_lot_management</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>lot_selector</name>
-		<message>
-			<source>btn_ok</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>lbl_performance_type</source>
-			<translation>Tipus d'actuació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_performance_type</source>
-			<translation>Performance type:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>State:</translation>
-		</message>
-	</context>
-	<context>
-		<name>organization_create</name>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>organization_create</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_organization_create</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>resources_management</name>
-		<message>
-			<source>title</source>
-			<translation>Administrador de Recursos</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_assign_team</source>
-			<translation>Assigna equip</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_assign_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>btn_organi_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_organi_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_organi_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_organi_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_organi_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_organi_update</source>
-			<translation>Modify</translation>
-		</message>
-		<message>
-			<source>btn_remove_team</source>
-			<translation>Elimina l'equip</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_team_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_team_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_team_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>btn_team_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_toggle_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_team_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_update</source>
-			<translation>Modify</translation>
-		</message>
-		<message>
-			<source>btn_user_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_toggle_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_update</source>
-			<translation>Modificar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cmb_team</source>
-			<translation>Seleccioneu l'equip</translation>
-		</message>
-		<message>
-			<source>tooltip_cmb_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_resources_management</source>
-			<translation>Administrador de Recursos</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_resources_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Gestió:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>Management:</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Gestió:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>Management:</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Filtrar per equip:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Filtrar per organizació:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_3</source>
-			<translation>Filtrar per equip:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>organizations</source>
-			<translation>Organizacions:</translation>
-		</message>
-		<message>
-			<source>tooltip_organizations</source>
-			<translation>Organizations</translation>
-		</message>
-		<message>
-			<source>resource_management</source>
-			<translation>Administrador de Recursos</translation>
-		</message>
-		<message>
-			<source>tooltip_resource_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_organizations</source>
-			<translation>Organizacions:</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_organizations</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_teams</source>
-			<translation>Equips</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_teams</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_users</source>
-			<translation>Usuaris</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_users</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>team</source>
-			<translation>Equips</translation>
-		</message>
-		<message>
-			<source>tooltip_team</source>
-			<translation>Teams</translation>
-		</message>
-	</context>
-	<context>
-		<name>team_create</name>
-		<message>
-			<source>title</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·la</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·la</translation>
-		</message>
-		<message>
-			<source>dlg_team_create</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_team_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_team</source>
-			<translation>Equip:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_active</source>
-			<translation>Actiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_active</source>
-			<translation>Actiu:</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>lbl_name</source>
-			<translation>Nom de l'equip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_name</source>
-			<translation>Team name:</translation>
-		</message>
-		<message>
-			<source>team_create</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_team_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>TeamTab</source>
-			<translation>Equip</translation>
-		</message>
-		<message>
-			<source>tooltip_TeamTab</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>team_management</name>
-		<message>
-			<source>title</source>
-			<translation>Administrador d'equips</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_select</source>
-			<translation>&gt;&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_select</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_unselect</source>
-			<translation>&lt;&lt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_unselect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_vehicle_select</source>
-			<translation>&gt;&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_vehicle_select</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_vehicle_unselect</source>
-			<translation>&lt;&lt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_vehicle_unselect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_visitclass_select</source>
-			<translation>&gt;&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_visitclass_select</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_visitclass_unselect</source>
-			<translation>&lt;&lt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_visitclass_unselect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_team_management</source>
-			<translation>Administrador d'equips</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_team_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_user</source>
-			<translation>Usuaris</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_user</source>
-			<translation>Users</translation>
-		</message>
-		<message>
-			<source>tab_vehicles</source>
-			<translation>Vehicles</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_vehicles</source>
-			<translation>Vehicles</translation>
-		</message>
-		<message>
-			<source>tab_visit_class</source>
-			<translation>Classe de Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit_class</source>
-			<translation>Classe de Visita</translation>
-		</message>
-		<message>
-			<source>team_management</source>
-			<translation>Administrador d'equips</translation>
-		</message>
-		<message>
-			<source>tooltip_team_management</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>user_create</name>
-		<message>
-			<source>title</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_user_create</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_user_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>user_create</source>
-			<translation>Crear usuari</translation>
-		</message>
-		<message>
-			<source>tooltip_user_create</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>work_management</name>
-		<message>
-			<source>btn_accept</source>
-			<translation>Guardar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Save</translation>
-		</message>
-		<message>
-			<source>btn_export_user</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_user</source>
-			<translation>Export to csv</translation>
-		</message>
-		<message>
-			<source>lbl_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_from</source>
-			<translation>From:</translation>
-		</message>
-		<message>
-			<source>lbl_team</source>
-			<translation>Equip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_team</source>
-			<translation>Team:</translation>
-		</message>
-		<message>
-			<source>lbl_to</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_to</source>
-			<translation>To:</translation>
-		</message>
-	</context>
-	<context>
-		<name>workorder_management</name>
-		<message>
-			<source>title</source>
-			<translation>Gestió d'ordres de treball</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear ordre de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create_wclass</source>
-			<translation>Crear classe</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_wclass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create_wtype</source>
-			<translation>Crear tipus</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_wtype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar ordre de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_management</source>
-			<translation>Administrador de Campañas</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_workorder_management</source>
-			<translation>Gestió d'ordres de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workorder_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Filtrar per nom:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_column_filter_dates</source>
-			<translation>Tipus d'ordre de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_filter_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Classe d'ordre de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>workorder_management</source>
-			<translation>Gestió d'ordres de treball</translation>
-		</message>
-		<message>
-			<source>tooltip_workorder_management</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>common</name>
-		<message>
-			<source>btn_help</source>
-			<translation>Ajuda</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_help</source>
-			<translation>Ajuda</translation>
-		</message>
-	</context>
-	<context>
-		<name>dialog_table</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_add_row</source>
-			<translation>Afegir fila</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_row</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>dlg_dialog_table</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dialog_table</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dialog_text</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_dialog_text</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dialog_text</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>dlg_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>arc_divide</name>
-		<message>
-			<source>title</source>
-			<translation>Divisió d'arc</translation>
-		</message>
-		<message>
-			<source>dlg_arc_divide</source>
-			<translation>Divisió d'arc</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_arc_divide</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>arc_fusion</name>
-		<message>
-			<source>title</source>
-			<translation>Fusionar arc</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>dlg_arc_fusion</source>
-			<translation>Fusionar arc</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_arc_fusion</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>enddate</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_arc1cat</source>
-			<translation>Catàleg Arc 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_arc1cat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_arc2cat</source>
-			<translation>Catàleg Arc 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_arc2cat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data de finalització:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_cat</source>
-			<translation>Nou catàleg:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_cat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodeaction</source>
-			<translation>Acció sobre node:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodeaction</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_statetype</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_statetype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Expedient baixa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Fusió d'arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>auxcircle</name>
-		<message>
-			<source>title</source>
-			<translation>Dibuixar cercle CAD</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>chk_delete_prev</source>
-			<translation>Eliminar cercles anteriors</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_delete_prev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_auxcircle</source>
-			<translation>Dibuixar cercle CAD</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_auxcircle</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ins_radius</source>
-			<translation>Inserir radi:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ins_radius</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>radius</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_radius</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>auxpoint</name>
-		<message>
-			<source>title</source>
-			<translation>Afegir punt CAD</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>chk_delete_prev</source>
-			<translation>Eliminar punts anteriors</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_delete_prev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dist_x</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_dist_x</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dist_y</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_dist_y</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_auxpoint</source>
-			<translation>Afegir punt CAD</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_auxpoint</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_from</source>
-			<translation>Des de</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_distx</source>
-			<translation>Distància X:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_distx</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_disty</source>
-			<translation>Distància Y:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_disty</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_left</source>
-			<translation>Punt inicial</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_left</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_right</source>
-			<translation>Punt final</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_right</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>connect_link</name>
-		<message>
-			<source>title</source>
-			<translation>Connecteu-vos a la xarxa</translation>
-		</message>
-		<message>
-			<source>dlg_connect_link</source>
-			<translation>Connecteu-vos a la xarxa</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_connect_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Configuració de l'enllaç</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Connecta</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_3</source>
-			<translation>Arcs</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connect</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dimensioning</name>
-		<message>
-			<source>title</source>
-			<translation>Acotacions</translation>
-		</message>
-		<message>
-			<source>actionEdit</source>
-			<translation>Editar</translation>
-		</message>
-		<message>
-			<source>tooltip_actionEdit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionOrientation</source>
-			<translation>Orientació</translation>
-		</message>
-		<message>
-			<source>tooltip_actionOrientation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSnapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSnapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>dlg_dimensioning</source>
-			<translation>Acotacions</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dimensioning</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_depth</source>
-			<translation>Amidaments</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_depth</source>
-			<translation>Amidaments</translation>
-		</message>
-		<message>
-			<source>grb_other</source>
-			<translation>Altres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_other</source>
-			<translation>Altres</translation>
-		</message>
-		<message>
-			<source>grb_symbology</source>
-			<translation>Simbologia del cercle</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_symbology</source>
-			<translation>Simbologia del cercle</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>barra d'eines</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>doc</name>
-		<message>
-			<source>title</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_add_geom</source>
-			<translation>Afegir geom</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>Afegir geometria</translation>
-		</message>
-		<message>
-			<source>btn_apply</source>
-			<translation>Aplicar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_apply</source>
-			<translation>Aplicar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Insertar</translation>
-		</message>
-		<message>
-			<source>btn_path_doc</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path_doc</source>
-			<translation>Ruta</translation>
-		</message>
-		<message>
-			<source>btn_path_url</source>
-			<translation>Web</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path_url</source>
-			<translation>Obri l'explorador per permetre la seecció de la ruta web. També és possible simplement enganzar la ruta en e quadrat d'enllaç de text</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccionar objecte</translation>
-		</message>
-		<message>
-			<source>date</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>_dlg_doc</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip__dlg_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_doc</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Data:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_doc_name</source>
-			<translation>Nom doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_doc_name</source>
-			<translation>Nom document</translation>
-		</message>
-		<message>
-			<source>lbl_doc_type</source>
-			<translation>Tipus doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_doc_type</source>
-			<translation>Tipus document</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Nom doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>Nom document</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Enllaç</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observacions:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>path</source>
-			<translation>Ruta</translation>
-		</message>
-		<message>
-			<source>tooltip_path</source>
-			<translation>Completar amb alguna ruta de carpeta accesible o ruta web.</translation>
-		</message>
-		<message>
-			<source>tab</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_tab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Escomesa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>Escomesa</translation>
-		</message>
-		<message>
-			<source>tab_doc</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_elem</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elem</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Reixa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_psector</source>
-			<translation>Psector</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_psector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_rel</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_visit</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_workcat</source>
-			<translation>Expedient</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_workcat</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>doc_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor de documents</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>dlg_doc_manager</source>
-			<translation>Gestor de documents</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_doc_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Filtrar per: Nom doc</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>element</name>
-		<message>
-			<source>title</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_add_geom</source>
-			<translation>Afegir geom</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>Afegeix geometria</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Insertar</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccionar objecte</translation>
-		</message>
-		<message>
-			<source>dlg_element</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buildercat_id</source>
-			<translation>Fabricant:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buildercat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Data construcció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>Data alta</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation>Codi:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
-			<translation>Codi</translation>
-		</message>
-		<message>
-			<source>lbl_comment</source>
-			<translation>Comentari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_comment</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_elementcat_id</source>
-			<translation>Id element catàleg:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_elementcat_id</source>
-			<translation>Catàleg</translation>
-		</message>
-		<message>
-			<source>lbl_element_id</source>
-			<translation>Id element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_element_type</source>
-			<translation>Tipus element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_type</source>
-			<translation>Tipus element</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data de finalització</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl_id</source>
-			<translation>Explotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Enllaç</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>lbl_location_type</source>
-			<translation>Tipus ubicació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_location_type</source>
-			<translation>Ubicació</translation>
-		</message>
-		<message>
-			<source>lbl_lock_level</source>
-			<translation>TextLabel</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_lock_level</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_element</source>
-			<translation>Nombre d'element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_elements</source>
-			<translation>Núm.Element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_elements</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observacions:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ownercat_id</source>
-			<translation>Propietari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ownercat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state_type</source>
-			<translation>Tipus estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state_type</source>
-			<translation>Tipus estat</translation>
-		</message>
-		<message>
-			<source>lbl_verified</source>
-			<translation>Verificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_verified</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id</source>
-			<translation>ID Workcat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id</source>
-			<translation>Expedient alta:</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Expedient baixa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>Final d'identificació de Workcat</translation>
-		</message>
-		<message>
-			<source>rotation</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Escomesa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>Escomesa</translation>
-		</message>
-		<message>
-			<source>tab_element</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Reixa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>undelete</source>
-			<translation>Restaurar</translation>
-		</message>
-		<message>
-			<source>tooltip_undelete</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>element_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor d'elements</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>dlg_element_manager</source>
-			<translation>Gestor d'elements</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_element_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_element_id</source>
-			<translation>Filtrar per: Id element</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_delete</name>
-		<message>
-			<source>title</source>
-			<translation>Esborrar element</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Esborrar element seleccionat</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_delete_another</source>
-			<translation>Eliminar un altre element</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_another</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_relations</source>
-			<translation>Mostrar relacions de l'element</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_relations</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccionar objecte</translation>
-		</message>
-		<message>
-			<source>dlg_feature_delete</source>
-			<translation>Esborrar element</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_id</source>
-			<translation>Id element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tipus de característica:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_del_feature</source>
-			<translation>Esborrar element</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_del_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_end</name>
-		<message>
-			<source>title</source>
-			<translation>Donar de baixa</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Insertar</translation>
-		</message>
-		<message>
-			<source>btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccionar objecte</translation>
-		</message>
-		<message>
-			<source>builtdate</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_feature_end</source>
-			<translation>Donar de baixa</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>enddate</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_description</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data de finalització:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state_type</source>
-			<translation>Tipus estat final:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_date</source>
-			<translation>Data epdte</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Expedient baixa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Escomesa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_elem</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elem</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Reixa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tab_workcat</source>
-			<translation>Expedient</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_workcat</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_end_connec</name>
-		<message>
-			<source>title</source>
-			<translation>Elements desconectats del tram</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>dlg_feature_end_connec</source>
-			<translation>Elements desconectats del tram</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_end_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_by</source>
-			<translation>Filtrar per id arc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_by</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Llista d'elements que quedarien desconectats quan els trams seleccionats siguin donats de baixa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_replace</name>
-		<message>
-			<source>title</source>
-			<translation>Remplaçar objecte</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>D'acord</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_feature_replace</source>
-			<translation>Remplaçar objecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_replace</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>enddate</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_end_parameters</source>
-			<translation>Paràmetres de baixa</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_end_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_feature_parameters</source>
-			<translation>Paràmetres de l'objecte</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_feature_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_catalog_id</source>
-			<translation>ID de catàleg:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_current_catalog_id</source>
-			<translation>Identificador actual del catàleg:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_current_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_description</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data de substitució</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tipus d'objecte actual</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_keep_asset_id</source>
-			<translation>Mantenir ID d’actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_keep_asset_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_keep_elements</source>
-			<translation>Mantenir elements</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_keep_elements</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_keep_epa_values</source>
-			<translation>Mantenir valors de l’EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_keep_epa_values</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_catalog_id</source>
-			<translation>Nou identificador de catàleg:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_feature_type</source>
-			<translation>Nou tipus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>ID Workcat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>featuretype_change</name>
-		<message>
-			<source>title</source>
-			<translation>Canviar tipus d'objecte</translation>
-		</message>
-		<message>
-			<source>dlg_featuretype_change</source>
-			<translation>Canviar tipus d'objecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_featuretype_change</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>nodetype_change</name>
-		<message>
-			<source>title</source>
-			<translation>Canviar tipus node</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>dlg_nodetype_change</source>
-			<translation>Canviar tipus node</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nodetype_change</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_catalog_id</source>
-			<translation>Id catàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_custom_node_type</source>
-			<translation>Nou tipus de node:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_custom_node_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_node_type</source>
-			<translation>Tipus node actual:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_node_type</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>workcat_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor de Workcat</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>dlg_workcat_manager</source>
-			<translation>Gestor de Workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workcat_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Filtrar per: Nom del Workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_demand_check</name>
-		<message>
-			<source>title</source>
-			<translation>Comprovació de la demanda addicional</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_add_demand_check</source>
-			<translation>Comprovació de la demanda addicional</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_demand_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodes</source>
-			<translation>Utilitzar nodes de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_config</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_database</source>
-			<translation>Base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_database</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dscenario_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor d'escenaris dinàmics</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>btn_toolbox</source>
-			<translation>Accions</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toolbox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update_dscenario</source>
-			<translation>Escenari actual</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_dscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>dlg_dscenario_manager</source>
-			<translation>Gestor d'escenaris dinàmics</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dscenario_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dscenario_name</source>
-			<translation>Filtrat per: Nom dscenari</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dscenario_name</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>emitter_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibració de l'emissor</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_emitter_calibration</source>
-			<translation>Calibració de l'emissor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_emitter_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_filename</source>
-			<translation>Nom dels fitxers de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_filename</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_add_demand_check</name>
-		<message>
-			<source>title</source>
-			<translation>Comprovació de la demanda addicional</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_add_demand_check</source>
-			<translation>Comprovació de la demanda addicional</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_add_demand_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodes</source>
-			<translation>Utilitzar nodes de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_config</source>
-			<translation>Fitxer de configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_database</source>
-			<translation>Base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_database</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_emitter_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibració de l'emissor</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_emitter_calibration</source>
-			<translation>Calibració de l'emissor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_emitter_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_filename</source>
-			<translation>Nom dels fitxers de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_quantized_demands</name>
-		<message>
-			<source>title</source>
-			<translation>Demandes quantificades</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_quantized_demands</source>
-			<translation>Demandes quantificades</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_quantized_demands</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_recursive_go2epa</name>
-		<message>
-			<source>title</source>
-			<translation>Epa Multi Calls</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_recursive_go2epa</source>
-			<translation>Epa Multi Calls</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_recursive_go2epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_static_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibració estàtica</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_save_dscenario</source>
-			<translation>Desa els canvis a dscenario</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_save_dscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_static_calibration</source>
-			<translation>Calibració estàtica</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_static_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dscenario</source>
-			<translation>Escenari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_inp_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_valve_operation_check</name>
-		<message>
-			<source>title</source>
-			<translation>Comprovació del funcionament de la vàlvula</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_valve_operation_check</source>
-			<translation>Comprovació del funcionament de la vàlvula</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_valve_operation_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_scenarios</source>
-			<translation>Utilitzar escenaris de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_scenarios</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_config</source>
-			<translation>Fitxer de configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_database</source>
-			<translation>Base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_database</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa</name>
-		<message>
-			<source>title</source>
-			<translation>Anar a EPA</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_file_inp</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_inp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_file_rpt</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_rpt</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_hs_ds</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_hs_ds</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_options</source>
-			<translation>Opcions</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_exec</source>
-			<translation>Executar software EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_exec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_export</source>
-			<translation>Exportar software INP</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_export_subcatch</source>
-			<translation>Exporta subcaptacions UD</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_export_subcatch</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_import_result</source>
-			<translation>Importar resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_import_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_only_check</source>
-			<translation>Utilitzar la geometria de red resultant</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_only_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_recurrent</source>
-			<translation>utilitzar trucades iteratives</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_recurrent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa</source>
-			<translation>Anar a EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_file_manager</source>
-			<translation>Gestor de fitxers</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_file_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_process_options</source>
-			<translation>Opcions de preprocessament</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_process_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Opcions de preprocessament</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Gestor de fitxers</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_counter</source>
-			<translation>Comptador</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_counter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_inp_file</source>
-			<translation>Arxiu INP</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inp_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name</source>
-			<translation>Nom del resultat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rpt_file</source>
-			<translation>Arxiu RPT:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rpt_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_file_manager</source>
-			<translation>Gestor de fitxers</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_file_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor de resultats EPA</translation>
-		</message>
-		<message>
-			<source>btn_archive</source>
-			<translation>Alternar arxiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_archive</source>
-			<translation>Commuta arxiu</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_edit</source>
-			<translation>Editar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_edit</source>
-			<translation>Editar</translation>
-		</message>
-		<message>
-			<source>btn_show_inp_data</source>
-			<translation>Mostrar dades d entrada</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_show_inp_data</source>
-			<translation>Mostra dades INP</translation>
-		</message>
-		<message>
-			<source>btn_toggle_corporate</source>
-			<translation>Alternar corporatiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_corporate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_manager</source>
-			<translation>Gestor de resultats EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_id</source>
-			<translation>Filtrar per: Id resultat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_options</name>
-		<message>
-			<source>title</source>
-			<translation>Go2Epa - opccions</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_options</source>
-			<translation>Go2Epa - opccions</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_energy</source>
-			<translation>Energia</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_energy</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_general</source>
-			<translation>General</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_general</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_hydraulics</source>
-			<translation>Hidràulica</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_hydraulics</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_other</source>
-			<translation>Altres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_reactions</source>
-			<translation>Reaccions</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_reactions</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_reports</source>
-			<translation>Informes</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_reports</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_time_steps</source>
-			<translation>Intervals de data i hora</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_time_steps</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_inp</source>
-			<translation>Inp</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_inp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_other</source>
-			<translation>Altres</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_other</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_result</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de resultats de EPA</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_result</source>
-			<translation>Selector de resultats de EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compare_date</source>
-			<translation>Comparar data:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compare_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compare_time</source>
-			<translation>Comparar hora:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compare_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_compare</source>
-			<translation>Nom del resultat (per comparar):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_show</source>
-			<translation>Nom del resultat (per mostrar):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_selector_date</source>
-			<translation>Selector de data:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_selector_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_selector_time</source>
-			<translation>Hora del selector:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_selector_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_time_to_compare</source>
-			<translation>Hora (per comparar):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_time_to_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_time_to_show</source>
-			<translation>Hora (per mostrar):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_time_to_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_datetime</source>
-			<translation>Dat i hora</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_datetime</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_time</source>
-			<translation>Hora</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_time</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de comparació de resultats</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_selector</source>
-			<translation>Selector de comparació de resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_time</source>
-			<translation>Dat i hora</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_time</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2iber</name>
-		<message>
-			<source>title</source>
-			<translation>Go2Iber</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_iber_options</source>
-			<translation>Opcions de Iber</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_iber_options</source>
-			<translation>Opcions Iber</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_swmm_options</source>
-			<translation>Opcions de SWMM</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_swmm_options</source>
-			<translation>Opcions SWMM</translation>
-		</message>
-		<message>
-			<source>dlg_go2iber</source>
-			<translation>Go2Iber</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2iber</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Opcions</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mesh</source>
-			<translation>Malla:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mesh</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_path</source>
-			<translation>Ruta de la carpeta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name</source>
-			<translation>Nom del resultat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Registre</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>inp_config_import</name>
 		<message>
 			<source>title</source>
 			<translation>Configuració d'importació d'INP</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -17146,6 +16608,22 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_feature</source>
+			<translation>Característiques</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_flwreg</source>
+			<translation>Reguladors de cabal</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_flwreg</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_arcs</source>
 			<translation>Seleccioneu l'arccat_id adequat per a cada combinació d'arc de les opcions següents.Si trieu &quot;Crea nou&quot;, introduïu el nou nom al &quot;Nou nom del catàleg&quot;columna.</translation>
 		</message>
@@ -17223,30 +16701,6 @@
 		</message>
 		<message>
 			<source>tooltip_tab_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_feature</source>
-			<translation>Característiques</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_flwreg</source>
-			<translation>Reguladors de cabal</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_flwreg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -17338,10 +16792,26 @@
 		</message>
 	</context>
 	<context>
-		<name>nonvisual_controls</name>
+		<name>interpolate</name>
 		<message>
 			<source>title</source>
-			<translation>Editor de controls simples</translation>
+			<translation>Interpolar</translation>
+		</message>
+		<message>
+			<source>dlg_interpolate</source>
+			<translation>Interpolar</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_interpolate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_interpolate</source>
+			<translation>Interpolar</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_interpolate</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -17352,11 +16822,2150 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_extrapolate</source>
+			<translation>Extrapolar</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_extrapolate</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>load_menu</name>
+		<message>
+			<source>title</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_load_menu</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_load_menu</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>lot_management</name>
+		<message>
+			<source>title</source>
+			<translation>Administrador de Lots</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_to</source>
+			<translation>Fins:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_to</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>chk_assignacio</source>
+			<translation>Obres pendents asignadas a OT</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_assignacio</source>
+			<translation>Pendent assign works to OT</translation>
+		</message>
+		<message>
+			<source>chk_show_nulls</source>
+			<translation>Mostrar valors buits</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_show_nulls</source>
+			<translation>Show empty values</translation>
+		</message>
+		<message>
+			<source>dlg_lot_management</source>
+			<translation>Administrador de Lots</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_lot_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_address</source>
+			<translation>Adreça:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_address</source>
+			<translation>Adreça:</translation>
+		</message>
+		<message>
+			<source>lbl_column_filter</source>
+			<translation>Columna filtre dades:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_filter</source>
+			<translation>Columna filtre dates:</translation>
+		</message>
+		<message>
+			<source>lbl_name</source>
+			<translation>Nom:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_performance_type</source>
+			<translation>Tipus d'actuació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_performance_type</source>
+			<translation>Performance type:</translation>
+		</message>
+		<message>
+			<source>lbl_serie</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_serie</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>State:</translation>
+		</message>
+		<message>
+			<source>lot_management</source>
+			<translation>Administrador de Lots</translation>
+		</message>
+		<message>
+			<source>tooltip_lot_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Delete lot</translation>
+		</message>
+		<message>
+			<source>btn_export</source>
+			<translation>Export to csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export</source>
+			<translation>Export to csv</translation>
+		</message>
+		<message>
+			<source>btn_lot_selector</source>
+			<translation>Lots selector</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_lot_selector</source>
+			<translation>Lots selector</translation>
+		</message>
+		<message>
+			<source>btn_manage_load</source>
+			<translation>Registre de residus</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_manage_load</source>
+			<translation>Waste registration</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Obrir Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>Open lot</translation>
+		</message>
+		<message>
+			<source>btn_work_register</source>
+			<translation>Logs de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_work_register</source>
+			<translation>Work logs</translation>
+		</message>
+	</context>
+	<context>
+		<name>lot_selector</name>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>State:</translation>
+		</message>
+		<message>
+			<source>lbl_performance_type</source>
+			<translation>Tipus d'actuació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_performance_type</source>
+			<translation>Performance type:</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>Tancar</translation>
+		</message>
+	</context>
+	<context>
+		<name>main_dbproject</name>
+		<message>
+			<source>title</source>
+			<translation>Crear esquema de projecte</translation>
+		</message>
+		<message>
+			<source>dlg_main_dbproject</source>
+			<translation>Projecte principal de base de dades:</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_dbproject</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mapzone_config</name>
+		<message>
+			<source>title</source>
+			<translation>Configuració de la zona de mapa</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_toArc</source>
+			<translation>toArc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_toArc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_preview</source>
+			<translation>Vista prèvia:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_nodeParent</source>
+			<translation>nodeParent:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_nodeParent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ignore</source>
+			<translation>ignorar</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ignore</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_forceClosed</source>
+			<translation>força tancat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_forceClosed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mapzone_config</source>
+			<translation>Configuració de la zona de mapa</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mapzone_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_remove_nodeParent</source>
+			<translation>ELIMINAR</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_nodeParent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_remove_ignore</source>
+			<translation>ELIMINAR</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_ignore</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_remove_forceClosed</source>
+			<translation>ELIMINAR</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_forceClosed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_clear_preview</source>
+			<translation>Esborra la vista prèvia</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_clear_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_cancel</source>
 			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_nodeParent</source>
+			<translation>AFEGIR</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_nodeParent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_forceClosed</source>
+			<translation>AFEGIR</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_forceClosed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_ignore</source>
+			<translation>AFEGIR</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_ignore</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mapzone_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestor de zones de mapa</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>btn_config</source>
+			<translation>Configurar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_config</source>
+			<translation>Configurar</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_execute</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_execute</source>
+			<translation>Executar el procés d'anàlisi de mapzone</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>chk_show_all</source>
+			<translation>Mostra totes les mapzones</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_show_all</source>
+			<translation>Mostra totes les mapzones</translation>
+		</message>
+		<message>
+			<source>dlg_mapzone_manager</source>
+			<translation>Gestor de zones de mapa</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mapzone_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mapzone_name</source>
+			<translation>Filtrar per: Nom de mapzone</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mapzone_name</source>
+			<translation>Filtrar per: Nom de mapzone</translation>
+		</message>
+	</context>
+	<context>
+		<name>massive_composer</name>
+		<message>
+			<source>title</source>
+			<translation>Imprimeix automàticament les pàgines del compositor</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_massive_composer</source>
+			<translation>Imprimeix automàticament les pàgines del compositor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_massive_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_comp</source>
+			<translation>Llista de compositors</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_comp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_composers</source>
+			<translation>Seleccionar compositor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_composers</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_folder</source>
+			<translation>Seleccionar carpeta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_prefix</source>
+			<translation>Prefix del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_prefix</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_single</source>
+			<translation>Fitxer únic:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_single</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_sleep</source>
+			<translation>Temps d’espera:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sleep</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut</name>
+		<message>
+			<source>title</source>
+			<translation>Polígon de tall</translation>
+		</message>
+		<message>
+			<source>lbl_turbidity</source>
+			<translation>Terbolesa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_turbidity</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_end_predict</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_end_predict</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_start</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_start_predict</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_start_predict</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_recieved_day</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_recieved_day</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_use_planified</source>
+			<translation>Utilitzar xarxa planificada</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_use_planified</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut</source>
+			<translation>Polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_exec_realdates</source>
+			<translation>Dates reals</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_exec_realdates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_details</source>
+			<translation>Detalls</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_details</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_forecasted_dates</source>
+			<translation>Dates previstes</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_forecasted_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_assigned_to</source>
+			<translation>Asignat a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_assigned_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cause</source>
+			<translation>Causa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cause</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_chlorine</source>
+			<translation>Clor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_chlorine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_depth</source>
+			<translation>Profunditat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_depth</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_pd</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_pd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_rd</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_rd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dist_from_plot</source>
+			<translation>Distància des de la parcel·la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dist_from_plot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end</source>
+			<translation>Final:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_appropriate</source>
+			<translation>Adequat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_appropriate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_enddate</source>
+			<translation>Data de finalització:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_startdate</source>
+			<translation>Data inicial:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_startdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_user</source>
+			<translation>Usuari executiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Sense resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_received_date</source>
+			<translation>Data de recepció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_received_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start</source>
+			<translation>Inici:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Registre</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tipus:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordre de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab</source>
+			<translation>Exec</translation>
+		</message>
+		<message>
+			<source>tooltip_tab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Plan</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydro</source>
+			<translation>Hidro</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydro</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Registre</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>barra d'eines</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_start</source>
+			<translation>Inici</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>lbl_cause</source>
+			<translation>Causa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cause</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_chlorine</source>
+			<translation>Clor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_chlorine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_forecasted_dates</source>
+			<translation>Dates previstes</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_forecasted_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_end</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_details</source>
+			<translation>Detalls</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_details</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_location</source>
+			<translation>Localització</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_exec_realdates</source>
+			<translation>Dates reals</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_exec_realdates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_depth</source>
+			<translation>Profunditat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_depth</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_pd</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_pd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_rd</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_rd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_use_planified</source>
+			<translation>Utilitzar xarxa planificada</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_use_planified</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_assigned_to</source>
+			<translation>Asignat a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_assigned_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_start</source>
+			<translation>Inici</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_end</source>
+			<translation>Final</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>lbl_dist_from_plot</source>
+			<translation>Distància des de la parcel·la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dist_from_plot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel_task</source>
+			<translation>Cancel·la la tasca</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel_task</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_end</source>
+			<translation>Final</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionAddConnec</source>
+			<translation>Em vaig connectar amb Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_actionAddConnec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionAddHydrometer</source>
+			<translation>Hidròmetre Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_actionAddHydrometer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionChangeValveStatus</source>
+			<translation>Canviar l'estat de la vàlvula</translation>
+		</message>
+		<message>
+			<source>tooltip_actionChangeValveStatus</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionComposer</source>
+			<translation>Compositor</translation>
+		</message>
+		<message>
+			<source>tooltip_actionComposer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCustomMincut</source>
+			<translation>Mincut personalitzat</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCustomMincut</source>
+			<translation>Polígon de tall personalitzat</translation>
+		</message>
+		<message>
+			<source>actionExportHydroCsv</source>
+			<translation>Exportació Hydro Csv</translation>
+		</message>
+		<message>
+			<source>tooltip_actionExportHydroCsv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionMincut</source>
+			<translation>Mentida automàtica</translation>
+		</message>
+		<message>
+			<source>tooltip_actionMincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionRefreshMincut</source>
+			<translation>Actualitza Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_actionRefreshMincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end</source>
+			<translation>Fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_equipment_code</source>
+			<translation>Equip de medició de clor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_equipment_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_appropriate</source>
+			<translation>Adequat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_appropriate</source>
+			<translation>Si es verdader, la ubicació real coincideix amb la informació mincut programada.</translation>
+		</message>
+		<message>
+			<source>lbl_exec_enddate</source>
+			<translation>Data de finalització:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_startdate</source>
+			<translation>Data inicial:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_startdate</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
+			<source>lbl_exec_user</source>
+			<translation>Usuari executiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Sense resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reagent_lot</source>
+			<translation>Lot del reactiu de clor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reagent_lot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_received_date</source>
+			<translation>Data de recepció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_received_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_turbidity</source>
+			<translation>Terbolesa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_turbidity</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tipus:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordre de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab</source>
+			<translation>Exec</translation>
+		</message>
+		<message>
+			<source>tooltip_tab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Plan</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydro</source>
+			<translation>Hidro</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydro</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_composer</name>
+		<message>
+			<source>title</source>
+			<translation>Compositor polígon de tall</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_composer</source>
+			<translation>Compositor polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Obrir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_title</source>
+			<translation>Títol</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_title</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Model:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Compositor polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_composer</source>
+			<translation>Compositor polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Obrir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>lbl_title</source>
+			<translation>Títol</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_title</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Model:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_connec</name>
+		<message>
+			<source>title</source>
+			<translation>Polígon de tall escomeses</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccionar objecte</translation>
+		</message>
+		<message>
+			<source>lbl_search</source>
+			<translation>Buscar per 'customer code':</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_connec</source>
+			<translation>Polígon de tall escomeses</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_search</source>
+			<translation>Buscar per 'customer code':</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Insertar</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_connec</source>
+			<translation>Polígon de tall escomeses</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_end</name>
+		<message>
+			<source>title</source>
+			<translation>Finalitzar polígon de tall</translation>
+		</message>
+		<message>
+			<source>lbl_street</source>
+			<translation>Carrer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_street</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordre de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordre de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_end</source>
+			<translation>Finalitzar polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Sense resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_hour</source>
+			<translation>Hora d'inici</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_set_real_location</source>
+			<translation>Establir ubicació real</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_set_real_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>Fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Dates</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_close_mincut</source>
+			<translation>Cerrar mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_close_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_end</source>
+			<translation>Finalitzar polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_hours_start_fin</source>
+			<translation>H:mm:ss</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_hours_start_fin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_start_fin</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_start_fin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_end_fin</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_end_fin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_set_real_location</source>
+			<translation>Establir ubicació real</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_set_real_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>Fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_hour</source>
+			<translation>Hora de finalització:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_executed</source>
+			<translation>Executat per:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_executed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_municipality</source>
+			<translation>Municipi:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_municipality</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_number</source>
+			<translation>Número:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_number</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_hour</source>
+			<translation>Hora d'inici</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_close_mincut</source>
+			<translation>Cerrar mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_close_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_executed</source>
+			<translation>Executat per:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_executed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_hour</source>
+			<translation>Hora de finalització:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_hour</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_hydrometer</name>
+		<message>
+			<source>title</source>
+			<translation>Hidròmetre polígon de tall</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Insertar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>lbl_ccc</source>
+			<translation>Conectar codi client:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ccc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hcc</source>
+			<translation>Codi client hidròmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hcc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_hydrometer</source>
+			<translation>Hidròmetre polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_hydrometer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hcc</source>
+			<translation>Codi client hidròmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hcc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ccc</source>
+			<translation>Conectar codi client:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ccc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_hydrometer</source>
+			<translation>Hidròmetre polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_hydrometer</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestió polígon de tall</translation>
+		</message>
+		<message>
+			<source>lbl_streetaxis</source>
+			<translation>Carrer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_streetaxis</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel_mincut</source>
+			<translation>Cancel·lació falsa</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_next_days</source>
+			<translation>Pròxims dies</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_next_days</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_notify</source>
+			<translation>Enviar SMS</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_notify</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_to</source>
+			<translation>Fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_selector_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_selector_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut_type</source>
+			<translation>Tipus:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrar per:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exploitation</source>
+			<translation>Explotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exploitation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_manager</source>
+			<translation>Gestió polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_manager</source>
+			<translation>Gestió polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_manager</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>netscenario</name>
+		<message>
+			<source>title</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Borrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Alterar actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+		<message>
+			<source>btn_toggle_closed</source>
+			<translation>Alterar tancament</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_closed</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Modificar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+		<message>
+			<source>dlg_netscenario</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_netscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mapzone_id</source>
+			<translation>Mapzone id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mapzone_id</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+		<message>
+			<source>btn_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_config</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+	</context>
+	<context>
+		<name>netscenario_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>btn_toc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toc</source>
+			<translation>Carregar capes Giswater</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>btn_update_netscenario</source>
+			<translation>Escenari de xarxa actual</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_netscenario</source>
+			<translation>Escenari de xarxa actual</translation>
+		</message>
+		<message>
+			<source>dlg_netscenario_manager</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_netscenario_manager</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>lbl_netscenario_name</source>
+			<translation>Filtrar per: Nom de l’escenari de xarxa</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_netscenario_name</source>
+			<translation>Filtra per: nom de l'escenari net</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>btn_execute</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_execute</source>
+			<translation>Executar anàlisi de zones de mapa</translation>
+		</message>
+	</context>
+	<context>
+		<name>nodetype_change</name>
+		<message>
+			<source>title</source>
+			<translation>Canviar tipus node</translation>
+		</message>
+		<message>
+			<source>dlg_nodetype_change</source>
+			<translation>Canviar tipus node</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nodetype_change</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_custom_node_type</source>
+			<translation>Nou tipus de node:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_custom_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_node_type</source>
+			<translation>Tipus node actual:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>lbl_catalog_id</source>
+			<translation>Id catàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_catalog_id</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>nonvisual_controls</name>
+		<message>
+			<source>title</source>
+			<translation>Editor de controls simples</translation>
+		</message>
+		<message>
+			<source>dlg_nonvisual_controls</source>
+			<translation>Editor de controls simples</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nonvisual_controls</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -17368,19 +18977,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_controls</source>
-			<translation>Editor de controls simples</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nonvisual_controls</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_sector_id</source>
 			<translation>ID del sector</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_sector_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -17389,6 +19006,14 @@
 		<message>
 			<source>title</source>
 			<translation>Editor de corbes</translation>
+		</message>
+		<message>
+			<source>lbl_curve_type</source>
+			<translation>Tipus de corba</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_curve_type</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -17407,14 +19032,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_curve</source>
-			<translation>Editor de corbes</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nonvisual_curve</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_curve_id</source>
 			<translation>ID de la corba</translation>
 		</message>
@@ -17423,19 +19040,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_curve_type</source>
-			<translation>Tipus de corba</translation>
+			<source>dlg_nonvisual_curve</source>
+			<translation>Editor de corbes</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_curve_type</source>
+			<source>tooltip_dlg_nonvisual_curve</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció</translation>
+			<source>tbl_curve_value</source>
+			<translation>Y</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_tbl_curve_value</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -17447,16 +19064,24 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tbl_curve_value</source>
-			<translation>Y</translation>
+			<source>lbl_descript</source>
+			<translation>Descripció</translation>
 		</message>
 		<message>
-			<source>tooltip_tbl_curve_value</source>
+			<source>tooltip_lbl_descript</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
 		<name>nonvisual_lids</name>
+		<message>
+			<source>lbl_thickness_drainage</source>
+			<translation>Gruix (polzades o mm)</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_thickness_drainage</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>btn_cancel</source>
 			<translation>Cancel·lar</translation>
@@ -17746,14 +19371,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_thickness_drainage</source>
-			<translation>Gruix (polzades o mm)</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_thickness_drainage</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_thickness_storage</source>
 			<translation>Gruix (polzades o mm)</translation>
 		</message>
@@ -17887,54 +19504,6 @@
 		</message>
 		<message>
 			<source>tooltip_txt_1_thickness_pavement</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_1_thickness_storage</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_1_thickness_storage</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_flow_exponent</source>
-			<translation>0,5</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_flow_exponent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_porosity</source>
-			<translation>0,5</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_porosity</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_vegetation_volume</source>
-			<translation>0,0</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_vegetation_volume</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_void_fraction</source>
-			<translation>0,5</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_void_fraction</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_void_ratio_pavement</source>
-			<translation>0,15</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_void_ratio_pavement</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -18113,6 +19682,54 @@
 			<source>tooltip_txt_flow_capacity</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>txt_1_thickness_storage</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_1_thickness_storage</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_void_ratio_pavement</source>
+			<translation>0,15</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_void_ratio_pavement</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_flow_exponent</source>
+			<translation>0,5</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_flow_exponent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_porosity</source>
+			<translation>0,5</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_porosity</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_vegetation_volume</source>
+			<translation>0,0</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_vegetation_volume</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_void_fraction</source>
+			<translation>0,5</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_void_fraction</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>nonvisual_manager</name>
@@ -18121,12 +19738,12 @@
 			<translation>Gestor d’objectes no visuals</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
+			<source>inp_lid</source>
+			<translation>Tapes</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Tancar</translation>
+			<source>tooltip_inp_lid</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -18240,12 +19857,76 @@
 			<source>tooltip_ve_inp_pattern</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>ve_inp_rules</source>
+			<translation>regles</translation>
+		</message>
+		<message>
+			<source>tooltip_ve_inp_rules</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>ve_inp_timeseries</source>
+			<translation>sèries temporals</translation>
+		</message>
+		<message>
+			<source>tooltip_ve_inp_timeseries</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cat_mat_roughness</source>
+			<translation>Rugositat</translation>
+		</message>
+		<message>
+			<source>tooltip_cat_mat_roughness</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
 	</context>
 	<context>
 		<name>nonvisual_pattern_ud</name>
 		<message>
 			<source>title</source>
 			<translation>Editor de patrons</translation>
+		</message>
+		<message>
+			<source>tbl_daily</source>
+			<translation>SOL</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_daily</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tbl_hourly</source>
+			<translation>23h</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_hourly</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tbl_monthly</source>
+			<translation>DES</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_monthly</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tbl_weekend</source>
+			<translation>23h</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_weekend</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18303,44 +19984,44 @@
 			<source>tooltip_lbl_pattern_type</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>tbl_daily</source>
-			<translation>SOL</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_daily</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tbl_hourly</source>
-			<translation>23h</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_hourly</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tbl_monthly</source>
-			<translation>DES</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_monthly</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tbl_weekend</source>
-			<translation>23h</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_weekend</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>nonvisual_pattern_ws</name>
 		<message>
 			<source>title</source>
 			<translation>Editor de patrons</translation>
+		</message>
+		<message>
+			<source>dlg_nonvisual_pattern_ws</source>
+			<translation>Editor de patrons</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nonvisual_pattern_ws</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pattern_type</source>
+			<translation>ID d'explotació</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pattern_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pattern_id</source>
+			<translation>ID del patró</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pattern_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observació</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18359,38 +20040,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_pattern_ws</source>
-			<translation>Editor de patrons</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nonvisual_pattern_ws</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observació</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pattern_id</source>
-			<translation>ID del patró</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pattern_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pattern_type</source>
-			<translation>ID d'explotació</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pattern_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>tbl_pattern_value</source>
 			<translation>18</translation>
 		</message>
@@ -18406,27 +20055,19 @@
 			<translation>Impressió d'objectes no visuals</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_path</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_nonvisual_print</source>
+			<translation>Impressió d'objectes no visuals</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nonvisual_print</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -18438,11 +20079,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_print</source>
-			<translation>Impressió d'objectes no visuals</translation>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_nonvisual_print</source>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -18684,2405 +20333,41 @@
 		</message>
 	</context>
 	<context>
-		<name>quantized_demands</name>
+		<name>organization_create</name>
 		<message>
-			<source>title</source>
-			<translation>Demandes quantificades</translation>
+			<source>actionT</source>
+			<translation>t</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_quantized_demands</source>
-			<translation>Demandes quantificades</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_quantized_demands</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>recursive_epa</name>
-		<message>
-			<source>title</source>
-			<translation>Epa Multi Calls</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_recursive_epa</source>
-			<translation>Epa Multi Calls</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_recursive_epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>static_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibració estàtica</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_static_calibration</source>
-			<translation>Calibració estàtica</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_static_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_inp_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Nom dels fitxers de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>valve_operation_check</name>
-		<message>
-			<source>title</source>
-			<translation>Comprovació del funcionament de la vàlvula</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_valve_operation_check</source>
-			<translation>Comprovació del funcionament de la vàlvula</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_valve_operation_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Nom del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fitxer INP d’entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Carpeta de sortida:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_scenarios</source>
-			<translation>Utilitzar escenaris de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_scenarios</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_config</source>
-			<translation>Fitxer de configuració:</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_database</source>
-			<translation>Base de dades</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_database</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>load_menu</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_load_menu</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_load_menu</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut</name>
-		<message>
-			<source>title</source>
-			<translation>Polígon de tall</translation>
-		</message>
-		<message>
-			<source>actionAddConnec</source>
-			<translation>Em vaig connectar amb Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_actionAddConnec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionAddHydrometer</source>
-			<translation>Hidròmetre Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_actionAddHydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionChangeValveStatus</source>
-			<translation>Canviar l'estat de la vàlvula</translation>
-		</message>
-		<message>
-			<source>tooltip_actionChangeValveStatus</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionComposer</source>
-			<translation>Compositor</translation>
-		</message>
-		<message>
-			<source>tooltip_actionComposer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCustomMincut</source>
-			<translation>Mincut personalitzat</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCustomMincut</source>
-			<translation>Polígon de tall personalitzat</translation>
-		</message>
-		<message>
-			<source>actionExportHydroCsv</source>
-			<translation>Exportació Hydro Csv</translation>
-		</message>
-		<message>
-			<source>tooltip_actionExportHydroCsv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionMincut</source>
-			<translation>Mentida automàtica</translation>
-		</message>
-		<message>
-			<source>tooltip_actionMincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionRefreshMincut</source>
-			<translation>Actualitza Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_actionRefreshMincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel_task</source>
-			<translation>Cancel·la la tasca</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_task</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_end</source>
-			<translation>Final</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_start</source>
-			<translation>Inici</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_end</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_end_predict</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_end_predict</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_start</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_start_predict</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_start_predict</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_recieved_day</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_recieved_day</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_use_planified</source>
-			<translation>Utilitzar xarxa planificada</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_use_planified</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut</source>
-			<translation>Polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_exec_realdates</source>
-			<translation>Dates reals</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_exec_realdates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_details</source>
-			<translation>Detalls</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_details</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_forecasted_dates</source>
-			<translation>Dates previstes</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_forecasted_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_assigned_to</source>
-			<translation>Asignat a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_assigned_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cause</source>
-			<translation>Causa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cause</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_chlorine</source>
-			<translation>Clor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_chlorine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_depth</source>
-			<translation>Profunditat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_depth</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_pd</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_pd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_rd</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_rd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dist_from_plot</source>
-			<translation>Distància des de la parcel·la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dist_from_plot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end</source>
-			<translation>Final:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_appropriate</source>
-			<translation>Adequat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_enddate</source>
-			<translation>Data de finalització:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Data inicial:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_user</source>
-			<translation>Usuari executiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_user</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Sense resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_received_date</source>
-			<translation>Data de recepció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_received_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start</source>
-			<translation>Inici:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_turbidity</source>
-			<translation>Terbolesa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_turbidity</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type</source>
-			<translation>Tipus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordre de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab</source>
-			<translation>Exec</translation>
-		</message>
-		<message>
-			<source>tooltip_tab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Plan</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydro</source>
-			<translation>Hidro</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydro</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Registre</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>barra d'eines</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_composer</name>
-		<message>
-			<source>title</source>
-			<translation>Compositor polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Obrir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_composer</source>
-			<translation>Compositor polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Compositor polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Model:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Títol</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_connec</name>
-		<message>
-			<source>title</source>
-			<translation>Polígon de tall escomeses</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_connec</source>
-			<translation>Polígon de tall escomeses</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_search</source>
-			<translation>Buscar per 'customer code':</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_search</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_end</name>
-		<message>
-			<source>title</source>
-			<translation>Finalitzar polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_set_real_location</source>
-			<translation>Establir ubicació real</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_set_real_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_end_fin</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_end_fin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_start_fin</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_start_fin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_hours_start_fin</source>
-			<translation>H:mm:ss</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_hours_start_fin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_end</source>
-			<translation>Finalitzar polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_close_mincut</source>
-			<translation>Cerrar mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_close_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Dates</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>Fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_hour</source>
-			<translation>Hora de finalització:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_executed</source>
-			<translation>Executat per:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_executed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Sense resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_hour</source>
-			<translation>Hora d'inici</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordre de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_hydrometer</name>
-		<message>
-			<source>title</source>
-			<translation>Hidròmetre polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_hydrometer</source>
-			<translation>Hidròmetre polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_hydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ccc</source>
-			<translation>Conectar codi client:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ccc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_hcc</source>
-			<translation>Codi client hidròmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_hcc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestió polígon de tall</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_manager</source>
-			<translation>Gestió polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_manager</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>profile</name>
-		<message>
-			<source>title</source>
-			<translation>Dibuixar perfil</translation>
-		</message>
-		<message>
-			<source>actionAddPoint</source>
-			<translation>Afegir punt adicional</translation>
-		</message>
-		<message>
-			<source>tooltip_actionAddPoint</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionProfile</source>
-			<translation>Establir nodes</translation>
-		</message>
-		<message>
-			<source>tooltip_actionProfile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_additional_point</source>
-			<translation>Afegir punt adicional</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_end_point</source>
-			<translation>Afegir punt final</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_end_point</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_add_start_point</source>
-			<translation>Afegir punt inicial</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_start_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_clear_profile</source>
-			<translation>Netejar perfil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_clear_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_delete_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_draw_profile</source>
-			<translation>Dibuixar perfil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_draw_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_pdf</source>
-			<translation>Obrir compositor</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_pdf</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_load_profile</source>
-			<translation>Carregar perfil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_load_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_save_profile</source>
-			<translation>Guardar perfil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_save_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>date</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_profile</source>
-			<translation>Dibuixar perfil</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_composer</source>
-			<translation>Paràmetres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_profile</source>
-			<translation>Perfil</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_additional_point</source>
-			<translation>Punt adicional:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date</source>
-			<translation>Data:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_point</source>
-			<translation>Punt final:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_min_distance</source>
-			<translation>Distància mínima Vnode:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_min_distance</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_path</source>
-			<translation>Camí:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_profile_id</source>
-			<translation>Id perfil:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_profile_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sh</source>
-			<translation>Escala horizontal:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sh</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_point</source>
-			<translation>Punt inicial:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sv</source>
-			<translation>Escala vertical:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Model:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Títol:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>barra d'eines</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_profile_id</source>
-			<translation>ID de perfil opcional</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_profile_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>profile_list</name>
-		<message>
-			<source>title</source>
-			<translation>Cargar perfils</translation>
-		</message>
-		<message>
-			<source>btn_delete_profile</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Obrir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_profile_list</source>
-			<translation>Cargar perfils</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_profile_list</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Llista de perfils</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector_date</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de dates</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>date_from</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>date_to</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_selector_date</source>
-			<translation>Selector de dates</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_from</source>
-			<translation>Data des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_to</source>
-			<translation>Data fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_to</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit</name>
-		<message>
-			<source>title</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_add_geom</source>
-			<translation>Afegir geom</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_doc_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_delete</source>
-			<translation>Esborrar document</translation>
-		</message>
-		<message>
-			<source>btn_doc_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_insert</source>
-			<translation>Insertar document</translation>
-		</message>
-		<message>
-			<source>btn_doc_new</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_new</source>
-			<translation>Crear nou document</translation>
-		</message>
-		<message>
-			<source>btn_event_delete</source>
-			<translation>Esborrar event</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_event_insert</source>
-			<translation>Inserir event</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_event_update</source>
-			<translation>Actualitzar event</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_doc</source>
-			<translation>Obrir document</translation>
-		</message>
-		<message>
-			<source>dlg_visit</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Tipus d'objecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation>Codi:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>Fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl</source>
-			<translation>Explotacio:*</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tipus d'objecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_user_name</source>
-			<translation>Nom d'usuari:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visitcat_id</source>
-			<translation>Visita cat id</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visitcat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_document</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_document</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_event</source>
-			<translation>Partes Feina</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tab_visit</source>
-			<translation>Visita</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_document</name>
-		<message>
-			<source>title</source>
-			<translation>Cargar documents</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Obrir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_document</source>
-			<translation>Cargar documents</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_document</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event</name>
-		<message>
-			<source>title</source>
-			<translation>Event estàndar d'arc</translation>
-		</message>
-		<message>
-			<source>btn_add_file</source>
-			<translation>Afegir arxiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_file</source>
-			<translation>Esborrar arxiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event</source>
-			<translation>Event estàndar d'arc</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_files</source>
-			<translation>Arxius:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Id paràmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Id posició:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Valor posció</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Valor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_full</name>
-		<message>
-			<source>title</source>
-			<translation>Event</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_full</source>
-			<translation>Event</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_full</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compass</source>
-			<translation>Otrientació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_event_code</source>
-			<translation>Codi event:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_event_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_files</source>
-			<translation>Arxius:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_index_val</source>
-			<translation>Factor de pes.</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_index_val</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_is_last</source>
-			<translation>Últim valor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_is_last</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Id paràmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Id posició:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Valor posició:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_tstamp</source>
-			<translation>Segell T:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_tstamp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Valor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value1</source>
-			<translation>Valor 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value2</source>
-			<translation>Valor 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>lbl_xcoord</source>
-			<translation>Coordenada X:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_xcoord</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ycoord</source>
-			<translation>Cooordenad Y:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ycoord</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_files</source>
-			<translation>Arxius</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info</source>
-			<translation>Informació</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_rehab</name>
-		<message>
-			<source>title</source>
-			<translation>Event rehabilització d'arc</translation>
-		</message>
-		<message>
-			<source>btn_add_file</source>
-			<translation>Afegir arxiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_file</source>
-			<translation>Esborrar arxiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_rehab</source>
-			<translation>Event rehabilització d'arc</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_rehab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_files</source>
-			<translation>Arxius:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Id paràmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Id posició.</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Valor posció</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value1</source>
-			<translation>Valor 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value2</source>
-			<translation>Valor 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_gallery</name>
-		<message>
-			<source>title</source>
-			<translation>Galería</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_next</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_next</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_gallery</source>
-			<translation>Galería</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_event_id</source>
-			<translation>Id event:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_event_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_gallery_zoom</name>
-		<message>
-			<source>title</source>
-			<translation>Zum galería</translation>
-		</message>
-		<message>
-			<source>btn_slideNext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_slideNext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_slidePrevious</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_slidePrevious</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_gallery_zoom</source>
-			<translation>Zum galería</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_gallery_zoom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_event_id</source>
-			<translation>Id event:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_event_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_img_zoom</source>
-			<translation>Zoom d’imatge</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_img_zoom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Visita ID</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestió de visites</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar visita</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Obrir visita</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_to</source>
-			<translation>Fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrar per codi:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_picture</name>
-		<message>
-			<source>title</source>
-			<translation>Afegir foto</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>dlg_visit_picture</source>
-			<translation>Afegir foto</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_picture</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Enllaç</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Link</translation>
-		</message>
-		<message>
-			<source>path_doc</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_path_doc</source>
+			<source>tooltip_actionT</source>
 			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>netscenario</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_config</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Borrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Alterar actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_toggle_closed</source>
-			<translation>Alterar tancament</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_closed</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Modificar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
 		</message>
 		<message>
-			<source>dlg_netscenario</source>
-			<translation>Diàleg</translation>
+			<source>organization_create</source>
+			<translation>t</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_netscenario</source>
+			<source>tooltip_organization_create</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mapzone_id</source>
-			<translation>Mapzone id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mapzone_id</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-	</context>
-	<context>
-		<name>netscenario_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>Duplicar</translation>
-		</message>
-		<message>
-			<source>btn_execute</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_execute</source>
-			<translation>Executar anàlisi de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_toc</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toc</source>
-			<translation>Carregar capes Giswater</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>btn_update_netscenario</source>
-			<translation>Escenari de xarxa actual</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_netscenario</source>
-			<translation>Escenari de xarxa actual</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>dlg_netscenario_manager</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_netscenario_manager</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>lbl_netscenario_name</source>
-			<translation>Filtrar per: Nom de l’escenari de xarxa</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_netscenario_name</source>
-			<translation>Filtra per: nom de l'escenari net</translation>
 		</message>
 	</context>
 	<context>
 		<name>plan_psector</name>
+		<message>
+			<source>label_7</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_7</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>active</source>
 			<translation>Actiu</translation>
 		</message>
 		<message>
 			<source>tooltip_active</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -21090,7 +20375,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_arc_fusion</source>
@@ -21106,7 +20391,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -21130,7 +20415,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_rapports</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_remove</source>
@@ -21138,7 +20423,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_remove</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_reports</source>
@@ -21154,7 +20439,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_select</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_select_arc</source>
@@ -21186,7 +20471,7 @@
 		</message>
 		<message>
 			<source>tooltip_chk_enable_all</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>gexpenses_label</source>
@@ -21258,7 +20543,7 @@
 		</message>
 		<message>
 			<source>tooltip_grb_map_details</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>groupBox</source>
@@ -21365,14 +20650,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>label_7</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>label_8</source>
 			<translation>Estat:</translation>
 		</message>
@@ -21386,7 +20663,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_atlas_id</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_descript</source>
@@ -21394,7 +20671,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_exploitation</source>
@@ -21402,7 +20679,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_exploitation</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_ext_code</source>
@@ -21410,7 +20687,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_ext_code</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_general_expenses</source>
@@ -21418,7 +20695,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_general_expenses</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_name</source>
@@ -21426,7 +20703,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_name</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_num_value</source>
@@ -21434,7 +20711,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_num_value</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_observation</source>
@@ -21442,7 +20719,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_observation</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_other_expenses</source>
@@ -21450,7 +20727,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_other_expenses</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_parent_id</source>
@@ -21458,7 +20735,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_parent_id</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_priority</source>
@@ -21466,7 +20743,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_priority</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_psector_id</source>
@@ -21474,7 +20751,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_psector_id</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_rotation</source>
@@ -21482,7 +20759,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_scale</source>
@@ -21490,7 +20767,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_scale</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_status</source>
@@ -21498,7 +20775,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_text1</source>
@@ -21506,7 +20783,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text1</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_text2</source>
@@ -21514,7 +20791,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text2</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_text3</source>
@@ -21522,7 +20799,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text3</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_text4</source>
@@ -21530,7 +20807,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text4</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_text5</source>
@@ -21538,7 +20815,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text5</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_text6</source>
@@ -21546,7 +20823,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text6</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_total_arcs</source>
@@ -21554,7 +20831,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_total_arcs</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_total_nodes</source>
@@ -21562,7 +20839,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_total_nodes</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_type</source>
@@ -21570,7 +20847,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_type</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_vat</source>
@@ -21578,7 +20855,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_vat</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
@@ -21586,7 +20863,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>other_label</source>
@@ -21757,10 +21034,1084 @@
 		</message>
 	</context>
 	<context>
+		<name>print</name>
+		<message>
+			<source>title</source>
+			<translation>Impressió fixa</translation>
+		</message>
+		<message>
+			<source>grb_option_values</source>
+			<translation>Valor opcionals</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_option_values</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_map_options</source>
+			<translation>Opcions de mapa:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_map_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_preview</source>
+			<translation>Previsualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_print</source>
+			<translation>Impressió ràpida</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_print</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_print</source>
+			<translation>Impressió fixa</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_print</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>priority</name>
+		<message>
+			<source>title</source>
+			<translation>Càlcul de prioritat</translation>
+		</message>
+		<message>
+			<source>grb_engine_1</source>
+			<translation>grb_engine_1</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_engine_1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Corre</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_again</source>
+			<translation>A continuació</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_again</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save2file</source>
+			<translation>Desa els resultats en un fitxer Excel...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save2file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>Seleccioneu les funcions del llenç</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Càlcul de prioritat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_catalog</source>
+			<translation>Catàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_catalog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Motor de càlcul</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diàmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Calcular</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccioni els elements en la vista del mapa</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Càlcul de prioritat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_global</source>
+			<translation>Paràmetres de càlcul</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection</source>
+			<translation>Selecció d'elements</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_budget</source>
+			<translation>Pressupost anual:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_budget</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl_selection</source>
+			<translation>Explotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_presszone</source>
+			<translation>Zona de pressió:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_presszone</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_id</source>
+			<translation>Nom del resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Any horitzó:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_calc</source>
+			<translation>Càlcul</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_calc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_catalog</source>
+			<translation>Catàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_catalog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Motor de càlcul</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_engine_2</source>
+			<translation>grb_engine_2</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_engine_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_global</source>
+			<translation>Paràmetres de càlcul</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection</source>
+			<translation>Selecció d'elements</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_budget</source>
+			<translation>Pressupost anual:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_budget</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diàmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl_selection</source>
+			<translation>Explotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_presszone</source>
+			<translation>Zona de pressió:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_presszone</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_id</source>
+			<translation>Nom del resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Any horitzó:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_calc</source>
+			<translation>Càlcul</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_calc</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>priority_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestor de resultats</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tipus:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority_manager</source>
+			<translation>Gestor de resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Explotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrar per: Nom del resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tipus:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_edit</source>
+			<translation>Editar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_edit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_status</source>
+			<translation>Canviar estat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority_manager</source>
+			<translation>Gestor de resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Explotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrar per: Nom del resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_corporate</source>
+			<translation>Establir corporatiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_corporate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_corporate</source>
+			<translation>Establir corporatiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_corporate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_edit</source>
+			<translation>Editar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_edit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_status</source>
+			<translation>Canviar estat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_status</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>profile</name>
+		<message>
+			<source>title</source>
+			<translation>Dibuixar perfil</translation>
+		</message>
+		<message>
+			<source>lbl_sh</source>
+			<translation>Escala horizontal:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sh</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_profile_id</source>
+			<translation>ID de perfil opcional</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_profile_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>barra d'eines</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_title</source>
+			<translation>Títol:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_title</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Model:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_sv</source>
+			<translation>Escala vertical:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_point</source>
+			<translation>Punt inicial:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_profile_id</source>
+			<translation>Id perfil:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_profile_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Camí:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_min_distance</source>
+			<translation>Distància mínima Vnode:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_min_distance</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_point</source>
+			<translation>Punt final:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date</source>
+			<translation>Data:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_additional_point</source>
+			<translation>Punt adicional:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_profile</source>
+			<translation>Perfil</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_composer</source>
+			<translation>Paràmetres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_profile</source>
+			<translation>Dibuixar perfil</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>date</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save_profile</source>
+			<translation>Guardar perfil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_load_profile</source>
+			<translation>Carregar perfil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_load_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_pdf</source>
+			<translation>Obrir compositor</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_pdf</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_draw_profile</source>
+			<translation>Dibuixar perfil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_draw_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_clear_profile</source>
+			<translation>Netejar perfil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_clear_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_start_point</source>
+			<translation>Afegir punt inicial</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_start_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_end_point</source>
+			<translation>Afegir punt final</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_end_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_additional_point</source>
+			<translation>Afegir punt adicional</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionProfile</source>
+			<translation>Establir nodes</translation>
+		</message>
+		<message>
+			<source>tooltip_actionProfile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionAddPoint</source>
+			<translation>Afegir punt adicional</translation>
+		</message>
+		<message>
+			<source>tooltip_actionAddPoint</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>profile_list</name>
+		<message>
+			<source>title</source>
+			<translation>Cargar perfils</translation>
+		</message>
+		<message>
+			<source>dlg_profile_list</source>
+			<translation>Cargar perfils</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_profile_list</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Llista de perfils</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_profile</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Obrir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>project_check</name>
+		<message>
+			<source>title</source>
+			<translation>Revisar projecte</translation>
+		</message>
+		<message>
+			<source>dlg_project_check</source>
+			<translation>Revisar projecte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_project_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_databaselog</source>
+			<translation>Base de dades log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_databaselog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tab_qgis_projlog</source>
+			<translation>QGIS projecte log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_qgis_projlog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
 		<name>psector</name>
 		<message>
 			<source>title</source>
 			<translation>Sector del pla</translation>
+		</message>
+		<message>
+			<source>vat_label</source>
+			<translation>IVA:</translation>
+		</message>
+		<message>
+			<source>tooltip_vat_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>gexpenses_label_7</source>
+			<translation>Total:</translation>
+		</message>
+		<message>
+			<source>tooltip_gexpenses_label_7</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>gexpenses_label_6</source>
+			<translation>Total:</translation>
+		</message>
+		<message>
+			<source>tooltip_gexpenses_label_6</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Reixa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_general</source>
+			<translation>General</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_general</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_document</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_document</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Escomesa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_other_prices</source>
+			<translation>Altres preus</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_other_prices</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text5</source>
+			<translation>Text 5:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text4</source>
+			<translation>Text 4:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text4</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text3</source>
+			<translation>Text 3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>other_label_2</source>
+			<translation>Altres despeses</translation>
+		</message>
+		<message>
+			<source>tooltip_other_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_value</source>
+			<translation>Número valor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>gexpenses_label_8</source>
+			<translation>Total:</translation>
+		</message>
+		<message>
+			<source>tooltip_gexpenses_label_8</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>other_label_4</source>
+			<translation>%</translation>
+		</message>
+		<message>
+			<source>tooltip_other_label_4</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_remove</source>
@@ -21843,83 +22194,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>gexpenses_label_6</source>
-			<translation>Total:</translation>
+			<source>tab_node</source>
+			<translation>Node</translation>
 		</message>
 		<message>
-			<source>tooltip_gexpenses_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>gexpenses_label_7</source>
-			<translation>Total:</translation>
-		</message>
-		<message>
-			<source>tooltip_gexpenses_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>gexpenses_label_8</source>
-			<translation>Total:</translation>
-		</message>
-		<message>
-			<source>tooltip_gexpenses_label_8</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_value</source>
-			<translation>Número valor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text3</source>
-			<translation>Text 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text4</source>
-			<translation>Text 4:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text5</source>
-			<translation>Text 5:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text6</source>
-			<translation>Text 6:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total</source>
-			<translation>Total:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total_count</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total_count</source>
+			<source>tooltip_tab_node</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -21931,43 +22210,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>other_label_2</source>
-			<translation>Altres despeses</translation>
-		</message>
-		<message>
-			<source>tooltip_other_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>other_label_3</source>
 			<translation>%</translation>
 		</message>
 		<message>
 			<source>tooltip_other_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>other_label_4</source>
-			<translation>%</translation>
-		</message>
-		<message>
-			<source>tooltip_other_label_4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_additional_info</source>
-			<translation>Info adicional</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_additional_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -21979,67 +22226,43 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_connec</source>
-			<translation>Escomesa</translation>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_connec</source>
+			<source>tooltip_tab_arc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_document</source>
-			<translation>Document</translation>
+			<source>tab_additional_info</source>
+			<translation>Info adicional</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_document</source>
+			<source>tooltip_tab_additional_info</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_general</source>
-			<translation>General</translation>
+			<source>lbl_total_count</source>
+			<translation>0</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_general</source>
+			<source>tooltip_lbl_total_count</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_gully</source>
-			<translation>Reixa</translation>
+			<source>lbl_total</source>
+			<translation>Total:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_gully</source>
+			<source>tooltip_lbl_total</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
+			<source>lbl_text6</source>
+			<translation>Text 6:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_other_prices</source>
-			<translation>Altres preus</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_other_prices</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relacions</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>vat_label</source>
-			<translation>IVA:</translation>
-		</message>
-		<message>
-			<source>tooltip_vat_label</source>
+			<source>tooltip_lbl_text6</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22050,20 +22273,20 @@
 			<translation>Duplicar sector</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
 			<source>btn_cancel</source>
 			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
 			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>dlg_psector_duplicate</source>
@@ -22113,62 +22336,6 @@
 			<translation>Gestor de psector </translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_merge</source>
-			<translation>Fusionar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_merge</source>
-			<translation>Per fusionar diversos sectors en un, has de sel·leccionar-los amb Ctrl y apretar aquest botó</translation>
-		</message>
-		<message>
-			<source>btn_restore</source>
-			<translation>Restaurar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_restore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_show</source>
-			<translation>Mostrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_toggle_active</source>
 			<translation>Commuta actiu</translation>
 		</message>
@@ -22177,43 +22344,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_update_psector</source>
-			<translation>Alterar actual</translation>
+			<source>lbl_psector_name</source>
+			<translation>Filtrar per:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_update_psector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>chk_archived</source>
-			<translation>Mostra arxivat</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_archived</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_filter_canvas</source>
-			<translation>Filtrar pel mapa</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_filter_canvas</source>
-			<translation>Mostrar només els psector visibles en el mapa</translation>
-		</message>
-		<message>
-			<source>dlg_psector_manager</source>
-			<translation>Gestor de psector </translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_psector_manager</source>
+			<source>tooltip_lbl_psector_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22225,12 +22360,100 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_psector_name</source>
-			<translation>Filtrar per:</translation>
+			<source>dlg_psector_manager</source>
+			<translation>Gestor de psector </translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_psector_name</source>
+			<source>tooltip_dlg_psector_manager</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_filter_canvas</source>
+			<translation>Filtrar pel mapa</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_filter_canvas</source>
+			<translation>Mostrar només els psector visibles en el mapa</translation>
+		</message>
+		<message>
+			<source>chk_archived</source>
+			<translation>Mostra arxivat</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_archived</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Mostrar inactius</translation>
+		</message>
+		<message>
+			<source>btn_update_psector</source>
+			<translation>Alterar actual</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_psector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_show</source>
+			<translation>Mostrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_restore</source>
+			<translation>Restaurar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_restore</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_merge</source>
+			<translation>Fusionar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_merge</source>
+			<translation>Per fusionar diversos sectors en un, has de sel·leccionar-los amb Ctrl y apretar aquest botó</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
@@ -22238,14 +22461,6 @@
 		<message>
 			<source>title</source>
 			<translation>Generador d'informes</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>btn_ok</source>
@@ -22264,27 +22479,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>chk_composer</source>
-			<translation>Arxiu pdf compositor</translation>
+			<source>lbl_template</source>
+			<translation>Model:</translation>
 		</message>
 		<message>
-			<source>tooltip_chk_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_psector_rapport</source>
-			<translation>Generador d'informes</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_psector_rapport</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_rapport</source>
-			<translation>Infrome</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_rapport</source>
+			<source>tooltip_lbl_template</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22296,11 +22495,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_detail_csv</source>
-			<translation>Arxiu CSV detall:</translation>
+			<source>grb_rapport</source>
+			<translation>Infrome</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_detail_csv</source>
+			<source>tooltip_grb_rapport</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_composer</source>
+			<translation>Arxiu pdf compositor</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_composer</source>
+			<translation>Arxiu pdf compositor</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_composer</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22312,12 +22527,28 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_template</source>
-			<translation>Model:</translation>
+			<source>lbl_detail_csv</source>
+			<translation>Arxiu CSV detall:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_template</source>
+			<source>tooltip_lbl_detail_csv</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_psector_rapport</source>
+			<translation>Generador d'informes</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_psector_rapport</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
 		</message>
 	</context>
 	<context>
@@ -22327,11 +22558,11 @@
 			<translation>Diàleg</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
+			<source>btn_repair</source>
+			<translation>Arreglar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_btn_repair</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22343,11 +22574,145 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_psector_repair</source>
 			<translation>Diàleg</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_repair</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>quantized_demands</name>
+		<message>
+			<source>title</source>
+			<translation>Demandes quantificades</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_quantized_demands</source>
+			<translation>Demandes quantificades</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_quantized_demands</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>recursive_epa</name>
+		<message>
+			<source>title</source>
+			<translation>Epa Multi Calls</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_recursive_epa</source>
+			<translation>Epa Multi Calls</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_recursive_epa</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22415,365 +22780,17 @@
 		</message>
 	</context>
 	<context>
-		<name>crm_trace</name>
-		<message>
-			<source>lbl_inst</source>
-			<translation>Instruccions:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inst</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>audit</name>
-		<message>
-			<source>title</source>
-			<translation>Auditoria</translation>
-		</message>
-		<message>
-			<source>dlg_audit</source>
-			<translation>Auditoria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_audit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_audit</source>
-			<translation>Registre</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_audit</source>
-			<translation>Registre</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Valors actualitzats</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>audit_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor d'auditoria</translation>
-		</message>
-		<message>
-			<source>dlg_audit_manager</source>
-			<translation>Gestor d'auditoria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_audit_manager</source>
-			<translation>Gestor d'auditoria</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Logs</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>Registres</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Data a</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>Data a</translation>
-		</message>
-	</context>
-	<context>
-		<name>dscenario</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_properties</source>
-			<translation>Propietats</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_properties</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_dscenario</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dscenario</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_catalog</name>
-		<message>
-			<source>title</source>
-			<translation>Catàleg</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_catalog</source>
-			<translation>Catàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_catalog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_generic</name>
-		<message>
-			<source>title</source>
-			<translation>Informació bàsica</translation>
-		</message>
-		<message>
-			<source>actionEdit</source>
-			<translation>Editar</translation>
-		</message>
-		<message>
-			<source>tooltip_actionEdit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSetToArc</source>
-			<translation>Establir a Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSetToArc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_generic</source>
-			<translation>Informació bàsica</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_generic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>barra d'eines</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_workcat</name>
-		<message>
-			<source>title</source>
-			<translation>Nou expedt</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>builtdate</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_workcat</source>
-			<translation>Nou expedt</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Data construcció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Enllaç</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_id</source>
-			<translation>ID de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workid_key_1</source>
-			<translation>Clau de treball 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workid_key_2</source>
-			<translation>Clau de treball 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>interpolate</name>
-		<message>
-			<source>title</source>
-			<translation>Interpolar</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_interpolate</source>
-			<translation>Interpolar</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_interpolate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_extrapolate</source>
-			<translation>Extrapolar</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_extrapolate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_interpolate</source>
-			<translation>Interpolar</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_interpolate</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
 		<name>replace_in_file</name>
 		<message>
 			<source>title</source>
 			<translation>Substitueix el text al fitxer</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
+			<source>lbl_title</source>
+			<translation>Substituïu aquests noms per altres de nous:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·la</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_replace_in_file</source>
-			<translation>Substitueix el text al fitxer</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_replace_in_file</source>
+			<source>tooltip_lbl_title</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22785,11 +22802,626 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_title</source>
-			<translation>Substituïu aquests noms per altres de nous:</translation>
+			<source>dlg_replace_in_file</source>
+			<translation>Substitueix el text al fitxer</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_title</source>
+			<source>tooltip_dlg_replace_in_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·la</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>reports</name>
+		<message>
+			<source>btn_export</source>
+			<translation>Exportar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_export_path</source>
+			<translation>Camí:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_export_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Informació</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_filters</source>
+			<translation>Filtres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_filters</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>resources_management</name>
+		<message>
+			<source>title</source>
+			<translation>Administrador de Recursos</translation>
+		</message>
+		<message>
+			<source>btn_team_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_assign_team</source>
+			<translation>Assigna equip</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_assign_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>btn_organi_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_organi_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_organi_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_organi_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_organi_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_organi_update</source>
+			<translation>Modify</translation>
+		</message>
+		<message>
+			<source>btn_remove_team</source>
+			<translation>Elimina l'equip</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_team_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>btn_team_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>btn_team_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_toggle_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_team_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_update</source>
+			<translation>Modify</translation>
+		</message>
+		<message>
+			<source>btn_user_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_toggle_active</source>
+			<translation>Commuta actiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_toggle_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_update</source>
+			<translation>Modificar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cmb_team</source>
+			<translation>Seleccioneu l'equip</translation>
+		</message>
+		<message>
+			<source>tooltip_cmb_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_resources_management</source>
+			<translation>Administrador de Recursos</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_resources_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Gestió:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>Management:</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Gestió:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>Management:</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Filtrar per equip:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Filtrar per organizació:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_3</source>
+			<translation>Filtrar per equip:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>organizations</source>
+			<translation>Organizacions:</translation>
+		</message>
+		<message>
+			<source>tooltip_organizations</source>
+			<translation>Organizations</translation>
+		</message>
+		<message>
+			<source>resource_management</source>
+			<translation>Administrador de Recursos</translation>
+		</message>
+		<message>
+			<source>tooltip_resource_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_organizations</source>
+			<translation>Organizacions:</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_organizations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_teams</source>
+			<translation>Equips</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_teams</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_users</source>
+			<translation>Usuaris</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_users</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>team</source>
+			<translation>Equips</translation>
+		</message>
+		<message>
+			<source>tooltip_team</source>
+			<translation>Teams</translation>
+		</message>
+	</context>
+	<context>
+		<name>result_selector</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de resultats</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Resultat per a mostrar</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_result_selector</source>
+			<translation>Selector de resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_result_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_compare</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_compare</source>
+			<translation>Resultat per comparar</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Resultat per a mostrar</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_compare</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_compare</source>
+			<translation>Resultat per comparar</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_result_selector</source>
+			<translation>Selector de resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_result_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>search</name>
+		<message>
+			<source>title</source>
+			<translation>Cerca</translation>
+		</message>
+		<message>
+			<source>Check all</source>
+			<translation>Marcar tots</translation>
+		</message>
+		<message>
+			<source>tooltip_Check all</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_search</source>
+			<translation>Cerca</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Sense resultats</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>search_workcat</name>
+		<message>
+			<source>title</source>
+			<translation>Bsucar expdte</translation>
+		</message>
+		<message>
+			<source>lbl_total2</source>
+			<translation>Números totals:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_total2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_to_csv</source>
+			<translation>Exportar a CSV</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_to_csv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_state0</source>
+			<translation>Activar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_state0</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_state1</source>
+			<translation>Activar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_state1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_search_workcat</source>
+			<translation>Bsucar expdte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_search_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_destination_path</source>
+			<translation>Ruta de destí</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_destination_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end</source>
+			<translation>Filtrar per:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_end</source>
+			<translation>Element donats de baixa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_ini</source>
+			<translation>Element donats d'alta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_ini</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_init</source>
+			<translation>Filtrar per:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_init</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_total1</source>
+			<translation>Números totals:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_total1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_doc</source>
+			<translation>Documents</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_ended</source>
+			<translation>Donat d'ata</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_ended</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_init</source>
+			<translation>Donat d'alta</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_init</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22798,6 +23430,30 @@
 		<message>
 			<source>title</source>
 			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>dlg_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -22833,10 +23489,1490 @@
 		</message>
 	</context>
 	<context>
+		<name>selector_date</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de dates</translation>
+		</message>
+		<message>
+			<source>dlg_selector_date</source>
+			<translation>Selector de dates</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_to</source>
+			<translation>Data fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>date_from</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>date_to</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_selector_date</source>
+			<translation>Selector de dates</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_from</source>
+			<translation>Data des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_from</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>show_info</name>
+		<message>
+			<source>title</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_show_info</source>
+			<translation>Diàleg</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_show_info</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>snapshot_view</name>
+		<message>
+			<source>title</source>
+			<translation>Auditoria</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Selecció temporal i espacial</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>Selecció temporal i espacial</translation>
+		</message>
+		<message>
+			<source>Use current map canvas extent</source>
+			<translation>Utilitzeu l'extensió actual del llenç del mapa</translation>
+		</message>
+		<message>
+			<source>tooltip_Use current map canvas extent</source>
+			<translation>Utilitzeu l'extensió actual del llenç del mapa</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Característiques per recuperar</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>Característiques per recuperar</translation>
+		</message>
+		<message>
+			<source>Draw on map canvas</source>
+			<translation>Dibuixa al llenç del mapa</translation>
+		</message>
+		<message>
+			<source>tooltip_Draw on map canvas</source>
+			<translation>Dibuixa al llenç del mapa</translation>
+		</message>
+		<message>
+			<source>dlg_snapshot_view</source>
+			<translation>Auditoria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_snapshot_view</source>
+			<translation>Auditoria</translation>
+		</message>
+		<message>
+			<source>Calculate from municipality</source>
+			<translation>Calcula des de l'ajuntament</translation>
+		</message>
+		<message>
+			<source>tooltip_Calculate from municipality</source>
+			<translation>Calcula des de l'ajuntament</translation>
+		</message>
+		<message>
+			<source>Calculate from exploitation</source>
+			<translation>Calcula a partir de l'explotació</translation>
+		</message>
+		<message>
+			<source>tooltip_Calculate from exploitation</source>
+			<translation>Calcula a partir de l'explotació</translation>
+		</message>
+		<message>
+			<source>Audit</source>
+			<translation>Auditoria</translation>
+		</message>
+		<message>
+			<source>tooltip_Audit</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>static_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibració estàtica</translation>
+		</message>
+		<message>
+			<source>lbl_inp_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_static_calibration</source>
+			<translation>Calibració estàtica</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_static_calibration</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Nom dels fitxers de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>status_selector</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de estado</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Està canviant l'estat del següent resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_status</source>
+			<translation>Nou estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_status_selector</source>
+			<translation>Selector de estado</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_status_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_status_selector</source>
+			<translation>Selector de estado</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_status_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_status</source>
+			<translation>Nou estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result</source>
+			<translation>result_id: nom_resultat</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Està canviant l'estat del següent resultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>style</name>
+		<message>
+			<source>title</source>
+			<translation>Afegeix una categoria</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_role</source>
+			<translation>Rol:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_role</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_del_feature</source>
+			<translation>Dades</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_del_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_style</source>
+			<translation>Afegeix una categoria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_style</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cat_id</source>
+			<translation>ID de categoria:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cat_name</source>
+			<translation>Nom de la categoria:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_name</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>style_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestor d'estils</translation>
+		</message>
+		<message>
+			<source>dlg_style_manager</source>
+			<translation>Gestor d'estils</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_style_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_addGroup</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_addGroup</source>
+			<translation>Afegeix una nova categoria</translation>
+		</message>
+		<message>
+			<source>btn_add_style</source>
+			<translation>Afegir estil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_style</source>
+			<translation>Afegir estil</translation>
+		</message>
+		<message>
+			<source>btn_addStyle</source>
+			<translation>Afegir estil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_addStyle</source>
+			<translation>Afegeix una capa a la categoria seleccionada</translation>
+		</message>
+		<message>
+			<source>btn_updateStyle</source>
+			<translation>Actualitzar estil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_updateStyle</source>
+			<translation>Actualitza l'estil de la capa seleccionada amb l'estil de la capa corresponent en el projecte</translation>
+		</message>
+		<message>
+			<source>btn_update_style</source>
+			<translation>Actualitzar estil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_style</source>
+			<translation>Actualitzar estil</translation>
+		</message>
+		<message>
+			<source>btn_update_group</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_group</source>
+			<translation>Actualitzar categoria seleccionada</translation>
+		</message>
+		<message>
+			<source>btn_refreshAll</source>
+			<translation>Actualitza-ho tot</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_refreshAll</source>
+			<translation>Recarrega els estils carregats al projecte</translation>
+		</message>
+		<message>
+			<source>btn_refresh_all</source>
+			<translation>Actualitza-ho tot</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_refresh_all</source>
+			<translation>Actualitzar-ho tot</translation>
+		</message>
+		<message>
+			<source>btn_deleteStyle</source>
+			<translation>Eliminar estil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_deleteStyle</source>
+			<translation>Elimina un estil de la categoria</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_delete_style</source>
+			<translation>Eliminar estil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_style</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_deleteGroup</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_deleteGroup</source>
+			<translation>Elimina la categoria seleccionada</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>stylegroup</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_stylegroup</source>
+			<translation>Totes les teves categories d'estils</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Filtrar per: Nom de la capa</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_category</source>
+			<translation>Filtrar per: Categoria</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_category</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>Delete style</source>
+			<translation>Eliminar estil</translation>
+		</message>
+		<message>
+			<source>tooltip_Delete style</source>
+			<translation>Eliminar estil</translation>
+		</message>
+		<message>
+			<source>style_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_style_name</source>
+			<translation>Introdueix el nom de la capa per filtrar</translation>
+		</message>
+	</context>
+	<context>
+		<name>style_update_category</name>
+		<message>
+			<source>title</source>
+			<translation>Canvia el nom de la categoria</translation>
+		</message>
+		<message>
+			<source>dlg_style_update_category</source>
+			<translation>Canvia el nom de la categoria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_style_update_category</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rename_copy</source>
+			<translation>Si us plau, seleccioni un nou nom per a la categoria:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rename_copy</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>team_create</name>
+		<message>
+			<source>title</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>dlg_team_create</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_team_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·la</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·la</translation>
+		</message>
+		<message>
+			<source>grb_team</source>
+			<translation>Equip:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_active</source>
+			<translation>Actiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_active</source>
+			<translation>Actiu:</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>lbl_name</source>
+			<translation>Nom de l'equip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_name</source>
+			<translation>Team name:</translation>
+		</message>
+		<message>
+			<source>team_create</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_team_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>TeamTab</source>
+			<translation>Equip</translation>
+		</message>
+		<message>
+			<source>tooltip_TeamTab</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>team_management</name>
+		<message>
+			<source>title</source>
+			<translation>Administrador d'equips</translation>
+		</message>
+		<message>
+			<source>team_management</source>
+			<translation>Administrador d'equips</translation>
+		</message>
+		<message>
+			<source>tooltip_team_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_vehicle_unselect</source>
+			<translation>&lt;&lt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_vehicle_unselect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_visitclass_select</source>
+			<translation>&gt;&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_visitclass_select</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_visitclass_unselect</source>
+			<translation>&lt;&lt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_visitclass_unselect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_team_management</source>
+			<translation>Administrador d'equips</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_team_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_select</source>
+			<translation>&gt;&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_select</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_unselect</source>
+			<translation>&lt;&lt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_unselect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_vehicle_select</source>
+			<translation>&gt;&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_vehicle_select</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_user</source>
+			<translation>Usuaris</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_user</source>
+			<translation>Users</translation>
+		</message>
+		<message>
+			<source>tab_vehicles</source>
+			<translation>Vehicles</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_vehicles</source>
+			<translation>Vehicles</translation>
+		</message>
+		<message>
+			<source>tab_visit_class</source>
+			<translation>Classe de Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit_class</source>
+			<translation>Classe de Visita</translation>
+		</message>
+	</context>
+	<context>
+		<name>toolbox</name>
+		<message>
+			<source>title</source>
+			<translation>Caixa d'eines</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection_type</source>
+			<translation>Tipus de selecció:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_layer</source>
+			<translation>Totes les característiques</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_previous</source>
+			<translation>Només característiques seleccionades</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>trv_processes</source>
+			<translation>Processos</translation>
+		</message>
+		<message>
+			<source>tooltip_trv_processes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>trv_reports</source>
+			<translation>Informes</translation>
+		</message>
+		<message>
+			<source>tooltip_trv_reports</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_run</source>
+			<translation>Corre</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_run</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_toolbox</source>
+			<translation>Caixa d'eines</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_toolbox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_input_layer</source>
+			<translation>Capa d'entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_input_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_parameters</source>
+			<translation>Paràmetres d'opció:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_parameters</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>toolbox_reports</name>
+		<message>
+			<source>title</source>
+			<translation>Informes</translation>
+		</message>
+		<message>
+			<source>grb_filters</source>
+			<translation>Filtres</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_filters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_toolbox_reports</source>
+			<translation>Informes</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_toolbox_reports</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_export_path</source>
+			<translation>Camí:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_export_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Informació</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export</source>
+			<translation>Exportar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>toolbox_tool</name>
+		<message>
+			<source>grb_input_layer</source>
+			<translation>Capa d'entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_input_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection_type</source>
+			<translation>Tipus de selecció:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_run</source>
+			<translation>Corre</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_run</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_parameters</source>
+			<translation>Paràmetres d'opció:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_parameters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuració</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_previous</source>
+			<translation>Només característiques seleccionades</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_layer</source>
+			<translation>Totes les característiques</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>progressBar</source>
+			<translation>%p%</translation>
+		</message>
+		<message>
+			<source>tooltip_progressBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>update_style_group</name>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>lbl_rename_copy</source>
+			<translation>Si us plau, seleccioni un nou nom per a la categoria:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rename_copy</source>
+			<translation>Si us plau, seleccioni un nou nom per a la categoria:</translation>
+		</message>
+	</context>
+	<context>
+		<name>user_create</name>
+		<message>
+			<source>title</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>user_create</source>
+			<translation>Crear usuari</translation>
+		</message>
+		<message>
+			<source>tooltip_user_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_user_create</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_user_create</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>valve_operation_check</name>
+		<message>
+			<source>title</source>
+			<translation>Comprovació del funcionament de la vàlvula</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_config</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_scenarios</source>
+			<translation>Utilitzar escenaris de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_scenarios</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Carpeta de sortida:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fitxer INP d’entrada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Nom del fitxer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fitxer de configuració:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_valve_operation_check</source>
+			<translation>Comprovació del funcionament de la vàlvula</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_valve_operation_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_database</source>
+			<translation>Base de dades</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_database</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
 		<name>visit</name>
 		<message>
 			<source>title</source>
 			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>btn_add_geom</source>
+			<translation>Afegir geom</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>btn_doc_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_doc_delete</source>
+			<translation>Esborrar document</translation>
+		</message>
+		<message>
+			<source>btn_doc_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_doc_insert</source>
+			<translation>Insertar document</translation>
+		</message>
+		<message>
+			<source>btn_doc_new</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_doc_new</source>
+			<translation>Crear nou document</translation>
+		</message>
+		<message>
+			<source>btn_event_delete</source>
+			<translation>Esborrar event</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_event_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_event_insert</source>
+			<translation>Inserir event</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_event_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_event_update</source>
+			<translation>Actualitzar event</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_event_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_feature_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_feature_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_feature_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_feature_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_doc</source>
+			<translation>Obrir document</translation>
+		</message>
+		<message>
+			<source>dlg_visit</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Tipus d'objecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_code</source>
+			<translation>Codi:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripció:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>Fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Explotacio:*</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Tipus d'objecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Informació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Estat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_user_name</source>
+			<translation>Nom d'usuari:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visitcat_id</source>
+			<translation>Visita cat id</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visitcat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_document</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_document</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_event</source>
+			<translation>Partes Feina</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relacions</translation>
+		</message>
+		<message>
+			<source>tab_visit</source>
+			<translation>Visita</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -23078,6 +25214,22 @@
 			<translation>Cargar documents</translation>
 		</message>
 		<message>
+			<source>groupBox_2</source>
+			<translation>Llistat de documents</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visita id</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_open</source>
 			<translation>Obrir</translation>
 		</message>
@@ -23094,19 +25246,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>groupBox_2</source>
-			<translation>Llistat de documents</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_visit_id</source>
-			<translation>Visita id</translation>
+			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Obrir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_document</source>
+			<translation>Cargar documents</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_document</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23115,6 +25275,94 @@
 		<message>
 			<source>title</source>
 			<translation>Event estàndar d'arc</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Valor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Afegir arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_file</source>
+			<translation>Esborrar arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event</source>
+			<translation>Event estàndar d'arc</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Arxius:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Id paràmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Id posició:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Valor posció</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Valor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -23133,19 +25381,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_delete_file</source>
 			<translation>Esborrar arxiu</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23196,52 +25444,12 @@
 			<source>tooltip_lbl_position_value</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Valor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>visit_event_full</name>
 		<message>
 			<source>title</source>
 			<translation>Event</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_full</source>
-			<translation>Event</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_full</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compass</source>
-			<translation>Otrientació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compass</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_event_code</source>
@@ -23396,6 +25604,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_info</source>
+			<translation>Informació</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_files</source>
 			<translation>Arxius</translation>
 		</message>
@@ -23404,58 +25620,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_info</source>
-			<translation>Informació</translation>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_rehab</name>
-		<message>
-			<source>title</source>
-			<translation>Event rehabilització d'arc</translation>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
+			<source>dlg_visit_event_full</source>
+			<translation>Event</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
+			<source>tooltip_dlg_visit_event_full</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_add_file</source>
-			<translation>Afegir arxiu</translation>
+			<source>lbl_compass</source>
+			<translation>Otrientació:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_add_file</source>
+			<source>tooltip_lbl_compass</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·la</translation>
+			<source>lbl_event_code</source>
+			<translation>Codi event:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_file</source>
-			<translation>Esborrar arxiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_rehab</source>
-			<translation>Event rehabilització d'arc</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_rehab</source>
+			<source>tooltip_lbl_event_code</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23468,7 +25661,7 @@
 		</message>
 		<message>
 			<source>lbl_geom1</source>
-			<translation>Geom1:</translation>
+			<translation>Geom 1:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom1</source>
@@ -23476,7 +25669,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Geom2:</translation>
+			<translation>Geom 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -23484,15 +25677,39 @@
 		</message>
 		<message>
 			<source>lbl_geom3</source>
-			<translation>Geom3:</translation>
+			<translation>Geom 3:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_index_val</source>
+			<translation>Factor de pes.</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_index_val</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_is_last</source>
+			<translation>Últim valor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_is_last</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Identificador del paràmetre:</translation>
+			<translation>Id paràmetre:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -23500,7 +25717,7 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Identificador de la posició:</translation>
+			<translation>Id posició:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -23508,7 +25725,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Valor de la posició:</translation>
+			<translation>Valor posició:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -23520,6 +25737,22 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_tstamp</source>
+			<translation>Segell T:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_tstamp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Valor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23538,6 +25771,301 @@
 			<source>tooltip_lbl_value2</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
+			<source>lbl_xcoord</source>
+			<translation>Coordenada X:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_xcoord</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ycoord</source>
+			<translation>Cooordenad Y:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ycoord</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_files</source>
+			<translation>Arxius</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info</source>
+			<translation>Informació</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_full</source>
+			<translation>Event</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_full</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compass</source>
+			<translation>Otrientació:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compass</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>visit_event_rehab</name>
+		<message>
+			<source>title</source>
+			<translation>Event rehabilització d'arc</translation>
+		</message>
+		<message>
+			<source>lbl_geom3</source>
+			<translation>Geom3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value2</source>
+			<translation>Valor 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value1</source>
+			<translation>Valor 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Valor de la posició:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Identificador de la posició:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Identificador del paràmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom2</source>
+			<translation>Geom2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom1</source>
+			<translation>Geom1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Arxius:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_rehab</source>
+			<translation>Event rehabilització d'arc</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_rehab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_file</source>
+			<translation>Esborrar arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·la</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Afegir arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value2</source>
+			<translation>Valor 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value1</source>
+			<translation>Valor 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Valor posció</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Id posició.</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Id paràmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom3</source>
+			<translation>Geom 3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom2</source>
+			<translation>Geom 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom1</source>
+			<translation>Geom 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Arxius:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_rehab</source>
+			<translation>Event rehabilització d'arc</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_rehab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_file</source>
+			<translation>Esborrar arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Afegir arxiu</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>visit_gallery</name>
@@ -23554,11 +26082,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_event_id</source>
+			<translation>Id event:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_event_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
 			<source>dlg_visit_gallery</source>
 			<translation>Galería</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Identificació de la visita:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23570,11 +26122,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_visit_id</source>
-			<translation>Identificació de la visita:</translation>
+			<source>btn_previous</source>
+			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_visit_id</source>
+			<source>tooltip_btn_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_next</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_next</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_gallery</source>
+			<translation>Galería</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_gallery</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23585,12 +26161,60 @@
 			<translation>Zum galería</translation>
 		</message>
 		<message>
+			<source>lbl_visit_id</source>
+			<translation>Identificació de la visita:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_img_zoom</source>
+			<translation>Zoom d’imatge</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_img_zoom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_event_id</source>
+			<translation>Id event:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_event_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_visit_gallery_zoom</source>
 			<translation>Zum galería</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery_zoom</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_slidePrevious</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_slidePrevious</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_slideNext</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_slideNext</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visita ID</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>lbl_event_id</source>
@@ -23601,11 +26225,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_visit_id</source>
-			<translation>Identificació de la visita:</translation>
+			<source>dlg_visit_gallery_zoom</source>
+			<translation>Zum galería</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_visit_id</source>
+			<source>tooltip_dlg_visit_gallery_zoom</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23614,6 +26238,78 @@
 		<message>
 			<source>title</source>
 			<translation>Gestió de visites</translation>
+		</message>
+		<message>
+			<source>date_event_to</source>
+			<translation>dd/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date_event_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_manager</source>
+			<translation>Gestió de visites</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar visita</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Obrir visita</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_to</source>
+			<translation>Fins a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrar per codi:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -23656,14 +26352,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>date_event_to</source>
-			<translation>dd/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date_event_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_visit_manager</source>
 			<translation>Gestió de visites</translation>
 		</message>
@@ -23697,183 +26385,10 @@
 		</message>
 	</context>
 	<context>
-		<name>show_info</name>
+		<name>visit_picture</name>
 		<message>
 			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_show_info</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_show_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>check_project</name>
-		<message>
-			<source>title</source>
-			<translation>Comprovar projecte</translation>
-		</message>
-		<message>
-			<source>brb_database_check</source>
-			<translation>Verificació de la base de dades:</translation>
-		</message>
-		<message>
-			<source>tooltip_brb_database_check</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_check_project</source>
-			<translation>Comprovar projecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_check_project</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>grb_system_check</source>
-			<translation>Verificació del sistema:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system_check</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Base de dades log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_log</source>
-			<translation>Logs</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>comp_x_pages</name>
-		<message>
-			<source>title</source>
-			<translation>Impressió automàtica de Composer</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>grb_comp</source>
-			<translation>Llista de compositors</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_comp</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>lbl_composers</source>
-			<translation>Seleccionar compositor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_composers</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>lbl_folder</source>
-			<translation>Seleccionar carpeta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_folder</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>lbl_prefix</source>
-			<translation>Prefix del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_prefix</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>lbl_single</source>
-			<translation>Fitxer únic:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_single</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>lbl_sleep</source>
-			<translation>Temps d’espera:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sleep</source>
-			<translation>Actualitzar</translation>
-		</message>
-	</context>
-	<context>
-		<name>config</name>
-		<message>
-			<source>title</source>
-			<translation>Configuració</translation>
+			<translation>Afegir foto</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -23889,670 +26404,46 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>dlg_visit_picture</source>
+			<translation>Afegir foto</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_picture</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_config</source>
-			<translation>Configuració</translation>
+			<source>lbl_link</source>
+			<translation>Enllaç</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_addfields</source>
-			<translation>Camps adicionals</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_addfields</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_admin_om</source>
-			<translation>O&amp;&amp;M</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_admin_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_admin_other</source>
-			<translation>Altres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_admin_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_basic</source>
-			<translation>Bàsic</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_category_type</source>
-			<translation>Tipus de categoria</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_category_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_connec</source>
-			<translation>Connec</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_epa</source>
-			<translation>Epa</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_fluid_type</source>
-			<translation>Tipus de fluid</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_fluid_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_function_type</source>
-			<translation>Tipus de funció</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_function_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_inventory</source>
-			<translation>Inventari</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_inventory</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_link</source>
+			<source>tooltip_lbl_link</source>
 			<translation>Link</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_location_type</source>
-			<translation>Tipus de ubicació</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_location_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_masterplan</source>
-			<translation>MasterPlan</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_masterplan</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_node</source>
-			<translation>Node</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_om</source>
-			<translation>O&amp;&amp;M</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_other</source>
-			<translation>Altres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_system</source>
-			<translation>Sistema</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_topology</source>
-			<translation>Topologia</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_topology</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_utils</source>
-			<translation>Utilitats</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_utils</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_addfields</source>
-			<translation>Camps adicionals</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_addfields</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_admin</source>
-			<translation>Admin</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_admin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_basic</source>
-			<translation>Bàsic</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_featurecat</source>
-			<translation>Featurecat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_featurecat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_mantype</source>
-			<translation>Tipus de gestió</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_mantype</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>create_style_group</name>
-		<message>
-			<source>btn_add</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>descript</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_descript</source>
-			<translation>Descripció</translation>
-		</message>
-		<message>
-			<source>feature_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_feature_id</source>
-			<translation>ID de categoria</translation>
-		</message>
-		<message>
-			<source>idval</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_idval</source>
-			<translation>Nom de la categoria</translation>
-		</message>
-		<message>
-			<source>lbl_cat_id</source>
-			<translation>ID de categoria:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_cat_name</source>
-			<translation>Nom de la categoria:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_name</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_role</source>
-			<translation>Rol:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_role</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>sys_role</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_sys_role</source>
-			<translation>Rol que podrà utilitzar aquest estil</translation>
-		</message>
-	</context>
-	<context>
-		<name>csv</name>
-		<message>
-			<source>title</source>
-			<translation>Importar CSV</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>btn_file_csv</source>
+			<source>path_doc</source>
 			<translation>...</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_file_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_csv</source>
-			<translation>Importar CSV</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_decimal</source>
-			<translation>Separador decimal:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_decimal</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_delimiter</source>
-			<translation>Delimitador:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_delimiter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_file</source>
-			<translation>Arxiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ignore_header</source>
-			<translation>Ignorar capçaleres:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ignore_header</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_import_label</source>
-			<translation>Importar etiqueta</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_import_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_import_type</source>
-			<translation>Importar tipus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_import_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_set_of_charac</source>
-			<translation>Conjunt de caràcters</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_set_of_charac</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_comma</source>
-			<translation>,</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_comma</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_dec_comma</source>
-			<translation>,</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_dec_comma</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_dec_period</source>
-			<translation>.</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_dec_period</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_semicolon</source>
-			<translation>;</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_semicolon</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_space</source>
-			<translation>Espai</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_space</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_preview</source>
-			<translation>Previsualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_preview</source>
+			<source>tooltip_path_doc</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>fastprint</name>
+		<name>workcat_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Impressió ràpida</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_preview</source>
-			<translation>Vista prèvia</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_print</source>
-			<translation>Imprimir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_print</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_fastprint</source>
-			<translation>Impressió ràpida</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_fastprint</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_map_options</source>
-			<translation>Opcions de mapa:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_map_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_option_values</source>
-			<translation>Valor opcionals</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_option_values</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mapzone_config</name>
-		<message>
-			<source>title</source>
-			<translation>Configuració de la zona de mapa</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_forceClosed</source>
-			<translation>AFEGIR</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_forceClosed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_ignore</source>
-			<translation>AFEGIR</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_ignore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_nodeParent</source>
-			<translation>AFEGIR</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_nodeParent</source>
-			<translation>None</translation>
+			<translation>Gestor de Workcat</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_clear_preview</source>
-			<translation>Esborra la vista prèvia</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_clear_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_remove_forceClosed</source>
-			<translation>ELIMINAR</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_forceClosed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_remove_ignore</source>
-			<translation>ELIMINAR</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_ignore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_remove_nodeParent</source>
-			<translation>ELIMINAR</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_nodeParent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mapzone_config</source>
-			<translation>Configuració de la zona de mapa</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mapzone_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_forceClosed</source>
-			<translation>força tancat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_forceClosed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ignore</source>
-			<translation>ignorar</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ignore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodeParent</source>
-			<translation>nodeParent:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodeParent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_preview</source>
-			<translation>Vista prèvia:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_toArc</source>
-			<translation>toArc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_toArc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mapzone_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor de zones de mapa</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>btn_config</source>
-			<translation>Configurar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_config</source>
-			<translation>Configurar</translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -24569,981 +26460,6 @@
 		<message>
 			<source>tooltip_btn_delete</source>
 			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_execute</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_execute</source>
-			<translation>Executar el procés d'anàlisi de mapzone</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Commuta actiu</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Mostrar inactius</translation>
-		</message>
-		<message>
-			<source>chk_show_all</source>
-			<translation>Mostra totes les mapzones</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_show_all</source>
-			<translation>Mostra totes les mapzones</translation>
-		</message>
-		<message>
-			<source>dlg_mapzone_manager</source>
-			<translation>Gestor de zones de mapa</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mapzone_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mapzone_name</source>
-			<translation>Filtrar per: Nom de mapzone</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mapzone_name</source>
-			<translation>Filtrar per: Nom de mapzone</translation>
-		</message>
-	</context>
-	<context>
-		<name>massive_composer</name>
-		<message>
-			<source>title</source>
-			<translation>Imprimeix automàticament les pàgines del compositor</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_massive_composer</source>
-			<translation>Imprimeix automàticament les pàgines del compositor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_massive_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_comp</source>
-			<translation>Llista de compositors</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_comp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_composers</source>
-			<translation>Seleccionar compositor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_composers</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_folder</source>
-			<translation>Seleccionar carpeta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_prefix</source>
-			<translation>Prefix del fitxer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_prefix</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_single</source>
-			<translation>Fitxer únic:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_single</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sleep</source>
-			<translation>Temps d’espera:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sleep</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>print</name>
-		<message>
-			<source>title</source>
-			<translation>Impressió fixa</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_preview</source>
-			<translation>Previsualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_print</source>
-			<translation>Impressió ràpida</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_print</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_print</source>
-			<translation>Impressió fixa</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_print</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_map_options</source>
-			<translation>Opcions de mapa:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_map_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_option_values</source>
-			<translation>Valor opcionals</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_option_values</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>project_check</name>
-		<message>
-			<source>title</source>
-			<translation>Revisar projecte</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>dlg_project_check</source>
-			<translation>Revisar projecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_project_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_databaselog</source>
-			<translation>Base de dades log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_databaselog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_qgis_projlog</source>
-			<translation>QGIS projecte log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_qgis_projlog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>reports</name>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export</source>
-			<translation>Exportar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_filters</source>
-			<translation>Filtres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_filters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Informació</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_export_path</source>
-			<translation>Camí:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_export_path</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>snapshot_view</name>
-		<message>
-			<source>title</source>
-			<translation>Auditoria</translation>
-		</message>
-		<message>
-			<source>Audit</source>
-			<translation>Auditoria</translation>
-		</message>
-		<message>
-			<source>tooltip_Audit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>Calculate from exploitation</source>
-			<translation>Calcula a partir de l'explotació</translation>
-		</message>
-		<message>
-			<source>tooltip_Calculate from exploitation</source>
-			<translation>Calcula a partir de l'explotació</translation>
-		</message>
-		<message>
-			<source>Calculate from municipality</source>
-			<translation>Calcula des de l'ajuntament</translation>
-		</message>
-		<message>
-			<source>tooltip_Calculate from municipality</source>
-			<translation>Calcula des de l'ajuntament</translation>
-		</message>
-		<message>
-			<source>dlg_snapshot_view</source>
-			<translation>Auditoria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_snapshot_view</source>
-			<translation>Auditoria</translation>
-		</message>
-		<message>
-			<source>Draw on map canvas</source>
-			<translation>Dibuixa al llenç del mapa</translation>
-		</message>
-		<message>
-			<source>tooltip_Draw on map canvas</source>
-			<translation>Dibuixa al llenç del mapa</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Característiques per recuperar</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>Característiques per recuperar</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Selecció temporal i espacial</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>Selecció temporal i espacial</translation>
-		</message>
-		<message>
-			<source>Use current map canvas extent</source>
-			<translation>Utilitzeu l'extensió actual del llenç del mapa</translation>
-		</message>
-		<message>
-			<source>tooltip_Use current map canvas extent</source>
-			<translation>Utilitzeu l'extensió actual del llenç del mapa</translation>
-		</message>
-	</context>
-	<context>
-		<name>style</name>
-		<message>
-			<source>title</source>
-			<translation>Afegeix una categoria</translation>
-		</message>
-		<message>
-			<source>btn_add</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_style</source>
-			<translation>Afegeix una categoria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_style</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cat_id</source>
-			<translation>ID de categoria:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cat_name</source>
-			<translation>Nom de la categoria:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_role</source>
-			<translation>Rol:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_role</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_del_feature</source>
-			<translation>Dades</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_del_feature</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>style_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor d'estils</translation>
-		</message>
-		<message>
-			<source>btn_addGroup</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_addGroup</source>
-			<translation>Afegeix una nova categoria</translation>
-		</message>
-		<message>
-			<source>btn_add_style</source>
-			<translation>Afegir estil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_style</source>
-			<translation>Afegir estil</translation>
-		</message>
-		<message>
-			<source>btn_addStyle</source>
-			<translation>Afegir estil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_addStyle</source>
-			<translation>Afegeix una capa a la categoria seleccionada</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_deleteGroup</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_deleteGroup</source>
-			<translation>Elimina la categoria seleccionada</translation>
-		</message>
-		<message>
-			<source>btn_delete_style</source>
-			<translation>Eliminar estil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_style</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_deleteStyle</source>
-			<translation>Eliminar estil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_deleteStyle</source>
-			<translation>Elimina un estil de la categoria</translation>
-		</message>
-		<message>
-			<source>btn_refresh_all</source>
-			<translation>Actualitza-ho tot</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_refresh_all</source>
-			<translation>Actualitzar-ho tot</translation>
-		</message>
-		<message>
-			<source>btn_refreshAll</source>
-			<translation>Actualitza-ho tot</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_refreshAll</source>
-			<translation>Recarrega els estils carregats al projecte</translation>
-		</message>
-		<message>
-			<source>btn_update_group</source>
-			<translation>Actualitzar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_group</source>
-			<translation>Actualitzar categoria seleccionada</translation>
-		</message>
-		<message>
-			<source>btn_update_style</source>
-			<translation>Actualitzar estil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_style</source>
-			<translation>Actualitzar estil</translation>
-		</message>
-		<message>
-			<source>btn_updateStyle</source>
-			<translation>Actualitzar estil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_updateStyle</source>
-			<translation>Actualitza l'estil de la capa seleccionada amb l'estil de la capa corresponent en el projecte</translation>
-		</message>
-		<message>
-			<source>Delete style</source>
-			<translation>Eliminar estil</translation>
-		</message>
-		<message>
-			<source>tooltip_Delete style</source>
-			<translation>Eliminar estil</translation>
-		</message>
-		<message>
-			<source>dlg_style_manager</source>
-			<translation>Gestor d'estils</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_style_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_category</source>
-			<translation>Filtrar per: Categoria</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_category</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Filtrar per: Nom de la capa</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>stylegroup</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_stylegroup</source>
-			<translation>Totes les teves categories d'estils</translation>
-		</message>
-		<message>
-			<source>style_name</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_style_name</source>
-			<translation>Introdueix el nom de la capa per filtrar</translation>
-		</message>
-	</context>
-	<context>
-		<name>style_update_category</name>
-		<message>
-			<source>title</source>
-			<translation>Canvia el nom de la categoria</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_style_update_category</source>
-			<translation>Canvia el nom de la categoria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_style_update_category</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rename_copy</source>
-			<translation>Si us plau, seleccioni un nou nom per a la categoria:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rename_copy</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>toolbox</name>
-		<message>
-			<source>title</source>
-			<translation>Caixa d'eines</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>btn_run</source>
-			<translation>Corre</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_run</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_toolbox</source>
-			<translation>Caixa d'eines</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_toolbox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_input_layer</source>
-			<translation>Capa d'entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_input_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_parameters</source>
-			<translation>Paràmetres d'opció:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_selection_type</source>
-			<translation>Tipus de selecció:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_layer</source>
-			<translation>Totes les característiques</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_previous</source>
-			<translation>Només característiques seleccionades</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>trv_processes</source>
-			<translation>Processos</translation>
-		</message>
-		<message>
-			<source>tooltip_trv_processes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>trv_reports</source>
-			<translation>Informes</translation>
-		</message>
-		<message>
-			<source>tooltip_trv_reports</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>toolbox_reports</name>
-		<message>
-			<source>title</source>
-			<translation>Informes</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export</source>
-			<translation>Exportar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_toolbox_reports</source>
-			<translation>Informes</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_toolbox_reports</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_filters</source>
-			<translation>Filtres</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_filters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Informació</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_export_path</source>
-			<translation>Camí:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_export_path</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>toolbox_tool</name>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_run</source>
-			<translation>Corre</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_run</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_input_layer</source>
-			<translation>Capa d'entrada:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_input_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_parameters</source>
-			<translation>Paràmetres d'opció:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_selection_type</source>
-			<translation>Tipus de selecció:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>progressBar</source>
-			<translation>%p%</translation>
-		</message>
-		<message>
-			<source>tooltip_progressBar</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_layer</source>
-			<translation>Totes les característiques</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_previous</source>
-			<translation>Només característiques seleccionades</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>update_style_group</name>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>lbl_rename_copy</source>
-			<translation>Si us plau, seleccioni un nou nom per a la categoria:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rename_copy</source>
-			<translation>Si us plau, seleccioni un nou nom per a la categoria:</translation>
-		</message>
-	</context>
-	<context>
-		<name>workcat_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor de Workcat</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -25577,67 +26493,181 @@
 			<source>tooltip_lbl_filter_name</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>workspace_create</name>
-		<message>
-			<source>title</source>
-			<translation>Crear nou espais de treball</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_toggle_privacy</source>
-			<translation>Commuta privadesa</translation>
+			<source>dlg_workcat_manager</source>
+			<translation>Gestor de Workcat</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_toggle_privacy</source>
+			<source>tooltip_dlg_workcat_manager</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_update</source>
-			<translation>Actualitzar</translation>
+			<source>lbl_filter_name</source>
+			<translation>Filtrar per: Nom del Workcat</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_update</source>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>work_management</name>
+		<message>
+			<source>btn_accept</source>
+			<translation>Guardar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Save</translation>
+		</message>
+		<message>
+			<source>lbl_to</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_to</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>lbl_team</source>
+			<translation>Equip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_team</source>
+			<translation>Team:</translation>
+		</message>
+		<message>
+			<source>lbl_from</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_from</source>
+			<translation>From:</translation>
+		</message>
+		<message>
+			<source>btn_export_user</source>
+			<translation>Export to csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_user</source>
+			<translation>Export to csv</translation>
+		</message>
+	</context>
+	<context>
+		<name>workorder_management</name>
+		<message>
+			<source>title</source>
+			<translation>Gestió d'ordres de treball</translation>
+		</message>
+		<message>
+			<source>btn_create_wclass</source>
+			<translation>Crear classe</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_wclass</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_workspace_create</source>
+			<source>btn_delete</source>
+			<translation>Eliminar ordre de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_management</source>
+			<translation>Administrador de Campañas</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>workorder_management</source>
+			<translation>Gestió d'ordres de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_workorder_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Classe d'ordre de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_column_filter_dates</source>
+			<translation>Tipus d'ordre de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_filter_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Filtrar per nom:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_workorder_management</source>
+			<translation>Gestió d'ordres de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_workorder_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crear ordre de treball:</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create_wtype</source>
+			<translation>Crear tipus</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_wtype</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>workspace_create</name>
+		<message>
+			<source>title</source>
 			<translation>Crear nou espai de treball</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_workspace_create</source>
-			<translation>None</translation>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
 		</message>
 		<message>
-			<source>lbl_new_workspace</source>
-			<translation>Nom:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_workspace</source>
-			<translation>Nom del nou espai de treball</translation>
-		</message>
-		<message>
-			<source>lbl_new_workspace_chk</source>
-			<translation>Espai de treball privat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_workspace_chk</source>
+			<source>tooltip_tab_info_log</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -25649,20 +26679,76 @@
 			<translation>Descripció del nou espai de treball</translation>
 		</message>
 		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
+			<source>lbl_new_workspace_chk</source>
+			<translation>Espai de treball privat:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_info_log</source>
+			<source>tooltip_lbl_new_workspace_chk</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_new_workspace</source>
+			<source>lbl_new_workspace</source>
+			<translation>Nom:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_workspace</source>
+			<translation>Nom del nou espai de treball</translation>
+		</message>
+		<message>
+			<source>dlg_workspace_create</source>
 			<translation>Crear nou espai de treball</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_new_workspace</source>
+			<source>tooltip_dlg_workspace_create</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_privacy</source>
+			<translation>Commuta privadesa</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_privacy</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_workspace_create</source>
+			<translation>Crear nou espais de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_workspace_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_workspace_name</source>
+			<translation>Nom de l’espai de treball</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_workspace_name</source>
+			<translation>Nom del nou espai de treball  *Obligatori</translation>
 		</message>
 		<message>
 			<source>txt_workspace_descript</source>
@@ -25673,12 +26759,12 @@
 			<translation>Utilitza aquest camp per descriure les característiques de l'espai de treball</translation>
 		</message>
 		<message>
-			<source>txt_workspace_name</source>
-			<translation>Nom de l’espai de treball</translation>
+			<source>tab_new_workspace</source>
+			<translation>Crear nou espai de treball</translation>
 		</message>
 		<message>
-			<source>tooltip_txt_workspace_name</source>
-			<translation>Nom del nou espai de treball  *Obligatori</translation>
+			<source>tooltip_tab_new_workspace</source>
+			<translation>None</translation>
 		</message>
 	</context>
 	<context>
@@ -25686,6 +26772,14 @@
 		<message>
 			<source>title</source>
 			<translation>Gestor d'espais de treball</translation>
+		</message>
+		<message>
+			<source>lbl_workspace_name</source>
+			<translation>Filtrar per: Nom</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workspace_name</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -25768,11 +26862,11 @@
 			<translation>Espai de treball actual</translation>
 		</message>
 		<message>
-			<source>lbl_workspace_name</source>
-			<translation>Filtrar per: Nom</translation>
+			<source>dlg_workspace_manager</source>
+			<translation>Gestor d'espais de treball</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_workspace_name</source>
+			<source>tooltip_dlg_workspace_manager</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -25782,1355 +26876,6 @@
 		<message>
 			<source>tooltip_txt_name</source>
 			<translation>Nom de l'espai de treball</translation>
-		</message>
-	</context>
-	<context>
-		<name>load_menu</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>psector_rapport</name>
-		<message>
-			<source>title</source>
-			<translation>Generador d'informes</translation>
-		</message>
-		<message>
-			<source>chk_composer</source>
-			<translation>Arxiu pdf compositor</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_composer</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>psector_repair</name>
-		<message>
-			<source>title</source>
-			<translation>Diàleg</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_repair</source>
-			<translation>Arreglar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_repair</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>assignation</name>
-		<message>
-			<source>title</source>
-			<translation>Assignació de fuites</translation>
-		</message>
-		<message>
-			<source>chk_all_leaks</source>
-			<translation>Utilitzar totes les fugues</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_all_leaks</source>
-			<translation>Calcula les fugues per kilòmetre i any utilitzant totes les dades disponibles, independentment del paramatre 'anys a calcular'.</translation>
-		</message>
-		<message>
-			<source>dlg_assignation</source>
-			<translation>Assignació de fuites</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_assignation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buffer</source>
-			<translation>Distància de buffer (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>Distància des d'una fuga a la qual es seleccionen les canonades per assignar aquesta fuga.</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Filtrar per data d'instalació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>Utilitza només les tuberies que coincidexen amb l'interval de dates d'instalació de la inicial.</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate_range</source>
-			<translation>Rang de data de construcció (anys):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate_range</source>
-			<translation>Interval de dates de construcció, en anys anteriors i posteriors a la tuberia inicial</translation>
-		</message>
-		<message>
-			<source>lbl_cluster_length</source>
-			<translation>Longitud del cluster (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cluster_length</source>
-			<translation>Suma màxima de longituds de tuberia dintre d'un cluster, en metres.</translation>
-		</message>
-		<message>
-			<source>lbl_diameter</source>
-			<translation>Filt6rar per diàmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter</source>
-			<translation>Utilitza només tuberies amb el rang de diàmetres de l'inicial.</translation>
-		</message>
-		<message>
-			<source>lbl_diameter_range</source>
-			<translation>Rang de diàmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter_range</source>
-			<translation>Rang de diàmetres basats en factors de la tuberia inicial.</translation>
-		</message>
-		<message>
-			<source>lbl_leaks</source>
-			<translation>Fugues</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_leaks</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Filtrar per material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>Utilitza només tuberies del mateix material que la inicial.</translation>
-		</message>
-		<message>
-			<source>lbl_max_distance</source>
-			<translation>Distància màxima (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_max_distance</source>
-			<translation>Distància màxima, e metres, entre la tuberia inicial i altres tuberies incluides en el cluster. </translation>
-		</message>
-		<message>
-			<source>lbl_pipes</source>
-			<translation>Canonades</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_years</source>
-			<translation>Anys a calcular</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_years</source>
-			<translation>Nombre d'anys de dades de fugues a tenir en compte, en funció de l'antiguitat.</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuració</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>priority</name>
-		<message>
-			<source>title</source>
-			<translation>Càlcul de prioritat</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Calcular</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccioni els elements en la vista del mapa</translation>
-		</message>
-		<message>
-			<source>dlg_priority</source>
-			<translation>Càlcul de prioritat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_global</source>
-			<translation>Paràmetres de càlcul</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_global</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_selection</source>
-			<translation>Selecció d'elements</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_budget</source>
-			<translation>Pressupost anual:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_budget</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dnom</source>
-			<translation>Diàmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dnom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl_selection</source>
-			<translation>Explotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_presszone</source>
-			<translation>Zona de pressió:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_presszone</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_id</source>
-			<translation>Nom del resultat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_year</source>
-			<translation>Any horitzó:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_calc</source>
-			<translation>Càlcul</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_calc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_catalog</source>
-			<translation>Catàleg</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_catalog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Motor de càlcul</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>priority_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor de resultats</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_corporate</source>
-			<translation>Establir corporatiu</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_corporate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_edit</source>
-			<translation>Editar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_edit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_status</source>
-			<translation>Canviar estat</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_priority_manager</source>
-			<translation>Gestor de resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl</source>
-			<translation>Explotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrar per: Nom del resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Informació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type</source>
-			<translation>Tipus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>result_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de resultats</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_result_selector</source>
-			<translation>Selector de resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_result_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
-			<translation>Resultat per comparar</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_main</source>
-			<translation>Resultat per a mostrar</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_main</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Resultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>status_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de estado</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_status_selector</source>
-			<translation>Selector de estado</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_status_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_status</source>
-			<translation>Nou estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_main</source>
-			<translation>Està canviant l'estat del següent resultat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_main</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>nonvisual_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestor d’objectes no visuals</translation>
-		</message>
-		<message>
-			<source>cat_mat_roughness</source>
-			<translation>Rugositat</translation>
-		</message>
-		<message>
-			<source>tooltip_cat_mat_roughness</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>ve_inp_rules</source>
-			<translation>regles</translation>
-		</message>
-		<message>
-			<source>tooltip_ve_inp_rules</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_replace</name>
-		<message>
-			<source>title</source>
-			<translation>Remplaçar objecte</translation>
-		</message>
-		<message>
-			<source>dlg_feature_replace</source>
-			<translation>Remplaçar objecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_replace</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>featuretype_change</name>
-		<message>
-			<source>title</source>
-			<translation>Canviar tipus d'objecte</translation>
-		</message>
-		<message>
-			<source>dlg_featuretype_change</source>
-			<translation>Canviar tipus d'objecte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_featuretype_change</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut</name>
-		<message>
-			<source>title</source>
-			<translation>Polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>btn_end</source>
-			<translation>Final</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_start</source>
-			<translation>Inici</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_use_planified</source>
-			<translation>Utilitzar xarxa planificada</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_use_planified</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_exec_realdates</source>
-			<translation>Dates reals</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_exec_realdates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_location</source>
-			<translation>Localització</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_details</source>
-			<translation>Detalls</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_details</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_forecasted_dates</source>
-			<translation>Dates previstes</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_forecasted_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_assigned_to</source>
-			<translation>Asignat a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_assigned_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cause</source>
-			<translation>Causa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cause</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_chlorine</source>
-			<translation>Clor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_chlorine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_depth</source>
-			<translation>Profunditat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_depth</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_pd</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_pd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_rd</source>
-			<translation>Descripció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_rd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dist_from_plot</source>
-			<translation>Distància des de la parcel·la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dist_from_plot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end</source>
-			<translation>Fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_equipment_code</source>
-			<translation>Equip de medició de clor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_equipment_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_appropriate</source>
-			<translation>Adequat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>Si es verdader, la ubicació real coincideix amb la informació mincut programada.</translation>
-		</message>
-		<message>
-			<source>lbl_exec_enddate</source>
-			<translation>Data de finalització:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Data inicial:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>lbl_exec_user</source>
-			<translation>Usuari executiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_user</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Sense resultats</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_reagent_lot</source>
-			<translation>Lot del reactiu de clor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_reagent_lot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_received_date</source>
-			<translation>Data de recepció:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_received_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_turbidity</source>
-			<translation>Terbolesa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_turbidity</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type</source>
-			<translation>Tipus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordre de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab</source>
-			<translation>Exec</translation>
-		</message>
-		<message>
-			<source>tooltip_tab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Plan</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydro</source>
-			<translation>Hidro</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydro</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Registre</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_composer</name>
-		<message>
-			<source>title</source>
-			<translation>Compositor polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Obrir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_composer</source>
-			<translation>Compositor polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Model:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Títol</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_connec</name>
-		<message>
-			<source>title</source>
-			<translation>Polígon de tall escomeses</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Insertar</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccionar objecte</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_connec</source>
-			<translation>Polígon de tall escomeses</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_search</source>
-			<translation>Buscar per 'customer code':</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_search</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_end</name>
-		<message>
-			<source>title</source>
-			<translation>Finalitzar polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_set_real_location</source>
-			<translation>Establir ubicació real</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_set_real_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_end</source>
-			<translation>Finalitzar polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_close_mincut</source>
-			<translation>Cerrar mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_close_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>Fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_hour</source>
-			<translation>Hora de finalització:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_executed</source>
-			<translation>Executat per:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_executed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_municipality</source>
-			<translation>Municipi:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_municipality</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_number</source>
-			<translation>Número:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_number</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_hour</source>
-			<translation>Hora d'inici</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_street</source>
-			<translation>Carrer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_street</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordre de treball:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_hydrometer</name>
-		<message>
-			<source>title</source>
-			<translation>Hidròmetre polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Insertar</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_hydrometer</source>
-			<translation>Hidròmetre polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_hydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ccc</source>
-			<translation>Conectar codi client:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ccc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_hcc</source>
-			<translation>Codi client hidròmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_hcc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestió polígon de tall</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_cancel_mincut</source>
-			<translation>Cancel·lació falsa</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_next_days</source>
-			<translation>Pròxims dies</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_next_days</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_notify</source>
-			<translation>Enviar SMS</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_notify</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_selector_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_selector_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_manager</source>
-			<translation>Gestió polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_from</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_to</source>
-			<translation>Fins a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exploitation</source>
-			<translation>Explotació:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exploitation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrar per:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut_type</source>
-			<translation>Tipus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Estat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_streetaxis</source>
-			<translation>Carrer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_streetaxis</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector_date</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de dates</translation>
-		</message>
-		<message>
-			<source>dlg_selector_date</source>
-			<translation>Selector de dates</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector_date</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestió de visites</translation>
-		</message>
-		<message>
-			<source>dlg_visit_manager</source>
-			<translation>Gestió de visites</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_manager</source>
-			<translation>None</translation>
 		</message>
 	</context>
 </TS>

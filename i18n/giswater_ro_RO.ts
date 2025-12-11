@@ -5,432 +5,204 @@
 	<context>
 		<name>giswater</name>
 		<message>
-			<source>Manage Campaign</source>
-			<translation>Gestionați campania</translation>
-		</message>
-		<message>
-			<source>Manage Lot</source>
-			<translation>Gestionați lotul</translation>
-		</message>
-		<message>
-			<source>Manage Workorder</source>
-			<translation>Gestionați comanda de lucru</translation>
-		</message>
-		<message>
-			<source>18_text</source>
-			<translation>Conexiune comercială</translation>
-		</message>
-		<message>
-			<source>19_text</source>
-			<translation>Instrumente topo</translation>
-		</message>
-		<message>
-			<source>24_text</source>
-			<translation>Go2EPA express</translation>
-		</message>
-		<message>
-			<source>301_text</source>
-			<translation>Planificator anual</translation>
-		</message>
-		<message>
-			<source>302_text</source>
-			<translation>Planificator lunar</translation>
-		</message>
-		<message>
-			<source>303_text</source>
-			<translation>Generator de prețuri</translation>
-		</message>
-		<message>
-			<source>304_text</source>
-			<translation>Adăugați o vizită</translation>
-		</message>
-		<message>
-			<source>305_text</source>
-			<translation>Planificator de unități</translation>
-		</message>
-		<message>
-			<source>309_text</source>
-			<translation>Manager de incidente</translation>
-		</message>
-		<message>
-			<source>36_text</source>
-			<translation>Giswater</translation>
-		</message>
-		<message>
-			<source>38_text</source>
-			<translation>Costul noii rețele</translation>
-		</message>
-		<message>
-			<source>47_text</source>
-			<translation>Selector Psector</translation>
-		</message>
-		<message>
-			<source>74_text</source>
-			<translation>Adăugați un lot nou</translation>
-		</message>
-		<message>
-			<source>75_text</source>
-			<translation>Manager de lot</translation>
-		</message>
-		<message>
-			<source>76_text</source>
-			<translation>Filtru de lot</translation>
-		</message>
-		<message>
-			<source>81_text</source>
-			<translation>Psector nou</translation>
-		</message>
-		<message>
-			<source>82_text</source>
-			<translation>Manager de sector</translation>
-		</message>
-		<message>
-			<source>98_text</source>
-			<translation>Editor de configurare</translation>
-		</message>
-		<message>
-			<source>Actions</source>
-			<translation>Acțiuni</translation>
-		</message>
-		<message>
-			<source>Add drain GPKG project</source>
-			<translation>Adăugați proiectul GPKG de scurgere</translation>
-		</message>
-		<message>
-			<source>Additional demand check</source>
-			<translation>Verificarea cererii suplimentare</translation>
-		</message>
-		<message>
-			<source>Advanced</source>
-			<translation>Avansat</translation>
-		</message>
-		<message>
-			<source>AmBreakage</source>
-			<translation>Instrument administrativ</translation>
-		</message>
-		<message>
-			<source>AmPriority</source>
-			<translation>Selectarea și calcularea priorității</translation>
-		</message>
-		<message>
-			<source>Analytics</source>
-			<translation>Analiză</translation>
-		</message>
-		<message>
-			<source>ARC</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>Breakdown Assignation</source>
-			<translation>Repartizare Alocarea</translation>
+			<source>CONNEC</source>
+			<translation>Conectare</translation>
 		</message>
 		<message>
 			<source>Calibration</source>
 			<translation>Calibrare</translation>
 		</message>
 		<message>
-			<source>Closest arcs</source>
-			<translation>Arcurile cele mai apropiate</translation>
-		</message>
-		<message>
-			<source>CONNEC</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>DRAG-DROP</source>
-			<translation>Drag-Drop</translation>
-		</message>
-		<message>
-			<source>Dscenario</source>
-			<translation>Dscenario</translation>
-		</message>
-		<message>
-			<source>DWF scenario</source>
-			<translation>Scenariul DWF</translation>
-		</message>
-		<message>
-			<source>Emitter calibration</source>
-			<translation>Calibrarea emițătorului</translation>
-		</message>
-		<message>
-			<source>EPA multi calls</source>
-			<translation>Apeluri multiple EPA</translation>
-		</message>
-		<message>
-			<source>Export</source>
-			<translation>Export</translation>
-		</message>
-		<message>
-			<source>Fast print</source>
-			<translation>Imprimare rapidă</translation>
-		</message>
-		<message>
-			<source>Forced arcs</source>
-			<translation>Arcuri forțate</translation>
-		</message>
-		<message>
-			<source>Forced arcs (selecting only arcs)</source>
-			<translation>Arcuri forțate (selectarea numai a arcurilor)</translation>
-		</message>
-		<message>
-			<source>Get help</source>
-			<translation>Obțineți ajutor</translation>
-		</message>
-		<message>
-			<source>Go2IBER</source>
-			<translation>Go2IBER</translation>
-		</message>
-		<message>
-			<source>GULLY</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>GwAddCampaignButton</source>
-			<translation>Adaugă campanie</translation>
-		</message>
-		<message>
-			<source>GwAddChildLayerButton</source>
-			<translation>Încărcați stratul Giswater</translation>
-		</message>
-		<message>
-			<source>GwAddLotButton</source>
-			<translation>Adaugă lot</translation>
-		</message>
-		<message>
-			<source>GwAmBreakageButton</source>
-			<translation>Instrument administrativ</translation>
-		</message>
-		<message>
-			<source>GwAmPriorityButton</source>
-			<translation>Selectarea și calcularea priorității</translation>
-		</message>
-		<message>
-			<source>GwArcAddButton</source>
-			<translation>Inserție arc</translation>
-		</message>
-		<message>
-			<source>GwArcDivideButton</source>
-			<translation>Arc de divizare</translation>
-		</message>
-		<message>
-			<source>GwArcFusionButton</source>
-			<translation>Fuziunea arcului</translation>
-		</message>
-		<message>
-			<source>GwAuxCircleAddButton</source>
-			<translation>Creați un cerc</translation>
-		</message>
-		<message>
-			<source>GwAuxPointAddButton</source>
-			<translation>Creați un punct</translation>
-		</message>
-		<message>
-			<source>GwConfigButton</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>GwConnectLinkButton</source>
-			<translation>Conectare la rețea</translation>
-		</message>
-		<message>
-			<source>GwCSVButton</source>
-			<translation>Import CSV</translation>
-		</message>
-		<message>
-			<source>GwDateSelectorButton</source>
-			<translation>Selector de dată</translation>
-		</message>
-		<message>
-			<source>GwDimensioningButton</source>
-			<translation>Dimensionare</translation>
-		</message>
-		<message>
-			<source>GwDocumentButton</source>
-			<translation>Adăugați documentul</translation>
-		</message>
-		<message>
-			<source>GwDocumentManagerButton</source>
-			<translation>Manager de documente</translation>
-		</message>
-		<message>
-			<source>GwDscenarioManagerButton</source>
-			<translation>Dscenario manager</translation>
-		</message>
-		<message>
-			<source>GwElementButton</source>
-			<translation>Adăugați un element</translation>
-		</message>
-		<message>
-			<source>GwElementManagerButton</source>
-			<translation>Manager de elemente</translation>
-		</message>
-		<message>
-			<source>GwEpaTools</source>
-			<translation>Instrumente APE</translation>
-		</message>
-		<message>
-			<source>GwFeatureDeleteButton</source>
-			<translation>Ștergeți caracteristica</translation>
-		</message>
-		<message>
-			<source>GwFeatureEndButton</source>
-			<translation>Caracteristică finală</translation>
-		</message>
-		<message>
-			<source>GwFeatureReplaceButton</source>
-			<translation>Înlocuiți caracteristica</translation>
-		</message>
-		<message>
-			<source>GwFeatureTypeChangeButton</source>
-			<translation>Modificarea clasei de caracteristici</translation>
-		</message>
-		<message>
-			<source>GwFlowExitButton</source>
-			<translation>Ieșire debit</translation>
-		</message>
-		<message>
 			<source>GwFlowTraceButton</source>
 			<translation>Urmărirea debitului</translation>
 		</message>
 		<message>
-			<source>GwGo2EpaButton</source>
-			<translation>Go2EPA</translation>
-		</message>
-		<message>
-			<source>GwGo2EpaManagerButton</source>
-			<translation>Manager de rezultate APE</translation>
-		</message>
-		<message>
-			<source>GwGo2EpaSelectorButton</source>
-			<translation>Selector de rezultate EPA</translation>
-		</message>
-		<message>
-			<source>GwInfoButton</source>
-			<translation>Info Giswater</translation>
-		</message>
-		<message>
-			<source>GwLayerStyleChangeButton</source>
-			<translation>Stiluri Giswater</translation>
-		</message>
-		<message>
-			<source>GwLotResourceManagementButton</source>
-			<translation>Gestionarea resurselor lotului</translation>
-		</message>
-		<message>
-			<source>GwManageCampaignLotButton</source>
-			<translation>Gestionați lotul de campanie</translation>
-		</message>
-		<message>
-			<source>GwMincutButton</source>
-			<translation>Mincut nou</translation>
-		</message>
-		<message>
-			<source>GwMincutManagerButton</source>
-			<translation>Managementul mincut</translation>
-		</message>
-		<message>
-			<source>GwNetscenarioManagerButton</source>
-			<translation>Manager Netscenario</translation>
-		</message>
-		<message>
-			<source>GwNonVisualManagerButton</source>
-			<translation>Manager de obiecte non-vizuale</translation>
-		</message>
-		<message>
-			<source>GwPointAddButton</source>
-			<translation>Inserare punct</translation>
-		</message>
-		<message>
-			<source>GwPriceManagerButton</source>
-			<translation>Manager costuri rețea</translation>
-		</message>
-		<message>
-			<source>GwPrintButton</source>
-			<translation>Imprimare</translation>
+			<source>Actions</source>
+			<translation>Acțiuni</translation>
 		</message>
 		<message>
 			<source>GwProfileButton</source>
 			<translation>Instrument de profil</translation>
 		</message>
 		<message>
-			<source>GwProjectCheckButton</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>GwPsectorButton</source>
-			<translation>Psector nou</translation>
-		</message>
-		<message>
-			<source>GwPsectorManagerButton</source>
-			<translation>Manager de sector</translation>
-		</message>
-		<message>
 			<source>GwResultManagerButton</source>
 			<translation>Manager de rezultate</translation>
 		</message>
 		<message>
-			<source>GwResultSelectorButton</source>
-			<translation>Selector de rezultate</translation>
+			<source>Emitter calibration</source>
+			<translation>Calibrarea emițătorului</translation>
 		</message>
 		<message>
-			<source>GwSearchButton</source>
-			<translation>Căutare plus</translation>
+			<source>NODE</source>
+			<translation>Nod</translation>
 		</message>
 		<message>
-			<source>GwSelectorButton</source>
-			<translation>Selectori</translation>
+			<source>toolbar_plan_name</source>
+			<translation>Giswater - Master plan</translation>
 		</message>
 		<message>
-			<source>GwSnapshotViewButton</source>
-			<translation>Vizualizare instantanee</translation>
-		</message>
-		<message>
-			<source>GwToolBoxButton</source>
-			<translation>Cutie de instrumente</translation>
-		</message>
-		<message>
-			<source>GwUtilsManagerButton</source>
-			<translation>Manager Utils</translation>
-		</message>
-		<message>
-			<source>GwVisitButton</source>
-			<translation>Adăugați o vizită</translation>
-		</message>
-		<message>
-			<source>GwVisitManagerButton</source>
-			<translation>Vizitați managerul</translation>
-		</message>
-		<message>
-			<source>GwWorkspaceManagerButton</source>
-			<translation>Manager de spațiu de lucru</translation>
-		</message>
-		<message>
-			<source>Hydrology scenario</source>
-			<translation>Scenariu hidrologic</translation>
-		</message>
-		<message>
-			<source>Import</source>
-			<translation>Import</translation>
-		</message>
-		<message>
-			<source>Import CSV</source>
-			<translation>Import CSV</translation>
-		</message>
-		<message>
-			<source>Import INP file</source>
-			<translation>Import fișier INP</translation>
-		</message>
-		<message>
-			<source>Manage Campaign</source>
-			<translation>Gestionați campania</translation>
+			<source>ARC</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
 			<source>Manage Lot</source>
 			<translation>Gestionați lotul</translation>
 		</message>
 		<message>
-			<source>Mapzones manager</source>
-			<translation>Mapzones manager</translation>
+			<source>74_text</source>
+			<translation>Adăugați un lot nou</translation>
+		</message>
+		<message>
+			<source>Manage Campaign</source>
+			<translation>Gestionați campania</translation>
+		</message>
+		<message>
+			<source>GwElementManagerButton</source>
+			<translation>Manager de elemente</translation>
+		</message>
+		<message>
+			<source>Get help</source>
+			<translation>Obțineți ajutor</translation>
+		</message>
+		<message>
+			<source>Forced arcs (selecting only arcs)</source>
+			<translation>Arcuri forțate (selectarea numai a arcurilor)</translation>
+		</message>
+		<message>
+			<source>38_text</source>
+			<translation>Costul noii rețele</translation>
+		</message>
+		<message>
+			<source>GULLY</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>36_text</source>
+			<translation>Giswater</translation>
+		</message>
+		<message>
+			<source>EPA multi calls</source>
+			<translation>Apeluri multiple EPA</translation>
+		</message>
+		<message>
+			<source>GwAddChildLayerButton</source>
+			<translation>Încărcați stratul Giswater</translation>
+		</message>
+		<message>
+			<source>GwFeatureTypeChangeButton</source>
+			<translation>Modificarea clasei de caracteristici</translation>
+		</message>
+		<message>
+			<source>Closest arcs</source>
+			<translation>Arcurile cele mai apropiate</translation>
+		</message>
+		<message>
+			<source>GwSearchButton</source>
+			<translation>Căutare plus</translation>
+		</message>
+		<message>
+			<source>GwSnapshotViewButton</source>
+			<translation>Vizualizare instantanee</translation>
+		</message>
+		<message>
+			<source>Dscenario</source>
+			<translation>Dscenario</translation>
+		</message>
+		<message>
+			<source>toolbar_custom_name</source>
+			<translation>Giswater - Personalizat</translation>
+		</message>
+		<message>
+			<source>GwNonVisualManagerButton</source>
+			<translation>Manager de obiecte non-vizuale</translation>
+		</message>
+		<message>
+			<source>toolbar_om_name</source>
+			<translation>Giswater - OM</translation>
+		</message>
+		<message>
+			<source>DRAG-DROP</source>
+			<translation>Drag-Drop</translation>
+		</message>
+		<message>
+			<source>toolbar_cm_name</source>
+			<translation>Giswater - Manager de campanie</translation>
+		</message>
+		<message>
+			<source>GwFeatureEndButton</source>
+			<translation>Caracteristică finală</translation>
+		</message>
+		<message>
+			<source>Manage Workorder</source>
+			<translation>Gestionați comanda de lucru</translation>
+		</message>
+		<message>
+			<source>Go2IBER</source>
+			<translation>Go2IBER</translation>
+		</message>
+		<message>
+			<source>Analytics</source>
+			<translation>Analiză</translation>
+		</message>
+		<message>
+			<source>302_text</source>
+			<translation>Planificator lunar</translation>
+		</message>
+		<message>
+			<source>Static calibration</source>
+			<translation>Calibrare statică</translation>
+		</message>
+		<message>
+			<source>Multi psector print</source>
+			<translation>Multi psector print</translation>
+		</message>
+		<message>
+			<source>GwPriceManagerButton</source>
+			<translation>Manager costuri rețea</translation>
+		</message>
+		<message>
+			<source>Quantized demands</source>
+			<translation>Cereri cuantificate</translation>
+		</message>
+		<message>
+			<source>GwFeatureDeleteButton</source>
+			<translation>Ștergeți caracteristica</translation>
+		</message>
+		<message>
+			<source>SELECT</source>
+			<translation>Selectați</translation>
+		</message>
+		<message>
+			<source>Manage Lot</source>
+			<translation>Gestionați lotul</translation>
+		</message>
+		<message>
+			<source>Hydrology scenario</source>
+			<translation>Scenariu hidrologic</translation>
+		</message>
+		<message>
+			<source>GwInfoButton</source>
+			<translation>Info Giswater</translation>
+		</message>
+		<message>
+			<source>GwDscenarioManagerButton</source>
+			<translation>Dscenario manager</translation>
+		</message>
+		<message>
+			<source>GwUtilsManagerButton</source>
+			<translation>Manager Utils</translation>
+		</message>
+		<message>
+			<source>Fast print</source>
+			<translation>Imprimare rapidă</translation>
+		</message>
+		<message>
+			<source>DWF scenario</source>
+			<translation>Scenariul DWF</translation>
+		</message>
+		<message>
+			<source>GwAuxCircleAddButton</source>
+			<translation>Creați un cerc</translation>
 		</message>
 		<message>
 			<source>Massive composer</source>
@@ -441,118 +213,778 @@
 			<translation>Giswater</translation>
 		</message>
 		<message>
-			<source>Multi psector print</source>
-			<translation>Multi psector print</translation>
+			<source>19_text</source>
+			<translation>Instrumente topo</translation>
 		</message>
 		<message>
-			<source>NODE</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>Open plugin folder</source>
-			<translation>Deschideți folderul plugin</translation>
-		</message>
-		<message>
-			<source>Open user folder</source>
-			<translation>Deschideți folderul utilizatorului</translation>
-		</message>
-		<message>
-			<source>Priority Calculation (Global)</source>
-			<translation>Calcularea priorității (global)</translation>
-		</message>
-		<message>
-			<source>Quantized demands</source>
-			<translation>Cereri cuantificate</translation>
-		</message>
-		<message>
-			<source>Reset dialogs</source>
-			<translation>Resetarea dialogurilor</translation>
-		</message>
-		<message>
-			<source>Reset plugin</source>
-			<translation>Resetare plugin</translation>
-		</message>
-		<message>
-			<source>ResultManager</source>
-			<translation>Manager de rezultate</translation>
-		</message>
-		<message>
-			<source>ResultSelector</source>
-			<translation>Selector de rezultate</translation>
-		</message>
-		<message>
-			<source>Review</source>
-			<translation>Recenzie</translation>
-		</message>
-		<message>
-			<source>SELECT</source>
-			<translation>Selectați</translation>
-		</message>
-		<message>
-			<source>Show current selectors</source>
-			<translation>Afișați selectorii actuali</translation>
-		</message>
-		<message>
-			<source>Static calibration</source>
-			<translation>Calibrare statică</translation>
-		</message>
-		<message>
-			<source>Style manager</source>
-			<translation>Manager de stil</translation>
-		</message>
-		<message>
-			<source>Toggle Log DB</source>
-			<translation>Toggle Log DB</translation>
-		</message>
-		<message>
-			<source>toolbar_am_name</source>
-			<translation>Giswater - Manager de active</translation>
+			<source>GwPsectorManagerButton</source>
+			<translation>Manager de sector</translation>
 		</message>
 		<message>
 			<source>toolbar_basic_name</source>
 			<translation>Giswater - de bază</translation>
 		</message>
 		<message>
-			<source>toolbar_cm_name</source>
-			<translation>Giswater - Manager de campanie</translation>
+			<source>Show current selectors</source>
+			<translation>Afișați selectorii actuali</translation>
 		</message>
 		<message>
-			<source>toolbar_custom_name</source>
-			<translation>Giswater - Personalizat</translation>
+			<source>GwArcAddButton</source>
+			<translation>Inserție arc</translation>
 		</message>
 		<message>
-			<source>toolbar_edit_name</source>
-			<translation>Giswater - Editare</translation>
+			<source>18_text</source>
+			<translation>Conexiune comercială</translation>
 		</message>
 		<message>
-			<source>toolbar_epa_name</source>
-			<translation>Giswater - Epa</translation>
+			<source>Import INP file</source>
+			<translation>Import fișier INP</translation>
 		</message>
 		<message>
-			<source>toolbar_om_name</source>
-			<translation>Giswater - OM</translation>
+			<source>Reset dialogs</source>
+			<translation>Resetarea dialogurilor</translation>
 		</message>
 		<message>
-			<source>toolbar_plan_name</source>
-			<translation>Giswater - Master plan</translation>
+			<source>301_text</source>
+			<translation>Planificator anual</translation>
+		</message>
+		<message>
+			<source>Mapzones manager</source>
+			<translation>Mapzones manager</translation>
+		</message>
+		<message>
+			<source>Open user folder</source>
+			<translation>Deschideți folderul utilizatorului</translation>
+		</message>
+		<message>
+			<source>Workcat manager</source>
+			<translation>Manager Workcat</translation>
+		</message>
+		<message>
+			<source>GwDimensioningButton</source>
+			<translation>Dimensionare</translation>
+		</message>
+		<message>
+			<source>Style manager</source>
+			<translation>Manager de stil</translation>
+		</message>
+		<message>
+			<source>GwDocumentButton</source>
+			<translation>Adăugați documentul</translation>
+		</message>
+		<message>
+			<source>ResultSelector</source>
+			<translation>Selector de rezultate</translation>
+		</message>
+		<message>
+			<source>98_text</source>
+			<translation>Editor de configurare</translation>
+		</message>
+		<message>
+			<source>Reset plugin</source>
+			<translation>Resetare plugin</translation>
+		</message>
+		<message>
+			<source>GwPsectorButton</source>
+			<translation>Psector nou</translation>
+		</message>
+		<message>
+			<source>GwNetscenarioManagerButton</source>
+			<translation>Manager Netscenario</translation>
+		</message>
+		<message>
+			<source>Forced arcs</source>
+			<translation>Arcuri forțate</translation>
+		</message>
+		<message>
+			<source>Open plugin folder</source>
+			<translation>Deschideți folderul plugin</translation>
+		</message>
+		<message>
+			<source>GwToolBoxButton</source>
+			<translation>Cutie de instrumente</translation>
+		</message>
+		<message>
+			<source>GwProjectCheckButton</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>GwArcFusionButton</source>
+			<translation>Fuziunea arcului</translation>
+		</message>
+		<message>
+			<source>303_text</source>
+			<translation>Generator de prețuri</translation>
+		</message>
+		<message>
+			<source>Add drain GPKG project</source>
+			<translation>Adăugați proiectul GPKG de scurgere</translation>
+		</message>
+		<message>
+			<source>GwGo2EpaManagerButton</source>
+			<translation>Manager de rezultate APE</translation>
+		</message>
+		<message>
+			<source>82_text</source>
+			<translation>Manager de sector</translation>
+		</message>
+		<message>
+			<source>Toggle Log DB</source>
+			<translation>Toggle Log DB</translation>
 		</message>
 		<message>
 			<source>toolbar_utilities_name</source>
 			<translation>Giswater - Utilități</translation>
 		</message>
 		<message>
-			<source>Valve operation check</source>
-			<translation>Verificarea funcționării supapei</translation>
+			<source>ResultManager</source>
+			<translation>Manager de rezultate</translation>
+		</message>
+		<message>
+			<source>GwSelectorButton</source>
+			<translation>Selectori</translation>
+		</message>
+		<message>
+			<source>GwFlowExitButton</source>
+			<translation>Ieșire debit</translation>
+		</message>
+		<message>
+			<source>GwDocumentManagerButton</source>
+			<translation>Manager de documente</translation>
+		</message>
+		<message>
+			<source>Priority Calculation (Global)</source>
+			<translation>Calcularea priorității (global)</translation>
+		</message>
+		<message>
+			<source>GwDateSelectorButton</source>
+			<translation>Selector de dată</translation>
+		</message>
+		<message>
+			<source>GwConfigButton</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>GwLayerStyleChangeButton</source>
+			<translation>Stiluri Giswater</translation>
+		</message>
+		<message>
+			<source>Review</source>
+			<translation>Recenzie</translation>
+		</message>
+		<message>
+			<source>GwMincutButton</source>
+			<translation>Mincut nou</translation>
+		</message>
+		<message>
+			<source>GwMincutManagerButton</source>
+			<translation>Managementul mincut</translation>
+		</message>
+		<message>
+			<source>toolbar_edit_name</source>
+			<translation>Giswater - Editare</translation>
+		</message>
+		<message>
+			<source>GwEpaTools</source>
+			<translation>Instrumente APE</translation>
+		</message>
+		<message>
+			<source>81_text</source>
+			<translation>Psector nou</translation>
+		</message>
+		<message>
+			<source>GwWorkspaceManagerButton</source>
+			<translation>Manager de spațiu de lucru</translation>
+		</message>
+		<message>
+			<source>47_text</source>
+			<translation>Selector Psector</translation>
+		</message>
+		<message>
+			<source>AmPriority</source>
+			<translation>Selectarea și calcularea priorității</translation>
+		</message>
+		<message>
+			<source>304_text</source>
+			<translation>Adăugați o vizită</translation>
+		</message>
+		<message>
+			<source>GwConnectLinkButton</source>
+			<translation>Conectare la rețea</translation>
+		</message>
+		<message>
+			<source>AmBreakage</source>
+			<translation>Instrument administrativ</translation>
+		</message>
+		<message>
+			<source>GwCSVButton</source>
+			<translation>Import CSV</translation>
+		</message>
+		<message>
+			<source>Import CSV</source>
+			<translation>Import CSV</translation>
+		</message>
+		<message>
+			<source>GwArcDivideButton</source>
+			<translation>Arc de divizare</translation>
+		</message>
+		<message>
+			<source>Import</source>
+			<translation>Import</translation>
+		</message>
+		<message>
+			<source>Advanced</source>
+			<translation>Avansat</translation>
+		</message>
+		<message>
+			<source>GwFeatureReplaceButton</source>
+			<translation>Înlocuiți caracteristica</translation>
+		</message>
+		<message>
+			<source>Export</source>
+			<translation>Export</translation>
+		</message>
+		<message>
+			<source>Breakdown Assignation</source>
+			<translation>Repartizare Alocarea</translation>
+		</message>
+		<message>
+			<source>GwVisitButton</source>
+			<translation>Adăugați o vizită</translation>
+		</message>
+		<message>
+			<source>75_text</source>
+			<translation>Manager de lot</translation>
+		</message>
+		<message>
+			<source>Additional demand check</source>
+			<translation>Verificarea cererii suplimentare</translation>
+		</message>
+		<message>
+			<source>GwElementButton</source>
+			<translation>Adăugați un element</translation>
+		</message>
+		<message>
+			<source>GwAddCampaignButton</source>
+			<translation>Adaugă campanie</translation>
+		</message>
+		<message>
+			<source>GwVisitManagerButton</source>
+			<translation>Vizitați managerul</translation>
+		</message>
+		<message>
+			<source>GwPointAddButton</source>
+			<translation>Inserare punct</translation>
+		</message>
+		<message>
+			<source>Manage Campaign</source>
+			<translation>Gestionați campania</translation>
+		</message>
+		<message>
+			<source>toolbar_epa_name</source>
+			<translation>Giswater - Epa</translation>
+		</message>
+		<message>
+			<source>GwAddLotButton</source>
+			<translation>Adaugă lot</translation>
+		</message>
+		<message>
+			<source>309_text</source>
+			<translation>Manager de incidente</translation>
+		</message>
+		<message>
+			<source>GwAuxPointAddButton</source>
+			<translation>Creați un punct</translation>
+		</message>
+		<message>
+			<source>305_text</source>
+			<translation>Planificator de unități</translation>
+		</message>
+		<message>
+			<source>GwResultSelectorButton</source>
+			<translation>Selector de rezultate</translation>
+		</message>
+		<message>
+			<source>GwAmBreakageButton</source>
+			<translation>Instrument administrativ</translation>
+		</message>
+		<message>
+			<source>GwGo2EpaButton</source>
+			<translation>Go2EPA</translation>
 		</message>
 		<message>
 			<source>Visit</source>
 			<translation>Vizită</translation>
 		</message>
 		<message>
-			<source>Workcat manager</source>
-			<translation>Manager Workcat</translation>
+			<source>24_text</source>
+			<translation>Go2EPA express</translation>
+		</message>
+		<message>
+			<source>GwPrintButton</source>
+			<translation>Imprimare</translation>
+		</message>
+		<message>
+			<source>Valve operation check</source>
+			<translation>Verificarea funcționării supapei</translation>
+		</message>
+		<message>
+			<source>toolbar_am_name</source>
+			<translation>Giswater - Manager de active</translation>
+		</message>
+		<message>
+			<source>GwLotResourceManagementButton</source>
+			<translation>Gestionarea resurselor lotului</translation>
+		</message>
+		<message>
+			<source>GwManageCampaignLotButton</source>
+			<translation>Gestionați lotul de campanie</translation>
+		</message>
+		<message>
+			<source>GwGo2EpaSelectorButton</source>
+			<translation>Selector de rezultate EPA</translation>
+		</message>
+		<message>
+			<source>76_text</source>
+			<translation>Filtru de lot</translation>
+		</message>
+		<message>
+			<source>GwAmPriorityButton</source>
+			<translation>Selectarea și calcularea priorității</translation>
 		</message>
 		<!-- PYTHON MESSAGES -->
+		<message>
+			<source>Campaign saved successfully.</source>
+			<translation>Campaign saved successfully.</translation>
+		</message>
+		<message>
+			<source>Failed to save campaign</source>
+			<translation>Failed to save campaign</translation>
+		</message>
+		<message>
+			<source>Invalid campaign mode</source>
+			<translation>Invalid campaign mode</translation>
+		</message>
+		<message>
+			<source>Real end date</source>
+			<translation>Real end date</translation>
+		</message>
+		<message>
+			<source>Planned end date</source>
+			<translation>Data finală planificată</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} workorder(s)?</source>
+			<translation>Sunteți sigur că doriți să ștergeți {0} ordin(e) de lucru?</translation>
+		</message>
+		<message>
+			<source>Custom mincut executed successfully</source>
+			<translation>Mincut personalizat executat cu succes</translation>
+		</message>
+		<message>
+			<source>IVI</source>
+			<translation>IVI</translation>
+		</message>
+		<message>
+			<source>English locale not found</source>
+			<translation>Locala engleză nu a fost găsită</translation>
+		</message>
+		<message>
+			<source>Key container</source>
+			<translation>Container cheie</translation>
+		</message>
+		<message>
+			<source>Atlas ID must be an integer.</source>
+			<translation>Atlas ID must be an integer.</translation>
+		</message>
+		<message>
+			<source>Failed to retrieve GeoJSON data.</source>
+			<translation>A eșuat extragerea datelor GeoJSON.</translation>
+		</message>
+		<message>
+			<source>Context</source>
+			<translation>Context</translation>
+		</message>
+		<message>
+			<source>Current node is not located over an arc. Please, select option 'DRAG-DROP'</source>
+			<translation>Nodul curent nu este situat deasupra unui arc. Vă rugăm, selectați opțiunea "DRAG-DROP</translation>
+		</message>
+		<message>
+			<source>No listValues for</source>
+			<translation>Nu există listValues pentru</translation>
+		</message>
+		<message>
+			<source>Material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>{0}</source>
+			<translation>{0}</translation>
+		</message>
+		<message>
+			<source>AUXILIAR</source>
+			<translation>ASISTENT</translation>
+		</message>
+		<message>
+			<source>Create example</source>
+			<translation>Creați un exemplu</translation>
+		</message>
+		<message>
+			<source>Select a workorder to delete.</source>
+			<translation>Select a workorder to delete.</translation>
+		</message>
+		<message>
+			<source>Unhandled Error</source>
+			<translation>Eroare negestionată</translation>
+		</message>
+		<message>
+			<source>Assign Team</source>
+			<translation>Assign Team</translation>
+		</message>
+		<message>
+			<source>Detail</source>
+			<translation>Detaliu</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lot(s) deleted.</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} lot(s)?</source>
+			<translation>Are you sure you want to delete {0} lot(s)?</translation>
+		</message>
+		<message>
+			<source>Delete Lot(s)</source>
+			<translation>Delete Lot(s)</translation>
+		</message>
+		<message>
+			<source>BASEMAP</source>
+			<translation>BASEMAP</translation>
+		</message>
+		<message>
+			<source>{0} ({1}) - {2} - Updating {3}...</source>
+			<translation>{0} ({1}) - {2} - Actualizarea {3}...</translation>
+		</message>
+		<message>
+			<source>DOWNGRADE NODE</source>
+			<translation>NODUL DOWNGRADE</translation>
+		</message>
+		<message>
+			<source>A new style has been added to '{0}' for the layer '{1}' using the 'GwBasic' style information.</source>
+			<translation>Un nou stil a fost adăugat la "{0}" pentru stratul "{1}" folosind informațiile de stil "GwBasic".</translation>
+		</message>
+		<message>
+			<source>    year = {2024}</source>
+			<translation>    an = {2024}</translation>
+		</message>
+		<message>
+			<source>Do you want to set this psector as current?</source>
+			<translation>Doriți să setați acest psector ca fiind curent?</translation>
+		</message>
+		<message>
+			<source>Error type</source>
+			<translation>Tip eroare</translation>
+		</message>
+		<message>
+			<source>Delete records</source>
+			<translation>Delete records</translation>
+		</message>
+		<message>
+			<source>Exception in {0}</source>
+			<translation>Excepție în {0}</translation>
+		</message>
+		<message>
+			<source></source>
+			<translation></translation>
+		</message>
+		<message>
+			<source>Error creating or updating team</source>
+			<translation>Error creating or updating team</translation>
+		</message>
+		<message>
+			<source>Document already exists</source>
+			<translation>Documentul există deja</translation>
+		</message>
+		<message>
+			<source>No campaign selected.</source>
+			<translation>No campaign selected.</translation>
+		</message>
+		<message>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>Are you sure you want to delete {0} campaign(s)?</translation>
+		</message>
+		<message>
+			<source>Error</source>
+			<translation>Eroare</translation>
+		</message>
+		<message>
+			<source>Couldn't import swmm_api package. Try to reload the Giswater plugin. If the issue persists restart QGIS.</source>
+			<translation>Nu s-a putut importa pachetul swmm_api. Încercați să reîncărcați pluginul Giswater. Dacă problema persistă, reporniți QGIS.</translation>
+		</message>
+		<message>
+			<source>{0} is not a table name or {1}</source>
+			<translation>{0} nu este un nume de tabel sau {1}</translation>
+		</message>
+		<message>
+			<source>Column not found</source>
+			<translation>Coloana nu a fost găsită</translation>
+		</message>
+		<message>
+			<source>No visit values</source>
+			<translation>Nicio valoare a vizitei</translation>
+		</message>
+		<message>
+			<source>Any record found</source>
+			<translation>Orice înregistrare găsită</translation>
+		</message>
+		<message>
+			<source>Alert</source>
+			<translation>Alertă</translation>
+		</message>
+		<message>
+			<source>Data retrieved and displayed successfully.</source>
+			<translation>Datele au fost preluate și afișate cu succes.</translation>
+		</message>
+		<message>
+			<source>Error</source>
+			<translation>Eroare</translation>
+		</message>
+		<message>
+			<source>Error updating table</source>
+			<translation>Eroare la actualizarea tabelului</translation>
+		</message>
+		<message>
+			<source>Dscenario manager</source>
+			<translation>Dscenario manager</translation>
+		</message>
+		<message>
+			<source>Begin topologically simplifying the graph...</source>
+			<translation>Începeți simplificarea topologică a grafului...</translation>
+		</message>
+		<message>
+			<source>Connection '{0}' not found in the file '{1}'</source>
+			<translation>Conexiunea "{0}" nu a fost găsită în fișierul "{1}</translation>
+		</message>
+		<message>
+			<source>Initialize plugin</source>
+			<translation>Inițializarea pluginului</translation>
+		</message>
+		<message>
+			<source>Fill table</source>
+			<translation>Tabel de umplere</translation>
+		</message>
+		<message>
+			<source>{0} campaign(s) deleted.</source>
+			<translation>{0} campanie(e) ștearsă(e).</translation>
+		</message>
+		<message>
+			<source>{0} lot(s) deleted.</source>
+			<translation>{0} lot(uri) șters(e).</translation>
+		</message>
+		<message>
+			<source>Arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>Missing Data</source>
+			<translation>Date lipsă</translation>
+		</message>
+		<message>
+			<source>}</source>
+			<translation>}</translation>
+		</message>
+		<message>
+			<source>Advanced Menu</source>
+			<translation>Meniu avansat</translation>
+		</message>
+		<message>
+			<source>End date</source>
+			<translation>A apărut o eroare la salvarea comenzii de lucru.</translation>
+		</message>
+		<message>
+			<source>Start date</source>
+			<translation>Data de începere</translation>
+		</message>
+		<message>
+			<source>Any document selected</source>
+			<translation>Orice document selectat</translation>
+		</message>
+		<message>
+			<source>Diameter</source>
+			<translation>Diametru</translation>
+		</message>
+		<message>
+			<source>Note: You can force the import by activating the variable '{0}' on the {1} file. </source>
+			<translation>Notă: Puteți forța importul prin activarea variabilei "{0}" pe fișierul {1}.</translation>
+		</message>
+		<message>
+			<source>Profile deleted</source>
+			<translation>Profil șters</translation>
+		</message>
+		<message>
+			<source>Print</source>
+			<translation>Imprimare</translation>
+		</message>
+		<message>
+			<source>Canceling task...</source>
+			<translation>Anularea sarcinii...</translation>
+		</message>
+		<message>
+			<source>(Error {}) </source>
+			<translation>(Eroare {})</translation>
+		</message>
+		<message>
+			<source>FAIL {0}</source>
+			<translation>FAIL {0}</translation>
+		</message>
+		<message>
+			<source>Error deleting data</source>
+			<translation>Eroare la ștergerea datelor</translation>
+		</message>
+		<message>
+			<source>Created edges GeoDataFrame from graph</source>
+			<translation>Creat margini GeoDataFrame din grafic</translation>
+		</message>
+		<message>
+			<source>Add document</source>
+			<translation>Adăugați documentul</translation>
+		</message>
+		<message>
+			<source>Overwrite file</source>
+			<translation>Suprascrieți fișierul</translation>
+		</message>
+		<message>
+			<source>Activate water netowrk snapshot</source>
+			<translation>Activați instantaneul rețelei de apă</translation>
+		</message>
+		<message>
+			<source>The team name already exists</source>
+			<translation>Numele echipei există deja</translation>
+		</message>
+		<message>
+			<source>Added grade attributes to all edges</source>
+			<translation>Atribute de grad adăugate la toate marginile</translation>
+		</message>
+		<message>
+			<source>Error near line {0} -> {1}</source>
+			<translation>Eroare lângă linia {0} -> {1}</translation>
+		</message>
+		<message>
+			<source>Function {0} error: {1} from last function is invalid</source>
+			<translation>Funcția {0} eroare: {1} din ultima funcție este invalidă</translation>
+		</message>
+		<message>
+			<source>Function not found in database</source>
+			<translation>Funcția nu se găsește în baza de date</translation>
+		</message>
+		<message>
+			<source>Invalid lot ID.</source>
+			<translation>ID lot invalid.</translation>
+		</message>
+		<message>
+			<source>Not '{0}'</source>
+			<translation>Nu "{0}</translation>
+		</message>
+		<message>
+			<source>ANALYTICS</source>
+			<translation>ANALITICĂ</translation>
+		</message>
+		<message>
+			<source>Create {project} schema</source>
+			<translation>Crearea schemei {proiect}</translation>
+		</message>
+		<message>
+			<source>ARC</source>
+			<translation>ARC</translation>
+		</message>
+		<message>
+			<source>Configuration file couldn't be imported:</source>
+			<translation>Fișierul de configurare nu a putut fi importat:</translation>
+		</message>
+		<message>
+			<source>{0}: {1}</source>
+			<translation>{0}: {1}</translation>
+		</message>
+		<message>
+			<source>Python translation successful</source>
+			<translation>Traducere Python reușită</translation>
+		</message>
+		<message>
+			<source>Create parent schema</source>
+			<translation>Crearea schemei părinte</translation>
+		</message>
+		<message>
+			<source>Select one</source>
+			<translation>Selectați una</translation>
+		</message>
+		<message>
+			<source>Add translator ({0})</source>
+			<translation>Adăugați traducător ({0})</translation>
+		</message>
+		<message>
+			<source>Calculating values</source>
+			<translation>Calcularea valorilor</translation>
+		</message>
+		<message>
+			<source>SQL</source>
+			<translation>SQL</translation>
+		</message>
+		<message>
+			<source>Error translating: {0}</source>
+			<translation>Eroare de traducere: {0}</translation>
+		</message>
+		<message>
+			<source>Cannot create file, check if its open</source>
+			<translation>Nu se poate crea un fișier, verificați dacă acesta este deschis</translation>
+		</message>
+		<message>
+			<source>Node psector: {0}</source>
+			<translation>Nod psector: {0}</translation>
+		</message>
+		<message>
+			<source>Parameter not found</source>
+			<translation>Parametrul nu a fost găsit</translation>
+		</message>
+		<message>
+			<source>Configuration file couldn't be imported:\n{0}</source>
+			<translation>Fișierul de configurare nu a putut fi importat:\n{0}</translation>
+		</message>
+		<message>
+			<source>Some events have documents</source>
+			<translation>Unele evenimente au documente</translation>
+		</message>
+		<message>
+			<source>Error during point selection: {0}</source>
+			<translation>Eroare în timpul selecției punctului: {0}</translation>
+		</message>
+		<message>
+			<source>Cannot set inactive a current scenario. Please update current first.</source>
+			<translation>Nu se poate dezactiva un scenariu curent. Vă rugăm să actualizați mai întâi scenariul curent.</translation>
+		</message>
+		<message>
+			<source>Couldn't add group.</source>
+			<translation>Nu s-a putut adăuga un grup.</translation>
+		</message>
+		<message>
+			<source>Exception: {0}</source>
+			<translation>Excepție: {0}</translation>
+		</message>
+		<message>
+			<source>Language: {self.project_language}</source>
+			<translation>Limba: {self.project_language}</translation>
+		</message>
+		<message>
+			<source>Do you want to open GIS project?</source>
+			<translation>Doriți să deschideți proiectul GIS?</translation>
+		</message>
+		<message>
+			<source>{1}</source>
+			<translation>{1}</translation>
+		</message>
+		<message>
+			<source>{2}</source>
+			<translation>{2}</translation>
+		</message>
 		<message>
 			<source>For select on canvas is mandatory to load v_asset_arc_input layer</source>
 			<translation>For select on canvas is mandatory to load v_asset_arc_input layer</translation>
@@ -564,10 +996,6 @@
 		<message>
 			<source>{0} campaign(s) deleted.</source>
 			<translation>{0} campaign(s) deleted.</translation>
-		</message>
-		<message>
-			<source>{0} lot(s) deleted.</source>
-			<translation>{0} lot(s) deleted.</translation>
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
@@ -582,14 +1010,6 @@
 			<translation>Are you sure you want to assign team '{0}' to {1} selected user(s)?</translation>
 		</message>
 		<message>
-			<source>Are you sure you want to delete {0} campaign(s)?</source>
-			<translation>Are you sure you want to delete {0} campaign(s)?</translation>
-		</message>
-		<message>
-			<source>Are you sure you want to delete {0} lot(s)?</source>
-			<translation>Are you sure you want to delete {0} lot(s)?</translation>
-		</message>
-		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
 			<translation>Are you sure you want to delete {0} workorder(s)?</translation>
 		</message>
@@ -602,36 +1022,12 @@
 			<translation>Are you sure you want to remove team assignment from {0} selected user(s)?</translation>
 		</message>
 		<message>
-			<source>Assign Team</source>
-			<translation>Assign Team</translation>
-		</message>
-		<message>
-			<source>Campaign saved successfully.</source>
-			<translation>Campaign saved successfully.</translation>
-		</message>
-		<message>
 			<source>CRITICAL ERROR in update_expl_sector_combos</source>
 			<translation>CRITICAL ERROR in update_expl_sector_combos</translation>
 		</message>
 		<message>
-			<source>Delete Lot(s)</source>
-			<translation>Delete Lot(s)</translation>
-		</message>
-		<message>
-			<source>Delete records</source>
-			<translation>Delete records</translation>
-		</message>
-		<message>
 			<source>Delete Workorder(s)</source>
 			<translation>Delete Workorder(s)</translation>
-		</message>
-		<message>
-			<source>End date</source>
-			<translation>A apărut o eroare la salvarea comenzii de lucru.</translation>
-		</message>
-		<message>
-			<source>Error</source>
-			<translation>Eroare</translation>
 		</message>
 		<message>
 			<source>Error assigning team: {0}</source>
@@ -640,10 +1036,6 @@
 		<message>
 			<source>Error creating dynamic dialog: {0}</source>
 			<translation>Error creating dynamic dialog: {0}</translation>
-		</message>
-		<message>
-			<source>Error creating or updating team</source>
-			<translation>Error creating or updating team</translation>
 		</message>
 		<message>
 			<source>Error removing team assignment: {0}</source>
@@ -674,12 +1066,12 @@
 			<translation>Failed to load team creation dialog configuration. Please check database configuration.</translation>
 		</message>
 		<message>
-			<source>Failed to load workorder form.</source>
-			<translation>Failed to load workorder form.</translation>
+			<source>Draw Profile</source>
+			<translation>Draw Profile</translation>
 		</message>
 		<message>
-			<source>Failed to save campaign</source>
-			<translation>Failed to save campaign</translation>
+			<source>Failed to load workorder form.</source>
+			<translation>Failed to load workorder form.</translation>
 		</message>
 		<message>
 			<source>Info</source>
@@ -690,10 +1082,6 @@
 			<translation>Invalid campaign ID.</translation>
 		</message>
 		<message>
-			<source>Invalid campaign mode</source>
-			<translation>Invalid campaign mode</translation>
-		</message>
-		<message>
 			<source>Invalid lot ID.</source>
 			<translation>Invalid lot ID.</translation>
 		</message>
@@ -702,24 +1090,12 @@
 			<translation>Invalid workorder ID.</translation>
 		</message>
 		<message>
-			<source>Missing Data</source>
-			<translation>Date lipsă</translation>
-		</message>
-		<message>
 			<source>Missing required fields</source>
 			<translation>Missing required fields</translation>
 		</message>
 		<message>
-			<source>No campaign selected.</source>
-			<translation>No campaign selected.</translation>
-		</message>
-		<message>
 			<source>No records selected</source>
 			<translation>No records selected</translation>
-		</message>
-		<message>
-			<source>Planned end date</source>
-			<translation>Data finală planificată</translation>
 		</message>
 		<message>
 			<source>Planned start date</source>
@@ -754,10 +1130,6 @@
 			<translation>Please select a workorder to open.</translation>
 		</message>
 		<message>
-			<source>Real end date</source>
-			<translation>Real end date</translation>
-		</message>
-		<message>
 			<source>Real start date</source>
 			<translation>Real start date</translation>
 		</message>
@@ -774,20 +1146,12 @@
 			<translation>Select a lot to delete.</translation>
 		</message>
 		<message>
-			<source>Select a workorder to delete.</source>
-			<translation>Select a workorder to delete.</translation>
-		</message>
-		<message>
 			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
 			<translation>Some mandatory fields are missing. Please fill the required fields (marked in red).</translation>
 		</message>
 		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
 			<translation>Some mandatory values are missing. Please check the widgets marked in red.</translation>
-		</message>
-		<message>
-			<source>Start date</source>
-			<translation>Data de începere</translation>
 		</message>
 		<message>
 			<source>Successfully assigned team '{0}' to {1} user(s).</source>
@@ -806,36 +1170,16 @@
 			<translation>This will also delete the database user(s):</translation>
 		</message>
 		<message>
-			<source></source>
-			<translation></translation>
-		</message>
-		<message>
 			<source> </source>
 			<translation> </translation>
-		</message>
-		<message>
-			<source>}</source>
-			<translation>}</translation>
-		</message>
-		<message>
-			<source>{0}</source>
-			<translation>{0}</translation>
 		</message>
 		<message>
 			<source>{0} --> {1}</source>
 			<translation>{0} --> {1}</translation>
 		</message>
 		<message>
-			<source>{0}: {1}</source>
-			<translation>{0}: {1}</translation>
-		</message>
-		<message>
 			<source>{0} --> {1} --> {2}</source>
 			<translation>{0} --> {1} --> {2}</translation>
-		</message>
-		<message>
-			<source>{0} ({1}) - {2} - Updating {3}...</source>
-			<translation>{0} ({1}) - {2} - Actualizarea {3}...</translation>
 		</message>
 		<message>
 			<source>{0}: {1} Python function: tools_gw.set_widgets. WHERE columname='{2}' AND widgetname='{3}' AND widgettype='{4}'</source>
@@ -848,10 +1192,6 @@
 		<message>
 			<source>{0}: {1}. widgetname='{2}' AND widgettype='{3}'</source>
 			<translation>{0}: {1}. widgetname='{2}' AND widgettype='{3}'</translation>
-		</message>
-		<message>
-			<source>{0} campaign(s) deleted.</source>
-			<translation>{0} campanie(e) ștearsă(e).</translation>
 		</message>
 		<message>
 			<source>{0}: Config file is not set</source>
@@ -894,16 +1234,8 @@
 			<translation>{0} id:</translation>
 		</message>
 		<message>
-			<source>{0} is not a table name or {1}</source>
-			<translation>{0} nu este un nume de tabel sau {1}</translation>
-		</message>
-		<message>
 			<source>{0} is not defined in table cat_feature</source>
 			<translation>{0} nu este definit în tabelul cat_feature</translation>
-		</message>
-		<message>
-			<source>{0} lot(s) deleted.</source>
-			<translation>{0} lot(uri) șters(e).</translation>
 		</message>
 		<message>
 			<source>{0}: project type '{1}' not supported</source>
@@ -930,32 +1262,12 @@
 			<translation>{0} ordin(uri) de lucru șters(e).</translation>
 		</message>
 		<message>
-			<source>{1}</source>
-			<translation>{1}</translation>
-		</message>
-		<message>
-			<source>{2}</source>
-			<translation>{2}</translation>
-		</message>
-		<message>
 			<source>Action has no function!!</source>
 			<translation>Acțiunea nu are nici o funcție!!</translation>
 		</message>
 		<message>
-			<source>Activate water netowrk snapshot</source>
-			<translation>Activați instantaneul rețelei de apă</translation>
-		</message>
-		<message>
-			<source>Add document</source>
-			<translation>Adăugați documentul</translation>
-		</message>
-		<message>
 			<source>Added elevation data from raster to all nodes</source>
 			<translation>Adăugarea datelor de elevație din raster la toate nodurile</translation>
-		</message>
-		<message>
-			<source>Added grade attributes to all edges</source>
-			<translation>Atribute de grad adăugate la toate marginile</translation>
 		</message>
 		<message>
 			<source>Added length attributes to graph edges</source>
@@ -974,10 +1286,6 @@
 			<translation>Adăugați traducător</translation>
 		</message>
 		<message>
-			<source>Add translator ({0})</source>
-			<translation>Adăugați traducător ({0})</translation>
-		</message>
-		<message>
 			<source>A diameter value is considered invalid if it is zero, negative, NULL or greater than the maximum diameter in the configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
 			<translation>O valoare a diametrului este considerată invalidă dacă este zero, negativă, NULL sau mai mare decât diametrul maxim din tabelul de configurare. Ca urmare, acestor conducte NU li se va atribui o valoare de prioritate.</translation>
 		</message>
@@ -988,14 +1296,6 @@
 		<message>
 			<source>Adress configuration. Field not found</source>
 			<translation>Configurarea adresei. Câmpul nu a fost găsit</translation>
-		</message>
-		<message>
-			<source>Advanced Menu</source>
-			<translation>Meniu avansat</translation>
-		</message>
-		<message>
-			<source>Alert</source>
-			<translation>Alertă</translation>
 		</message>
 		<message>
 			<source>All dialogs updated correctly</source>
@@ -1018,12 +1318,16 @@
 			<translation>Toate valorile din coloana "atlas_id" din tabelul "plan_psector" trebuie să fie INTEGER. Acesta nu este cazul pentru tabelul dvs., vă rugăm să remediați acest lucru înainte de a continua.</translation>
 		</message>
 		<message>
-			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
-			<translation>Un material este considerat invalid dacă nu este listat în tabelul de configurare a materialelor.</translation>
+			<source>Are you sure you want to continue?</source>
+			<translation>Sunteți sigur că doriți să continuați?</translation>
 		</message>
 		<message>
-			<source>ANALYTICS</source>
-			<translation>ANALITICĂ</translation>
+			<source>Import RPT file</source>
+			<translation>Importați fișierul RPT</translation>
+		</message>
+		<message>
+			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
+			<translation>Un material este considerat invalid dacă nu este listat în tabelul de configurare a materialelor.</translation>
 		</message>
 		<message>
 			<source>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
@@ -1038,10 +1342,6 @@
 			<translation>A apărut o eroare în timpul adăugării stilului pentru stratul '{0}':\n{1}</translation>
 		</message>
 		<message>
-			<source>A new style has been added to '{0}' for the layer '{1}' using the 'GwBasic' style information.</source>
-			<translation>Un nou stil a fost adăugat la "{0}" pentru stratul "{1}" folosind informațiile de stil "GwBasic".</translation>
-		</message>
-		<message>
 			<source>A new style has been added to '{0}' for the layer '{1}' using the 'GwBasic' style information.\nYou can change it and use 'Update Style' to create a personalized version.</source>
 			<translation>Un nou stil a fost adăugat la '{0}' pentru stratul '{1}' folosind informațiile stilului 'GwBasic'.\nÎl puteți modifica și folosi 'Actualizare stil' pentru a crea o versiune personalizată.</translation>
 		</message>
@@ -1050,16 +1350,12 @@
 			<translation>Orice conec_id găsit cu acest cod_client</translation>
 		</message>
 		<message>
-			<source>Any document selected</source>
-			<translation>Orice document selectat</translation>
-		</message>
-		<message>
 			<source>Any of the snapped features belong to selected layer</source>
 			<translation>Oricare dintre caracteristicile fixate aparține stratului selectat</translation>
 		</message>
 		<message>
-			<source>Any record found</source>
-			<translation>Orice înregistrare găsită</translation>
+			<source>Are you sure you want to delete {0} campaign(s)?</source>
+			<translation>Sunteți sigur că doriți să ștergeți {0} campanie(e)?</translation>
 		</message>
 		<message>
 			<source>Any record found for current user in table</source>
@@ -1086,14 +1382,6 @@
 			<translation>Stiluri aplicate pentru context</translation>
 		</message>
 		<message>
-			<source>Arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>ARC</source>
-			<translation>ARC</translation>
-		</message>
-		<message>
 			<source>Arc fusion</source>
 			<translation>Fuziunea arcului</translation>
 		</message>
@@ -1118,20 +1406,12 @@
 			<translation>Sunteți sigur că doriți să anulați aceste minutaje?</translation>
 		</message>
 		<message>
-			<source>Are you sure you want to continue?</source>
-			<translation>Sunteți sigur că doriți să continuați?</translation>
-		</message>
-		<message>
-			<source>Are you sure you want to delete {0} campaign(s)?</source>
-			<translation>Sunteți sigur că doriți să ștergeți {0} campanie(e)?</translation>
+			<source>Exception error: {0}</source>
+			<translation>Eroare de excepție: {0}</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} lot(s)?</source>
 			<translation>Sunteți sigur că doriți să ștergeți {0} lot(uri)?</translation>
-		</message>
-		<message>
-			<source>Are you sure you want to delete {0} workorder(s)?</source>
-			<translation>Sunteți sigur că doriți să ștergeți {0} ordin(e) de lucru?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete the selected styles?</source>
@@ -1170,6 +1450,14 @@
 			<translation>Sunteți sigur că doriți să deconectați aceste elemente?</translation>
 		</message>
 		<message>
+			<source>As a result, the material of these pipes will be treated as the configured unknown material, {0}.</source>
+			<translation>Ca urmare, materialul acestor conducte va fi tratat ca materialul necunoscut configurat, {0}.</translation>
+		</message>
+		<message>
+			<source>Error connecting to database (settings)</source>
+			<translation>Eroare de conectare la baza de date (setări)</translation>
+		</message>
+		<message>
 			<source>Are you sure you want to override the configuration of this workspace?</source>
 			<translation>Sunteți sigur că doriți să suprascrieți configurația acestui spațiu de lucru?</translation>
 		</message>
@@ -1206,8 +1494,8 @@
 			<translation>Se va efectua un rollback al schemei.</translation>
 		</message>
 		<message>
-			<source>As a result, the material of these pipes will be treated as the configured unknown material, {0}.</source>
-			<translation>Ca urmare, materialul acestor conducte va fi tratat ca materialul necunoscut configurat, {0}.</translation>
+			<source>Epa2data execution successful.</source>
+			<translation>Execuția Epa2data a avut succes.</translation>
 		</message>
 		<message>
 			<source>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</source>
@@ -1222,28 +1510,12 @@
 			<translation>Există deja un stil pentru stratul "{0}" în grupul de stiluri selectat.</translation>
 		</message>
 		<message>
-			<source>Atlas ID must be an integer.</source>
-			<translation>Atlas ID must be an integer.</translation>
-		</message>
-		<message>
 			<source>    author = {Boeing, Geoff},</source>
 			<translation>    author = {Boeing, Geoff},</translation>
 		</message>
 		<message>
-			<source>AUXILIAR</source>
-			<translation>ASISTENT</translation>
-		</message>
-		<message>
-			<source>BASEMAP</source>
-			<translation>BASEMAP</translation>
-		</message>
-		<message>
 			<source>Begin plotting the graph...</source>
 			<translation>Începeți trasarea graficului...</translation>
-		</message>
-		<message>
-			<source>Begin topologically simplifying the graph...</source>
-			<translation>Începeți simplificarea topologică a grafului...</translation>
 		</message>
 		<message>
 			<source>Boeing, G. (2024). Modeling and Analyzing Urban Networks and Amenities with OSMnx. Working paper. https://geoffboeing.com/publications/osmnx-paper/</source>
@@ -1258,10 +1530,6 @@
 			<translation>Calculați prioritatea</translation>
 		</message>
 		<message>
-			<source>Calculating values</source>
-			<translation>Calcularea valorilor</translation>
-		</message>
-		<message>
 			<source>Campaign ID is missing.</source>
 			<translation>Lipsește ID-ul campaniei.</translation>
 		</message>
@@ -1274,19 +1542,19 @@
 			<translation>Campania a fost salvată cu succes.</translation>
 		</message>
 		<message>
-			<source>Canceling task...</source>
-			<translation>Anularea sarcinii...</translation>
-		</message>
-		<message>
 			<source>Cancel mincuts</source>
 			<translation>Anulează mincuts</translation>
 		</message>
 		<message>
-			<source>Cannot create file</source>
-			<translation>Nu se poate crea un fișier, verificați dacă acesta este deschis</translation>
+			<source>EPA model finished. </source>
+			<translation>Model EPA terminat.</translation>
 		</message>
 		<message>
-			<source>Cannot create file, check if its open</source>
+			<source>Epatools Plugin</source>
+			<translation>Plugin Epatools</translation>
+		</message>
+		<message>
+			<source>Cannot create file</source>
 			<translation>Nu se poate crea un fișier, verificați dacă acesta este deschis</translation>
 		</message>
 		<message>
@@ -1318,12 +1586,16 @@
 			<translation>Nu se poate obține versiunea minoră giswater din registrul Windows</translation>
 		</message>
 		<message>
-			<source>Cannot get Java folder from windows registry</source>
-			<translation>Nu se poate obține folderul Java din registrul Windows</translation>
+			<source>EPSG: {self.project_epsg}</source>
+			<translation>EPSG: {self.project_epsg}</translation>
 		</message>
 		<message>
-			<source>Cannot set inactive a current scenario. Please update current first.</source>
-			<translation>Nu se poate dezactiva un scenariu curent. Vă rugăm să actualizați mai întâi scenariul curent.</translation>
+			<source>Event deleted</source>
+			<translation>Eveniment șters</translation>
+		</message>
+		<message>
+			<source>Cannot get Java folder from windows registry</source>
+			<translation>Nu se poate obține folderul Java din registrul Windows</translation>
 		</message>
 		<message>
 			<source>Cannot set the current {0} scenario of an inactive scenario. Please activate it first.</source>
@@ -1364,6 +1636,10 @@
 		<message>
 			<source>CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\nAre you sure you want to delete these records?</source>
 			<translation>ATENȚIE! Ștergerea unui dscenariu va șterge datele din caracteristicile legate de dscenariu.\nSunteți sigur că doriți să ștergeți aceste înregistrări?</translation>
+		</message>
+		<message>
+			<source>EXCEPTION</source>
+			<translation>EXCEPȚIE</translation>
 		</message>
 		<message>
 			<source>CAUTION! Deleting a netscenario will delete data from features related to the netscenario.</source>
@@ -1438,6 +1714,10 @@
 			<translation>Faceți clic pe nodul deconectat, mutați indicatorul în locația dorită pe conductă pentru a-l rupe</translation>
 		</message>
 		<message>
+			<source>Couldn't find layer to zoom to</source>
+			<translation>Nu am putut găsi stratul la care să măresc</translation>
+		</message>
+		<message>
 			<source>Click on disconnected node, move the pointer to the desired location on pipe to break it</source>
 			<translation>Faceți clic pe nodul deconectat, mutați indicatorul în locația dorită pe conductă pentru a-l rupe</translation>
 		</message>
@@ -1460,6 +1740,10 @@
 		<message>
 			<source>Click on node, that joins two pipes, in order to remove it</source>
 			<translation>Faceți clic pe nodul care unește două conducte, pentru a-l elimina</translation>
+		</message>
+		<message>
+			<source>Exception: {0}.</source>
+			<translation>Excepție: {0}.</translation>
 		</message>
 		<message>
 			<source>Click on node, that joins two pipes, in order to remove it and merge pipes</source>
@@ -1492,10 +1776,6 @@
 		<message>
 			<source>Column name and Label fields are mandatory. Please set correct value.</source>
 			<translation>Câmpurile Nume coloană și Etichetă sunt obligatorii. Vă rugăm să setați valoarea corectă.</translation>
-		</message>
-		<message>
-			<source>Column not found</source>
-			<translation>Coloana nu a fost găsită</translation>
 		</message>
 		<message>
 			<source>_compare failed in ControlBase because </source>
@@ -1538,14 +1818,6 @@
 			<translation>Sarcina ConfigLayerFields este deja activă!</translation>
 		</message>
 		<message>
-			<source>Configuration file couldn't be imported:</source>
-			<translation>Fișierul de configurare nu a putut fi importat:</translation>
-		</message>
-		<message>
-			<source>Configuration file couldn't be imported:\n{0}</source>
-			<translation>Fișierul de configurare nu a putut fi importat:\n{0}</translation>
-		</message>
-		<message>
 			<source>Configuration file not found, please make sure it is located in the correct directory and try again</source>
 			<translation>Fișierul de configurare nu a fost găsit, asigurați-vă că este localizat în directorul corect și încercați din nou</translation>
 		</message>
@@ -1570,10 +1842,6 @@
 			<translation>Conectat la {0}</translation>
 		</message>
 		<message>
-			<source>Connection '{0}' not found in the file '{1}'</source>
-			<translation>Conexiunea "{0}" nu a fost găsită în fișierul "{1}</translation>
-		</message>
-		<message>
 			<source>Connection '{0}' not found in the file '{1}'. Trying in '{2}'...</source>
 			<translation>Conexiunea '{0}' nu a fost găsită în fișierul '{1}'. Încercare în '{2}'...</translation>
 		</message>
@@ -1586,16 +1854,16 @@
 			<translation>Conexiune eșuată. Vă rugăm, verificați parametrii de conectare</translation>
 		</message>
 		<message>
+			<source>Error connecting to i18n dataabse</source>
+			<translation>Eroare de conectare la i18n dataabse</translation>
+		</message>
+		<message>
 			<source>Connect link task is already active!</source>
 			<translation>Sarcina Connect link este deja activă!</translation>
 		</message>
 		<message>
 			<source>Constructed place geometry polygon(s) to query Overpass</source>
 			<translation>Poligon(uri) de geometrie a locului construit(e) pentru interogare Pasaj superior</translation>
-		</message>
-		<message>
-			<source>Context</source>
-			<translation>Context</translation>
 		</message>
 		<message>
 			<source>Converted MultiDiGraph to DiGraph</source>
@@ -1646,24 +1914,16 @@
 			<translation>Nu s-a putut extrage caracteristica din strat</translation>
 		</message>
 		<message>
-			<source>Couldn't add group.</source>
-			<translation>Nu s-a putut adăuga un grup.</translation>
-		</message>
-		<message>
 			<source>Couldn't draw profile. You may need to select another exploitation.</source>
 			<translation>Nu s-a putut desena profilul. Este posibil să trebuiască să selectați o altă exploatare.</translation>
 		</message>
 		<message>
-			<source>Couldn't find layer to zoom to</source>
-			<translation>Nu am putut găsi stratul la care să măresc</translation>
+			<source>Did not save to cache because HTTP status code is not OK</source>
+			<translation>Nu a fost salvat în cache deoarece codul de stare HTTP nu este OK</translation>
 		</message>
 		<message>
 			<source>Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version</source>
 			<translation>Nu s-a putut importa scipy/numpy, deci graficul nu poate fi afișat. Vă rugăm să-l instalați manual sau să încercați cu o altă versiune QGIS</translation>
-		</message>
-		<message>
-			<source>Couldn't import swmm_api package. Try to reload the Giswater plugin. If the issue persists restart QGIS.</source>
-			<translation>Nu s-a putut importa pachetul swmm_api. Încercați să reîncărcați pluginul Giswater. Dacă problema persistă, reporniți QGIS.</translation>
 		</message>
 		<message>
 			<source>Counted undirected street segments incident on each node</source>
@@ -1678,28 +1938,12 @@
 			<translation>Crearea schemei de bază</translation>
 		</message>
 		<message>
-			<source>Created edges GeoDataFrame from graph</source>
-			<translation>Creat margini GeoDataFrame din grafic</translation>
-		</message>
-		<message>
 			<source>Created graph from node/edge GeoDataFrames</source>
 			<translation>Grafic creat din noduri/ muchii GeoDataFrames</translation>
 		</message>
 		<message>
 			<source>Created nodes GeoDataFrame from graph</source>
 			<translation>Noduri create GeoDataFrame din grafic</translation>
-		</message>
-		<message>
-			<source>Create example</source>
-			<translation>Creați un exemplu</translation>
-		</message>
-		<message>
-			<source>Create parent schema</source>
-			<translation>Crearea schemei părinte</translation>
-		</message>
-		<message>
-			<source>Create {project} schema</source>
-			<translation>Crearea schemei {proiect}</translation>
 		</message>
 		<message>
 			<source>Create schema of type '{0}': '{1}'</source>
@@ -1734,6 +1978,14 @@
 			<translation>Legitimațiile vor fi stocate în fișierul proiectului GIS ca text simplu și se vor aplica atât straturilor existente, cât și celor viitoare. Doriți să continuați?</translation>
 		</message>
 		<message>
+			<source>DRAIN plugin not found</source>
+			<translation>Pluginul DRAIN nu a fost găsit</translation>
+		</message>
+		<message>
+			<source>Error connecting to i18n database</source>
+			<translation>Eroare de conectare la baza de date i18n</translation>
+		</message>
+		<message>
 			<source>CSV not generated. Check fields from table or view</source>
 			<translation>CSV nu este generat. Verificarea câmpurilor din tabel sau vizualizare</translation>
 		</message>
@@ -1758,10 +2010,6 @@
 			<translation>Nodul curent nu este situat deasupra unui arc. Vă rugăm, selectați opțiunea "DRAG-DROP</translation>
 		</message>
 		<message>
-			<source>Current node is not located over an arc. Please, select option 'DRAG-DROP'</source>
-			<translation>Nodul curent nu este situat deasupra unui arc. Vă rugăm, selectați opțiunea "DRAG-DROP</translation>
-		</message>
-		<message>
 			<source>Current psector</source>
 			<translation>Sectorul actual</translation>
 		</message>
@@ -1774,10 +2022,6 @@
 			<translation>Utilizatorul curent nu are "plan_psector_current". Valoarea psectorului curent va fi introdusă.</translation>
 		</message>
 		<message>
-			<source>Custom mincut executed successfully</source>
-			<translation>Mincut personalizat executat cu succes</translation>
-		</message>
-		<message>
 			<source>Database connection error: {0}</source>
 			<translation>Eroare de conectare la baza de date: {0}</translation>
 		</message>
@@ -1788,6 +2032,10 @@
 		<message>
 			<source>Database connection error (PgDao). Please open plugin log file to get more details</source>
 			<translation>Eroare de conectare la baza de date (PgDao). Vă rugăm să deschideți fișierul jurnal al pluginului pentru a obține mai multe detalii</translation>
+		</message>
+		<message>
+			<source>Error: '{0}' or '{1}' field is missing in the result.</source>
+			<translation>Eroare: câmpul "{0}" sau "{1}" lipsește din rezultat.</translation>
 		</message>
 		<message>
 			<source>Database connection error. Please check your connection parameters.</source>
@@ -1826,6 +2074,10 @@
 			<translation>Execuția bazei de date a eșuat</translation>
 		</message>
 		<message>
+			<source>Error connecting to database (layer)</source>
+			<translation>Eroare de conectare la baza de date (strat)</translation>
+		</message>
+		<message>
 			<source>Database name contains special characters that are not supported</source>
 			<translation>Numele bazei de date conține caractere speciale care nu sunt acceptate</translation>
 		</message>
@@ -1852,10 +2104,6 @@
 		<message>
 			<source>Data is ok. You can try to generate the INP file</source>
 			<translation>Datele sunt în regulă. Puteți încerca să generați fișierul INP</translation>
-		</message>
-		<message>
-			<source>Data retrieved and displayed successfully.</source>
-			<translation>Datele au fost preluate și afișate cu succes.</translation>
 		</message>
 		<message>
 			<source>Date</source>
@@ -1914,16 +2162,8 @@
 			<translation>Descriere</translation>
 		</message>
 		<message>
-			<source>Detail</source>
-			<translation>Detaliu</translation>
-		</message>
-		<message>
-			<source>Diameter</source>
-			<translation>Diametru</translation>
-		</message>
-		<message>
-			<source>Did not save to cache because HTTP status code is not OK</source>
-			<translation>Nu a fost salvat în cache deoarece codul de stare HTTP nu este OK</translation>
+			<source>EXCEPTION: {0}, {1}</source>
+			<translation>EXCEPȚIE: {0}, {1}</translation>
 		</message>
 		<message>
 			<source>Discarding the `gdf_nodes` 'geometry' column, though its values differ from the coordinates in the 'x' and 'y' columns.</source>
@@ -1939,10 +2179,6 @@
 		</message>
 		<message>
 			<source>Document already exist</source>
-			<translation>Documentul există deja</translation>
-		</message>
-		<message>
-			<source>Document already exists</source>
 			<translation>Documentul există deja</translation>
 		</message>
 		<message>
@@ -1964,10 +2200,6 @@
 		<message>
 			<source>Documents deleted successfully</source>
 			<translation>Documente șterse cu succes</translation>
-		</message>
-		<message>
-			<source>DOWNGRADE NODE</source>
-			<translation>NODUL DOWNGRADE</translation>
 		</message>
 		<message>
 			<source>Do you want change it and continue?</source>
@@ -1994,10 +2226,6 @@
 			<translation>Doriți să introduceți elementele selectate? {0}</translation>
 		</message>
 		<message>
-			<source>Do you want to open GIS project?</source>
-			<translation>Doriți să deschideți proiectul GIS?</translation>
-		</message>
-		<message>
 			<source>Do you want to overwrite custom values?</source>
 			<translation>Doriți să suprascrieți valorile personalizate?</translation>
 		</message>
@@ -2014,24 +2242,12 @@
 			<translation>Doriți să salvați modificările la dscenario</translation>
 		</message>
 		<message>
-			<source>Do you want to set this psector as current?</source>
-			<translation>Doriți să setați acest psector ca fiind curent?</translation>
-		</message>
-		<message>
-			<source>DRAIN plugin not found</source>
-			<translation>Pluginul DRAIN nu a fost găsit</translation>
-		</message>
-		<message>
 			<source>Draw a pipe connected to two nodes</source>
 			<translation>Desenați o conductă conectată la două noduri</translation>
 		</message>
 		<message>
 			<source>Draw a point on the map inside created map zones</source>
 			<translation>Desenați un punct pe hartă în interiorul zonelor de hartă create</translation>
-		</message>
-		<message>
-			<source>Dscenario manager</source>
-			<translation>Dscenario manager</translation>
 		</message>
 		<message>
 			<source>During task '{0}, function {1} returned False</source>
@@ -2082,56 +2298,8 @@
 			<translation>Eroare de codare la citirea fișierului inp</translation>
 		</message>
 		<message>
-			<source>English locale not found</source>
-			<translation>Locala engleză nu a fost găsită</translation>
-		</message>
-		<message>
 			<source>Epa2data execution failed. See logs for more details...</source>
 			<translation>Execuția Epa2data a eșuat. Consultați jurnalele pentru mai multe detalii...</translation>
-		</message>
-		<message>
-			<source>Epa2data execution successful.</source>
-			<translation>Execuția Epa2data a avut succes.</translation>
-		</message>
-		<message>
-			<source>EPA model finished. </source>
-			<translation>Model EPA terminat.</translation>
-		</message>
-		<message>
-			<source>Epatools Plugin</source>
-			<translation>Plugin Epatools</translation>
-		</message>
-		<message>
-			<source>EPSG: {self.project_epsg}</source>
-			<translation>EPSG: {self.project_epsg}</translation>
-		</message>
-		<message>
-			<source>(Error {}) </source>
-			<translation>(Eroare {})</translation>
-		</message>
-		<message>
-			<source>Error</source>
-			<translation>Eroare</translation>
-		</message>
-		<message>
-			<source>Error: '{0}' or '{1}' field is missing in the result.</source>
-			<translation>Eroare: câmpul "{0}" sau "{1}" lipsește din rezultat.</translation>
-		</message>
-		<message>
-			<source>Error connecting to database (layer)</source>
-			<translation>Eroare de conectare la baza de date (strat)</translation>
-		</message>
-		<message>
-			<source>Error connecting to database (settings)</source>
-			<translation>Eroare de conectare la baza de date (setări)</translation>
-		</message>
-		<message>
-			<source>Error connecting to i18n dataabse</source>
-			<translation>Eroare de conectare la i18n dataabse</translation>
-		</message>
-		<message>
-			<source>Error connecting to i18n database</source>
-			<translation>Eroare de conectare la baza de date i18n</translation>
 		</message>
 		<message>
 			<source>Error connecting to origin database</source>
@@ -2170,10 +2338,6 @@
 			<translation>Eroare. Baza de date a returnat null. Verificați funcția postgres "{0}</translation>
 		</message>
 		<message>
-			<source>Error deleting data</source>
-			<translation>Eroare la ștergerea datelor</translation>
-		</message>
-		<message>
 			<source>Error deleting profile</source>
 			<translation>Eroare la ștergerea profilului</translation>
 		</message>
@@ -2188,10 +2352,6 @@
 		<message>
 			<source>Error deleting row: {0} - Query: {1}</source>
 			<translation>Eroare la ștergerea rândului: {0} - Interogare: {1}</translation>
-		</message>
-		<message>
-			<source>Error during point selection: {0}</source>
-			<translation>Eroare în timpul selecției punctului: {0}</translation>
 		</message>
 		<message>
 			<source>Error executing gw_fct_create_dscenario_empty</source>
@@ -2282,10 +2442,6 @@
 			<translation>Eroare lângă linie</translation>
 		</message>
 		<message>
-			<source>Error near line {0} -> {1}</source>
-			<translation>Eroare lângă linia {0} -> {1}</translation>
-		</message>
-		<message>
 			<source>Error on create auto mincut</source>
 			<translation>Error on create auto mincut, you need to review data</translation>
 		</message>
@@ -2338,14 +2494,6 @@
 			<translation>Error setting node</translation>
 		</message>
 		<message>
-			<source>Error translating: {0}</source>
-			<translation>Eroare de traducere: {0}</translation>
-		</message>
-		<message>
-			<source>Error type</source>
-			<translation>Tip eroare</translation>
-		</message>
-		<message>
 			<source>Error updating: {0}.</source>
 			<translation>Eroare de actualizare: {0}.</translation>
 		</message>
@@ -2372,38 +2520,6 @@
 		<message>
 			<source>Error updating messages</source>
 			<translation>Mesaje de actualizare a erorilor</translation>
-		</message>
-		<message>
-			<source>Error updating table</source>
-			<translation>Eroare la actualizarea tabelului</translation>
-		</message>
-		<message>
-			<source>Event deleted</source>
-			<translation>Eveniment șters</translation>
-		</message>
-		<message>
-			<source>EXCEPTION</source>
-			<translation>EXCEPȚIE</translation>
-		</message>
-		<message>
-			<source>Exception: {0}</source>
-			<translation>Excepție: {0}</translation>
-		</message>
-		<message>
-			<source>Exception: {0}.</source>
-			<translation>Excepție: {0}.</translation>
-		</message>
-		<message>
-			<source>EXCEPTION: {0}, {1}</source>
-			<translation>EXCEPȚIE: {0}, {1}</translation>
-		</message>
-		<message>
-			<source>Exception error: {0}</source>
-			<translation>Eroare de excepție: {0}</translation>
-		</message>
-		<message>
-			<source>Exception in {0}</source>
-			<translation>Excepție în {0}</translation>
 		</message>
 		<message>
 			<source>Exception in {0} (executing {1} from {2}): {3}</source>
@@ -2498,10 +2614,6 @@
 			<translation>Eroare de expresie</translation>
 		</message>
 		<message>
-			<source>FAIL {0}</source>
-			<translation>FAIL {0}</translation>
-		</message>
-		<message>
 			<source>Failed to add feature</source>
 			<translation>A eșuat adăugarea caracteristicii</translation>
 		</message>
@@ -2564,10 +2676,6 @@
 		<message>
 			<source>Failed to rename user from '{0}' to '{1}'. The new name might already be in use in the database.</source>
 			<translation>A eșuat redenumirea utilizatorului de la "{0}" la "{1}". Noul nume ar putea fi deja utilizat în baza de date.</translation>
-		</message>
-		<message>
-			<source>Failed to retrieve GeoJSON data.</source>
-			<translation>A eșuat extragerea datelor GeoJSON.</translation>
 		</message>
 		<message>
 			<source>Failed to retrieve graph configuration.</source>
@@ -2718,10 +2826,6 @@
 			<translation>Fișierele definite în variabilele de mediu "{0}" și "{1}" nu sunt găsite.</translation>
 		</message>
 		<message>
-			<source>Fill table</source>
-			<translation>Tabel de umplere</translation>
-		</message>
-		<message>
 			<source>Filter by code</source>
 			<translation>Filtrați după cod</translation>
 		</message>
@@ -2736,6 +2840,10 @@
 		<message>
 			<source>First iteration</source>
 			<translation>Prima iterație</translation>
+		</message>
+		<message>
+			<source>GIS folder not set</source>
+			<translation>Dosarul GIS nu este setat</translation>
 		</message>
 		<message>
 			<source>First node already selected with id: {0}. Select second one.</source>
@@ -2776,10 +2884,6 @@
 		<message>
 			<source>From {0}, updating {1}...</source>
 			<translation>De la {0}, actualizând {1}...</translation>
-		</message>
-		<message>
-			<source>Function {0} error: {1} from last function is invalid</source>
-			<translation>Funcția {0} eroare: {1} din ultima funcție este invalidă</translation>
 		</message>
 		<message>
 			<source>Function {0} error: {1} returned null</source>
@@ -2830,6 +2934,10 @@
 			<translation>Funcția gw_fct_psector_duplicate executată fără rezultat</translation>
 		</message>
 		<message>
+			<source>Process finished.\n\n</source>
+			<translation>Proces terminat.\n\n</translation>
+		</message>
+		<message>
 			<source>Function gw_fct_setfeaturedelete executed with no result </source>
 			<translation>Funcția gw_fct_setfeaturedelete executată fără rezultat</translation>
 		</message>
@@ -2840,10 +2948,6 @@
 		<message>
 			<source>Function not found</source>
 			<translation>Funcția nu a fost găsită</translation>
-		</message>
-		<message>
-			<source>Function not found in database</source>
-			<translation>Funcția nu se găsește în baza de date</translation>
 		</message>
 		<message>
 			<source>Function not found in database: {0}</source>
@@ -2894,6 +2998,10 @@
 			<translation>Geometria a fost adăugată!</translation>
 		</message>
 		<message>
+			<source>Id already selected</source>
+			<translation>Id deja selectat</translation>
+		</message>
+		<message>
 			<source>Geometry must be a shapely Polygon or MultiPolygon.</source>
 			<translation>Geometria trebuie să fie un Poligon sau MultiPolygon cu formă.</translation>
 		</message>
@@ -2940,10 +3048,6 @@
 		<message>
 			<source>GIS file name not set</source>
 			<translation>Numele fișierului GIS nu este setat</translation>
-		</message>
-		<message>
-			<source>GIS folder not set</source>
-			<translation>Dosarul GIS nu este setat</translation>
 		</message>
 		<message>
 			<source>Giswater executable file not found</source>
@@ -3074,10 +3178,6 @@
 			<translation>Proiect IBERGIS importat cu succes</translation>
 		</message>
 		<message>
-			<source>Id already selected</source>
-			<translation>Id deja selectat</translation>
-		</message>
-		<message>
 			<source>Identify all</source>
 			<translation>Identify all</translation>
 		</message>
@@ -3130,10 +3230,6 @@
 			<translation>Importați OSM Streetaxis doar pentru proiectele WS</translation>
 		</message>
 		<message>
-			<source>Import RPT file</source>
-			<translation>Importați fișierul RPT</translation>
-		</message>
-		<message>
 			<source>Import rpt file........: {0}</source>
 			<translation>Import rpt file........: {0}</translation>
 		</message>
@@ -3164,10 +3260,6 @@
 		<message>
 			<source>Information about exception</source>
 			<translation>Informații despre excepție</translation>
-		</message>
-		<message>
-			<source>Initialize plugin</source>
-			<translation>Inițializarea pluginului</translation>
 		</message>
 		<message>
 			<source>In order to create a qgis project you have to create a schema first .</source>
@@ -3254,10 +3346,6 @@
 			<translation>Diametre invalide: {list}.</translation>
 		</message>
 		<message>
-			<source>Invalid lot ID.</source>
-			<translation>ID lot invalid.</translation>
-		</message>
-		<message>
 			<source>Invalid materials: {3}.</source>
 			<translation>Materiale invalide: {3}.</translation>
 		</message>
@@ -3272,6 +3360,14 @@
 		<message>
 			<source>Invalid value for scenario_results in [OPTIONS] section.</source>
 			<translation>Valoare invalidă pentru scenario_results în secțiunea [OPTIONS].</translation>
+		</message>
+		<message>
+			<source>Key on returned json from ddbb is missed</source>
+			<translation>Cheia de pe jsonul returnat de la ddbb este ratată</translation>
+		</message>
+		<message>
+			<source>Python file</source>
+			<translation>Fișier Python</translation>
 		</message>
 		<message>
 			<source>Invalid value for type of priority dialog. Please pass either 'GLOBAL' or 'SELECTION'. Value passed:</source>
@@ -3296,10 +3392,6 @@
 		<message>
 			<source>It will then show the log of the process in the last tab.</source>
 			<translation>Acesta va afișa apoi jurnalul procesului în ultima filă.</translation>
-		</message>
-		<message>
-			<source>IVI</source>
-			<translation>IVI</translation>
 		</message>
 		<message>
 			<source>Java executable file not found</source>
@@ -3334,10 +3426,6 @@
 			<translation>cheia "comboIds" sau/și comboNames nu sunt găsite WHERE widgetname='{0}' AND widgettype='{1}'</translation>
 		</message>
 		<message>
-			<source>Key container</source>
-			<translation>Container cheie</translation>
-		</message>
-		<message>
 			<source>Key not found</source>
 			<translation>Cheia nu a fost găsită</translation>
 		</message>
@@ -3346,8 +3434,8 @@
 			<translation>Cheie necunoscută: "{0}</translation>
 		</message>
 		<message>
-			<source>Key on returned json from ddbb is missed</source>
-			<translation>Cheia de pe jsonul returnat de la ddbb este ratată</translation>
+			<source>MASTERPLAN</source>
+			<translation>MASTERPLAN</translation>
 		</message>
 		<message>
 			<source>Key on returned json from ddbb is missed.</source>
@@ -3356,10 +3444,6 @@
 		<message>
 			<source>Language</source>
 			<translation>Limba</translation>
-		</message>
-		<message>
-			<source>Language: {self.project_language}</source>
-			<translation>Limba: {self.project_language}</translation>
 		</message>
 		<message>
 			<source>Layer {0} does not found, therefore, not configured</source>
@@ -3420,6 +3504,14 @@
 		<message>
 			<source>Leaks assigned to any nearby pipes: {leaks}.</source>
 			<translation>Scurgeri atribuite oricăror conducte din apropiere: {pierderi}.</translation>
+		</message>
+		<message>
+			<source>No current netscenario</source>
+			<translation>No current netscenario</translation>
+		</message>
+		<message>
+			<source>Python function</source>
+			<translation>Funcția Python</translation>
 		</message>
 		<message>
 			<source>Leaks within the indicated period: {leaks}.</source>
@@ -3506,14 +3598,6 @@
 			<translation>Valorile marcate trebuie să fie mai mari decât 0</translation>
 		</message>
 		<message>
-			<source>MASTERPLAN</source>
-			<translation>MASTERPLAN</translation>
-		</message>
-		<message>
-			<source>Material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
 			<source>Matplotlib cannot be installed automatically. Please install Matplotlib manually.</source>
 			<translation>Matplotlib nu poate fi instalat automat. Vă rugăm să instalați Matplotlib manual.</translation>
 		</message>
@@ -3574,6 +3658,14 @@
 			<translation>Mincut realizat, dar are conflicte și se suprapune cu</translation>
 		</message>
 		<message>
+			<source>No current psector selected</source>
+			<translation>Niciun sector curent selectat</translation>
+		</message>
+		<message>
+			<source>Python translation canceled</source>
+			<translation>Traducere Python anulată</translation>
+		</message>
+		<message>
 			<source>Mincut done, but has conflict and overlaps with</source>
 			<translation>Mincut realizat, dar are conflicte și se suprapune cu</translation>
 		</message>
@@ -3620,6 +3712,10 @@
 		<message>
 			<source>More then one event selected. Select just one</source>
 			<translation>Mai mult de un eveniment selectat. Selectați doar unul</translation>
+		</message>
+		<message>
+			<source>Only one record can be selected</source>
+			<translation>Poate fi selectată o singură înregistrare</translation>
 		</message>
 		<message>
 			<source>Move node: Error updating geometry</source>
@@ -3698,14 +3794,6 @@
 			<translation>Nu s-au găsit compozitori.</translation>
 		</message>
 		<message>
-			<source>No current netscenario</source>
-			<translation>No current netscenario</translation>
-		</message>
-		<message>
-			<source>No current psector selected</source>
-			<translation>Niciun sector curent selectat</translation>
-		</message>
-		<message>
 			<source>No data elements in server response. Check query location/filters and log.</source>
 			<translation>Nu există elemente de date în răspunsul serverului. Verificați locația interogării/filtrele și jurnalul.</translation>
 		</message>
@@ -3732,10 +3820,6 @@
 		<message>
 			<source>Node id:</source>
 			<translation>Nod id:</translation>
-		</message>
-		<message>
-			<source>Node psector: {0}</source>
-			<translation>Nod psector: {0}</translation>
 		</message>
 		<message>
 			<source>Node replaced successfully</source>
@@ -3776,10 +3860,6 @@
 		<message>
 			<source>No help file found</source>
 			<translation>Nu a fost găsit niciun fișier de ajutor</translation>
-		</message>
-		<message>
-			<source>No listValues for</source>
-			<translation>Nu există listValues pentru</translation>
 		</message>
 		<message>
 			<source>No matching features. Check query location, tags, and log.</source>
@@ -3862,14 +3942,6 @@
 			<translation>Nu este disponibil niciun context SQL.</translation>
 		</message>
 		<message>
-			<source>Not '{0}'</source>
-			<translation>Nu "{0}</translation>
-		</message>
-		<message>
-			<source>Note: You can force the import by activating the variable '{0}' on the {1} file. </source>
-			<translation>Notă: Puteți forța importul prin activarea variabilei "{0}" pe fișierul {1}.</translation>
-		</message>
-		<message>
 			<source>Not found: {0}</source>
 			<translation>Nu a fost găsit: {0}</translation>
 		</message>
@@ -3888,10 +3960,6 @@
 		<message>
 			<source>No valid snapping result. Please select a valid point.</source>
 			<translation>Niciun rezultat valid. Vă rugăm să selectați un punct valid.</translation>
-		</message>
-		<message>
-			<source>No visit values</source>
-			<translation>Nicio valoare a vizitei</translation>
 		</message>
 		<message>
 			<source>No workcat values</source>
@@ -3938,10 +4006,6 @@
 			<translation>Numai FRELEM poate fi adăugat la dscenario</translation>
 		</message>
 		<message>
-			<source>Only one record can be selected</source>
-			<translation>Poate fi selectată o singură înregistrare</translation>
-		</message>
-		<message>
 			<source>Only rows with values are allowed to be deleted.</source>
 			<translation>Numai rândurile cu valori pot fi șterse.</translation>
 		</message>
@@ -3986,10 +4050,6 @@
 			<translation>Suprascriere</translation>
 		</message>
 		<message>
-			<source>Overwrite file</source>
-			<translation>Suprascrieți fișierul</translation>
-		</message>
-		<message>
 			<source>Overwrite values</source>
 			<translation>Suprascrieți valorile</translation>
 		</message>
@@ -4016,10 +4076,6 @@
 		<message>
 			<source>Parameter functionName is null for check</source>
 			<translation>Parametrul functionName este nul pentru verificare</translation>
-		</message>
-		<message>
-			<source>Parameter not found</source>
-			<translation>Parametrul nu a fost găsit</translation>
 		</message>
 		<message>
 			<source>Parameter not found: {parameter}</source>
@@ -4194,6 +4250,14 @@
 			<translation>Vă rugăm să introduceți un Workcat_id pentru a continua cu acest import.</translation>
 		</message>
 		<message>
+			<source>Please select a default raingage to proceed with this import.</source>
+			<translation>Vă rugăm să selectați un raingaj implicit pentru a continua cu acest import.</translation>
+		</message>
+		<message>
+			<source>Python translation failed</source>
+			<translation>Traducerea Python a eșuat</translation>
+		</message>
+		<message>
 			<source>Please enter the diameter range in this format: [minimum factor]-[maximum factor]. For example, 0.75-1.5</source>
 			<translation>Vă rugăm să introduceți intervalul de diametre în acest format: [factor minim]-[factor maxim]. De exemplu, 0,75-1,5</translation>
 		</message>
@@ -4234,8 +4298,8 @@
 			<translation>Vă rugăm să selectați o categorie pentru actualizare.</translation>
 		</message>
 		<message>
-			<source>Please select a default raingage to proceed with this import.</source>
-			<translation>Vă rugăm să selectați un raingaj implicit pentru a continua cu acest import.</translation>
+			<source>Prob. of Failure</source>
+			<translation>Prob. de eșec</translation>
 		</message>
 		<message>
 			<source>Please, select a diferent project name than current.</source>
@@ -4302,6 +4366,14 @@
 			<translation>Vă rugăm să selectați un singur rezultat înainte de a-i schimba statutul.</translation>
 		</message>
 		<message>
+			<source>Process completed</source>
+			<translation>Proces finalizat</translation>
+		</message>
+		<message>
+			<source>Process finished.</source>
+			<translation>Proces finalizat.</translation>
+		</message>
+		<message>
 			<source>Please select rows to remove from the table</source>
 			<translation>Vă rugăm să selectați rândurile pe care doriți să le eliminați din tabel</translation>
 		</message>
@@ -4358,28 +4430,8 @@
 			<translation>PREȚURI</translation>
 		</message>
 		<message>
-			<source>Print</source>
-			<translation>Imprimare</translation>
-		</message>
-		<message>
 			<source>Priority Calculation (Selection)</source>
 			<translation>Calcularea priorității (selecție)</translation>
-		</message>
-		<message>
-			<source>Prob. of Failure</source>
-			<translation>Prob. de eșec</translation>
-		</message>
-		<message>
-			<source>Process completed</source>
-			<translation>Proces finalizat</translation>
-		</message>
-		<message>
-			<source>Process finished.</source>
-			<translation>Proces finalizat.</translation>
-		</message>
-		<message>
-			<source>Process finished.\n\n</source>
-			<translation>Proces terminat.\n\n</translation>
 		</message>
 		<message>
 			<source>Process finished successfully</source>
@@ -4400,10 +4452,6 @@
 		<message>
 			<source>Processing muni_id {0}</source>
 			<translation>Procesare muni_id {0}</translation>
-		</message>
-		<message>
-			<source>Profile deleted</source>
-			<translation>Profil șters</translation>
 		</message>
 		<message>
 			<source>Profile name is mandatory.</source>
@@ -4464,26 +4512,6 @@
 		<message>
 			<source>Psector values updated successfully</source>
 			<translation>Valori Psector actualizate cu succes</translation>
-		</message>
-		<message>
-			<source>Python file</source>
-			<translation>Fișier Python</translation>
-		</message>
-		<message>
-			<source>Python function</source>
-			<translation>Funcția Python</translation>
-		</message>
-		<message>
-			<source>Python translation canceled</source>
-			<translation>Traducere Python anulată</translation>
-		</message>
-		<message>
-			<source>Python translation failed</source>
-			<translation>Traducerea Python a eșuat</translation>
-		</message>
-		<message>
-			<source>Python translation successful</source>
-			<translation>Traducere Python reușită</translation>
 		</message>
 		<message>
 			<source>QGIS project has more than one {0} layer coming from different schemas. If you are looking to manage two schemas, it is mandatory to define which is the master and which isn't. To do this, you need to configure the QGIS project setting this project's variables: {1} and {2}.</source>
@@ -4598,6 +4626,10 @@
 			<translation>Numele rezultatului este deja utilizat, vă rugăm să alegeți un alt nume.</translation>
 		</message>
 		<message>
+			<source>The file selected is not an INP file</source>
+			<translation>Fișierul selectat nu este un fișier INP</translation>
+		</message>
+		<message>
 			<source>Result name not found. It's not possible to import RPT file into database</source>
 			<translation>Numele rezultatului nu a fost găsit. Nu este posibil să importați fișierul RPT în baza de date</translation>
 		</message>
@@ -4672,6 +4704,10 @@
 		<message>
 			<source>Schema vacuum executed</source>
 			<translation>Schema vacuum executată</translation>
+		</message>
+		<message>
+			<source>`X` and `Y` cannot contain nulls.</source>
+			<translation>`X` și `Y` nu pot conține valori nule.</translation>
 		</message>
 		<message>
 			<source>(Schema version is higher than plugin version, please update plugin)</source>
@@ -4814,10 +4850,6 @@
 			<translation>Selectați o singură vizită</translation>
 		</message>
 		<message>
-			<source>Select one</source>
-			<translation>Selectați una</translation>
-		</message>
-		<message>
 			<source>Selector help</source>
 			<translation>Ajutor selector</translation>
 		</message>
@@ -4886,16 +4918,16 @@
 			<translation>Unele muchii nu au noduri, posibil din cauza unei probleme de tăiere a datelor de intrare.</translation>
 		</message>
 		<message>
-			<source>Some events have documents</source>
-			<translation>Unele evenimente au documente</translation>
-		</message>
-		<message>
 			<source>Some layers of your role not found. Do you want to view them?</source>
 			<translation>Unele straturi ale rolului dvs. nu au fost găsite. Doriți să le vizualizați?</translation>
 		</message>
 		<message>
 			<source>Some mandatory fields are missing. Please fill the required fields (marked in red).</source>
 			<translation>Unele câmpuri obligatorii lipsesc. Vă rugăm să completați câmpurile obligatorii (marcate cu roșu).</translation>
+		</message>
+		<message>
+			<source>Year</source>
+			<translation>Anul</translation>
 		</message>
 		<message>
 			<source>Some mandatory values are missing. Please check the widgets marked in red.</source>
@@ -4908,10 +4940,6 @@
 		<message>
 			<source>Some parameters are missing (Values Defaults used for)</source>
 			<translation>Unii parametri lipsesc (Valori implicite utilizate pentru)</translation>
-		</message>
-		<message>
-			<source>SQL</source>
-			<translation>SQL</translation>
 		</message>
 		<message>
 			<source>SQL Context</source>
@@ -5056,6 +5084,10 @@
 		<message>
 			<source>task_completed</source>
 			<translation>task_completed</translation>
+		</message>
+		<message>
+			<source>The [SCENARIOS] section of the configuration file is empty.</source>
+			<translation>Secțiunea [SCENARIOS] din fișierul de configurare este goală.</translation>
 		</message>
 		<message>
 			<source>Task 'Connect link' execute function '{0}' from '{1}' with parameters: '{2}'</source>
@@ -5214,8 +5246,8 @@
 			<translation>Fișierul selectat nu este un fișier GPKG</translation>
 		</message>
 		<message>
-			<source>The file selected is not an INP file</source>
-			<translation>Fișierul selectat nu este un fișier INP</translation>
+			<source>The schema ({0}) does not exists</source>
+			<translation>Schema ({0}) nu există</translation>
 		</message>
 		<message>
 			<source>The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.</source>
@@ -5354,6 +5386,10 @@
 			<translation>Au existat erori de traducere:</translation>
 		</message>
 		<message>
+			<source>You are about to delete the result</source>
+			<translation>Sunteți pe punctul de a șterge rezultatul</translation>
+		</message>
+		<message>
 			<source>There is an error in the configuration of the pgservice file, please check it or consult your administrator</source>
 			<translation>Există o eroare în configurarea fișierului pgservice, vă rugăm să o verificați sau să consultați administratorul</translation>
 		</message>
@@ -5388,6 +5424,10 @@
 		<message>
 			<source>The result cannot be deleted</source>
 			<translation>Rezultatul nu poate fi șters</translation>
+		</message>
+		<message>
+			<source>Work_id field is empty</source>
+			<translation>Câmpul Work_id este gol</translation>
 		</message>
 		<message>
 			<source>There was an error deleting object.</source>
@@ -5430,6 +5470,10 @@
 			<translation>A fost o eroare la introducerea capacului.</translation>
 		</message>
 		<message>
+			<source>These links could not be located within the network: </source>
+			<translation>Aceste legături nu au putut fi localizate în cadrul rețelei:</translation>
+		</message>
+		<message>
 			<source>There was an error inserting pattern.</source>
 			<translation>A fost o eroare la inserarea modelului.</translation>
 		</message>
@@ -5458,6 +5502,14 @@
 			<translation>Fișierul rpt nu este valid pentru import. Deoarece coloanele din fișierul rpt sunt suprapuse, se pare că trebuie să vă îmbunătățiți simularea. Vă rugăm să verificați și să reparați înainte de a continua. \n{0}</translation>
 		</message>
 		<message>
+			<source>The schema '{0}' is being used in production! It can't be deleted.</source>
+			<translation>Schema "{0}" este utilizată în producție! Aceasta nu poate fi ștearsă.</translation>
+		</message>
+		<message>
+			<source>Triggers updated successfully</source>
+			<translation>Declanșatoare actualizate cu succes</translation>
+		</message>
+		<message>
 			<source>The rpt file is not valid to import. Because columns on rpt file are overlapped, it seems you need to improve your simulation. Please check and fix it before continuing.</source>
 			<translation>Fișierul rpt nu este valid pentru import. Deoarece coloanele din fișierul rpt sunt suprapuse, se pare că trebuie să vă îmbunătățiți simularea. Vă rugăm să verificați și să remediați problema înainte de a continua.</translation>
 		</message>
@@ -5476,18 +5528,6 @@
 		<message>
 			<source>The rpt file is not valid to import. Because velocity has not numeric value (>50), it seems you need to improve your simulation. Please ckeck and fix it before continue. \nNote: You can force the import by activating the variable '{0}' on the {1} file. \n{2}</source>
 			<translation>Fișierul rpt nu este valid pentru import. Deoarece viteza nu are o valoare numerică (>50), se pare că trebuie să vă îmbunătățiți simularea. Vă rugăm să verificați și să rezolvați problema înainte de a continua. \nNota: Puteți forța importul prin activarea variabilei "{0}" în fișierul {1}. \n{2}</translation>
-		</message>
-		<message>
-			<source>The [SCENARIOS] section of the configuration file is empty.</source>
-			<translation>Secțiunea [SCENARIOS] din fișierul de configurare este goală.</translation>
-		</message>
-		<message>
-			<source>The schema ({0}) does not exists</source>
-			<translation>Schema ({0}) nu există</translation>
-		</message>
-		<message>
-			<source>The schema '{0}' is being used in production! It can't be deleted.</source>
-			<translation>Schema "{0}" este utilizată în producție! Aceasta nu poate fi ștearsă.</translation>
 		</message>
 		<message>
 			<source>The schema version has to be updated to make rename</source>
@@ -5530,10 +5570,6 @@
 			<translation>Nodul selectat trebuie să aibă exact două arce legate.</translation>
 		</message>
 		<message>
-			<source>These links could not be located within the network: </source>
-			<translation>Aceste legături nu au putut fi localizate în cadrul rețelei:</translation>
-		</message>
-		<message>
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
 			<translation>Aceste conducte au fost atribuite implicit ca fiind conforme, ceea ce le poate afecta valoarea priorității.</translation>
 		</message>
@@ -5552,6 +5588,10 @@
 		<message>
 			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
 			<translation>Aceste conducte NU au primit o valoare de prioritate, deoarece materialul necunoscut configurat, {unknown_material}, nu este listat în fila de configurare pentru materiale.</translation>
+		</message>
+		<message>
+			<source>Truncated graph by bounding box</source>
+			<translation>Grafic trunchiat prin caseta de delimitare</translation>
 		</message>
 		<message>
 			<source>These pipes received the maximum longevity value for their material.</source>
@@ -5586,8 +5626,8 @@
 			<translation>Anul țintă trebuie să fie între {0} și {1}.</translation>
 		</message>
 		<message>
-			<source>The team name already exists</source>
-			<translation>Numele echipei există deja</translation>
+			<source>Truncated graph by polygon</source>
+			<translation>Grafic trunchiat prin poligon</translation>
 		</message>
 		<message>
 			<source>The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.</source>
@@ -5628,6 +5668,10 @@
 		<message>
 			<source>This arc has redundant data on both (elev  y) values. Review it and use only one.</source>
 			<translation>Acest arc are date redundante privind ambele valori (elev  y). Revizuiți-le și folosiți doar una.</translation>
+		</message>
+		<message>
+			<source>Try again</source>
+			<translation>Încercați din nou</translation>
 		</message>
 		<message>
 			<source>This area is {ratio:,} times your configured Overpass max query area size. It will automatically be divided up into multiple sub-queries accordingly. This may take a long time.</source>
@@ -5754,6 +5798,10 @@
 			<translation>Această sarcină poate dura ceva timp până la finalizare, doriți să continuați?</translation>
 		</message>
 		<message>
+			<source>Typeahead '{0}' doesn't have neither a queryText nor comboIds/comboNames.</source>
+			<translation>Typeahead '{0}' nu are nici queryText, nici comboIds/comboNames.</translation>
+		</message>
+		<message>
 			<source>This tool is still in developement, it might not work as intended.</source>
 			<translation>Acest instrument este încă în curs de dezvoltare, este posibil să nu funcționeze conform destinației.</translation>
 		</message>
@@ -5870,26 +5918,6 @@
 			<translation>Am încercat să setez {0} la '{1}', dar nu este un număr întreg. Implicit 4 fire.</translation>
 		</message>
 		<message>
-			<source>Triggers updated successfully</source>
-			<translation>Declanșatoare actualizate cu succes</translation>
-		</message>
-		<message>
-			<source>Truncated graph by bounding box</source>
-			<translation>Grafic trunchiat prin caseta de delimitare</translation>
-		</message>
-		<message>
-			<source>Truncated graph by polygon</source>
-			<translation>Grafic trunchiat prin poligon</translation>
-		</message>
-		<message>
-			<source>Try again</source>
-			<translation>Încercați din nou</translation>
-		</message>
-		<message>
-			<source>Typeahead '{0}' doesn't have neither a queryText nor comboIds/comboNames.</source>
-			<translation>Typeahead '{0}' nu are nici queryText, nici comboIds/comboNames.</translation>
-		</message>
-		<message>
 			<source>    type = {Working paper},</source>
 			<translation>    tip = {Hârtie de lucru},</translation>
 		</message>
@@ -5920,10 +5948,6 @@
 		<message>
 			<source>Unexpected json_data structure!</source>
 			<translation>Structură neașteptată json_data!</translation>
-		</message>
-		<message>
-			<source>Unhandled Error</source>
-			<translation>Eroare negestionată</translation>
 		</message>
 		<message>
 			<source>Unknown context: {0}, skipping.</source>
@@ -6034,6 +6058,10 @@
 			<translation>AVERTISMENT</translation>
 		</message>
 		<message>
+			<source>widgettype is wrongly configured. Needs to be in </source>
+			<translation>widgettype este configurat greșit. Trebuie să fie în</translation>
+		</message>
+		<message>
 			<source>Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing all strings defined on the config/dev.config file. Be sure your config file is OK before continue</source>
 			<translation>Avertisment: Sunteți sigur că doriți să continuați?. Acest buton va actualiza fișierul șabloanelor plugin qgis înlocuind toate șirurile definite în fișierul config/dev.config. Asigurați-vă că fișierul dvs. de configurare este OK înainte de a continua</translation>
 		</message>
@@ -6056,6 +6084,26 @@
 		<message>
 			<source>WARNING: You have updated the status value to EXECUTED (Save Trace). If you click 'Accept' on  </source>
 			<translation>AVERTISMENT: Ați actualizat valoarea statutului la EXECUTED (Save Trace). Dacă faceți clic pe "Accept" pe</translation>
+		</message>
+		<message>
+			<source>widgettype not found. </source>
+			<translation>widgettype nu a fost găsit.</translation>
+		</message>
+		<message>
+			<source>Without replacements</source>
+			<translation>Fără înlocuiri</translation>
+		</message>
+		<message>
+			<source>With replacements</source>
+			<translation>Cu înlocuitori</translation>
+		</message>
+		<message>
+			<source>Workcat created successfully.</source>
+			<translation>Workcat creat cu succes.</translation>
+		</message>
+		<message>
+			<source>Write inp file........: {0}</source>
+			<translation>Write inp file........: {0}</translation>
 		</message>
 		<message>
 			<source>WARNING: You have updated the status value to EXECUTED (Set OPERATIVE and Save Trace). If you  </source>
@@ -6122,50 +6170,6 @@
 			<translation>Widget-ul nu a fost găsit</translation>
 		</message>
 		<message>
-			<source>widgettype is wrongly configured. Needs to be in </source>
-			<translation>widgettype este configurat greșit. Trebuie să fie în</translation>
-		</message>
-		<message>
-			<source>widgettype not found. </source>
-			<translation>widgettype nu a fost găsit.</translation>
-		</message>
-		<message>
-			<source>Without replacements</source>
-			<translation>Fără înlocuiri</translation>
-		</message>
-		<message>
-			<source>With replacements</source>
-			<translation>Cu înlocuitori</translation>
-		</message>
-		<message>
-			<source>Workcat created successfully.</source>
-			<translation>Workcat creat cu succes.</translation>
-		</message>
-		<message>
-			<source>Work_id field is empty</source>
-			<translation>Câmpul Work_id este gol</translation>
-		</message>
-		<message>
-			<source>Write inp file........: {0}</source>
-			<translation>Write inp file........: {0}</translation>
-		</message>
-		<message>
-			<source>`X` and `Y` cannot contain nulls.</source>
-			<translation>`X` și `Y` nu pot conține valori nule.</translation>
-		</message>
-		<message>
-			<source>Year</source>
-			<translation>Anul</translation>
-		</message>
-		<message>
-			<source>    year = {2024}</source>
-			<translation>    an = {2024}</translation>
-		</message>
-		<message>
-			<source>You are about to delete the result</source>
-			<translation>Sunteți pe punctul de a șterge rezultatul</translation>
-		</message>
-		<message>
 			<source>You are about to delete the result </source>
 			<translation>Sunteți pe punctul de a șterge rezultatul</translation>
 		</message>
@@ -6202,6 +6206,14 @@
 			<translation>Veți pierde informațiile anterioare!</translation>
 		</message>
 		<message>
+			<source>You can change it and use 'Update Style' to create a personalized version.</source>
+			<translation>Puteți să-l modificați și să utilizați "Actualizare stil" pentru a crea o versiune personalizată.</translation>
+		</message>
+		<message>
+			<source>You need to enter a workcat id</source>
+			<translation>Trebuie să introduceți un id workcat</translation>
+		</message>
+		<message>
 			<source>You are going to make this result corporate. From now on the result values will appear on feature form. Do you want to continue?</source>
 			<translation>Veți face acest rezultat corporativ. De acum înainte, valorile rezultatului vor apărea pe formularul feature. Doriți să continuați?</translation>
 		</message>
@@ -6228,10 +6240,6 @@
 		<message>
 			<source>You are trying to enter different types</source>
 			<translation>Încercați să introduceți diferite tipuri</translation>
-		</message>
-		<message>
-			<source>You can change it and use 'Update Style' to create a personalized version.</source>
-			<translation>Puteți să-l modificați și să utilizați "Actualizare stil" pentru a crea o versiune personalizată.</translation>
 		</message>
 		<message>
 			<source>You cannot change the status of a result with status 'FINISHED'.</source>
@@ -6266,6 +6274,10 @@
 			<translation>Ați închis o supapă, acest lucru va modifica zonele actuale ale hărții și poate dura puțin timp.</translation>
 		</message>
 		<message>
+			<source>You need to enter a psector name</source>
+			<translation>Trebuie să introduceți un nume de sector</translation>
+		</message>
+		<message>
 			<source>You closed a valve, this will modify the current mapzones and it may take a little bit of time.</source>
 			<translation>Ați închis o supapă, acest lucru va modifica zonele actuale ale hărții și poate dura puțin timp.</translation>
 		</message>
@@ -6296,6 +6308,10 @@
 		<message>
 			<source>You have selected multiple documents. In this case, name will be a sequential number for all selected documents and your name won't be used.</source>
 			<translation>Ați selectat mai multe documente. În acest caz, numele va fi un număr secvențial pentru toate documentele selectate, iar numele dvs. nu va fi utilizat.</translation>
+		</message>
+		<message>
+			<source>You need to enter a visit ID</source>
+			<translation>Trebuie să introduceți un ID de vizită</translation>
 		</message>
 		<message>
 			<source>You have to fill in 'date'</source>
@@ -6360,18 +6376,6 @@
 		<message>
 			<source>You need to enter a feature id</source>
 			<translation>Trebuie să introduceți un id al caracteristicii</translation>
-		</message>
-		<message>
-			<source>You need to enter a psector name</source>
-			<translation>Trebuie să introduceți un nume de sector</translation>
-		</message>
-		<message>
-			<source>You need to enter a visit ID</source>
-			<translation>Trebuie să introduceți un ID de vizită</translation>
-		</message>
-		<message>
-			<source>You need to enter a workcat id</source>
-			<translation>Trebuie să introduceți un id workcat</translation>
 		</message>
 		<message>
 			<source>You need to enter hydrometer_id</source>
@@ -6489,25 +6493,1245 @@
 
 	<!-- UI TRANSLATION -->
 	<context>
-		<name>nonvisual_manager</name>
+		<name>add_campaign</name>
 		<message>
 			<source>title</source>
-			<translation>Manager de obiecte non-vizuale</translation>
+			<translation>Campanie</translation>
 		</message>
 		<message>
-			<source>inp_lid</source>
-			<translation>Capace</translation>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
-			<source>tooltip_inp_lid</source>
+			<source>tooltip_tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relația dintre elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relația dintre elemente</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>dlg_add_campaign</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_campaign</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>ve_inp_timeseries</source>
-			<translation>serii de timp</translation>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
 		</message>
 		<message>
-			<source>tooltip_ve_inp_timeseries</source>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_inventory</name>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații între elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_review</name>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații între elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_review_old</name>
+		<message>
+			<source>campaign_btn_export_rel</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_export_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>active</source>
+			<translation>Activ:</translation>
+		</message>
+		<message>
+			<source>tooltip_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>action_selector</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_action_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_5</source>
+			<translation>Rotație:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_8</source>
+			<translation>Adresa:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_8</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_7</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_7</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_6</source>
+			<translation>Durata:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_6</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_5</source>
+			<translation>Organizație:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_4</source>
+			<translation>Fi real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_4</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_3</source>
+			<translation>Inici real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Exercițiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_campaign</source>
+			<translation>Campanie:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_path_rel</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_path_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>CampaignTab</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_CampaignTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_flexunion_code_5</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_flexunion_code_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>reviewclass_id</source>
+			<translation>Clasa de revizuire:</translation>
+		</message>
+		<message>
+			<source>tooltip_reviewclass_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>RelationsTab</source>
+			<translation>Relații între elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_RelationsTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_feature_type</source>
+			<translation>Tip element:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_3</source>
+			<translation>Start planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_2</source>
+			<translation>Sfârșit planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_visit</name>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații între elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_campaign_visit_old</name>
+		<message>
+			<source>label</source>
+			<translation>Exercițiu:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_flexunion_code_5</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_flexunion_code_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>active</source>
+			<translation>Activ:</translation>
+		</message>
+		<message>
+			<source>tooltip_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>action_selector</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_action_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_campaign</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_add_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_export_rel</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_export_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_path_rel</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_path_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>CampaignTab</source>
+			<translation>Campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_CampaignTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_campaign</source>
+			<translation>Campanie:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_campaign</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_3</source>
+			<translation>Început real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_4</source>
+			<translation>Sfârșit real:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_4</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_5</source>
+			<translation>Organizație:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_6</source>
+			<translation>Durata:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_6</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_7</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_7</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_8</source>
+			<translation>Adresa:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_8</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_feature_type</source>
+			<translation>Tip de element</translation>
+		</message>
+		<message>
+			<source>tooltip_label_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_2</source>
+			<translation>Sfârșit planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_3</source>
+			<translation>Start planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_node_type_5</source>
+			<translation>Rotație:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_node_type_5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>RelationsTab</source>
+			<translation>Relații între elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_RelationsTab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>visitclass_id</source>
+			<translation>Clasa de vizitare:</translation>
+		</message>
+		<message>
+			<source>tooltip_visitclass_id</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_demand_check</name>
+		<message>
+			<source>title</source>
+			<translation>Verificarea cererii suplimentare</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_config</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_nodes</source>
+			<translation>Utilizați noduri de la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_nodes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_database</source>
+			<translation>Baza de date</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_add_demand_check</source>
+			<translation>Verificarea cererii suplimentare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_demand_check</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_lot</name>
+		<message>
+			<source>title</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>lbl_team</source>
+			<translation>Echipa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_team</source>
+			<translation>Echipa:</translation>
+		</message>
+		<message>
+			<source>LotTab</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_LotTab</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_rel</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_rel</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>lbl_ot_type</source>
+			<translation>Tip Ot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ot_type</source>
+			<translation>Tip Ot:</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>VisitsTab</source>
+			<translation>Vizite</translation>
+		</message>
+		<message>
+			<source>tooltip_VisitsTab</source>
+			<translation>Vizite</translation>
+		</message>
+		<message>
+			<source>add_lot</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_add_lot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_address</source>
+			<translation>Adresa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_address</source>
+			<translation>Adresa:</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrați după id-ul elementului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>Filtrați după id-ul elementului:</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>lbl_observations</source>
+			<translation>Observații:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observations</source>
+			<translation>Observații:</translation>
+		</message>
+		<message>
+			<source>lbl_ot</source>
+			<translation>Ot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ot</source>
+			<translation>Ot:</translation>
+		</message>
+		<message>
+			<source>lbl_performance_type</source>
+			<translation>Tip de performanță:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_performance_type</source>
+			<translation>Tip de performanță:</translation>
+		</message>
+		<message>
+			<source>lbl_plan_end</source>
+			<translation>Sfârșit planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_plan_end</source>
+			<translation>Sfârșit planificat:</translation>
+		</message>
+		<message>
+			<source>lbl_plan_start</source>
+			<translation>Start planificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_plan_start</source>
+			<translation>Start planificat:</translation>
+		</message>
+		<message>
+			<source>lbl_real_end</source>
+			<translation>Sfârșit real:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_real_end</source>
+			<translation>Sfârșit real:</translation>
+		</message>
+		<message>
+			<source>lbl_real_start</source>
+			<translation>Început real:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_real_start</source>
+			<translation>Început real:</translation>
+		</message>
+		<message>
+			<source>RelationsTab</source>
+			<translation>Relații între elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_RelationsTab</source>
+			<translation>Relația dintre elemente</translation>
+		</message>
+		<message>
+			<source>grb_ot</source>
+			<translation>Ordin de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_ot</source>
+			<translation>Ordin de lucru</translation>
+		</message>
+		<message>
+			<source>label_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>label_data_event_to</source>
+			<translation>Până la:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_data_event_to</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>label_feature_type</source>
+			<translation>Tip element:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_feature_type</source>
+			<translation>Tip element:</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_description</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_visit</source>
+			<translation>Ștergeți vizita</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_visit</source>
+			<translation>Ștergeți vizita</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_user</source>
+			<translation>Utilizator:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user</source>
+			<translation>Utilizator:</translation>
+		</message>
+		<message>
+			<source>btn_export_visits</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_visits</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>btn_open_photo</source>
+			<translation>Deschideți fotografia</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_photo</source>
+			<translation>Deschideți fotografia</translation>
+		</message>
+		<message>
+			<source>btn_open_visit</source>
+			<translation>Vizită deschisă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_visit</source>
+			<translation>Vizită deschisă</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_validate_all</source>
+			<translation>Validați toate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_validate_all</source>
+			<translation>Validați toate</translation>
+		</message>
+		<message>
+			<source>dlg_add_lot</source>
+			<translation>Lot</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_lot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_lot</source>
+			<translation>Lot:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_lot</source>
+			<translation>Lot:</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>add_workorder</name>
+		<message>
+			<source>title</source>
+			<translation>Ordin de lucru</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>add_workorder</source>
+			<translation>Ordin de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_add_workorder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_add_workorder</source>
+			<translation>Ordin de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_add_workorder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Ordin de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6516,6 +7740,30 @@
 		<message>
 			<source>title</source>
 			<translation>Giswater</translation>
+		</message>
+		<message>
+			<source>btn_create_audit</source>
+			<translation>Crearea schemei de audit a BD</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_audit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_connection</source>
+			<translation>Numele conexiunii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_custom_select_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_custom_select_file</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>action_create_sample</source>
@@ -6566,14 +7814,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_create_audit</source>
-			<translation>Crearea schemei de audit a BD</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_audit</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_create_cm</source>
 			<translation>Crearea schemei DB cm</translation>
 		</message>
@@ -6611,14 +7851,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_custom_load_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_custom_select_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_custom_select_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6886,14 +8118,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_connection</source>
-			<translation>Numele conexiunii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connection</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_name</source>
 			<translation>Nume:</translation>
 		</message>
@@ -6957,35 +8181,11 @@
 			<translation>Dialog</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_open</source>
 			<translation>Deschis</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_admin_addfields</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_admin_addfields</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7010,6 +8210,62 @@
 		</message>
 		<message>
 			<source>tooltip_grb_mandatory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_field_name</source>
+			<translation>Numele câmpului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_field_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editable</source>
+			<translation>Editabil:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editable</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enabled</source>
+			<translation>Activat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enabled</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_field_length</source>
+			<translation>Lungimea câmpului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_field_length</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_admin_addfields</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_admin_addfields</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7042,118 +8298,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_columnname</source>
-			<translation>Numele coloanei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_columnname</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_type</source>
-			<translation>Tip de date:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_datatype</source>
-			<translation>Tip de date:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_datatype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dv_orderby</source>
-			<translation>Comanda după id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dv_orderby</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dv_querynullvalue</source>
-			<translation>Interogare valoare nulă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dv_querynullvalue</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dv_querytext</source>
-			<translation>Text de interogare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dv_querytext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_editability</source>
-			<translation>Editabilitate:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_editability</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_editable</source>
-			<translation>Editabil:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_editable</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enabled</source>
-			<translation>Activat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enabled</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_field_length</source>
-			<translation>Lungimea câmpului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_field_length</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_field_name</source>
-			<translation>Numele câmpului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_field_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_form_type</source>
-			<translation>Tip de formular:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_form_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_formtype</source>
-			<translation>Tip de formular:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_formtype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_hidden</source>
-			<translation>Ascunse:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_hidden</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7194,14 +8338,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_linkedobject</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mandatory</source>
-			<translation>Obligatoriu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mandatory</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7269,6 +8405,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_data_type</source>
+			<translation>Tip de date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_query_text</source>
 			<translation>Text de interogare:</translation>
 		</message>
@@ -7290,6 +8434,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_stylesheet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mandatory</source>
+			<translation>Obligatoriu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mandatory</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7333,14 +8485,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_widgettype</source>
-			<translation>Tip widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgettype</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>stylesheet</source>
 			<translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
 		</message>
@@ -7373,11 +8517,91 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_widgettype</source>
+			<translation>Tip widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgettype</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_update</source>
 			<translation>Actualizare</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hidden</source>
+			<translation>Ascunse:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hidden</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_formtype</source>
+			<translation>Tip de formular:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_formtype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_form_type</source>
+			<translation>Tip de formular:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_form_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_columnname</source>
+			<translation>Numele coloanei:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_columnname</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_datatype</source>
+			<translation>Tip de date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_datatype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dv_orderby</source>
+			<translation>Comanda după id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dv_orderby</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dv_querynullvalue</source>
+			<translation>Interogare valoare nulă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dv_querynullvalue</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dv_querytext</source>
+			<translation>Text de interogare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dv_querytext</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editability</source>
+			<translation>Editabilitate:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editability</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7388,27 +8612,19 @@
 			<translation>Crearea schemei de bază</translation>
 		</message>
 		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_accept</source>
 			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel_task</source>
-			<translation>Anulează sarcina</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_task</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7428,11 +8644,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
+			<source>btn_cancel_task</source>
+			<translation>Anulează sarcina</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_btn_cancel_task</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7443,36 +8659,20 @@
 			<source>tooltip_lbl_project_name</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>admin_cm_create</name>
 		<message>
 			<source>title</source>
 			<translation>Creați un proiect</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Creați un eșantion</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crearea Dev-ului de probă</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_base_schema</source>
@@ -7499,6 +8699,38 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_pschema_qgis_file</source>
+			<translation>Crearea fișierului pschema qgis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_pschema_qgis_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample</source>
+			<translation>Creați un eșantion</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crearea Dev-ului de probă</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample_Dev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_example</source>
 			<translation>Creați un exemplu</translation>
 		</message>
@@ -7512,14 +8744,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_parent_schema</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_pschema_qgis_file</source>
-			<translation>Crearea fișierului pschema qgis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_pschema_qgis_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7554,14 +8778,6 @@
 			<translation>Credențiale de conectare</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
 			<source>dlg_admin_credentials</source>
 			<translation>Credențiale de conectare</translation>
 		</message>
@@ -7570,35 +8786,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_main_credentials</source>
-			<translation>Principalele acreditări</translation>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_credentials</source>
-			<translation>None</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>label</source>
-			<translation>Modul SSL:</translation>
+			<source>lbl_user_name</source>
+			<translation>Nume utilizator:</translation>
 		</message>
 		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_connec</source>
-			<translation>Conexiune:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_connection_message</source>
-			<translation>Nu s-au putut prelua parametrii de conectare pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connection_message</source>
+			<source>tooltip_lbl_user_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7610,11 +8810,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_user_name</source>
-			<translation>Nume utilizator:</translation>
+			<source>lbl_connection_message</source>
+			<translation>Nu s-au putut prelua parametrii de conectare pentru:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_user_name</source>
+			<source>tooltip_lbl_connection_message</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_connec</source>
+			<translation>Conexiune:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Modul SSL:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_credentials</source>
+			<translation>Principalele acreditări</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_credentials</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7625,67 +8849,27 @@
 			<translation>Creați un proiect</translation>
 		</message>
 		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Creați un eșantion</translation>
+			<source>lbl_locale</source>
+			<translation>Locale:</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
+			<source>tooltip_lbl_locale</source>
+			<translation>Limbajul schemei</translation>
 		</message>
 		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crearea Dev-ului de probă</translation>
+			<source>lbl_filter</source>
+			<translation>Filtru SRID:</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
-			<translation>None</translation>
+			<source>tooltip_lbl_filter</source>
+			<translation>Identificator de referință spațială. Sunt permise numai valorile indicate în tabelul de mai jos.</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel_task</source>
-			<translation>Anulează sarcina</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_task</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_push_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_admin_dbproject</source>
-			<translation>Creați un proiect</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_admin_dbproject</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_main_dbproject</source>
-			<translation>Creați un proiect</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_main_dbproject</source>
+			<source>tooltip_lbl_descript</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7697,60 +8881,60 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
+			<source>dlg_main_dbproject</source>
+			<translation>Creați un proiect</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_dlg_main_dbproject</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_filter</source>
-			<translation>Filtru SRID:</translation>
+			<source>btn_cancel_task</source>
+			<translation>Anulează sarcina</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>Identificator de referință spațială. Sunt permise numai valorile indicate în tabelul de mai jos.</translation>
-		</message>
-		<message>
-			<source>lbl_locale</source>
-			<translation>Locale:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_locale</source>
-			<translation>Limbajul schemei</translation>
-		</message>
-		<message>
-			<source>lbl_project_name</source>
-			<translation>Numele proiectului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_name</source>
-			<translation>Numele unei scheme noi. Numele trebuie să fie scris cu litere mici, folosind numai literele alfabetului englez și fără spații sau liniuțe</translation>
-		</message>
-		<message>
-			<source>lbl_project_type</source>
-			<translation>Tip proiect:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_type</source>
+			<source>tooltip_btn_cancel_task</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_source</source>
-			<translation>Sursa datelor:</translation>
+			<source>dlg_admin_dbproject</source>
+			<translation>Creați un proiect</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_source</source>
+			<source>tooltip_dlg_admin_dbproject</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>rdb_empty</source>
-			<translation>Date goale</translation>
+			<source>actionCreate_Sample</source>
+			<translation>Creați un eșantion</translation>
 		</message>
 		<message>
-			<source>tooltip_rdb_empty</source>
+			<source>tooltip_actionCreate_Sample</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>rdb_inp</source>
@@ -7758,6 +8942,22 @@
 		</message>
 		<message>
 			<source>tooltip_rdb_inp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crearea Dev-ului de probă</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample_Dev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_sample_inv</source>
+			<translation>Exemplu de inventar</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_sample_inv</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7769,12 +8969,36 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>rdb_sample_inv</source>
-			<translation>Exemplu de inventar</translation>
+			<source>rdb_empty</source>
+			<translation>Date goale</translation>
 		</message>
 		<message>
-			<source>tooltip_rdb_sample_inv</source>
+			<source>tooltip_rdb_empty</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_source</source>
+			<translation>Sursa datelor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_source</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_type</source>
+			<translation>Tip proiect:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_name</source>
+			<translation>Numele proiectului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_name</source>
+			<translation>Numele unei scheme noi. Numele trebuie să fie scris cu litere mici, folosind numai literele alfabetului englez și fără spații sau liniuțe</translation>
 		</message>
 	</context>
 	<context>
@@ -7782,6 +9006,46 @@
 		<message>
 			<source>title</source>
 			<translation>Crearea proiectului GIS</translation>
+		</message>
+		<message>
+			<source>txt_roletype</source>
+			<translation>inventar</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_roletype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_gis_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_gis_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_gis_folder</source>
+			<translation>Dosar GIS:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_gis_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_type</source>
+			<translation>Tip proiect:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_role</source>
+			<translation>Tipul rolului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_role</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>actionCreate_Sample</source>
@@ -7814,14 +9078,6 @@
 		<message>
 			<source>tooltip_btn_close</source>
 			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_gis_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_gis_folder</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>dlg_admin_gisproject</source>
@@ -7856,43 +9112,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_gis_folder</source>
-			<translation>Dosar GIS:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_gis_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_project_type</source>
-			<translation>Tip proiect:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_role</source>
-			<translation>Tipul rolului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_role</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>statusbar</source>
 			<translation>Crearea Dev-ului de probă</translation>
 		</message>
 		<message>
 			<source>tooltip_statusbar</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_roletype</source>
-			<translation>inventar</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_roletype</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7901,6 +9125,78 @@
 		<message>
 			<source>title</source>
 			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>dlg_admin_i18n_manager</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_admin_i18n_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_search</source>
+			<translation>Căutare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_user</source>
+			<translation>Utilizator:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_port</source>
+			<translation>Port:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_port</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pass</source>
+			<translation>Parolă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pass</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_host</source>
+			<translation>Invitat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_host</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_database</source>
+			<translation>Baza de date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grp_search_options</source>
+			<translation>Opțiuni de căutare</translation>
+		</message>
+		<message>
+			<source>tooltip_grp_search_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_i18n_conn</source>
+			<translation>Conecția i18n</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_i18n_conn</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -7916,14 +9212,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_connection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_search</source>
-			<translation>Căutare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_search</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7982,70 +9270,6 @@
 			<source>tooltip_chk_py_messages</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>dlg_admin_i18n_manager</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_admin_i18n_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_i18n_conn</source>
-			<translation>Conecția i18n</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_i18n_conn</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grp_search_options</source>
-			<translation>Opțiuni de căutare</translation>
-		</message>
-		<message>
-			<source>tooltip_grp_search_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_database</source>
-			<translation>Baza de date:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_database</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_host</source>
-			<translation>Invitat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_host</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pass</source>
-			<translation>Parolă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_port</source>
-			<translation>Port:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_port</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_user</source>
-			<translation>Utilizator:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_importinp</name>
@@ -8097,27 +9321,19 @@
 			<translation>Dialog</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Executare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_admin_import_osm</source>
 			<translation>Dialog</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_admin_import_osm</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_log</source>
+			<translation>Jurnale</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_log</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8129,11 +9345,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_log</source>
-			<translation>Jurnale</translation>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_log</source>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Executare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -8144,6 +9368,14 @@
 			<translation>Dialog</translation>
 		</message>
 		<message>
+			<source>lbl_schema_update</source>
+			<translation>Numele schemei:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_schema_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Închidere</translation>
 		</message>
@@ -8152,11 +9384,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_generate</source>
-			<translation>Generați</translation>
+			<source>lb_path</source>
+			<translation>Calea fișierului:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_generate</source>
+			<source>tooltip_lb_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8176,27 +9408,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_schema_update</source>
-			<translation>Numele schemei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_schema_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lb_path</source>
-			<translation>Calea fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lb_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>pushButton_2</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_pushButton_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_generate</source>
+			<translation>Generați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_generate</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -8205,6 +9429,14 @@
 		<message>
 			<source>title</source>
 			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>lb_path</source>
+			<translation>Calea fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lb_path</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -8278,14 +9510,6 @@
 			<source>tooltip_lbl_schema_update</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lb_path</source>
-			<translation>Calea fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lb_path</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_projectinfo</name>
@@ -8294,19 +9518,11 @@
 			<translation>Actualizare SQL</translation>
 		</message>
 		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Creați un eșantion</translation>
+			<source>btn_update</source>
+			<translation>Actualizare</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crearea Dev-ului de probă</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
+			<source>tooltip_btn_update</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8318,11 +9534,11 @@
 			<translation>Închidere</translation>
 		</message>
 		<message>
-			<source>btn_update</source>
-			<translation>Actualizare</translation>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crearea Dev-ului de probă</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_update</source>
+			<source>tooltip_actionCreate_Sample_Dev</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8334,27 +9550,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_main_projectinfo</source>
-			<translation>Actualizare SQL</translation>
+			<source>actionCreate_Sample</source>
+			<translation>Creați un eșantion</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_projectinfo</source>
+			<source>tooltip_actionCreate_Sample</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_info</source>
-			<translation>Informații despre noile actualizări</translation>
+			<source>tab_main</source>
+			<translation>Principală</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>statusbar</source>
-			<translation>Crearea Dev-ului de probă</translation>
-		</message>
-		<message>
-			<source>tooltip_statusbar</source>
+			<source>tooltip_tab_main</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8366,38 +9574,46 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_main</source>
-			<translation>Principală</translation>
+			<source>statusbar</source>
+			<translation>Crearea Dev-ului de probă</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_main</source>
+			<source>tooltip_statusbar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Informații despre noile actualizări</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_projectinfo</source>
+			<translation>Actualizare SQL</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_projectinfo</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
 		<name>admin_qtdialog</name>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
 			<source>btn_path</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Calea UI:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8409,6 +9625,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
 			<source>lbl_formname</source>
 			<translation>Numele formularului:</translation>
 		</message>
@@ -8417,12 +9641,12 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_path</source>
-			<translation>Calea UI:</translation>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_path</source>
-			<translation>None</translation>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
 		</message>
 	</context>
 	<context>
@@ -8430,30 +9654,6 @@
 		<message>
 			<source>title</source>
 			<translation>Redenumire</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample</source>
-			<translation>Creați un eșantion</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCreate_Sample_Dev</source>
-			<translation>Crearea Dev-ului de probă</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCreate_Sample_Dev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -8464,19 +9664,19 @@
 			<translation>Anulează</translation>
 		</message>
 		<message>
-			<source>dlg_admin_renameproj</source>
-			<translation>Redenumire</translation>
+			<source>actionCreate_Sample_Dev</source>
+			<translation>Crearea Dev-ului de probă</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_admin_renameproj</source>
+			<source>tooltip_actionCreate_Sample_Dev</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_readsq_rename</source>
-			<translation>Redenumiți proiectul</translation>
+			<source>statusbar</source>
+			<translation>Crearea Dev-ului de probă</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_readsq_rename</source>
+			<source>tooltip_statusbar</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8488,16 +9688,112 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>statusbar</source>
-			<translation>Crearea Dev-ului de probă</translation>
+			<source>dlg_readsq_rename</source>
+			<translation>Redenumiți proiectul</translation>
 		</message>
 		<message>
-			<source>tooltip_statusbar</source>
+			<source>tooltip_dlg_readsq_rename</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_admin_renameproj</source>
+			<translation>Redenumire</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_admin_renameproj</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCreate_Sample</source>
+			<translation>Creați un eșantion</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCreate_Sample</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 	</context>
 	<context>
 		<name>admin_sysfields</name>
+		<message>
+			<source>lbl_layout_name</source>
+			<translation>Numele machetei:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_layout_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mandatory</source>
+			<translation>Obligatoriu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mandatory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_placeholder</source>
+			<translation>Placeholder:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_placeholder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_stylesheet</source>
+			<translation>Foaie de stil:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_stylesheet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_tooltip</source>
+			<translation>Tooltip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_tooltip</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_widgetcontrols</source>
+			<translation>Controale widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgetcontrols</source>
+			<translation>Exemple de chei de configurare {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014","filterSign": ">}</translation>
+		</message>
+		<message>
+			<source>tab_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>btn_accept</source>
 			<translation>Acceptați</translation>
@@ -8515,14 +9811,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_open</source>
-			<translation>Deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_main_sysfields</source>
 			<translation>Dialog</translation>
 		</message>
@@ -8531,19 +9819,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_additional_conf</source>
-			<translation>Configurație suplimentară</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_additional_conf</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>grb_basic_conf</source>
 			<translation>Configurație de bază</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_basic_conf</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_additional_conf</source>
+			<translation>Configurație suplimentară</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_additional_conf</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8603,75 +9891,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_layout_name</source>
-			<translation>Numele machetei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_layout_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_layout_order</source>
 			<translation>Ordine de aranjare:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_layout_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mandatory</source>
-			<translation>Obligatoriu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mandatory</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_placeholder</source>
-			<translation>Placeholder:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_placeholder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_stylesheet</source>
-			<translation>Foaie de stil:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_stylesheet</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_tooltip</source>
-			<translation>Tooltip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_tooltip</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_widgetcontrols</source>
-			<translation>Controale widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgetcontrols</source>
-			<translation>Exemple de chei de configurare {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014","filterSign": ">}</translation>
-		</message>
-		<message>
-			<source>tab_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_update</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -8680,6 +9904,14 @@
 		<message>
 			<source>title</source>
 			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>grb_info_connection</source>
+			<translation>Informații de conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info_connection</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -8759,14 +9991,6 @@
 		</message>
 		<message>
 			<source>tooltip_dlg_admin_translation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info_connection</source>
-			<translation>Informații de conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info_connection</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -8853,6 +10077,174 @@
 	<context>
 		<name>admin_ui</name>
 		<message>
+			<source>grb_project_scin</source>
+			<translation>Informații privind schema proiectului</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_project_scin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_schema_manager</source>
+			<translation>Gestionarea schemelor</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_schema_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_general</source>
+			<translation>Generalități</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_general</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_fields_manager</source>
+			<translation>Manager de domenii</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_fields_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_api_manager</source>
+			<translation>Manager de incendiu</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_api_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_advanced</source>
+			<translation>Avansat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_advanced</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_use_constrains</source>
+			<translation>Utilizați constrângeri:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_use_constrains</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_update_all_sch</source>
+			<translation>Actualizați toate:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_update_all_sch</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create_field</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_field</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ui_path</source>
+			<translation>Calea UI:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ui_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ui_form_name</source>
+			<translation>Numele formularului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ui_form_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_system_feature</source>
+			<translation>Numele funcției:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_system_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reload_func_sch</source>
+			<translation>Funcții de reîncărcare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reload_func_sch</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_project_type</source>
+			<translation>Tip proiect:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_type</source>
+			<translation>Tip de proiect giswater</translation>
+		</message>
+		<message>
+			<source>lbl_name</source>
+			<translation>Nume:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_name</source>
+			<translation>Numele schemei bazei de date</translation>
+		</message>
+		<message>
+			<source>lbl_connection</source>
+			<translation>Numele conexiunii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connection</source>
+			<translation>Numele unei conexiuni la baza de date definite în QGIS</translation>
+		</message>
+		<message>
+			<source>lbl_child_feature</source>
+			<translation>Numele funcției:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_child_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_add_fields_feature</source>
+			<translation>Numele funcției:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_add_fields_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_visit</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_visit</source>
+			<translation>Crearea, configurarea sau eliminarea definiției vizitei referitoare la un tip de caracteristică selectat sau pentru toate tipurile de caracteristici definite într-un proiect</translation>
+		</message>
+		<message>
+			<source>tab_schema_manager</source>
+			<translation>Manager de schemă</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_schema_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_schema_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_schema_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Închidere</translation>
 		</message>
@@ -8877,14 +10269,6 @@
 			<translation>Copierea schemei de bază de date selectate</translation>
 		</message>
 		<message>
-			<source>btn_create_field</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_field</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_create_qgis_template</source>
 			<translation>Șabloane QGIS</translation>
 		</message>
@@ -8898,6 +10282,14 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create_view</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_schema_reload</source>
+			<translation>Reîncărcare</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_schema_reload</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9100,180 +10492,20 @@
 			<source>tooltip_grb_manage_ui</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>grb_project_scin</source>
-			<translation>Informații privind schema proiectului</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_project_scin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_schema_manager</source>
-			<translation>Gestionarea schemelor</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_schema_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_schema_reload</source>
-			<translation>Reîncărcare</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_schema_reload</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_schema_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_schema_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_visit</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_visit</source>
-			<translation>Crearea, configurarea sau eliminarea definiției vizitei referitoare la un tip de caracteristică selectat sau pentru toate tipurile de caracteristici definite într-un proiect</translation>
-		</message>
-		<message>
-			<source>lbl_add_fields_feature</source>
-			<translation>Numele funcției:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_add_fields_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_child_feature</source>
-			<translation>Numele funcției:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_child_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_connection</source>
-			<translation>Numele conexiunii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connection</source>
-			<translation>Numele unei conexiuni la baza de date definite în QGIS</translation>
-		</message>
-		<message>
-			<source>lbl_name</source>
-			<translation>Nume:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_name</source>
-			<translation>Numele schemei bazei de date</translation>
-		</message>
-		<message>
-			<source>lbl_project_type</source>
-			<translation>Tip proiect:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_type</source>
-			<translation>Tip de proiect giswater</translation>
-		</message>
-		<message>
-			<source>lbl_reload_func_sch</source>
-			<translation>Funcții de reîncărcare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_reload_func_sch</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_system_feature</source>
-			<translation>Numele funcției:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_system_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ui_form_name</source>
-			<translation>Numele formularului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ui_form_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ui_path</source>
-			<translation>Calea UI:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ui_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_update_all_sch</source>
-			<translation>Actualizați toate:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_update_all_sch</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_use_constrains</source>
-			<translation>Utilizați constrângeri:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_use_constrains</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_advanced</source>
-			<translation>Avansat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_advanced</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_api_manager</source>
-			<translation>Manager de incendiu</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_api_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_fields_manager</source>
-			<translation>Manager de domenii</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_fields_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_general</source>
-			<translation>Generalități</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_general</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_schema_manager</source>
-			<translation>Manager de schemă</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_schema_manager</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_update_translation</name>
 		<message>
 			<source>title</source>
 			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>lbl_user</source>
+			<translation>Utilizator:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -9356,14 +10588,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_language</source>
-			<translation>Limba:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_language</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_pass</source>
 			<translation>Parolă:</translation>
 		</message>
@@ -9396,11 +10620,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_user</source>
-			<translation>Utilizator:</translation>
+			<source>lbl_language</source>
+			<translation>Limba:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_user</source>
+			<source>tooltip_lbl_language</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -9409,14 +10633,6 @@
 		<message>
 			<source>title</source>
 			<translation>Gestionați clasa de vizite</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_class_cancel</source>
@@ -9475,83 +10691,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_main_visitclass</source>
-			<translation>Gestionați clasa de vizite</translation>
+			<source>lbl_viewname</source>
+			<translation>Vezi numele:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_visitclass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Clasa</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Parametru</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_active</source>
-			<translation>Activ:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_class_id</source>
-			<translation>Clasa id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_class_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_class_name</source>
-			<translation>Numele clasei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_class_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descript:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_type</source>
-			<translation>Tip caracteristică:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_multi_event</source>
-			<translation>Eveniment multiplu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_multi_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_multi_feat</source>
-			<translation>Caracteristici multiple:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_multi_feat</source>
+			<source>tooltip_lbl_viewname</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9563,11 +10707,59 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_viewname</source>
-			<translation>Vezi numele:</translation>
+			<source>lbl_multi_feat</source>
+			<translation>Caracteristici multiple:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_viewname</source>
+			<source>tooltip_lbl_multi_feat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_multi_event</source>
+			<translation>Eveniment multiplu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_multi_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_type</source>
+			<translation>Tip caracteristică:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descript:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_class_name</source>
+			<translation>Numele clasei:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_class_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_class_id</source>
+			<translation>Clasa id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_class_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_active</source>
+			<translation>Activ:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_active</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9578,12 +10770,100 @@
 			<source>tooltip_lbl_visit_type</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Parametru</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Clasa</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_visitclass</source>
+			<translation>Gestionați clasa de vizite</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_visitclass</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>admin_visitparam</name>
 		<message>
 			<source>title</source>
 			<translation>Gestionați parametrii vizitei</translation>
+		</message>
+		<message>
+			<source>lbl_form_type</source>
+			<translation>Tip de formular:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_form_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_name</source>
+			<translation>Denumirea parametrului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_type</source>
+			<translation>Tipul parametrului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_query_text</source>
+			<translation>Text de interogare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_query_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_short_descript</source>
+			<translation>Descript pe scurt:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_short_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_widgettype</source>
+			<translation>Tip widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgettype</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_code</source>
+			<translation>Cod:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -9623,14 +10903,6 @@
 		</message>
 		<message>
 			<source>tooltip_grb_params</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation>Cod:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9674,14 +10946,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_form_type</source>
-			<translation>Tip de formular:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_form_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_mandatory</source>
 			<translation>Obligatoriu:</translation>
 		</message>
@@ -9689,112 +10953,130 @@
 			<source>tooltip_lbl_mandatory</source>
 			<translation>None</translation>
 		</message>
+	</context>
+	<context>
+		<name>arc_divide</name>
 		<message>
-			<source>lbl_parameter_name</source>
-			<translation>Denumirea parametrului:</translation>
+			<source>title</source>
+			<translation>Arc de divizare</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_parameter_name</source>
-			<translation>None</translation>
+			<source>dlg_arc_divide</source>
+			<translation>Arc de divizare</translation>
 		</message>
 		<message>
-			<source>lbl_parameter_type</source>
-			<translation>Tipul parametrului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_query_text</source>
-			<translation>Text de interogare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_query_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_short_descript</source>
-			<translation>Descript pe scurt:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_short_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_widgettype</source>
-			<translation>Tip widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgettype</source>
+			<source>tooltip_dlg_arc_divide</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>comp_x_pages</name>
+		<name>arc_fusion</name>
 		<message>
 			<source>title</source>
-			<translation>Imprimarea automată a paginilor compozitorului</translation>
+			<translation>Fuziunea arcului</translation>
 		</message>
 		<message>
-			<source>dlg_comp_x_pages</source>
-			<translation>Imprimarea automată a paginilor compozitorului</translation>
+			<source>btn_accept</source>
+			<translation>OK</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_comp_x_pages</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>main_dbproject</name>
-		<message>
-			<source>title</source>
-			<translation>Creați un proiect</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>dlg_main_dbproject</source>
-			<translation>Principal dbproject:</translation>
+			<source>lbl_enddate</source>
+			<translation>Data de încheiere:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_dbproject</source>
+			<source>tooltip_lbl_enddate</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
+			<source>lbl_new_cat</source>
+			<translation>Catalog nou:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_lbl_new_cat</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>workspace_create</name>
 		<message>
-			<source>title</source>
-			<translation>Creați un nou spațiu de lucru</translation>
+			<source>lbl_nodeaction</source>
+			<translation>Acțiunea nodului:</translation>
 		</message>
 		<message>
-			<source>dlg_workspace_create</source>
-			<translation>Creați un nou spațiu de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workspace_create</source>
+			<source>tooltip_lbl_nodeaction</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>workspace_manager</name>
 		<message>
-			<source>title</source>
-			<translation>Manager de spațiu de lucru</translation>
+			<source>lbl_statetype</source>
+			<translation>Tipul de stat:</translation>
 		</message>
 		<message>
-			<source>dlg_workspace_manager</source>
-			<translation>Manager de spațiu de lucru</translation>
+			<source>tooltip_lbl_statetype</source>
+			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_workspace_manager</source>
+			<source>lbl_workcat_id_end</source>
+			<translation>Workcat id end:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Fuziunea arcului</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_arc_fusion</source>
+			<translation>Fuziunea arcului</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_arc_fusion</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_arc2cat</source>
+			<translation>Catalog Arc 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_arc2cat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_arc1cat</source>
+			<translation>Catalog Arc 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_arc1cat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>enddate</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_enddate</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -9802,7 +11084,71 @@
 		<name>assignation</name>
 		<message>
 			<source>title</source>
-			<translation>Repartizarea repartizării</translation>
+			<translation>Atribuirea scurgerilor</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate_range</source>
+			<translation>Intervalul de date construit (ani):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate_range</source>
+			<translation>Intervalul de date de construcție, în ani înainte și după conducta inițială.</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Filtrați în funcție de data construirii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>Utilizează numai conductele care corespund intervalului de date de construcție al celei inițiale.</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Distanța tampon (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>Distanța de la o scurgere la care conductele sunt selectate pentru a li se atribui scurgerea respectivă.</translation>
+		</message>
+		<message>
+			<source>lbl_cluster_length</source>
+			<translation>Lungimea clusterelor (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cluster_length</source>
+			<translation>Suma maximă a lungimilor conductelor dintr-un grup, în metri.</translation>
+		</message>
+		<message>
+			<source>dlg_assignation</source>
+			<translation>Atribuirea scurgerilor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_assignation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_all_leaks</source>
+			<translation>Utilizați toate scurgerile</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_all_leaks</source>
+			<translation>Calculează scurgerile pe kilometru pe an utilizând toate datele disponibile, indiferent de parametrul "ani pentru calcul".</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
@@ -9917,34 +11263,606 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
+			<source>lbl_leaks</source>
+			<translation>Scurgeri</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_infolog</source>
+			<source>tooltip_lbl_leaks</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Filtrați după material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>Folosește numai țevi din același material ca și cea inițială.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter</source>
+			<translation>Filtrați după diametru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter</source>
+			<translation>Folosește numai țevi care corespund diametrului celei inițiale.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter_range</source>
+			<translation>Gama de diametre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter_range</source>
+			<translation>Gama de diametre bazată pe factorii conductei inițiale.</translation>
+		</message>
+		<message>
+			<source>lbl_years</source>
+			<translation>Ani de calculat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_years</source>
+			<translation>Numărul de ani de date privind scurgerile care trebuie luate în considerare, în funcție de recurență.</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pipes</source>
+			<translation>Țevi</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_max_distance</source>
+			<translation>Distanța maximă (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>Distanța maximă, în metri, dintre conducta inițială și alte conducte incluse în grup.</translation>
+		</message>
+	</context>
+	<context>
+		<name>audit</name>
+		<message>
+			<source>title</source>
+			<translation>Audit</translation>
+		</message>
+		<message>
+			<source>dlg_info_audit</source>
+			<translation>Jurnal</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_audit</source>
+			<translation>Jurnal</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Valori actualizate</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_audit</source>
+			<translation>Audit</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_audit</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>priority</name>
+		<name>audit_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Calcularea priorității</translation>
+			<translation>Manager de audit</translation>
+		</message>
+		<message>
+			<source>dlg_audit_manager</source>
+			<translation>Manager de audit</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_audit_manager</source>
+			<translation>Manager de audit</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Data până la</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>Data până la</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Jurnale</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>Jurnale</translation>
+		</message>
+	</context>
+	<context>
+		<name>auxcircle</name>
+		<message>
+			<source>title</source>
+			<translation>CAD Desenați un cerc</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Aleargă</translation>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>radius</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_radius</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_auxcircle</source>
+			<translation>CAD Desenați un cerc</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_auxcircle</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_delete_prev</source>
+			<translation>Ștergeți cercurile anterioare</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_delete_prev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ins_radius</source>
+			<translation>Raza de inserție:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ins_radius</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>auxpoint</name>
+		<message>
+			<source>title</source>
+			<translation>CAD Punct de adăugare</translation>
+		</message>
+		<message>
+			<source>rb_right</source>
+			<translation>Punct final</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_right</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_disty</source>
+			<translation>Distanța (Y):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_disty</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_distx</source>
+			<translation>Distanța (X):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_distx</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_left</source>
+			<translation>Punct init</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_left</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_auxpoint</source>
+			<translation>CAD Punct de adăugare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_auxpoint</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dist_y</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_dist_y</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dist_x</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_dist_x</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_delete_prev</source>
+			<translation>Ștergeți punctele anterioare</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_delete_prev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+	</context>
+	<context>
+		<name>campaign_management</name>
+		<message>
+			<source>title</source>
+			<translation>Managementul campaniei</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>btn_campaign_selector</source>
+			<translation>Selector de campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_campaign_selector</source>
+			<translation>Selector de campanie</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_btn_delete</source>
+			<translation>Ștergeți campania</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_delete</source>
+			<translation>Ștergeți campania</translation>
+		</message>
+		<message>
+			<source>campaign_btn_open</source>
+			<translation>Campanie deschisă</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_btn_open</source>
+			<translation>Campanie deschisă</translation>
+		</message>
+		<message>
+			<source>campaign_chk_show_nulls</source>
+			<translation>Afișați valorile nule</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_chk_show_nulls</source>
+			<translation>Afișați valorile goale</translation>
+		</message>
+		<message>
+			<source>campaign_management</source>
+			<translation>Managementul campaniei</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_campaign_management</source>
+			<translation>Managementul campaniei</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_campaign_management</source>
+			<translation>Gestionarea campaniilor</translation>
+		</message>
+		<message>
+			<source>lbl_column_filter_dates</source>
+			<translation>Filtrați coloana de date</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_filter_dates</source>
+			<translation>Filtrați coloana de date:</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_to</source>
+			<translation>Până la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_to</source>
+			<translation>Pentru:</translation>
+		</message>
+	</context>
+	<context>
+		<name>check_project</name>
+		<message>
+			<source>title</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>dlg_check_project</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_check_project</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_system_check</source>
+			<translation>Verificarea stării sistemului:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_system_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Jurnalul bazei de date</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_log</source>
+			<translation>Jurnale</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>brb_database_check</source>
+			<translation>Verificarea stării bazei de date:</translation>
+		</message>
+		<message>
+			<source>tooltip_brb_database_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_again</source>
-			<translation>Următorul</translation>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_again</source>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>check_project_cm</name>
+		<message>
+			<source>title</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_system_health_check</source>
+			<translation>Verificarea stării sistemului</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_system_health_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Jurnalul bazei de date</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_log</source>
+			<translation>Jurnale</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_system_check</source>
+			<translation>Verificarea stării sistemului:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_system_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>brb_database_check</source>
+			<translation>Verificarea stării bazei de date:</translation>
+		</message>
+		<message>
+			<source>tooltip_brb_database_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_manage_config</source>
+			<translation>Verificarea configurațiilor de gestionare</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_manage_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_check_project_cm</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_check_project_cm</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_database_health_check</source>
+			<translation>Verificarea stării bazei de date</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_database_health_check</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>common</name>
+		<message>
+			<source>btn_help</source>
+			<translation>Ajutor</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_help</source>
+			<translation>Ajutor</translation>
+		</message>
+	</context>
+	<context>
+		<name>comp_x_pages</name>
+		<message>
+			<source>title</source>
+			<translation>Imprimarea automată a paginilor compozitorului</translation>
+		</message>
+		<message>
+			<source>grb_comp</source>
+			<translation>Lista compozitorilor</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_comp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_sleep</source>
+			<translation>Timpul de somn:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sleep</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_single</source>
+			<translation>Fișier unic:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_single</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_prefix</source>
+			<translation>Fișier prefix:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_prefix</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_folder</source>
+			<translation>Selectați folderul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_comp_x_pages</source>
+			<translation>Imprimarea automată a paginilor compozitorului</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_comp_x_pages</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -9956,67 +11874,332 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_save2file</source>
-			<translation>Salvați rezultatele într-un fișier Excel...</translation>
+			<source>lbl_composers</source>
+			<translation>Selectați compozitorul:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_save2file</source>
+			<source>tooltip_lbl_composers</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>config</name>
+		<message>
+			<source>title</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>grb_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_connec</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_snapping</source>
-			<translation>Selectați caracteristicile pe pânză</translation>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_snapping</source>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_priority</source>
-			<translation>Calcularea priorității</translation>
+			<source>dlg_config</source>
+			<translation>Configurare</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_priority</source>
+			<source>tooltip_dlg_config</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_engine_1</source>
-			<translation>grb_engine_1</translation>
+			<source>grb_addfields</source>
+			<translation>Câmpuri adăugate</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_engine_1</source>
+			<source>tooltip_grb_addfields</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_engine_2</source>
-			<translation>grb_engine_2</translation>
+			<source>grb_admin_om</source>
+			<translation>O&amp;&amp;M</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_engine_2</source>
+			<source>tooltip_grb_admin_om</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_global</source>
-			<translation>Parametrii de calcul</translation>
+			<source>grb_admin_other</source>
+			<translation>Altele</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_global</source>
+			<source>tooltip_grb_admin_other</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_selection</source>
-			<translation>Selectarea caracteristicilor</translation>
+			<source>grb_arc</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_selection</source>
+			<source>tooltip_grb_arc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_budget</source>
-			<translation>Buget anual:</translation>
+			<source>grb_basic</source>
+			<translation>De bază</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_budget</source>
+			<source>tooltip_grb_basic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_category_type</source>
+			<translation>Tip de categorie</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_category_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_epa</source>
+			<translation>Epa</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_epa</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_fluid_type</source>
+			<translation>Tipul de lichid</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_fluid_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_function_type</source>
+			<translation>Tip de funcție</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_function_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_inventory</source>
+			<translation>Inventar</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_inventory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_location_type</source>
+			<translation>Tip locație</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_location_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_masterplan</source>
+			<translation>MasterPlan</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_masterplan</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_om</source>
+			<translation>O&amp;&amp;M</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Altele</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_system</source>
+			<translation>Sistemul</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_system</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_topology</source>
+			<translation>Topologie</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_topology</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_utils</source>
+			<translation>Utilități</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_utils</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_addfields</source>
+			<translation>Câmpuri adăugate</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_addfields</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_admin</source>
+			<translation>Administrator</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_admin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_basic</source>
+			<translation>De bază</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_basic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_featurecat</source>
+			<translation>Featurecat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_featurecat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_mantype</source>
+			<translation>Tipul de om</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_mantype</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>connect_link</name>
+		<message>
+			<source>title</source>
+			<translation>Conectare la rețea</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Configurarea legăturii</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Conexiuni</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_3</source>
+			<translation>Arce</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connect</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_connect_link</source>
+			<translation>Conectare la rețea</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_connect_link</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>create_style_group</name>
+		<message>
+			<source>lbl_cat_id</source>
+			<translation>Categorie ID:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>sys_role</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_sys_role</source>
+			<translation>Rolul care va putea utiliza acest stil</translation>
+		</message>
+		<message>
+			<source>lbl_role</source>
+			<translation>Role:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_role</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10028,178 +12211,149 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_dnom</source>
-			<translation>Diametru:</translation>
+			<source>lbl_cat_name</source>
+			<translation>Numele categoriei:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_dnom</source>
+			<source>tooltip_lbl_cat_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_expl_selection</source>
-			<translation>Funcționare:</translation>
+			<source>btn_add</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_expl_selection</source>
+			<source>tooltip_btn_add</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>descript</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_material</source>
-			<translation>Material:</translation>
+			<source>tooltip_descript</source>
+			<translation>Descriere</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_material</source>
+			<source>feature_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_presszone</source>
-			<translation>Zona de presă:</translation>
+			<source>tooltip_feature_id</source>
+			<translation>Categorie ID</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_presszone</source>
+			<source>idval</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_id</source>
-			<translation>Numele rezultatului:</translation>
+			<source>tooltip_idval</source>
+			<translation>Numele categoriei</translation>
+		</message>
+	</context>
+	<context>
+		<name>crm_trace</name>
+		<message>
+			<source>lbl_inst</source>
+			<translation>Instrucțiuni:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Statutul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_year</source>
-			<translation>Anul de orizont:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_calc</source>
-			<translation>Calculul</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_calc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_catalog</source>
-			<translation>Catalog</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_catalog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Motor</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
+			<source>tooltip_lbl_inst</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>priority_manager</name>
+		<name>csv</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Import CSV</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
+			<source>lbl_ignore_header</source>
+			<translation>Ignorați anteturile:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_lbl_ignore_header</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_corporate</source>
-			<translation>Set Corporate</translation>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_corporate</source>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>btn_file_csv</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_csv</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
+			<source>dlg_csv</source>
+			<translation>Import CSV</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_dlg_csv</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicat</translation>
+			<source>lbl_decimal</source>
+			<translation>Separator zecimal:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_duplicate</source>
+			<source>tooltip_lbl_decimal</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_edit</source>
-			<translation>Editare</translation>
+			<source>lbl_delimiter</source>
+			<translation>Delimitator:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_edit</source>
+			<source>tooltip_lbl_delimiter</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_status</source>
-			<translation>Modificarea statutului</translation>
+			<source>lbl_file</source>
+			<translation>Fișier:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_status</source>
+			<source>tooltip_lbl_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_priority_manager</source>
-			<translation>Dialog</translation>
+			<source>lbl_import_label</source>
+			<translation>Etichetă de import:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_priority_manager</source>
+			<source>tooltip_lbl_import_label</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_expl</source>
-			<translation>Funcționare:</translation>
+			<source>lbl_import_type</source>
+			<translation>Tip de import:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_expl</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrați după: Numele rezultatului</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
+			<source>tooltip_lbl_import_type</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10211,31 +12365,2187 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_status</source>
-			<translation>Statutul:</translation>
+			<source>lbl_set_of_charac</source>
+			<translation>Set de caractere:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_status</source>
+			<source>tooltip_lbl_set_of_charac</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_type</source>
-			<translation>Tip:</translation>
+			<source>rb_comma</source>
+			<translation>,</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_type</source>
+			<source>tooltip_rb_comma</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_dec_comma</source>
+			<translation>,</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_dec_comma</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_dec_period</source>
+			<translation>.</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_dec_period</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_semicolon</source>
+			<translation>;</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_semicolon</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_space</source>
+			<translation>Spațiu</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_space</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_preview</source>
+			<translation>Previzualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_preview</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>result_selector</name>
+		<name>dialog_table</name>
 		<message>
 			<source>title</source>
-			<translation>Selector de rezultate</translation>
+			<translation>Tabel</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
 			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_add_row</source>
+			<translation>Adăugați rând</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_row</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_dialog_table</source>
+			<translation>Tabel</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dialog_table</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dialog_text</name>
+		<message>
+			<source>title</source>
+			<translation>Text</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_dialog_text</source>
+			<translation>Text</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dialog_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+	</context>
+	<context>
+		<name>dimensioning</name>
+		<message>
+			<source>title</source>
+			<translation>Dimensionare</translation>
+		</message>
+		<message>
+			<source>actionEdit</source>
+			<translation>Editare</translation>
+		</message>
+		<message>
+			<source>tooltip_actionEdit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Altele</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>actionSnapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSnapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionOrientation</source>
+			<translation>Orientare</translation>
+		</message>
+		<message>
+			<source>tooltip_actionOrientation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_dimensioning</source>
+			<translation>Dimensionare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dimensioning</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_depth</source>
+			<translation>Măsurători</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_depth</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_symbology</source>
+			<translation>Simbologia cercului</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_symbology</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>bara de instrumente</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>doc</name>
+		<message>
+			<source>title</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>path</source>
+			<translation>cale</translation>
+		</message>
+		<message>
+			<source>tooltip_path</source>
+			<translation>Completați-l cu o cale accesibilă de folder sau de web</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_add_geom</source>
+			<translation>Adăugați geom</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>Adăugați geom</translation>
+		</message>
+		<message>
+			<source>btn_apply</source>
+			<translation>Aplicați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_apply</source>
+			<translation>Aplicați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Introduceți</translation>
+		</message>
+		<message>
+			<source>btn_path_doc</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_path_url</source>
+			<translation>web</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path_url</source>
+			<translation>Deschideți Explorer pentru a permite selectarea căii web. De asemenea, este posibil să lipiți pur și simplu calea în caseta de text Link</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>date</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>_dlg_doc</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip__dlg_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_doc</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Data:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_doc_name</source>
+			<translation>Nume doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_doc_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_doc_type</source>
+			<translation>Tip doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_doc_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Nume doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Link:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observații:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_tab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_doc</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_elem</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elem</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_psector</source>
+			<translation>Psector</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_psector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_rel</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_rel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_visit</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_workcat</source>
+			<translation>Pisica de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_workcat</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>doc_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestionarea documentelor</translation>
+		</message>
+		<message>
+			<source>dlg_doc_manager</source>
+			<translation>Gestionarea documentelor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_doc_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Filtrați după: Numele medicului</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dscenario</name>
+		<message>
+			<source>title</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>dlg_dscenario</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_properties</source>
+			<translation>Proprietăți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_properties</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dscenario_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Dscenario manager</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toolbox</source>
+			<translation>Acțiuni</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toolbox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update_dscenario</source>
+			<translation>Scenariul actual</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>dlg_dscenario_manager</source>
+			<translation>Dscenario manager</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dscenario_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dscenario_name</source>
+			<translation>Filtrare prin: Numele Dscenario</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dscenario_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>     Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>element</name>
+		<message>
+			<source>title</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>Data limită:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl_id</source>
+			<translation>Funcționare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Link:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>lbl_location_type</source>
+			<translation>Tip locație:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_location_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_lock_level</source>
+			<translation>TextLabel</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_lock_level</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_element</source>
+			<translation>Numărul elementului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_elements</source>
+			<translation>Num. element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_elements</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observații:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ownercat_id</source>
+			<translation>Proprietar:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ownercat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotație:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state_type</source>
+			<translation>Tipul de stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_verified</source>
+			<translation>Verificat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_verified</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id</source>
+			<translation>Workcat id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id</source>
+			<translation>Workcat id</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Workcat id end:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>Workcat id sfârșit</translation>
+		</message>
+		<message>
+			<source>rotation</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tab_element</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>undelete</source>
+			<translation>Ștergere</translation>
+		</message>
+		<message>
+			<source>tooltip_undelete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_add_geom</source>
+			<translation>Adăugați geom</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>Adăugați geometrie</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Introduceți</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>dlg_element</source>
+			<translation>Element</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_buildercat_id</source>
+			<translation>Buildercat id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buildercat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Data construirii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_code</source>
+			<translation> Cod:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_comment</source>
+			<translation>Cum vă pot ajuta?</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_comment</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_elementcat_id</source>
+			<translation>Elementcat id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_elementcat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_element_id</source>
+			<translation>Element id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_element_type</source>
+			<translation>Tip_element:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_type</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>element_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestionarea elementelor</translation>
+		</message>
+		<message>
+			<source>dlg_element_manager</source>
+			<translation>Gestionarea elementelor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_element_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>lbl_element_id</source>
+			<translation>Filtrați după: Element id</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_id</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>emitter_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibrarea Emmiter</translation>
+		</message>
+		<message>
+			<source>dlg_emitter_calibration</source>
+			<translation>Calibrarea Emmiter</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_emitter_calibration</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_filename</source>
+			<translation>Numele fișierelor de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_add_demand_check</name>
+		<message>
+			<source>title</source>
+			<translation>Verificarea cererii suplimentare</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_add_demand_check</source>
+			<translation>Verificarea cererii suplimentare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_add_demand_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_nodes</source>
+			<translation>Utilizați noduri de la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_nodes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_config</source>
+			<translation>Fișier de configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_nodes_database</source>
+			<translation>Baza de date</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_nodes_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_emitter_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibrarea emițătorului</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_emitter_calibration</source>
+			<translation>Calibrarea emițătorului</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_emitter_calibration</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_filename</source>
+			<translation>Numele fișierelor de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_quantized_demands</name>
+		<message>
+			<source>title</source>
+			<translation>Cereri cuantificate</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_quantized_demands</source>
+			<translation>Cereri cuantificate</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_quantized_demands</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_recursive_go2epa</name>
+		<message>
+			<source>title</source>
+			<translation>Epa Apeluri multiple</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_recursive_go2epa</source>
+			<translation>Epa Apeluri multiple</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_recursive_go2epa</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_static_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibrare statică</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dscenario</source>
+			<translation>Scenariu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_inp_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save_dscenario</source>
+			<translation>Salvați modificările în dscenario</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save_dscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_static_calibration</source>
+			<translation>Calibrare statică</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_static_calibration</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>epatools_valve_operation_check</name>
+		<message>
+			<source>title</source>
+			<translation>Verificarea funcționării supapei</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_config_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_inp_input_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_push_output_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_epatools_valve_operation_check</source>
+			<translation>Verificarea funcționării supapei</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_epatools_valve_operation_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_scenarios</source>
+			<translation>Utilizați scenarii din:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_scenarios</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_config</source>
+			<translation>Fișier de configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_database</source>
+			<translation>Baza de date</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_database</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>fastprint</name>
+		<message>
+			<source>title</source>
+			<translation>Imprimare</translation>
+		</message>
+		<message>
+			<source>dlg_fastprint</source>
+			<translation>Imprimare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_fastprint</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_map_options</source>
+			<translation>Opțiunile hărții:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_map_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_option_values</source>
+			<translation>Valori opționale:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_option_values</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_preview</source>
+			<translation>Previzualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_print</source>
+			<translation>Imprimare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_print</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_delete</name>
+		<message>
+			<source>title</source>
+			<translation>Ștergeți caracteristica</translation>
+		</message>
+		<message>
+			<source>btn_relations</source>
+			<translation>Afișați relațiile dintre caracteristici</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>dlg_feature_delete</source>
+			<translation>Ștergeți caracteristica</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_id</source>
+			<translation>Caracteristică id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Tip caracteristică:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_del_feature</source>
+			<translation>Ștergeți caracteristica</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_del_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>       Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți caracteristica selectată</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_delete_another</source>
+			<translation>Ștergeți o altă caracteristică</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_another</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_end</name>
+		<message>
+			<source>title</source>
+			<translation>Caracteristică finală</translation>
+		</message>
+		<message>
+			<source>lbl_state_type</source>
+			<translation>Sfârșit de tip stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_date</source>
+			<translation>Data Workcat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Workcat id end:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_elem</source>
+			<translation>Elem</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elem</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_workcat</source>
+			<translation>Pisica de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Introduceți</translation>
+		</message>
+		<message>
+			<source>btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>builtdate</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_end</source>
+			<translation>Caracteristică finală</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>enddate</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_description</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>Data de încheiere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_end_connec</name>
+		<message>
+			<source>title</source>
+			<translation>Lista finală Workcat</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Aceste conexiuni sau rigole vor fi deconectate atunci când arcele selectate sunt șterse</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>dlg_feature_end_connec</source>
+			<translation>Lista finală Workcat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_end_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_by</source>
+			<translation>Filtrați după arc_id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_by</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>feature_replace</name>
+		<message>
+			<source>title</source>
+			<translation>Înlocuiți caracteristica</translation>
+		</message>
+		<message>
+			<source>lbl_new_catalog_id</source>
+			<translation>Id catalog nou:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_catalog_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_keep_epa_values</source>
+			<translation>Păstrați valorile EPA:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_keep_epa_values</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_feature_type</source>
+			<translation>Tip de caracteristică nouă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_replace</source>
+			<translation>Înlocuiți caracteristica</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_replace</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Workcat id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Bine</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -10250,43 +14560,645 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_result_selector</source>
-			<translation>Selector de rezultate</translation>
+			<source>config</source>
+			<translation>Configurare</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_result_selector</source>
+			<source>tooltip_config</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
+			<source>dlg_feature_replace</source>
+			<translation>Înlocuiți caracteristica</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_replace</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>enddate</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_end_parameters</source>
+			<translation>Parametrii finali</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_end_parameters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_feature_parameters</source>
+			<translation>Parametrii caracteristicilor</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_feature_parameters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_catalog_id</source>
+			<translation>Catalog:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_catalog_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_current_catalog_id</source>
+			<translation>ID catalog curent:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_current_catalog_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
 			<translation>Descriere:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_lbl_description</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Descriere:</translation>
+			<source>lbl_enddate</source>
+			<translation>Data înlocuirii:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript_compare</source>
+			<source>tooltip_lbl_enddate</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_compare</source>
-			<translation>Rezultat de comparat:</translation>
+			<source>lbl_feature_type</source>
+			<translation>Tipul curent de caracteristică:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_compare</source>
+			<source>tooltip_lbl_feature_type</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>Rezultat pentru a arăta:</translation>
+			<source>lbl_keep_asset_id</source>
+			<translation>Păstrați id-ul activului:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_lbl_keep_asset_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_keep_elements</source>
+			<translation>Păstrați elementele:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_keep_elements</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>featuretype_change</name>
+		<message>
+			<source>title</source>
+			<translation>Modificarea tipului de caracteristică</translation>
+		</message>
+		<message>
+			<source>dlg_featuretype_change</source>
+			<translation>Modificarea tipului de caracteristică</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_featuretype_change</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_featuretype_change</source>
+			<translation>Modificarea tipului de caracteristică</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_featuretype_change</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa</name>
+		<message>
+			<source>title</source>
+			<translation>Go2Epa</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Opțiuni de preprocesare</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_file_manager</source>
+			<translation>Manager de fișiere</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_file_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_process_options</source>
+			<translation>Opțiuni de preprocesare</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_process_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Manager de fișiere</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_counter</source>
+			<translation>Contor</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_counter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_inp_file</source>
+			<translation>Fișier INP:            </translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_inp_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name</source>
+			<translation>Numele rezultatului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rpt_file</source>
+			<translation>RPT file:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rpt_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_file_manager</source>
+			<translation>Manager de fișiere</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_file_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_file_rpt</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_rpt</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_file_inp</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_inp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_hs_ds</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_hs_ds</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_options</source>
+			<translation>Opțiuni</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_exec</source>
+			<translation>Executarea software-ului APE</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_exec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_export</source>
+			<translation>Export INP</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_export</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_export_subcatch</source>
+			<translation>Export subtraversări UD</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_export_subcatch</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_import_result</source>
+			<translation>Rezultatul importului</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_import_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_only_check</source>
+			<translation>Utilizați geometria rețelei de rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_only_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_recurrent</source>
+			<translation>Utilizați apeluri iterative</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_recurrent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa</source>
+			<translation>Go2Epa</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Manager de rezultate APE</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_manager</source>
+			<translation>Manager de rezultate APE</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_corporate</source>
+			<translation>Toggle corporate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_corporate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_show_inp_data</source>
+			<translation>Afișați datele inp</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_show_inp_data</source>
+			<translation>Afișați datele inp</translation>
+		</message>
+		<message>
+			<source>btn_archive</source>
+			<translation>Schimbă arhiva</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_archive</source>
+			<translation>Schimbă arhiva</translation>
+		</message>
+		<message>
+			<source>lbl_result_id</source>
+			<translation>Filtrați după: Id rezultat</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_edit</source>
+			<translation>Editare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_edit</source>
+			<translation>Editare</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_options</name>
+		<message>
+			<source>title</source>
+			<translation>Go2Epa - opțiuni</translation>
+		</message>
+		<message>
+			<source>grb_reactions</source>
+			<translation>Reacții</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_reactions</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_inp</source>
+			<translation>Inp</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_inp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_options</source>
+			<translation>Go2Epa - opțiuni</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_other</source>
+			<translation>Altele</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_energy</source>
+			<translation>Energie</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_energy</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_general</source>
+			<translation>Generalități</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_general</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_hydraulics</source>
+			<translation>Hidraulică</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_hydraulics</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Altele</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_reports</source>
+			<translation>Rapoarte</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_reports</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_time_steps</source>
+			<translation>Data &amp; pași de timp</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_time_steps</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_result</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de rezultate EPA</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_compare</source>
+			<translation>Numele rezultatului (pentru comparație):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_result</source>
+			<translation>Selector de rezultate EPA</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compare_date</source>
+			<translation>Date de apariție:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compare_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compare_time</source>
+			<translation>Comparați timpul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compare_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_time_to_compare</source>
+			<translation>Timp (pentru comparație):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_time_to_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_time_to_show</source>
+			<translation>Timp (pentru a arăta):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_time_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_datetime</source>
+			<translation>Data și ora</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_datetime</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Rezultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_time</source>
+			<translation>Timp</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_show</source>
+			<translation>Numele rezultatului (de afișat):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_selector_date</source>
+			<translation>Data selectorului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_selector_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_selector_time</source>
+			<translation>Selector de timp:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_selector_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+	</context>
+	<context>
+		<name>go2epa_selector</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de comparare a rezultatelor</translation>
+		</message>
+		<message>
+			<source>tab_time</source>
+			<translation>Data și ora</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_selector</source>
+			<translation>Selector de comparare a rezultatelor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_selector</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10299,14 +15211,22 @@
 		</message>
 	</context>
 	<context>
-		<name>status_selector</name>
+		<name>go2iber</name>
 		<message>
 			<source>title</source>
-			<translation>Selector de stare</translation>
+			<translation>Go2Iber</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>OK</translation>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -10321,35 +15241,75 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_status_selector</source>
-			<translation>Selector de stare</translation>
+			<source>btn_iber_options</source>
+			<translation>Opțiuni Iber</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_status_selector</source>
+			<source>tooltip_btn_iber_options</source>
+			<translation>Opțiuni Iber</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_new_status</source>
-			<translation>Stare nouă:</translation>
+			<source>btn_swmm_options</source>
+			<translation>Opțiuni SWMM</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_new_status</source>
+			<source>tooltip_btn_swmm_options</source>
+			<translation>Opțiuni SWMM</translation>
+		</message>
+		<message>
+			<source>dlg_go2iber</source>
+			<translation>Go2Iber</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2iber</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result</source>
-			<translation>result_id: result_name</translation>
+			<source>groupBox</source>
+			<translation>Opțiuni</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result</source>
+			<source>tooltip_groupBox</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>Modificați starea următorului rezultat:</translation>
+			<source>lbl_mesh</source>
+			<translation>Plasă:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_lbl_mesh</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Calea dosarului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name</source>
+			<translation>Numele rezultatului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -10358,14 +15318,6 @@
 		<message>
 			<source>title</source>
 			<translation>Catalog</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -10383,12 +15335,29 @@
 			<source>tooltip_dlg_info_catalog</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>info_crmvalue</name>
 		<message>
-			<source>title</source>
-			<translation>Hidrometru</translation>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_info_catalog</source>
+			<translation>Catalog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_catalog</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -10398,12 +15367,27 @@
 			<source>tooltip_btn_accept</source>
 			<translation>Acceptați</translation>
 		</message>
+	</context>
+	<context>
+		<name>info_crmvalue</name>
+		<message>
+			<source>title</source>
+			<translation>Hidrometru</translation>
+		</message>
 		<message>
 			<source>btn_close</source>
 			<translation>Închidere</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hydrometer_id</source>
+			<translation>Hydrometer id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hydrometer_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10415,12 +15399,12 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_hydrometer_id</source>
-			<translation>Hydrometer id:</translation>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_hydrometer_id</source>
-			<translation>None</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 	</context>
 	<context>
@@ -10428,6 +15412,38 @@
 		<message>
 			<source>title</source>
 			<translation>Secțiunea</translation>
+		</message>
+		<message>
+			<source>lbl_cost_trench</source>
+			<translation>% Șanțuri:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_trench</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_width</source>
+			<translation>Lățimea costului</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_width</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_section_image</source>
+			<translation>Imagine secțiune</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_section_image</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_y_param</source>
+			<translation>Cost și param</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_y_param</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -10501,44 +15517,20 @@
 			<source>tooltip_lbl_cost_fill</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_cost_trench</source>
-			<translation>% Șanțuri:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_trench</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_width</source>
-			<translation>Lățimea costului</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_width</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_y_param</source>
-			<translation>Cost și param</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_y_param</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_section_image</source>
-			<translation>Imagine secțiune</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_section_image</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>info_epa</name>
 		<message>
 			<source>title</source>
 			<translation>InfoEpa</translation>
+		</message>
+		<message>
+			<source>page_dwf</source>
+			<translation>DWF</translation>
+		</message>
+		<message>
+			<source>tooltip_page_dwf</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -10589,14 +15581,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>page_dwf</source>
-			<translation>DWF</translation>
-		</message>
-		<message>
-			<source>tooltip_page_dwf</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>page_inflows</source>
 			<translation>INFLUXURI</translation>
 		</message>
@@ -10610,6 +15594,14 @@
 		<message>
 			<source>title</source>
 			<translation>Joncțiune</translation>
+		</message>
+		<message>
+			<source>actionCentered</source>
+			<translation>Centrat</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCentered</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>actionAudit</source>
@@ -10628,11 +15620,219 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>actionCentered</source>
-			<translation>Centrat</translation>
+			<source>tab_data</source>
+			<translation>Date</translation>
 		</message>
 		<message>
-			<source>tooltip_actionCentered</source>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_documents</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_documents</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_elements</source>
+			<translation>Elemente</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elements</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_epa</source>
+			<translation>APE</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_epa</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_event</source>
+			<translation>Eveniment</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_features</source>
+			<translation>Caracteristici</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_features</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydrometer</source>
+			<translation>Hidrometru</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydrometer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydrometer_val</source>
+			<translation>Valorile hidrometrului</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydrometer_val</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_link</source>
+			<translation>Link către</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nod</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_om</source>
+			<translation>O&amp;&amp;M</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_orifice</source>
+			<translation>Orificiu</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_orifice</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_outlet</source>
+			<translation>Ieșire</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_outlet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_plan</source>
+			<translation>Plan</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_plan</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_pump</source>
+			<translation>Pompă</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_pump</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tab_rpt</source>
+			<translation>Rpt</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_rpt</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_shortpipe</source>
+			<translation>Țeava scurtă</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_shortpipe</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_valve</source>
+			<translation>Supapă</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_valve</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_visit</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_weir</source>
+			<translation>Weir</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_weir</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>bara de instrumente</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionSetGeom</source>
+			<translation>Set Geom</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSetGeom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionSection</source>
+			<translation>Arată secțiunea</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_gallery</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_gallery</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10729,22 +15929,6 @@
 		</message>
 		<message>
 			<source>tooltip_actionRotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSection</source>
-			<translation>Arată secțiunea</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSetGeom</source>
-			<translation>Set Geom</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSetGeom</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -10873,22 +16057,6 @@
 		</message>
 		<message>
 			<source>tooltip_btn_open_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_visit</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -11083,190 +16251,6 @@
 			<source>tooltip_tab_connections</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Date</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_documents</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_documents</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_elements</source>
-			<translation>Elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elements</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_epa</source>
-			<translation>APE</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_event</source>
-			<translation>Eveniment</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_features</source>
-			<translation>Caracteristici</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_features</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydrometer</source>
-			<translation>Hidrometru</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydrometer_val</source>
-			<translation>Valorile hidrometrului</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydrometer_val</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_om</source>
-			<translation>O&amp;&amp;M</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_orifice</source>
-			<translation>Orificiu</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_orifice</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_outlet</source>
-			<translation>Ieșire</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_outlet</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_plan</source>
-			<translation>Plan</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_plan</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_pump</source>
-			<translation>Pompă</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_pump</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tab_rpt</source>
-			<translation>Rpt</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_rpt</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_shortpipe</source>
-			<translation>Țeava scurtă</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_shortpipe</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_valve</source>
-			<translation>Supapă</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_valve</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_visit</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_weir</source>
-			<translation>Weir</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_weir</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>bara de instrumente</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>info_generic</name>
@@ -11298,12 +16282,148 @@
 			<source>tooltip_dlg_info_generic</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>dlg_info_generic</source>
+			<translation>Informații de bază</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_generic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionEdit</source>
+			<translation>Editare</translation>
+		</message>
+		<message>
+			<source>tooltip_actionEdit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionSetToArc</source>
+			<translation>Setați la arc</translation>
+		</message>
+		<message>
+			<source>tooltip_actionSetToArc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>bara de instrumente</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>info_workcat</name>
 		<message>
 			<source>title</source>
 			<translation>Nou workcat</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_2</source>
+			<translation>Cheie de identificare a muncii 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_id</source>
+			<translation>ID de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Data construirii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_2</source>
+			<translation>Cheia Workid 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>builtdate</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_builtdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Link:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_info_workcat</source>
+			<translation>Nou workcat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_1</source>
+			<translation>Cheia Workid 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_1</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -11361,5678 +16481,20 @@
 			<source>tooltip_lbl_workid_key_1</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_workid_key_2</source>
-			<translation>Cheie de identificare a muncii 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>search</name>
-		<message>
-			<source>title</source>
-			<translation>Căutare</translation>
-		</message>
-		<message>
-			<source>Check all</source>
-			<translation>Verificați toate</translation>
-		</message>
-		<message>
-			<source>tooltip_Check all</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_search</source>
-			<translation>Căutare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_search</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Nu s-au găsit rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>search_workcat</name>
-		<message>
-			<source>title</source>
-			<translation>Căutare Workcat</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_to_csv</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_to_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_state0</source>
-			<translation>Activați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_state0</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_state1</source>
-			<translation>Activați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_state1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_search_workcat</source>
-			<translation>Căutare Workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_search_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_destination_path</source>
-			<translation>Calea de destinație:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_destination_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end</source>
-			<translation>Filtrare după: cod</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_end</source>
-			<translation>Caracteristici eliminate cu pisica de lucru selectată</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_ini</source>
-			<translation>Caracteristici instalate cu workcat-ul selectat</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_ini</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_init</source>
-			<translation>Filtrare după: cod</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_init</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total1</source>
-			<translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total numere:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total2</source>
-			<translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total numere:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_doc</source>
-			<translation>Documente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_ended</source>
-			<translation>Eliminat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_ended</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_init</source>
-			<translation>Instalat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_init</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign</name>
-		<message>
-			<source>title</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>dlg_add_campaign</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relația dintre elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relația dintre elemente</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_inventory</name>
-		<message>
-			<source>add_campaign</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații între elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_review</name>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații între elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_review_old</name>
-		<message>
-			<source>action_selector</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_action_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>active</source>
-			<translation>Activ:</translation>
-		</message>
-		<message>
-			<source>tooltip_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_export_rel</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_export_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_path_rel</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_path_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>CampaignTab</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_CampaignTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_campaign</source>
-			<translation>Campanie:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Exercițiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_3</source>
-			<translation>Inici real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_4</source>
-			<translation>Fi real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_5</source>
-			<translation>Organizație:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_6</source>
-			<translation>Durata:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_7</source>
-			<translation>Statutul:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_8</source>
-			<translation>Adresa:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_8</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_feature_type</source>
-			<translation>Tip element:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_flexunion_code_5</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_flexunion_code_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_2</source>
-			<translation>Sfârșit planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_3</source>
-			<translation>Start planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_5</source>
-			<translation>Rotație:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>RelationsTab</source>
-			<translation>Relații între elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_RelationsTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>reviewclass_id</source>
-			<translation>Clasa de revizuire:</translation>
-		</message>
-		<message>
-			<source>tooltip_reviewclass_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_visit</name>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații între elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_campaign_visit_old</name>
-		<message>
-			<source>action_selector</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_action_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>active</source>
-			<translation>Activ:</translation>
-		</message>
-		<message>
-			<source>tooltip_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_campaign</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_add_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_export_rel</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_export_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_path_rel</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_path_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>CampaignTab</source>
-			<translation>Campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_CampaignTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_campaign</source>
-			<translation>Campanie:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_campaign</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Exercițiu:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_3</source>
-			<translation>Început real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_4</source>
-			<translation>Sfârșit real:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_5</source>
-			<translation>Organizație:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_6</source>
-			<translation>Durata:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_7</source>
-			<translation>Statutul:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_8</source>
-			<translation>Adresa:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_8</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_feature_type</source>
-			<translation>Tip de element</translation>
-		</message>
-		<message>
-			<source>tooltip_label_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_flexunion_code_5</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_flexunion_code_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_2</source>
-			<translation>Sfârșit planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_3</source>
-			<translation>Start planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_node_type_5</source>
-			<translation>Rotație:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_node_type_5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>RelationsTab</source>
-			<translation>Relații între elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_RelationsTab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>visitclass_id</source>
-			<translation>Clasa de vizitare:</translation>
-		</message>
-		<message>
-			<source>tooltip_visitclass_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_lot</name>
-		<message>
-			<source>title</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_lot</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_add_lot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_visit</source>
-			<translation>Ștergeți vizita</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_visit</source>
-			<translation>Ștergeți vizita</translation>
-		</message>
-		<message>
-			<source>btn_export_rel</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_rel</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>btn_export_visits</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_visits</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>btn_open_photo</source>
-			<translation>Deschideți fotografia</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_photo</source>
-			<translation>Deschideți fotografia</translation>
-		</message>
-		<message>
-			<source>btn_open_visit</source>
-			<translation>Vizită deschisă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_visit</source>
-			<translation>Vizită deschisă</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_validate_all</source>
-			<translation>Validați toate</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_validate_all</source>
-			<translation>Validați toate</translation>
-		</message>
-		<message>
-			<source>dlg_add_lot</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_lot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_lot</source>
-			<translation>Lot:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_lot</source>
-			<translation>Lot:</translation>
-		</message>
-		<message>
-			<source>grb_ot</source>
-			<translation>Ordin de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_ot</source>
-			<translation>Ordin de lucru</translation>
-		</message>
-		<message>
-			<source>label_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>label_data_event_to</source>
-			<translation>Până la:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_data_event_to</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>label_feature_type</source>
-			<translation>Tip element:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_feature_type</source>
-			<translation>Tip element:</translation>
-		</message>
-		<message>
-			<source>lbl_address</source>
-			<translation>Adresa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_address</source>
-			<translation>Adresa:</translation>
-		</message>
-		<message>
-			<source>lbl_description</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrați după id-ul elementului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>Filtrați după id-ul elementului:</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>lbl_observations</source>
-			<translation>Observații:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observations</source>
-			<translation>Observații:</translation>
-		</message>
-		<message>
-			<source>lbl_ot</source>
-			<translation>Ot:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ot</source>
-			<translation>Ot:</translation>
-		</message>
-		<message>
-			<source>lbl_ot_type</source>
-			<translation>Tip Ot:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ot_type</source>
-			<translation>Tip Ot:</translation>
-		</message>
-		<message>
-			<source>lbl_performance_type</source>
-			<translation>Tip de performanță:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_performance_type</source>
-			<translation>Tip de performanță:</translation>
-		</message>
-		<message>
-			<source>lbl_plan_end</source>
-			<translation>Sfârșit planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_plan_end</source>
-			<translation>Sfârșit planificat:</translation>
-		</message>
-		<message>
-			<source>lbl_plan_start</source>
-			<translation>Start planificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_plan_start</source>
-			<translation>Start planificat:</translation>
-		</message>
-		<message>
-			<source>lbl_real_end</source>
-			<translation>Sfârșit real:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_real_end</source>
-			<translation>Sfârșit real:</translation>
-		</message>
-		<message>
-			<source>lbl_real_start</source>
-			<translation>Început real:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_real_start</source>
-			<translation>Început real:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>lbl_team</source>
-			<translation>Echipa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_team</source>
-			<translation>Echipa:</translation>
-		</message>
-		<message>
-			<source>lbl_user</source>
-			<translation>Utilizator:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user</source>
-			<translation>Utilizator:</translation>
-		</message>
-		<message>
-			<source>LotTab</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>tooltip_LotTab</source>
-			<translation>Lot</translation>
-		</message>
-		<message>
-			<source>RelationsTab</source>
-			<translation>Relații între elemente</translation>
-		</message>
-		<message>
-			<source>tooltip_RelationsTab</source>
-			<translation>Relația dintre elemente</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>VisitsTab</source>
-			<translation>Vizite</translation>
-		</message>
-		<message>
-			<source>tooltip_VisitsTab</source>
-			<translation>Vizite</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_workorder</name>
-		<message>
-			<source>title</source>
-			<translation>Ordin de lucru</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>add_workorder</source>
-			<translation>Ordin de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_add_workorder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_add_workorder</source>
-			<translation>Ordin de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_workorder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Ordin de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>campaign_management</name>
-		<message>
-			<source>title</source>
-			<translation>Managementul campaniei</translation>
-		</message>
-		<message>
-			<source>btn_campaign_selector</source>
-			<translation>Selector de campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_campaign_selector</source>
-			<translation>Selector de campanie</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_btn_delete</source>
-			<translation>Ștergeți campania</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_delete</source>
-			<translation>Ștergeți campania</translation>
-		</message>
-		<message>
-			<source>campaign_btn_open</source>
-			<translation>Campanie deschisă</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_btn_open</source>
-			<translation>Campanie deschisă</translation>
-		</message>
-		<message>
-			<source>campaign_chk_show_nulls</source>
-			<translation>Afișați valorile nule</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_chk_show_nulls</source>
-			<translation>Afișați valorile goale</translation>
-		</message>
-		<message>
-			<source>campaign_management</source>
-			<translation>Managementul campaniei</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_campaign_management</source>
-			<translation>Managementul campaniei</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_campaign_management</source>
-			<translation>Gestionarea campaniilor</translation>
-		</message>
-		<message>
-			<source>lbl_column_filter_dates</source>
-			<translation>Filtrați coloana de date</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_filter_dates</source>
-			<translation>Filtrați coloana de date:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_to</source>
-			<translation>Până la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_to</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-	</context>
-	<context>
-		<name>check_project_cm</name>
-		<message>
-			<source>title</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>brb_database_check</source>
-			<translation>Verificarea stării bazei de date:</translation>
-		</message>
-		<message>
-			<source>tooltip_brb_database_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_manage_config</source>
-			<translation>Verificarea configurațiilor de gestionare</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_manage_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_check_project_cm</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_check_project_cm</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_database_health_check</source>
-			<translation>Verificarea stării bazei de date</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_database_health_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_system_check</source>
-			<translation>Verificarea stării sistemului:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_system_health_check</source>
-			<translation>Verificarea stării sistemului</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system_health_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Jurnalul bazei de date</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_log</source>
-			<translation>Jurnale</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>lot_management</name>
-		<message>
-			<source>title</source>
-			<translation>Gestionarea loturilor</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți lotul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți lotul</translation>
-		</message>
-		<message>
-			<source>btn_export</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>btn_lot_selector</source>
-			<translation>Selector de loturi</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_lot_selector</source>
-			<translation>Selector de loturi</translation>
-		</message>
-		<message>
-			<source>btn_manage_load</source>
-			<translation>Înregistrarea deșeurilor</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_manage_load</source>
-			<translation>Înregistrarea deșeurilor</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Lot deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>Lot deschis</translation>
-		</message>
-		<message>
-			<source>btn_work_register</source>
-			<translation>Jurnale de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_work_register</source>
-			<translation>Jurnale de lucru</translation>
-		</message>
-		<message>
-			<source>chk_assignacio</source>
-			<translation>Pendent atribuie lucrări la OT</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_assignacio</source>
-			<translation>Pendent atribuie lucrări la OT</translation>
-		</message>
-		<message>
-			<source>chk_show_nulls</source>
-			<translation>Afișați valorile nule</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_show_nulls</source>
-			<translation>Afișați valorile goale</translation>
-		</message>
-		<message>
-			<source>dlg_lot_management</source>
-			<translation>Gestionarea loturilor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_lot_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_address</source>
-			<translation>Adresa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_address</source>
-			<translation>Adresa:</translation>
-		</message>
-		<message>
-			<source>lbl_column_filter</source>
-			<translation>Filtrați coloana de date:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_filter</source>
-			<translation>Filtru coloană de date:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_to</source>
-			<translation>Până la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_to</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>lbl_name</source>
-			<translation>Nume:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_performance_type</source>
-			<translation>Tip de performanță:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_performance_type</source>
-			<translation>Tip de performanță:</translation>
-		</message>
-		<message>
-			<source>lbl_serie</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_serie</source>
-			<translation>Serie:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>lot_management</source>
-			<translation>Gestionarea loturilor</translation>
-		</message>
-		<message>
-			<source>tooltip_lot_management</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>lot_selector</name>
-		<message>
-			<source>btn_ok</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>lbl_performance_type</source>
-			<translation>Tip de performanță:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_performance_type</source>
-			<translation>Tip de performanță:</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-	</context>
-	<context>
-		<name>organization_create</name>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>organization_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_organization_create</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>resources_management</name>
-		<message>
-			<source>title</source>
-			<translation>Gestionarea resurselor</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_assign_team</source>
-			<translation>Atribuiți echipa</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_assign_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_organi_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_organi_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_organi_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_organi_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_organi_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_organi_update</source>
-			<translation>Modificați</translation>
-		</message>
-		<message>
-			<source>btn_remove_team</source>
-			<translation>Eliminați echipa</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_team_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_team_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_team_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>btn_team_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_toggle_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_team_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_team_update</source>
-			<translation>Modificați</translation>
-		</message>
-		<message>
-			<source>btn_user_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_toggle_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_update</source>
-			<translation>Modificați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cmb_team</source>
-			<translation>Selectați echipa</translation>
-		</message>
-		<message>
-			<source>tooltip_cmb_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_resources_management</source>
-			<translation>Gestionarea resurselor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_resources_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Management:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>Management:</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Management:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>Management:</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Filtrați după nume:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Filtrați după numele echipei:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_3</source>
-			<translation>Filtrați după echipă:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>organizations</source>
-			<translation>Organizații</translation>
-		</message>
-		<message>
-			<source>tooltip_organizations</source>
-			<translation>Organizații</translation>
-		</message>
-		<message>
-			<source>resource_management</source>
-			<translation>Gestionarea resurselor</translation>
-		</message>
-		<message>
-			<source>tooltip_resource_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_organizations</source>
-			<translation>Organizații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_organizations</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_teams</source>
-			<translation>Echipe</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_teams</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_users</source>
-			<translation>Utilizatori</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_users</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>team</source>
-			<translation>Echipe</translation>
-		</message>
-		<message>
-			<source>tooltip_team</source>
-			<translation>Echipe</translation>
-		</message>
-	</context>
-	<context>
-		<name>team_create</name>
-		<message>
-			<source>title</source>
-			<translation>Creați o echipă</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>dlg_team_create</source>
-			<translation>Creați o echipă</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_team_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_team</source>
-			<translation>Echipa:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_team</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_active</source>
-			<translation>Activ:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_active</source>
-			<translation>Activ:</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>lbl_name</source>
-			<translation>Numele echipei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_name</source>
-			<translation>Numele echipei:</translation>
-		</message>
-		<message>
-			<source>team_create</source>
-			<translation>Creați o echipă</translation>
-		</message>
-		<message>
-			<source>tooltip_team_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>TeamTab</source>
-			<translation>Echipa</translation>
-		</message>
-		<message>
-			<source>tooltip_TeamTab</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>team_management</name>
-		<message>
-			<source>title</source>
-			<translation>Managementul echipei</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_select</source>
-			<translation>&gt;&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_select</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_user_unselect</source>
-			<translation>&lt;&lt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_user_unselect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_vehicle_select</source>
-			<translation>&gt;&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_vehicle_select</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_vehicle_unselect</source>
-			<translation>&lt;&lt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_vehicle_unselect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_visitclass_select</source>
-			<translation>&gt;&gt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_visitclass_select</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_visitclass_unselect</source>
-			<translation>&lt;&lt;</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_visitclass_unselect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_team_management</source>
-			<translation>Managementul echipei</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_team_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_user</source>
-			<translation>Utilizatori</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_user</source>
-			<translation>Utilizatori</translation>
-		</message>
-		<message>
-			<source>tab_vehicles</source>
-			<translation>Vehicule</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_vehicles</source>
-			<translation>Vehicule</translation>
-		</message>
-		<message>
-			<source>tab_visit_class</source>
-			<translation>Vizitați clasa</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit_class</source>
-			<translation>Vizitați clasa</translation>
-		</message>
-		<message>
-			<source>team_management</source>
-			<translation>Managementul echipei</translation>
-		</message>
-		<message>
-			<source>tooltip_team_management</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>user_create</name>
-		<message>
-			<source>title</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>actionT</source>
-			<translation>t</translation>
-		</message>
-		<message>
-			<source>tooltip_actionT</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_user_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_user_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>user_create</source>
-			<translation>Creează utilizator</translation>
-		</message>
-		<message>
-			<source>tooltip_user_create</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>work_management</name>
-		<message>
-			<source>btn_accept</source>
-			<translation>Salvați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Salvați</translation>
-		</message>
-		<message>
-			<source>btn_export_user</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_user</source>
-			<translation>Export la csv</translation>
-		</message>
-		<message>
-			<source>lbl_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>lbl_team</source>
-			<translation>Echipa:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_team</source>
-			<translation>Echipa:</translation>
-		</message>
-		<message>
-			<source>lbl_to</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_to</source>
-			<translation>Pentru:</translation>
-		</message>
-	</context>
-	<context>
-		<name>workorder_management</name>
-		<message>
-			<source>title</source>
-			<translation>Gestionarea comenzilor de lucru</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crearea comenzii de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create_wclass</source>
-			<translation>Crearea clasei</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_wclass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create_wtype</source>
-			<translation>Creare tip</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create_wtype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți comanda de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>campaign_management</source>
-			<translation>Manager de campanie</translation>
-		</message>
-		<message>
-			<source>tooltip_campaign_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_workorder_management</source>
-			<translation>Gestionarea comenzilor de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workorder_management</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Filtrați după nume:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_column_filter_dates</source>
-			<translation>Tip comandă de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_filter_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Clasa comenzii de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>workorder_management</source>
-			<translation>Gestionarea comenzilor de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_workorder_management</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>common</name>
-		<message>
-			<source>btn_help</source>
-			<translation>Ajutor</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_help</source>
-			<translation>Ajutor</translation>
-		</message>
-	</context>
-	<context>
-		<name>dialog_table</name>
-		<message>
-			<source>title</source>
-			<translation>Tabel</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_add_row</source>
-			<translation>Adăugați rând</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_row</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_dialog_table</source>
-			<translation>Tabel</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dialog_table</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dialog_text</name>
-		<message>
-			<source>title</source>
-			<translation>Text</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_dialog_text</source>
-			<translation>Text</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dialog_text</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>arc_divide</name>
-		<message>
-			<source>title</source>
-			<translation>Arc de divizare</translation>
-		</message>
-		<message>
-			<source>dlg_arc_divide</source>
-			<translation>Arc de divizare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_arc_divide</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>arc_fusion</name>
-		<message>
-			<source>title</source>
-			<translation>Fuziunea arcului</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_arc_fusion</source>
-			<translation>Fuziunea arcului</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_arc_fusion</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>enddate</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_arc1cat</source>
-			<translation>Catalog Arc 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_arc1cat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_arc2cat</source>
-			<translation>Catalog Arc 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_arc2cat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data de încheiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_cat</source>
-			<translation>Catalog nou:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_cat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodeaction</source>
-			<translation>Acțiunea nodului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodeaction</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_statetype</source>
-			<translation>Tipul de stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_statetype</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Fuziunea arcului</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>auxcircle</name>
-		<message>
-			<source>title</source>
-			<translation>CAD Desenați un cerc</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_delete_prev</source>
-			<translation>Ștergeți cercurile anterioare</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_delete_prev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_auxcircle</source>
-			<translation>CAD Desenați un cerc</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_auxcircle</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ins_radius</source>
-			<translation>Raza de inserție:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ins_radius</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>radius</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_radius</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>auxpoint</name>
-		<message>
-			<source>title</source>
-			<translation>CAD Punct de adăugare</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_delete_prev</source>
-			<translation>Ștergeți punctele anterioare</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_delete_prev</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dist_x</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_dist_x</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dist_y</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_dist_y</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_auxpoint</source>
-			<translation>CAD Punct de adăugare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_auxpoint</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_distx</source>
-			<translation>Distanța (X):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_distx</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_disty</source>
-			<translation>Distanța (Y):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_disty</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_left</source>
-			<translation>Punct init</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_left</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_right</source>
-			<translation>Punct final</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_right</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>connect_link</name>
-		<message>
-			<source>title</source>
-			<translation>Conectare la rețea</translation>
-		</message>
-		<message>
-			<source>dlg_connect_link</source>
-			<translation>Conectare la rețea</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_connect_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Configurarea legăturii</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Conexiuni</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_3</source>
-			<translation>Arce</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connect</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connect</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dimensioning</name>
-		<message>
-			<source>title</source>
-			<translation>Dimensionare</translation>
-		</message>
-		<message>
-			<source>actionEdit</source>
-			<translation>Editare</translation>
-		</message>
-		<message>
-			<source>tooltip_actionEdit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionOrientation</source>
-			<translation>Orientare</translation>
-		</message>
-		<message>
-			<source>tooltip_actionOrientation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSnapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSnapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_dimensioning</source>
-			<translation>Dimensionare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dimensioning</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_depth</source>
-			<translation>Măsurători</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_depth</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_other</source>
-			<translation>Altele</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_symbology</source>
-			<translation>Simbologia cercului</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_symbology</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>bara de instrumente</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>doc</name>
-		<message>
-			<source>title</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_add_geom</source>
-			<translation>Adăugați geom</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>Adăugați geom</translation>
-		</message>
-		<message>
-			<source>btn_apply</source>
-			<translation>Aplicați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_apply</source>
-			<translation>Aplicați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Introduceți</translation>
-		</message>
-		<message>
-			<source>btn_path_doc</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_path_url</source>
-			<translation>web</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path_url</source>
-			<translation>Deschideți Explorer pentru a permite selectarea căii web. De asemenea, este posibil să lipiți pur și simplu calea în caseta de text Link</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>date</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>_dlg_doc</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip__dlg_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_doc</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Data:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_doc_name</source>
-			<translation>Nume doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_doc_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_doc_type</source>
-			<translation>Tip doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_doc_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Nume doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Link:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observații:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>path</source>
-			<translation>cale</translation>
-		</message>
-		<message>
-			<source>tooltip_path</source>
-			<translation>Completați-l cu o cale accesibilă de folder sau de web</translation>
-		</message>
-		<message>
-			<source>tab</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_tab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_doc</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_elem</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elem</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_psector</source>
-			<translation>Psector</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_psector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_rel</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_rel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_visit</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_workcat</source>
-			<translation>Pisica de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_workcat</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>doc_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestionarea documentelor</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_doc_manager</source>
-			<translation>Gestionarea documentelor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_doc_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Filtrați după: Numele medicului</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>element</name>
-		<message>
-			<source>title</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_add_geom</source>
-			<translation>Adăugați geom</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>Adăugați geometrie</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Introduceți</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>dlg_element</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buildercat_id</source>
-			<translation>Buildercat id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buildercat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Data construirii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation> Cod:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_comment</source>
-			<translation>Cum vă pot ajuta?</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_comment</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_elementcat_id</source>
-			<translation>Elementcat id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_elementcat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_element_id</source>
-			<translation>Element id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_element_type</source>
-			<translation>Tip_element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data limită:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl_id</source>
-			<translation>Funcționare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Link:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>lbl_location_type</source>
-			<translation>Tip locație:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_location_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_lock_level</source>
-			<translation>TextLabel</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_lock_level</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_element</source>
-			<translation>Numărul elementului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_elements</source>
-			<translation>Num. element:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_elements</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observații:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ownercat_id</source>
-			<translation>Proprietar:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ownercat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotație:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state_type</source>
-			<translation>Tipul de stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_verified</source>
-			<translation>Verificat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_verified</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id</source>
-			<translation>Workcat id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id</source>
-			<translation>Workcat id</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>Workcat id sfârșit</translation>
-		</message>
-		<message>
-			<source>rotation</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_element</source>
-			<translation>Element</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>undelete</source>
-			<translation>Ștergere</translation>
-		</message>
-		<message>
-			<source>tooltip_undelete</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>element_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestionarea elementelor</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>dlg_element_manager</source>
-			<translation>Gestionarea elementelor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_element_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_element_id</source>
-			<translation>Filtrați după: Element id</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_delete</name>
-		<message>
-			<source>title</source>
-			<translation>Ștergeți caracteristica</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>       Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți caracteristica selectată</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_delete_another</source>
-			<translation>Ștergeți o altă caracteristică</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_another</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_relations</source>
-			<translation>Afișați relațiile dintre caracteristici</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_relations</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>dlg_feature_delete</source>
-			<translation>Ștergeți caracteristica</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_id</source>
-			<translation>Caracteristică id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tip caracteristică:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_del_feature</source>
-			<translation>Ștergeți caracteristica</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_del_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_end</name>
-		<message>
-			<source>title</source>
-			<translation>Caracteristică finală</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Introduceți</translation>
-		</message>
-		<message>
-			<source>btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>builtdate</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_feature_end</source>
-			<translation>Caracteristică finală</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>enddate</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_description</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data de încheiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state_type</source>
-			<translation>Sfârșit de tip stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_date</source>
-			<translation>Data Workcat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_elem</source>
-			<translation>Elem</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elem</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tab_workcat</source>
-			<translation>Pisica de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_workcat</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_end_connec</name>
-		<message>
-			<source>title</source>
-			<translation>Lista finală Workcat</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>dlg_feature_end_connec</source>
-			<translation>Lista finală Workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_end_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_by</source>
-			<translation>Filtrați după arc_id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_by</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Aceste conexiuni sau rigole vor fi deconectate atunci când arcele selectate sunt șterse</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_replace</name>
-		<message>
-			<source>title</source>
-			<translation>Înlocuiți caracteristica</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Bine</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_feature_replace</source>
-			<translation>Înlocuiți caracteristica</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_replace</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>enddate</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_end_parameters</source>
-			<translation>Parametrii finali</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_end_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_feature_parameters</source>
-			<translation>Parametrii caracteristicilor</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_feature_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_catalog_id</source>
-			<translation>Catalog:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_current_catalog_id</source>
-			<translation>ID catalog curent:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_current_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_description</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>Data înlocuirii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tipul curent de caracteristică:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_keep_asset_id</source>
-			<translation>Păstrați id-ul activului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_keep_asset_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_keep_elements</source>
-			<translation>Păstrați elementele:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_keep_elements</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_keep_epa_values</source>
-			<translation>Păstrați valorile EPA:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_keep_epa_values</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_catalog_id</source>
-			<translation>Id catalog nou:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_feature_type</source>
-			<translation>Tip de caracteristică nouă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>featuretype_change</name>
-		<message>
-			<source>title</source>
-			<translation>Modificarea tipului de caracteristică</translation>
-		</message>
-		<message>
-			<source>dlg_featuretype_change</source>
-			<translation>Modificarea tipului de caracteristică</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_featuretype_change</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>nodetype_change</name>
-		<message>
-			<source>title</source>
-			<translation>Schimbarea tipului de nod</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_nodetype_change</source>
-			<translation>Schimbarea tipului de nod</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nodetype_change</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_catalog_id</source>
-			<translation>Catalog id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_catalog_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_custom_node_type</source>
-			<translation>Tip nou de nod:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_custom_node_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_node_type</source>
-			<translation>Tipul curent de nod:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_node_type</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>workcat_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Managementul Workcat</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>dlg_workcat_manager</source>
-			<translation>Managementul Workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workcat_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Filtrați după: Numele pisicii de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>add_demand_check</name>
-		<message>
-			<source>title</source>
-			<translation>Verificarea cererii suplimentare</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_add_demand_check</source>
-			<translation>Verificarea cererii suplimentare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_add_demand_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodes</source>
-			<translation>Utilizați noduri de la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_config</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_database</source>
-			<translation>Baza de date</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_database</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dscenario_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Dscenario manager</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>     Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicat</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>btn_toolbox</source>
-			<translation>Acțiuni</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toolbox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update_dscenario</source>
-			<translation>Scenariul actual</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_dscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>dlg_dscenario_manager</source>
-			<translation>Dscenario manager</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dscenario_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dscenario_name</source>
-			<translation>Filtrare prin: Numele Dscenario</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dscenario_name</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>emitter_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibrarea Emmiter</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_emitter_calibration</source>
-			<translation>Calibrarea Emmiter</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_emitter_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_filename</source>
-			<translation>Numele fișierelor de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_filename</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_add_demand_check</name>
-		<message>
-			<source>title</source>
-			<translation>Verificarea cererii suplimentare</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_add_demand_check</source>
-			<translation>Verificarea cererii suplimentare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_add_demand_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodes</source>
-			<translation>Utilizați noduri de la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_config</source>
-			<translation>Fișier de configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_nodes_database</source>
-			<translation>Baza de date</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_nodes_database</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_emitter_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibrarea emițătorului</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_emitter_calibration</source>
-			<translation>Calibrarea emițătorului</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_emitter_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_filename</source>
-			<translation>Numele fișierelor de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_quantized_demands</name>
-		<message>
-			<source>title</source>
-			<translation>Cereri cuantificate</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_quantized_demands</source>
-			<translation>Cereri cuantificate</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_quantized_demands</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_recursive_go2epa</name>
-		<message>
-			<source>title</source>
-			<translation>Epa Apeluri multiple</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_recursive_go2epa</source>
-			<translation>Epa Apeluri multiple</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_recursive_go2epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_static_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibrare statică</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_save_dscenario</source>
-			<translation>Salvați modificările în dscenario</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_save_dscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_static_calibration</source>
-			<translation>Calibrare statică</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_static_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dscenario</source>
-			<translation>Scenariu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_inp_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>epatools_valve_operation_check</name>
-		<message>
-			<source>title</source>
-			<translation>Verificarea funcționării supapei</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_config_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_inp_input_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_push_output_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_epatools_valve_operation_check</source>
-			<translation>Verificarea funcționării supapei</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_epatools_valve_operation_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_scenarios</source>
-			<translation>Utilizați scenarii din:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_scenarios</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_config</source>
-			<translation>Fișier de configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_database</source>
-			<translation>Baza de date</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_database</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa</name>
-		<message>
-			<source>title</source>
-			<translation>Go2Epa</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_file_inp</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_inp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_file_rpt</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_rpt</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_hs_ds</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_hs_ds</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_options</source>
-			<translation>Opțiuni</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_exec</source>
-			<translation>Executarea software-ului APE</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_exec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_export</source>
-			<translation>Export INP</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_export_subcatch</source>
-			<translation>Export subtraversări UD</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_export_subcatch</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_import_result</source>
-			<translation>Rezultatul importului</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_import_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_only_check</source>
-			<translation>Utilizați geometria rețelei de rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_only_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_recurrent</source>
-			<translation>Utilizați apeluri iterative</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_recurrent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa</source>
-			<translation>Go2Epa</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_file_manager</source>
-			<translation>Manager de fișiere</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_file_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_process_options</source>
-			<translation>Opțiuni de preprocesare</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_process_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Opțiuni de preprocesare</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Manager de fișiere</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_counter</source>
-			<translation>Contor</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_counter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_inp_file</source>
-			<translation>Fișier INP:            </translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inp_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name</source>
-			<translation>Numele rezultatului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rpt_file</source>
-			<translation>RPT file:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rpt_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_file_manager</source>
-			<translation>Manager de fișiere</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_file_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Manager de rezultate APE</translation>
-		</message>
-		<message>
-			<source>btn_archive</source>
-			<translation>Schimbă arhiva</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_archive</source>
-			<translation>Schimbă arhiva</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_edit</source>
-			<translation>Editare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_edit</source>
-			<translation>Editare</translation>
-		</message>
-		<message>
-			<source>btn_show_inp_data</source>
-			<translation>Afișați datele inp</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_show_inp_data</source>
-			<translation>Afișați datele inp</translation>
-		</message>
-		<message>
-			<source>btn_toggle_corporate</source>
-			<translation>Toggle corporate</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_corporate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_manager</source>
-			<translation>Manager de rezultate APE</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_id</source>
-			<translation>Filtrați după: Id rezultat</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_options</name>
-		<message>
-			<source>title</source>
-			<translation>Go2Epa - opțiuni</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_options</source>
-			<translation>Go2Epa - opțiuni</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_energy</source>
-			<translation>Energie</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_energy</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_general</source>
-			<translation>Generalități</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_general</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_hydraulics</source>
-			<translation>Hidraulică</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_hydraulics</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_other</source>
-			<translation>Altele</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_reactions</source>
-			<translation>Reacții</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_reactions</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_reports</source>
-			<translation>Rapoarte</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_reports</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_time_steps</source>
-			<translation>Data &amp; pași de timp</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_time_steps</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_inp</source>
-			<translation>Inp</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_inp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_other</source>
-			<translation>Altele</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_other</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_result</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de rezultate EPA</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_result</source>
-			<translation>Selector de rezultate EPA</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compare_date</source>
-			<translation>Date de apariție:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compare_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compare_time</source>
-			<translation>Comparați timpul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compare_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_compare</source>
-			<translation>Numele rezultatului (pentru comparație):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_show</source>
-			<translation>Numele rezultatului (de afișat):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_selector_date</source>
-			<translation>Data selectorului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_selector_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_selector_time</source>
-			<translation>Selector de timp:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_selector_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_time_to_compare</source>
-			<translation>Timp (pentru comparație):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_time_to_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_time_to_show</source>
-			<translation>Timp (pentru a arăta):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_time_to_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_datetime</source>
-			<translation>Data și ora</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_datetime</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Rezultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_time</source>
-			<translation>Timp</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_time</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2epa_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de comparare a rezultatelor</translation>
-		</message>
-		<message>
-			<source>dlg_go2epa_selector</source>
-			<translation>Selector de comparare a rezultatelor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Rezultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_time</source>
-			<translation>Data și ora</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_time</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>go2iber</name>
-		<message>
-			<source>title</source>
-			<translation>Go2Iber</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_iber_options</source>
-			<translation>Opțiuni Iber</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_iber_options</source>
-			<translation>Opțiuni Iber</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_swmm_options</source>
-			<translation>Opțiuni SWMM</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_swmm_options</source>
-			<translation>Opțiuni SWMM</translation>
-		</message>
-		<message>
-			<source>dlg_go2iber</source>
-			<translation>Go2Iber</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2iber</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Opțiuni</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mesh</source>
-			<translation>Plasă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mesh</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_path</source>
-			<translation>Calea dosarului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name</source>
-			<translation>Numele rezultatului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>inp_config_import</name>
 		<message>
 			<source>title</source>
 			<translation>Configurare import INP</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -17147,6 +16609,22 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_feature</source>
+			<translation>Caracteristici</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_flwreg</source>
+			<translation>Regulatoare de debit</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_flwreg</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_arcs</source>
 			<translation>Selectați arccat_id corespunzător pentru fiecare combinație de arcuri din opțiunile de mai jos. Dacă alegeți &quot;Create new&quot;, introduceți noul nume în coloana &quot;New catalog name&quot;.</translation>
 		</message>
@@ -17224,30 +16702,6 @@
 		</message>
 		<message>
 			<source>tooltip_tab_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_feature</source>
-			<translation>Caracteristici</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_flwreg</source>
-			<translation>Regulatoare de debit</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_flwreg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -17339,10 +16793,297 @@
 		</message>
 	</context>
 	<context>
-		<name>nonvisual_controls</name>
+		<name>interpolate</name>
 		<message>
 			<source>title</source>
-			<translation>Editor de comenzi simple</translation>
+			<translation>Interpolare</translation>
+		</message>
+		<message>
+			<source>dlg_interpolate</source>
+			<translation>Interpolare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_interpolate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_interpolate</source>
+			<translation>Interpolare</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_interpolate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_extrapolate</source>
+			<translation>Extrapolare</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_extrapolate</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>load_menu</name>
+		<message>
+			<source>title</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_load_menu</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_load_menu</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>lot_management</name>
+		<message>
+			<source>title</source>
+			<translation>Gestionarea loturilor</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_to</source>
+			<translation>Până la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_to</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>chk_assignacio</source>
+			<translation>Pendent atribuie lucrări la OT</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_assignacio</source>
+			<translation>Pendent atribuie lucrări la OT</translation>
+		</message>
+		<message>
+			<source>chk_show_nulls</source>
+			<translation>Afișați valorile nule</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_show_nulls</source>
+			<translation>Afișați valorile goale</translation>
+		</message>
+		<message>
+			<source>dlg_lot_management</source>
+			<translation>Gestionarea loturilor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_lot_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_address</source>
+			<translation>Adresa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_address</source>
+			<translation>Adresa:</translation>
+		</message>
+		<message>
+			<source>lbl_column_filter</source>
+			<translation>Filtrați coloana de date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_filter</source>
+			<translation>Filtru coloană de date:</translation>
+		</message>
+		<message>
+			<source>lbl_name</source>
+			<translation>Nume:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_performance_type</source>
+			<translation>Tip de performanță:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_performance_type</source>
+			<translation>Tip de performanță:</translation>
+		</message>
+		<message>
+			<source>lbl_serie</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_serie</source>
+			<translation>Serie:</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>lot_management</source>
+			<translation>Gestionarea loturilor</translation>
+		</message>
+		<message>
+			<source>tooltip_lot_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți lotul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți lotul</translation>
+		</message>
+		<message>
+			<source>btn_export</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>btn_lot_selector</source>
+			<translation>Selector de loturi</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_lot_selector</source>
+			<translation>Selector de loturi</translation>
+		</message>
+		<message>
+			<source>btn_manage_load</source>
+			<translation>Înregistrarea deșeurilor</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_manage_load</source>
+			<translation>Înregistrarea deșeurilor</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Lot deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>Lot deschis</translation>
+		</message>
+		<message>
+			<source>btn_work_register</source>
+			<translation>Jurnale de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_work_register</source>
+			<translation>Jurnale de lucru</translation>
+		</message>
+	</context>
+	<context>
+		<name>lot_selector</name>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>lbl_performance_type</source>
+			<translation>Tip de performanță:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_performance_type</source>
+			<translation>Tip de performanță:</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>Închidere</translation>
+		</message>
+	</context>
+	<context>
+		<name>main_dbproject</name>
+		<message>
+			<source>title</source>
+			<translation>Creați un proiect</translation>
+		</message>
+		<message>
+			<source>dlg_main_dbproject</source>
+			<translation>Principal dbproject:</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_dbproject</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mapzone_config</name>
+		<message>
+			<source>title</source>
+			<translation>Mapzone Config</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -17353,11 +17094,1879 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_toArc</source>
+			<translation>toArc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_toArc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_preview</source>
+			<translation>Previzualizare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_nodeParent</source>
+			<translation>nodeParent:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_nodeParent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ignore</source>
+			<translation>ignorați</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ignore</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_forceClosed</source>
+			<translation>forceClosed:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_forceClosed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mapzone_config</source>
+			<translation>Mapzone Config</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mapzone_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_remove_nodeParent</source>
+			<translation>ELIMINAȚI</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_nodeParent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_remove_ignore</source>
+			<translation>ELIMINAȚI</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_ignore</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_remove_forceClosed</source>
+			<translation>ELIMINAȚI</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_forceClosed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_clear_preview</source>
+			<translation>Previzualizare clară</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_clear_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_cancel</source>
 			<translation>Anulează</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_nodeParent</source>
+			<translation>ADD</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_nodeParent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_forceClosed</source>
+			<translation>ADD</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_forceClosed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_ignore</source>
+			<translation>ADD</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_ignore</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mapzone_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Mapzones manager</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>btn_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_execute</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_execute</source>
+			<translation>Executarea procesului de analiză a zonei hărții</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>chk_show_all</source>
+			<translation>Afișați toate mapzonele</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_show_all</source>
+			<translation>Afișați toate mapzonele</translation>
+		</message>
+		<message>
+			<source>dlg_mapzone_manager</source>
+			<translation>Mapzones manager</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mapzone_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mapzone_name</source>
+			<translation>Filtrați după: Numele zonei cartografice</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mapzone_name</source>
+			<translation>Filtrați după: Numele zonei cartografice</translation>
+		</message>
+	</context>
+	<context>
+		<name>massive_composer</name>
+		<message>
+			<source>title</source>
+			<translation>Imprimarea automată a paginilor compozitorului</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_massive_composer</source>
+			<translation>Imprimarea automată a paginilor compozitorului</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_massive_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_comp</source>
+			<translation>Lista compozitorilor</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_comp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_composers</source>
+			<translation>Selectați compozitorul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_composers</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_folder</source>
+			<translation>Selectați folderul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_prefix</source>
+			<translation>Fișier prefix:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_prefix</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_single</source>
+			<translation>Fișier unic:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_single</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_sleep</source>
+			<translation>Timpul de somn:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sleep</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut</name>
+		<message>
+			<source>title</source>
+			<translation>Mincut</translation>
+		</message>
+		<message>
+			<source>lbl_turbidity</source>
+			<translation>Turbiditate:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_turbidity</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_end_predict</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_end_predict</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_start</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_start_predict</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_start_predict</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_recieved_day</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_recieved_day</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_use_planified</source>
+			<translation>Utilizați rețeaua planificată</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_use_planified</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut</source>
+			<translation>Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_exec_realdates</source>
+			<translation>Date reale</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_exec_realdates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_details</source>
+			<translation>Detalii</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_details</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_forecasted_dates</source>
+			<translation>Date previzionate</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_forecasted_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_assigned_to</source>
+			<translation>Atribuit către:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_assigned_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cause</source>
+			<translation>Cauza:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cause</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_chlorine</source>
+			<translation>Clor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_chlorine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_depth</source>
+			<translation>Adâncime:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_depth</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_pd</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_pd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_rd</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_rd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dist_from_plot</source>
+			<translation>Distanța de la parcelă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dist_from_plot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end</source>
+			<translation>Sfârșit:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_appropriate</source>
+			<translation>Apropiat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_appropriate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_enddate</source>
+			<translation>Data de încheiere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_startdate</source>
+			<translation>Data de începere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_startdate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_user</source>
+			<translation>Exec utilizator:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Nu s-au găsit rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_received_date</source>
+			<translation>Data primirii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_received_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start</source>
+			<translation>Începeți:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordin de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab</source>
+			<translation>Executare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Plan</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydro</source>
+			<translation>Hidro</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydro</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>bara de instrumente</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_start</source>
+			<translation>Start</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>lbl_cause</source>
+			<translation>Cauza:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cause</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_chlorine</source>
+			<translation>Clor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_chlorine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_forecasted_dates</source>
+			<translation>Date previzionate</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_forecasted_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_end</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_details</source>
+			<translation>Detalii</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_details</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_location</source>
+			<translation>Locație</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_exec_realdates</source>
+			<translation>Date reale</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_exec_realdates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_depth</source>
+			<translation>Adâncime:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_depth</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_pd</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_pd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_rd</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_rd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_use_planified</source>
+			<translation>Utilizați rețeaua planificată</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_use_planified</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_assigned_to</source>
+			<translation>Atribuit către:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_assigned_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_start</source>
+			<translation>Start</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_end</source>
+			<translation>Sfârșit</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>lbl_dist_from_plot</source>
+			<translation>Distanța de la parcelă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dist_from_plot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel_task</source>
+			<translation>Anulează sarcina</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel_task</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_end</source>
+			<translation>Sfârșit</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionAddConnec</source>
+			<translation>Connec Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_actionAddConnec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionAddHydrometer</source>
+			<translation>Hidrometru Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_actionAddHydrometer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionChangeValveStatus</source>
+			<translation>Modificarea stării supapei</translation>
+		</message>
+		<message>
+			<source>tooltip_actionChangeValveStatus</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionComposer</source>
+			<translation>Compozitor</translation>
+		</message>
+		<message>
+			<source>tooltip_actionComposer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionCustomMincut</source>
+			<translation>Mincut personalizat</translation>
+		</message>
+		<message>
+			<source>tooltip_actionCustomMincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionExportHydroCsv</source>
+			<translation>Export Hydro Csv</translation>
+		</message>
+		<message>
+			<source>tooltip_actionExportHydroCsv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionMincut</source>
+			<translation>Mincut automat</translation>
+		</message>
+		<message>
+			<source>tooltip_actionMincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionRefreshMincut</source>
+			<translation>Reîmprospătați Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_actionRefreshMincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_equipment_code</source>
+			<translation>Chlorine measurement equipment:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_equipment_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_appropriate</source>
+			<translation>Apropiat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_appropriate</source>
+			<translation>Dacă este adevărat, locația reală corespunde informațiilor programate pentru mincut</translation>
+		</message>
+		<message>
+			<source>lbl_exec_enddate</source>
+			<translation>Data de încheiere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_startdate</source>
+			<translation>Data de începere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_startdate</source>
+			<translation>Vizită ID</translation>
+		</message>
+		<message>
+			<source>lbl_exec_user</source>
+			<translation>Exec utilizator:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Nu s-au găsit rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reagent_lot</source>
+			<translation>Chlorine reagent lot:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reagent_lot</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_received_date</source>
+			<translation>Data primirii:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_received_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_turbidity</source>
+			<translation>Turbiditate:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_turbidity</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordin de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab</source>
+			<translation>Executare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Plan</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_hydro</source>
+			<translation>Hidro</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_hydro</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_composer</name>
+		<message>
+			<source>title</source>
+			<translation>Compozitor Mincut</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_composer</source>
+			<translation>Compozitor Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotație:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_title</source>
+			<translation>Titlu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_title</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Șablon:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotație:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Compozitor Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_composer</source>
+			<translation>Compozitor Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>lbl_title</source>
+			<translation>Titlu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_title</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Șablon:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_connec</name>
+		<message>
+			<source>title</source>
+			<translation>Conectare Mincut</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
+			<source>lbl_search</source>
+			<translation>Căutați după codul clientului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_connec</source>
+			<translation>Conectare Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_search</source>
+			<translation>Căutați după codul clientului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Introduceți</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_connec</source>
+			<translation>Conectare Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_end</name>
+		<message>
+			<source>title</source>
+			<translation>Sfârșit mincut</translation>
+		</message>
+		<message>
+			<source>lbl_street</source>
+			<translation>Strada:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_street</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordin de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Ordin de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_end</source>
+			<translation>Sfârșit mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Nu s-au găsit rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut</source>
+			<translation>Mincut:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_hour</source>
+			<translation>Ora de începere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_set_real_location</source>
+			<translation>Setați locația reală</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_set_real_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Date</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_close_mincut</source>
+			<translation>Închide mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_close_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_end</source>
+			<translation>Sfârșit mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_hours_start_fin</source>
+			<translation>H:mm:ss</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_hours_start_fin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_start_fin</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_start_fin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cbx_date_end_fin</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_cbx_date_end_fin</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_set_real_location</source>
+			<translation>Setați locația reală</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_set_real_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_hour</source>
+			<translation>Ora finală:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_executed</source>
+			<translation>Executat de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_executed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut</source>
+			<translation>Mincut:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_municipality</source>
+			<translation>Municipalitate:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_municipality</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_number</source>
+			<translation>Număr:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_number</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_hour</source>
+			<translation>Ora de începere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_close_mincut</source>
+			<translation>Închide mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_close_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_executed</source>
+			<translation>Executat de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_executed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_hour</source>
+			<translation>Ora finală:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_hour</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_hydrometer</name>
+		<message>
+			<source>title</source>
+			<translation>Hidrometru Mincut</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Introduceți</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>lbl_ccc</source>
+			<translation>Cod client Connec:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ccc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hcc</source>
+			<translation>Cod client hidrometru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hcc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_hydrometer</source>
+			<translation>Hidrometru Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_hydrometer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_hcc</source>
+			<translation>Cod client hidrometru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hcc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ccc</source>
+			<translation>Cod client Connec:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ccc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_hydrometer</source>
+			<translation>Hidrometru Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_hydrometer</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>mincut_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Managementul mincut</translation>
+		</message>
+		<message>
+			<source>lbl_streetaxis</source>
+			<translation>Streetaxis:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_streetaxis</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel_mincut</source>
+			<translation>Anulează mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_next_days</source>
+			<translation>Zilele următoare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_next_days</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_notify</source>
+			<translation>Trimite sms</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_notify</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_to</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_selector_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_selector_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Stat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut_type</source>
+			<translation>Tip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrați prin:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exploitation</source>
+			<translation>Funcționare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exploitation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_manager</source>
+			<translation>Managementul mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_manager</source>
+			<translation>Managementul mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_manager</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>netscenario</name>
+		<message>
+			<source>title</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_closed</source>
+			<translation>Toggle închis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_closed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_netscenario</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_netscenario</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mapzone_id</source>
+			<translation>Mapzone id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mapzone_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>netscenario_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Manager Netscenario</translation>
+		</message>
+		<message>
+			<source>btn_toc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toc</source>
+			<translation>Încărcați stratul Giswater</translation>
+		</message>
+		<message>
+			<source>btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>btn_update_netscenario</source>
+			<translation>Scenariu net curent</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_netscenario</source>
+			<translation>Scenariu net curent</translation>
+		</message>
+		<message>
+			<source>dlg_netscenario_manager</source>
+			<translation>Manager Netscenario</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_netscenario_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_netscenario_name</source>
+			<translation>Filtrați după: Numele Netscenarului</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_netscenario_name</source>
+			<translation>Filtrați după: Numele Netscenarului</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>     Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>Duplicat</translation>
+		</message>
+		<message>
+			<source>btn_execute</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_execute</source>
+			<translation>Executarea analizei mapzones</translation>
+		</message>
+	</context>
+	<context>
+		<name>nodetype_change</name>
+		<message>
+			<source>title</source>
+			<translation>Schimbarea tipului de nod</translation>
+		</message>
+		<message>
+			<source>dlg_nodetype_change</source>
+			<translation>Schimbarea tipului de nod</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nodetype_change</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_custom_node_type</source>
+			<translation>Tip nou de nod:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_custom_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_node_type</source>
+			<translation>Tipul curent de nod:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_catalog_id</source>
+			<translation>Catalog id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_catalog_id</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>nonvisual_controls</name>
+		<message>
+			<source>title</source>
+			<translation>Editor de comenzi simple</translation>
+		</message>
+		<message>
+			<source>dlg_nonvisual_controls</source>
+			<translation>Editor de comenzi simple</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nonvisual_controls</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -17369,19 +18978,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_controls</source>
-			<translation>Editor de comenzi simple</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nonvisual_controls</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_sector_id</source>
 			<translation>ID sector</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_sector_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -17390,6 +19007,14 @@
 		<message>
 			<source>title</source>
 			<translation>Editor de curbe</translation>
+		</message>
+		<message>
+			<source>lbl_curve_type</source>
+			<translation>Tip de curbă</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_curve_type</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -17408,14 +19033,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_curve</source>
-			<translation>Editor de curbe</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nonvisual_curve</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_curve_id</source>
 			<translation>Curbă ID</translation>
 		</message>
@@ -17424,19 +19041,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_curve_type</source>
-			<translation>Tip de curbă</translation>
+			<source>dlg_nonvisual_curve</source>
+			<translation>Editor de curbe</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_curve_type</source>
+			<source>tooltip_dlg_nonvisual_curve</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere</translation>
+			<source>tbl_curve_value</source>
+			<translation>Y</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_tbl_curve_value</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -17448,16 +19065,24 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tbl_curve_value</source>
-			<translation>Y</translation>
+			<source>lbl_descript</source>
+			<translation>Descriere</translation>
 		</message>
 		<message>
-			<source>tooltip_tbl_curve_value</source>
+			<source>tooltip_lbl_descript</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
 		<name>nonvisual_lids</name>
+		<message>
+			<source>lbl_thickness_drainage</source>
+			<translation>Grosime (in. sau mm)</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_thickness_drainage</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>btn_cancel</source>
 			<translation>Anulează</translation>
@@ -17747,14 +19372,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_thickness_drainage</source>
-			<translation>Grosime (in. sau mm)</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_thickness_drainage</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_thickness_storage</source>
 			<translation>Grosime (in. sau mm)</translation>
 		</message>
@@ -17888,54 +19505,6 @@
 		</message>
 		<message>
 			<source>tooltip_txt_1_thickness_pavement</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_1_thickness_storage</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_1_thickness_storage</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_flow_exponent</source>
-			<translation>0.5</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_flow_exponent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_porosity</source>
-			<translation>0.5</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_porosity</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_vegetation_volume</source>
-			<translation>0.0</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_vegetation_volume</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_void_fraction</source>
-			<translation>0.5</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_void_fraction</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_2_void_ratio_pavement</source>
-			<translation>0.15</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_2_void_ratio_pavement</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -18114,6 +19683,54 @@
 			<source>tooltip_txt_flow_capacity</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>txt_1_thickness_storage</source>
+			<translation>0</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_1_thickness_storage</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_void_ratio_pavement</source>
+			<translation>0.15</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_void_ratio_pavement</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_flow_exponent</source>
+			<translation>0.5</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_flow_exponent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_porosity</source>
+			<translation>0.5</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_porosity</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_vegetation_volume</source>
+			<translation>0.0</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_vegetation_volume</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_2_void_fraction</source>
+			<translation>0.5</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_2_void_fraction</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>nonvisual_manager</name>
@@ -18122,12 +19739,12 @@
 			<translation>Manager de obiecte non-vizuale</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
+			<source>inp_lid</source>
+			<translation>Capace</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Închidere</translation>
+			<source>tooltip_inp_lid</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -18159,7 +19776,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_print</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_toggle_active</source>
@@ -18167,7 +19784,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_toggle_active</source>
-			<translation></translation>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>chk_active</source>
@@ -18241,12 +19858,76 @@
 			<source>tooltip_ve_inp_pattern</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>ve_inp_rules</source>
+			<translation>reguli</translation>
+		</message>
+		<message>
+			<source>tooltip_ve_inp_rules</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>ve_inp_timeseries</source>
+			<translation>serii de timp</translation>
+		</message>
+		<message>
+			<source>tooltip_ve_inp_timeseries</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cat_mat_roughness</source>
+			<translation>Rugozitatea</translation>
+		</message>
+		<message>
+			<source>tooltip_cat_mat_roughness</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
 	</context>
 	<context>
 		<name>nonvisual_pattern_ud</name>
 		<message>
 			<source>title</source>
 			<translation>Editor de modele</translation>
+		</message>
+		<message>
+			<source>tbl_daily</source>
+			<translation>SUN</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_daily</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tbl_hourly</source>
+			<translation>11PM</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_hourly</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tbl_monthly</source>
+			<translation>DEC</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_monthly</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tbl_weekend</source>
+			<translation>11PM</translation>
+		</message>
+		<message>
+			<source>tooltip_tbl_weekend</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18304,44 +19985,44 @@
 			<source>tooltip_lbl_pattern_type</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>tbl_daily</source>
-			<translation>SUN</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_daily</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tbl_hourly</source>
-			<translation>11PM</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_hourly</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tbl_monthly</source>
-			<translation>DEC</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_monthly</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tbl_weekend</source>
-			<translation>11PM</translation>
-		</message>
-		<message>
-			<source>tooltip_tbl_weekend</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>nonvisual_pattern_ws</name>
 		<message>
 			<source>title</source>
 			<translation>Editor de modele</translation>
+		</message>
+		<message>
+			<source>dlg_nonvisual_pattern_ws</source>
+			<translation>Editor de modele</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nonvisual_pattern_ws</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pattern_type</source>
+			<translation>ID operațiune</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pattern_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_pattern_id</source>
+			<translation>ID model</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pattern_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observație</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18360,38 +20041,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_pattern_ws</source>
-			<translation>Editor de modele</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_nonvisual_pattern_ws</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observație</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pattern_id</source>
-			<translation>ID model</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pattern_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pattern_type</source>
-			<translation>ID operațiune</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pattern_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>tbl_pattern_value</source>
 			<translation>18</translation>
 		</message>
@@ -18407,27 +20056,19 @@
 			<translation>Obiect non-vizual Imprimare</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_path</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_nonvisual_print</source>
+			<translation>Obiect non-vizual Imprimare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_nonvisual_print</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -18439,11 +20080,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_nonvisual_print</source>
-			<translation>Obiect non-vizual Imprimare</translation>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_nonvisual_print</source>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -18685,2398 +20334,34 @@
 		</message>
 	</context>
 	<context>
-		<name>quantized_demands</name>
+		<name>organization_create</name>
 		<message>
-			<source>title</source>
-			<translation>Cereri cuantificate</translation>
+			<source>actionT</source>
+			<translation>t</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_quantized_demands</source>
-			<translation>Cereri cuantificate</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_quantized_demands</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>recursive_epa</name>
-		<message>
-			<source>title</source>
-			<translation>Epa Apeluri multiple</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_recursive_epa</source>
-			<translation>Epa Apeluri multiple</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_recursive_epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>static_calibration</name>
-		<message>
-			<source>title</source>
-			<translation>Calibrare statică</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_static_calibration</source>
-			<translation>Calibrare statică</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_static_calibration</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_inp_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inp_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Numele fișierelor de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>valve_operation_check</name>
-		<message>
-			<source>title</source>
-			<translation>Verificarea funcționării supapei</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_valve_operation_check</source>
-			<translation>Verificarea funcționării supapei</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_valve_operation_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_config_file</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_config_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filename</source>
-			<translation>Numele fișierului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filename</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_input_file</source>
-			<translation>Fișier INP de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_input_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_output_folder</source>
-			<translation>Dosar de ieșire:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_output_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_scenarios</source>
-			<translation>Utilizați scenarii din:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_scenarios</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_config</source>
-			<translation>Fișier de configurare:</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rdb_scenarios_database</source>
-			<translation>Baza de date</translation>
-		</message>
-		<message>
-			<source>tooltip_rdb_scenarios_database</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>load_menu</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_load_menu</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_load_menu</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut</name>
-		<message>
-			<source>title</source>
-			<translation>Mincut</translation>
-		</message>
-		<message>
-			<source>actionAddConnec</source>
-			<translation>Connec Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_actionAddConnec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionAddHydrometer</source>
-			<translation>Hidrometru Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_actionAddHydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionChangeValveStatus</source>
-			<translation>Modificarea stării supapei</translation>
-		</message>
-		<message>
-			<source>tooltip_actionChangeValveStatus</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionComposer</source>
-			<translation>Compozitor</translation>
-		</message>
-		<message>
-			<source>tooltip_actionComposer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionCustomMincut</source>
-			<translation>Mincut personalizat</translation>
-		</message>
-		<message>
-			<source>tooltip_actionCustomMincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionExportHydroCsv</source>
-			<translation>Export Hydro Csv</translation>
-		</message>
-		<message>
-			<source>tooltip_actionExportHydroCsv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionMincut</source>
-			<translation>Mincut automat</translation>
-		</message>
-		<message>
-			<source>tooltip_actionMincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionRefreshMincut</source>
-			<translation>Reîmprospătați Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_actionRefreshMincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel_task</source>
-			<translation>Anulează sarcina</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_task</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_end</source>
-			<translation>Sfârșit</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_start</source>
-			<translation>Start</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_end</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_end_predict</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_end_predict</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_start</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_start_predict</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_start_predict</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_recieved_day</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_recieved_day</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_use_planified</source>
-			<translation>Utilizați rețeaua planificată</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_use_planified</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut</source>
-			<translation>Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_exec_realdates</source>
-			<translation>Date reale</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_exec_realdates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_details</source>
-			<translation>Detalii</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_details</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_forecasted_dates</source>
-			<translation>Date previzionate</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_forecasted_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_assigned_to</source>
-			<translation>Atribuit către:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_assigned_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cause</source>
-			<translation>Cauza:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cause</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_chlorine</source>
-			<translation>Clor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_chlorine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_depth</source>
-			<translation>Adâncime:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_depth</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_pd</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_pd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_rd</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_rd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dist_from_plot</source>
-			<translation>Distanța de la parcelă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dist_from_plot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end</source>
-			<translation>Sfârșit:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_appropriate</source>
-			<translation>Apropiat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_enddate</source>
-			<translation>Data de încheiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Data de începere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_user</source>
-			<translation>Exec utilizator:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_user</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Nu s-au găsit rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_received_date</source>
-			<translation>Data primirii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_received_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start</source>
-			<translation>Începeți:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_turbidity</source>
-			<translation>Turbiditate:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_turbidity</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type</source>
-			<translation>Tip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordin de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab</source>
-			<translation>Executare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Plan</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydro</source>
-			<translation>Hidro</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydro</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>bara de instrumente</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_composer</name>
-		<message>
-			<source>title</source>
-			<translation>Compozitor Mincut</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_composer</source>
-			<translation>Compozitor Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Compozitor Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotație:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Șablon:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Titlu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_connec</name>
-		<message>
-			<source>title</source>
-			<translation>Conectare Mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_connec</source>
-			<translation>Conectare Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_search</source>
-			<translation>Căutați după codul clientului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_search</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_end</name>
-		<message>
-			<source>title</source>
-			<translation>Sfârșit mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_set_real_location</source>
-			<translation>Setați locația reală</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_set_real_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_end_fin</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_end_fin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_date_start_fin</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_date_start_fin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>cbx_hours_start_fin</source>
-			<translation>H:mm:ss</translation>
-		</message>
-		<message>
-			<source>tooltip_cbx_hours_start_fin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_end</source>
-			<translation>Sfârșit mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_close_mincut</source>
-			<translation>Închide mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_close_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Date</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_hour</source>
-			<translation>Ora finală:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_executed</source>
-			<translation>Executat de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_executed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut</source>
-			<translation>Mincut:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Nu s-au găsit rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_hour</source>
-			<translation>Ora de începere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordin de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_hydrometer</name>
-		<message>
-			<source>title</source>
-			<translation>Hidrometru Mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_hydrometer</source>
-			<translation>Hidrometru Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_hydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ccc</source>
-			<translation>Cod client Connec:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ccc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_hcc</source>
-			<translation>Cod client hidrometru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_hcc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Managementul mincut</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_manager</source>
-			<translation>Managementul mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_manager</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>profile</name>
-		<message>
-			<source>title</source>
-			<translation>Profil de desen</translation>
-		</message>
-		<message>
-			<source>actionAddPoint</source>
-			<translation>Adăugați un punct suplimentar</translation>
-		</message>
-		<message>
-			<source>tooltip_actionAddPoint</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionProfile</source>
-			<translation>Set noduri</translation>
-		</message>
-		<message>
-			<source>tooltip_actionProfile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_additional_point</source>
-			<translation>Adăugați un punct suplimentar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_end_point</source>
-			<translation>Adăugați punctul final</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_end_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_start_point</source>
-			<translation>Adăugați punctul de pornire</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_start_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_clear_profile</source>
-			<translation>Profil clar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_clear_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_draw_profile</source>
-			<translation>Profil de tragere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_draw_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_pdf</source>
-			<translation>Compozitor deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_pdf</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_load_profile</source>
-			<translation>Load profiile</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_load_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_save_profile</source>
-			<translation>Salvare profil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_save_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>date</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_profile</source>
-			<translation>Profil de desen</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_composer</source>
-			<translation>Parametrii</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_profile</source>
-			<translation>Profil</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_additional_point</source>
-			<translation>Punct suplimentar:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date</source>
-			<translation>Data:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_point</source>
-			<translation>Punct final:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_min_distance</source>
-			<translation>Vnode Min Dist:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_min_distance</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_path</source>
-			<translation>Calea:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_profile_id</source>
-			<translation>Profil id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_profile_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotație:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sh</source>
-			<translation>Horizontal scale:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sh</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_point</source>
-			<translation>Punct de plecare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sv</source>
-			<translation>Scară verticală:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Șablon:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Titlu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>bara de instrumente</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>txt_profile_id</source>
-			<translation>ID profil opțional</translation>
-		</message>
-		<message>
-			<source>tooltip_txt_profile_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>profile_list</name>
-		<message>
-			<source>title</source>
-			<translation>Profiluri de încărcare</translation>
-		</message>
-		<message>
-			<source>btn_delete_profile</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_profile_list</source>
-			<translation>Profiluri de încărcare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_profile_list</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Lista de profiluri</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector_date</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de dată</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>date_from</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>date_to</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_selector_date</source>
-			<translation>Selector de dată</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_from</source>
-			<translation>Data de la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_to</source>
-			<translation>Data până la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_to</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit</name>
-		<message>
-			<source>title</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_add_geom</source>
-			<translation>Adăugați geom</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_doc_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_delete</source>
-			<translation>Ștergeți documentul</translation>
-		</message>
-		<message>
-			<source>btn_doc_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_insert</source>
-			<translation>Introduceți documentul</translation>
-		</message>
-		<message>
-			<source>btn_doc_new</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_new</source>
-			<translation>Creați un document nou</translation>
-		</message>
-		<message>
-			<source>btn_event_delete</source>
-			<translation>Ștergeți evenimentul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_event_insert</source>
-			<translation>Introduceți evenimentul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_event_update</source>
-			<translation>Eveniment de actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_doc</source>
-			<translation>Deschideți documentul</translation>
-		</message>
-		<message>
-			<source>dlg_visit</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Tip caracteristică:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation>Cod:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl</source>
-			<translation>Explozie:*</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tip caracteristică:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Statutul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_user_name</source>
-			<translation>Nume utilizator:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visitcat_id</source>
-			<translation>Vizitați cat id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visitcat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_document</source>
-			<translation>Document</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_document</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_event</source>
-			<translation>Eveniment</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tab_visit</source>
-			<translation>Vizită</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_document</name>
-		<message>
-			<source>title</source>
-			<translation>Încărcați documentele</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_document</source>
-			<translation>Încărcați documentele</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_document</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Vizitați id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Vizită ID</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event</name>
-		<message>
-			<source>title</source>
-			<translation>Eveniment arc standard</translation>
-		</message>
-		<message>
-			<source>btn_add_file</source>
-			<translation>Adăugați fișier</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_file</source>
-			<translation>Ștergeți fișierul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event</source>
-			<translation>Eveniment arc standard</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_files</source>
-			<translation>Fișiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Parametru id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Poziția id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Valoarea poziției:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Valoare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_full</name>
-		<message>
-			<source>title</source>
-			<translation>Eveniment</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_full</source>
-			<translation>Eveniment</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_full</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compass</source>
-			<translation>Compas:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_event_code</source>
-			<translation>Codul evenimentului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_event_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_files</source>
-			<translation>Fișiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_index_val</source>
-			<translation>Index trap:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_index_val</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_is_last</source>
-			<translation>Este ultima:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_is_last</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Parametru id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Poziția id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Valoarea poziției:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_tstamp</source>
-			<translation>Tstamp:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_tstamp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Valoare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value1</source>
-			<translation>Valoarea 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value2</source>
-			<translation>Valoarea 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Vizitați id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Vizită ID</translation>
-		</message>
-		<message>
-			<source>lbl_xcoord</source>
-			<translation>X coord:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_xcoord</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ycoord</source>
-			<translation>Y coord:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ycoord</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_files</source>
-			<translation>Fișiere</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info</source>
-			<translation>Info</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_rehab</name>
-		<message>
-			<source>title</source>
-			<translation>Reabilitare arc eveniment</translation>
-		</message>
-		<message>
-			<source>btn_add_file</source>
-			<translation>Adăugați fișier</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_file</source>
-			<translation>Ștergeți fișierul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_rehab</source>
-			<translation>Reabilitare arc eveniment</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_rehab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_files</source>
-			<translation>Fișiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Parametru id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Poziția id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Valoarea poziției:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value1</source>
-			<translation>Valoarea 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value2</source>
-			<translation>Valoarea 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_gallery</name>
-		<message>
-			<source>title</source>
-			<translation>Galerie</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_actionT</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_next</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_next</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_gallery</source>
-			<translation>Galerie</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_event_id</source>
-			<translation>Eveniment id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_event_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Vizitați id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Vizită ID</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_gallery_zoom</name>
-		<message>
-			<source>title</source>
-			<translation>Galerie zoom</translation>
-		</message>
-		<message>
-			<source>btn_slideNext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_slideNext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_slidePrevious</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_slidePrevious</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_gallery_zoom</source>
-			<translation>Galerie zoom</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_gallery_zoom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_event_id</source>
-			<translation>Eveniment id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_event_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_img_zoom</source>
-			<translation>Zoom imagine</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_img_zoom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Vizitați id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>Vizită ID</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Vizitați managementul</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
 		</message>
 		<message>
-			<source>btn_create</source>
+			<source>organization_create</source>
 			<translation>Creați</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți vizita</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_organization_create</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Vizită deschisă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_event_to</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_event_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrați după cod:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_picture</name>
-		<message>
-			<source>title</source>
-			<translation>Adaugă imagine</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_picture</source>
-			<translation>Adaugă imagine</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_picture</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Link:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Link către</translation>
-		</message>
-		<message>
-			<source>path_doc</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_path_doc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>netscenario</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_toggle_closed</source>
-			<translation>Toggle închis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_closed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_netscenario</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_netscenario</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mapzone_id</source>
-			<translation>Mapzone id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mapzone_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>netscenario_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Manager Netscenario</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>     Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicat</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>Duplicat</translation>
-		</message>
-		<message>
-			<source>btn_execute</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_execute</source>
-			<translation>Executarea analizei mapzones</translation>
-		</message>
-		<message>
-			<source>btn_toc</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toc</source>
-			<translation>Încărcați stratul Giswater</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>btn_update_netscenario</source>
-			<translation>Scenariu net curent</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_netscenario</source>
-			<translation>Scenariu net curent</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>dlg_netscenario_manager</source>
-			<translation>Manager Netscenario</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_netscenario_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_netscenario_name</source>
-			<translation>Filtrați după: Numele Netscenarului</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_netscenario_name</source>
-			<translation>Filtrați după: Numele Netscenarului</translation>
 		</message>
 	</context>
 	<context>
 		<name>plan_psector</name>
+		<message>
+			<source>label_7</source>
+			<translation>Descript:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_7</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>active</source>
 			<translation>Activ</translation>
@@ -21363,14 +20648,6 @@
 		</message>
 		<message>
 			<source>tooltip_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_7</source>
-			<translation>Descript:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_7</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -21758,10 +21035,1084 @@
 		</message>
 	</context>
 	<context>
+		<name>print</name>
+		<message>
+			<source>title</source>
+			<translation>Imprimare rapidă</translation>
+		</message>
+		<message>
+			<source>grb_option_values</source>
+			<translation>Valori opționale:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_option_values</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_map_options</source>
+			<translation>Opțiunile hărții:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_map_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_preview</source>
+			<translation>Previzualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_print</source>
+			<translation>Imprimare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_print</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_print</source>
+			<translation>Imprimare rapidă</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_print</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>priority</name>
+		<message>
+			<source>title</source>
+			<translation>Calcularea priorității</translation>
+		</message>
+		<message>
+			<source>grb_engine_1</source>
+			<translation>grb_engine_1</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_engine_1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Aleargă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_again</source>
+			<translation>Următorul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_again</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save2file</source>
+			<translation>Salvați rezultatele într-un fișier Excel...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save2file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>Selectați caracteristicile pe pânză</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Calcularea priorității</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_catalog</source>
+			<translation>Catalog</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_catalog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Motor</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diametru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Calculați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Selectați caracteristicile pe pânză</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Calcularea priorității</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_global</source>
+			<translation>Parametrii de calcul</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection</source>
+			<translation>Selectarea caracteristicilor</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_budget</source>
+			<translation>Buget anual:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_budget</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl_selection</source>
+			<translation>Funcționare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_presszone</source>
+			<translation>Zona de presă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_presszone</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_id</source>
+			<translation>Numele rezultatului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Anul de orizont:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_calc</source>
+			<translation>Calculul</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_calc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_catalog</source>
+			<translation>Catalog</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_catalog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Motor</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_engine_2</source>
+			<translation>grb_engine_2</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_engine_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_global</source>
+			<translation>Parametrii de calcul</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection</source>
+			<translation>Selectarea caracteristicilor</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_budget</source>
+			<translation>Buget anual:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_budget</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diametru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl_selection</source>
+			<translation>Funcționare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_presszone</source>
+			<translation>Zona de presă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_presszone</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_id</source>
+			<translation>Numele rezultatului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Anul de orizont:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_calc</source>
+			<translation>Calculul</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_calc</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>priority_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority_manager</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Funcționare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrați după: Numele rezultatului</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Tip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_edit</source>
+			<translation>Editare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_edit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_status</source>
+			<translation>Modificarea statutului</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority_manager</source>
+			<translation>Manager de rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Funcționare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrați după: Numele rezultatului</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_corporate</source>
+			<translation>Set Corporate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_corporate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_corporate</source>
+			<translation>Set Corporate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_corporate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_edit</source>
+			<translation>Editare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_edit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_status</source>
+			<translation>Modificarea statutului</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_status</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>profile</name>
+		<message>
+			<source>title</source>
+			<translation>Profil de desen</translation>
+		</message>
+		<message>
+			<source>lbl_sh</source>
+			<translation>Horizontal scale:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sh</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_profile_id</source>
+			<translation>ID profil opțional</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_profile_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>toolBar</source>
+			<translation>bara de instrumente</translation>
+		</message>
+		<message>
+			<source>tooltip_toolBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_title</source>
+			<translation>Titlu:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_title</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Șablon:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_sv</source>
+			<translation>Scară verticală:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_point</source>
+			<translation>Punct de plecare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotație:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_profile_id</source>
+			<translation>Profil id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_profile_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Calea:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_min_distance</source>
+			<translation>Vnode Min Dist:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_min_distance</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_point</source>
+			<translation>Punct final:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date</source>
+			<translation>Data:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_additional_point</source>
+			<translation>Punct suplimentar:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_profile</source>
+			<translation>Profil</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_composer</source>
+			<translation>Parametrii</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_profile</source>
+			<translation>Profil de desen</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>date</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save_profile</source>
+			<translation>Salvare profil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_load_profile</source>
+			<translation>Load profiile</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_load_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_pdf</source>
+			<translation>Compozitor deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_pdf</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_draw_profile</source>
+			<translation>Profil de tragere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_draw_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_clear_profile</source>
+			<translation>Profil clar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_clear_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_start_point</source>
+			<translation>Adăugați punctul de pornire</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_start_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_end_point</source>
+			<translation>Adăugați punctul final</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_end_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_additional_point</source>
+			<translation>Adăugați un punct suplimentar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionProfile</source>
+			<translation>Set noduri</translation>
+		</message>
+		<message>
+			<source>tooltip_actionProfile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionAddPoint</source>
+			<translation>Adăugați un punct suplimentar</translation>
+		</message>
+		<message>
+			<source>tooltip_actionAddPoint</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>profile_list</name>
+		<message>
+			<source>title</source>
+			<translation>Profiluri de încărcare</translation>
+		</message>
+		<message>
+			<source>dlg_profile_list</source>
+			<translation>Profiluri de încărcare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_profile_list</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Lista de profiluri</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_profile</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>project_check</name>
+		<message>
+			<source>title</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>dlg_project_check</source>
+			<translation>Verificați proiectul</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_project_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_databaselog</source>
+			<translation>Jurnalul bazei de date</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_databaselog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tab_qgis_projlog</source>
+			<translation>Jurnal de proiect Qgis</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_qgis_projlog</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
 		<name>psector</name>
 		<message>
 			<source>title</source>
 			<translation>Plan psector</translation>
+		</message>
+		<message>
+			<source>vat_label</source>
+			<translation>TVA:</translation>
+		</message>
+		<message>
+			<source>tooltip_vat_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>gexpenses_label_7</source>
+			<translation>Total:</translation>
+		</message>
+		<message>
+			<source>tooltip_gexpenses_label_7</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>gexpenses_label_6</source>
+			<translation>Total:</translation>
+		</message>
+		<message>
+			<source>tooltip_gexpenses_label_6</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_general</source>
+			<translation>Generalități</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_general</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_document</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_document</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_connec</source>
+			<translation>Conectare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_other_prices</source>
+			<translation>Alte prețuri</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_other_prices</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text5</source>
+			<translation>Textul 5:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text5</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text4</source>
+			<translation>Textul 4:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text4</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text3</source>
+			<translation>Textul 3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>other_label_2</source>
+			<translation>Alte cheltuieli</translation>
+		</message>
+		<message>
+			<source>tooltip_other_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_value</source>
+			<translation>Valoarea numerică:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>gexpenses_label_8</source>
+			<translation>Total:</translation>
+		</message>
+		<message>
+			<source>tooltip_gexpenses_label_8</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>other_label_4</source>
+			<translation>%</translation>
+		</message>
+		<message>
+			<source>tooltip_other_label_4</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_remove</source>
@@ -21844,83 +22195,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>gexpenses_label_6</source>
-			<translation>Total:</translation>
+			<source>tab_node</source>
+			<translation>Nod</translation>
 		</message>
 		<message>
-			<source>tooltip_gexpenses_label_6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>gexpenses_label_7</source>
-			<translation>Total:</translation>
-		</message>
-		<message>
-			<source>tooltip_gexpenses_label_7</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>gexpenses_label_8</source>
-			<translation>Total:</translation>
-		</message>
-		<message>
-			<source>tooltip_gexpenses_label_8</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_value</source>
-			<translation>Valoarea numerică:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text3</source>
-			<translation>Textul 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text4</source>
-			<translation>Textul 4:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text5</source>
-			<translation>Textul 5:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text5</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text6</source>
-			<translation>Textul 6:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text6</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total</source>
-			<translation>Total :</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total_count</source>
-			<translation>0</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total_count</source>
+			<source>tooltip_tab_node</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -21932,43 +22211,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>other_label_2</source>
-			<translation>Alte cheltuieli</translation>
-		</message>
-		<message>
-			<source>tooltip_other_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>other_label_3</source>
 			<translation>%</translation>
 		</message>
 		<message>
 			<source>tooltip_other_label_3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>other_label_4</source>
-			<translation>%</translation>
-		</message>
-		<message>
-			<source>tooltip_other_label_4</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_additional_info</source>
-			<translation>Informații suplimentare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_additional_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -21980,67 +22227,43 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_connec</source>
-			<translation>Conectare</translation>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_connec</source>
+			<source>tooltip_tab_arc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_document</source>
-			<translation>Document</translation>
+			<source>tab_additional_info</source>
+			<translation>Informații suplimentare</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_document</source>
+			<source>tooltip_tab_additional_info</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_general</source>
-			<translation>Generalități</translation>
+			<source>lbl_total_count</source>
+			<translation>0</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_general</source>
+			<source>tooltip_lbl_total_count</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<source>lbl_total</source>
+			<translation>Total :</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_gully</source>
+			<source>tooltip_lbl_total</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_node</source>
-			<translation>Nod</translation>
+			<source>lbl_text6</source>
+			<translation>Textul 6:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_other_prices</source>
-			<translation>Alte prețuri</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_other_prices</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>vat_label</source>
-			<translation>TVA:</translation>
-		</message>
-		<message>
-			<source>tooltip_vat_label</source>
+			<source>tooltip_lbl_text6</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22051,20 +22274,20 @@
 			<translation>Psector duplicat</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
 			<source>btn_cancel</source>
 			<translation>Anulează</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
 		</message>
 		<message>
 			<source>dlg_psector_duplicate</source>
@@ -22114,62 +22337,6 @@
 			<translation>Managementul sectorului</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Creați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicat</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_merge</source>
-			<translation>Unire</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_merge</source>
-			<translation>Pentru a uni mai mulți psectori într-unul singur, trebuie să îi selectați anterior folosind Ctrl și apoi să faceți clic pe acest buton</translation>
-		</message>
-		<message>
-			<source>btn_restore</source>
-			<translation>Restaurare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_restore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_show</source>
-			<translation>Spectacol</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_toggle_active</source>
 			<translation>Comutare activă</translation>
 		</message>
@@ -22178,43 +22345,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_update_psector</source>
-			<translation>Comutare curent</translation>
+			<source>lbl_psector_name</source>
+			<translation>Filtrați după: Numele sectorului</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_update_psector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>chk_archived</source>
-			<translation>Afișare arhivată</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_archived</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_filter_canvas</source>
-			<translation>Filtru din pânză</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_filter_canvas</source>
-			<translation>Afișați numai psectoarele vizibile în pânză</translation>
-		</message>
-		<message>
-			<source>dlg_psector_manager</source>
-			<translation>Managementul sectorului</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_psector_manager</source>
+			<source>tooltip_lbl_psector_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22226,11 +22361,99 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_psector_name</source>
-			<translation>Filtrați după: Numele sectorului</translation>
+			<source>dlg_psector_manager</source>
+			<translation>Managementul sectorului</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_psector_name</source>
+			<source>tooltip_dlg_psector_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_filter_canvas</source>
+			<translation>Filtru din pânză</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_filter_canvas</source>
+			<translation>Afișați numai psectoarele vizibile în pânză</translation>
+		</message>
+		<message>
+			<source>chk_archived</source>
+			<translation>Afișare arhivată</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_archived</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_active</source>
+			<translation>Arată inactiv</translation>
+		</message>
+		<message>
+			<source>btn_update_psector</source>
+			<translation>Comutare curent</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_psector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_show</source>
+			<translation>Spectacol</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_restore</source>
+			<translation>Restaurare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_restore</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_merge</source>
+			<translation>Unire</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_merge</source>
+			<translation>Pentru a uni mai mulți psectori într-unul singur, trebuie să îi selectați anterior folosind Ctrl și apoi să faceți clic pe acest buton</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicat</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22239,14 +22462,6 @@
 		<message>
 			<source>title</source>
 			<translation>Raport sectorial</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
 		</message>
 		<message>
 			<source>btn_ok</source>
@@ -22265,27 +22480,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>chk_composer</source>
-			<translation>Compozitor fișier pdf</translation>
+			<source>lbl_template</source>
+			<translation>Șablon</translation>
 		</message>
 		<message>
-			<source>tooltip_chk_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_psector_rapport</source>
-			<translation>Raport sectorial</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_psector_rapport</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_rapport</source>
-			<translation>Raport</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_rapport</source>
+			<source>tooltip_lbl_template</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22297,11 +22496,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_detail_csv</source>
-			<translation>Detaliu fișier csv:</translation>
+			<source>grb_rapport</source>
+			<translation>Raport</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_detail_csv</source>
+			<source>tooltip_grb_rapport</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_composer</source>
+			<translation>Compozitor fișier pdf</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_composer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_composer</source>
+			<translation>Compozitor fișier pdf</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_composer</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22313,12 +22528,28 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_template</source>
-			<translation>Șablon</translation>
+			<source>lbl_detail_csv</source>
+			<translation>Detaliu fișier csv:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_template</source>
+			<source>tooltip_lbl_detail_csv</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_psector_rapport</source>
+			<translation>Raport sectorial</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_psector_rapport</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
 		</message>
 	</context>
 	<context>
@@ -22328,11 +22559,11 @@
 			<translation>Dialog</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
+			<source>btn_repair</source>
+			<translation>Reparare</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_btn_repair</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22344,11 +22575,145 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_psector_repair</source>
 			<translation>Dialog</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_repair</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>quantized_demands</name>
+		<message>
+			<source>title</source>
+			<translation>Cereri cuantificate</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_quantized_demands</source>
+			<translation>Cereri cuantificate</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_quantized_demands</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>recursive_epa</name>
+		<message>
+			<source>title</source>
+			<translation>Epa Apeluri multiple</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_recursive_epa</source>
+			<translation>Epa Apeluri multiple</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_recursive_epa</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22416,365 +22781,17 @@
 		</message>
 	</context>
 	<context>
-		<name>crm_trace</name>
-		<message>
-			<source>lbl_inst</source>
-			<translation>Instrucțiuni:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_inst</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>audit</name>
-		<message>
-			<source>title</source>
-			<translation>Audit</translation>
-		</message>
-		<message>
-			<source>dlg_audit</source>
-			<translation>Audit</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_audit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_audit</source>
-			<translation>Jurnal</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_audit</source>
-			<translation>Jurnal</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Valori actualizate</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>audit_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Manager de audit</translation>
-		</message>
-		<message>
-			<source>dlg_audit_manager</source>
-			<translation>Manager de audit</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_audit_manager</source>
-			<translation>Manager de audit</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Jurnale</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>Jurnale</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Data până la</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>Data până la</translation>
-		</message>
-	</context>
-	<context>
-		<name>dscenario</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_properties</source>
-			<translation>Proprietăți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_properties</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_dscenario</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_dscenario</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_catalog</name>
-		<message>
-			<source>title</source>
-			<translation>Catalog</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_catalog</source>
-			<translation>Catalog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_catalog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_generic</name>
-		<message>
-			<source>title</source>
-			<translation>Informații de bază</translation>
-		</message>
-		<message>
-			<source>actionEdit</source>
-			<translation>Editare</translation>
-		</message>
-		<message>
-			<source>tooltip_actionEdit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>actionSetToArc</source>
-			<translation>Setați la arc</translation>
-		</message>
-		<message>
-			<source>tooltip_actionSetToArc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_generic</source>
-			<translation>Informații de bază</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_generic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>toolBar</source>
-			<translation>bara de instrumente</translation>
-		</message>
-		<message>
-			<source>tooltip_toolBar</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_workcat</name>
-		<message>
-			<source>title</source>
-			<translation>Nou workcat</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>builtdate</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_workcat</source>
-			<translation>Nou workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Data construirii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Link:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_id</source>
-			<translation>ID de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workid_key_1</source>
-			<translation>Cheia Workid 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workid_key_2</source>
-			<translation>Cheia Workid 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_2</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>interpolate</name>
-		<message>
-			<source>title</source>
-			<translation>Interpolare</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_interpolate</source>
-			<translation>Interpolare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_interpolate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_extrapolate</source>
-			<translation>Extrapolare</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_extrapolate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_interpolate</source>
-			<translation>Interpolare</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_interpolate</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
 		<name>replace_in_file</name>
 		<message>
 			<source>title</source>
 			<translation>Înlocuiți textul din fișier</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
+			<source>lbl_title</source>
+			<translation>Înlocuiți aceste nume cu altele noi:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_replace_in_file</source>
-			<translation>Înlocuiți textul din fișier</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_replace_in_file</source>
+			<source>tooltip_lbl_title</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -22786,11 +22803,626 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_title</source>
-			<translation>Înlocuiți aceste nume cu altele noi:</translation>
+			<source>dlg_replace_in_file</source>
+			<translation>Înlocuiți textul din fișier</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_title</source>
+			<source>tooltip_dlg_replace_in_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>reports</name>
+		<message>
+			<source>btn_export</source>
+			<translation>Export</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_export_path</source>
+			<translation>Calea:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_export_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Întrebare:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Info</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_filters</source>
+			<translation>Filtre</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_filters</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>resources_management</name>
+		<message>
+			<source>title</source>
+			<translation>Gestionarea resurselor</translation>
+		</message>
+		<message>
+			<source>btn_team_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_assign_team</source>
+			<translation>Atribuiți echipa</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_assign_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_organi_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_organi_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>btn_organi_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_organi_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_organi_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_organi_update</source>
+			<translation>Modificați</translation>
+		</message>
+		<message>
+			<source>btn_remove_team</source>
+			<translation>Eliminați echipa</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_remove_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_team_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>btn_team_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>btn_team_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_toggle_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_team_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_team_update</source>
+			<translation>Modificați</translation>
+		</message>
+		<message>
+			<source>btn_user_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_delete</source>
+			<translation>Ștergeți</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_toggle_active</source>
+			<translation>Comutare activă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_toggle_active</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_update</source>
+			<translation>Modificați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>cmb_team</source>
+			<translation>Selectați echipa</translation>
+		</message>
+		<message>
+			<source>tooltip_cmb_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_resources_management</source>
+			<translation>Gestionarea resurselor</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_resources_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Management:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>Management:</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Management:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>Management:</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Filtrați după nume:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Filtrați după numele echipei:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_3</source>
+			<translation>Filtrați după echipă:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>organizations</source>
+			<translation>Organizații</translation>
+		</message>
+		<message>
+			<source>tooltip_organizations</source>
+			<translation>Organizații</translation>
+		</message>
+		<message>
+			<source>resource_management</source>
+			<translation>Gestionarea resurselor</translation>
+		</message>
+		<message>
+			<source>tooltip_resource_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_organizations</source>
+			<translation>Organizații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_organizations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_teams</source>
+			<translation>Echipe</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_teams</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_users</source>
+			<translation>Utilizatori</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_users</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>team</source>
+			<translation>Echipe</translation>
+		</message>
+		<message>
+			<source>tooltip_team</source>
+			<translation>Echipe</translation>
+		</message>
+	</context>
+	<context>
+		<name>result_selector</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de rezultate</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Rezultat pentru a arăta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_result_selector</source>
+			<translation>Selector de rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_result_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_compare</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_compare</source>
+			<translation>Rezultat de comparat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Rezultat pentru a arăta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Rezultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_compare</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_compare</source>
+			<translation>Rezultat de comparat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Rezultat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_result_selector</source>
+			<translation>Selector de rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_result_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>search</name>
+		<message>
+			<source>title</source>
+			<translation>Căutare</translation>
+		</message>
+		<message>
+			<source>Check all</source>
+			<translation>Verificați toate</translation>
+		</message>
+		<message>
+			<source>tooltip_Check all</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_search</source>
+			<translation>Căutare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_search</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>Nu s-au găsit rezultate</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>search_workcat</name>
+		<message>
+			<source>title</source>
+			<translation>Căutare Workcat</translation>
+		</message>
+		<message>
+			<source>lbl_total2</source>
+			<translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total numere:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_total2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_to_csv</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_to_csv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_state0</source>
+			<translation>Activați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_state0</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_state1</source>
+			<translation>Activați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_state1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_search_workcat</source>
+			<translation>Căutare Workcat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_search_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_destination_path</source>
+			<translation>Calea de destinație:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_destination_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end</source>
+			<translation>Filtrare după: cod</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_end</source>
+			<translation>Caracteristici eliminate cu pisica de lucru selectată</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_ini</source>
+			<translation>Caracteristici instalate cu workcat-ul selectat</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_ini</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_init</source>
+			<translation>Filtrare după: cod</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_init</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_total1</source>
+			<translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total numere:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_total1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_doc</source>
+			<translation>Documente</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_ended</source>
+			<translation>Eliminat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_ended</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_init</source>
+			<translation>Instalat</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_init</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -22799,6 +23431,30 @@
 		<message>
 			<source>title</source>
 			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -22834,10 +23490,1490 @@
 		</message>
 	</context>
 	<context>
+		<name>selector_date</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de dată</translation>
+		</message>
+		<message>
+			<source>dlg_selector_date</source>
+			<translation>Selector de dată</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_to</source>
+			<translation>Data până la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>date_from</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>date_to</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_selector_date</source>
+			<translation>Selector de dată</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_from</source>
+			<translation>Data de la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_from</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>show_info</name>
+		<message>
+			<source>title</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_show_info</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_show_info</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>snapshot_view</name>
+		<message>
+			<source>title</source>
+			<translation>Audit</translation>
+		</message>
+		<message>
+			<source>groupBox_2</source>
+			<translation>Selecția temporală și spațială</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>Selecția temporală și spațială</translation>
+		</message>
+		<message>
+			<source>Use current map canvas extent</source>
+			<translation>Utilizați întinderea actuală a hărții</translation>
+		</message>
+		<message>
+			<source>tooltip_Use current map canvas extent</source>
+			<translation>Utilizați întinderea actuală a hărții</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Caracteristici de recuperat</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>Caracteristici de recuperat</translation>
+		</message>
+		<message>
+			<source>Draw on map canvas</source>
+			<translation>Desenați pe pânză hartă</translation>
+		</message>
+		<message>
+			<source>tooltip_Draw on map canvas</source>
+			<translation>Desenați pe pânză hartă</translation>
+		</message>
+		<message>
+			<source>dlg_snapshot_view</source>
+			<translation>Audit</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_snapshot_view</source>
+			<translation>Audit</translation>
+		</message>
+		<message>
+			<source>Calculate from municipality</source>
+			<translation>Calculați din municipalitate</translation>
+		</message>
+		<message>
+			<source>tooltip_Calculate from municipality</source>
+			<translation>Calculați din municipalitate</translation>
+		</message>
+		<message>
+			<source>Calculate from exploitation</source>
+			<translation>Calculați din exploatare</translation>
+		</message>
+		<message>
+			<source>tooltip_Calculate from exploitation</source>
+			<translation>Calculați din exploatare</translation>
+		</message>
+		<message>
+			<source>Audit</source>
+			<translation>Audit</translation>
+		</message>
+		<message>
+			<source>tooltip_Audit</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>static_calibration</name>
+		<message>
+			<source>title</source>
+			<translation>Calibrare statică</translation>
+		</message>
+		<message>
+			<source>lbl_inp_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_inp_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_static_calibration</source>
+			<translation>Calibrare statică</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_static_calibration</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Numele fișierelor de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>status_selector</name>
+		<message>
+			<source>title</source>
+			<translation>Selector de stare</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Modificați starea următorului rezultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_status</source>
+			<translation>Stare nouă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_status_selector</source>
+			<translation>Selector de stare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_status_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_status_selector</source>
+			<translation>Selector de stare</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_status_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_status</source>
+			<translation>Stare nouă:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result</source>
+			<translation>result_id: result_name</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Modificați starea următorului rezultat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>style</name>
+		<message>
+			<source>title</source>
+			<translation>Adaugă categorie</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_role</source>
+			<translation>Role:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_role</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_del_feature</source>
+			<translation>Date</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_del_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_style</source>
+			<translation>Adaugă categorie</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_style</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cat_id</source>
+			<translation>Categorie ID:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cat_name</source>
+			<translation>Numele categoriei:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_name</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>style_manager</name>
+		<message>
+			<source>title</source>
+			<translation>Gestionarea stilului</translation>
+		</message>
+		<message>
+			<source>dlg_style_manager</source>
+			<translation>Gestionarea stilului</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_style_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_addGroup</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_addGroup</source>
+			<translation>Adăugați o nouă categorie</translation>
+		</message>
+		<message>
+			<source>btn_add_style</source>
+			<translation>Adaugă stil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_style</source>
+			<translation>Adaugă stil</translation>
+		</message>
+		<message>
+			<source>btn_addStyle</source>
+			<translation>Adaugă stil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_addStyle</source>
+			<translation>Adaugă un strat la categoria selectată</translation>
+		</message>
+		<message>
+			<source>btn_updateStyle</source>
+			<translation>Actualizare stil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_updateStyle</source>
+			<translation>Actualizează stilul stratului selectat cu stilul din stratul de proiect corespunzător</translation>
+		</message>
+		<message>
+			<source>btn_update_style</source>
+			<translation>Actualizare stil</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_style</source>
+			<translation>Actualizare stil</translation>
+		</message>
+		<message>
+			<source>btn_update_group</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_group</source>
+			<translation>Actualizarea categoriei selectate</translation>
+		</message>
+		<message>
+			<source>btn_refreshAll</source>
+			<translation>Actualizați toate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_refreshAll</source>
+			<translation>Reîncarcă stilurile încărcate în proiect</translation>
+		</message>
+		<message>
+			<source>btn_refresh_all</source>
+			<translation>Actualizați toate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_refresh_all</source>
+			<translation>Actualizați toate</translation>
+		</message>
+		<message>
+			<source>btn_deleteStyle</source>
+			<translation>Ștergeți stilul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_deleteStyle</source>
+			<translation>Înlătură un stil din categorie</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_delete_style</source>
+			<translation>Ștergeți stilul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_style</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_deleteGroup</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_deleteGroup</source>
+			<translation>Ștergeți categoria selectată</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>stylegroup</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_stylegroup</source>
+			<translation>Toate categoriile tale de stil</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Filtrare după: layername</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_category</source>
+			<translation>Filtrați după: Categorie</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_category</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>Delete style</source>
+			<translation>Ștergeți stilul</translation>
+		</message>
+		<message>
+			<source>tooltip_Delete style</source>
+			<translation>Ștergeți stilul</translation>
+		</message>
+		<message>
+			<source>style_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_style_name</source>
+			<translation>Introduceți numele stratului pentru filtrare</translation>
+		</message>
+	</context>
+	<context>
+		<name>style_update_category</name>
+		<message>
+			<source>title</source>
+			<translation>Redenumiți categoria</translation>
+		</message>
+		<message>
+			<source>dlg_style_update_category</source>
+			<translation>Redenumiți categoria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_style_update_category</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_rename_copy</source>
+			<translation>Vă rugăm să selectați un nou nume de categorie:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rename_copy</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>team_create</name>
+		<message>
+			<source>title</source>
+			<translation>Creați o echipă</translation>
+		</message>
+		<message>
+			<source>dlg_team_create</source>
+			<translation>Creați o echipă</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_team_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>grb_team</source>
+			<translation>Echipa:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_team</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_active</source>
+			<translation>Activ:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_active</source>
+			<translation>Activ:</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>lbl_name</source>
+			<translation>Numele echipei:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_name</source>
+			<translation>Numele echipei:</translation>
+		</message>
+		<message>
+			<source>team_create</source>
+			<translation>Creați o echipă</translation>
+		</message>
+		<message>
+			<source>tooltip_team_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>TeamTab</source>
+			<translation>Echipa</translation>
+		</message>
+		<message>
+			<source>tooltip_TeamTab</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>team_management</name>
+		<message>
+			<source>title</source>
+			<translation>Managementul echipei</translation>
+		</message>
+		<message>
+			<source>team_management</source>
+			<translation>Managementul echipei</translation>
+		</message>
+		<message>
+			<source>tooltip_team_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_vehicle_unselect</source>
+			<translation>&lt;&lt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_vehicle_unselect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_visitclass_select</source>
+			<translation>&gt;&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_visitclass_select</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_visitclass_unselect</source>
+			<translation>&lt;&lt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_visitclass_unselect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_team_management</source>
+			<translation>Managementul echipei</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_team_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_select</source>
+			<translation>&gt;&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_select</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_user_unselect</source>
+			<translation>&lt;&lt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_user_unselect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_vehicle_select</source>
+			<translation>&gt;&gt;</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_vehicle_select</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_user</source>
+			<translation>Utilizatori</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_user</source>
+			<translation>Utilizatori</translation>
+		</message>
+		<message>
+			<source>tab_vehicles</source>
+			<translation>Vehicule</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_vehicles</source>
+			<translation>Vehicule</translation>
+		</message>
+		<message>
+			<source>tab_visit_class</source>
+			<translation>Vizitați clasa</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit_class</source>
+			<translation>Vizitați clasa</translation>
+		</message>
+	</context>
+	<context>
+		<name>toolbox</name>
+		<message>
+			<source>title</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection_type</source>
+			<translation>Tip de selecție:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_layer</source>
+			<translation>Toate caracteristicile</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_previous</source>
+			<translation>Numai caracteristici selectate</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>trv_processes</source>
+			<translation>Procese</translation>
+		</message>
+		<message>
+			<source>tooltip_trv_processes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>trv_reports</source>
+			<translation>Raportează</translation>
+		</message>
+		<message>
+			<source>tooltip_trv_reports</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_run</source>
+			<translation>Aleargă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_run</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_toolbox</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_toolbox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_input_layer</source>
+			<translation>Stratul de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_input_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_parameters</source>
+			<translation>Parametrii opțiunii:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_parameters</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>toolbox_reports</name>
+		<message>
+			<source>title</source>
+			<translation>Rapoarte</translation>
+		</message>
+		<message>
+			<source>grb_filters</source>
+			<translation>Filtre</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_filters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_toolbox_reports</source>
+			<translation>Rapoarte</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_toolbox_reports</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_export_path</source>
+			<translation>Calea:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_export_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label_2</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_label_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Întrebare:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_info</source>
+			<translation>Info</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export</source>
+			<translation>Export</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>toolbox_tool</name>
+		<message>
+			<source>grb_input_layer</source>
+			<translation>Stratul de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_input_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection_type</source>
+			<translation>Tip de selecție:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_run</source>
+			<translation>Aleargă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_run</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_parameters</source>
+			<translation>Parametrii opțiunii:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_parameters</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Jurnal de informații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configurare</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_previous</source>
+			<translation>Numai caracteristici selectate</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rbt_layer</source>
+			<translation>Toate caracteristicile</translation>
+		</message>
+		<message>
+			<source>tooltip_rbt_layer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>progressBar</source>
+			<translation>%p%</translation>
+		</message>
+		<message>
+			<source>tooltip_progressBar</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>groupBox</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>update_style_group</name>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>lbl_rename_copy</source>
+			<translation>Vă rugăm să selectați un nou nume de categorie:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rename_copy</source>
+			<translation>Vă rugăm să selectați un nou nume de categorie:</translation>
+		</message>
+	</context>
+	<context>
+		<name>user_create</name>
+		<message>
+			<source>title</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>actionT</source>
+			<translation>t</translation>
+		</message>
+		<message>
+			<source>tooltip_actionT</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>user_create</source>
+			<translation>Creează utilizator</translation>
+		</message>
+		<message>
+			<source>tooltip_user_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_user_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_user_create</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>valve_operation_check</name>
+		<message>
+			<source>title</source>
+			<translation>Verificarea funcționării supapei</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_config</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_config</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_scenarios</source>
+			<translation>Utilizați scenarii din:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_scenarios</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_output_folder</source>
+			<translation>Dosar de ieșire:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_output_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_input_file</source>
+			<translation>Fișier INP de intrare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_input_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filename</source>
+			<translation>Numele fișierului:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filename</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_config_file</source>
+			<translation>Fișier de configurare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_config_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_valve_operation_check</source>
+			<translation>Verificarea funcționării supapei</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_valve_operation_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>OK</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rdb_scenarios_database</source>
+			<translation>Baza de date</translation>
+		</message>
+		<message>
+			<source>tooltip_rdb_scenarios_database</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
 		<name>visit</name>
 		<message>
 			<source>title</source>
 			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>btn_add_geom</source>
+			<translation>Adăugați geom</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_doc_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_doc_delete</source>
+			<translation>Ștergeți documentul</translation>
+		</message>
+		<message>
+			<source>btn_doc_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_doc_insert</source>
+			<translation>Introduceți documentul</translation>
+		</message>
+		<message>
+			<source>btn_doc_new</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_doc_new</source>
+			<translation>Creați un document nou</translation>
+		</message>
+		<message>
+			<source>btn_event_delete</source>
+			<translation>Ștergeți evenimentul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_event_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_event_insert</source>
+			<translation>Introduceți evenimentul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_event_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_event_update</source>
+			<translation>Eveniment de actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_event_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_feature_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_feature_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_feature_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_feature_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_doc</source>
+			<translation>Deschideți documentul</translation>
+		</message>
+		<message>
+			<source>dlg_visit</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Tip caracteristică:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_code</source>
+			<translation>Cod:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descriere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Explozie:*</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Tip caracteristică:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Statutul:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_user_name</source>
+			<translation>Nume utilizator:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visitcat_id</source>
+			<translation>Vizitați cat id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visitcat_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_document</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_document</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_event</source>
+			<translation>Eveniment</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>Relații</translation>
+		</message>
+		<message>
+			<source>tab_visit</source>
+			<translation>Vizită</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -23079,6 +25215,22 @@
 			<translation>Încărcați documentele</translation>
 		</message>
 		<message>
+			<source>groupBox_2</source>
+			<translation>Lista de documente</translation>
+		</message>
+		<message>
+			<source>tooltip_groupBox_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Vizitați id</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_open</source>
 			<translation>Deschis</translation>
 		</message>
@@ -23095,19 +25247,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>groupBox_2</source>
-			<translation>Lista de documente</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_visit_id</source>
-			<translation>Vizitați id</translation>
+			<translation>Vizitați id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
+			<translation>Vizită ID</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Deschis</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_document</source>
+			<translation>Încărcați documentele</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_document</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23116,6 +25276,94 @@
 		<message>
 			<source>title</source>
 			<translation>Eveniment arc standard</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Valoare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Adăugați fișier</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_file</source>
+			<translation>Ștergeți fișierul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event</source>
+			<translation>Eveniment arc standard</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Fișiere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Parametru id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Poziția id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Valoarea poziției:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Valoare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -23134,19 +25382,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_delete_file</source>
 			<translation>Ștergeți fișierul</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23197,52 +25445,12 @@
 			<source>tooltip_lbl_position_value</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Valoare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>visit_event_full</name>
 		<message>
 			<source>title</source>
 			<translation>Eveniment</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_full</source>
-			<translation>Eveniment</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_full</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_compass</source>
-			<translation>Compas:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_compass</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_event_code</source>
@@ -23397,6 +25605,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_info</source>
+			<translation>Info</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_files</source>
 			<translation>Fișiere</translation>
 		</message>
@@ -23405,58 +25621,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_info</source>
-			<translation>Info</translation>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_rehab</name>
-		<message>
-			<source>title</source>
-			<translation>Reabilitare arc eveniment</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
+			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_add_file</source>
-			<translation>Adăugați fișier</translation>
+			<source>dlg_visit_event_full</source>
+			<translation>Eveniment</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_add_file</source>
+			<source>tooltip_dlg_visit_event_full</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
+			<source>lbl_compass</source>
+			<translation>Compas:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_lbl_compass</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete_file</source>
-			<translation>Ștergeți fișierul</translation>
+			<source>lbl_event_code</source>
+			<translation>Codul evenimentului:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_visit_event_rehab</source>
-			<translation>Reabilitare arc eveniment</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_event_rehab</source>
+			<source>tooltip_lbl_event_code</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23469,7 +25662,7 @@
 		</message>
 		<message>
 			<source>lbl_geom1</source>
-			<translation>Geom1:</translation>
+			<translation>Geom 1:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom1</source>
@@ -23477,7 +25670,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Geom2:</translation>
+			<translation>Geom 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -23485,15 +25678,39 @@
 		</message>
 		<message>
 			<source>lbl_geom3</source>
-			<translation>Geom3:</translation>
+			<translation>Geom 3:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_id</source>
+			<translation>Id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_index_val</source>
+			<translation>Index trap:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_index_val</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_is_last</source>
+			<translation>Este ultima:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_is_last</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Parametru id:      </translation>
+			<translation>Parametru id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -23524,11 +25741,114 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_tstamp</source>
+			<translation>Tstamp:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_tstamp</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Valoare:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_value1</source>
-			<translation>Valoare1:</translation>
+			<translation>Valoarea 1:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value2</source>
+			<translation>Valoarea 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Vizitați id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>Vizită ID</translation>
+		</message>
+		<message>
+			<source>lbl_xcoord</source>
+			<translation>X coord:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_xcoord</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ycoord</source>
+			<translation>Y coord:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ycoord</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_files</source>
+			<translation>Fișiere</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info</source>
+			<translation>Info</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_full</source>
+			<translation>Eveniment</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_full</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compass</source>
+			<translation>Compas:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compass</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>visit_event_rehab</name>
+		<message>
+			<source>title</source>
+			<translation>Reabilitare arc eveniment</translation>
+		</message>
+		<message>
+			<source>lbl_geom3</source>
+			<translation>Geom3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom3</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23537,6 +25857,214 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value1</source>
+			<translation>Valoare1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Valoarea poziției:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Poziția id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Parametru id:      </translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom2</source>
+			<translation>Geom2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom1</source>
+			<translation>Geom1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Fișiere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_rehab</source>
+			<translation>Reabilitare arc eveniment</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_rehab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_file</source>
+			<translation>Ștergeți fișierul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Adăugați fișier</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value2</source>
+			<translation>Valoarea 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value1</source>
+			<translation>Valoarea 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Valoarea poziției:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Poziția id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Parametru id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom3</source>
+			<translation>Geom 3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom2</source>
+			<translation>Geom 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom1</source>
+			<translation>Geom 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Fișiere:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_rehab</source>
+			<translation>Reabilitare arc eveniment</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_rehab</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete_file</source>
+			<translation>Ștergeți fișierul</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete_file</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Adăugați fișier</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23555,14 +26083,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_visit_gallery</source>
-			<translation>Galerie</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_event_id</source>
 			<translation>Eveniment id:</translation>
 		</message>
@@ -23576,6 +26096,62 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
+			<translation>Vizită ID</translation>
+		</message>
+		<message>
+			<source>dlg_visit_gallery</source>
+			<translation>Galerie</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_gallery</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Vizitați id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_event_id</source>
+			<translation>Eveniment id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_event_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_previous</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_next</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_next</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_gallery</source>
+			<translation>Galerie</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_gallery</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23586,11 +26162,19 @@
 			<translation>Galerie zoom</translation>
 		</message>
 		<message>
-			<source>dlg_visit_gallery_zoom</source>
-			<translation>Galerie zoom</translation>
+			<source>lbl_visit_id</source>
+			<translation>Vizitați id:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_visit_gallery_zoom</source>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_img_zoom</source>
+			<translation>Zoom imagine</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_img_zoom</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -23602,11 +26186,51 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>dlg_visit_gallery_zoom</source>
+			<translation>Galerie zoom</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_gallery_zoom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_slidePrevious</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_slidePrevious</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_slideNext</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_slideNext</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_visit_id</source>
 			<translation>Vizitați id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
+			<translation>Vizită ID</translation>
+		</message>
+		<message>
+			<source>lbl_event_id</source>
+			<translation>Eveniment id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_event_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_gallery_zoom</source>
+			<translation>Galerie zoom</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_gallery_zoom</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -23615,6 +26239,78 @@
 		<message>
 			<source>title</source>
 			<translation>Vizitați managementul</translation>
+		</message>
+		<message>
+			<source>date_event_to</source>
+			<translation>zz/MM/aaaa</translation>
+		</message>
+		<message>
+			<source>tooltip_date_event_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_manager</source>
+			<translation>Vizitați managementul</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Creați</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți vizita</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Vizită deschisă</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_from</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_data_event_to</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_event_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filtrați după cod:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -23657,14 +26353,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>date_event_to</source>
-			<translation>zz/MM/aaaa</translation>
-		</message>
-		<message>
-			<source>tooltip_date_event_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_visit_manager</source>
 			<translation>Vizitați managementul</translation>
 		</message>
@@ -23698,183 +26386,10 @@
 		</message>
 	</context>
 	<context>
-		<name>show_info</name>
+		<name>visit_picture</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_show_info</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_show_info</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>check_project</name>
-		<message>
-			<source>title</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>brb_database_check</source>
-			<translation>Verificarea stării bazei de date:</translation>
-		</message>
-		<message>
-			<source>tooltip_brb_database_check</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_check_project</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_check_project</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>grb_system_check</source>
-			<translation>Verificarea stării sistemului:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system_check</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tab_data</source>
-			<translation>Jurnalul bazei de date</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_log</source>
-			<translation>Jurnale</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_log</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>comp_x_pages</name>
-		<message>
-			<source>title</source>
-			<translation>Imprimarea automată a paginilor compozitorului</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>grb_comp</source>
-			<translation>Lista compozitorilor</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_comp</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_composers</source>
-			<translation>Selectați compozitorul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_composers</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_folder</source>
-			<translation>Selectați folderul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_folder</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_prefix</source>
-			<translation>Fișier prefix:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_prefix</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_single</source>
-			<translation>Fișier unic:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_single</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_sleep</source>
-			<translation>Timpul de somn:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sleep</source>
-			<translation></translation>
-		</message>
-	</context>
-	<context>
-		<name>config</name>
-		<message>
-			<source>title</source>
-			<translation>Configurare</translation>
+			<translation>Adaugă imagine</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -23893,651 +26408,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_config</source>
-			<translation>Configurare</translation>
+			<source>dlg_visit_picture</source>
+			<translation>Adaugă imagine</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_config</source>
+			<source>tooltip_dlg_visit_picture</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_addfields</source>
-			<translation>Câmpuri adăugate</translation>
+			<source>lbl_link</source>
+			<translation>Link:</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_addfields</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_admin_om</source>
-			<translation>O&amp;&amp;M</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_admin_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_admin_other</source>
-			<translation>Altele</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_admin_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_arc</source>
-			<translation>Arc</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_basic</source>
-			<translation>De bază</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_category_type</source>
-			<translation>Tip de categorie</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_category_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_connec</source>
-			<translation>Conectare</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_epa</source>
-			<translation>Epa</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_epa</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_fluid_type</source>
-			<translation>Tipul de lichid</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_fluid_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_function_type</source>
-			<translation>Tip de funcție</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_function_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_gully</source>
-			<translation>Gully</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_inventory</source>
-			<translation>Inventar</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_inventory</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_link</source>
+			<source>tooltip_lbl_link</source>
 			<translation>Link către</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_location_type</source>
-			<translation>Tip locație</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_location_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_masterplan</source>
-			<translation>MasterPlan</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_masterplan</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_node</source>
-			<translation>Nod</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_om</source>
-			<translation>O&amp;&amp;M</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_other</source>
-			<translation>Altele</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_other</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_system</source>
-			<translation>Sistemul</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_system</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_topology</source>
-			<translation>Topologie</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_topology</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_utils</source>
-			<translation>Utilități</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_utils</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_addfields</source>
-			<translation>Câmpuri adăugate</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_addfields</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_admin</source>
-			<translation>Administrator</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_admin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_basic</source>
-			<translation>De bază</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_featurecat</source>
-			<translation>Featurecat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_featurecat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_mantype</source>
-			<translation>Tipul de om</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_mantype</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>create_style_group</name>
-		<message>
-			<source>btn_add</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>descript</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_descript</source>
-			<translation>Descriere</translation>
-		</message>
-		<message>
-			<source>feature_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_feature_id</source>
-			<translation>Categorie ID</translation>
-		</message>
-		<message>
-			<source>idval</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_idval</source>
-			<translation>Numele categoriei</translation>
-		</message>
-		<message>
-			<source>lbl_cat_id</source>
-			<translation>Categorie ID:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cat_name</source>
-			<translation>Numele categoriei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_role</source>
-			<translation>Role:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_role</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>sys_role</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_sys_role</source>
-			<translation>Rolul care va putea utiliza acest stil</translation>
-		</message>
-	</context>
-	<context>
-		<name>csv</name>
-		<message>
-			<source>title</source>
-			<translation>Import CSV</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>btn_file_csv</source>
+			<source>path_doc</source>
 			<translation>...</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_file_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_csv</source>
-			<translation>Import CSV</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_decimal</source>
-			<translation>Separator zecimal:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_decimal</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_delimiter</source>
-			<translation>Delimitator:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_delimiter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_file</source>
-			<translation>Fișier:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ignore_header</source>
-			<translation>Ignorați anteturile:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ignore_header</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_import_label</source>
-			<translation>Etichetă de import:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_import_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_import_type</source>
-			<translation>Tip de import:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_import_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_set_of_charac</source>
-			<translation>Set de caractere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_set_of_charac</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_comma</source>
-			<translation>,</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_comma</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_dec_comma</source>
-			<translation>,</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_dec_comma</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_dec_period</source>
-			<translation>.</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_dec_period</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_semicolon</source>
-			<translation>;</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_semicolon</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rb_space</source>
-			<translation>Spațiu</translation>
-		</message>
-		<message>
-			<source>tooltip_rb_space</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_preview</source>
-			<translation>Previzualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_preview</source>
+			<source>tooltip_path_doc</source>
 			<translation>None</translation>
 		</message>
 	</context>
 	<context>
-		<name>fastprint</name>
+		<name>workcat_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Imprimare</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_preview</source>
-			<translation>Previzualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_print</source>
-			<translation>Imprimare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_print</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_fastprint</source>
-			<translation>Imprimare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_fastprint</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_map_options</source>
-			<translation>Opțiunile hărții:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_map_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_option_values</source>
-			<translation>Valori opționale:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_option_values</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mapzone_config</name>
-		<message>
-			<source>title</source>
-			<translation>Mapzone Config</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_forceClosed</source>
-			<translation>ADD</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_forceClosed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_ignore</source>
-			<translation>ADD</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_ignore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_nodeParent</source>
-			<translation>ADD</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_nodeParent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_clear_preview</source>
-			<translation>Previzualizare clară</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_clear_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_remove_forceClosed</source>
-			<translation>ELIMINAȚI</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_forceClosed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_remove_ignore</source>
-			<translation>ELIMINAȚI</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_ignore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_remove_nodeParent</source>
-			<translation>ELIMINAȚI</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_remove_nodeParent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mapzone_config</source>
-			<translation>Mapzone Config</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mapzone_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_forceClosed</source>
-			<translation>forceClosed:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_forceClosed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ignore</source>
-			<translation>ignorați</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ignore</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_nodeParent</source>
-			<translation>nodeParent:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_nodeParent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_preview</source>
-			<translation>Previzualizare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_toArc</source>
-			<translation>toArc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_toArc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mapzone_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Mapzones manager</translation>
+			<translation>Managementul Workcat</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -24545,15 +26444,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>btn_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_config</source>
-			<translation>Configurare</translation>
+			<translation>Închidere</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -24570,981 +26461,6 @@
 		<message>
 			<source>tooltip_btn_delete</source>
 			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_execute</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_execute</source>
-			<translation>Executarea procesului de analiză a zonei hărții</translation>
-		</message>
-		<message>
-			<source>btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_active</source>
-			<translation>Comutare activă</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_active</source>
-			<translation>Arată inactiv</translation>
-		</message>
-		<message>
-			<source>chk_show_all</source>
-			<translation>Afișați toate mapzonele</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_show_all</source>
-			<translation>Afișați toate mapzonele</translation>
-		</message>
-		<message>
-			<source>dlg_mapzone_manager</source>
-			<translation>Mapzones manager</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mapzone_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mapzone_name</source>
-			<translation>Filtrați după: Numele zonei cartografice</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mapzone_name</source>
-			<translation>Filtrați după: Numele zonei cartografice</translation>
-		</message>
-	</context>
-	<context>
-		<name>massive_composer</name>
-		<message>
-			<source>title</source>
-			<translation>Imprimarea automată a paginilor compozitorului</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_massive_composer</source>
-			<translation>Imprimarea automată a paginilor compozitorului</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_massive_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_comp</source>
-			<translation>Lista compozitorilor</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_comp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_composers</source>
-			<translation>Selectați compozitorul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_composers</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_folder</source>
-			<translation>Selectați folderul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_prefix</source>
-			<translation>Fișier prefix:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_prefix</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_single</source>
-			<translation>Fișier unic:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_single</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sleep</source>
-			<translation>Timpul de somn:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sleep</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>print</name>
-		<message>
-			<source>title</source>
-			<translation>Imprimare rapidă</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_preview</source>
-			<translation>Previzualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_preview</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_print</source>
-			<translation>Imprimare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_print</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_print</source>
-			<translation>Imprimare rapidă</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_print</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_map_options</source>
-			<translation>Opțiunile hărții:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_map_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_option_values</source>
-			<translation>Valori opționale:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_option_values</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>project_check</name>
-		<message>
-			<source>title</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>dlg_project_check</source>
-			<translation>Verificați proiectul</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_project_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_databaselog</source>
-			<translation>Jurnalul bazei de date</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_databaselog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_qgis_projlog</source>
-			<translation>Jurnal de proiect Qgis</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_qgis_projlog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>reports</name>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export</source>
-			<translation>Export</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_filters</source>
-			<translation>Filtre</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_filters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Info</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Întrebare:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_export_path</source>
-			<translation>Calea:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_export_path</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>snapshot_view</name>
-		<message>
-			<source>title</source>
-			<translation>Audit</translation>
-		</message>
-		<message>
-			<source>Audit</source>
-			<translation>Audit</translation>
-		</message>
-		<message>
-			<source>tooltip_Audit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>Calculate from exploitation</source>
-			<translation>Calculați din exploatare</translation>
-		</message>
-		<message>
-			<source>tooltip_Calculate from exploitation</source>
-			<translation>Calculați din exploatare</translation>
-		</message>
-		<message>
-			<source>Calculate from municipality</source>
-			<translation>Calculați din municipalitate</translation>
-		</message>
-		<message>
-			<source>tooltip_Calculate from municipality</source>
-			<translation>Calculați din municipalitate</translation>
-		</message>
-		<message>
-			<source>dlg_snapshot_view</source>
-			<translation>Audit</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_snapshot_view</source>
-			<translation>Audit</translation>
-		</message>
-		<message>
-			<source>Draw on map canvas</source>
-			<translation>Desenați pe pânză hartă</translation>
-		</message>
-		<message>
-			<source>tooltip_Draw on map canvas</source>
-			<translation>Desenați pe pânză hartă</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Caracteristici de recuperat</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>Caracteristici de recuperat</translation>
-		</message>
-		<message>
-			<source>groupBox_2</source>
-			<translation>Selecția temporală și spațială</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox_2</source>
-			<translation>Selecția temporală și spațială</translation>
-		</message>
-		<message>
-			<source>Use current map canvas extent</source>
-			<translation>Utilizați întinderea actuală a hărții</translation>
-		</message>
-		<message>
-			<source>tooltip_Use current map canvas extent</source>
-			<translation>Utilizați întinderea actuală a hărții</translation>
-		</message>
-	</context>
-	<context>
-		<name>style</name>
-		<message>
-			<source>title</source>
-			<translation>Adaugă categorie</translation>
-		</message>
-		<message>
-			<source>btn_add</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_style</source>
-			<translation>Adaugă categorie</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_style</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cat_id</source>
-			<translation>Categorie ID:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cat_name</source>
-			<translation>Numele categoriei:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_role</source>
-			<translation>Role:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_role</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_del_feature</source>
-			<translation>Date</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_del_feature</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>style_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Gestionarea stilului</translation>
-		</message>
-		<message>
-			<source>btn_addGroup</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_addGroup</source>
-			<translation>Adăugați o nouă categorie</translation>
-		</message>
-		<message>
-			<source>btn_add_style</source>
-			<translation>Adaugă stil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_style</source>
-			<translation>Adaugă stil</translation>
-		</message>
-		<message>
-			<source>btn_addStyle</source>
-			<translation>Adaugă stil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_addStyle</source>
-			<translation>Adaugă un strat la categoria selectată</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>btn_deleteGroup</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_deleteGroup</source>
-			<translation>Ștergeți categoria selectată</translation>
-		</message>
-		<message>
-			<source>btn_delete_style</source>
-			<translation>Ștergeți stilul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_style</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_deleteStyle</source>
-			<translation>Ștergeți stilul</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_deleteStyle</source>
-			<translation>Înlătură un stil din categorie</translation>
-		</message>
-		<message>
-			<source>btn_refresh_all</source>
-			<translation>Actualizați toate</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_refresh_all</source>
-			<translation>Actualizați toate</translation>
-		</message>
-		<message>
-			<source>btn_refreshAll</source>
-			<translation>Actualizați toate</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_refreshAll</source>
-			<translation>Reîncarcă stilurile încărcate în proiect</translation>
-		</message>
-		<message>
-			<source>btn_update_group</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_group</source>
-			<translation>Actualizarea categoriei selectate</translation>
-		</message>
-		<message>
-			<source>btn_update_style</source>
-			<translation>Actualizare stil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_style</source>
-			<translation>Actualizare stil</translation>
-		</message>
-		<message>
-			<source>btn_updateStyle</source>
-			<translation>Actualizare stil</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_updateStyle</source>
-			<translation>Actualizează stilul stratului selectat cu stilul din stratul de proiect corespunzător</translation>
-		</message>
-		<message>
-			<source>Delete style</source>
-			<translation>Ștergeți stilul</translation>
-		</message>
-		<message>
-			<source>tooltip_Delete style</source>
-			<translation>Ștergeți stilul</translation>
-		</message>
-		<message>
-			<source>dlg_style_manager</source>
-			<translation>Gestionarea stilului</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_style_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_category</source>
-			<translation>Filtrați după: Categorie</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_category</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter_name</source>
-			<translation>Filtrare după: layername</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>stylegroup</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_stylegroup</source>
-			<translation>Toate categoriile tale de stil</translation>
-		</message>
-		<message>
-			<source>style_name</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_style_name</source>
-			<translation>Introduceți numele stratului pentru filtrare</translation>
-		</message>
-	</context>
-	<context>
-		<name>style_update_category</name>
-		<message>
-			<source>title</source>
-			<translation>Redenumiți categoria</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_style_update_category</source>
-			<translation>Redenumiți categoria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_style_update_category</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rename_copy</source>
-			<translation>Vă rugăm să selectați un nou nume de categorie:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rename_copy</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>toolbox</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_run</source>
-			<translation>Aleargă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_run</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_toolbox</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_toolbox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_input_layer</source>
-			<translation>Stratul de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_input_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_parameters</source>
-			<translation>Parametrii opțiunii:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_selection_type</source>
-			<translation>Tip de selecție:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_layer</source>
-			<translation>Toate caracteristicile</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_previous</source>
-			<translation>Numai caracteristici selectate</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>trv_processes</source>
-			<translation>Procese</translation>
-		</message>
-		<message>
-			<source>tooltip_trv_processes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>trv_reports</source>
-			<translation>Raportează</translation>
-		</message>
-		<message>
-			<source>tooltip_trv_reports</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>toolbox_reports</name>
-		<message>
-			<source>title</source>
-			<translation>Rapoarte</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export</source>
-			<translation>Export</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_toolbox_reports</source>
-			<translation>Rapoarte</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_toolbox_reports</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_filters</source>
-			<translation>Filtre</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_filters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_info</source>
-			<translation>Info</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label</source>
-			<translation>Întrebare:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>label_2</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_label_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_export_path</source>
-			<translation>Calea:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_export_path</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>toolbox_tool</name>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_run</source>
-			<translation>Aleargă</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_run</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_input_layer</source>
-			<translation>Stratul de intrare:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_input_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_parameters</source>
-			<translation>Parametrii opțiunii:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_parameters</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_selection_type</source>
-			<translation>Tip de selecție:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>groupBox</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_groupBox</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>progressBar</source>
-			<translation>%p%</translation>
-		</message>
-		<message>
-			<source>tooltip_progressBar</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_layer</source>
-			<translation>Toate caracteristicile</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_layer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>rbt_previous</source>
-			<translation>Numai caracteristici selectate</translation>
-		</message>
-		<message>
-			<source>tooltip_rbt_previous</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>update_style_group</name>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>lbl_rename_copy</source>
-			<translation>Vă rugăm să selectați un nou nume de categorie:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rename_copy</source>
-			<translation>Vă rugăm să selectați un nou nume de categorie:</translation>
-		</message>
-	</context>
-	<context>
-		<name>workcat_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Managementul Workcat</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -25578,6 +26494,168 @@
 			<source>tooltip_lbl_filter_name</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_workcat_manager</source>
+			<translation>Managementul Workcat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_workcat_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter_name</source>
+			<translation>Filtrați după: Numele pisicii de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter_name</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>work_management</name>
+		<message>
+			<source>btn_accept</source>
+			<translation>Salvați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Salvați</translation>
+		</message>
+		<message>
+			<source>lbl_to</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_to</source>
+			<translation>Pentru:</translation>
+		</message>
+		<message>
+			<source>lbl_team</source>
+			<translation>Echipa:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_team</source>
+			<translation>Echipa:</translation>
+		</message>
+		<message>
+			<source>lbl_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_from</source>
+			<translation>De la:</translation>
+		</message>
+		<message>
+			<source>btn_export_user</source>
+			<translation>Export la csv</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_user</source>
+			<translation>Export la csv</translation>
+		</message>
+	</context>
+	<context>
+		<name>workorder_management</name>
+		<message>
+			<source>title</source>
+			<translation>Gestionarea comenzilor de lucru</translation>
+		</message>
+		<message>
+			<source>btn_create_wclass</source>
+			<translation>Crearea clasei</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_wclass</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Ștergeți comanda de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>campaign_management</source>
+			<translation>Manager de campanie</translation>
+		</message>
+		<message>
+			<source>tooltip_campaign_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>workorder_management</source>
+			<translation>Gestionarea comenzilor de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_workorder_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state</source>
+			<translation>Clasa comenzii de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_column_filter_dates</source>
+			<translation>Tip comandă de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_filter_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>label</source>
+			<translation>Filtrați după nume:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_workorder_management</source>
+			<translation>Gestionarea comenzilor de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_workorder_management</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Închidere</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create</source>
+			<translation>Crearea comenzii de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_create_wtype</source>
+			<translation>Creare tip</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create_wtype</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>workspace_create</name>
@@ -25586,59 +26664,11 @@
 			<translation>Creați un nou spațiu de lucru</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
+			<source>tab_info_log</source>
+			<translation>Jurnal de informații</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_toggle_privacy</source>
-			<translation>Modificarea confidențialității</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toggle_privacy</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Actualizare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_workspace_create</source>
-			<translation>Creați un nou spațiu de lucru</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_workspace_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_workspace</source>
-			<translation>Numele spațiului de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_workspace</source>
-			<translation>Numele spațiului de lucru</translation>
-		</message>
-		<message>
-			<source>lbl_new_workspace_chk</source>
-			<translation>Spațiu de lucru privat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_workspace_chk</source>
+			<source>tooltip_tab_info_log</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -25650,20 +26680,76 @@
 			<translation>Descrierea spațiului de lucru</translation>
 		</message>
 		<message>
-			<source>tab_info_log</source>
-			<translation>Jurnal de informații</translation>
+			<source>lbl_new_workspace_chk</source>
+			<translation>Spațiu de lucru privat:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_info_log</source>
+			<source>tooltip_lbl_new_workspace_chk</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_new_workspace</source>
+			<source>lbl_new_workspace</source>
+			<translation>Numele spațiului de lucru:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_workspace</source>
+			<translation>Numele spațiului de lucru</translation>
+		</message>
+		<message>
+			<source>dlg_workspace_create</source>
 			<translation>Creați un nou spațiu de lucru</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_new_workspace</source>
+			<source>tooltip_dlg_workspace_create</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualizare</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_toggle_privacy</source>
+			<translation>Modificarea confidențialității</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toggle_privacy</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Anulează</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptați</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_workspace_create</source>
+			<translation>Creați un nou spațiu de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_workspace_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>txt_workspace_name</source>
+			<translation>Numele spațiului de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_txt_workspace_name</source>
+			<translation>Numele spațiului de lucru *Required</translation>
 		</message>
 		<message>
 			<source>txt_workspace_descript</source>
@@ -25674,12 +26760,12 @@
 			<translation>Utilizați această opțiune pentru a descrie pentru ce este utilizat spațiul de lucru</translation>
 		</message>
 		<message>
-			<source>txt_workspace_name</source>
-			<translation>Numele spațiului de lucru</translation>
+			<source>tab_new_workspace</source>
+			<translation>Creați un nou spațiu de lucru</translation>
 		</message>
 		<message>
-			<source>tooltip_txt_workspace_name</source>
-			<translation>Numele spațiului de lucru *Required</translation>
+			<source>tooltip_tab_new_workspace</source>
+			<translation>None</translation>
 		</message>
 	</context>
 	<context>
@@ -25687,6 +26773,14 @@
 		<message>
 			<source>title</source>
 			<translation>Manager de spațiu de lucru</translation>
+		</message>
+		<message>
+			<source>lbl_workspace_name</source>
+			<translation>Filtrați după: Numele spațiului de lucru</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workspace_name</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -25769,11 +26863,11 @@
 			<translation>Spațiul de lucru curent</translation>
 		</message>
 		<message>
-			<source>lbl_workspace_name</source>
-			<translation>Filtrați după: Numele spațiului de lucru</translation>
+			<source>dlg_workspace_manager</source>
+			<translation>Manager de spațiu de lucru</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_workspace_name</source>
+			<source>tooltip_dlg_workspace_manager</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -25783,1355 +26877,6 @@
 		<message>
 			<source>tooltip_txt_name</source>
 			<translation>Numele spațiului de lucru</translation>
-		</message>
-	</context>
-	<context>
-		<name>load_menu</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>psector_rapport</name>
-		<message>
-			<source>title</source>
-			<translation>Raport sectorial</translation>
-		</message>
-		<message>
-			<source>chk_composer</source>
-			<translation>Compozitor fișier pdf</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_composer</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>psector_repair</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_repair</source>
-			<translation>Reparare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_repair</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>assignation</name>
-		<message>
-			<source>title</source>
-			<translation>Repartizarea repartizării</translation>
-		</message>
-		<message>
-			<source>chk_all_leaks</source>
-			<translation>Utilizați toate scurgerile</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_all_leaks</source>
-			<translation>Calculează scurgerile pe kilometru pe an utilizând toate datele disponibile, indiferent de parametrul "ani pentru calcul".</translation>
-		</message>
-		<message>
-			<source>dlg_assignation</source>
-			<translation>Atribuirea scurgerilor</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_assignation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buffer</source>
-			<translation>Distanța tampon (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>Distanța de la o scurgere la care conductele sunt selectate pentru a li se atribui scurgerea respectivă.</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Filtrați în funcție de data construirii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>Utilizează numai conductele care corespund intervalului de date de construcție al celei inițiale.</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate_range</source>
-			<translation>Intervalul de date construit (ani):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate_range</source>
-			<translation>Intervalul de date de construcție, în ani înainte și după conducta inițială.</translation>
-		</message>
-		<message>
-			<source>lbl_cluster_length</source>
-			<translation>Lungimea clusterelor (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cluster_length</source>
-			<translation>Suma maximă a lungimilor conductelor dintr-un grup, în metri.</translation>
-		</message>
-		<message>
-			<source>lbl_diameter</source>
-			<translation>Filtrați după diametru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter</source>
-			<translation>Folosește numai țevi care corespund diametrului celei inițiale.</translation>
-		</message>
-		<message>
-			<source>lbl_diameter_range</source>
-			<translation>Gama de diametre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter_range</source>
-			<translation>Gama de diametre bazată pe factorii conductei inițiale.</translation>
-		</message>
-		<message>
-			<source>lbl_leaks</source>
-			<translation>Scurgeri</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_leaks</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Filtrați după material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>Folosește numai țevi din același material ca și cea inițială.</translation>
-		</message>
-		<message>
-			<source>lbl_max_distance</source>
-			<translation>Distanța maximă (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_max_distance</source>
-			<translation>Distanța maximă, în metri, dintre conducta inițială și alte conducte incluse în grup.</translation>
-		</message>
-		<message>
-			<source>lbl_pipes</source>
-			<translation>Țevi</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_years</source>
-			<translation>Ani de calculat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_years</source>
-			<translation>Numărul de ani de date privind scurgerile care trebuie luate în considerare, în funcție de recurență.</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configurare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>priority</name>
-		<message>
-			<source>title</source>
-			<translation>Calcularea priorității</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Calculați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Selectați caracteristicile pe pânză</translation>
-		</message>
-		<message>
-			<source>dlg_priority</source>
-			<translation>Calcularea priorității</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_global</source>
-			<translation>Parametrii de calcul</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_global</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_selection</source>
-			<translation>Selectarea caracteristicilor</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_budget</source>
-			<translation>Buget anual:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_budget</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dnom</source>
-			<translation>Diametru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dnom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl_selection</source>
-			<translation>Funcționare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_presszone</source>
-			<translation>Zona de presă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_presszone</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_id</source>
-			<translation>Numele rezultatului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Statutul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_year</source>
-			<translation>Anul de orizont:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_calc</source>
-			<translation>Calculul</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_calc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_catalog</source>
-			<translation>Catalog</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_catalog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Motor</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Jurnal de informații</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>priority_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_corporate</source>
-			<translation>Set Corporate</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_corporate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicat</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_edit</source>
-			<translation>Editare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_edit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_status</source>
-			<translation>Modificarea statutului</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_priority_manager</source>
-			<translation>Manager de rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_expl</source>
-			<translation>Funcționare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrați după: Numele rezultatului</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Statutul:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type</source>
-			<translation>Tip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>result_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de rezultate</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_result_selector</source>
-			<translation>Selector de rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_result_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
-			<translation>Rezultat de comparat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_main</source>
-			<translation>Rezultat pentru a arăta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_main</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Rezultat</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>status_selector</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de stare</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_status_selector</source>
-			<translation>Selector de stare</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_status_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_new_status</source>
-			<translation>Stare nouă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_main</source>
-			<translation>Modificați starea următorului rezultat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_main</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>nonvisual_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Manager de obiecte non-vizuale</translation>
-		</message>
-		<message>
-			<source>cat_mat_roughness</source>
-			<translation>Rugozitatea</translation>
-		</message>
-		<message>
-			<source>tooltip_cat_mat_roughness</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>ve_inp_rules</source>
-			<translation>reguli</translation>
-		</message>
-		<message>
-			<source>tooltip_ve_inp_rules</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_replace</name>
-		<message>
-			<source>title</source>
-			<translation>Înlocuiți caracteristica</translation>
-		</message>
-		<message>
-			<source>dlg_feature_replace</source>
-			<translation>Înlocuiți caracteristica</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_replace</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>featuretype_change</name>
-		<message>
-			<source>title</source>
-			<translation>Modificarea tipului de caracteristică</translation>
-		</message>
-		<message>
-			<source>dlg_featuretype_change</source>
-			<translation>Modificarea tipului de caracteristică</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_featuretype_change</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut</name>
-		<message>
-			<source>title</source>
-			<translation>Mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>btn_end</source>
-			<translation>Sfârșit</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_start</source>
-			<translation>Start</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_use_planified</source>
-			<translation>Utilizați rețeaua planificată</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_use_planified</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_exec_realdates</source>
-			<translation>Date reale</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_exec_realdates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_location</source>
-			<translation>Locație</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_details</source>
-			<translation>Detalii</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_details</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_forecasted_dates</source>
-			<translation>Date previzionate</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_forecasted_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_assigned_to</source>
-			<translation>Atribuit către:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_assigned_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cause</source>
-			<translation>Cauza:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cause</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_chlorine</source>
-			<translation>Clor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_chlorine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_depth</source>
-			<translation>Adâncime:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_depth</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_pd</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_pd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_rd</source>
-			<translation>Descriere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_rd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dist_from_plot</source>
-			<translation>Distanța de la parcelă:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dist_from_plot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_equipment_code</source>
-			<translation>Chlorine measurement equipment:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_equipment_code</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_appropriate</source>
-			<translation>Apropiat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>Dacă este adevărat, locația reală corespunde informațiilor programate pentru mincut</translation>
-		</message>
-		<message>
-			<source>lbl_exec_enddate</source>
-			<translation>Data de încheiere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Data de începere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation>Vizită ID</translation>
-		</message>
-		<message>
-			<source>lbl_exec_user</source>
-			<translation>Exec utilizator:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_user</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>Nu s-au găsit rezultate</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_reagent_lot</source>
-			<translation>Chlorine reagent lot:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_reagent_lot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_received_date</source>
-			<translation>Data primirii:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_received_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_turbidity</source>
-			<translation>Turbiditate:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_turbidity</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type</source>
-			<translation>Tip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordin de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab</source>
-			<translation>Executare</translation>
-		</message>
-		<message>
-			<source>tooltip_tab</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Plan</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_hydro</source>
-			<translation>Hidro</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_hydro</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Jurnal</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_composer</name>
-		<message>
-			<source>title</source>
-			<translation>Compozitor Mincut</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Deschis</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_composer</source>
-			<translation>Compozitor Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_composer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotație:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Șablon:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Titlu:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_connec</name>
-		<message>
-			<source>title</source>
-			<translation>Conectare Mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Introduceți</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_connec</source>
-			<translation>Conectare Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_search</source>
-			<translation>Căutați după codul clientului:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_search</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_end</name>
-		<message>
-			<source>title</source>
-			<translation>Sfârșit mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Anulează</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_set_real_location</source>
-			<translation>Setați locația reală</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_set_real_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_end</source>
-			<translation>Sfârșit mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_close_mincut</source>
-			<translation>Închide mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_close_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_hour</source>
-			<translation>Ora finală:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_executed</source>
-			<translation>Executat de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_executed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut</source>
-			<translation>Mincut:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_municipality</source>
-			<translation>Municipalitate:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_municipality</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_number</source>
-			<translation>Număr:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_number</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_hour</source>
-			<translation>Ora de începere:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_street</source>
-			<translation>Strada:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_street</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Ordin de lucru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_hydrometer</name>
-		<message>
-			<source>title</source>
-			<translation>Hidrometru Mincut</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptați</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Introduceți</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_hydrometer</source>
-			<translation>Hidrometru Mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_hydrometer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_ccc</source>
-			<translation>Cod client Connec:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ccc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_hcc</source>
-			<translation>Cod client hidrometru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_hcc</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>mincut_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Managementul mincut</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Închidere</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel_mincut</source>
-			<translation>Anulează mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Ștergeți</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_next_days</source>
-			<translation>Zilele următoare</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_next_days</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_notify</source>
-			<translation>Trimite sms</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_notify</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_selector_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_selector_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_manager</source>
-			<translation>Managementul mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_from</source>
-			<translation>De la:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_to</source>
-			<translation>Pentru:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_to</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exploitation</source>
-			<translation>Funcționare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exploitation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_filter</source>
-			<translation>Filtrați prin:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_filter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut_type</source>
-			<translation>Tip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>Stat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_streetaxis</source>
-			<translation>Streetaxis:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_streetaxis</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>selector_date</name>
-		<message>
-			<source>title</source>
-			<translation>Selector de dată</translation>
-		</message>
-		<message>
-			<source>dlg_selector_date</source>
-			<translation>Selector de dată</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector_date</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_manager</name>
-		<message>
-			<source>title</source>
-			<translation>Vizitați managementul</translation>
-		</message>
-		<message>
-			<source>dlg_visit_manager</source>
-			<translation>Vizitați managementul</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_manager</source>
-			<translation>None</translation>
 		</message>
 	</context>
 </TS>
