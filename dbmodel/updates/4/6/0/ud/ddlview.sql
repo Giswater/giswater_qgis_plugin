@@ -1938,7 +1938,8 @@ AS WITH sel_state AS (
             arc.the_geom,
             arc.meandering,
             arc_selector.p_state,
-            arc.uuid
+            arc.uuid,
+            arc.treatment_type
            FROM arc_selector
              JOIN arc USING (arc_id)
              JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
@@ -2099,7 +2100,8 @@ AS WITH sel_state AS (
             arc_selected.the_geom,
             arc_selected.meandering,
             arc_selected.p_state,
-            arc_selected.uuid
+            arc_selected.uuid,
+            arc_selected.treatment_type
            FROM arc_selected
         )
  SELECT arc_id,
@@ -2241,7 +2243,8 @@ AS WITH sel_state AS (
     the_geom,
     meandering,
     p_state,
-    uuid
+    uuid,
+    treatment_type
    FROM arc_base;
 
 
@@ -2475,7 +2478,8 @@ AS WITH sel_state AS (
             arc.the_geom,
             arc.meandering,
             arc_selector.p_state,
-            arc.uuid
+            arc.uuid,
+            arc.treatment_type
            FROM arc_selector
              JOIN arc USING (arc_id)
              JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
@@ -2636,7 +2640,8 @@ AS WITH sel_state AS (
             arc_selected.the_geom,
             arc_selected.meandering,
             arc_selected.p_state,
-            arc_selected.uuid
+            arc_selected.uuid,
+            arc_selected.treatment_type
            FROM arc_selected
         )
  SELECT arc_id,
@@ -2778,7 +2783,8 @@ AS WITH sel_state AS (
     the_geom,
     meandering,
     p_state,
-    uuid
+    uuid,
+    treatment_type
    FROM arc_base;
 
 
