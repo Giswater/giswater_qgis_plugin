@@ -157,3 +157,149 @@ ALTER TABLE temp_node_other ADD active boolean NULL;
 
 ALTER TABLE temp_node_other drop CONSTRAINT temp_node_other_unique;
 ALTER TABLE temp_node_other ADD CONSTRAINT temp_node_other_unique UNIQUE (node_id, other, type);
+
+-- Drop trigger that depends on custom_ymax column in node
+DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON node;
+
+-- Drop all dependent views in dependency order due to dependency on custom_ymax in node via ve_node
+DROP VIEW IF EXISTS 
+    v_ui_plan_node_cost,
+    v_plan_result_node,
+    v_plan_psector_budget_node,
+    v_plan_current_psector,
+    v_plan_psector_all,
+    v_plan_psector_budget,
+    v_plan_psector,
+    v_plan_node,
+    ve_pol_storage,
+    ve_pol_wwtp,
+    ve_pol_chamber,
+    ve_pol_netgully,
+    ve_inp_dscenario_outfall,
+    ve_inp_outfall,
+    ve_inp_dscenario_storage,
+    ve_inp_storage,
+    ve_inp_netgully,
+    ve_inp_dscenario_inflows,
+    ve_inp_dscenario_inflows_poll,
+    ve_inp_dscenario_junction,
+    ve_inp_dscenario_treatment,
+    ve_inp_dwf,
+    ve_inp_inflows,
+    ve_inp_inflows_poll,
+    ve_inp_treatment,
+    ve_inp_junction,
+    ve_inp_divider,
+    ve_inp_inlet,
+    ve_inp_dscenario_inlet,
+    v_ui_workcat_x_feature_end,
+    ve_node_chamber,
+    ve_node_change,
+    ve_node_circ_manhole,
+    ve_node_highpoint,
+    ve_node_jump,
+    ve_node_junction,
+    ve_node_netelement,
+    ve_node_netgully,
+    ve_node_netinit,
+    ve_node_out_manhole,
+    ve_node_outfall,
+    ve_node_pump_station,
+    ve_node_rect_manhole,
+    ve_node_register,
+    ve_node_sandbox,
+    ve_node_sewer_storage,
+    ve_node_valve,
+    ve_node_virtual_node,
+    ve_node_weir,
+    ve_node_wwtp,
+    ve_node_overflow_storage,
+    ve_node,
+    v_edit_node;
+
+ALTER TABLE node DROP COLUMN custom_ymax;
+
+
+-- Drop dependent views in correct order before dropping the column
+DROP VIEW IF EXISTS ve_arc_waccel;
+DROP VIEW IF EXISTS ve_arc_varc;
+DROP VIEW IF EXISTS ve_arc_siphon;
+DROP VIEW IF EXISTS ve_arc_pump_pipe;
+DROP VIEW IF EXISTS ve_arc_conduit;
+DROP VIEW IF EXISTS ve_inp_weir;
+DROP VIEW IF EXISTS ve_inp_virtual;
+DROP VIEW IF EXISTS ve_inp_pump;
+DROP VIEW IF EXISTS ve_inp_outlet;
+DROP VIEW IF EXISTS ve_inp_orifice;
+DROP VIEW IF EXISTS v_ui_node_x_connection_downstream;
+DROP VIEW IF EXISTS ve_inp_dscenario_conduit;
+DROP VIEW IF EXISTS ve_inp_conduit;
+DROP VIEW IF EXISTS v_ui_node_x_connection_upstream;
+DROP VIEW IF EXISTS v_plan_psector_budget_detail;
+DROP VIEW IF EXISTS v_plan_psector_budget_arc;
+DROP VIEW IF EXISTS v_plan_result_arc;
+DROP VIEW IF EXISTS v_ui_plan_arc_cost;
+DROP VIEW IF EXISTS v_plan_arc;
+DROP VIEW IF EXISTS v_plan_aux_arc_pavement;
+DROP VIEW IF EXISTS ve_arc;
+DROP VIEW IF EXISTS v_edit_arc;
+
+-- Drop the trigger that depends on the column
+DROP TRIGGER IF EXISTS gw_trg_topocontrol_arc ON arc;
+
+-- create and rename columns
+-- node_1
+ALTER TABLE arc RENAME COLUMN node_sys_top_elev_1 TO node_top_elev_1;
+ALTER TABLE arc ADD COLUMN node_custom_top_elev_1 numeric(12,3) NULL;
+ALTER TABLE arc RENAME COLUMN node_sys_elev_1 TO node_elev_1;
+ALTER TABLE arc ADD COLUMN node_custom_elev_1 numeric(12,3) NULL;
+
+-- node_2
+ALTER TABLE arc RENAME COLUMN node_sys_top_elev_2 TO node_top_elev_2;
+ALTER TABLE arc ADD COLUMN node_custom_top_elev_2 numeric(12,3) NULL;
+ALTER TABLE arc RENAME COLUMN node_sys_elev_2 TO node_elev_2;
+ALTER TABLE arc ADD COLUMN node_custom_elev_2 numeric(12,3) NULL;
+
+CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom, y1, y2, elev1, elev2, custom_elev1, custom_elev2, state, inverted_slope, node_top_elev_1, node_elev_1, node_top_elev_2, node_elev_2 ON
+arc FOR EACH ROW EXECUTE FUNCTION gw_trg_topocontrol_arc();
+
+-- node_1
+UPDATE arc SET node_top_elev_1 = top_elev
+FROM node WHERE node.node_id = arc.node_1 AND node.top_elev IS NOT NULL;
+
+UPDATE arc SET node_custom_top_elev_1 = custom_top_elev
+FROM node WHERE node.node_id = arc.node_1 AND node.custom_top_elev IS NOT NULL;
+
+UPDATE arc SET node_elev_1 = elev
+FROM node WHERE node.node_id = arc.node_1 AND node.elev IS NOT NULL;
+
+UPDATE arc SET node_custom_elev_1 = custom_elev
+FROM node WHERE node.node_id = arc.node_1 AND node.custom_elev IS NOT NULL;
+
+UPDATE arc SET elev1 = sys_elev1
+WHERE elev1 IS NULL;
+
+-- node_2
+UPDATE arc SET node_top_elev_2 = top_elev
+FROM node WHERE node.node_id = arc.node_2 AND node.top_elev IS NOT NULL;
+
+UPDATE arc SET node_custom_top_elev_2 = custom_top_elev
+FROM node WHERE node.node_id = arc.node_2 AND node.custom_top_elev IS NOT NULL;
+
+UPDATE arc SET node_elev_2 = elev
+FROM node WHERE node.node_id = arc.node_2 AND node.elev IS NOT NULL;
+
+UPDATE arc SET node_custom_elev_2 = custom_elev
+FROM node WHERE node.node_id = arc.node_2 AND node.custom_elev IS NOT NULL;
+
+UPDATE arc SET elev2 = sys_elev2
+WHERE elev2 IS NULL;
+
+-- drop columns
+-- node_1
+ALTER TABLE arc drop column sys_elev1;
+ALTER TABLE arc drop column custom_y1;
+
+-- node_2
+ALTER TABLE arc drop column sys_elev2;
+ALTER TABLE arc drop column custom_y2;

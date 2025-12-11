@@ -13,32 +13,14 @@ $BODY$
 DECLARE
 nodeRecord1 Record;
 nodeRecord2 Record;
-optionsRecord Record;
-sys_elev1_aux double precision;
-sys_elev2_aux double precision;
-custom_elev1_aux double precision;
-custom_elev2_aux double precision;
 y_aux double precision;
-vnoderec Record;
-newPoint public.geometry;
-connecPoint public.geometry;
-value1 boolean;
-value2 boolean;
-featurecat_aux text;
 v_sys_statetopocontrol boolean;
-sys_y1_aux double precision;
-sys_y2_aux double precision;
 sys_length_aux double precision;
 geom_slp_direction_bool boolean;
-connec_id_aux varchar;
-gully_id_aux varchar;
-array_agg varchar [];
 v_projecttype text;
 v_dsbl_error boolean;
 v_samenode_init_end_control boolean;
 v_nodeinsert_arcendpoint boolean;
-v_node_proximity_control boolean;
-v_node_proximity double precision;
 v_arc_searchnodes_control boolean;
 v_arc_searchnodes double precision;
 v_node2 text;
@@ -47,6 +29,7 @@ v_keepdepthvalues boolean;
 v_message text;
 v_user_disable_statetopocontrol boolean;
 v_user_disable_arctopocontrol boolean;
+v_node_topelev_autoupdate integer := 0;
 
 BEGIN
 
@@ -66,6 +49,8 @@ BEGIN
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 	SELECT value::boolean INTO v_keepdepthvalues FROM config_param_user WHERE parameter='edit_arc_keepdepthval_when_reverse_geom' AND cur_user = current_user;
 	SELECT value::boolean INTO v_user_disable_arctopocontrol FROM config_param_user WHERE parameter='edit_disable_arctopocontrol' AND cur_user = current_user;
+	SELECT value::integer INTO v_node_topelev_autoupdate FROM config_param_user WHERE parameter='edit_node_topelev_options' AND cur_user = current_user;
+	v_node_topelev_autoupdate := COALESCE(v_node_topelev_autoupdate, 0);
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -78,7 +63,7 @@ BEGIN
 		RETURN NEW;
 	END IF;
 
-	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_disable_statetopocontrol IS TRUE THEN
+	IF v_sys_statetopocontrol IS NOT TRUE THEN
 
 		SELECT * INTO nodeRecord1 FROM node
 		JOIN cat_feature_node ON cat_feature_node.id = node_type
@@ -232,85 +217,80 @@ BEGIN
                 NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
 
                 -- calculate length
-                sys_length_aux:= ST_length(NEW.the_geom);
-
-                IF NEW.custom_length IS NOT NULL THEN
-                    sys_length_aux=NEW.custom_length;
-                END IF;
+                sys_length_aux := COALESCE(NEW.custom_length, ST_length(NEW.the_geom));
 
                 IF sys_length_aux < 0.1 THEN
                     sys_length_aux=0.1;
                 END IF;
 
-                -- calculate sys_elev_1 & sys_elev_2 when USE top_elevation values from node and depth values from arc
-                IF (nodeRecord1.elev IS NOT NULL OR nodeRecord1.custom_elev IS NOT NULL) AND (nodeRecord1.top_elev IS NULL AND nodeRecord1.custom_top_elev IS NULL) THEN -- when only elev is used on node only elev must be used on arc
-                    sys_elev1_aux = nodeRecord1.sys_elev;
+                IF TG_OP = 'UPDATE' THEN
 
-                ELSE
-                    sys_y1_aux:= (CASE WHEN NEW.custom_y1 IS NOT NULL THEN NEW.custom_y1
-                               WHEN NEW.y1 IS NOT NULL THEN NEW.y1
-                               ELSE nodeRecord1.sys_ymax END);
-                    sys_elev1_aux := nodeRecord1.sys_top_elev - sys_y1_aux;
+					-- 1: top_elev is changed
+					IF NEW.node_top_elev_1 IS NOT NULL AND (OLD.node_top_elev_1 IS DISTINCT FROM NEW.node_top_elev_1) THEN
+						-- user variable is elev
+						IF v_node_topelev_autoupdate = 0 THEN
 
-                END IF;
-
-                IF (nodeRecord2.elev IS NOT NULL OR nodeRecord2.custom_elev IS NOT NULL) AND (nodeRecord2.top_elev IS NULL AND nodeRecord2.custom_top_elev IS NULL) THEN -- when only elev is used on node only elev must be used on arc
-                    sys_elev2_aux = nodeRecord2.sys_elev;
-                    sys_y2_aux = null;
-                ELSE
-                    sys_y2_aux:= (CASE WHEN NEW.custom_y2 IS NOT NULL THEN NEW.custom_y2
-                               WHEN NEW.y2 IS NOT NULL THEN NEW.y2
-                               ELSE nodeRecord2.sys_ymax END);
-                    sys_elev2_aux := nodeRecord2.sys_top_elev - sys_y2_aux;
-
-                END IF;
-
-                -- calculate sys_elev_1 & sys_elev_2 when USE elevation values from arc
-                IF TG_OP  = 'INSERT' THEN
-
-					-- sys elev1
-					IF NEW.custom_elev1 IS NOT NULL THEN
-						sys_elev1_aux = NEW.custom_elev1;
-					ELSIF NEW.elev1 IS NOT NULL THEN
-						sys_elev1_aux = NEW.elev1;
+							IF NEW.y1 IS NOT NULL THEN
+								-- recalculate elev
+								NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
+							ELSIF NEW.elev1 IS NOT NULL THEN
+								-- recalculate ymax
+								NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
+							END IF;
+						-- user variable is ymax
+						ELSIF v_node_topelev_autoupdate = 1 THEN
+							IF NEW.elev1 IS NOT NULL THEN
+								-- recalculate ymax
+								NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
+							ELSIF NEW.y1 IS NOT NULL THEN
+								-- recalculate elev
+								NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
+							END IF;
+						END IF;
+					-- 2: ymax is changed
+					ELSIF NEW.y1 IS NOT NULL AND (OLD.y1 IS DISTINCT FROM NEW.y1) THEN
+						IF NEW.node_top_elev_1 IS NOT NULL THEN
+							NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
+						END IF;
+					-- 3: elev is changed
+					ELSIF NEW.elev1 IS NOT NULL AND (OLD.elev1 IS DISTINCT FROM NEW.elev1) THEN
+						IF NEW.node_top_elev_1 IS NOT NULL THEN
+							NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
+						END IF;
 					END IF;
 
-					-- sys_elev2
-					IF NEW.custom_elev2 IS NOT NULL THEN
-						sys_elev2_aux = NEW.custom_elev2;
-					ELSIF NEW.elev1 IS NOT NULL THEN
-						sys_elev2_aux = NEW.elev2;
+					IF NEW.node_top_elev_2 IS NOT NULL AND (OLD.node_top_elev_2 IS DISTINCT FROM NEW.node_top_elev_2) THEN
+						-- user variable is elev
+						IF v_node_topelev_autoupdate = 0 THEN
+
+							IF NEW.y2 IS NOT NULL THEN
+								-- recalculate elev
+								NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
+							ELSIF NEW.elev2 IS NOT NULL THEN
+								-- recalculate ymax
+								NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
+							END IF;
+						-- user variable is ymax
+						ELSIF v_node_topelev_autoupdate = 1 THEN
+							IF NEW.elev2 IS NOT NULL THEN
+								-- recalculate ymax
+								NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
+							ELSIF NEW.y2 IS NOT NULL THEN
+								-- recalculate elev
+								NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
+							END IF;
+						END IF;
+					-- 2: ymax is changed
+					ELSIF NEW.y2 IS NOT NULL AND (OLD.y2 IS DISTINCT FROM NEW.y2) THEN
+						IF NEW.node_top_elev_2 IS NOT NULL THEN
+							NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
+						END IF;
+					-- 3: elev is changed
+					ELSIF NEW.elev2 IS NOT NULL AND (OLD.elev2 IS DISTINCT FROM NEW.elev2) THEN
+						IF NEW.node_top_elev_2 IS NOT NULL THEN
+							NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
+						END IF;
 					END IF;
-
-					NEW.sys_elev1 := sys_elev1_aux;
-					NEW.sys_elev2 := sys_elev2_aux;
-
-					NEW.sys_elev1 := sys_elev1_aux;
-					NEW.sys_elev2 := sys_elev2_aux;
-
-					NEW.sys_elev1 := sys_elev1_aux;
-					NEW.sys_elev2 := sys_elev2_aux;
-
-					NEW.sys_elev1 := sys_elev1_aux;
-					NEW.sys_elev2 := sys_elev2_aux;
-
-
-                ELSIF TG_OP = 'UPDATE' THEN
-
-                    -- sys elev1
-                    IF (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) THEN
-                        sys_elev1_aux = NEW.custom_elev1;
-                    ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)	OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
-                        sys_elev1_aux = NEW.elev1;
-                    END IF;
-
-
-                    -- sys elev2
-                    IF (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN
-                        sys_elev2_aux = NEW.custom_elev2;
-                    ELSIF (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) THEN
-                        sys_elev2_aux = NEW.elev2;
-                    END IF;
 
                     -- update values when geometry is forced to reverse by custom operation
                     IF  geom_slp_direction_bool IS FALSE AND st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE
@@ -323,10 +303,6 @@ BEGIN
 							NEW.y1 := NEW.y2;
 							NEW.y2 := y_aux;
 
-							y_aux := NEW.custom_y1;
-							NEW.custom_y1 := NEW.custom_y2;
-							NEW.custom_y2 := y_aux;
-
 							y_aux := NEW.elev1;
 							NEW.elev1 := NEW.elev2;
 							NEW.elev2 := y_aux;
@@ -335,16 +311,7 @@ BEGIN
 							NEW.custom_elev1 := NEW.custom_elev2;
 							NEW.custom_elev2 := y_aux;
 
-							y_aux := NEW.sys_elev1;
-							NEW.sys_elev1 := NEW.sys_elev2;
-							NEW.sys_elev2 := y_aux;
-
 						END IF;
-
-                    ELSE
-                        NEW.sys_elev1 := sys_elev1_aux;
-                        NEW.sys_elev2 := sys_elev2_aux;
-
 
                     END IF;
 
@@ -353,8 +320,8 @@ BEGIN
                 -- update values when geometry is forced to reverse by geom_slp_direction_bool variable on true
                 IF geom_slp_direction_bool IS TRUE THEN
 
-                    IF ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE))
-                    OR ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS TRUE)) THEN
+                    IF ((COALESCE(NEW.custom_elev1, NEW.elev1) < COALESCE(NEW.custom_elev2, NEW.elev2)) AND (NEW.inverted_slope IS NOT TRUE))
+                    OR ((COALESCE(NEW.custom_elev1, NEW.elev1) > COALESCE(NEW.custom_elev2, NEW.elev2)) AND (NEW.inverted_slope IS TRUE)) THEN
 
                         -- Update conduit direction
                         -- Geometry
@@ -369,10 +336,6 @@ BEGIN
                         NEW.y1 := NEW.y2;
                         NEW.y2 := y_aux;
 
-                        y_aux := NEW.custom_y1;
-                        NEW.custom_y1 := NEW.custom_y2;
-                        NEW.custom_y2 := y_aux;
-
                         y_aux := NEW.elev1;
                         NEW.elev1 := NEW.elev2;
                         NEW.elev2 := y_aux;
@@ -380,27 +343,29 @@ BEGIN
                         y_aux := NEW.custom_elev1;
                         NEW.custom_elev1 := NEW.custom_elev2;
                         NEW.custom_elev2 := y_aux;
-
-                        y_aux := NEW.sys_elev1;
-                        NEW.sys_elev1 := NEW.sys_elev2;
-                        NEW.sys_elev2 := y_aux;
 						
-						-- Node sys values
+						-- Node values
 						NEW.nodetype_1 := nodeRecord2.node_type;
 						NEW.nodetype_2 := nodeRecord1.node_type;
 						
-						NEW.node_sys_top_elev_1 := nodeRecord2.sys_top_elev;
-						NEW.node_sys_top_elev_2 := nodeRecord1.sys_top_elev;
+						NEW.node_top_elev_1 := nodeRecord2.top_elev;
+						NEW.node_top_elev_2 := nodeRecord1.top_elev;
 
-						NEW.node_sys_elev_1 := nodeRecord2.sys_elev;
-						NEW.node_sys_elev_2 := nodeRecord1.sys_elev;
+						NEW.node_custom_top_elev_1 := nodeRecord2.custom_top_elev;
+						NEW.node_custom_top_elev_2 := nodeRecord1.custom_top_elev;
+
+						NEW.node_elev_1 := nodeRecord2.elev;
+						NEW.node_elev_2 := nodeRecord1.elev;
+
+						NEW.node_custom_elev_1 := nodeRecord2.custom_elev;
+						NEW.node_custom_elev_2 := nodeRecord1.custom_elev;
 	
                     END IF;
 
                 END IF;
 
                 -- slope
-                NEW.sys_slope:= (NEW.sys_elev1-NEW.sys_elev2)/sys_length_aux;
+                NEW.sys_slope:= (NEW.elev1-NEW.elev2)/sys_length_aux;
 
 			END IF;
 

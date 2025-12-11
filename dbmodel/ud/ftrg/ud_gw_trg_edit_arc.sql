@@ -417,13 +417,13 @@ BEGIN
 
 		-- FEATURE INSERT
 		IF v_matfromcat THEN
-			INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
+			INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, y1, y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified,
 			the_geom,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value, updated_at, updated_by, asset_id, pavcat_id,
 			parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, brand_id, model_id, serial_number, initoverflowpath, lock_level, is_scadamap, registration_date,
 			meandering, conserv_state, om_state, last_visitdate, negative_offset, drainzone_outfall, dwfzone_outfall, omunit_id, uuid, treatment_type)
-			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
+			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.elev1, NEW.elev2,
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, COALESCE(NEW.sector_id, 0), NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,
 			NEW.inverted_slope, NEW.custom_length, COALESCE(NEW.omzone_id, 0), COALESCE(NEW.dma_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
@@ -433,13 +433,13 @@ BEGIN
 			 NEW.parent_id, NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.visitability, NEW.label_quadrant, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.initoverflowpath, NEW.lock_level, NEW.is_scadamap,
 			NEW.registration_date, NEW.meandering, NEW.conserv_state, NEW.om_state, NEW.last_visitdate, NEW.negative_offset, NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.omunit_id, 0), NEW.uuid, COALESCE(NEW.treatment_type, 0));
 		ELSE
-			INSERT INTO arc (arc_id, code, sys_code, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
+			INSERT INTO arc (arc_id, code, sys_code, y1, y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified,
 			the_geom,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id, updated_at, updated_by, asset_id, pavcat_id,
 			parent_id, expl_visibility, adate, adescript, visitability, label_quadrant, brand_id, model_id, serial_number, initoverflowpath, lock_level, is_scadamap, registration_date,
 			meandering, conserv_state, om_state, last_visitdate, negative_offset, drainzone_outfall, dwfzone_outfall, omunit_id, uuid, treatment_type)
-			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
+			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.y1, NEW.y2, NEW.elev1, NEW.elev2,
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, COALESCE(NEW.sector_id, 0), NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,
 			NEW.inverted_slope, NEW.custom_length, COALESCE(NEW.omzone_id, 0), COALESCE(NEW.dma_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, COALESCE(NEW.fluid_type, 0),
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
@@ -680,8 +680,6 @@ BEGIN
 		-- Update of topocontrol fields only when one if it has changed in order to prevent to be triggered the topocontrol without changes
 		IF (NEW.y1 != OLD.y1) OR (NEW.y1 IS NULL AND OLD.y1 IS NOT NULL) OR (NEW.y1 IS NOT NULL AND OLD.y1 IS NULL) OR
 		   (NEW.y2 != OLD.y2) OR (NEW.y2 IS NULL AND OLD.y2 IS NOT NULL) OR (NEW.y2 IS NOT NULL AND OLD.y2 IS NULL) OR
-		   (NEW.custom_y1 != OLD.custom_y1) OR (NEW.custom_y1 IS NULL AND OLD.custom_y1 IS NOT NULL) OR (NEW.custom_y1 IS NOT NULL AND OLD.custom_y1 IS NULL) OR
-		   (NEW.custom_y2 != OLD.custom_y2) OR (NEW.custom_y2 IS NULL AND OLD.custom_y2 IS NOT NULL) OR (NEW.custom_y2 IS NOT NULL AND OLD.custom_y2 IS NULL) OR
 		   (NEW.elev1 != OLD.elev1) OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) OR
 		   (NEW.elev2 != OLD.elev2) OR (NEW.elev2 IS NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) OR
 		   (NEW.custom_elev1 != OLD.custom_elev1) OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) OR
@@ -689,7 +687,7 @@ BEGIN
 		   (NEW.inverted_slope::text != OLD.inverted_slope::text) OR (NEW.inverted_slope is null and OLD.inverted_slope is not null)
 		   OR (NEW.inverted_slope is not null and OLD.inverted_slope is null)
 		   THEN
-			UPDATE arc SET y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2,
+			UPDATE arc SET y1=NEW.y1, y2=NEW.y2, elev1=NEW.elev1, elev2=NEW.elev2,
 					custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, inverted_slope=NEW.inverted_slope
 					WHERE arc_id=NEW.arc_id;
 		END IF;

@@ -132,3 +132,7 @@ WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='elev
 UPDATE config_form_fields
 SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+
+INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('edit_node_topelev_options', '0', 'ELEV');
+INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('edit_node_topelev_options', '1', 'YMAX');
+INSERT INTO sys_param_user VALUES ('edit_node_topelev_options', 'config', 'If elev, ymax is recalculated when node top_elev is changed. If ymax, elev is recalculated when node elev is changed.', 'role_edit', NULL, 'Auto-update elevation/ymax:', 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''edit_node_topelev_options'' AND id IS NOT NULL', NULL, true, 1, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', true, NULL, NULL, 'lyt_inventory', true, NULL, NULL, NULL, NULL, 'core');

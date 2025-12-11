@@ -20,7 +20,6 @@ v_noderecord2 Record;
 v_x double precision;
 v_y double precision;
 v_pol varchar;
-v_topelev double precision;
 v_arc record;
 v_arcrecord record;
 v_arcrecordtb record;
@@ -28,7 +27,6 @@ v_node_proximity_control boolean;
 v_node_proximity double precision;
 v_dsbl_error boolean;
 v_psector_id integer;
-v_tempvalue text;
 v_mantable text;
 v_epatable text;
 v_manquerytext1 text;
@@ -42,22 +40,13 @@ v_linkrec record;
 v_message text;
 v_trace_featuregeom boolean;
 
-v_sys_elev1 double precision;
-v_sys_elev2 double precision;
-v_sys_top_elev double precision;
-v_sys_elev double precision;
-v_node2_sys_top_elev double precision;
-v_node2_sys_elev double precision;
-v_length double precision;
-v_slope  double precision;
-
 rec_addfields record;
 v_sql text;
 v_query_string_update text;
 v_arc_childtable_name text;
 v_arc_type text;
 v_node_replace_code boolean;
-
+v_node_topelev_autoupdate integer := 0;
 
 BEGIN
 
@@ -71,6 +60,8 @@ BEGIN
     SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT value INTO v_psector_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_psector_current';
     SELECT value::boolean INTO v_node_replace_code FROM config_param_system WHERE parameter='plan_node_replace_code';
+	SELECT value::integer INTO v_node_topelev_autoupdate FROM config_param_user WHERE cur_user=current_user AND parameter = 'edit_node_topelev_options';
+	v_node_topelev_autoupdate := COALESCE(v_node_topelev_autoupdate, 0);
 
     --Check if user has migration mode enabled
     IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -128,7 +119,7 @@ BEGIN
 
 		END IF;
 
-	IF TG_OP = 'INSERT' then
+		IF TG_OP = 'INSERT' then
 			-- check for existing node (1)
 			SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
 
@@ -323,30 +314,41 @@ BEGIN
 				UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol;
 			END IF;
 
-			-- calculate sys_top_elev for node
-			IF NEW.custom_top_elev is not null THEN
-				v_sys_top_elev =  NEW.custom_top_elev;
-
-			ELSIF NEW.top_elev is not null THEN
-				v_sys_top_elev =  NEW.top_elev;
-			ELSE
-				v_sys_top_elev = null;
-			END IF;
-
-			-- calculate sys_elev for node
-			IF NEW.custom_elev IS NOT NULL THEN
-				v_sys_elev =  NEW.custom_elev;
-
-			ELSIF NEW.elev IS NOT NULL THEN
-				v_sys_elev =  NEW.elev;
-
-			ELSIF NEW.custom_ymax IS NOT NULL THEN
-				v_sys_elev =  v_sys_top_elev - NEW.custom_ymax;
-
-			ELSIF NEW.ymax IS NOT NULL THEN
-				v_sys_elev =  v_sys_top_elev - NEW.ymax;
-			ELSE
-				v_sys_elev =  null; --in case of null sys_elev is = sys_top_elev
+			-- 1: top_elev is changed
+			IF NEW.top_elev IS NOT NULL AND (OLD.top_elev IS DISTINCT FROM NEW.top_elev) THEN
+				-- user variable is elev
+				IF v_node_topelev_autoupdate = 0 THEN
+					IF NEW.ymax IS NOT NULL THEN
+						-- recalculate elev
+						NEW.elev := NEW.top_elev - NEW.ymax;
+					ELSIF NEW.elev IS NOT NULL THEN
+						-- recalculate ymax
+						NEW.ymax := NEW.top_elev - NEW.elev;
+					END IF;
+				-- user variable is ymax
+				ELSIF v_node_topelev_autoupdate = 1 THEN
+					IF NEW.elev IS NOT NULL THEN
+						-- recalculate ymax
+						NEW.ymax := NEW.top_elev - NEW.elev;
+					ELSIF NEW.ymax IS NOT NULL THEN
+						-- recalculate elev
+						NEW.elev := NEW.top_elev - NEW.ymax;
+					END IF;
+				END IF;
+				update node set ymax = new.ymax, elev = new.elev where node_id = new.node_id;
+			-- 2: ymax is changed
+			ELSIF NEW.ymax IS NOT NULL AND (OLD.ymax IS DISTINCT FROM NEW.ymax) THEN
+				IF NEW.top_elev IS NOT NULL THEN
+					NEW.elev := NEW.top_elev - NEW.ymax;
+					update node set elev = new.elev where node_id = new.node_id;
+				END IF;
+			
+			-- 3: elev is changed
+			ELSIF NEW.elev IS NOT NULL AND (OLD.elev IS DISTINCT FROM NEW.elev) THEN
+				IF NEW.top_elev IS NOT NULL THEN
+					NEW.ymax := NEW.top_elev - NEW.elev;
+					update node set ymax= new.ymax where node_id = new.node_id;
+				END IF;
 			END IF;
 
 			-- looking for nodes
@@ -355,42 +357,19 @@ BEGIN
 			--updating arcs
 			FOR v_arcrecordtb IN EXECUTE v_querytext
 			LOOP
-				-- set length (to calculate after slope)
-				IF v_arcrecordtb.custom_length IS NOT NULL THEN v_length = v_arcrecordtb.custom_length;	ELSE v_length = st_length(v_arcrecordtb.the_geom); END IF;
-				IF v_length < 0.1 or v_length is null then v_length = 0.1; END IF;
-
 				-- Initial node
 				SELECT * INTO v_nodeRecord1 FROM node WHERE node.node_id = v_arcrecordtb.node_1 AND node_id = NEW.node_id;
 				SELECT * INTO v_nodeRecord2 FROM node WHERE node.node_id = v_arcrecordtb.node_2 AND node_id = NEW.node_id;
 
 				IF v_nodeRecord1.node_id IS NOT NULL THEN
 
-					-- calculate sys_elev1 for arc
-					IF v_arcrecordtb.elev1 IS NOT NULL OR v_arcrecordtb.custom_elev1 IS NOT NULL THEN
-						-- do nothing because sys_elev1 only depends of arc itself
-
-					ELSIF v_arcrecordtb.custom_y1 IS NOT NULL AND v_sys_top_elev IS NOT NULL THEN -- if depends of custom_y1
-						v_sys_elev1 = v_sys_top_elev - v_arcrecordtb.custom_y1;
-
-					ELSIF v_arcrecordtb.y1 IS NOT NULL AND v_sys_top_elev IS NOT NULL THEN  -- if sys_elev1 depends of y1
-						v_sys_elev1 = v_sys_top_elev - v_arcrecordtb.y1;
-
-					ELSIF v_sys_elev IS NOT NULL THEN  -- case when (elev1 & custom_elev1) & (y1 & custom_y1) is null
-						v_sys_elev1 = v_sys_elev;
-					END IF;
-
-					-- calculate new slope
-					v_slope = (v_sys_elev1 - v_arcrecordtb.sys_elev2)/v_length;
-
-					-- update arc
-					IF v_sys_top_elev IS NOT NULL AND v_sys_elev IS NOT NULL AND v_sys_elev1 IS NOT NULL AND v_slope IS NOT NULL THEN
-						EXECUTE 'UPDATE arc SET
-							node_sys_top_elev_1 = '|| v_sys_top_elev ||',
-							node_sys_elev_1 = '|| v_sys_elev ||',
-							sys_elev1 = '|| v_sys_elev1||',
-							sys_slope = '|| v_slope ||' 
-							WHERE arc_id = ' || quote_literal(v_arcrecordtb."arc_id");
-					END IF;
+					EXECUTE 'UPDATE arc SET
+						node_top_elev_1 = '|| quote_nullable(NEW.top_elev) ||',
+						node_custom_top_elev_1 = '|| quote_nullable(NEW.custom_top_elev) ||',
+						node_elev_1 = '|| quote_nullable(NEW.elev) ||',
+						node_custom_elev_1 = '|| quote_nullable(NEW.custom_elev) ||'
+						WHERE arc_id = ' || quote_literal(v_arcrecordtb."arc_id");
+					
 
 					EXECUTE 'UPDATE arc SET 
 					the_geom = ST_SetPoint($1, 0, $2), 
@@ -399,34 +378,14 @@ BEGIN
 
 
 				ELSIF v_nodeRecord2.node_id IS NOT NULL THEN
-
-					-- calculate sys_elev2
-					IF v_arcrecordtb.elev2 IS  NOT NULL OR v_arcrecordtb.custom_elev2 IS NOT NULL THEN
-						-- do nothing because sys_elev2 only depends of arc itself
-
-					ELSIF v_arcrecordtb.custom_y2 IS NOT NULL AND v_sys_top_elev IS NOT NULL THEN -- if depends of custom_y2
-						v_sys_elev2 = v_sys_top_elev - v_arcrecordtb.custom_y2;
-
-					ELSIF v_arcrecordtb.y2 IS NOT NULL AND v_sys_top_elev IS NOT NULL THEN  -- if sys_elev2 depends of y2
-						v_sys_elev2 = v_sys_top_elev - v_arcrecordtb.y2;
-
-					ELSIF v_sys_elev IS NOT NULL THEN  -- case when (elev1 & custom_elev1) & (y1 & custom_y1) is null
-						v_sys_elev2 = v_sys_elev;
-					END IF;
-
-					-- slope
-					v_slope = (v_arcrecordtb.sys_elev1 - v_sys_elev2)/v_length;
-
 					-- update arc
 
-					IF v_sys_top_elev IS NOT NULL AND v_sys_elev IS NOT NULL AND v_sys_elev2 IS NOT NULL AND v_slope IS NOT NULL THEN
-						EXECUTE 'UPDATE arc SET
-							node_sys_top_elev_2 = '|| v_sys_top_elev ||',
-							node_sys_elev_2 = '|| v_sys_elev ||',
-							sys_elev2 = '|| v_sys_elev2||',
-							sys_slope = '|| v_slope ||' 
-							WHERE arc_id = ' || quote_literal(v_arcrecordtb."arc_id");
-					END IF;
+					EXECUTE 'UPDATE arc SET
+						node_top_elev_2 = '|| quote_nullable(NEW.top_elev) ||',
+						node_custom_top_elev_2 = '|| quote_nullable(NEW.custom_top_elev) ||',
+						node_elev_2 = '|| quote_nullable(NEW.elev) ||',
+						node_custom_elev_2 = '|| quote_nullable(NEW.custom_elev) ||'
+						WHERE arc_id = ' || quote_literal(v_arcrecordtb."arc_id");
 
 					EXECUTE 'UPDATE arc SET 
 					the_geom = ST_SetPoint($1, ST_NumPoints($1) -1, $2), 

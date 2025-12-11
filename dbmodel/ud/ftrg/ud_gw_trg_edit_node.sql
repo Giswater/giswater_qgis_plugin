@@ -586,13 +586,13 @@ BEGIN
 
 		-- feature insert
 		IF v_matfromcat THEN
-			INSERT INTO node (node_id, code, sys_code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
+			INSERT INTO node (node_id, code, sys_code, top_elev, custom_top_elev, ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			omzone_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, conserv_state,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by,
 			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id, uuid, treatment_type)
-			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,COALESCE(NEW.sector_id, 0),
+			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,COALESCE(NEW.sector_id, 0),
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,COALESCE(NEW.omzone_id, 0),NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.conserv_state,
 			COALESCE(NEW.muni_id, 0), NEW.streetaxis_id, NEW.postcode, NEW.district_id,NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
@@ -602,13 +602,13 @@ BEGIN
 			NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id, NEW.hemisphere,
 			NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), COALESCE(NEW.omunit_id, 0), NEW.uuid, COALESCE(NEW.treatment_type, 0));
 		ELSE
-			INSERT INTO node (node_id, code, sys_code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
+			INSERT INTO node (node_id, code, sys_code, top_elev, custom_top_elev, ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			omzone_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, conserv_state,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, updated_at, updated_by, matcat_id,
 			asset_id, parent_id, arc_id, expl_visibility, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, lock_level, is_scadamap, pavcat_id, hemisphere,
 			drainzone_outfall, dwfzone_outfall, dma_id, omunit_id, uuid, treatment_type)
-			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,COALESCE(NEW.sector_id, 0),
+			VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,COALESCE(NEW.sector_id, 0),
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,COALESCE(NEW.omzone_id, 0),NEW.soilcat_id, NEW. function_type, NEW.category_type,COALESCE(NEW.fluid_type, 0),NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.conserv_state,
 			COALESCE(NEW.muni_id, 0), NEW.streetaxis_id, NEW.postcode, NEW.district_id, NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
@@ -885,15 +885,12 @@ BEGIN
 		END IF;
 
 		-- Update of topocontrol fields only when one if it has changed in order to prevent to be triggered the topocontrol without changes
-		IF  (NEW.top_elev <> OLD.top_elev) OR (NEW.custom_top_elev <> OLD.custom_top_elev) OR (NEW.ymax <> OLD.ymax) OR
-			(NEW.custom_ymax <> OLD.custom_ymax) OR (NEW.elev <> OLD.elev)  OR (NEW.custom_elev <> OLD.custom_elev) OR
-			(NEW.top_elev IS NULL AND OLD.top_elev IS NOT NULL) OR (NEW.top_elev IS NOT NULL AND OLD.top_elev IS NULL) OR
-			(NEW.custom_top_elev IS NULL AND OLD.custom_top_elev IS NOT NULL) OR (NEW.custom_top_elev IS NOT NULL AND OLD.custom_top_elev IS NULL) OR
-			(NEW.ymax IS NULL AND OLD.ymax IS NOT NULL) OR (NEW.ymax IS NOT NULL AND OLD.ymax IS NULL) OR
-			(NEW.custom_ymax IS NULL AND OLD.custom_ymax IS NOT NULL) OR (NEW.custom_ymax IS NOT NULL AND OLD.custom_ymax IS NULL) OR
-			(NEW.elev IS NULL AND OLD.elev IS NOT NULL) OR (NEW.elev IS NOT NULL AND OLD.elev IS NULL) OR
-			(NEW.custom_elev IS NULL AND OLD.custom_elev IS NOT NULL) OR (NEW.custom_elev IS NOT NULL AND OLD.custom_elev IS NULL) THEN
-				UPDATE	node SET top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, custom_elev=NEW.custom_elev
+		IF  (NEW.top_elev IS DISTINCT FROM OLD.top_elev) OR
+			(NEW.custom_top_elev IS DISTINCT FROM OLD.custom_top_elev) OR
+			(NEW.ymax IS DISTINCT FROM OLD.ymax) OR
+			(NEW.elev IS DISTINCT FROM OLD.elev) OR
+			(NEW.custom_elev IS DISTINCT FROM OLD.custom_elev) THEN
+				UPDATE	node SET top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, elev=NEW.elev, custom_elev=NEW.custom_elev
 				WHERE node_id = OLD.node_id;
 		END IF;
 

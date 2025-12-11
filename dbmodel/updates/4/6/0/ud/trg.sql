@@ -28,3 +28,12 @@ DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON arc;
 CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER
 UPDATE OF arc_id ON arc FOR EACH ROW WHEN (OLD.arc_id IS DISTINCT FROM NEW.arc_id) EXECUTE FUNCTION gw_trg_array_fk_id_table('arc_id',
 '{"man_frelem":"to_arc"}');
+
+CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE OF the_geom, state, top_elev, ymax, elev, custom_top_elev, custom_elev ON
+node FOR EACH ROW EXECUTE FUNCTION gw_trg_topocontrol_node();
+
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
