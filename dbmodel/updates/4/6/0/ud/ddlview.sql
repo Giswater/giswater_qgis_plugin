@@ -1067,7 +1067,6 @@ LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
 LEFT JOIN drainzone_table ON node.omzone_id = drainzone_table.drainzone_id
 LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
 LEFT JOIN node_add ON node_add.node_id = node.node_id;
-;
 
 CREATE OR REPLACE VIEW ve_arc
 AS WITH typevalue AS (
@@ -1623,7 +1622,8 @@ AS WITH typevalue AS (
         arc.the_geom,
         arc.meandering,
         COALESCE(pp.state, arc.state) AS p_state,
-        arc.uuid
+        arc.uuid,
+        arc.treatment_type
     FROM arc
     LEFT JOIN LATERAL (
         SELECT pp.state
@@ -1800,7 +1800,8 @@ SELECT
     arc_selected.the_geom,
     arc_selected.meandering,
     arc_selected.p_state,
-    arc_selected.uuid
+    arc_selected.uuid,
+    arc_selected.treatment_type
 FROM arc_selected;
 
 
@@ -1876,10 +1877,13 @@ SELECT
     connec.muni_id,
     connec.sector_id,
     sector_table.macrosector_id,
+    sector_table.sector_type,
     dwfzone_table.drainzone_id,
     drainzone_table.drainzone_type,
+    connec.drainzone_outfall,
     connec.dwfzone_id,
     dwfzone_table.dwfzone_type,
+    connec.dwfzone_outfall,
     connec.omzone_id,
     omzone_table.macroomzone_id,
     omzone_table.omzone_type,
@@ -2100,52 +2104,19 @@ SELECT
     gully.expl_id,
     exploitation.macroexpl_id,
     gully.muni_id,
-        CASE
-            WHEN link_planned.sector_id IS NULL THEN sector_table.sector_id
-            ELSE link_planned.sector_id
-        END AS sector_id,
-        CASE
-            WHEN link_planned.macrosector_id IS NULL THEN sector_table.macrosector_id
-            ELSE link_planned.macrosector_id
-        END AS macrosector_id,
-        CASE
-            WHEN link_planned.sector_id IS NULL THEN sector_table.sector_type
-            ELSE link_planned.sector_type
-        END AS sector_type,
-        CASE
-            WHEN link_planned.drainzone_id IS NULL THEN dwfzone_table.drainzone_id
-            ELSE link_planned.drainzone_id
-        END AS drainzone_id,
-        CASE
-            WHEN link_planned.drainzone_type IS NULL THEN drainzone_table.drainzone_type
-            ELSE link_planned.drainzone_type
-        END AS drainzone_type,
+    sector_table.sector_id,
+    sector_table.macrosector_id,
+    sector_table.sector_type,
+    dwfzone_table.drainzone_id,
+    drainzone_table.drainzone_type,
     gully.drainzone_outfall,
-        CASE
-            WHEN link_planned.dwfzone_id IS NULL THEN dwfzone_table.dwfzone_id
-            ELSE link_planned.dwfzone_id
-        END AS dwfzone_id,
-        CASE
-            WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
-            ELSE link_planned.dwfzone_type
-        END AS dwfzone_type,
+    dwfzone_table.dwfzone_id,
+    dwfzone_table.dwfzone_type,
     gully.dwfzone_outfall,
-        CASE
-            WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
-            ELSE link_planned.omzone_id
-        END AS omzone_id,
-        CASE
-            WHEN link_planned.macroomzone_id IS NULL THEN omzone_table.macroomzone_id
-            ELSE link_planned.macroomzone_id
-        END AS macroomzone_id,
-        CASE
-            WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
-            ELSE link_planned.omzone_type
-        END AS omzone_type,
-        CASE
-            WHEN link_planned.dma_id IS NULL THEN gully.dma_id
-            ELSE link_planned.dma_id
-        END AS dma_id,
+    omzone_table.omzone_id,
+    omzone_table.macroomzone_id,
+    gully.dma_id,
+    omzone_table.omzone_type,
     gully.omunit_id,
     gully.minsector_id,
     gully.soilcat_id,
