@@ -21,9 +21,9 @@ SELECT has_table('arc'::name, 'Table arc should exist');
 SELECT columns_are(
     'arc',
     ARRAY[
-        'arc_id', 'code', 'sys_code', 'node_1', 'nodetype_1', 'node_sys_top_elev_1', 'node_sys_elev_1', 'elev1',
-        'custom_elev1', 'sys_elev1', 'y1', 'custom_y1', 'node_2', 'nodetype_2', 'node_sys_top_elev_2', 'node_sys_elev_2',
-        'elev2', 'custom_elev2', 'sys_elev2', 'y2', 'custom_y2', 'feature_type', 'arc_type', 'matcat_id', 'arccat_id',
+        'arc_id', 'code', 'sys_code', 'node_1', 'nodetype_1', 'node_top_elev_1', 'node_custom_top_elev_1', 'node_elev_1', 'node_custom_elev_1', 'elev1',
+        'custom_elev1', 'y1', 'node_2', 'nodetype_2', 'node_top_elev_2', 'node_custom_top_elev_2', 'node_elev_2', 'node_custom_elev_2',
+        'elev2', 'custom_elev2', 'sys_elev2', 'y2', 'feature_type', 'arc_type', 'matcat_id', 'arccat_id',
         'epa_type', 'state', 'state_type', 'parent_id', 'expl_id', 'muni_id', 'sector_id', 'dma_id',
         'drainzone_outfall', 'dwfzone_id', 'dwfzone_outfall', 'omzone_id', 'omunit_id', 'minsector_id', 'pavcat_id',
         'soilcat_id', 'function_type', 'category_type', 'location_type', '_fluid_type', 'fluid_type', 'treatment_type',
@@ -51,22 +51,22 @@ SELECT col_type_is('arc', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('arc', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('arc', 'node_1', 'integer', 'Column node_1 should be integer');
 SELECT col_type_is('arc', 'nodetype_1', 'varchar(30)', 'Column nodetype_1 should be varchar(30)');
-SELECT col_type_is('arc', 'node_sys_top_elev_1', 'numeric(12,3)', 'Column node_sys_top_elev_1 should be numeric(12,3)');
-SELECT col_type_is('arc', 'node_sys_elev_1', 'numeric(12,3)', 'Column node_sys_elev_1 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_top_elev_1', 'numeric(12,3)', 'Column node_top_elev_1 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_custom_top_elev_1', 'numeric(12,3)', 'Column node_custom_top_elev_1 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_elev_1', 'numeric(12,3)', 'Column node_elev_1 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_custom_elev_1', 'numeric(12,3)', 'Column node_custom_elev_1 should be numeric(12,3)');
 SELECT col_type_is('arc', 'elev1', 'numeric(12,3)', 'Column elev1 should be numeric(12,3)');
 SELECT col_type_is('arc', 'custom_elev1', 'numeric(12,3)', 'Column custom_elev1 should be numeric(12,3)');
-SELECT col_type_is('arc', 'sys_elev1', 'numeric(12,3)', 'Column sys_elev1 should be numeric(12,3)');
 SELECT col_type_is('arc', 'y1', 'numeric(12,3)', 'Column y1 should be numeric(12,3)');
-SELECT col_type_is('arc', 'custom_y1', 'numeric(12,3)', 'Column custom_y1 should be numeric(12,3)');
 SELECT col_type_is('arc', 'node_2', 'integer', 'Column node_2 should be integer');
 SELECT col_type_is('arc', 'nodetype_2', 'varchar(30)', 'Column nodetype_2 should be varchar(30)');
-SELECT col_type_is('arc', 'node_sys_top_elev_2', 'numeric(12,3)', 'Column node_sys_top_elev_2 should be numeric(12,3)');
-SELECT col_type_is('arc', 'node_sys_elev_2', 'numeric(12,3)', 'Column node_sys_elev_2 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_top_elev_2', 'numeric(12,3)', 'Column node_top_elev_2 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_custom_top_elev_2', 'numeric(12,3)', 'Column node_custom_top_elev_2 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_elev_2', 'numeric(12,3)', 'Column node_elev_2 should be numeric(12,3)');
+SELECT col_type_is('arc', 'node_custom_elev_2', 'numeric(12,3)', 'Column node_custom_elev_2 should be numeric(12,3)');
 SELECT col_type_is('arc', 'elev2', 'numeric(12,3)', 'Column elev2 should be numeric(12,3)');
 SELECT col_type_is('arc', 'custom_elev2', 'numeric(12,3)', 'Column custom_elev2 should be numeric(12,3)');
-SELECT col_type_is('arc', 'sys_elev2', 'numeric(12,3)', 'Column sys_elev2 should be numeric(12,3)');
 SELECT col_type_is('arc', 'y2', 'numeric(12,3)', 'Column y2 should be numeric(12,3)');
-SELECT col_type_is('arc', 'custom_y2', 'numeric(12,3)', 'Column custom_y2 should be numeric(12,3)');
 SELECT col_type_is('arc', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('arc', 'arc_type', 'varchar(18)', 'Column arc_type should be varchar(18)');
 SELECT col_type_is('arc', 'matcat_id', 'varchar(30)', 'Column matcat_id should be varchar(30)');
