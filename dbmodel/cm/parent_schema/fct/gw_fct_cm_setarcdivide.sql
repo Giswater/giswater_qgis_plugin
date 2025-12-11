@@ -285,8 +285,8 @@ BEGIN
         minsector_id = rec_aux1.minsector_id WHERE node_id = v_node_id;
     ELSIF v_project_type ='UD' THEN
         -- set y1/y2 to null for those values related to new node
-        UPDATE PARENT_SCHEMA.arc SET y2=null, custom_y2=null WHERE arc_id = rec_aux1.arc_id;
-        UPDATE PARENT_SCHEMA.arc SET y1=null, custom_y1=null WHERE arc_id = rec_aux2.arc_id;
+        UPDATE PARENT_SCHEMA.arc SET y2=null WHERE arc_id = rec_aux1.arc_id;
+        UPDATE PARENT_SCHEMA.arc SET y1=null WHERE arc_id = rec_aux2.arc_id;
     END IF;
 
     v_status := 'Accepted';
