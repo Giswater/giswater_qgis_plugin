@@ -723,7 +723,7 @@ CREATE TABLE cm_audit.log (
 	feature_id int4 NOT NULL,
 	feature_type text NULL,
 	"action" text NULL,
-	sql text NULL,
+	sql text NULL limit 100 characters,
 	old_value json NULL,
 	new_value json NULL,
 	insert_by TEXT NULL,
