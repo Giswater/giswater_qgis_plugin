@@ -134,7 +134,7 @@ LEFT JOIN LATERAL (
     SELECT psector_id FROM (
         SELECT 
             pp1.connec_id AS feature_id,
-            pp1.psector_id,
+            pp1.psector_id
         FROM plan_psector_x_connec pp1
         WHERE pp1.psector_id IN (
             SELECT sp.psector_id
@@ -144,7 +144,7 @@ LEFT JOIN LATERAL (
         UNION ALL
         SELECT 
             pg1.gully_id AS feature_id,
-            pg1.psector_id,
+            pg1.psector_id
         FROM plan_psector_x_gully pg1
         WHERE pg1.psector_id IN (
             SELECT sp.psector_id
@@ -159,13 +159,13 @@ LEFT JOIN LATERAL (
     SELECT p.state
     FROM (
         SELECT 
-            pp2.state,
+            pp2.state
         FROM plan_psector_x_connec pp2
         WHERE pp2.link_id = l.link_id 
         AND pp2.psector_id = last_ps.psector_id
         UNION ALL
         SELECT 
-            pg2.state,
+            pg2.state
         FROM plan_psector_x_gully pg2
         WHERE pg2.link_id = l.link_id 
         AND pg2.psector_id = last_ps.psector_id

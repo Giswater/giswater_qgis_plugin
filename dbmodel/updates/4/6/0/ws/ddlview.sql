@@ -3646,7 +3646,7 @@ LEFT JOIN connec c ON c.connec_id = l.feature_id
 LEFT JOIN LATERAL ( 
     SELECT 
         pp1.connec_id,
-        pp1.psector_id,
+        pp1.psector_id
     FROM plan_psector_x_connec pp1
     WHERE pp1.psector_id IN (
         SELECT sp.psector_id
