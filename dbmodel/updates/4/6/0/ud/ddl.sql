@@ -260,8 +260,11 @@ ALTER TABLE arc ADD COLUMN node_custom_top_elev_2 numeric(12,3) NULL;
 ALTER TABLE arc RENAME COLUMN node_sys_elev_2 TO node_elev_2;
 ALTER TABLE arc ADD COLUMN node_custom_elev_2 numeric(12,3) NULL;
 
-CREATE TRIGGER gw_trg_topocontrol_arc AFTER INSERT OR UPDATE OF the_geom, y1, y2, elev1, elev2, custom_elev1, custom_elev2, state, inverted_slope, node_top_elev_1, node_elev_1, node_top_elev_2, node_elev_2 ON
+CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom, y1, y2, elev1, elev2, custom_elev1, custom_elev2, state, inverted_slope ON
 arc FOR EACH ROW EXECUTE FUNCTION gw_trg_topocontrol_arc();
+
+CREATE TRIGGER gw_trg_autoupdate_arc_topology BEFORE INSERT OR UPDATE OF node_top_elev_1, node_top_elev_2, node_elev_1, node_elev_2 ON
+arc FOR EACH ROW EXECUTE FUNCTION gw_trg_autoupdate_arc_topology();
 
 -- node_1
 UPDATE arc SET node_top_elev_1 = top_elev

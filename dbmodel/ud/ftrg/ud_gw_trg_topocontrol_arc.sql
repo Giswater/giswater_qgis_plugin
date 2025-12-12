@@ -223,74 +223,33 @@ BEGIN
                     sys_length_aux=0.1;
                 END IF;
 
+				-- node_1
+				-- 1: ymax is changed
+				IF NEW.y1 IS NOT NULL AND (OLD.y1 IS DISTINCT FROM NEW.y1) THEN
+					IF NEW.node_top_elev_1 IS NOT NULL THEN
+						NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
+					END IF;
+				-- 2: elev is changed
+				ELSIF NEW.elev1 IS NOT NULL AND (OLD.elev1 IS DISTINCT FROM NEW.elev1) THEN
+					IF NEW.node_top_elev_1 IS NOT NULL THEN
+						NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
+					END IF;
+				END IF;
+
+				-- node_2
+				-- 1: ymax is changed
+				IF NEW.y2 IS NOT NULL AND (OLD.y2 IS DISTINCT FROM NEW.y2) THEN
+					IF NEW.node_top_elev_2 IS NOT NULL THEN
+						NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
+					END IF;
+				-- 2: elev is changed
+				ELSIF NEW.elev2 IS NOT NULL AND (OLD.elev2 IS DISTINCT FROM NEW.elev2) THEN
+					IF NEW.node_top_elev_2 IS NOT NULL THEN
+						NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
+					END IF;
+				END IF;
+
                 IF TG_OP = 'UPDATE' THEN
-
-					-- 1: top_elev is changed
-					IF NEW.node_top_elev_1 IS NOT NULL AND (OLD.node_top_elev_1 IS DISTINCT FROM NEW.node_top_elev_1) THEN
-						-- user variable is elev
-						IF v_node_topelev_autoupdate = 0 THEN
-
-							IF NEW.y1 IS NOT NULL THEN
-								-- recalculate elev
-								NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
-							ELSIF NEW.elev1 IS NOT NULL THEN
-								-- recalculate ymax
-								NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
-							END IF;
-						-- user variable is ymax
-						ELSIF v_node_topelev_autoupdate = 1 THEN
-							IF NEW.elev1 IS NOT NULL THEN
-								-- recalculate ymax
-								NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
-							ELSIF NEW.y1 IS NOT NULL THEN
-								-- recalculate elev
-								NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
-							END IF;
-						END IF;
-					-- 2: ymax is changed
-					ELSIF NEW.y1 IS NOT NULL AND (OLD.y1 IS DISTINCT FROM NEW.y1) THEN
-						IF NEW.node_top_elev_1 IS NOT NULL THEN
-							NEW.elev1 := NEW.node_top_elev_1 - NEW.y1;
-						END IF;
-					-- 3: elev is changed
-					ELSIF NEW.elev1 IS NOT NULL AND (OLD.elev1 IS DISTINCT FROM NEW.elev1) THEN
-						IF NEW.node_top_elev_1 IS NOT NULL THEN
-							NEW.y1 := NEW.node_top_elev_1 - NEW.elev1;
-						END IF;
-					END IF;
-
-					IF NEW.node_top_elev_2 IS NOT NULL AND (OLD.node_top_elev_2 IS DISTINCT FROM NEW.node_top_elev_2) THEN
-						-- user variable is elev
-						IF v_node_topelev_autoupdate = 0 THEN
-
-							IF NEW.y2 IS NOT NULL THEN
-								-- recalculate elev
-								NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
-							ELSIF NEW.elev2 IS NOT NULL THEN
-								-- recalculate ymax
-								NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
-							END IF;
-						-- user variable is ymax
-						ELSIF v_node_topelev_autoupdate = 1 THEN
-							IF NEW.elev2 IS NOT NULL THEN
-								-- recalculate ymax
-								NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
-							ELSIF NEW.y2 IS NOT NULL THEN
-								-- recalculate elev
-								NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
-							END IF;
-						END IF;
-					-- 2: ymax is changed
-					ELSIF NEW.y2 IS NOT NULL AND (OLD.y2 IS DISTINCT FROM NEW.y2) THEN
-						IF NEW.node_top_elev_2 IS NOT NULL THEN
-							NEW.elev2 := NEW.node_top_elev_2 - NEW.y2;
-						END IF;
-					-- 3: elev is changed
-					ELSIF NEW.elev2 IS NOT NULL AND (OLD.elev2 IS DISTINCT FROM NEW.elev2) THEN
-						IF NEW.node_top_elev_2 IS NOT NULL THEN
-							NEW.y2 := NEW.node_top_elev_2 - NEW.elev2;
-						END IF;
-					END IF;
 
                     -- update values when geometry is forced to reverse by custom operation
                     IF  geom_slp_direction_bool IS FALSE AND st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE
