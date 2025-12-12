@@ -334,3 +334,13 @@ SET alias =
             '_', ' '
         ), 
     2));
+
+-- 12/12/2025
+-- Config_form_fields
+UPDATE config_form_fields
+	SET "label"='Sys elev2:'
+	WHERE label = 'Elevation of the selected node 2:';
+
+UPDATE config_form_tableview
+    SET alias = 'roughness'
+    WHERE objectname = 'cat_mat_roughness' AND columnname = 'roughness';

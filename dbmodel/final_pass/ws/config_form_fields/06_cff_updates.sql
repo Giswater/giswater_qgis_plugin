@@ -1463,3 +1463,9 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
 	WHERE formname='ve_node_x' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+
+-- 12/12/2025
+-- Config_form_fields
+UPDATE config_form_fields
+	SET "label"='Sys elev2:'
+	WHERE label = 'Elevation of the selected node 2:';

@@ -142,3 +142,21 @@ SET query_text = 'SELECT node_id, nodecat_id, the_geom, expl_id FROM t_node WHER
 and (top_elev is not null or custom_top_elev is not null) and (elev is not null or custom_elev is not null)'
 WHERE fid = 461;
 
+
+-- 12/12/2025
+-- Config_form_fields
+UPDATE config_form_fields
+	SET tooltip='Sys_elev2 - Input level of the final node selected for the calculation'
+	WHERE formname='ve_inp_conduit' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET tooltip='Sys_elev2 - Input level of the final node selected for the calculation'
+	WHERE formname='ve_inp_orifice' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET tooltip='Sys_elev2 - Input level of the final node selected for the calculation'
+	WHERE formname='ve_inp_outlet' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET tooltip='Sys_elev2 - Input level of the final node selected for the calculation'
+	WHERE formname='ve_inp_pump' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET tooltip='Sys_elev2 - Input level of the final node selected for the calculation'
+	WHERE formname='ve_inp_weir' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_none';
