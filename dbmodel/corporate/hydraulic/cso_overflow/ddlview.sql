@@ -86,9 +86,9 @@ SELECT
 	outfall_id,
     cso.thyssen_plv_area::numeric(12,3) AS total_area,
     cso.imperv_area::numeric(12,3) AS imperv_area,
-    cso.mean_coef_runoff::numeric(12,3) AS runoffc,
-    CASE WHEN calib_imperv_area IS NULL THEN cso.imperv_area::numeric(12,3) ELSE calib_imperv_area::numeric(12,3) END AS calib_imperv_area,
-    CASE WHEN calib_imperv_area IS NOT NULL THEN (calib_imperv_area/cso.thyssen_plv_area)::numeric(12,3) ELSE mean_coef_runoff::numeric(12,3) END AS calib_runoffc,
+    (cso.imperv_area/cso.thyssen_plv_area)::numeric(12,3) AS runoffc,
+    CASE WHEN cc.calib_imperv_area IS NULL THEN cso.imperv_area::numeric(12,3) ELSE cc.calib_imperv_area::numeric(12,3) END AS calib_imperv_area,
+    CASE WHEN cc.calib_imperv_area IS NOT NULL THEN (cc.calib_imperv_area/cso.thyssen_plv_area)::numeric(12,3) ELSE mean_coef_runoff::numeric(12,3) END AS calib_runoffc,
     (d.addparam->>'kmLength')::numeric(12,3) AS kmlength,
     sum(vol_dwf) AS vol_dwf,
     sum(vol_wwtp) AS vol_wwtp,
@@ -99,9 +99,10 @@ SELECT
     avg(cov.efficiency)::numeric(12,3) AS efficiency,
     d.the_geom
    FROM v_cso_drainzone_rainfall cov 
+   	 LEFT JOIN cso_calibration cc ON cc.drainzone_id = cov.drainzone_id
      LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id = cov.drainzone_id
      LEFT JOIN drainzone d ON d.drainzone_id =cov.drainzone_id 
-     GROUP BY macroexplotation,	exploitation,	municipality,	drainzone, d.drainzone_id,cov.outfall_id, d.addparam->>'kmLength', cso.eq_inhab, d.the_geom, cso.thyssen_plv_area, cso.imperv_area, cso.mean_coef_runoff, calib_imperv_area, cso.thyssen_plv_area
+     GROUP BY macroexplotation,	exploitation,	municipality,	drainzone, d.drainzone_id,cov.outfall_id, d.addparam->>'kmLength', cso.eq_inhab, d.the_geom, cso.thyssen_plv_area, cso.imperv_area, cso.mean_coef_runoff, cc.calib_imperv_area, cso.thyssen_plv_area
   ORDER BY 1,2,4;
  
 
