@@ -373,8 +373,6 @@ class GwSchemaI18NManager:
 
         if not diff_rows and table_i18n != "i18n.dbstyle":
             return ""
-        if table_i18n == "i18n.dbstyle":
-            print('aaaaa')
 
         # Get the columns to insert
         columns_org = diff_rows[0].keys()
@@ -900,6 +898,12 @@ class GwSchemaI18NManager:
 
     def _rewrite_project_type(self, table):
         """Rewrite the project_type to the correct value"""
+
+        if 'dbstyle' in table:
+            if 'org_text' in self.conflict_project_type:
+                self.conflict_project_type.remove('org_text')
+            if 'org_text' in self.values_en_us:
+                self.values_en_us.remove('org_text')
 
         # Determine which rows that although they share primary keys but different project_type must not be converted to utils
         text = self._update_fake_utils(table)
