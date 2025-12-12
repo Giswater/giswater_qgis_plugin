@@ -529,9 +529,9 @@ class GwI18NGenerator:
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbparam_user':
-            columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
-            order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbconfig_param_system':
             columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
@@ -544,9 +544,9 @@ class GwI18NGenerator:
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'source', 'id'])
 
         elif table == 'dbmessage':
-            columns = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
+            columns = ["source", "project_type", "context", "ms_en_us", "ht_en_us"]
             lang_columns = self._generate_lang_columns(table, ['ms', 'ht'])
-            order_by.extend(['source_code', 'project_type', 'context', 'source', 'log_level', 'id'])
+            order_by.extend(['source_code', 'project_type', 'context', 'source', 'id'])
 
         elif table == 'dbfprocess':
             columns = ["project_type", "context", "source", "ex_en_us", "in_en_us", "na_en_us"]

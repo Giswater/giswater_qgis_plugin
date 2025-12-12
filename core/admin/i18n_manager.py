@@ -444,8 +444,8 @@ class GwSchemaI18NManager:
             columns_org = ["formname", "formtype", "tabname", "columnname", "label", "tooltip"]
 
         elif 'dbparam_user' in table_i18n:
-            columns_i18n = ["source", "formname", "lb_en_us", "tt_en_us"]
-            columns_org = ["id", "formname", "label", "descript"]
+            columns_i18n = ["source", "lb_en_us", "tt_en_us"]
+            columns_org = ["id", "label", "descript"]
 
         elif 'dbconfig_param_system' in table_i18n:
             columns_i18n = ["source", "lb_en_us", "tt_en_us"]
@@ -460,9 +460,8 @@ class GwSchemaI18NManager:
             columns_org = ["id", "idval"]
 
         elif 'dbmessage' in table_i18n:
-            columns_i18n = ["CAST(source AS INTEGER) AS source", "CAST(log_level AS INTEGER) AS log_level",
-                             "ms_en_us", "ht_en_us"]
-            columns_org = ["id", "log_level", "error_message", "hint_message"]
+            columns_i18n = ["CAST(source AS INTEGER) AS source", "ms_en_us", "ht_en_us"]
+            columns_org = ["id", "error_message", "hint_message"]
 
         elif 'dbfprocess' in table_i18n:
             columns_i18n = ["CAST(source AS INTEGER) AS source", "ex_en_us", "in_en_us", "na_en_us"]
@@ -1873,7 +1872,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbconfig_visit_parameter",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_visit_parameter"],
+                "dbtables": ["dbstyle"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1882,7 +1881,7 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbconfig_visit_parameter",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbconfig_visit_parameter"],
+                "dbtables": ["dbstyle"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {
