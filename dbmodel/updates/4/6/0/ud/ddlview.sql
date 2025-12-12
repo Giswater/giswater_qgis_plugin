@@ -133,7 +133,7 @@ FROM link l
 LEFT JOIN LATERAL (
     SELECT p.state
     FROM (
-        SELECT DISTINCT ON (pc.connec_id) pc.connec_id AS feature_id, pc.state, pc.link_id
+        SELECT DISTINCT ON (pc.connec_id) pc.connec_id AS feature_id, pc.state, pc.link_id, pc.psector_id
         FROM plan_psector_x_connec pc
         WHERE pc.link_id = l.link_id
         AND pc.psector_id IN (
@@ -142,7 +142,7 @@ LEFT JOIN LATERAL (
             WHERE sp.cur_user = CURRENT_USER
         )
         UNION ALL
-        SELECT DISTINCT ON (pg.gully_id) pg.gully_id AS feature_id, pg.state, pg.link_id
+        SELECT DISTINCT ON (pg.gully_id) pg.gully_id AS feature_id, pg.state, pg.link_id, pg.psector_id
         FROM plan_psector_x_gully pg
         WHERE pg.link_id = l.link_id
         AND pg.psector_id IN (
