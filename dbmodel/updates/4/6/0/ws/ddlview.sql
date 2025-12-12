@@ -3029,7 +3029,7 @@ LEFT JOIN LATERAL (
             FROM selector_psector sp
             WHERE sp.cur_user = CURRENT_USER
         )
-    ORDER BY pp.state DESC
+    ORDER BY pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, a.state) AND ss.cur_user = CURRENT_USER
@@ -3241,7 +3241,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC
+    ORDER BY pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, n.state) AND ss.cur_user = CURRENT_USER
@@ -3406,14 +3406,8 @@ SELECT
     c.builtdate,
     c.enddate,
     c.ownercat_id,
-        CASE
-            WHEN link_planned.link_id IS NULL THEN c.pjoint_id
-            ELSE link_planned.exit_id
-        END AS pjoint_id,
-        CASE
-            WHEN link_planned.link_id IS NULL THEN c.pjoint_type
-            ELSE link_planned.exit_type
-        END AS pjoint_type,
+    COALESCE(link_planned.exit_id, c.pjoint_id) AS pjoint_id,
+    COALESCE(link_planned.exit_type, c.pjoint_type) AS pjoint_type,
     c.om_state,
     c.conserv_state,
     c.accessibility,
@@ -3489,7 +3483,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC, pp.link_id DESC NULLS LAST
+    ORDER BY pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, c.state) AND ss.cur_user = CURRENT_USER
@@ -3649,7 +3643,7 @@ AS WITH typevalue AS (
     l.uuid
 FROM link l
 LEFT JOIN LATERAL (
-    SELECT pp.state
+    SELECT DISTINCT ON (pp.connec_id) pp.state, pp.link_id
     FROM plan_psector_x_connec pp
     WHERE pp.link_id = l.link_id
     AND pp.psector_id IN (
@@ -3657,7 +3651,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC
+    ORDER BY pp.connec_id, pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, l.state) AND ss.cur_user = CURRENT_USER

@@ -133,7 +133,7 @@ FROM link l
 LEFT JOIN LATERAL (
     SELECT p.state
     FROM (
-        SELECT pc.state
+        SELECT DISTINCT ON (pc.connec_id) pc.connec_id AS feature_id, pc.state, pc.link_id
         FROM plan_psector_x_connec pc
         WHERE pc.link_id = l.link_id
         AND pc.psector_id IN (
@@ -142,7 +142,7 @@ LEFT JOIN LATERAL (
             WHERE sp.cur_user = CURRENT_USER
         )
         UNION ALL
-        SELECT pg.state
+        SELECT DISTINCT ON (pg.gully_id) pg.gully_id AS feature_id, pg.state, pg.link_id
         FROM plan_psector_x_gully pg
         WHERE pg.link_id = l.link_id
         AND pg.psector_id IN (
@@ -151,7 +151,7 @@ LEFT JOIN LATERAL (
             WHERE sp.cur_user = CURRENT_USER
         )
     ) p
-    ORDER BY p.state DESC
+    ORDER BY p.feature_id, p.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, l.state) AND ss.cur_user = CURRENT_USER
@@ -854,7 +854,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC
+    ORDER BY pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, n.state) AND ss.cur_user = CURRENT_USER
@@ -1050,7 +1050,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC
+    ORDER BY pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, node.state) AND ss.cur_user = CURRENT_USER
@@ -1265,7 +1265,7 @@ AS WITH typevalue AS (
                 FROM selector_psector sp
                 WHERE sp.cur_user = CURRENT_USER
             )
-        ORDER BY pp.state DESC
+        ORDER BY pp.psector_id DESC
         LIMIT 1
     ) pp ON TRUE
     JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, arc.state) AND ss.cur_user = CURRENT_USER
@@ -1634,7 +1634,7 @@ AS WITH typevalue AS (
                 FROM selector_psector sp
                 WHERE sp.cur_user = CURRENT_USER
             )
-        ORDER BY pp.state DESC
+        ORDER BY pp.psector_id DESC
         LIMIT 1
     ) pp ON TRUE
     JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, arc.state) AND ss.cur_user = CURRENT_USER
@@ -1923,14 +1923,8 @@ SELECT
     connec.enddate,
     connec.ownercat_id,
     connec.om_state,
-    CASE
-        WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
-        ELSE link_planned.exit_id
-    END AS pjoint_id,
-    CASE
-        WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
-        ELSE link_planned.exit_type
-    END AS pjoint_type,
+    COALESCE(link_planned.exit_id, connec.pjoint_id) AS pjoint_id,
+    COALESCE(link_planned.exit_type, connec.pjoint_type) AS pjoint_type,
     connec.access_type,
     connec.placement_type,
     connec.accessibility,
@@ -1982,7 +1976,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC, pp.link_id DESC NULLS LAST
+    ORDER BY pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, connec.state) AND ss.cur_user = CURRENT_USER
@@ -2147,14 +2141,8 @@ SELECT
     gully.enddate,
     gully.ownercat_id,
     gully.om_state,
-        CASE
-            WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
-            ELSE link_planned.exit_id
-        END AS pjoint_id,
-        CASE
-            WHEN link_planned.exit_type IS NULL THEN gully.pjoint_type
-            ELSE link_planned.exit_type
-        END AS pjoint_type,
+    COALESCE(link_planned.exit_id, gully.pjoint_id) AS pjoint_id,
+    COALESCE(link_planned.exit_type, gully.pjoint_type) AS pjoint_type,
     gully.placement_type,
     gully.access_type,
     gully.brand_id,
@@ -2204,7 +2192,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.state DESC, pp.link_id DESC NULLS LAST
+    ORDER BY pp.gully_id, pp.psector_id DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, gully.state) AND ss.cur_user = CURRENT_USER
