@@ -27,7 +27,7 @@ FROM _cat_connec;
 INSERT INTO cat_gully (id, gully_type, matcat_id, length, width, efficiency, descript, link, brand_id, model_id, svg, label, active)
 SELECT id, gully_type, matcat_id, length, width,
 CASE
-  WHEN effective_area IS NOT NULL AND total_area IS NOT NULL THEN
+  WHEN effective_area IS NOT NULL AND total_area > 0 THEN
     effective_area/total_area
   ELSE
     0.8
