@@ -3483,7 +3483,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.psector_id DESC
+    ORDER BY pp.psector_id DESC, pp.state DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, c.state) AND ss.cur_user = CURRENT_USER
@@ -3642,23 +3642,32 @@ AS WITH typevalue AS (
     COALESCE(pp.state, l.state) AS p_state,
     l.uuid
 FROM link l
-LEFT JOIN LATERAL (
-    SELECT DISTINCT ON (pp.connec_id) pp.state, pp.link_id
-    FROM plan_psector_x_connec pp
-    WHERE pp.link_id = l.link_id
-    AND pp.psector_id IN (
+LEFT JOIN connec c ON c.connec_id = l.feature_id
+LEFT JOIN LATERAL ( 
+    SELECT 
+        pp1.connec_id,
+        pp1.psector_id,
+    FROM plan_psector_x_connec pp1
+    WHERE pp1.psector_id IN (
         SELECT sp.psector_id
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
-    )
-    ORDER BY pp.connec_id, pp.psector_id DESC
+    ) AND pp1.connec_id = l.feature_id
+    ORDER BY pp1.psector_id DESC
     LIMIT 1
-) pp ON TRUE
+) last_ps ON true
+LEFT JOIN LATERAL (
+    SELECT 
+        pp2.state
+    FROM plan_psector_x_connec pp2
+    WHERE pp2.link_id = l.link_id 
+    AND pp2.psector_id = last_ps.psector_id
+    LIMIT 1
+) pp ON true
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, l.state) AND ss.cur_user = CURRENT_USER
 JOIN selector_sector ssec ON ssec.sector_id = l.sector_id AND ssec.cur_user = CURRENT_USER
 JOIN selector_municipality sm  ON sm.muni_id = l.muni_id AND sm.cur_user = CURRENT_USER
 JOIN selector_expl se ON se.expl_id = ANY (array_append(l.expl_visibility::integer[], l.expl_id)) AND se.cur_user = CURRENT_USER
-LEFT JOIN connec c ON c.connec_id = l.feature_id
 JOIN sector_table ON sector_table.sector_id = l.sector_id
 JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
 JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text

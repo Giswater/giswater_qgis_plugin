@@ -130,30 +130,48 @@ SELECT
     l.uuid,
     l.omunit_id
 FROM link l
+LEFT JOIN LATERAL ( 
+    SELECT psector_id FROM (
+        SELECT 
+            pp1.connec_id AS feature_id,
+            pp1.psector_id,
+        FROM plan_psector_x_connec pp1
+        WHERE pp1.psector_id IN (
+            SELECT sp.psector_id
+            FROM selector_psector sp
+            WHERE sp.cur_user = CURRENT_USER
+        ) AND pp1.connec_id = l.feature_id
+        UNION ALL
+        SELECT 
+            pg1.gully_id AS feature_id,
+            pg1.psector_id,
+        FROM plan_psector_x_gully pg1
+        WHERE pg1.psector_id IN (
+            SELECT sp.psector_id
+            FROM selector_psector sp
+            WHERE sp.cur_user = CURRENT_USER
+        ) AND pg1.gully_id = l.feature_id
+    ) p
+    ORDER BY p.psector_id DESC
+    LIMIT 1
+) last_ps ON true
 LEFT JOIN LATERAL (
     SELECT p.state
     FROM (
-        SELECT DISTINCT ON (pc.connec_id) pc.connec_id AS feature_id, pc.state, pc.link_id, pc.psector_id
-        FROM plan_psector_x_connec pc
-        WHERE pc.link_id = l.link_id
-        AND pc.psector_id IN (
-            SELECT sp.psector_id
-            FROM selector_psector sp
-            WHERE sp.cur_user = CURRENT_USER
-        )
+        SELECT 
+            pp2.state,
+        FROM plan_psector_x_connec pp2
+        WHERE pp2.link_id = l.link_id 
+        AND pp2.psector_id = last_ps.psector_id
         UNION ALL
-        SELECT DISTINCT ON (pg.gully_id) pg.gully_id AS feature_id, pg.state, pg.link_id, pg.psector_id
-        FROM plan_psector_x_gully pg
-        WHERE pg.link_id = l.link_id
-        AND pg.psector_id IN (
-            SELECT sp.psector_id
-            FROM selector_psector sp
-            WHERE sp.cur_user = CURRENT_USER
-        )
+        SELECT 
+            pg2.state,
+        FROM plan_psector_x_gully pg2
+        WHERE pg2.link_id = l.link_id 
+        AND pg2.psector_id = last_ps.psector_id
     ) p
-    ORDER BY p.feature_id, p.psector_id DESC
     LIMIT 1
-) pp ON TRUE
+) pp ON true
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, l.state) AND ss.cur_user = CURRENT_USER
 JOIN selector_sector ssec ON ssec.sector_id = l.sector_id AND ssec.cur_user = CURRENT_USER
 JOIN selector_municipality sm  ON sm.muni_id = l.muni_id AND sm.cur_user = CURRENT_USER
@@ -1976,7 +1994,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.psector_id DESC
+    ORDER BY pp.psector_id DESC, pp.state DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, connec.state) AND ss.cur_user = CURRENT_USER
@@ -2192,7 +2210,7 @@ LEFT JOIN LATERAL (
         FROM selector_psector sp
         WHERE sp.cur_user = CURRENT_USER
     )
-    ORDER BY pp.gully_id, pp.psector_id DESC
+    ORDER BY pp.psector_id DESC, pp.state DESC
     LIMIT 1
 ) pp ON TRUE
 JOIN selector_state ss ON ss.state_id = COALESCE(pp.state, gully.state) AND ss.cur_user = CURRENT_USER
