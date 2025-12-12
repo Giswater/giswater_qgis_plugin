@@ -37,7 +37,6 @@ class GwMenuLoad(QObject):
 
         self.main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
         self.main_menu.setObjectName("Giswater")
-        tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
