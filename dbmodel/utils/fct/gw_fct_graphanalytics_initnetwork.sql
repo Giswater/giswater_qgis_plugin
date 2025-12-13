@@ -38,8 +38,8 @@ DECLARE
 
     -- extra variables
     v_graph_delimiter TEXT;
-    v_cost INTEGER = 1;
-    v_reverse_cost INTEGER = 1;
+    v_cost INTEGER;
+    v_reverse_cost INTEGER;
 
     v_query_text TEXT;
     v_query_text_components TEXT;
@@ -63,6 +63,14 @@ BEGIN
     v_mapzone_name = p_data->'data'->>'mapzone_name';
     v_arc_id = p_data->'data'->>'arc_id';
     v_mode = p_data->'data'->>'mode';
+    v_cost = p_data->'data'->>'cost';
+    v_reverse_cost = p_data->'data'->>'reverse_cost';
+
+    IF v_cost IS NULL THEN v_cost := 1; 
+    END IF;
+
+    IF v_reverse_cost IS NULL THEN v_reverse_cost := 1; 
+    END IF;
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -86,8 +94,6 @@ BEGIN
         v_temp_arc_table = 'temp_pgr_arc'::regclass;
         v_temp_node_table = 'temp_pgr_node'::regclass;
     END IF;
-
-    IF v_project_type = 'UD' THEN v_reverse_cost = -1; END IF;
 
     IF v_mapzone_name IN ('MINSECTOR', 'MINCUT') THEN
         v_graph_delimiter := 'SECTOR';

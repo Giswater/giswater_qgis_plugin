@@ -172,7 +172,9 @@ BEGIN
     v_data := jsonb_build_object(
         'data', jsonb_build_object(
             'expl_id_array', array_to_string(v_expl_id_array, ','),
-            'mapzone_name', 'MINSECTOR'
+            'mapzone_name', 'MINSECTOR',
+			'cost', 1,
+			'reverse_cost', 1
         )
     )::text;
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
@@ -593,7 +595,9 @@ BEGIN
             'data', jsonb_build_object(
                 'expl_id_array', array_to_string(v_expl_id_array, ','),
                 'mapzone_name', 'MINCUT',
-                'mode', 'MINSECTOR'
+                'mode', 'MINSECTOR',
+				'cost', 1,
+				'reverse_cost', 1
             )
         )::text;
 		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;

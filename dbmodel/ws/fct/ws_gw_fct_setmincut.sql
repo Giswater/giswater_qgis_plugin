@@ -711,11 +711,14 @@ BEGIN
 	IF v_init_mincut THEN
 		-- Initialize process
 		-- =======================
+		
 		v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'mapzone_name', 'MINCUT',
 				'arc_id', v_arc_id,
-				'mode', v_mode
+				'mode', v_mode,
+				'cost', 1,
+				'reverse_cost', 1
 			)
 		)::text;
 		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;

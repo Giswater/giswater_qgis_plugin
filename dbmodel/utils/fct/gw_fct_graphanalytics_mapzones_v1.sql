@@ -96,6 +96,8 @@ DECLARE
 	v_use_plan_psector boolean;
 	v_commit_changes boolean;
 	v_netscenario integer;
+	v_cost INTEGER;
+	v_reverse_cost INTEGER;
 
 	-- geometry variables
 	v_geom_param_update_divide float;
@@ -258,7 +260,22 @@ BEGIN
 
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_mapzone_name ||'"}}';
+	v_cost := 1;
+	IF v_project_type = 'WS' THEN
+		v_reverse_cost := 1;
+	ELSE
+		v_reverse_cost := -1;
+    END IF;
+
+    v_data := jsonb_build_object(
+        'data', jsonb_build_object(
+            'expl_id_array', array_to_string(v_expl_id_array, ','),
+            'mapzone_name', v_mapzone_name,
+			'cost', v_cost,
+			'reverse_cost', v_reverse_cost
+        )
+    )::text;
+
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
