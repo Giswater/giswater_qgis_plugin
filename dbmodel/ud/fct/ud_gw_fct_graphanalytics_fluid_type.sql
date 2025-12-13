@@ -184,7 +184,11 @@ BEGIN
         RETURN v_response;
     END IF;
 
-
+	UPDATE temp_pgr_node n SET mapzone_id = t.fluid_type, old_mapzone_id = t.fluid_type 
+    FROM v_temp_node t WHERE n.node_id = t.node_id;
+	
+	UPDATE temp_pfr_arc a SET mapzone_id = t.fluid_type, old_mapzone_id = t.fluid_type 
+    FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
 
 	WITH feature_type AS (
 		SELECT

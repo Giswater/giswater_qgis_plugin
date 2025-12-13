@@ -32,7 +32,6 @@ DECLARE
     -- parameters
     v_expl_id_array text[];
     v_mapzone_name TEXT;
-    v_mapzone_field text;
     v_mode text;
     v_arc_id integer;
 
@@ -101,12 +100,6 @@ BEGIN
         v_graph_delimiter := v_mapzone_name;
     END IF;
 
-    IF v_mapzone_name ILIKE '%TYPE%' THEN
-        v_mapzone_field = LOWER(v_mapzone_name);
-    ELSIF v_mapzone_name = 'MINCUT' THEN v_mapzone_field = NULL;
-    ELSE v_mapzone_field = LOWER(v_mapzone_name) || '_id';
-    END IF;
-
     -- prepare query used for connectedComponents
     IF v_mode = 'MINSECTOR' THEN
         v_query_text := '
@@ -128,12 +121,12 @@ BEGIN
                 FROM v_temp_arc a
                 WHERE NOT EXISTS (
                     SELECT 1 FROM v_temp_node n 
-                    WHERE ''' || v_graph_delimiter ||''' = ANY (n.graph_delimiter)
+                    WHERE ''SECTOR'' = ANY (n.graph_delimiter)
                     AND a.node_1 = n.node_id
                 )
                 AND NOT EXISTS (
                     SELECT 1 FROM v_temp_node n 
-                    WHERE '''|| v_graph_delimiter ||''' = ANY (n.graph_delimiter)
+                    WHERE ''SECTOR'' = ANY (n.graph_delimiter)
                     AND a.node_2 = n.node_id
                 )
             ';
@@ -220,32 +213,32 @@ BEGIN
             -- insert nodes that are graph_delimiter = 'SECTOR' (water source)
             EXECUTE format('
                 INSERT INTO %I (node_id, graph_delimiter)
-                SELECT DISTINCT n.node_id, %L
+                SELECT DISTINCT n.node_id, ''SECTOR''
                 FROM v_temp_node n
                 JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2) 
-                WHERE %L = ANY(n.graph_delimiter)
+                WHERE ''SECTOR'' = ANY(n.graph_delimiter)
                 AND EXISTS (SELECT 1 FROM %I vtn WHERE a.minsector_id = vtn.node_id);
-            ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
+            ', v_temp_node_table, v_temp_node_table);
         ELSE
             IF v_node = 0 THEN
                 -- the arc is between 2 water source nodes, v_temp_node_table has no nodes, insert them
                 EXECUTE format('
                 INSERT INTO %I (node_id, graph_delimiter)
-                SELECT n.node_id, %L
+                SELECT n.node_id, ''SECTOR''
                 FROM v_temp_node n
                 JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
                 WHERE a.arc_id = %L
-            ', v_temp_node_table, v_graph_delimiter, v_arc_id);
+            ', v_temp_node_table, v_arc_id);
             ELSE
                 -- insert nodes that are graph_delimiter = 'SECTOR' (water source) and the other node is in v_temp_node_table
                 EXECUTE format('
                     INSERT INTO %I (node_id, graph_delimiter)
-                    SELECT DISTINCT n.node_id, %L
+                    SELECT DISTINCT n.node_id, ''SECTOR''
                     FROM v_temp_node n
                     JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2) 
-                    WHERE %L = ANY(n.graph_delimiter)
+                    WHERE ''SECTOR'' = ANY(n.graph_delimiter)
                     AND EXISTS (SELECT 1 FROM %I vtn WHERE vtn.node_id IN (a.node_1, a.node_2));
-                ', v_temp_node_table, v_graph_delimiter, v_graph_delimiter, v_temp_node_table);
+                ', v_temp_node_table, v_temp_node_table);
             END IF;
         END IF;
     ELSE
@@ -288,22 +281,7 @@ BEGIN
         ', v_temp_arc_table, v_cost, v_reverse_cost, v_temp_node_table, v_temp_node_table);
     END IF;
 
-    IF v_mapzone_name ILIKE '%TYPE%' THEN
-        v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || ' 
-            FROM v_temp_node t WHERE n.node_id = t.node_id';
-        EXECUTE v_query_text;
-        v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET mapzone_id = t.' || v_mapzone_field || ', old_mapzone_id = t.' || v_mapzone_field || '
-             FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
-        EXECUTE v_query_text;
-    ELSE
-        IF v_mapzone_name <> 'MINCUT' THEN
-            v_query_text = 'UPDATE ' || v_temp_node_table || ' n SET old_mapzone_id = t.' || v_mapzone_field || ' 
-                FROM v_temp_node t WHERE n.node_id = t.node_id';
-            EXECUTE v_query_text;
-            v_query_text = 'UPDATE ' || v_temp_arc_table || ' a SET old_mapzone_id = t.' || v_mapzone_field || ' 
-                FROM v_temp_arc t WHERE a.arc_id = t.arc_id';
-            EXECUTE v_query_text;
-        END IF;
+    IF v_mapzone_name NOT ILIKE '%TYPE%' THEN
 
         IF v_project_type = 'WS' THEN
             -- update to_arc, closed, broken, graph_delimiter for VALVES (valves are arcs for version 6.1, nodes if not)

@@ -183,6 +183,12 @@ BEGIN
         RETURN v_response;
     END IF;
 
+    UPDATE temp_pgr_node n SET old_mapzone_id = t.minsector_id
+    FROM v_temp_node t WHERE n.node_id = t.node_id;
+	
+	UPDATE temp_pgr_arc a SET old_mapzone_id = t.minsector_id 
+    FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
+
     UPDATE temp_pgr_node t
     SET modif = TRUE
 	WHERE graph_delimiter = 'MINSECTOR'

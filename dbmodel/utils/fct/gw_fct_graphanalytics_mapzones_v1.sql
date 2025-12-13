@@ -282,6 +282,16 @@ BEGIN
         RETURN v_response;
     END IF;
 
+	EXECUTE '
+		UPDATE temp_pgr_node n SET old_mapzone_id = ' || v_mapzone_field || '
+		FROM v_temp_node t WHERE n.node_id = t.node_id; 
+	';
+
+	EXECUTE '
+		UPDATE temp_pgr_arc a SET old_mapzone_id = ' || v_mapzone_field || '
+		FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
+	';
+
 	-- NODES TO MODIFY
 	IF v_project_type = 'WS' THEN
 

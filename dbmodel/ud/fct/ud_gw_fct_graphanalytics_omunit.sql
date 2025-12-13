@@ -149,6 +149,12 @@ BEGIN
         RETURN v_response;
     END IF;
 
+    UPDATE temp_pgr_node n SET old_mapzone_id = t.omunit_id
+    FROM v_temp_node t WHERE n.node_id = t.node_id;
+	
+	UPDATE temp_pgr_arc a SET old_mapzone_id = t.omunit_id 
+    FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
+
 	-- -- =======================
     -- v_data := '{"data":{"mapzone_name":"OMUNIT"}}';
     -- SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
