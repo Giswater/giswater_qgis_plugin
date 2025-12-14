@@ -730,8 +730,8 @@ BEGIN
                 WHERE a.arc_id = %L
             ', v_arc_id);
 
-			INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, 1 as cost, 1 as reverse_cost)
-			SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L
+			INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
+			SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, 1 as cost, 1 as reverse_cost
 			FROM v_temp_arc a
 			JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
 			JOIN temp_pgr_node n2 ON n2.node_id = a.node_2;

@@ -49,6 +49,7 @@ v_mincut_class integer;
 v_node integer;
 v_arc integer;
 v_use_psectors boolean;
+v_ignore_check_valves boolean;
 
 -- coordinates parameters
 v_xcoord float;
@@ -113,17 +114,18 @@ BEGIN
 	SELECT giswater, epsg, UPPER(project_type) INTO v_version, v_srid, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Parameters
-	v_pgr_distance = p_data->'data'->>'pgrDistance';
-	v_root_vids = ARRAY(SELECT json_array_elements_text((p_data->'data'->>'pgrRootVids')::json))::int[];
+	v_pgr_distance := p_data->'data'->>'pgrDistance';
+	v_root_vids := ARRAY(SELECT json_array_elements_text((p_data->'data'->>'pgrRootVids')::json))::int[];
     
-    v_mode = p_data->'data'->>'mode';
+    v_mode := p_data->'data'->>'mode';
+    v_ignore_check_valves := p_data->'data'->>'ignoreCheckValvesMincut';
 
     IF v_mode = 'MINSECTOR' THEN
-        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
-        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
+        v_temp_arc_table := 'temp_pgr_arc_minsector'::regclass;
+        v_temp_node_table := 'temp_pgr_node_minsector'::regclass;
     ELSE
-        v_temp_arc_table = 'temp_pgr_arc'::regclass;
-        v_temp_node_table = 'temp_pgr_node'::regclass;
+        v_temp_arc_table := 'temp_pgr_arc'::regclass;
+        v_temp_node_table := 'temp_pgr_node'::regclass;
     END IF;
 
 
@@ -313,6 +315,24 @@ BEGIN
                 v_temp_arc_table
             )
             USING v_root_with_water;
+
+            -- si v_ignore_check_valves is TRUE, close also the valves that seems without water because of a checkvalve
+            IF v_ignore_check_valves THEN
+                EXECUTE format(
+                    'UPDATE %I a SET proposed = TRUE
+                    FROM (
+                        SELECT DISTINCT start_vid
+                        FROM temp_pgr_drivingdistance
+                        WHERE start_vid <> ALL ($1)
+                    ) d
+                    WHERE a.graph_delimiter = ''MINSECTOR''
+                    AND a.mapzone_id = 1
+                    AND a.cost >= 0 AND a.reverse_cost >= 0
+                    AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);',
+                    v_temp_arc_table
+                )
+                USING v_root_with_water;
+            END IF;
 
             -- update mapzone_id with value 2 for the border open valves when the zones are without water
             -- for the nodes
