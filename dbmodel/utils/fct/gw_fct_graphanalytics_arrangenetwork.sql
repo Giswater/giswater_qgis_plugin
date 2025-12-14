@@ -396,25 +396,19 @@ BEGIN
             ', v_temp_arc_table);
         END IF;
 
-        -- for mapzone graph_delimiter and the watersources (SECTOR) - the inlet arcs behave like checkvalves
-            EXECUTE format('
-                UPDATE %I a
-                SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-                    reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-                WHERE a.graph_delimiter IN (%L, ''SECTOR'')
-                AND a.old_arc_id <> ALL (a.to_arc);
-            ', v_temp_arc_table, v_graph_delimiter);
+        -- for the watersources (SECTOR) - the inlet arcs behave like checkvalves
+        EXECUTE format('
+            UPDATE %I a
+            SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
+                reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
+            WHERE a.graph_delimiter = ''SECTOR''
+            AND a.old_arc_id <> ALL (a.to_arc);
+        ', v_temp_arc_table);
     END IF;
-
-    -- FORCECLOSED
-    EXECUTE format('
-        UPDATE %I a
-        SET cost = -1, reverse_cost = -1
-        WHERE a.graph_delimiter  = ''FORCECLOSED'';
-    ', v_temp_arc_table);
 
     -- calculate to_arc of node parents in from zero mode
     IF v_from_zero AND v_project_type = 'WS' AND v_graph_delimiter <> 'SECTOR' THEN
+
         EXECUTE format('
             SELECT COUNT(*)::INT FROM %I 
             WHERE to_arc IS NULL AND graph_delimiter = %L
