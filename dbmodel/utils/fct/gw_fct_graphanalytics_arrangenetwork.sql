@@ -30,8 +30,8 @@ DECLARE
     v_graph_delimiter TEXT;
     v_record RECORD;
     v_pgr_node_id INTEGER;
-    v_cost integer=0; -- for the new arcs the cost/reverse_cost is 0 and not 1 so the inundation will be seen correct
-    v_reverse_cost integer=0;
+    v_cost integer; -- for the new arcs the cost/reverse_cost is 0 and not 1 so the inundation will be seen correct
+    v_reverse_cost integer;
     v_query_text TEXT;
     v_pgr_root_vids INT[];
     v_pgr_distance INTEGER;
@@ -55,6 +55,8 @@ BEGIN
     v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
     v_from_zero = p_data->'data'->>'from_zero';
     v_mode = p_data->'data'->>'mode';
+    v_cost = p_data->'data'->>'cost';
+    v_reverse_cost = p_data->'data'->>'reverse_cost';
 
     IF v_mapzone_name IS NULL OR v_mapzone_name = '' THEN
         RETURN jsonb_build_object(
@@ -84,10 +86,6 @@ BEGIN
         v_graph_delimiter := 'SECTOR';
     ELSE
         v_graph_delimiter := v_mapzone_name;
-    END IF;
-
-    IF v_project_type = 'UD' THEN
-        v_reverse_cost = -1;
     END IF;
 
     -- ARCS TO MODIFY - Depending on the nodes with modif = TRUE

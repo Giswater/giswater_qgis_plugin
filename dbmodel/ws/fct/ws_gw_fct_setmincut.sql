@@ -757,7 +757,9 @@ BEGIN
 		v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'mapzone_name', 'MINCUT',
-				'mode', v_mode
+				'mode', v_mode,
+				'cost', 0,
+				'reverse_cost', 0
 			)
 		)::text;
 		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
