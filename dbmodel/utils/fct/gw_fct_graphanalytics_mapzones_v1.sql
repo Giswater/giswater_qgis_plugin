@@ -385,7 +385,7 @@ BEGIN
 			-- update to_arc for nodes that are graph_delimiter or water source
             -- SET TO_ARC from TANK
             EXECUTE format($$
-                UPDATE %I t
+                UPDATE temp_pgr_node t
                 SET to_arc = a.to_arc
                 FROM  (
                     SELECT m.node_id, array_agg(a.arc_id) AS to_arc
@@ -395,11 +395,11 @@ BEGIN
                     GROUP BY m.node_id
                 ) a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_temp_node_table, v_mapzone_name);
+            $$, v_mapzone_name);
 
 			-- SET TO_ARC from SOURCE
             EXECUTE format($$
-                UPDATE %I t
+                UPDATE temp_pgr_node t
                 SET to_arc = a.to_arc
                 FROM
                     (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
@@ -409,11 +409,11 @@ BEGIN
                     GROUP BY m.node_id
                     )a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_temp_node_table, v_mapzone_name);
+            $$, v_mapzone_name);
 
 			-- SET TO_ARC from WATERWELL
             EXECUTE format($$
-                UPDATE %I t
+                UPDATE temp_pgr_node t
                 SET to_arc = a.to_arc
                 FROM
                     (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
@@ -423,11 +423,11 @@ BEGIN
                     GROUP BY m.node_id
                     )a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_temp_node_table, v_mapzone_name);
+            $$, v_mapzone_name);
 
             -- SET TO_ARC from WTP
             EXECUTE format($$
-                UPDATE %I t
+                UPDATE temp_pgr_node t
                 SET to_arc = a.to_arc
                 FROM
                     (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
@@ -437,11 +437,11 @@ BEGIN
                     GROUP BY m.node_id
                     )a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_temp_node_table, v_mapzone_name);
+            $$, v_mapzone_name);
 
 			-- SET TO_ARC from METER
             EXECUTE format($$
-                UPDATE %I t
+                UPDATE temp_pgr_node t
                 SET to_arc = a.to_arc
                 FROM
                     (SELECT node_id,
@@ -451,11 +451,11 @@ BEGIN
                     FROM man_meter m
                     ) a
                 WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
-            $$, v_temp_node_table, v_mapzone_name);
+            $$, v_mapzone_name);
 
             -- SET TO_ARC from PUMP
             EXECUTE format($$
-                UPDATE %I t
+                UPDATE temp_pgr_node t
                 SET to_arc = a.to_arc
                 FROM
                     (SELECT node_id,
@@ -465,7 +465,7 @@ BEGIN
                     FROM man_pump m
                     ) a
                 WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
-            $$, v_temp_node_table, v_mapzone_name);	
+            $$, v_mapzone_name);	
 
 		ELSE
 			EXECUTE format($$
