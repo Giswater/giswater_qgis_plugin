@@ -155,13 +155,11 @@ BEGIN
 	UPDATE temp_pgr_arc a SET old_mapzone_id = t.omunit_id 
     FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
 
-	-- -- =======================
-    -- v_data := '{"data":{"mapzone_name":"OMUNIT"}}';
-    -- SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
-
-    -- IF v_response->>'status' <> 'Accepted' THEN
-    --     RETURN v_response;
-    -- END IF;
+    UPDATE temp_pgr_node t
+    SET graph_delimiter = 'OMUNIT'
+    FROM v_temp_node n
+    WHERE 'OMUNIT' = ANY(n.graph_delimiter)
+    AND t.node_id = n.node_id;
 
     --------------------------------------------------
     -- SECTION: Create omunits and macroomunits
@@ -184,7 +182,7 @@ BEGIN
     WITH 
         pair_arcs AS (
             SELECT 
-                l.SOURCE, l.seq, l.target, l.graph_delimiter,
+                l.SOURCE, l.seq, l.target,
                 CASE
                     WHEN a1.initoverflowpath = a2.initoverflowpath THEN 0  -- the same: first
                     ELSE 1                                        -- not the same: after

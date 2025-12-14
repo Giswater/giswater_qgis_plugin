@@ -295,7 +295,28 @@ BEGIN
 	-- NODES TO MODIFY
 	IF v_project_type = 'WS' THEN
 
-		-- NODES VALVES
+		-- NODES VALVES (MINSECTOR)
+		UPDATE temp_pgr_node t
+		SET
+			graph_delimiter = 'MINSECTOR',
+			closed = v.closed,
+			broken = v.broken,
+			to_arc = v.to_arc
+		FROM (
+			SELECT
+			n.node_id,
+			v.closed,
+			v.broken,
+			CASE
+				WHEN to_arc IS NULL THEN NULL
+				ELSE ARRAY[to_arc]
+			END AS to_arc
+			FROM v_temp_node n
+			JOIN man_valve v ON v.node_id = n.node_id
+			WHERE 'MINSECTOR' = ANY(n.graph_delimiter)
+		) v
+		WHERE t.node_id = v.node_id; 
+
 		-- closed valves
 		UPDATE temp_pgr_node n  SET modif = TRUE
 		WHERE  n.graph_delimiter = 'MINSECTOR'
@@ -308,11 +329,6 @@ BEGIN
 		AND n.to_arc IS NOT NULL
 		AND n.closed = FALSE
 		AND n.broken = FALSE;
-
-		-- NODES watersource (SECTOR)
-		UPDATE temp_pgr_node n  SET modif = TRUE
-		WHERE  n.graph_delimiter = 'SECTOR'
-		AND n.graph_delimiter <> v_mapzone_name;
 	END IF;
 
 	-- CLOSED AND OPEN VALVES FROM NETSCENARIO
@@ -346,11 +362,125 @@ BEGIN
 	-- NODES MAPZONES
 	-- Nodes that are the starting/ending points of mapzones
 	IF v_from_zero THEN
-		v_query_text :=
-			'UPDATE temp_pgr_node n SET modif = TRUE
-			WHERE  graph_delimiter  = ''' || v_mapzone_name || '''
-			';
-		EXECUTE v_query_text;
+
+		EXECUTE format($$
+            UPDATE temp_pgr_node t
+            SET graph_delimiter = %L, modif = TRUE
+            FROM v_temp_node n
+            WHERE %L = ANY(n.graph_delimiter)
+            AND t.node_id = n.node_id;
+        $$, v_mapzone_name, v_mapzone_name);
+
+		IF v_project_type = 'WS' THEN
+			-- water source (SECTOR) graph_delimiter
+            UPDATE temp_pgr_node t
+            SET graph_delimiter = 'SECTOR', modif = TRUE
+            FROM v_temp_node n
+            WHERE t.node_id = n.node_id
+            AND t.graph_delimiter = 'NONE'
+            AND 'SECTOR' = ANY(n.graph_delimiter);
+		END IF;
+
+		IF v_project_type = 'WS' THEN
+			-- update to_arc for nodes that are graph_delimiter or water source
+            -- SET TO_ARC from TANK
+            EXECUTE format($$
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM  (
+                    SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_tank m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                ) a
+                WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
+            $$, v_temp_node_table, v_mapzone_name);
+
+			-- SET TO_ARC from SOURCE
+            EXECUTE format($$
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_source m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                    )a
+                WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
+            $$, v_temp_node_table, v_mapzone_name);
+
+			-- SET TO_ARC from WATERWELL
+            EXECUTE format($$
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_waterwell m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                    )a
+                WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
+            $$, v_temp_node_table, v_mapzone_name);
+
+            -- SET TO_ARC from WTP
+            EXECUTE format($$
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT m.node_id, array_agg(a.arc_id) AS to_arc
+                    FROM man_wtp m
+                    JOIN v_temp_arc a ON m.node_id IN (a.node_1, a.node_2)
+                    WHERE m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc)
+                    GROUP BY m.node_id
+                    )a
+                WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
+            $$, v_temp_node_table, v_mapzone_name);
+
+			-- SET TO_ARC from METER
+            EXECUTE format($$
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT node_id,
+                        CASE WHEN to_arc IS NULL THEN NULL
+                        ELSE ARRAY[to_arc]
+                        END AS to_arc
+                    FROM man_meter m
+                    ) a
+                WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
+            $$, v_temp_node_table, v_mapzone_name);
+
+            -- SET TO_ARC from PUMP
+            EXECUTE format($$
+                UPDATE %I t
+                SET to_arc = a.to_arc
+                FROM
+                    (SELECT node_id,
+                        CASE WHEN to_arc IS NULL THEN NULL
+                        ELSE ARRAY[to_arc]
+                        END AS to_arc
+                    FROM man_pump m
+                    ) a
+                WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
+            $$, v_temp_node_table, v_mapzone_name);	
+
+		ELSE
+			EXECUTE format($$
+				UPDATE temp_pgr_node t
+				SET to_arc = a.to_arc
+				FROM (
+					SELECT pgr_node_1,
+						array_agg(arc_id) AS to_arc
+					FROM temp_pgr_arc
+					GROUP BY pgr_node_1
+				) a
+				WHERE t.graph_delimiter = %L
+				AND t.pgr_node_id = a.pgr_node_1;
+			$$, v_mapzone_name);
+		END IF;
 	ELSE
 		-- netscenario query
 		IF v_netscenario IS NOT NULL THEN
@@ -360,46 +490,67 @@ BEGIN
 		END IF;
 
 		IF v_project_type = 'WS' THEN
-			v_query_text :=
-				'
-				WITH 
-					graphconfig AS (
-						SELECT DISTINCT 
-						' || v_mapzone_field || ' AS mapzone_id,
-						(use_item->>''nodeParent'')::int AS node_id,
-						elem_to_arc.value::int AS to_arc  
-						FROM ' || v_table_name || ',
-						LATERAL json_array_elements(graphconfig->''use'') AS use_item,
-						LATERAL json_array_elements_text(use_item->''toArc'') AS elem_to_arc(value)
-						WHERE (use_item->>''nodeParent'') <> ''''
-						AND graphconfig IS NOT NULL AND active
-						AND json_array_length(use_item->''toArc'') > 0
-						' || v_query_text_aux || '
-					) 
-				UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id, to_arc = s.to_arc
+			EXECUTE format($$
+				WITH graphconfig AS (
+					SELECT DISTINCT
+						%s AS mapzone_id,
+						(use_item->>'nodeParent')::int AS node_id,
+						elem_to_arc.value::int AS to_arc
+					FROM %I,
+						LATERAL json_array_elements(graphconfig->'use') AS use_item,
+						LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value)
+					WHERE (use_item->>'nodeParent') <> ''
+					AND graphconfig IS NOT NULL
+					AND active
+					AND json_array_length(use_item->'toArc') > 0
+					%s
+				)
+				UPDATE temp_pgr_node n
+				SET modif = TRUE,
+					graph_delimiter = %L,
+					mapzone_id = s.mapzone_id,
+					to_arc = s.to_arc
 				FROM (
-					SELECT mapzone_id, node_id, array_agg(to_arc)::int[] AS to_arc 
+					SELECT mapzone_id,
+						node_id,
+						array_agg(to_arc)::int[] AS to_arc
 					FROM graphconfig
-					GROUP BY mapzone_id, node_id 
+					GROUP BY mapzone_id, node_id
 				) s
-				WHERE n.node_id = s.node_id;		
-				';
+				WHERE n.node_id = s.node_id;
+			$$, v_mapzone_field, v_table_name, v_query_text_aux, v_mapzone_name);
 		ELSE
-			v_query_text :=
-                'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', mapzone_id = s.mapzone_id
-                FROM (
-					SELECT ' || v_mapzone_field || ' AS mapzone_id,
-						(use_item->>''nodeParent'')::int AS node_id
-					FROM ' || v_table_name || ', 
-					LATERAL json_array_elements(graphconfig->''use'') AS use_item
-					WHERE (use_item->>''nodeParent'') <> ''''
-					AND graphconfig IS NOT NULL AND active
-					' || v_query_text_aux || '
-				) AS s WHERE n.node_id = s.node_id;
-				';
+			EXECUTE format($$
+				UPDATE temp_pgr_node n
+				SET modif = TRUE,
+					graph_delimiter = %L,
+					mapzone_id = s.mapzone_id
+				FROM (
+					SELECT %s AS mapzone_id,
+						(use_item->>'nodeParent')::int AS node_id
+					FROM %I,
+						LATERAL json_array_elements(graphconfig->'use') AS use_item
+					WHERE (use_item->>'nodeParent') <> ''
+					AND graphconfig IS NOT NULL
+					AND active
+					%s
+				) AS s
+				WHERE n.node_id = s.node_id;
+			$$, v_mapzone_name, v_mapzone_field, v_table_name, v_query_text_aux);
+			
+			EXECUTE format($$
+				UPDATE temp_pgr_node t
+				SET to_arc = a.to_arc
+				FROM (
+					SELECT pgr_node_1,
+						array_agg(arc_id) AS to_arc
+					FROM temp_pgr_arc
+					GROUP BY pgr_node_1
+				) a
+				WHERE t.graph_delimiter = %L
+				AND t.pgr_node_id = a.pgr_node_1;
+			$$, v_mapzone_name);
 		END IF;
-
-		EXECUTE v_query_text;
 
 		-- Nodes forceClosed acording init parameters - for ws; for ud forceClosed are arcs
 		IF v_project_type = 'WS' THEN
@@ -525,6 +676,11 @@ BEGIN
         WHERE graph_delimiter = v_mapzone_name
         AND old_arc_id = ANY (to_arc);
 	END IF;
+
+	-- disconnect FORCECLOSED
+	UPDATE temp_pgr_arc a
+	SET cost = -1, reverse_cost = -1
+	WHERE a.graph_delimiter  = 'FORCECLOSED';
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
     INTO v_pgr_distance;

@@ -190,12 +190,23 @@ BEGIN
     FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
 
     UPDATE temp_pgr_node t
-    SET modif = TRUE
-	WHERE graph_delimiter = 'MINSECTOR'
-	OR graph_delimiter = 'SECTOR';
+    SET graph_delimiter = 'SECTOR', modif = TRUE
+    FROM v_temp_node n
+    WHERE 'SECTOR' = ANY(n.graph_delimiter)
+    AND t.node_id = n.node_id;
+
+    -- NODES VALVES (MINSECTOR)
+    UPDATE temp_pgr_node t
+    SET
+        graph_delimiter = 'MINSECTOR',
+        modif = TRUE
+    FROM v_temp_node n
+    JOIN man_valve v USING (node_id)
+    WHERE 'MINSECTOR' = ANY(n.graph_delimiter)
+    AND t.node_id = n.node_id; 
 
     -- Generate new arcs when n.modif = TRUE AND (a.modif1 = TRUE OR a.modif2 = TRUE)
-    -- cost i reverse cost for new arcs is 0, arc_id is NULL, old_arc_id = arc_id of the old arc
+    -- arc_id is NULL for the new arcs, old_arc_id = arc_id of the old arc
 	-- =======================
     v_data := jsonb_build_object(
         'data', jsonb_build_object(
@@ -352,7 +363,7 @@ BEGIN
                         GROUP BY t.mapzone_id
                     )
                     SELECT 
-                        mapzone_id AS minsector_id, 
+                        minsector_id, 
                         CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::text THEN ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
                         ELSE ST_Expand(ST_Buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') 
                         END AS the_geom 
@@ -623,6 +634,7 @@ BEGIN
 				'mode', 'MINSECTOR'
 			)
 		)::text;
+
 		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
 
 		IF v_response->>'status' <> 'Accepted' THEN
@@ -736,6 +748,7 @@ BEGIN
                 'data', jsonb_build_object(
                     'pgrDistance', v_pgr_distance,
                     'pgrRootVids', ARRAY[v_record_minsector.pgr_node_id],
+                    'ignoreCheckValvesMincut', v_ignore_check_valves,
                     'mode', 'MINSECTOR'
                 )
             )::text;

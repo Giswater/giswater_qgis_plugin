@@ -49,7 +49,7 @@ v_mincut_version text;
 -- 6.1 - mincut with minsectors
 v_vdefault json;
 v_ignore_check_valves boolean;
-v_minsector_id integer;
+v_node integer;
 
 v_action_aux text;
 
@@ -276,9 +276,9 @@ BEGIN
 	END IF;
 
 	IF v_mode = 'MINSECTOR' THEN
-		v_minsector_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+		v_node := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
-		IF v_minsector_id IS NULL OR v_minsector_id = 0 THEN
+		IF v_node IS NULL OR v_node = 0 THEN
 			RETURN jsonb_build_object(
 				'status', 'Failed',
 				'message', jsonb_build_object(
@@ -287,7 +287,20 @@ BEGIN
 				)
 			);
 		END IF;
-	END IF;
+	ELSE
+		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 0 if both of the nodes are water source
+		EXECUTE format('
+			SELECT COALESCE(
+				(SELECT node_id
+				FROM v_temp_node n
+				JOIN v_temp_arc a ON n.node_id IN (a.node_1, node_2)
+				WHERE a.arc_id = %L
+				AND ''SECTOR'' <> ALL(n.graph_delimiter)
+				LIMIT 1
+			), 0);
+		', v_arc_id)
+		INTO v_node;
+	END IF;	
 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
@@ -298,11 +311,7 @@ BEGIN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
-		IF v_mode = 'MINSECTOR' THEN
-			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-		ELSE
-			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
-		END IF;
+		EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
 		IF v_row_count = 0 THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
@@ -338,11 +347,7 @@ BEGIN
 		-- check if the arc exists in the cluster:
 			-- true: refresh mincut
 			-- false: init and refresh mincut
-		IF v_mode = 'MINSECTOR' THEN
-			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-		ELSE
-			EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
-		END IF;
+		EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
 		IF v_row_count = 0 THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
@@ -371,11 +376,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			IF v_mode = 'MINSECTOR' THEN
-				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-			ELSE
-				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
-			END IF;
+			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
 			IF v_row_count = 0 THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
@@ -403,11 +404,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			IF v_mode = 'MINSECTOR' THEN
-				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-			ELSE
-				EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
-			END IF;
+			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
 			IF v_row_count = 0 THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
@@ -433,11 +430,7 @@ BEGIN
 			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
 
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
-				IF v_mode = 'MINSECTOR' THEN
-					EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_row_count;
-				ELSE
-					EXECUTE format('SELECT count(*) FROM %I WHERE arc_id = %L', v_temp_arc_table, v_arc_id) INTO v_row_count;
-				END IF;
+				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
 				IF v_row_count = 0 THEN
 					v_init_mincut := TRUE;
 					v_prepare_mincut := FALSE;
@@ -715,7 +708,7 @@ BEGIN
 		v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'mapzone_name', 'MINCUT',
-				'arc_id', v_arc_id,
+				'node', v_node,
 				'mode', v_mode,
 				'cost', 1,
 				'reverse_cost', 1
@@ -725,6 +718,23 @@ BEGIN
 
 		IF v_response->>'status' <> 'Accepted' THEN
 			RETURN v_response;
+		END IF;
+
+		IF v_node = 0 THEN
+            -- the arc is between 2 water source nodes, v_temp_node_table(temp_pgr_node) has no nodes, insert them
+			EXECUTE format('
+                INSERT INTO temp_pgr_node (node_id, graph_delimiter)
+                SELECT n.node_id, ''SECTOR''
+                FROM v_temp_node n
+                JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+                WHERE a.arc_id = %L
+            ', v_arc_id);
+
+			INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, 1 as cost, 1 as reverse_cost)
+			SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, %L, %L
+			FROM v_temp_arc a
+			JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
+			JOIN temp_pgr_node n2 ON n2.node_id = a.node_2;
 		END IF;
 
 		-- Generate new arcs and update to_arc, closed, broken and cost
@@ -880,7 +890,7 @@ BEGIN
 		-- mincut
 		EXECUTE format('SELECT count(*)::int FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
 		IF v_mode = 'MINSECTOR' THEN
-			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_minsector_id) INTO v_pgr_node_id;
+			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_pgr_node_id;
 		ELSE
 			EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
 		END IF;
@@ -890,6 +900,7 @@ BEGIN
 			'data', jsonb_build_object(
 				'pgrDistance', v_pgr_distance,
 				'pgrRootVids', ARRAY[v_pgr_node_id],
+				'ignoreCheckValvesMincut', v_ignore_check_valves,
 				'mode', v_mode
 			)
 		)::text;
