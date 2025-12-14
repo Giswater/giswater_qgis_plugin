@@ -22,7 +22,6 @@ DECLARE
     -- configuration
 	v_version TEXT;
     v_project_type TEXT;
-    v_from_zero boolean;
 
     -- parameters
     v_mapzone_name TEXT;
@@ -37,7 +36,6 @@ DECLARE
     v_pgr_distance INTEGER;
     v_source TEXT;
     v_target TEXT;
-    v_count INTEGER;
     v_mode TEXT;
 
     v_temp_arc_table regclass;
@@ -53,7 +51,6 @@ BEGIN
 
 	-- Get variables from input JSON
     v_mapzone_name = (SELECT (p_data::json->>'data')::json->>'mapzone_name');
-    v_from_zero = p_data->'data'->>'from_zero';
     v_mode = p_data->'data'->>'mode';
     v_cost = p_data->'data'->>'cost';
     v_reverse_cost = p_data->'data'->>'reverse_cost';
@@ -402,95 +399,6 @@ BEGIN
             WHERE a.graph_delimiter = ''SECTOR''
             AND a.old_arc_id <> ALL (a.to_arc);
         ', v_temp_arc_table);
-    END IF;
-
-    -- calculate to_arc of node parents in from zero mode
-    IF v_from_zero AND v_project_type = 'WS' AND v_graph_delimiter <> 'SECTOR' THEN
-
-        EXECUTE format('
-            SELECT COUNT(*)::INT FROM %I 
-            WHERE to_arc IS NULL AND graph_delimiter = %L
-        ', v_temp_arc_table, v_graph_delimiter)
-        INTO v_count;
-
-        IF v_count > 0 THEN
-            v_query_text := format('
-                SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
-                FROM %I
-            ', v_temp_arc_table);
-
-            EXECUTE format('
-                SELECT array_agg(pgr_node_id)::INT[] 
-                FROM %I n
-                JOIN v_temp_node v ON v.node_id = n.node_id
-                WHERE ''SECTOR'' = ANY(v.graph_delimiter)', v_temp_node_table
-            ) INTO v_pgr_root_vids;
-
-            EXECUTE format('SELECT COUNT(*)::INT FROM %I', v_temp_arc_table) INTO v_pgr_distance;
-
-            INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
-            (
-                SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
-                FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
-            );
-            -- update to_arc of nodes in from zero mode
-            EXECUTE format('
-                WITH node_parents AS (
-                    SELECT pgr_node_id, node_id
-                    FROM %I
-                    WHERE graph_delimiter = %L
-                    AND to_arc IS NULL
-                    AND node_id IS NOT NULL
-                ), 
-                arc_parents AS (
-                    SELECT pgr_arc_id, old_arc_id
-                    FROM %I
-                    WHERE graph_delimiter = %L
-                ),
-                nodes_to_update AS (
-                    SELECT DISTINCT ON (d.pred) d.pred, a.old_arc_id 
-                    FROM temp_pgr_drivingdistance d
-                    JOIN node_parents n ON d.pred = n.pgr_node_id
-                    JOIN arc_parents a ON d.edge = a.pgr_arc_id
-                )
-                UPDATE %I t
-                SET to_arc = array[n.old_arc_id]
-                FROM nodes_to_update n
-                WHERE t.pgr_node_id = n.pred;
-            ',
-            v_temp_node_table, v_graph_delimiter,
-            v_temp_arc_table, v_graph_delimiter,
-            v_temp_node_table);
-
-            EXECUTE format('
-                UPDATE %I t
-                SET to_arc = n.to_arc
-                FROM %I n
-                WHERE t.old_node_id = n.node_id
-                AND t.graph_delimiter = %L
-                AND t.to_arc IS NULL;
-            ', v_temp_node_table, v_temp_node_table, v_graph_delimiter);
-
-            EXECUTE format('
-                UPDATE %I t
-                SET to_arc = n.to_arc
-                FROM %I n
-                WHERE COALESCE(t.node_1, t.node_2) = n.node_id
-                AND t.graph_delimiter = %L
-                AND n.graph_delimiter = %L
-                AND t.to_arc IS NULL
-                AND n.to_arc IS NOT NULL;
-            ', v_temp_arc_table, v_temp_node_table, v_graph_delimiter, v_graph_delimiter);
-
-            -- for mapzone graph_delimiter - the inlet arcs behave like checkvalves
-            EXECUTE format('
-                UPDATE %I a
-                SET cost = CASE WHEN a.node_1 IS NOT NULL THEN -1 ELSE a.cost END,
-                    reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
-                WHERE a.graph_delimiter = %L
-                AND a.old_arc_id <> ALL (a.to_arc);
-            ', v_temp_arc_table, v_graph_delimiter);
-        END IF;
     END IF;
 
     RETURN jsonb_build_object(
