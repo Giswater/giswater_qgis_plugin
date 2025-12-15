@@ -281,6 +281,7 @@ BEGIN
 				ALTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
 				ALTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
 				ALTER TABLE gully DROP COLUMN IF EXISTS _gratecat2_id;
+				ALTER TABLE link DROP COLUMN IF EXISTS _expl_id2;
 			END IF;
 
 			-- inserting on config_param_system table
