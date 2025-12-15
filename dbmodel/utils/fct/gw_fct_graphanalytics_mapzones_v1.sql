@@ -1724,14 +1724,35 @@ BEGIN
 			EXECUTE v_query_text;
 
 			-- Insert into selector_sector all sectors that match muni_id and expl_id from selectors
-			INSERT INTO selector_sector (sector_id, cur_user)
-			SELECT DISTINCT s.sector_id, sm.cur_user
-			FROM sector s
-			JOIN selector_municipality sm ON sm.muni_id = ANY(s.muni_id)
-			JOIN selector_expl se ON se.expl_id = ANY(s.expl_id) AND se.cur_user = sm.cur_user
-			WHERE s.muni_id IS NOT NULL 
-			  AND s.expl_id IS NOT NULL
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+			IF v_class = 'SECTOR' THEN
+
+				DELETE FROM selector_sector ss
+				WHERE NOT EXISTS (
+				    SELECT 1 
+				    FROM sector s
+				    JOIN selector_municipality sm ON sm.muni_id = ANY(s.muni_id)
+				    WHERE s.active
+				        AND EXISTS (
+				            SELECT 1
+				            FROM selector_expl se 
+				            WHERE se.expl_id = ANY(s.expl_id) AND se.cur_user = sm.cur_user
+				        )
+				      AND ss.sector_id = s.sector_id
+				      AND ss.cur_user = sm.cur_user
+				);
+				
+				INSERT INTO selector_sector (sector_id, cur_user)
+				SELECT s.sector_id, sm.cur_user
+				FROM sector s
+				JOIN selector_municipality sm ON sm.muni_id = ANY(s.muni_id)
+				WHERE s.active
+					AND EXISTS (
+						SELECT 1 
+						FROM selector_expl se 
+						WHERE se.expl_id = ANY(s.expl_id) AND se.cur_user = sm.cur_user
+					)
+					ON CONFLICT (sector_id, cur_user) DO NOTHING;
+			END IF;
 
 			-- for DISCONNECTED, mapzone_id is 0, for  CONFLICT mapzone_id is -1
 			v_query_text := '
