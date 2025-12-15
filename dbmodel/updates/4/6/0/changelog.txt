@@ -4,3 +4,6 @@
 - feat(netscenario): add muni_id and sector_id columns as _int4 arrays
 - feat(netscenario): add commitChanges and fromZero widgets to the dialog
 - feat(mincut): add modification_user and change modification_date. Update them for any change made on the key fields of om_mincut
+- feat(ud, link): rename column expl_id2 to _expl_id2, drop on sample
+- refactor(ud): improve topology columns and logic
+- perf(views): improve ve_* views, remove unecessaty union all
