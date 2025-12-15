@@ -104,7 +104,6 @@ BEGIN
 		v_idarg := (((p_data->>'data')::json)->>'add_street')::json->>'text';
 		v_editable := (((p_data->>'data')::json)->>'add_postnumber')::json->>'text';
 		v_searchtext := concat('%', v_editable ,'%');
-		v_street_layer, v_street_id_field, v_address_street_id_field, v_street_display_field, v_idarg, v_street_muni_id_field, v_muni, v_searchtext;
 
 		-- Get address
 		v_querytext =  'SELECT array_to_json(array_agg(row_to_json(a))) 
