@@ -160,3 +160,127 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET tooltip='Sys_elev2 - Input level of the final node selected for the calculation'
 	WHERE formname='ve_inp_weir' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_none';
+
+-- 15/12/2025
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Graph class:",
+    "tooltip": "Graphanalytics method used",
+    "comboIds": [
+      "DWFZONE",
+      "SECTOR",
+      "DMA"
+    ],
+    "datatype": "text",
+    "comboNames": [
+      "Drainage area (DRAINZONE + DWFZONE)",
+      "SECTOR",
+      "DMA"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "graphClass",
+    "widgettype": "combo",
+    "layoutorder": 1
+  },
+  {
+    "label": "Exploitation:",
+    "tooltip": "Choose exploitation to work with",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "exploitation",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 ) a ORDER BY sort_order ASC, idval ASC",
+    "layoutorder": 2
+  },
+  {
+    "label": "Force open arcs: (*)",
+    "value": null,
+    "tooltip": "Optative arc id(s) to temporary open closed arc(s) in order to force algorithm to continue there",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "forceOpen",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 5,
+    "placeholder": "1015,2231,3123"
+  },
+  {
+    "label": "Force closed arcs: (*)",
+    "value": null,
+    "tooltip": "Optative arc id(s) to temporary close open arc(s) to force algorithm to stop there",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "forceClosed",
+    "widgettype": "text",
+    "isMandatory": false,
+    "layoutorder": 6,
+    "placeholder": "1015,2231,3123"
+  },
+  {
+    "label": "Use selected psectors:",
+    "value": null,
+    "tooltip": "If true, use selected psectors. If false ignore selected psectors and only works with on-service network",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "usePlanPsector",
+    "widgettype": "check",
+    "layoutorder": 7
+  },
+  {
+    "label": "Commit changes:",
+    "value": null,
+    "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "commitChanges",
+    "widgettype": "check",
+    "layoutorder": 8
+  },
+  {
+    "label": "Mapzone constructor method:",
+    "comboIds": [
+      0,
+      1,
+      2,
+      6
+    ],
+    "datatype": "integer",
+    "comboNames": [
+      "NONE",
+      "CONCAVE POLYGON",
+      "PIPE BUFFER",
+      "EPA SUBCATCH"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "updateMapZone",
+    "widgettype": "combo",
+    "layoutorder": 10
+  },
+  {
+    "label": "Pipe buffer",
+    "value": null,
+    "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.",
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "geomParamUpdate",
+    "widgettype": "text",
+    "isMandatory": false,
+    "layoutorder": 11,
+    "placeholder": "5-30"
+  },
+  {
+    "widgetname": "fromZero",
+    "label": "Mapzones from zero:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "tooltip": "If true, mapzones are calculated automatically from zero",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 12,
+    "value": null
+  }
+]'::json
+	WHERE id=2768;
