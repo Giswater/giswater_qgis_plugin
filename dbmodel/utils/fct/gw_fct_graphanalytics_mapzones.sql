@@ -755,7 +755,6 @@ BEGIN
 			v_count = v_count+1;
 			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace, checkf = v_count FROM v_temp_anlgraph a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectrow = row_count;
-			raise notice 'v_count --> %' , v_count;
 			EXIT WHEN v_affectrow = 0;
 			EXIT WHEN v_count = 5000;
 		END LOOP;
@@ -1181,7 +1180,6 @@ BEGIN
 			group by a.'||quote_ident(v_field)||'
 			)c group by '||quote_ident(v_field)||')b
 			WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
-			raise notice 'v_querytext,%',v_querytext;
 
 			/*
 			UPDATE dma set the_geom = geom FROM

@@ -51,7 +51,6 @@ BEGIN
 		_values = '';
 		-- get columns name and values
 		FOR _key, _value IN SELECT * FROM json_each_text(rec) LOOP
-			raise notice '_value-->%',_value;
 			keys = concat(_key,', ',keys);
 
 			IF v_separator = ',' THEN

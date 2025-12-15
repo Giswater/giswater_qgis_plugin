@@ -407,7 +407,6 @@ BEGIN
 	  	) AS feature
 	  	FROM (SELECT id, ST_Transform(anl_the_geom, 4326) as anl_the_geom
 	  	FROM  v_om_mincut) row) features;
-		raise notice 'v_om_mincut -> %', v_result;
 		v_mincut_init = v_result;
 
 			--v_om_mincut_valve proposed true

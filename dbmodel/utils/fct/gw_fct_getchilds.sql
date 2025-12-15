@@ -153,7 +153,6 @@ BEGIN
 		v_editability = replace (((v_aux_json_child->>'editability')::json->>'trueWhenParentIn'), '[', '{');
 		v_editability = replace (v_editability, ']', '}');
 
-		raise notice 'v_editability % v_combovalue %', v_editability, v_combovalue;
 
 		IF v_combovalue != ANY (v_editability::text[]) THEN
 			v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'iseditable', false);

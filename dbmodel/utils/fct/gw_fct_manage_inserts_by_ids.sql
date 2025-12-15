@@ -224,10 +224,8 @@ BEGIN
         ON CONFLICT (' || v_conflict_clause || ') DO NOTHING';
 
     -- Execute the query and get the count of inserted rows
-    RAISE NOTICE 'Executing query for % features', array_length(v_ids, 1);
     EXECUTE v_querytext USING v_ids;
     GET DIAGNOSTICS v_inserted_count = ROW_COUNT;
-    RAISE NOTICE 'Inserted % records', v_inserted_count;
 
     -- Return JSON object with status and inserted count
     RETURN json_build_object(

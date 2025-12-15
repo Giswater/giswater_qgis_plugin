@@ -73,7 +73,6 @@ BEGIN
     v_fields = ((p_data::json->>'data')::json->>'fields')::json;
     v_formname := ((p_data::json->>'form')::json->>'formName');
 
-    raise notice 'v_fields %', v_fields;
 
     FOR v_json IN SELECT * FROM json_array_elements(v_fields) as v_text
     LOOP
@@ -105,7 +104,6 @@ BEGIN
 		EXECUTE 'SELECT * FROM '|| quote_ident(v_table) ||' WHERE parameter = $1 AND cur_user=current_user'
 		INTO result
 		USING v_widget;
-		RAISE NOTICE 'result: %',result;
 
 		-- Perform INSERT
 		IF v_isChecked = 'True' THEN

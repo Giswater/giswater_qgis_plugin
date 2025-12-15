@@ -65,7 +65,6 @@ BEGIN
 	v_fields = gw_fct_json_object_set_key(v_fields, 'text', v_text::text);
 	v_fields = gw_fct_json_object_delete_keys(v_fields, 'url', 'idval'::text);
 
-	raise notice 'v_fields %', v_fields;
 
 	v_data =  gw_fct_json_object_set_key(v_data, 'fields', v_fields);
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',v_data,'}')::json;

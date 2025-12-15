@@ -104,8 +104,6 @@ BEGIN
 		v_idarg := (((p_data->>'data')::json)->>'add_street')::json->>'text';
 		v_editable := (((p_data->>'data')::json)->>'add_postnumber')::json->>'text';
 		v_searchtext := concat('%', v_editable ,'%');
-		raise notice 'name_arg %', v_idarg;
-		raise notice 'v_searchtext % % % % % % % % % % % % %', v_searchtext, v_address_layer, v_address_display_field, v_address_layer, v_address_geom_id_field, 
 		v_street_layer, v_street_id_field, v_address_street_id_field, v_street_display_field, v_idarg, v_street_muni_id_field, v_muni, v_searchtext;
 
 		-- Get address
@@ -121,7 +119,6 @@ BEGIN
 			AND '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' ILIKE '||quote_literal(v_searchtext)||' 
 			ORDER BY regexp_replace(postnumber,''[^0-9]+'','''',''g'')::integer LIMIT 10)a';
 
-		raise notice 'v_querytext %', v_querytext;
 
 		EXECUTE v_querytext INTO v_response;
 	END IF;

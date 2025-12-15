@@ -29,7 +29,6 @@ BEGIN
 	SELECT arc.node_1, arc.node_2, arc.the_geom, arc.arc_id INTO v_node_1, v_node_2, v_the_geom, v_arc_id FROM arc JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id 
 	JOIN om_visit_event ON om_visit_x_arc.visit_id=om_visit_event.visit_id WHERE om_visit_event.visit_id=NEW.visit_id;
 
-	RAISE NOTICE 'v_node_1 %, v_node_2 %, v_the_geom %', v_node_1, v_node_2, v_the_geom;
 
 	IF v_the_geom IS NOT NULL AND NEW.position_value IS NOT NULL AND NEW.position_id IS NOT NULL THEN 
 	

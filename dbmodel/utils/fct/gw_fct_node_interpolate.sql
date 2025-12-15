@@ -265,7 +265,6 @@ BEGIN
 		v_result_fields = concat('[{"tab_data_',v_col_top,'":',v_result_top,',"tab_data_',v_col_ymax,'":',v_result_ymax,'}]');
 	END IF;
 
-	raise notice ' v_result_fields %', v_result_fields;
 
 	-- Control NULL's
 	v_version:=COALESCE(v_version,'{}');

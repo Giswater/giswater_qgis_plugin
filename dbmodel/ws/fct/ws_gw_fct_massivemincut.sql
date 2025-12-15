@@ -155,7 +155,6 @@ BEGIN
 		LOOP
 			v_count1 = v_count1 + 1;
 
-			RAISE NOTICE '----------------------- % maxmsector % ', v_count1, v_maxmsector;
 
 			-- get arc_id represented minsector (fid: 134)
 			v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fid=134 AND cur_user=current_user LIMIT 1);

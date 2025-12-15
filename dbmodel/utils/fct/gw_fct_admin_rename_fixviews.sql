@@ -48,7 +48,6 @@ BEGIN
 		-- execute new definition
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_newschemaname||'.'||v_viewname||' AS '||v_definition;
 
-		RAISE NOTICE 'v_definition %', v_definition;
 	END LOOP;
 	
 	RETURN;

@@ -71,7 +71,6 @@ BEGIN
 
 	FOR v_record IN SELECT id, csv1 FROM temp_csv WHERE cur_user=current_user AND fid = 237 order by id
 	LOOP 
-		raise notice ' %', v_record;
 		v_i=v_i+1;
 		-- massive refactor of source field (getting target)
 		IF v_record.csv1 = '66' THEN
@@ -83,7 +82,6 @@ BEGIN
 
 		IF v_percent > v_filter THEN
 				v_filter = v_percent;
-				raise notice '(1/2), % %% executed, %', v_percent, v_target;
 		END IF;
 
 	END LOOP;
@@ -138,7 +136,6 @@ BEGIN
 
 		IF v_percent > v_filter THEN
 				v_filter = v_percent;
-				raise notice '(2/2), %%% executed', v_percent;
 		END IF;		
 
 	END LOOP;

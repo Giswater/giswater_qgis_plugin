@@ -105,7 +105,6 @@ BEGIN
     -- Get maps from composer
     v_json3 := v_json2->'ComposerMap';
 
-    raise notice 'v_json3 %', v_json3;
 
     -- select map with maximum width
     SELECT array_agg(a->>'width') INTO v_array_width FROM json_array_elements(v_json3) AS a;
@@ -115,7 +114,6 @@ BEGIN
     SELECT a->>'index' INTO v_index FROM json_array_elements(v_json3) AS a WHERE a->>'name' = v_mapcomposer_name;  
     
 
-	raise notice 'v_rotation %', v_rotation;
 
 	v_width = v_width - 0.05;  -- reduce width in 0.05mm (let say nothing) to prevent possible rounds to better approach to scale
 

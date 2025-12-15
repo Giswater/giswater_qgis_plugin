@@ -97,7 +97,6 @@ BEGIN
     
 	IF (aux_json->>'type')::text='combo' THEN
 
-		raise notice 'aux_json %', aux_json;
 
 		v_sql_text=(aux_json->>'sql_text');
 

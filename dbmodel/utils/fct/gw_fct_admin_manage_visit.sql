@@ -253,7 +253,6 @@ BEGIN
 						WHERE columnname='''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;';
 					END LOOP;
 				END IF;
-				RAISE NOTICE 'v_config_fields_update';
 				UPDATE config_form_fields SET columnname = concat(v_feature_type,'_id'), label = concat(initcap(v_feature_type),'_id')
 				WHERE columnname = 'feature_id' and formname = v_viewname;
 
@@ -327,7 +326,6 @@ BEGIN
 					v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
 					"feature_class":"'||v_feature_type||'","class_id":"'||v_class_id||'","old_a_param":"null", "old_ct_param":"null",
 					"old_id_param":"null","old_datatype":"null"}}';
-					raise notice 'v_data_view,%',v_data_view;
 					PERFORM gw_fct_admin_manage_visit_view(v_data_view);
 
 
@@ -351,15 +349,12 @@ BEGIN
 
 
 	IF v_action = 'UPDATE' AND v_action_type = 'class' THEN
-raise notice 'classID,%',v_class_id;
 
 		UPDATE config_visit_class
 	   	SET idval=v_class_name, descript=v_descript, active=v_active, visit_type=v_visit_type, param_options=v_param_options
 	 	WHERE id = v_class_id;
 
 	 	SELECT tablename INTO v_old_viewname FROM config_visit_class WHERE id = v_class_id;
-
-		RAISE NOTICE 'v_old_viewname,v_viewname,%,%',v_old_viewname, v_viewname;
 
 	 	IF v_old_viewname != v_viewname THEN
 
@@ -417,7 +412,6 @@ raise notice 'classID,%',v_class_id;
 				DELETE FROM config_form_fields WHERE formname = v_viewname and formtype='visit' and columnname = v_param_name;
 
 				IF v_ismultievent = TRUE THEN
-				raise notice 'multi_delete';
 					v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
 					"feature_class":"'||v_feature_type||'","class_id":"'||v_class_id||'","old_a_param":"'||v_old_parameters.a_param||'", 
 					"old_ct_param":"'||v_old_parameters.ct_param||'", "old_id_param":"'||v_old_parameters.id_param||'","old_datatype":"'||v_old_parameters.datatype||'"}}';
@@ -432,12 +426,10 @@ raise notice 'classID,%',v_class_id;
 			END IF;
 
 	ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
-			raise notice 'delete class - class_id,%',v_class_id;
 
 			v_viewname = (SELECT tablename FROM config_visit_class WHERE id = v_class_id);
 
 			IF (SELECT count(id) FROM om_visit WHERE class_id = v_class_id) = 0 THEN
-				RAISE NOTICE 'DELETE ALL';
 				DELETE FROM config_form_fields  WHERE formtype='visit' and formname IN (SELECT formname FROM config_visit_class WHERE id = v_class_id);
 				DELETE FROM config_visit_class_x_parameter WHERE class_id = v_class_id;
 				DELETE FROM config_visit_parameter WHERE id IN (SELECT parameter_id FROM config_visit_class_x_parameter WHERE class_id = v_class_id);
@@ -466,7 +458,6 @@ raise notice 'classID,%',v_class_id;
 					INSERT INTO sys_table (id, descript, sys_role,context, alias, orderby)
 					SELECT v_viewname, 'Editable view that saves visits', 'role_om', '["OM","VISIT"]', v_class_name, max(orderby)+1
 					FROM sys_table WHERE context = '["OM","VISIT"]';
-					raise notice 'multi -  sys_table';
 				END IF;
 
 			ELSE
@@ -482,16 +473,13 @@ raise notice 'classID,%',v_class_id;
 				AND column_name!=''formname'';'
 				INTO v_config_fields;
 
-raise notice 'v_config_fields,%',v_config_fields;
 				--insert common fields for the new formname (view)
 				IF v_ismultievent = TRUE THEN
 					FOR rec IN (SELECT * FROM config_form_fields  WHERE formname='visit_multievent')
 					LOOP
-						raise notice 'rec.id,%',rec;
 						EXECUTE 'INSERT INTO config_form_fields (formname,'||v_config_fields||')
 						SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields  WHERE formname='''||rec.formname||'''
 						and columnname = '''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;';
-						raise notice 'multi -  config_form_fields ';
 					END LOOP;
 				ELSE
 					FOR rec IN (SELECT * FROM config_form_fields  WHERE formname='visit_singlevent')

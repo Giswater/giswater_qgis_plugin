@@ -32,7 +32,6 @@ BEGIN
 	-- Loop for the virtual arcs
 	FOR rec_virtual IN SELECT * FROM temp_t_arc WHERE epa_type='VIRTUAL'
 	LOOP
-		RAISE NOTICE 'rec_virtual %', rec_virtual;
 
 		-- Taking values from inp_virtual arc
 		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id::text=rec_virtual.arc_id;

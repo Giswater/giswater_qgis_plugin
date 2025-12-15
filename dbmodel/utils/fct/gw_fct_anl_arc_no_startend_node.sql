@@ -115,7 +115,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		RAISE NOTICE 'Progress %', (v_partcount::float*100/v_totcount::float)::numeric (5,2);
 
 	END LOOP;
 

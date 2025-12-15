@@ -94,7 +94,6 @@ BEGIN
 	left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 	where p.arc_id is null and a.state>0';
 
-	raise notice 'v_query :>> %', v_query;
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 	INTO v_count;
@@ -125,7 +124,6 @@ BEGIN
 	left join (select * from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 1) pn ON pn.node_id = a.node_2
 	where pn.node_id is null and a.state=2  and node.state = 2';
 
-	raise notice 'v_query :>> %', v_query;
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 	INTO v_count;

@@ -155,7 +155,6 @@ CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
 		EXIT when v_count = 400;
 
 		v_sum = v_sum + affected_rows;
-		RAISE NOTICE ' % % %', v_count, affected_rows, v_sum;
 	END LOOP;
 
 	-- insert into result table

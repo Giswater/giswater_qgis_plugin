@@ -90,13 +90,9 @@ BEGIN
         v_device,
         NULL
         ) INTO v_fields_array;
-        raise notice 'test v_fields_array %', v_fields_array;
-        raise notice 'test p_data %', p_data;
         v_querystring = concat('SELECT (row_to_json(a)) FROM 
                 (SELECT * FROM ','om_mincut',' WHERE id = ',quote_literal(v_mincutid),')a');
-        raise notice 'test v_querystring %', v_querystring;
         EXECUTE v_querystring INTO v_values_array;
-        raise notice 'test v_values_array %', v_values_array;
 
         -- Update table 'selector_mincut_result'
         DELETE FROM selector_mincut_result WHERE cur_user = current_user;
@@ -146,7 +142,6 @@ BEGIN
                 field_value := (v_values_array->>(aux_json->>'columnname'));
                 IF (aux_json->>'columnname') = 'mincut_state' THEN
                     SELECT idval into field_value FROM om_typevalue where typevalue = 'mincut_state' and id = (v_values_array->>'mincut_state');
-                    raise notice 'state % -> %', field_value, (v_values_array->>'mincut_state');
                 END IF;
 
                 IF (aux_json->>'columnname') = 'streetaxis_id' THEN
@@ -198,7 +193,6 @@ BEGIN
                             --remove current combo Ids from return json
                             v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboIds'::text;
                             v_new_id = '['||v_new_id || ','|| quote_ident(v_selected_id)||']';
-                            raise notice 'MISSING v_new_id1,%',v_new_id;
                             --add new combo Ids to return json
                             v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboIds',v_new_id::json);
 

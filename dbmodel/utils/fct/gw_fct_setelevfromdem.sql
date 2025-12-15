@@ -137,7 +137,6 @@ BEGIN
 					USING rec.the_geom
 					INTO v_elevation;
 
-				raise notice 'elevation %', v_elevation;
 
 				--if node is out of raster, add warning, if it's inside update value of node layer
 				IF v_elevation = -9999 OR v_elevation IS NULL THEN

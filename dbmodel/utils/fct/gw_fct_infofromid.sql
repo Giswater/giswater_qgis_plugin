@@ -632,7 +632,6 @@ BEGIN
 	) AS subquery
 	WHERE rn = 1
 	ORDER BY orderby)a');
-		raise notice 'v_querystring -> %',v_querystring;
 
 	EXECUTE v_querystring INTO form_tabs;
 
@@ -760,7 +759,6 @@ BEGIN
 						)
 					)
 				)::text || '$$);';
-			RAISE NOTICE 'v_querystring:: %', v_querystring;
 			EXECUTE v_querystring INTO v_fields;
 
 		ELSIF v_editable THEN
@@ -852,24 +850,18 @@ BEGIN
 		v_formheader_field = (SELECT (value::json->>'element')::json->>'column' FROM config_param_system WHERE parameter='admin_formheader_field');
 		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE element_id ='||v_id::integer;
 	ELSE
-		raise notice 'v_sourcetable11:: %', v_sourcetable;
 		IF v_id ~ '^\d+$' THEN
 			v_querystring = 'SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||v_id::integer;
 		ELSE
 			v_querystring = 'SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||quote_literal(v_id);
 		END IF;
 	END IF;
-		raise notice 'FADSAFSDF:: %', v_sourcetable;
-		raise notice 'v_querystring:: %', v_querystring;
-		raise notice 'v_formheader_field:: %', v_formheader_field;
-		raise notice 'v_id:: %', v_id;
+
 
 	IF v_querystring IS NOT NULL THEN
-		raise notice 'ADSFASDFASD:: %', v_sourcetable;
 
 		EXECUTE v_querystring INTO v_formheader_value;
-		RAISE NOTICE 'v_formheader_value:: %', v_formheader_value;
-		RAISE NOTICE 'v_querystring:: %', v_querystring;
+
 
 		-- define v_headertext
 		IF v_formheader_value IS NOT NULL THEN

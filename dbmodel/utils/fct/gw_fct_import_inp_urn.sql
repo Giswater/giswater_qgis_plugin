@@ -86,10 +86,7 @@ SELECT project_type, giswater INTO project_type_aux, v_version FROM sys_version 
 				v_tables ='{inp_controls, inp_rules}';
 
 				FOREACH rec_inp IN ARRAY(v_tables) LOOP
-					raise notice 'rec_inp,%',rec_inp;
-					raise notice 'rec.feature_id,%',rec.feature_id;
 					EXECUTE 'SELECT count(*) FROM '||rec_inp||' WHERE position('||quote_literal(rec.feature_id)||' in text) > 0' INTO v_count;
-					raise notice 'rec_inp,%',v_count;
 					IF v_count>0 THEN
 						Execute 'UPDATE '||rec_inp||' SET text = replace(text,'||quote_literal(rec.feature_id)||', '||quote_literal(v_id)||' )
 						WHERE position('||quote_literal(rec.feature_id)||' in text) > 0;';

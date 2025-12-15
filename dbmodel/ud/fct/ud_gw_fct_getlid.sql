@@ -196,7 +196,6 @@ BEGIN
 	    END IF;
 
 	    v_querystring := v_querystring || ') a;';
-	    RAISE NOTICE 'Generated query: %', v_querystring;
 
 	    EXECUTE v_querystring INTO v_values_array;
 		v_array_index := 0;
@@ -217,7 +216,6 @@ BEGIN
 
 		-- Get widget values for each lidlayer (tab)
 	    v_lidlayer_query := 'SELECT DISTINCT lidlayer FROM inp_lid_value WHERE lidco_id = ' || quote_literal(v_id);
-	    RAISE NOTICE 'Generated lidlayer query: %', v_lidlayer_query;
 
 	    FOR v_lidlayer_rec IN EXECUTE v_lidlayer_query LOOP
 	        v_lidlayer := v_lidlayer_rec.lidlayer;

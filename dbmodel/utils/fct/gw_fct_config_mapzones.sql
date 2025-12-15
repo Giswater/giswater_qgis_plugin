@@ -192,7 +192,6 @@ BEGIN
 
         IF v_netscenario_id IS NULL THEN
             EXECUTE 'UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text;';
-            RAISE NOTICE '%', ('UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text;');
         ELSE
             EXECUTE 'UPDATE plan_netscenario_'||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text AND netscenario_id='||v_netscenario_id||';';
         END IF;

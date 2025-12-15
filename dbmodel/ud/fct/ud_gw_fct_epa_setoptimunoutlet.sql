@@ -104,7 +104,6 @@ BEGIN
 		FOR rec_subc IN SELECT * FROM inp_subcatchment WHERE hydrology_id = v_hydrology AND sector_id in (select sector_id from ve_sector)
 		loop
 
-			raise notice 'loop rec_subc % ', rec_subc.subc_id;
 
 			IF rec_subc.minelev IS NULL THEN
 				SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, v_buffer)

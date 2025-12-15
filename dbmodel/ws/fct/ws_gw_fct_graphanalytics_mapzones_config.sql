@@ -200,7 +200,6 @@ BEGIN
 				END IF;
 			END IF;
 
-			RAISE NOTICE 'rec % v_next_arc_id  % arc1 % arc2 % flag %', rec, v_next_arc_id, v_arc_id1,v_arc_id2, v_flag;
 			v_arc_id1 = null;
 			v_arc_id2 = null;
 			v_flag = null;

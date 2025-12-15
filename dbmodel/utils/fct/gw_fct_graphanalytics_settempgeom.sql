@@ -148,7 +148,6 @@ BEGIN
                         ) b
                         WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 
-        RAISE NOTICE 'v_querytext, %',v_querytext;
 
         EXECUTE v_querytext;
 

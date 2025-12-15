@@ -652,7 +652,6 @@ BEGIN
 
 		-- static pressure
 		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
-			raise notice '2 NEW.presszone_id ---> %', NEW.presszone_id;
 			UPDATE connec SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-top_elev
 			WHERE connec_id = NEW.connec_id;
 		END IF;

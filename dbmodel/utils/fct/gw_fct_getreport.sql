@@ -168,7 +168,6 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE 'v_querytext: %', v_querytext;
 	-- order by
 	v_default = (SELECT addparam->>'orderBy' FROM config_report WHERE id = v_list_id);
 

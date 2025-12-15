@@ -314,7 +314,6 @@ BEGIN
 
 			-- Set the info to the info from v_result body data info
 			v_response = jsonb_set(v_response::jsonb, '{body,data,info}', v_result::jsonb->'body'->'data'->'info');
-			raise notice 'v_response: %', v_response;
 			RETURN v_response;
 
 		ELSE

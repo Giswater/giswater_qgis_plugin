@@ -113,12 +113,10 @@ BEGIN
 
 		END IF;
 
-		raise notice 'v_querytext %', v_querytext;
 
 		FOR v_childview, v_cat_feature, v_parent_layer IN EXECUTE v_querytext
 		LOOP
 
-			raise notice ' v_childview, % v_cat_feature, % v_parent_layer %',  v_childview, v_cat_feature, v_parent_layer;
 
 			-- delete existing view
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
@@ -153,8 +151,6 @@ BEGIN
 	ELSIF v_action = 'SINGLE-UPDATE' THEN
 
 		SELECT child_layer, parent_layer INTO v_childview, v_parent_layer FROM cat_feature WHERE id = v_cat_feature;
-
-		raise notice 'v_childview, % v_parent_layer %', v_childview, v_parent_layer ;
 
 
 		-- delete existing view

@@ -74,7 +74,6 @@ BEGIN
 	FOREACH aux_json IN ARRAY v_fields 
 	LOOP          
 		IF (aux_json->>'columnname')='composer' THEN 
-			raise notice 'asg';
 			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'comboIds', COALESCE (combo_json,'[]') );
 			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'comboNames', COALESCE (combo_json,'[]') );
 			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', combo_json->0::text );

@@ -147,7 +147,6 @@ BEGIN
 					v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN node USING (node_id)
 					WHERE dwfscenario_id = '||v_copyfrom||' AND sector_id = '||v_sector||
 					' ON CONFLICT (dwfscenario_id, '||object_rec.pk||') DO NOTHING';
-					RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext;
 
 					-- get message

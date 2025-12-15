@@ -105,11 +105,9 @@ BEGIN
 				(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1)) a '
 				INTO v_count;
 
-				RAISE NOTICE 'v_count %', v_count;
 
 				IF v_closedstatus IS TRUE OR (v_closedstatus IS FALSE AND v_count = 2) THEN
 
-					raise notice 'r1';
 					-- getting mapzone id (indistinct side of valve)
 					EXECUTE 'SELECT array_agg('||lower(v_mapzone)||'_id) FROM (SELECT DISTINCT ('||lower(v_mapzone)||'_id) FROM arc WHERE arc_id IN 
 					(SELECT arc_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT arc_id FROM arc WHERE node_1 = '||v_id||'::text) 
@@ -126,7 +124,6 @@ BEGIN
 
 						v_mapzone_id = REPLACE(REPLACE (v_mapzone_id,'{','[') ,'}',']');
 
-						RAISE NOTICE 'mapzones %', v_mapzone_id;
 
 						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "exploitation":"'||v_exploitation||'", "floodOnlyMapzone":"'||v_mapzone_id||'", "checkData":false, "commitChanges":"true", 
 						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';

@@ -94,7 +94,6 @@ BEGIN
 
 			INSERT INTO om_visit_x_node (visit_id,node_id) VALUES (id_last, rec_node.node_id);
 					
-			RAISE NOTICE 'inserting new visit %', id_last;
 
 			
 			-- insert parameters
@@ -110,7 +109,6 @@ BEGIN
 				INSERT INTO om_visit_event (ext_code, visit_id, parameter_id, value, text) VALUES 
 				(rec_parameter.ext_code, id_last, v_parameter, rec_parameter.value, rec_parameter.text) RETURNING id INTO id_event;
 
-				RAISE NOTICE 'inserting new event %',id_event ;
 
 
 
@@ -124,7 +122,6 @@ BEGIN
 						EXECUTE v_querytext;    
 					END IF;
 
-					RAISE NOTICE 'sql parameter (action_type=4) % ', v_querytext;
 				END LOOP;
 
 				--price parameter (action type=5)
@@ -139,7 +136,6 @@ BEGIN
 					campaign_aux=(select id FROM cat_campaign WHERE start_date<=event_date_aux and end_date>=event_date_aux AND active = TRUE);
 					price_aux = (select price FROM cat_price WHERE size_id=size_id_aux AND work_id=work_aux AND campaign_id=campaign_aux);
 
-					RAISE NOTICE 'work_aux % builder_aux % size_id_aux % event_date_aux % campaign_aux % price_aux %', work_aux, builder_aux, size_id_aux, event_date_aux, campaign_aux, price_aux;
 					
 					IF id_event in (select event_id FROM om_visit_work_x_node) then
 						UPDATE om_visit_work_x_node SET work_id=work_aux, work_date=event_date_aux, builder_id=builder_aux, size_id=size_id_aux,
@@ -197,7 +193,6 @@ BEGIN
 			v_querytext:= rec_parameter.action_value||' WHERE node_id= '||quote_literal(node_id_aux);
 			IF v_querytext IS NOT NULL THEN
 				EXECUTE v_querytext;   
-				RAISE NOTICE 'sql parameter (action_type=4) % ', v_querytext; 
 			END IF;
 			END LOOP;
 
@@ -237,7 +232,6 @@ BEGIN
 					(node_id_aux, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, rec_parameter.id);
 				END IF;
 
-			RAISE NOTICE 'work_aux % builder_aux % size_id_aux % event_date_aux % campaign_aux % price_aux %', work_aux, builder_aux, size_id_aux, event_date_aux, campaign_aux, price_aux;
 						   
 			END LOOP;
 			
@@ -291,7 +285,6 @@ BEGIN
 	-- adding the initial node to array
 	concat_agg=concat(concat_agg, (SELECT concat('POINT (',st_x(the_geom),' ', st_y(the_geom),')') FROM node WHERE node_id=node_id_aux)::text);
 	
-	raise notice '%', concat_agg;
    
 	RETURN concat_agg;
 

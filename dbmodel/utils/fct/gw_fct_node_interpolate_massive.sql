@@ -89,7 +89,6 @@ BEGIN
 
 		IF v_node1 IS NOT NULL AND v_node2 IS NOT NULL THEN
 			v_querytext = 'SELECT gw_fct_node_interpolate (''{"data":{"parameters":{"action":"MASSIVE-INTERPOLATE", "x":'||v_x||', "y":'||v_y||', "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}}'')';
-			RAISE NOTICE ' v_querytext %', v_querytext;
 			EXECUTE v_querytext;
 		END IF;
 

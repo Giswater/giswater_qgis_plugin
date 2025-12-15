@@ -274,7 +274,6 @@ BEGIN
 
 				v_querytext = 'INSERT INTO ve_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
 				WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
-				raise notice 'v_querytext: %', v_querytext;
 				EXECUTE 'INSERT INTO ve_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
 				WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
 

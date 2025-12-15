@@ -37,7 +37,6 @@ BEGIN
 	SELECT ((value::json->>'junction')::json)->>'baseDemand' INTO v_basedemand FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
 
 	-- update values for valves
-	RAISE NOTICE 'v_valve %',v_valve;
 	UPDATE temp_arc SET minorloss = (v_valve->>'minorloss')::float WHERE epa_type='VALVE' AND (minorloss = 0 OR minorloss is null);
 	UPDATE temp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null);
 	UPDATE temp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE';

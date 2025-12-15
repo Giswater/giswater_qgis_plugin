@@ -216,7 +216,6 @@ BEGIN
 		WHERE active
 		AND '|| v_mapzone_field ||' NOT IN (0, -1) -- 0 and -1 are conflict and undefined
 		AND expl_id && ARRAY['||array_to_string(v_expl_id_array, ',')||']';
-		RAISE NOTICE 'v_query_text: %', v_query_text;
 		EXECUTE v_query_text INTO v_mapzone_count;
 		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

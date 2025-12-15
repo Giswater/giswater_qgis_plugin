@@ -49,11 +49,9 @@ BEGIN
     
     v_fields = ((p_data->>'data')::json->>'fields')::json;
 
-    	raise notice 'v_fields % ', v_fields;
 
     select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
-        	raise notice 'v_text % ', v_text;
 
 
      FOREACH text IN ARRAY v_text
@@ -67,7 +65,6 @@ BEGIN
 
 	i=i+1;
 
-	raise notice 'v_field % v_value %', v_field, v_value;
 	
 	EXECUTE 'UPDATE config_param_user SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
 		USING  v_value, v_field;
@@ -77,8 +74,6 @@ BEGIN
 	/*
     v_fields = ((p_data::json->>'data')::json->>'fields')::json;
     v_table:= 'config_param_user';
-
-    raise notice 'x %', v_fields;
 
     --FOREACH field IN p_fields
     FOR v_json IN SELECT * FROM json_array_elements(v_fields) as v_text

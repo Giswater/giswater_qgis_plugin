@@ -85,8 +85,6 @@ BEGIN
 
 	FOR rec_node IN EXECUTE v_sql
 		LOOP
-			-- raise notice
-			--raise notice '% - %', v_i, v_count;
 			v_i=v_i+1;
 
 			-- setting variables
@@ -120,7 +118,6 @@ BEGIN
 			IF v_sys_elev1 > v_sys_elev2 AND v_sys_elev1 IS NOT NULL AND v_sys_elev2 IS NOT NULL THEN
 				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fid, the_geom, arc_distance, state) VALUES
 				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 111, rec_node.the_geom,v_sys_elev1 - v_sys_elev2,rec_node.state );
-				raise notice 'Node found % :[% / %] maxelevin % maxelevout %',rec_node.node_id, v_i, v_count, v_sys_elev2 , v_sys_elev1 ;
 			END IF;
 
 		END LOOP;

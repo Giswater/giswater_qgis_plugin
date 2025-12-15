@@ -327,7 +327,6 @@ BEGIN
 	v_return = concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, '", "featureDialog": ',v_featuredialog,
 	'},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'"}}');
 
-	RAISE NOTICE 'v_return %', v_return;
 
 	--   Call and return gw_fct_getinfofromid
 	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(v_return::json), 2580, null, null, null);

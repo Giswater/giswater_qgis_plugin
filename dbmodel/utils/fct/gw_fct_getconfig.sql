@@ -302,10 +302,8 @@ BEGIN
 								'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead');
 
 							END IF;
-							raise notice 'parent % v_selected_id % aux_json_child %', (aux_json->>'widgetname'), v_selected_id, aux_json_child;
 						END IF;
 
-						raise notice ' CHILDDDDDDDDDDDDDDDD % ', fields_array[(aux_json_child->>'orderby')::INT];
 					END LOOP;
 				END IF;
 			END IF;
@@ -314,7 +312,6 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
 			'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'sys_role', 'project_type');
 
-			raise notice ' aux_json %', aux_json;
 
 		END LOOP;
 

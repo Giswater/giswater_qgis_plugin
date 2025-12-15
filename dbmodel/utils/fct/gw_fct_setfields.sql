@@ -228,9 +228,6 @@ BEGIN
 			i := 1;
 		END IF;
 
-		raise notice 'v_querytext: %', v_querytext;
-		raise notice 'v_idname: %', v_idname;
-
 		-- query text, step2
 		FOREACH text IN ARRAY v_text
 		LOOP

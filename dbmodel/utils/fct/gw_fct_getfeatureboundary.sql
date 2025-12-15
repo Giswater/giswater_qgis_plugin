@@ -92,7 +92,6 @@ BEGIN
 
 	    END LOOP;
 
-		raise notice 'query: %', v_querytext;
 
 		v_querytext = left(v_querytext, length(v_querytext) - 6);
 		v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Collect(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))

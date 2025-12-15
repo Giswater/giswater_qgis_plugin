@@ -47,7 +47,6 @@ BEGIN
 	v_diameter = (SELECT ((value::json->>'parameters')::json->>'pipe')::json->>'diameter' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 	v_statsmethod = (SELECT ((value::json->>'parameters')::json->>'pipe')::json->>'roughness' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 
-	raise notice ' % % % %',v_nullbuffer,v_cerobuffer,v_diameter,v_statsmethod;
 
 	RAISE NOTICE 'setting roughness for null values';
 	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM temp_t_arc '

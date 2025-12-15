@@ -175,7 +175,6 @@ BEGIN
 	SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
 	FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'')a'
 	into v_node_list;
-	--raise notice 'v_node_list,%',v_node_list;
 	-- close boundary conditions, setting flag=1 for all nodes that fits on graph delimiters
 	EXECUTE 'UPDATE temp_anlgraph SET flag=1 WHERE node_1::text IN ('||v_querynode||') OR  node_2::text IN ('||v_querynode||')';
 
@@ -201,7 +200,6 @@ BEGIN
 
 			--set value of accumulation sum
 			v_acc_value = 0;
-			--RAISE NOTICE 'v_acc_value_BEGIN,%',v_acc_value;
 
 		END IF;
 
@@ -256,7 +254,6 @@ BEGIN
 			INTO v_count_feature;
 
 			IF v_count_feature >1 THEN
-				--raise notice 'v_bifurcation,%',v_bifurcation;
 				--case when bifurcation node is also the beginning of new branch, and arcs depend to 2 different branches
 				IF v_end_node = ANY(v_node_list) THEN
 					v_bifurcation = 0;
@@ -304,7 +301,6 @@ BEGIN
 				((json_array_elements_text((value::json->>''headers'')::json))::json->>''end'') as end 
 				FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'' order by 1)a where a.node='''||v_feature.node_1||''';'
 				INTO v_end_bifurc;
-				--raise notice 'v_end_bifurc,%',v_end_bifurc;
 
 				EXIT WHEN v_end_node = v_end_bifurc;
 			END IF;

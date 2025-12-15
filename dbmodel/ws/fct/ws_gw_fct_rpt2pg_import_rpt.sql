@@ -80,7 +80,6 @@ BEGIN
 		for v_rec in select id, csv4 from temp_t_csv where csv2 like 'Results%' order by id desc
 		loop
 			if v_time_last = 0 then v_time_last = v_rec.id;end if;
-			raise notice ' v_rec % v_time_last %', v_rec, v_time_last;
 			update temp_t_csv set csv40 = v_rec.csv4 where id > v_rec.id and  id < v_time_last;
 			v_time_last := v_rec.id;
 		end loop;

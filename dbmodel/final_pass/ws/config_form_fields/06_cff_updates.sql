@@ -1249,7 +1249,6 @@ BEGIN
                 AND formtype = table_records.formtype
                 AND columnname = table_records.columnname
                 AND tabname = table_records.tabname;
-		raise notice '%', table_records.label;
 
         -- Step 2: Capitalize only the first letter of each entry
         UPDATE config_form_fields

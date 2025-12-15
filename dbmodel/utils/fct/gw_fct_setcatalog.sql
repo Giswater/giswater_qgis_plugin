@@ -130,7 +130,6 @@ BEGIN
 
 	-- query text, step1
 	v_querytext := 'INSERT INTO ' || quote_ident(v_catname) ||' (';
-	raise notice 'v_querytext1,%',v_querytext;
 
 	-- query text, step2
 	i=1;

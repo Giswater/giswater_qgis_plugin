@@ -201,7 +201,6 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '7 - Stats';
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,concat(''));
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,concat('BASIC STATS'));
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,concat('-------------------'));

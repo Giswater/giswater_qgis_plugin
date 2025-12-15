@@ -56,11 +56,6 @@ BEGIN
 	FROM config_visit_parameter JOIN config_visit_class_x_parameter ON config_visit_parameter.id=config_visit_class_x_parameter.parameter_id
 	WHERE class_id=v_class_id AND config_visit_parameter.active IS TRUE AND config_visit_class_x_parameter.active IS TRUE;
 
-	raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
-	raise notice 'v_old_a_param,%',v_old_a_param;
-	raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;
-	raise notice 'v_old_ct_param,%',v_old_ct_param;
-
 	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
 		-- create a new view if doesn't exist
 	EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit_x_'||v_feature_class||'.'',column_name)::text,'', '')
@@ -71,8 +66,6 @@ BEGIN
 		EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit.'',column_name)::text,'', '')
 		FROM information_schema.columns where table_name=''om_visit'' and table_schema='''||v_schemaname||''' and column_name!=''publish'' and column_name NOT IN (''id'', ''vehicle_id'', ''unit_id'', ''visit_type'', ''the_geom'')'
 		INTO v_om_visit_fields;
-
-		raise notice 'v_new_parameters.id_param,%',v_new_parameters.id_param;
 
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||lower(v_viewname)||' AS
 			SELECT '||v_om_visit_x_feature_fields||',
@@ -106,8 +99,6 @@ BEGIN
 		v_definition = replace(v_definition,v_old_a_param,v_new_parameters.a_param);
 		v_definition = replace(v_definition,v_old_id_param,v_new_parameters.id_param);
 		v_definition = replace(v_definition,v_old_datatype,v_new_parameters.datatype);
-
-		RAISE NOTICE 'v_definition,%',v_definition;
 
 		--replace the existing view and create the trigger
 

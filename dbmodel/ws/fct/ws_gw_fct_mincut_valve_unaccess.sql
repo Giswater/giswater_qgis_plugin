@@ -81,7 +81,6 @@ BEGIN
 			DELETE FROM om_mincut_valve_unaccess WHERE result_id=v_result_id AND node_id=v_node_id;
 		END IF;
 	END IF;
-	RAISE NOTICE 'TEST 10';
 
 	-- Recalculate the mincut
 	IF v_mincut_version = 5 THEN

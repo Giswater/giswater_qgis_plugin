@@ -37,8 +37,6 @@ BEGIN
     v_sql_insert := 'INSERT INTO '||element_table||' (element_id, '||feature_column||') VALUES ($1, $2)';
     v_sql_delete := 'DELETE FROM '||element_table||' WHERE element_id = $1 AND '||feature_column||' = $2';
 
-    -- i want to print all new. values
-    RAISE NOTICE 'NEW: %', NEW;
 
     IF TG_OP = 'INSERT' THEN
 

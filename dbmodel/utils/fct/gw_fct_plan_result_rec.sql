@@ -246,7 +246,6 @@ BEGIN
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
-	raise notice 'v_result_info %', v_result_info;
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

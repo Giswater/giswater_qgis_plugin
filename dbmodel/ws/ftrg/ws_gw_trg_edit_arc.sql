@@ -502,7 +502,6 @@ BEGIN
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='dhc_edit_insert_cable'
 			AND cur_user=current_user) is true AND (SELECT json_extract_path_text(value::json,'cableFeaturecat')
 				FROM config_param_system WHERE parameter='dhc_edit_insert_cable') != NEW.arc_type THEN
-					raise notice 'execute';
 					EXECUTE 'SELECT dhc_fct_edit_cable($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"form":{},"feature":{"tableName":"ve_node", "featureType":"NODE", "id":[]}, 
 					"data":{"filterFields":{}, "pageInfo":{},"arcId":"'||NEW.arc_id::text||'", 

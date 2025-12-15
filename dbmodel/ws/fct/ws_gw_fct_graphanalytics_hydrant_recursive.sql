@@ -62,7 +62,6 @@ BEGIN
 	IF v_distance_left IS NULL THEN
 		v_distance_left=v_distance;
 	END IF;
-	raise notice 'v_distance_left,%',v_distance_left;
 	-- Check if the node is already computed
 	SELECT node_id INTO v_exists_id FROM temp_anl_node WHERE node_id = v_node_id::text AND cur_user="current_user"() AND fid = v_fid;
 
@@ -113,7 +112,6 @@ BEGIN
 					SELECT rec_table.arc_id, v_fid, rec_table.the_geom, v_arclength, v_hydrant, expl_id, v_hydrant FROM exploitation
 					WHERE ST_DWithin(rec_table.the_geom, exploitation.the_geom,0.01);
 			--END IF;
-			raise notice 'rec_table.arc_id,v_distance_left,%-%',rec_table.arc_id,v_distance_left;
 			v_currentDistance=v_currentDistance+v_arclength;
 
 			UPDATE temp_anl_node set total_distance=v_currentDistance WHERE node_id=v_node_id::text AND fid=v_fid and cur_user="current_user"();
@@ -153,7 +151,6 @@ BEGIN
 					rec_table.the_geom=ST_Reverse(rec_table.the_geom);
 				end if;
 
-				RAISE NOTICE 'v_hydrant,% - arc, %',v_hydrant,rec_table.arc_id;
 
 				IF v_percent > 0.001 	THEN
 					EXECUTE 'UPDATE temp_anl_arc SET the_geom=(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')), fid='||v_fid_cross||', 

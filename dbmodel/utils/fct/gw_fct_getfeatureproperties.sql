@@ -112,11 +112,9 @@ BEGIN
 	END IF;
 
 	v_query_text := format('SELECT expl_id FROM %I WHERE %I = $1', v_feature_table, v_feature_id_field);
-	RAISE NOTICE 'v_query_text: %', v_query_text;
 	EXECUTE v_query_text INTO v_feature_expl_id USING v_feature_id;
 
 	v_query_text := format('SELECT state FROM %I WHERE %I = $1', v_feature_table, v_feature_id_field);
-	RAISE NOTICE 'v_query_text: %', v_query_text;
 	EXECUTE v_query_text INTO v_feature_state USING v_feature_id;
 
 	v_status := 'Accepted';

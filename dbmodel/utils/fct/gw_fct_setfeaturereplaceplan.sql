@@ -81,7 +81,6 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE ' %',v_feature_array;
 
 
 	-- starting process

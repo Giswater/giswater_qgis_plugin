@@ -212,7 +212,6 @@ BEGIN
 
 			v_i = v_i+1;
 
-			RAISE NOTICE '% - %', v_i, v_connect_id;
 
 			IF v_isforcedarcs IS FALSE THEN
 				v_forcedarcs= '';

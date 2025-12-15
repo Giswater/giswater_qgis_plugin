@@ -84,7 +84,6 @@ BEGIN
 				cross join json_array_elements((graphconfig->>''use'')::json) elem
 				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||' 
 				AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
-				raise notice ' %', v_querytext;
 				EXECUTE v_querytext;
 
 			END LOOP;
