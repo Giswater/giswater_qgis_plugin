@@ -192,7 +192,6 @@ BEGIN
 
 	-- control of nulls
 	IF v_addschema = 'NULL' THEN v_addschema = null; END IF;
-	IF v_tablename = 've_man_frelem' THEN v_tablename := 've_element'; END IF;
 
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN

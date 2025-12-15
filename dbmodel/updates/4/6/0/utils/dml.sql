@@ -343,3 +343,122 @@ UPDATE config_form_fields
 UPDATE config_form_tableview
     SET alias = 'roughness'
     WHERE objectname = 'cat_mat_roughness' AND columnname = 'roughness';
+
+-- 15/12/2025
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,stylesheet,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',false,false,true,false,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,'{"label":"color:blue; font-weight:bold;"}'::json,'{"setMultiline": false, "labelPosition": "top"}'::json,false,2);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',false,false,true,false,'WITH psector_value AS (
+  		SELECT value::integer AS psector_value 
+  		FROM config_param_user 
+  		WHERE parameter = ''plan_psector_current'' AND cur_user = current_user),
+	 tg_op_value AS (
+  		SELECT value::text AS tg_op_value 
+  		FROM config_param_user 
+  		WHERE parameter = ''utils_transaction_mode'' AND cur_user = current_user)  
+SELECT id::integer as id, name as idval
+FROM value_state 
+WHERE id IS NOT NULL 
+AND CASE 
+  WHEN (SELECT tg_op_value FROM tg_op_value)!=''INSERT'' THEN id IN (0,1,2)
+  WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2 
+  ELSE id < 2 
+END',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,3);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','state_type','lyt_bot_1',3,'integer','combo','State Type:','State Type',false,false,true,false,'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,4);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','code','lyt_data_1',1,'string','text','Code:','Code',false,false,true,false,'{"setMultiline":false}'::json,false,5);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','num_elements','lyt_data_1',2,'integer','text','Number of Elements:','Number of Elements',false,false,true,false,'{"setMultiline":false}'::json,false,6);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','comment','lyt_data_1',3,'string','text','Comments:','Comments',false,false,true,false,'{"setMultiline":true}'::json,true,7);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','function_type','lyt_data_1',4,'string','combo','Function Type:','Function Type',false,false,true,false,'SELECT function_type as id, function_type as idval FROM man_type_function WHERE ''ELEMENT''=ANY(feature_type) OR ''EORIFICE'' = ANY(featurecat_id::text[])',true,false,'{"setMultiline":false}'::json,false,8);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','category_type','lyt_data_1',5,'string','combo','Category Type:','Category Type',false,false,true,false,'SELECT category_type as id, category_type as idval FROM man_type_category WHERE ''ELEMENT''=ANY(feature_type) OR ''EORIFICE'' = ANY(featurecat_id::text[])',true,false,'{"setMultiline":false}'::json,false,9);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','location_type','lyt_data_1',6,'string','combo','Location Type:','Location Type',false,false,true,false,'SELECT location_type as id, location_type as idval FROM man_type_location WHERE ''ELEMENT''=ANY(feature_type) OR ''EORIFICE'' = ANY(featurecat_id::text[])',true,false,'{"setMultiline":false}'::json,false,10);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,widgetcontrols,linkedobject,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','workcat_id','lyt_data_1',7,'string','typeahead','Workcat id:','Workcat id',false,false,true,false,'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL AND active IS TRUE','{"setMultiline":false}'::json,'action_workcat',false,11);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','workcat_id_end','lyt_data_1',8,'string','typeahead','Workcat id End:','Workcat id End','Only when state is obsolete',false,false,true,false,'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL AND active IS TRUE','{"setMultiline":false}'::json,false,12);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','builtdate','lyt_data_1',9,'date','datetime','Built Date:','Built Date',false,false,true,false,'{"setMultiline":false}'::json,false,13);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','enddate','lyt_data_1',10,'date','datetime','End Date:','End Date',false,false,true,false,'{"setMultiline":false}'::json,false,14);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','ownercat_id','lyt_data_1',11,'string','combo','Owner Catalog:','Owner Catalog',false,false,true,false,'SELECT id, id as idval FROM cat_owner WHERE id IS NOT NULL AND active IS TRUE',true,false,'{"setMultiline":false}'::json,false,15);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','rotation','lyt_data_1',12,'double','text','Rotation:','Rotation',false,false,true,false,'{"setMultiline":false}'::json,false,16);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','top_elev','lyt_data_1',13,'double','text','Top Elevation:','Top Elevation',false,false,true,false,'{"setMultiline":false}'::json,false,18);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,stylesheet,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','expl_id','lyt_data_2',1,'integer','combo','Exploitation id:','Exploitation id',false,false,true,false,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,'{"label":"color:green; font-weight:bold;"}'::json,'{"setMultiline": false}'::json,false,20);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',false,false,true,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,false,21);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',false,false,true,false,'{"setMultiline":true}'::json,false,22);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_frelem','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',true,false,true,false,'SELECT ce.id, ce.id as idval FROM cat_element ce
+JOIN cat_feature_element cfe ON ce.element_type = cfe.id
+JOIN cat_feature cf ON cf.id = cfe.id
+WHERE feature_class = ''FRELEM''',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,1);
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,stylesheet,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',false,false,true,false,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,'{"label":"color:blue; font-weight:bold;"}'::json,'{"setMultiline": false, "labelPosition": "top"}'::json,false,2);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',false,false,true,false,'WITH psector_value AS (
+  		SELECT value::integer AS psector_value 
+  		FROM config_param_user 
+  		WHERE parameter = ''plan_psector_current'' AND cur_user = current_user),
+	 tg_op_value AS (
+  		SELECT value::text AS tg_op_value 
+  		FROM config_param_user 
+  		WHERE parameter = ''utils_transaction_mode'' AND cur_user = current_user)  
+SELECT id::integer as id, name as idval
+FROM value_state 
+WHERE id IS NOT NULL 
+AND CASE 
+  WHEN (SELECT tg_op_value FROM tg_op_value)!=''INSERT'' THEN id IN (0,1,2)
+  WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2 
+  ELSE id < 2 
+END',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,3);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','state_type','lyt_bot_1',3,'integer','combo','State Type:','State Type',false,false,true,false,'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,4);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','code','lyt_data_1',1,'string','text','Code:','Code',false,false,true,false,'{"setMultiline":false}'::json,false,5);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','num_elements','lyt_data_1',2,'integer','text','Number of Elements:','Number of Elements',false,false,true,false,'{"setMultiline":false}'::json,false,6);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','comment','lyt_data_1',3,'string','text','Comments:','Comments',false,false,true,false,'{"setMultiline":true}'::json,true,7);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','function_type','lyt_data_1',4,'string','combo','Function Type:','Function Type',false,false,true,false,'SELECT function_type as id, function_type as idval FROM man_type_function WHERE ''ELEMENT''=ANY(feature_type) OR ''EORIFICE'' = ANY(featurecat_id::text[])',true,false,'{"setMultiline":false}'::json,false,8);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','category_type','lyt_data_1',5,'string','combo','Category Type:','Category Type',false,false,true,false,'SELECT category_type as id, category_type as idval FROM man_type_category WHERE ''ELEMENT''=ANY(feature_type) OR ''EORIFICE'' = ANY(featurecat_id::text[])',true,false,'{"setMultiline":false}'::json,false,9);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','location_type','lyt_data_1',6,'string','combo','Location Type:','Location Type',false,false,true,false,'SELECT location_type as id, location_type as idval FROM man_type_location WHERE ''ELEMENT''=ANY(feature_type) OR ''EORIFICE'' = ANY(featurecat_id::text[])',true,false,'{"setMultiline":false}'::json,false,10);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,widgetcontrols,linkedobject,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','workcat_id','lyt_data_1',7,'string','typeahead','Workcat id:','Workcat id',false,false,true,false,'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL AND active IS TRUE','{"setMultiline":false}'::json,'action_workcat',false,11);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','workcat_id_end','lyt_data_1',8,'string','typeahead','Workcat id End:','Workcat id End','Only when state is obsolete',false,false,true,false,'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL AND active IS TRUE','{"setMultiline":false}'::json,false,12);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','builtdate','lyt_data_1',9,'date','datetime','Built Date:','Built Date',false,false,true,false,'{"setMultiline":false}'::json,false,13);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','enddate','lyt_data_1',10,'date','datetime','End Date:','End Date',false,false,true,false,'{"setMultiline":false}'::json,false,14);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','ownercat_id','lyt_data_1',11,'string','combo','Owner Catalog:','Owner Catalog',false,false,true,false,'SELECT id, id as idval FROM cat_owner WHERE id IS NOT NULL AND active IS TRUE',true,false,'{"setMultiline":false}'::json,false,15);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','rotation','lyt_data_1',12,'double','text','Rotation:','Rotation',false,false,true,false,'{"setMultiline":false}'::json,false,16);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','top_elev','lyt_data_1',13,'double','text','Top Elevation:','Top Elevation',false,false,true,false,'{"setMultiline":false}'::json,false,18);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,stylesheet,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','expl_id','lyt_data_2',1,'integer','combo','Exploitation id:','Exploitation id',false,false,true,false,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL',true,false,'{"label":"color:green; font-weight:bold;"}'::json,'{"setMultiline": false}'::json,false,20);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,dv_querytext,dv_orderby_id,dv_isnullvalue,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',false,false,true,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,false,21);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',false,false,true,false,'{"setMultiline":true}'::json,false,22);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden,web_layoutorder)
+	VALUES ('ve_man_genelem','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',true,false,true,false,'SELECT ce.id, ce.id as idval FROM cat_element ce
+JOIN cat_feature_element cfe ON ce.element_type = cfe.id
+JOIN cat_feature cf ON cf.id = cfe.id
+WHERE feature_class = ''GENELEM''',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,1);
