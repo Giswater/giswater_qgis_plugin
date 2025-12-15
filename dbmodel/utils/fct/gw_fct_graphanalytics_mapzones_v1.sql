@@ -1742,7 +1742,7 @@ BEGIN
 				);
 				
 				INSERT INTO selector_sector (sector_id, cur_user)
-				SELECT s.sector_id, sm.cur_user
+				SELECT DISTINCT s.sector_id, sm.cur_user
 				FROM sector s
 				JOIN selector_municipality sm ON sm.muni_id = ANY(s.muni_id)
 				WHERE s.active
