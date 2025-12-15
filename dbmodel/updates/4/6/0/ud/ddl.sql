@@ -306,3 +306,6 @@ ALTER TABLE arc drop column custom_y1;
 -- node_2
 ALTER TABLE arc drop column sys_elev2;
 ALTER TABLE arc drop column custom_y2;
+
+-- 15/12/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"expl_id2", "newName":"_expl_id2"}}$$);
