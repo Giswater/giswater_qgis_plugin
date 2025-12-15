@@ -5,47 +5,52 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 1132
+-- FUNCTION CODE: 1132
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_psector_x_node()
   RETURNS trigger AS
 $BODY$
 DECLARE
-
-
-v_stateaux smallint;
-v_explaux smallint;
-v_psector_expl smallint;
-v_final_arc text;
-
+    v_node_state                smallint;
+    v_node_expl_id              smallint;
+    v_node_expl_visibility      smallint[];
+    v_plan_psector_expl_id      smallint;
+    v_combined_visibility       smallint[];
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    EXECUTE 'SET search_path TO ' || quote_literal(TG_TABLE_SCHEMA) || ', public';
 
-    SELECT expl_id INTO v_psector_expl FROM plan_psector WHERE psector_id=NEW.psector_id;
-	SELECT node.state, node.expl_id INTO v_stateaux, v_explaux FROM node WHERE node_id=NEW.node_id;
+    SELECT expl_id
+        INTO v_plan_psector_expl_id
+    FROM plan_psector 
+        WHERE psector_id = NEW.psector_id;
 
-	-- do not allow to insert features with expl diferent from psector expl
-	IF v_explaux<>v_psector_expl THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3234", "function":"1132","parameters":null}}$$);';
-	END IF;
+    SELECT state, expl_id, expl_visibility 
+        INTO v_node_state, v_node_expl_id, v_node_expl_visibility
+    FROM node 
+        WHERE node_id = NEW.node_id;
 
-	IF v_stateaux=1	THEN
-		NEW.state=0;
-		NEW.doable=false;
-	ELSIF v_stateaux=2 THEN
-		IF NEW.state = 0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3182", "function":"1132","parameters":{"psector_id":"'||OLD.psector_id||'"}}}$$);';
-		END IF;
-		NEW.state = 1;
-		NEW.doable=true;
-	END IF;
+    v_combined_visibility := array_append(v_node_expl_visibility, v_node_expl_id);
 
-	RETURN NEW;
+    -- Do not allow to insert features with expl different from psector expl
+    IF v_plan_psector_expl_id <> ALL(v_combined_visibility) THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3234", "function":"1132","parameters":null}}$$);';
+    END IF;
+
+    IF v_node_state = 1 THEN
+        NEW.state := 0;
+        NEW.doable := false;
+    ELSIF v_node_state = 2 THEN
+        IF NEW.state = 0 THEN
+            EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3182", "function":"1132","parameters":{"psector_id":"'|| OLD.psector_id || '"}}}$$);';
+        END IF;
+        NEW.state := 1;
+        NEW.doable := true;
+    END IF;
+
+    RETURN NEW;
 
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+LANGUAGE plpgsql VOLATILE
+COST 100;

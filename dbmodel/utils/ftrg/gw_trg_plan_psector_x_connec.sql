@@ -5,76 +5,85 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 2936
+-- FUNCTION CODE: 2936
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
 RETURNS trigger AS
 $BODY$
-
-
 DECLARE
-v_stateaux smallint;
-v_explaux smallint;
-v_psector_expl smallint;
-v_link_id integer;
-v_arc_id integer;
-
+    v_connec_state           	smallint;
+    v_connec_expl_id            smallint;
+	v_connec_expl_visibility    smallint[];
+	v_combined_visibility       smallint[];
+    v_plan_psector_expl_id      smallint;
+    v_link_id_var         		integer;
+    v_arc_id_var          		integer;
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    EXECUTE 'SET search_path TO ' || quote_literal(TG_TABLE_SCHEMA) || ', public';
 
-	SELECT expl_id INTO v_psector_expl FROM plan_psector WHERE psector_id=NEW.psector_id;
-	SELECT connec.state, connec.expl_id INTO v_stateaux, v_explaux FROM connec WHERE connec_id=NEW.connec_id;
+    -- Get expl_id for plan_psector and connec
+    SELECT expl_id 
+		INTO v_plan_psector_expl_id 
+	FROM plan_psector 
+		WHERE psector_id = NEW.psector_id;
 
-	-- do not allow to insert features with expl diferent from psector expl
-	IF v_explaux<>v_psector_expl THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3234", "function":"2936","parameters":null}}$$);';
-	END IF;
+    SELECT state, expl_id, expl_visibility 
+		INTO v_connec_state, v_connec_expl_id, v_connec_expl_visibility 
+	FROM connec 
+		WHERE connec_id = NEW.connec_id;
 
-	IF NEW.state IS NULL AND v_stateaux = 1 THEN
-		NEW.state = 0;
-	ELSIF NEW.state IS NULL AND v_stateaux=2 THEN
-		NEW.state=1;
-	END IF;
+	v_combined_visibility := array_append(v_connec_expl_visibility, v_connec_expl_id);
 
-	IF NEW.state = 1 AND v_stateaux = 1 THEN
-		NEW.doable=false;
-		-- looking for arc_id state=2 closest
+    -- Do not allow to insert features with expl different from psector expl
+    IF v_plan_psector_expl_id <> ALL(v_combined_visibility) THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3234", "function":"2936","parameters":null}}$$);';
+    END IF;
 
-	ELSIF NEW.state = 0 AND v_stateaux=1 THEN
-		NEW.doable=false;
+    -- Set NEW.state by default if NULL, based on connec previous state
+    IF NEW.state IS NULL THEN
+        IF v_connec_state = 1 THEN
+            NEW.state := 0;
+        ELSIF v_connec_state = 2 THEN
+            NEW.state := 1;
+        END IF;
+    END IF;
 
-	ELSIF v_stateaux=2 THEN
-		IF NEW.state = 0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3182", "function":"2936","parameters":null}}$$);';
-		END IF;
-		NEW.doable=true;
-	END IF;
+    -- Update doable and state logic
+    IF NEW.state = 1 AND v_connec_state = 1 THEN
+        NEW.doable := false;
 
-	-- profilactic control of doable
-	IF NEW.doable IS NULL THEN
-		NEW.doable =  TRUE;
-	END IF;
+    ELSIF NEW.state = 0 AND v_connec_state = 1 THEN
+        NEW.doable := false;
 
-	SELECT link_id INTO v_link_id FROM ve_link WHERE feature_id = NEW.connec_id LIMIT 1;
+    ELSIF v_connec_state = 2 THEN
+        IF NEW.state = 0 THEN
+            EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3182", "function":"2936","parameters":null}}$$);';
+        END IF;
+        NEW.doable := true;
+    END IF;
 
-	SELECT arc_id INTO v_arc_id FROM ve_connec WHERE connec_id = NEW.connec_id LIMIT 1;
+    -- Prophylactic control of doable
+    IF NEW.doable IS NULL THEN
+        NEW.doable := true;
+    END IF;
 
-	IF TG_OP = 'INSERT' THEN
-		IF v_link_id IS NOT NULL AND NEW.state = 0 THEN
-			NEW.link_id = v_link_id;
-		END IF;
+    -- Get link_id and arc_id only once
+    SELECT link_id INTO v_link_id_var FROM ve_link WHERE feature_id = NEW.connec_id LIMIT 1;
+    SELECT arc_id INTO v_arc_id_var FROM ve_connec WHERE connec_id = NEW.connec_id LIMIT 1;
 
-		IF v_arc_id IS NOT NULL AND NEW.state = 0 THEN
-			NEW.arc_id = v_arc_id;
-		END IF;
-	END IF;
+    IF TG_OP = 'INSERT' THEN
+        IF v_link_id_var IS NOT NULL AND NEW.state = 0 THEN
+            NEW.link_id := v_link_id_var;
+        END IF;
 
-	RETURN NEW;
+        IF v_arc_id_var IS NOT NULL AND NEW.state = 0 THEN
+            NEW.arc_id := v_arc_id_var;
+        END IF;
+    END IF;
 
+    RETURN NEW;
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+LANGUAGE plpgsql VOLATILE
+COST 100;

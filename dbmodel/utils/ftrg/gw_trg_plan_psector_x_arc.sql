@@ -12,13 +12,15 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_psector_x_arc()
 $BODY$
 DECLARE 
 
-v_stateaux smallint;
-v_explaux smallint;
-v_psector_expl smallint;
-num_connec integer;
-v_project_type text;
-v_user_planordercontrol boolean;
-v_auto_insert_connec boolean;
+	v_arc_state smallint;
+	v_arc_expl_id smallint;
+	v_arc_expl_visibility smallint[];
+	v_combined_visibility smallint[];
+	v_plan_psector_expl_id smallint;
+	num_connec integer;
+	v_project_type text;
+	v_user_planordercontrol boolean;
+	v_auto_insert_connec boolean;
 
 BEGIN 
 
@@ -31,16 +33,18 @@ BEGIN
 	SELECT value::boolean INTO v_user_planordercontrol FROM config_param_user WHERE parameter='edit_plan_order_control' AND cur_user = current_user;
 	SELECT value::boolean INTO v_auto_insert_connec FROM config_param_user WHERE parameter='plan_psector_auto_insert_connec' AND cur_user = current_user;
 
-	SELECT expl_id INTO v_psector_expl FROM plan_psector WHERE psector_id=NEW.psector_id;
-	SELECT arc.state, arc.expl_id INTO v_stateaux, v_explaux FROM arc WHERE arc_id=NEW.arc_id;
+	SELECT expl_id INTO v_plan_psector_expl_id FROM plan_psector WHERE psector_id=NEW.psector_id;
+	SELECT arc.state, arc.expl_id, arc.expl_visibility INTO v_arc_state, v_arc_expl_id, v_arc_expl_visibility FROM arc WHERE arc_id=NEW.arc_id;
+
+	v_combined_visibility := array_append(v_arc_expl_visibility, v_arc_expl_id);
 
 	-- do not allow to insert features with expl diferent from psector expl
-	IF v_explaux<>v_psector_expl THEN
+	IF v_plan_psector_expl_id <> ALL(v_combined_visibility) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3234", "function":"1130","parameters":null}}$$);';
 	END IF;
 	
-	IF v_stateaux=1	THEN 
+	IF v_arc_state=1	THEN 
 		NEW.state=0;
 		NEW.doable=false;
         
@@ -114,7 +118,7 @@ BEGIN
 	       
 		END IF;
         
-	ELSIF v_stateaux=2 THEN
+	ELSIF v_arc_state=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3182", "function":"1130","parameters":{"psector_id":"'||NEW.psector_id||'"}}}$$);';
