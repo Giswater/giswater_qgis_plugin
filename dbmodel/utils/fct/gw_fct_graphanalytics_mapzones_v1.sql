@@ -1705,6 +1705,24 @@ BEGIN
 			)';
 			EXECUTE v_query_text;
 
+			-- Update mapzone addparam with kmLength calculation
+			v_query_text := '
+				UPDATE '||v_table_name||' m SET addparam = 
+					(COALESCE(addparam::jsonb, ''{}''::jsonb) || jsonb_build_object(''kmLength'', COALESCE(a.km, 0)))::json
+				FROM (
+					SELECT mz.mapzone_id[1] AS '||v_mapzone_field||', 
+						sum(st_length(va.the_geom)/1000)::numeric(12,3) AS km 
+					FROM temp_pgr_arc ta
+					JOIN ve_arc va ON ta.arc_id = va.arc_id
+					JOIN temp_pgr_mapzone mz ON ta.mapzone_id = mz.component
+					WHERE ta.mapzone_id > 0
+					AND CARDINALITY(mz.mapzone_id) = 1
+					GROUP BY mz.mapzone_id[1]
+				) a 
+				WHERE a.'||v_mapzone_field||' = m.'||v_mapzone_field||'
+			';
+			EXECUTE v_query_text;
+
 			-- for DISCONNECTED, mapzone_id is 0, for  CONFLICT mapzone_id is -1
 			v_query_text := '
 				WITH mapzones AS (
