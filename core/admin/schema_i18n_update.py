@@ -12,6 +12,7 @@ from functools import partial
 import datetime
 import ast
 import json
+from collections import defaultdict
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
@@ -209,6 +210,8 @@ class GwSchemaI18NUpdate:
             else:
                 if "json" in dbtable:
                     self._write_dbjson_values(dbtable_rows)
+                elif "dbstyle" in dbtable:
+                    self._write_dbstyle_values(dbtable_rows)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable)
 
@@ -242,6 +245,7 @@ class GwSchemaI18NUpdate:
         QApplication.processEvents()
         columns = []
         lang_columns = []
+        order_by = None
 
         if 'dbconfig_form_fields' in table:
             columns = ["source", "formname", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
@@ -255,7 +259,7 @@ class GwSchemaI18NUpdate:
                 lang_columns = lang_columns[:3]
 
         elif 'dbparam_user' in table:
-            columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}",
                             f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
@@ -269,7 +273,7 @@ class GwSchemaI18NUpdate:
             lang_columns = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
 
         elif 'dbmessage' in table:
-            columns = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
+            columns = ["source", "project_type", "context", "ms_en_us", "ht_en_us"]
             lang_columns = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang},"
                             f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
 
@@ -336,6 +340,20 @@ class GwSchemaI18NUpdate:
             lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}",
                             f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
 
+        elif 'dbplan_price' in table:
+            columns = ["source", "project_type", "context", "ds_en_us", "tx_en_us", "pr_en_us"]
+            lang_columns = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}",
+                            f"tx_{self.lower_lang}", f"auto_tx_{self.lower_lang}", f"va_auto_tx_{self.lower_lang}",
+                            f"pr_{self.lower_lang}", f"auto_pr_{self.lower_lang}", f"va_auto_pr_{self.lower_lang}"]
+
+        elif 'dbconfig_visit_parameter' in table:
+            columns = ["source", "project_type", "context", "ds_en_us"]
+            lang_columns = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
+        elif 'dbstyle' in table:
+            columns = ["source", "layername", "project_type", "context", "org_text", "hint", "lb_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+            order_by = ["source_code", "layername", "source", "hint"]
         # Make the query
         sql = ""
         if self.lower_lang == 'en_us':
@@ -346,7 +364,10 @@ class GwSchemaI18NUpdate:
                f"FROM {table} ")
         if not self.add_tab_data and 'config_form_fields' in table:
             sql += "WHERE tabname != 'tab_data' "
-        sql += "ORDER BY context;"
+        if order_by:
+            sql += f"ORDER BY {', '.join(order_by)};"
+        else:
+            sql += "ORDER BY context;"
         rows = self._get_rows(sql, self.cursor_i18n)
 
         # Return the corresponding information
@@ -477,6 +498,14 @@ class GwSchemaI18NUpdate:
                         sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
                                     f"WHERE id = '{row['source']}';\n")
 
+                elif 'dbplan_price' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET descript = {texts[0]}, text = {texts[1]}, price = REPLACE({texts[2]}, ',', '.')::numeric "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbconfig_visit_parameter' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET descript = {texts[0]} "
+                                f"WHERE id = '{row['source']}';\n")
+
                 try:
                     self.cursor_dest.execute(sql_text)
                     self._commit_dest()
@@ -567,6 +596,54 @@ class GwSchemaI18NUpdate:
                 print(e)
                 tools_db.dao.rollback()
 
+    def _write_dbstyle_values(self, rows):
+        updates = defaultdict(list)
+        project_type = [self.project_type, "utils"] if self.project_type in ["ws", "ud"] else [self.project_type]
+
+        for row in rows:
+            if row['project_type'] not in project_type:
+                continue
+            
+            key = (row["source"], row["layername"], row["context"], row["org_text"].replace("'", "''"))
+            updates[key].append(row)
+
+        for key, related_rows in updates.items():
+            source, layername, context, stylevalue = key
+            new_stylevalue = stylevalue
+            do_style_update = False
+
+            for row in related_rows:
+                default_text = row.get("lb_en_us", "")
+                translated = (
+                    row.get(f"lb_{self.lower_lang}") or
+                    row.get(f"auto_lb_{self.lower_lang}") or
+                    default_text
+                )
+
+                if not default_text or not translated or default_text == translated:
+                    continue
+                
+                # Replace exact label string: label="Original" -> label="Translated"
+                if translated != default_text:
+                    escaped_default = default_text.replace("'", "''")
+                    escaped_translated = translated.replace("'", "''")
+                    old_str = f'label="{escaped_default}"'
+                    new_str = f'label="{escaped_translated}"'
+                    
+                    # Simple string replacement is robust for this purpose
+                    new_stylevalue = new_stylevalue.replace(old_str, new_str)
+                    do_style_update = True
+
+            if do_style_update:
+                values_str = ",\n\t".join([f"('{source}', '{layername}', '{new_stylevalue}')"])
+                sql_text = f"UPDATE {self.schema}.{context} AS t\nSET stylevalue = v.stylevalue\nFROM (\n\tVALUES\n\t{values_str}\n) AS v(styleconfig_id, layername, stylevalue)\nWHERE t.styleconfig_id::text = v.styleconfig_id AND t.layername = v.layername;\n\n"
+                try:
+                    self.cursor_dest.execute(sql_text)
+                    self._commit_dest()
+                except Exception as e:
+                    print(f"Error updating style: {e}")
+                    tools_db.dao.rollback()
+
     # endregion
 
     # region Extra fucntions
@@ -595,35 +672,6 @@ class GwSchemaI18NUpdate:
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "session", prefix=False)
-
-    def _check_missing_dbmessage_values(self):
-        """ Get db message values from schema_name """
-
-        sql_main = (f"SELECT id, project_type, error_message, hint_message, log_level "
-                    f"FROM {self.schema_name}.sys_message "
-                    f"WHERE project_type = \'{self.project_type}\' or project_type = 'utils'")
-        rows_main = tools_db.get_rows(sql_main)
-
-        if rows_main:
-            for row in rows_main:
-                # Get values
-                source = row['id'] if row['id'] is not None else ""
-                project_type = row['project_type'] if row['project_type'] is not None else ""
-                ms_msg = row['error_message'] if row['error_message'] is not None else ""
-                ht_msg = row['hint_message'] if row['hint_message'] is not None else ""
-                log_level = row['log_level'] if row['log_level'] is not None else 2
-
-                sql_i18n = (
-                    f" SELECT source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}"
-                    f" FROM i18n.dbmessage "
-                    f" WHERE source = \'{source}\'")
-                rows_i18n = self._get_rows(sql_i18n)
-
-                if not rows_i18n:
-                    sql_insert = (f"INSERT INTO i18n.dbmessage "
-                                  f"(source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}, source_code, log_level) "
-                                  f"VALUES ('{source}', '{project_type}', 'sys_message', $${ms_msg}$$, $${ht_msg}$$, 'giswater', {log_level});")
-                    self._get_rows(sql_insert)
 
     def _load_user_values(self):
         """
@@ -821,7 +869,8 @@ class GwSchemaI18NUpdate:
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
-                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                    "dbconfig_form_tableview", "dbconfig_visit_parameter", "dbtable", "dbplan_price", "dbstyle",
+                    "su_basic_tables", "dbjson", "dbconfig_form_fields_json"
                  ],
                  "project_type": ["ws", "utils"]
                  #"dbtables": ["dbtable"]
@@ -830,7 +879,8 @@ class GwSchemaI18NUpdate:
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
                     "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report",
                     "dbconfig_toolbox", "dbfunction", "dblabel", "dbtypevalue", "dbconfig_form_fields_feat",
-                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                    "dbconfig_form_tableview", "dbconfig_visit_parameter", "dbtable", "dbplan_price", "dbstyle",
+                    "su_basic_tables", "dbjson", "dbconfig_form_fields_json"
                  ],
                  "project_type": ["ud", "utils"]
             },
