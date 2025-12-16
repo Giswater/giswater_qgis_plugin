@@ -2682,11 +2682,9 @@ AS SELECT inp_shortpipe.node_id,
     inp_shortpipe.custom_dint,
     v.to_arc,
         CASE
-            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
-            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'CV'::character varying(12)
             WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
-            ELSE NULL::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
         END AS status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
@@ -2761,11 +2759,9 @@ AS SELECT n.node_id,
     concat(n.node_id, '_n2a') AS nodarc_id,
     inp_shortpipe.minorloss,
         CASE
-            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
-            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'CV'::character varying(12)
             WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
-            ELSE NULL::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
         END AS status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
