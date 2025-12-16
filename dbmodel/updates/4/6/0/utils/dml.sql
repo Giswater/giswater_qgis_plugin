@@ -444,6 +444,10 @@ WHERE feature_class = ''GENELEM''',true,false,'{"setMultiline": false, "labelPos
 -- insert search configuration parameters for psectors
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('basic_search_v2_tab_psector ', '{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"v_edit_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}', 'Search configuration parameteres', 'Psector:', NULL, NULL, true, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
+-- insert tabs for go2epa
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('go2epa', 'tab_data', 'Data', NULL, 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('go2epa', 'tab_log', 'Log', NULL, 'role_basic', NULL, NULL, 1, '{5}');
+
 -- insert typevalues for go2epa
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'go2epa', 'go2epa', 'go2Epa', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_1', 'lyt_go2epa_1', 'lytGo2epa1', '{"lytOrientation":"horizontal"}'::json);
