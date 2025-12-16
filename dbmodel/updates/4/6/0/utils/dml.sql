@@ -438,3 +438,58 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 JOIN cat_feature_element cfe ON ce.element_type = cfe.id
 JOIN cat_feature cf ON cf.id = cfe.id
 WHERE feature_class = ''GENELEM''',true,false,'{"setMultiline": false, "labelPosition": "top"}'::json,false,1);
+
+
+--WEB SECTION
+-- insert search configuration parameters for psectors
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('basic_search_v2_tab_psector ', '{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"v_edit_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}', 'Search configuration parameteres', 'Psector:', NULL, NULL, true, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+-- insert typevalues for go2epa
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'go2epa', 'go2epa', 'go2Epa', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_1', 'lyt_go2epa_1', 'lytGo2epa1', '{"lytOrientation":"horizontal"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_data_1', 'lyt_go2epa_data_1', 'lytGo2epaData1', '{"lytOrientation":"horizontal"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_data_2', 'lyt_go2epa_data_2', 'lytGo2epaData2', '{"lytOrientation":"horizontal"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_log', 'lyt_go2epa_log', 'lytGo2epaLog', '{
+  "lytOrientation": "vertical"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_log_btns', 'lyt_go2epa_log_btns', 'lytGo2epaLogBtns', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_go2epa_data_3', 'lyt_go2epa_data_3', 'lytGo2epaData3', '{"lytOrientation":"vertical"}'::json);
+
+-- DLG GO2EPA
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_none', 'tab_main', 'lyt_go2epa_1', 0, NULL, 'tabwidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"tabs":["tab_data", "tab_log"]}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_none', 'btn_close', 'lyt_buttons', 1, 'string', 'button', NULL, 'Close dialog', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Close"
+}'::json, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_log', 'gridLayout_log', 'lyt_go2epa_log', 0, 'string', 'textarea', NULL, NULL, NULL, false, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_log', 'btn_download_inp', 'lyt_go2epa_log_btns', 1, 'string', 'button', NULL, 'Download INP file', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "INP File"
+}'::json, '{
+  "functionName": "downloadInp"
+}'::json, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_data', 'vspacer_go2epa_1', 'lyt_go2epa_data_3', 1, 'string', 'vspacer', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_log', 'btn_download_rpt', 'lyt_go2epa_log_btns', 2, 'string', 'button', NULL, 'Download RPT file', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "RPT File"
+}'::json, '{
+  "functionName": "downloadRpt"
+}'::json, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_data', 'btn_selector', 'lyt_go2epa_data_1', 1, 'string', 'button', NULL, 'Open selector dialog', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Selector"
+}'::json, '{"functionName": "openSelector"}'::json, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_data', 'resultId', 'lyt_go2epa_data_2', 1, 'string', 'text', 'Result Name:', 'Name for the EPA result', 'Enter result name...', true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_data', 'btn_options', 'lyt_go2epa_data_1', 2, 'string', 'button', NULL, 'Configure EPA options', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Options"
+}'::json, '{"functionName": "openOptions"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'go2epa', 'tab_none', 'btn_execute_epa', 'lyt_buttons', 0, 'string', 'button', NULL, 'Execute EPA logic', NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Execute"
+}'::json, '{
+  "functionName": "executeEpa"
+}'::json, NULL, false, 1);
+
+-- change to show file name instead of date in files
+UPDATE config_form_list
+	SET addparam='{
+  "displayField": "text"
+}'::json,query_text='SELECT id, value as url, tstamp, COALESCE(NULLIF(text, ''''''''), tstamp::text) as text FROM om_visit_event_photo WHERE id IS NOT NULL'
+	WHERE listname='om_visit_event_photo' AND device=5;
