@@ -82,8 +82,8 @@ BEGIN
 
 			-- set inverted slope
 			IF v_slopedirection THEN
-				EXECUTE 'UPDATE arc SET inverted_slope = true WHERE sys_elev1 < sys_elev2 AND arc_id IN ' ||v_array;
-				EXECUTE 'UPDATE arc SET inverted_slope = false WHERE sys_elev1 >= sys_elev2 AND arc_id IN ' ||v_array;
+				EXECUTE 'UPDATE arc SET inverted_slope = true WHERE COALESCE(custom_elev1, elev1) < COALESCE(custom_elev2, elev2) AND arc_id IN ' ||v_array;
+				EXECUTE 'UPDATE arc SET inverted_slope = false WHERE COALESCE(custom_elev1, elev1) >= COALESCE(custom_elev2, elev2) AND arc_id IN ' ||v_array;
 			END IF;
 
 			SELECT count(*) INTO v_count FROM anl_arc WHERE fid=357 AND cur_user=current_user;
