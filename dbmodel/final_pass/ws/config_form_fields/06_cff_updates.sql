@@ -1579,3 +1579,27 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('ve_link_vlink', 'form_feature', 'tab_data', 'expl_visibility', 'lyt_data_2', 43, 'text', 'text', 'Expl id visibility:', 'Expl_id visibility', NULL, false, false, true, false, NULL, 'select expl_id AS id, name AS idval from ve_exploitation where expl_id > 0', NULL, NULL, NULL, NULL, NULL, '{"setMultiline": false}'::json, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
 
 
+-- 16/12/2025
+UPDATE config_form_tableview
+SET alias = 
+    -- 1. Take the first character and Uppercase it
+    UPPER(SUBSTR(
+        REPLACE(
+            CASE 
+                WHEN alias IS NOT NULL THEN REGEXP_REPLACE(alias, '[:.]$', '') 
+                ELSE columnname 
+            END, 
+            '_', ' '
+        ), 
+    1, 1)) 
+    || -- Concatenate
+    -- 2. Take the rest of the string (from pos 2) and Lowercase it
+    LOWER(SUBSTR(
+        REPLACE(
+            CASE 
+                WHEN alias IS NOT NULL THEN REGEXP_REPLACE(alias, '[:.]$', '') 
+                ELSE columnname 
+            END, 
+            '_', ' '
+        ), 
+    2));

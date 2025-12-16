@@ -310,30 +310,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",
 	VALUES ('cat_material','form_feature','tab_none','active','boolean','check','Active','id - Id',false,false,true,false,false);
 
 
-UPDATE config_form_tableview
-SET alias = 
-    -- 1. Take the first character and Uppercase it
-    UPPER(SUBSTR(
-        REPLACE(
-            CASE 
-                WHEN alias IS NOT NULL THEN REGEXP_REPLACE(alias, '[:.]$', '') 
-                ELSE columnname 
-            END, 
-            '_', ' '
-        ), 
-    1, 1)) 
-    || -- Concatenate
-    -- 2. Take the rest of the string (from pos 2) and Lowercase it
-    LOWER(SUBSTR(
-        REPLACE(
-            CASE 
-                WHEN alias IS NOT NULL THEN REGEXP_REPLACE(alias, '[:.]$', '') 
-                ELSE columnname 
-            END, 
-            '_', ' '
-        ), 
-    2));
-
 -- 12/12/2025
 -- Config_form_fields
 UPDATE config_form_fields
