@@ -309,3 +309,8 @@ ALTER TABLE arc drop column custom_y2;
 
 -- 15/12/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"expl_id2", "newName":"_expl_id2"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"dma_type", "dataType":"varchar(32)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"pattern_id", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"avg_press", "dataType":"numeric(12,2)"}}$$);
+ALTER TABLE dma ADD CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE;

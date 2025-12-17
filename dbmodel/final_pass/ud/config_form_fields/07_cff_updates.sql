@@ -759,28 +759,24 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('ve_sector','form_feature','tab_none','expl_id','lyt_data_1',8,'text','text','Expl id:','expl_id','Ex: {1,2}',false,false,false,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
 	VALUES ('ve_sector','form_feature','tab_none','muni_id','lyt_data_1',9,'text','text','Muni id:','muni_id','Ex: {1,2}',false,false,false,false,'{"setMultiline":false}'::json,false);
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','avg_press','lyt_data_1',10,'numeric','text','Average pressure:','avg_press',false,false,true,false,false,false);
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','pattern_id','lyt_data_1',11,'string','combo','Pattern id:','pattern_id',false,false,true,false,false,'SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL',true,true,'{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "ve_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','graphconfig','lyt_data_1',12,'string','text','Graphconfig:','graphconfig',false,false,false,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','graphconfig','lyt_data_1',10,'string','text','Graphconfig:','graphconfig',false,false,false,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','stylesheet','lyt_data_1',13,'string','text','Stylesheet:','stylesheet',false,false,true,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','stylesheet','lyt_data_1',11,'string','text','Stylesheet:','stylesheet',false,false,true,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','lock_level','lyt_data_1',14,'text','text','Lock level:','lock_level',false,false,true,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','lock_level','lyt_data_1',12,'text','text','Lock level:','lock_level',false,false,true,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','link','lyt_data_1',15,'text','text','Link:','link',false,false,true,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','link','lyt_data_1',13,'text','text','Link:','link',false,false,true,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','addparam','lyt_data_1',16,'text','text','Addparam:','addparam',false,false,true,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','addparam','lyt_data_1',14,'text','text','Addparam:','addparam',false,false,true,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','created_at','lyt_data_1',17,'datetime','datetime','Created at:','created_at',false,false,false,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','created_at','lyt_data_1',15,'datetime','datetime','Created at:','created_at',false,false,false,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','created_by','lyt_data_1',18,'string','text','Created by:','created_by',false,false,false,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','created_by','lyt_data_1',16,'string','text','Created by:','created_by',false,false,false,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','updated_at','lyt_data_1',19,'datetime','datetime','Updated at:','updated_at',false,false,false,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','updated_at','lyt_data_1',17,'datetime','datetime','Updated at:','updated_at',false,false,false,false,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('ve_sector','form_feature','tab_none','updated_by','lyt_data_1',20,'string','text','Updated by:','updated_by',false,false,false,false,'{"setMultiline":false}'::json,false);
+	VALUES ('ve_sector','form_feature','tab_none','updated_by','lyt_data_1',18,'string','text','Updated by:','updated_by',false,false,false,false,'{"setMultiline":false}'::json,false);
 
 UPDATE config_form_fields SET widgettype='list' WHERE formname IN('ve_dma', 've_sector', 've_macrosector', 've_omzone', 've_macroomzone', 've_dwfzone', 've_drainzone') AND columnname IN('expl_id', 'sector_id', 'muni_id');
 
