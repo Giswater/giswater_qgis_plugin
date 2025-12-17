@@ -64,3 +64,5 @@ ALTER TABLE element DROP CONSTRAINT IF EXISTS element_man_type_location_fk;
 ALTER TABLE element ADD CONSTRAINT element_man_type_category_fk FOREIGN KEY (category_type) REFERENCES man_type_category(category_type) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE element ADD CONSTRAINT element_man_type_function_fk FOREIGN KEY (function_type) REFERENCES man_type_function(function_type) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE element ADD CONSTRAINT element_man_type_location_fk FOREIGN KEY (location_type) REFERENCES man_type_location(location_type) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE gully ADD CONSTRAINT gully_sys_code_unique UNIQUE (sys_code);
