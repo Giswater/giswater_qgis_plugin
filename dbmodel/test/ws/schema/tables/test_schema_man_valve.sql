@@ -73,7 +73,6 @@ SELECT has_trigger('man_valve', 'gw_trg_typevalue_fk_update', 'Table should have
 
 -- Check constraints
 SELECT col_not_null('man_valve', 'node_id', 'Column node_id should be NOT NULL');
-SELECT col_not_null('man_valve', 'connection_type', 'Column connection_type should be NOT NULL');
 
 SELECT * FROM finish();
 

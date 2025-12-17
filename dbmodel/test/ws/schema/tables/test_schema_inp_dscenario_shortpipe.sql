@@ -20,7 +20,7 @@ SELECT has_table('inp_dscenario_shortpipe'::name, 'Table inp_dscenario_shortpipe
 SELECT columns_are(
     'inp_dscenario_shortpipe',
     ARRAY[
-        'dscenario_id', 'node_id', 'minorloss', 'status', 'bulk_coeff', 'wall_coeff'
+        'dscenario_id', 'node_id', 'minorloss', 'status', 'bulk_coeff', 'wall_coeff', 'to_arc'
     ],
     'Table inp_dscenario_shortpipe should have the correct columns'
 );
@@ -35,6 +35,7 @@ SELECT col_type_is('inp_dscenario_shortpipe', 'minorloss', 'numeric(12,6)', 'Col
 SELECT col_type_is('inp_dscenario_shortpipe', 'status', 'varchar(12)', 'Column status should be varchar(12)');
 SELECT col_type_is('inp_dscenario_shortpipe', 'bulk_coeff', 'double precision', 'Column bulk_coeff should be double precision');
 SELECT col_type_is('inp_dscenario_shortpipe', 'wall_coeff', 'double precision', 'Column wall_coeff should be double precision');
+SELECT col_type_is('inp_dscenario_shortpipe', 'to_arc', 'integer', 'Column to_arc should be integer');
 
 -- Check foreign keys
 SELECT has_fk('inp_dscenario_shortpipe', 'Table inp_dscenario_shortpipe should have foreign keys');
