@@ -497,3 +497,52 @@ UPDATE config_form_list
   "displayField": "text"
 }'::json,query_text='SELECT id, value as url, tstamp, COALESCE(NULLIF(text, ''''''''), tstamp::text) as text FROM om_visit_event_photo WHERE id IS NOT NULL'
 	WHERE listname='om_visit_event_photo' AND device=5;
+
+-- 17/12/2025
+-- Auto-generated SQL script #202512170935
+INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,vdefault,layoutname,"source")
+	VALUES ('custom_order_by','config','Configuration to order result of getselectors by columname','role_edit','Configuration to order result of getselectors by columname:',true,27,'utils',false,false,'json','text',true,'{
+  "tab_exploitation": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_exploitation_add": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_macroexploitation": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_macrosector": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_municipality": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_network": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_network_state": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_period": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_psector": {
+    "order_by_column": "value",
+    "is_checked": false
+  },
+  "tab_sector": {
+    "order_by_column": "value",
+    "is_checked": false
+  }
+}','lyt_other','core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3524, 'gw_fct_set_selector_tab_custom_order_by_value', 'utils', 'function', 'json', 'json', 'Function to set custom order by value for selectors.', NULL, NULL, 'core', NULL);
