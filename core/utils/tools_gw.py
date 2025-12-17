@@ -2946,6 +2946,31 @@ def make_list_multiple_option(completer, model, widget, field, list_widget):
         sorted(display_list, key=lambda x: x["idval"])
     )
 
+def get_sequence_next_preview(seq_name: str, schema: str = None) -> int:
+    """
+    Returns a NON-reserving preview of the next sequence value.
+    IMPORTANT: Not guaranteed under concurrency (other sessions may consume nextval()).
+    """
+    seq_ref = f'{schema}.{seq_name}' if schema else seq_name
+
+    # increment_by is NOT a column in a sequence relation; only last_value/is_called are.
+    sql = f"SELECT last_value, is_called FROM {seq_ref}"
+    row = tools_db.get_row(sql)
+
+    if not row:
+        return 1
+
+    # row can be tuple or dict-like depending on tools_db implementation
+    try:
+        last_value = int(row[0])
+        is_called = bool(row[1])
+    except Exception:
+        last_value = int(row.get('last_value', 0))
+        is_called = bool(row.get('is_called', False))
+
+    next_id = last_value if not is_called else (last_value + 1)
+    return max(next_id, 1)
+
 
 def add_item_multiple_option(completer, widget, typeahead):
     """Add selected item from completer popup to QListWidget

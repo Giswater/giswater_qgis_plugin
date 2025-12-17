@@ -392,6 +392,12 @@ class GwPsector:
         if psector_id is None:
             tools_qt.set_widget_text(self.dlg_plan_psector, 'tab_general_active', True)
 
+            next_id = tools_gw.get_sequence_next_preview(
+                seq_name='plan_psector_id_seq',
+                schema=self.schema_name.replace('"', '')
+            )
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'tab_general_psector_id', str(next_id))
+
         self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
 
         # Set psector editability based on current and archived status

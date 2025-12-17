@@ -470,17 +470,11 @@ class GwMincut:
         self._load_widgets_values()
 
     def set_id_val(self):
-
-        # Show future id of mincut
-        sql = "SELECT last_value FROM om_mincut_seq"
-        row = tools_db.get_row(sql)
-        result_mincut_id = '1'
-        if not row or row[0] is None or row[0] < 1:
-            result_mincut_id = '1'
-        elif row[0]:
-            result_mincut_id = str(int(row[0]) + 1)
-
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
+        next_id = tools_gw.get_sequence_next_preview(
+        seq_name='om_mincut_seq',
+        schema=self.schema_name.replace('"', '')
+        )
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(next_id))
 
     def get_mincut(self):
         """ Button 11: Mincut """
