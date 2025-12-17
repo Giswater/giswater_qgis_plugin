@@ -15,7 +15,7 @@ from qgis.core import Qgis
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...libs import lib_vars, tools_qgis, tools_qt, tools_os
+from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 
 
 class GwSelector:
@@ -25,12 +25,16 @@ class GwSelector:
         self.help_button = None
         self.scrolled_amount = 0
         self.is_campaign = is_campaign
+        self._selector_dialog = None
+        self._selector_type = None
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None, show_lot_tab=True):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
         if reload_dlg:
+            self._selector_dialog = reload_dlg
+            self._selector_type = selector_type
             aux_params = None
             if selector_type == "selector_mincut":
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
@@ -46,6 +50,8 @@ class GwSelector:
             return
 
         dlg_selector = GwSelectorUi(self)
+        self._selector_dialog = dlg_selector
+        self._selector_type = selector_type
         tools_gw.load_settings(dlg_selector)
         dlg_selector.setProperty('GwSelector', self)
 
@@ -115,6 +121,8 @@ class GwSelector:
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
             :param selector_type: List of selectors to ask DB ['exploitation', 'state', ...]
         """
+        self._selector_dialog = dialog
+        self._selector_type = selector_type
 
         index = 0
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
@@ -226,6 +234,35 @@ class GwSelector:
                 i = i + 1
                 gridlayout.addWidget(label, int(field['layoutorder']), 0)
                 gridlayout.addWidget(widget, int(field['layoutorder']), 2)
+                
+                # Add checkbox filter move selections (if configured in DB)
+                show_move_selections = tools_os.set_boolean(form_tab.get('hasCustomOrderBy'), False)
+                if show_move_selections:
+                    chk_filter_name = f'chk_filter_{tab_name}'
+                    if tools_qt.get_widget(dialog, chk_filter_name) is None:
+                        chk_filter = QCheckBox()
+                        chk_filter.setObjectName(chk_filter_name)
+                        chk_filter.setText(tools_qt.tr('chk_filter', 'selector', default='Custom order by'))
+                    else:
+                        chk_filter = tools_qt.get_widget(dialog, chk_filter_name)
+                    sql = ("SELECT COALESCE((value::jsonb #>> ARRAY[%s,'is_checked'])::boolean, false) "
+                           "FROM config_param_user "
+                           "WHERE parameter = 'custom_order_by' "
+                           "AND cur_user = current_user;")
+                    row = tools_db.get_row(sql, log_info=False, params=(tab_name,))
+                    chk_filter_value = False
+                    if row:
+                        chk_filter_value = tools_os.set_boolean(row[0], False)
+                    chk_filter.blockSignals(True)
+                    chk_filter.setChecked(chk_filter_value)
+                    chk_filter.blockSignals(False)
+                    if not tools_os.set_boolean(chk_filter.property('gw_custom_order_by_connected'), False):
+                        chk_filter.toggled.connect(
+                            partial(self._set_selector_tab_custom_order_by_value, tab_name)
+                        )
+                        chk_filter.setProperty('gw_custom_order_by_connected', True)
+                    gridlayout.addWidget(chk_filter, int(field['layoutorder']), 3)
+                
                 widget.setFocus()
 
             if 'manageAll' in form_tab and (form_tab['manageAll']).lower() == 'true':
@@ -368,6 +405,41 @@ class GwSelector:
             self._remove_previuos(dialog, widget, widget_all, widget_list)
 
         self._set_selector(dialog, widget, is_alone, disable_parent)
+
+    def _set_selector_tab_custom_order_by_value(self, tab_name, checked):
+        tab_name_sql = tab_name.replace("'", "''")
+        checked_sql = "true" if checked else "false"
+        tools_gw.execute_procedure(
+            "gw_fct_set_selector_tab_custom_order_by_value",
+            f"'{tab_name_sql}', {checked_sql}",
+            log_sql=False,
+        )
+        dialog = self._selector_dialog
+        if dialog is None:
+            return
+        selector_type = self._selector_type
+        if selector_type is None:
+            current_widget = dialog.main_tab.currentWidget()
+            if current_widget is not None:
+                selector_type = current_widget.property("selector_type")
+        if selector_type is None:
+            return
+
+        current_widget = dialog.main_tab.currentWidget()
+        if current_widget is None:
+            return
+
+        self.scrolled_amount = current_widget.verticalScrollBar().value()
+        current_tab = current_widget.objectName()
+
+        aux_params = None
+        if selector_type == "selector_mincut":
+            aux_params = tools_gw.get_config_parser("selector_mincut", "aux_params", "user", "session")
+
+        dialog.main_tab.clear()
+        self.get_selector(dialog, selector_type, current_tab=current_tab, aux_params=aux_params)
+        if self.scrolled_amount and dialog.main_tab.currentWidget() is not None:
+            dialog.main_tab.currentWidget().verticalScrollBar().setValue(self.scrolled_amount)
 
     def _set_selector(self, dialog, widget, is_alone, disable_parent, check_all_override=None):
         """
