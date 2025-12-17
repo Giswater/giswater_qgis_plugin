@@ -2906,62 +2906,45 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
 
 
 def make_list_multiple_option(completer, model, widget, field, list_widget):
-    """ Create a list of ids and populate widget (QLineEdit) 
-    
-    Args:
-        completer (QCompleter): Completer object for auto-completion
-        model (QStandardItemModel): Model to store completion items
-        widget (QLineEdit): The text input widget
-        field (dict): Field configuration containing query info
-        
-    Returns:
-        bool: False if no results found, None otherwise
+    """
+    Populate completer suggestions for multiple_option fields.
+    IMPORTANT: do not refresh model while the completer popup is visible, or the first click is eaten.
     """
 
-    # Initialize variables
+    # If user is selecting from popup, do not rebuild suggestions
+    if completer.popup().isVisible():
+        return
+
+    # Also avoid running while we are programmatically changing text during add()
+    if widget.property("_gw_setting_from_completer"):
+        return
+
+    value = widget.text()
+    if not value:
+        return
+
     result = None
-    line_edit = None
-    line_list = []
-    line_list.append(widget)
+    if field.get("queryText") and value is not None:
+        if field.get("queryTextFilter"):
+            sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
+        else:
+            sql = f"{field['queryText']};"
+        result = tools_db.get_rows(sql)
 
-    if line_list:
-        # Get the text input widget and its current value
-        line_edit = line_list[0]
-        value = line_edit.text()
+    if not result:
+        return False
 
-        # Return if empty value
-        if str(value) == '':
-            return
+    existing_items = {list_widget.item(i).text() for i in range(list_widget.count())}
 
-        # Execute query if field has required query parameters
-        if 'queryText' in field and 'queryText' != '' and value is not None:
-            # Build SQL with ILIKE filter for case-insensitive search
-            if 'queryTextFilter' in field and field['queryTextFilter'] is not None:
-                sql = f"{field['queryText']} {field['queryTextFilter']}::text ilike '%{str(value)}%';"
-            else:
-                sql = f"{field['queryText']};"
-            result = tools_db.get_rows(sql)
-
-        # Return False if no results
-        if not result:
-            return False
-
-    # Build display list from results
     display_list = []
-    if result:
-        # Gather all current items' text from the list widget to avoid duplicates
-        existing_items = set()
-        for i in range(list_widget.count()):
-            existing_items.add(list_widget.item(i).text())
+    for data in result:
+        if data[1] not in existing_items:
+            display_list.append({"id": data[0], "idval": data[1]})
 
-        # Extract id and value from each result row, skip those already present
-        for data in result:
-            if data[1] not in existing_items:
-                item = {"id": data[0], "idval": data[1]}
-                display_list.append(item)
-
-        # Update completer with sorted display list
-        tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
+    tools_qt.set_completer_object(
+        completer, model, widget,
+        sorted(display_list, key=lambda x: x["idval"])
+    )
 
 
 def add_item_multiple_option(completer, widget, typeahead):
