@@ -51,3 +51,5 @@ ALTER TABLE link DROP CONSTRAINT IF EXISTS link_man_type_location_fk;
 
 ALTER TABLE link ADD CONSTRAINT link_man_type_fluid_fk FOREIGN KEY (fluid_type) REFERENCES man_type_fluid(fluid_type) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE link ADD CONSTRAINT link_man_type_location_fk FOREIGN KEY (location_type) REFERENCES man_type_location(location_type) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE man_valve ALTER COLUMN connection_type DROP NOT NULL;
