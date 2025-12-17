@@ -114,19 +114,17 @@ BEGIN
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- Get input parameters:
-	v_selector_type := p_data->'data'->>'selectorType';
-	v_currenttab := p_data->'form'->>'currentTab';
-	v_filterfrominput := p_data->'data'->>'filterText';
-	v_geometry := p_data->'data'->>'geometry';
-	v_useatlas := p_data->'data'->>'useAtlas';
-	v_loadProject := p_data->'data'->>'loadProject';
-	v_orderby := p_data->'data'->>'orderBy';
-	v_orderby_check := p_data->'data'->>'orderbyCheck';
-	v_message := p_data->'message';
-	v_cur_user := p_data->'client'->>'cur_user';
-	v_device := p_data->'client'->>'device';
-	v_addschema := p_data->'data'->>'addSchema';
-	v_tiled := p_data->'client'->>'tiled';
+	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
+	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
+	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
+	v_geometry := ((p_data ->> 'data')::json->>'geometry');
+	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
+	v_loadProject := (p_data ->> 'data')::json->> 'loadProject';
+	v_message := (p_data ->> 'message')::json;
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_device := (p_data ->> 'client')::json->> 'device';
+	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
+	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
 
 	IF v_addschema IS NOT NULL THEN v_tabnetworksignal = -1; END IF;
 
@@ -251,16 +249,10 @@ BEGIN
 		v_manageall = v_tab.value::json->>'manageAll';
 		v_typeahead = v_tab.value::json->>'typeaheadFilter';
 		v_selectionMode = v_tab.value::json->>'selectionMode';
+		v_orderby = v_tab.value::json->>'orderBy';
 		v_name = v_tab.value::json->>'name';
 		v_typeaheadForced = v_tab.value::json->>'typeaheadForced';
-
-		IF v_orderby IS NULL THEN
-			v_orderby = v_tab.value::json->>'orderBy';
-		END IF;
-
-		IF v_orderby_check IS NULL THEN
-			v_orderby_check = v_tab.value::json->>'orderbyCheck';
-		END IF;
+		v_orderby_check = v_tab.value::json->>'orderbyCheck';
 
 		-- profilactic control of v_orderby
 		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
@@ -277,7 +269,7 @@ BEGIN
 		END IF;
 
 		-- order by heck. This enables to put checked rows on the top. Useful when there are lots of rows and you need to use the scrollbar to kwow what is checked
-		IF v_orderby_check THEN
+		IF v_orderby_check AND v_tab.tabname != v_currenttab THEN
 			v_orderby_query = 'ORDER BY value DESC, orderby';
 		ELSE
 			v_orderby_query = 'ORDER BY orderby';
@@ -335,54 +327,13 @@ BEGIN
 					null as stylesheet
 					FROM ', v_table ,' s WHERE TRUE ', v_fullfilter, ' ) a)b');
 		ELSE
-			v_finalquery :=
-				format(
-					$SQL$
-						SELECT array_to_json(array_agg(row_to_json(b))) FROM (
-							SELECT *, row_number() OVER (%s) as orderby FROM (
-								
-								FROM (
-									SELECT
-									%s AS id,
-									concat(%s) AS label,
-									%s AS name,
-									%s::text AS widgetname,
-									%s AS orderby,
-									'%s' AS columnname,
-									'check' AS type,
-									'boolean' AS "dataType",
-									EXISTS (
-										SELECT %s FROM %s e
-										WHERE e.%s = s.%s
-										  AND cur_user = current_user
-									) AS "value",
-									active,
-									CASE
-										WHEN EXISTS (
-											SELECT %s FROM %s e
-											WHERE active AND e.%s = s.%s
-										) IS NOT TRUE
-										THEN 'color: lightgray; font-style: italic;'
-									END AS stylesheet
-									FROM 
-								)
-								
-
-							) a
-						) b
-					$SQL$,
-					v_orderby_query,
-					quote_ident(v_table_id),
-					v_label,
-					v_name,
-					v_table_id,
-					v_orderby,
-					v_selector_id,
-					v_selector_id, v_selector, v_selector_id, v_table_id,
-					v_table_id, v_table, v_table_id, v_table_id,
-					v_table,
-					COALESCE(v_fullfilter, '')
-				);
+			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
+					select *, row_number() OVER (',v_orderby_query,') as orderby from (
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
+					v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType",
+					EXISTS (SELECT ', v_selector_id, ' FROM ', v_selector, ' e WHERE e.', v_selector_id, ' = s.', v_table_id, ' and cur_user=current_user) as "value", active,
+					case when EXISTS(SELECT ', v_table_id, ' FROM ', v_table, ' e WHERE active and e.', v_table_id, ' = s.', v_table_id, ') is not true then ''color: lightgray; font-style: italic;'' end as stylesheet
+					FROM ', v_table ,' s WHERE TRUE ', v_fullfilter, ' ) a)b');
 		END IF;
 
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
