@@ -237,7 +237,7 @@ BEGIN
 				SELECT * INTO v_new_record FROM arc WHERE arc_id = v_record1.arc_id;
 
 				-- set new sys_code to avoid crushing the unique constraint of sys_code
-				v_new_record.sys_code = v_new_record.arc_id;
+				v_new_record.sys_code = v_new_record.arc_id+1;
 
 				-- Get arctype
 				IF v_arc_type IS NULL THEN

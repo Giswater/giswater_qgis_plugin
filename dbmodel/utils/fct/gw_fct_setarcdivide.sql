@@ -245,6 +245,9 @@ BEGIN
 					SELECT * INTO rec_aux1 FROM arc WHERE arc_id = v_arc_id;
 					SELECT * INTO rec_aux2 FROM arc WHERE arc_id = v_arc_id;
 
+					rec_aux1.sys_code = v_arc_id;
+					rec_aux2.sys_code = v_arc_id+1;
+
 					-- use specific sequence for code when its name matches featurecat_code_seq
 					SELECT addparam::json->>'code_prefix' INTO v_code_prefix FROM cat_feature WHERE id=v_arc_type;
 					EXECUTE 'SELECT concat('||quote_literal(lower(v_arc_type))||',''_code_seq'');' INTO v_seq_name;

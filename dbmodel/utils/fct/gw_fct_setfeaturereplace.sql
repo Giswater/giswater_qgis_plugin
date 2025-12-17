@@ -395,7 +395,8 @@ BEGIN
 							table_name='''||v_feature_type||''') and column_name!='''||v_id_column||''' and column_name!=''the_geom'' and column_name!=''state''
 							and column_name!=''code'' and column_name!=''epa_type'' and column_name!=''state_type'' and column_name!='''||v_cat_column||'''
 							and column_name!=''sector_id'' and column_name!=''dma_id'' and column_name!=''expl_id'' and column_name!=''category_type'' 
-							and column_name!=''function_type'' and column_name!=''fluid_type'' and column_name!=''location_type'' and column_name!=''link'';';
+							and column_name!=''function_type'' and column_name!=''fluid_type'' and column_name!=''location_type'' and column_name!=''link''
+							and column_name!=''sys_code'';';
 
 		FOR v_column IN EXECUTE v_sql
 		LOOP
@@ -412,8 +413,8 @@ BEGIN
 		END LOOP;
 
 		-- update sys_code to avoid crushing unique cosntraint of sys_code
-		EXECUTE 'UPDATE  '||v_feature_type||' SET sys_code = '||v_feature_type||'_id WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||'';
 
+		EXECUTE 'UPDATE  '||v_feature_type||' SET sys_code = '||v_id||'+1 WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||'';
 
 		-- updating values on table man_table from values of old feature
 		IF v_old_featuretype = v_feature_type_new AND (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) THEN
