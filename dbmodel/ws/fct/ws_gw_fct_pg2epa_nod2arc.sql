@@ -35,11 +35,14 @@ v_diameter float = 200;
 v_roughness float;
 v_querystring text;
 v_error_context text;
+v_userscenario integer[];
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
+
+	v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
 
 	CREATE INDEX IF NOT EXISTS temp_t_node_node2arc_gix
 	ON temp_t_node USING GIST (the_geom) WHERE node_type = 'NODE2ARC';
@@ -67,7 +70,18 @@ BEGIN
 							UNION ALL SELECT node_2 FROM ve_arc) a ON n.node_id=a.node_id group by n.node_id';
 
 	-- query text for mandatory node2arcs
-	v_querytext = 'SELECT a.*, v.to_arc FROM temp_t_node a JOIN man_valve v ON a.node_id=v.node_id::text WHERE to_arc is not null
+	v_querytext = 'SELECT a.*,
+				CASE
+					WHEN d.dscenario_id = ANY ('||quote_nullable(v_userscenario)::text||') AND d.dscenario_id IS NOT NULL THEN
+						COALESCE(d.to_arc, v.to_arc)
+					WHEN d2.dscenario_id = ANY ('||quote_nullable(v_userscenario)::text||') AND d2.dscenario_id IS NOT NULL THEN
+						COALESCE(d2.to_arc, v.to_arc)
+					ELSE
+						v.to_arc
+				END AS to_arc
+				FROM temp_t_node a JOIN man_valve v ON a.node_id=v.node_id::text
+				LEFT JOIN inp_dscenario_shortpipe d ON d.node_id::text = a.node_id
+				LEFT JOIN inp_dscenario_valve d2 ON d2.node_id::text = a.node_id WHERE v.to_arc is not null
 				UNION  
 				SELECT a.*, m.to_arc FROM temp_t_node a JOIN man_pump m ON a.node_id=m.node_id::text WHERE to_arc is not null
 				UNION
@@ -87,12 +101,25 @@ BEGIN
 
 	-- query text for non-mandatory node2arcs
 	IF p_only_mandatory_nodarc IS FALSE THEN -- shortpipes & tcv valves
-		v_querytext = 'SELECT a.*, s.to_arc FROM temp_t_node a JOIN inp_shortpipe i ON i.node_id::text = a.node_id 
+
+		v_querytext = 'SELECT a.*,
+					   CASE
+					   		WHEN d.dscenario_id = ANY ('||quote_nullable(v_userscenario)::text||') THEN d.to_arc
+							ELSE s.to_arc
+					   END AS to_arc
+					   FROM temp_t_node a JOIN inp_shortpipe i ON i.node_id::text = a.node_id 
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id
+					   LEFT JOIN inp_dscenario_shortpipe d ON i.node_id = d.node_id
 					   LEFT JOIN man_frelem ON a.node_id=man_frelem.node_id::text WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL
 					   UNION
-					   SELECT a.*, s.to_arc FROM temp_t_node a JOIN inp_valve i ON i.node_id::text = a.node_id 
+					   SELECT a.*,
+					   CASE
+					   		WHEN d.dscenario_id = ANY ('||quote_nullable(v_userscenario)::text||') THEN d.to_arc
+							ELSE s.to_arc
+					   END AS to_arc
+					   FROM temp_t_node a JOIN inp_valve i ON i.node_id::text = a.node_id 
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id
+					   LEFT JOIN inp_dscenario_valve d ON i.node_id = d.node_id
 					   LEFT JOIN man_frelem ON s.node_id=man_frelem.node_id WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL';
 
 		v_querytext = concat (' INSERT INTO t_anl_node (num_arcs, arc_id, node_id, top_elev, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, 

@@ -215,6 +215,9 @@ BEGIN
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a') AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
 		UPDATE temp_t_arc t SET minorloss = d.minorloss FROM inp_dscenario_shortpipe d
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = jsonb_set(addparam::jsonb, '{to_arc}', to_jsonb(to_arc), true)
+		FROM inp_dscenario_shortpipe d
+		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.to_arc IS NOT NULL;
 
 		-- updating values for frshortpipes
 		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_frshortpipe d
@@ -269,6 +272,9 @@ BEGIN
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minorloss',d.minorloss) FROM inp_dscenario_valve d
 		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = jsonb_set(addparam::jsonb, '{to_arc}', to_jsonb(to_arc), true)
+		FROM inp_dscenario_valve d
+		WHERE t.arc_id = concat(d.node_id::text, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.to_arc IS NOT NULL;
 
 		-- updating values for frvalve
 		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_frvalve d

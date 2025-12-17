@@ -200,3 +200,6 @@ ALTER TABLE om_mincut ALTER COLUMN modification_date TYPE timestamp;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"invert_level", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
+-- 16/12/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_shortpipe", "column":"to_arc", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_valve", "column":"to_arc", "dataType":"integer", "isUtils":"False"}}$$);

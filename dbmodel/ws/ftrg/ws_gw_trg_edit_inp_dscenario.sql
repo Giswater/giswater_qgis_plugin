@@ -76,9 +76,10 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.to_arc IS NULL THEN NEW.to_arc = (SELECT to_arc FROM man_valve WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_shortpipe(dscenario_id, node_id, minorloss, status, bulk_coeff, wall_coeff )
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff);
+			INSERT INTO inp_dscenario_shortpipe(dscenario_id, node_id, minorloss, status, bulk_coeff, wall_coeff, to_arc)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff, NEW.to_arc);
 
 		ELSIF v_dscenario_type = 'RESERVOIR' THEN
 
@@ -282,7 +283,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'SHORTPIPE' THEN
 			UPDATE inp_dscenario_shortpipe SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, minorloss=NEW.minorloss, status=NEW.status,
-			bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff
+			bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff, to_arc = NEW.to_arc
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'RESERVOIR' THEN

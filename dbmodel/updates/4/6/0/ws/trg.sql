@@ -48,3 +48,9 @@ UPDATE OF arc_id ON arc FOR EACH ROW WHEN (OLD.arc_id IS DISTINCT FROM NEW.arc_i
 DROP TRIGGER IF EXISTS gw_trg_mincut ON om_mincut;
 CREATE TRIGGER gw_trg_mincut AFTER
 UPDATE ON om_mincut FOR EACH ROW EXECUTE FUNCTION gw_trg_mincut();
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_dscenario_shortpipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('SHORTPIPE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_inp_dscenario_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VALVE');

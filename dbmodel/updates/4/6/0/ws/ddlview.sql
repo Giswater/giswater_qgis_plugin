@@ -2646,11 +2646,9 @@ AS SELECT inp_valve.node_id,
     inp_valve.minorloss,
     v.to_arc,
         CASE
-            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
-            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
             WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
-            ELSE NULL::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'ACTIVE'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
         END AS status,
     inp_valve.add_settings,
     inp_valve.init_quality,
@@ -2728,11 +2726,9 @@ AS SELECT n.node_id,
     inp_valve.minorloss,
     v.to_arc,
         CASE
-            WHEN v.broken IS TRUE THEN 'OPEN'::character varying(12)
-            WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
             WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
-            ELSE NULL::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'ACTIVE'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
         END AS status,
     n.cat_dint,
     inp_valve.custom_dint,
@@ -2743,6 +2739,26 @@ AS SELECT n.node_id,
      JOIN inp_valve USING (node_id)
      JOIN man_valve v USING (node_id)
   WHERE n.is_operative IS TRUE;
+
+DROP VIEW IF EXISTS ve_inp_dscenario_valve;
+CREATE OR REPLACE VIEW ve_inp_dscenario_valve
+AS SELECT d.dscenario_id,
+    p.node_id,
+    concat(p.node_id, '_n2a') AS nodarc_id,
+    p.valve_type,
+    p.setting,
+    p.curve_id,
+    p.minorloss,
+    p.status,
+    p.add_settings,
+    p.init_quality,
+    p.to_arc,
+    n.the_geom
+   FROM selector_inp_dscenario,
+    ve_node n
+     JOIN inp_dscenario_valve p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = CURRENT_USER AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW ve_inp_shortpipe
 AS SELECT n.node_id,
@@ -2770,6 +2786,22 @@ AS SELECT n.node_id,
      JOIN inp_shortpipe USING (node_id)
      LEFT JOIN man_valve v ON v.node_id = n.node_id
   WHERE n.is_operative IS TRUE;
+
+DROP VIEW IF EXISTS ve_inp_dscenario_shortpipe;
+CREATE OR REPLACE VIEW ve_inp_dscenario_shortpipe
+AS SELECT d.dscenario_id,
+    p.node_id,
+    p.minorloss,
+    p.status,
+    p.bulk_coeff,
+    p.wall_coeff,
+    p.to_arc,
+    n.the_geom
+   FROM selector_inp_dscenario,
+    ve_node n
+     JOIN inp_dscenario_shortpipe p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = CURRENT_USER AND n.is_operative IS TRUE;
 
 
 CREATE OR REPLACE VIEW v_om_mincut_polygon
