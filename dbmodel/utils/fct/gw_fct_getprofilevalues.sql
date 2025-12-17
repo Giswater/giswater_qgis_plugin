@@ -341,13 +341,13 @@ BEGIN
 		-- insert edge values on temp_anl_arc table
 		EXECUTE '
 			INSERT INTO temp_anl_arc (
-				fid, arc_id, b.code, node_1, 
+				fid, arc_id, code, node_1, 
 				node_2, 
 				sys_type, arccat_id, cat_geom1, length, 
 				slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom
 			)
 			SELECT  
-				222, arc_id, code, e.node, 
+				222, arc_id, b.code, e.node, 
 				CASE WHEN e.node = b.node_1 THEN b.node_2
 				ELSE b.node_1
 				END AS node_2,
