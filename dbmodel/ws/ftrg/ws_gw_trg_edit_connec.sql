@@ -91,7 +91,7 @@ BEGIN
 			    = 'plan_psector_current'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		IF NEW.conneccat_id NOT IN (SELECT id FROM cat_connec WHERE connec_type = NEW.connec_type) THEN
+		IF NEW.conneccat_id NOT IN (SELECT id FROM cat_connec WHERE connec_type = NEW.connec_type) AND NEW.connec_type IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	       		"data":{"message":"4464", "function":"1304","parameters":null, "is_process":true}}$$);';
 		END IF;

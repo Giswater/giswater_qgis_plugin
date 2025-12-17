@@ -56,7 +56,7 @@ BEGIN
 	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_current' AND cur_user=current_user);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		IF NEW.arccat_id NOT IN (SELECT id FROM cat_arc WHERE arc_type = NEW.arc_type) THEN
+		IF NEW.arccat_id NOT IN (SELECT id FROM cat_arc WHERE arc_type = NEW.arc_type) AND NEW.arc_type IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	       		"data":{"message":"4464", "function":"1302","parameters":null, "is_process":true}}$$);';
 		END IF;
