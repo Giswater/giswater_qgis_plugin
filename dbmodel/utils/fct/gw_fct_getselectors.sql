@@ -99,10 +99,11 @@ v_mincut_connec json;
 v_mincut_arc json;
 v_exclude_tab text='';
 v_orderby_query text;
-v_orderby_check boolean;
+v_order_by_check boolean;
+v_has_custom_order_by boolean;
 v_project_type text;
 v_tabnetworksignal integer = 0;
-
+v_custom_order_by_column text;
 BEGIN
 
 	-- Set search path to local schema
@@ -252,7 +253,8 @@ BEGIN
 		v_orderby = v_tab.value::json->>'orderBy';
 		v_name = v_tab.value::json->>'name';
 		v_typeaheadForced = v_tab.value::json->>'typeaheadForced';
-		v_orderby_check = v_tab.value::json->>'orderbyCheck';
+		v_order_by_check = v_tab.value::json->>'orderbyCheck';
+		v_has_custom_order_by = v_tab.value::json->>'hasCustomOrderBy';
 
 		-- profilactic control of v_orderby
 		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
@@ -268,10 +270,21 @@ BEGIN
 			v_selectionMode = 'keepPrevious';
 		END IF;
 
-		-- order by heck. This enables to put checked rows on the top. Useful when there are lots of rows and you need to use the scrollbar to kwow what is checked
-		IF v_orderby_check AND v_tab.tabname != v_currenttab THEN
+		IF v_has_custom_order_by THEN
+			EXECUTE format(
+				'SELECT value::jsonb->''%s''->>''order_by_column'' FROM config_param_user cpu WHERE PARAMETER = ''custom_order_by'' AND (value::jsonb->''%s''->>''is_checked'')::boolean IS TRUE AND cur_user = ''%s''',
+				v_tab.tabname,
+				v_tab.tabname,
+				current_user
+			) INTO v_custom_order_by_column;
+			IF v_custom_order_by_column IS NOT NULL THEN
+				v_orderby_query = 'ORDER BY ' || v_custom_order_by_column || ' DESC, orderby';
+			END IF;
+		ELSIF v_order_by_check THEN
 			v_orderby_query = 'ORDER BY value DESC, orderby';
-		ELSE
+		END IF;
+
+		IF v_orderby_query IS NULL THEN
 			v_orderby_query = 'ORDER BY orderby';
 		END IF;
 
