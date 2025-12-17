@@ -303,6 +303,29 @@ BEGIN
 				END LOOP;
 			END IF;
 
+			IF NEW.top_elev IS NOT NULL AND (OLD.top_elev IS DISTINCT FROM NEW.top_elev) THEN
+				-- user variable is elev
+				IF v_node_topelev_autoupdate = 0 THEN
+					IF NEW.ymax IS NOT NULL THEN
+						-- recalculate elev
+						NEW.elev := NEW.top_elev - NEW.ymax;
+					ELSIF NEW.elev IS NOT NULL THEN
+						-- recalculate ymax
+						NEW.ymax := NEW.top_elev - NEW.elev;
+					END IF;
+				-- user variable is ymax
+				ELSIF v_node_topelev_autoupdate = 1 THEN
+					IF NEW.elev IS NOT NULL THEN
+						-- recalculate ymax
+						NEW.ymax := NEW.top_elev - NEW.elev;
+					ELSIF NEW.ymax IS NOT NULL THEN
+						-- recalculate elev
+						NEW.elev := NEW.top_elev - NEW.ymax;
+					END IF;
+				END IF;
+				update node set ymax = new.ymax, elev = new.elev where node_id = new.node_id;
+			END IF;
+
 		ELSIF TG_OP ='UPDATE' THEN
 
 			-- Updating polygon geometry in case of exists it
