@@ -10,3 +10,4 @@ ALTER TABLE node ADD CONSTRAINT node_sys_code_unique UNIQUE (sys_code);
 ALTER TABLE arc ADD CONSTRAINT arc_sys_code_unique UNIQUE (sys_code);
 ALTER TABLE connec ADD CONSTRAINT connec_sys_code_unique UNIQUE (sys_code);
 ALTER TABLE "element" ADD CONSTRAINT element_sys_code_unique UNIQUE (sys_code);
+ALTER TABLE link ADD CONSTRAINT link_sys_code_unique UNIQUE (sys_code);
