@@ -8,6 +8,15 @@ version=4.6.0
 author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Lia Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez, Nico Pérez, Pablo Marques, Arnau Torret, Namrata Karki, Arnau Urgeles, Oscar Pueyo
 
 Changelog=Version 4.6.0
+    - Improve translations and split files using DB i18n tables
+    - Add new check logic in selector to filter by user configuration
+    - Create new function to retrieve user configuration for currency values (type, separator, and whether to show decimals)
+    - Make composer check more restrictive; now it takes into account more conditions before enabling and advising the user
+    - Create new global function to retrieve IDs for new features without using nextval (psector and mincut)
+    - Refactor plugin to support Qt6 while maintaining compatibility with Qt5
+    - Add AM layers to the Add Giswater Layer button, including predefined styles
+    - Standardize internal structures to comply with the GeoJSON specification
+    - Improve dimensioning feature to support more feature types
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
