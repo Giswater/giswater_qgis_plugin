@@ -20,7 +20,7 @@ SELECT has_table('cat_pavement'::name, 'Table cat_pavement should exist');
 SELECT columns_are(
     'cat_pavement',
     ARRAY[
-        'id', 'descript', 'link', 'thickness', 'm2_cost', 'active'
+        'id', 'code', 'descript', 'link', 'thickness', 'm2_cost', 'active'
     ],
     'Table cat_pavement should have the correct columns'
 );
@@ -35,6 +35,7 @@ SELECT col_type_is('cat_pavement', 'link', 'character varying(512)', 'Column lin
 SELECT col_type_is('cat_pavement', 'thickness', 'numeric(12,2)', 'Column thickness should be numeric(12,2)');
 SELECT col_type_is('cat_pavement', 'm2_cost', 'character varying(16)', 'Column m2_cost should be varchar(16)');
 SELECT col_type_is('cat_pavement', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('cat_pavement', 'code', 'text', 'Column code should be text');
 
 -- Check foreign keys
 SELECT has_fk('cat_pavement', 'Table cat_pavement should have foreign keys');

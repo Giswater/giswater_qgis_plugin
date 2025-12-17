@@ -20,7 +20,7 @@ SELECT has_table('cat_soil'::name, 'Table cat_soil should exist');
 SELECT columns_are(
     'cat_soil',
     ARRAY[
-        'id', 'descript', 'link', 'y_param', 'b', 'trenchlining', 'm3exc_cost', 'm3fill_cost', 'm3excess_cost', 'm2trenchl_cost', 'active'
+        'id', 'code', 'descript', 'link', 'y_param', 'b', 'trenchlining', 'm3exc_cost', 'm3fill_cost', 'm3excess_cost', 'm2trenchl_cost', 'active'
     ],
     'Table cat_soil should have the correct columns'
 );
@@ -40,6 +40,7 @@ SELECT col_type_is('cat_soil', 'm3fill_cost', 'character varying(16)', 'Column m
 SELECT col_type_is('cat_soil', 'm3excess_cost', 'character varying(16)', 'Column m3excess_cost should be varchar(16)');
 SELECT col_type_is('cat_soil', 'm2trenchl_cost', 'character varying(16)', 'Column m2trenchl_cost should be varchar(16)');
 SELECT col_type_is('cat_soil', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('cat_soil', 'code', 'text', 'Column code should be text');
 
 -- Check foreign keys
 SELECT has_fk('cat_soil', 'Table cat_soil should have foreign keys');

@@ -20,7 +20,7 @@ SELECT has_table('cat_node'::name, 'Table cat_node should exist');
 SELECT columns_are(
     'cat_node',
     ARRAY[
-        'id', 'node_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'shape', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'estimated_depth', 'cost_unit', 'cost', 'active', 'label', 'ischange', 'acoeff'
+        'id', 'code', 'node_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'shape', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'estimated_depth', 'cost_unit', 'cost', 'active', 'label', 'ischange', 'acoeff'
     ],
     'Table cat_node should have the correct columns'
 );
@@ -49,6 +49,7 @@ SELECT col_type_is('cat_node', 'active', 'boolean', 'Column active should be boo
 SELECT col_type_is('cat_node', 'label', 'character varying(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_node', 'ischange', 'smallint', 'Column ischange should be smallint');
 SELECT col_type_is('cat_node', 'acoeff', 'double precision', 'Column acoeff should be double precision');
+SELECT col_type_is('cat_node', 'code', 'double precision', 'Column code should be double text');
 
 -- Check foreign keys
 SELECT has_fk('cat_node', 'Table cat_node should have foreign keys');

@@ -20,7 +20,7 @@ SELECT has_table('cat_arc'::name, 'Table cat_arc should exist');
 SELECT columns_are(
     'cat_arc',
     ARRAY[
-        'id', 'arc_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'z1', 'z2', 'width', 'area', 'estimated_depth', 'thickness', 'cost_unit', 'cost', 'm2bottom_cost', 'm3protec_cost', 'active', 'label', 'shape', 'acoeff', 'connect_cost', 'dr'
+        'id', 'code', 'arc_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'z1', 'z2', 'width', 'area', 'estimated_depth', 'thickness', 'cost_unit', 'cost', 'm2bottom_cost', 'm3protec_cost', 'active', 'label', 'shape', 'acoeff', 'connect_cost', 'dr'
     ],
     'Table cat_arc should have the correct columns'
 );
@@ -57,6 +57,7 @@ SELECT col_type_is('cat_arc', 'shape', 'character varying(30)', 'Column shape sh
 SELECT col_type_is('cat_arc', 'acoeff', 'double precision', 'Column acoeff should be double precision');
 SELECT col_type_is('cat_arc', 'connect_cost', 'text', 'Column connect_cost should be text');
 SELECT col_type_is('cat_arc', 'dr', 'integer', 'Column dr should be integer');
+SELECT col_type_is('cat_arc', 'code', 'text', 'Column dr should be text');
 
 -- Check foreign keys
 SELECT has_fk('cat_arc', 'Table cat_arc should have foreign keys');
