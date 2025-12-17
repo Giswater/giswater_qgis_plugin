@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>501</width>
     <height>573</height>
    </rect>
   </property>
@@ -106,9 +106,19 @@
       <item>
        <widget class="QCheckBox" name="chk_relative_langs">
         <property name="text">
-         <string>Use transaltions from similar languages</string>
+         <string>Enable fallback to similar locales. </string>
         </property>
         <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>If a translation is missing in the specific target dialect (e.g., es_ES), the system searches other regional variants (e.g., es_CR, es_AR). If a match is found, that translation is applied.</string>
+        </property>
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
