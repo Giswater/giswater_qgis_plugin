@@ -584,9 +584,9 @@ class GwI18NGenerator:
             order_by.extend(['source_code', 'project_type', 'context', 'typevalue', 'source', 'id'])
 
         elif table == 'dbconfig_form_tableview':
-            columns = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
+            columns = ["source", "columnname", "project_type", "context", "al_en_us"]
             lang_columns = self._generate_lang_columns(table, ['al'])
-            order_by.extend(['source_code', 'project_type', 'context', 'columnname', 'location_type', 'source', 'id'])
+            order_by.extend(['source_code', 'project_type', 'context', 'columnname', 'source', 'id'])
 
         elif table == 'dbjson':
             columns = ["source", "project_type", "context", "hint", "text", "lb_en_us"]

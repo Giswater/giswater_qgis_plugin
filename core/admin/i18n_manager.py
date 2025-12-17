@@ -490,8 +490,8 @@ class GwSchemaI18NManager:
             columns_org = ["typevalue", "id", "idval", "descript"]
 
         elif 'dbconfig_form_tableview' in table_i18n:
-            columns_i18n = ["location_type", "columnname", "source", "al_en_us"]
-            columns_org = ["location_type", "columnname", "objectname", "alias"]
+            columns_i18n = ["columnname", "source", "al_en_us"]
+            columns_org = ["columnname", "objectname", "alias"]
 
         elif 'dbtable' in table_i18n:
             columns_i18n = ["source", "ds_en_us", "al_en_us"]
@@ -1876,7 +1876,6 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbconfig_visit_parameter",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbstyle"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "ud": {
@@ -1885,7 +1884,6 @@ class GwSchemaI18NManager:
                     "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbconfig_visit_parameter",
                     "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "dblabel", "dbplan_price", "dbjson",
                     "dbconfig_form_fields_json"],
-                "dbtables": ["dbstyle"],
                 "sutables": ["su_basic_tables", "su_feature"]
             },
             "am": {

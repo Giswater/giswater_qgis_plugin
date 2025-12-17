@@ -313,7 +313,7 @@ class GwSchemaI18NUpdate:
                             f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         elif 'dbconfig_form_tableview' in table:
-            columns = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
+            columns = ["source", "columnname", "project_type", "context", "al_en_us"]
             lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}"]
 
         elif 'dbjson' in table:
