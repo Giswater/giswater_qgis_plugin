@@ -19,6 +19,9 @@ $BODY$
 DECLARE
 	v_result json;
 	v_version text;
+	v_errcontext text;
+	v_msgerr json;
+
 BEGIN
 	SET search_path= 'SCHEMA_NAME','public';		
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;

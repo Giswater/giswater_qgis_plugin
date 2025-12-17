@@ -383,6 +383,7 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadForced', v_typeaheadForced::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'hasCustomOrderBy', v_has_custom_order_by::TEXT);
 
 		-- Create tabs array
 		IF v_firsttab THEN
@@ -510,6 +511,7 @@ BEGIN
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);
+	v_has_custom_order_by := COALESCE(v_has_custom_order_by, FALSE);
 	v_selectionMode = COALESCE(v_selectionMode, '');
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
