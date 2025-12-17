@@ -2946,6 +2946,7 @@ def make_list_multiple_option(completer, model, widget, field, list_widget):
         sorted(display_list, key=lambda x: x["idval"])
     )
 
+
 def get_sequence_next_preview(seq_name: str, schema: str = None) -> int:
     """
     Returns a NON-reserving preview of the next sequence value.
