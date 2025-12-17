@@ -546,3 +546,7 @@ INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layo
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3526, 'gw_fct_set_selector_tab_custom_order_by_value', 'utils', 'function', 'json', 'json', 'Function to set custom order by value for selectors.', NULL, NULL, 'core', NULL);
+
+UPDATE config_param_system
+    SET value = jsonb_set(value::jsonb, '{hasCustomOrderBy}', 'true'::jsonb, true)
+    WHERE "parameter" = 'basic_selector_tab_psector';
