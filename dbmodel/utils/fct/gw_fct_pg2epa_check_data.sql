@@ -53,6 +53,21 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPA"}}}$$)';
 	END IF;
 
+    -- [MODIFICACIÓN 1] Insertar cabeceras y separadores para ordenar la salida (Estilo O&M)
+    IF v_fid = 225 THEN
+       
+        -- Critical Errors (Criticity 3)
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'","criticity":"3", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"1004", "separator_id":"2022"}}$$)';
+
+        -- Warnings (Criticity 2)
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'", "criticity":"2", "tempTable":"t_","is_process":true, "separator_id":"2000"}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'","criticity":"2", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"3002", "separator_id":"2014"}}$$)';
+
+        -- Info (Criticity 1)
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'", "criticity":"1", "tempTable":"t_", "is_process":true, "separator_id":"2000"}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'","criticity":"1", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"3001", "separator_id":"2007"}}$$)';
+    END IF;
+
 	-- getting sys_fprocess to be executed
 	v_querytext = '
 		SELECT * FROM sys_fprocess 
