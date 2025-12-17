@@ -20,7 +20,7 @@ SELECT has_table('cat_soil'::name, 'Table cat_soil should exist');
 SELECT columns_are(
     'cat_soil',
     ARRAY[
-        'id', 'descript', 'link', 'y_param', 'b', 'trenchlining', 'm3exc_cost', 'm3fill_cost', 'm3excess_cost', 'm2trenchl_cost',
+        'id', 'code', 'descript', 'link', 'y_param', 'b', 'trenchlining', 'm3exc_cost', 'm3fill_cost', 'm3excess_cost', 'm2trenchl_cost',
         'active'
     ],
     'Table cat_soil should have the correct columns'
@@ -41,6 +41,7 @@ SELECT col_type_is('cat_soil', 'm3fill_cost', 'varchar(16)', 'Column m3fill_cost
 SELECT col_type_is('cat_soil', 'm3excess_cost', 'varchar(16)', 'Column m3excess_cost should be varchar(16)');
 SELECT col_type_is('cat_soil', 'm2trenchl_cost', 'varchar(16)', 'Column m2trenchl_cost should be varchar(16)');
 SELECT col_type_is('cat_soil', 'active', 'bool', 'Column active should be bool');
+SELECT col_type_is('cat_soil', 'code', 'text', 'Column code should be text');
 
 -- Check default values
 SELECT col_has_default('cat_soil', 'active', 'Column active should have default value');

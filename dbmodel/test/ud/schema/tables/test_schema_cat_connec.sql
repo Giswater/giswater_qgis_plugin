@@ -22,7 +22,7 @@ SELECT has_table('cat_connec'::name, 'Table cat_connec should exist');
 SELECT columns_are(
     'cat_connec',
     ARRAY[
-       'id', 'connec_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'geom4', 'geom_r', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'active', 'label', 'estimated_depth'
+       'id', 'code', 'connec_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'geom4', 'geom_r', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'active', 'label', 'estimated_depth'
     ],
     'Table cat_connec should have the correct columns'
 );
@@ -44,6 +44,7 @@ SELECT col_type_is('cat_connec', 'svg', 'varchar(50)', 'Column svg should be var
 SELECT col_type_is('cat_connec', 'active', 'bool', 'Column active should be bool');
 SELECT col_type_is('cat_connec', 'label', 'varchar(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_connec', 'estimated_depth', 'numeric(12, 3)', 'Column estimated_depth should be numeric(12, 3)');
+SELECT col_type_is('cat_connec', 'code', 'text', 'Column code should be text');
 
 
 

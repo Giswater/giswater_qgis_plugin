@@ -20,7 +20,7 @@ SELECT has_table('cat_element'::name, 'Table cat_element should exist');
 SELECT columns_are(
     'cat_element',
     ARRAY[
-        'id', 'element_type', 'matcat_id', 'geometry', 'descript', 'link', 'brand', 'type', 
+        'id', 'code', 'element_type', 'matcat_id', 'geometry', 'descript', 'link', 'brand', 'type', 
         'model', 'svg', 'active', 'geom1', 'geom2', 'isdoublegeom'
     ],
     'Table cat_element should have the correct columns'
@@ -45,6 +45,7 @@ SELECT col_type_is('cat_element', 'active', 'bool', 'Column active should be boo
 SELECT col_type_is('cat_element', 'geom1', 'numeric(12,3)', 'Column geom1 should be numeric(12,3)');
 SELECT col_type_is('cat_element', 'geom2', 'numeric(12,3)', 'Column geom2 should be numeric(12,3)');
 SELECT col_type_is('cat_element', 'isdoublegeom', 'bool', 'Column isdoublegeom should be bool');
+SELECT col_type_is('cat_element', 'code', 'text', 'Column code should be text');
 
 -- Check default values
 SELECT col_has_default('cat_element', 'active', 'Column active should have default value');

@@ -19,7 +19,7 @@ SELECT has_table('cat_arc'::name, 'Table cat_arc should exist');
 -- Check columns
 SELECT columns_are(
     'cat_arc',
-    ARRAY['id','arc_type','matcat_id','shape','geom1','geom2','geom3','geom4','geom5','geom6',
+    ARRAY['id', 'code', 'arc_type','matcat_id','shape','geom1','geom2','geom3','geom4','geom5','geom6',
         'geom7','geom8','geom_r','descript','link','brand_id','model_id','svg','z1','z2','width','area',
         'estimated_depth','thickness','cost_unit','cost','m2bottom_cost','m3protec_cost','active','label',
         'tsect_id','curve_id','acoeff','connect_cost','visitability_vdef'
@@ -68,6 +68,7 @@ SELECT col_type_is('cat_arc', 'curve_id', 'varchar(16)', 'Column curve_id should
 SELECT col_type_is('cat_arc', 'acoeff', 'float8', 'Column acoeff should be float8');
 SELECT col_type_is('cat_arc', 'connect_cost', 'text', 'Column connect_cost should be text');
 SELECT col_type_is('cat_arc', 'visitability_vdef', 'int4', 'Column visitability_vdef should be int4');
+SELECT col_type_is('cat_arc', 'code', 'text', 'Column code should be text');
 
 -- Check default values
 SELECT col_has_default('cat_arc', 'geom2', 'Column geom2 should have default value');

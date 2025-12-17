@@ -49,7 +49,7 @@ SELECT col_type_is('cat_node', 'active', 'boolean', 'Column active should be boo
 SELECT col_type_is('cat_node', 'label', 'character varying(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_node', 'ischange', 'smallint', 'Column ischange should be smallint');
 SELECT col_type_is('cat_node', 'acoeff', 'double precision', 'Column acoeff should be double precision');
-SELECT col_type_is('cat_node', 'code', 'double precision', 'Column code should be double text');
+SELECT col_type_is('cat_node', 'code', 'text', 'Column code should be double text');
 
 -- Check foreign keys
 SELECT has_fk('cat_node', 'Table cat_node should have foreign keys');

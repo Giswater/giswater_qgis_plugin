@@ -22,7 +22,7 @@ SELECT has_table('cat_link'::name, 'Table cat_link should exist');
 SELECT columns_are(
     'cat_link',
     ARRAY[
-      'id', 'link_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 
+      'id', 'code', 'link_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 
       'brand_id', 'model_id', 'svg', 'z1', 'z2', 'width', 'area', 'estimated_depth', 'thickness', 'cost_unit', 'cost',
        'm2bottom_cost', 'm3protec_cost', 'active', 'label'
     ],
@@ -53,6 +53,7 @@ SELECT col_type_is('cat_link', 'm2bottom_cost', 'varchar(16)', 'Column m2bottom_
 SELECT col_type_is('cat_link', 'm3protec_cost', 'varchar(16)', 'Column m3protec_cost should be varchar(16)');
 SELECT col_type_is('cat_link', 'active', 'bool', 'Column active should be bool DEFAULT true');
 SELECT col_type_is('cat_link', 'label', 'varchar(255)', 'Column label should be varchar(255)');
+SELECT col_type_is('cat_link', 'code', 'text', 'Column code should be text');
 
 
 

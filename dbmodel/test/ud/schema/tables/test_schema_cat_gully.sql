@@ -20,7 +20,7 @@ SELECT has_table('cat_gully'::name, 'Table cat_gully should exist');
 SELECT columns_are(
     'cat_gully',
     ARRAY[
-        'id', 'gully_type', 'matcat_id', 'length', 'width', 'ymax', 'efficiency', 'descript', 'link', 'brand_id',
+        'id', 'code', 'gully_type', 'matcat_id', 'length', 'width', 'ymax', 'efficiency', 'descript', 'link', 'brand_id',
         'model_id', 'svg', 'label', 'active'
     ],
     'Table cat_gully should have the correct columns'
@@ -44,6 +44,7 @@ SELECT col_type_is('cat_gully', 'model_id', 'varchar(30)', 'Column model_id shou
 SELECT col_type_is('cat_gully', 'svg', 'varchar(50)', 'Column svg should be varchar(50)');
 SELECT col_type_is('cat_gully', 'label', 'varchar(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_gully', 'active', 'bool', 'Column active should be bool');
+SELECT col_type_is('cat_gully', 'code', 'text', 'Column code should be text');
 
 -- Check default values
 SELECT col_has_default('cat_gully', 'length', 'Column length should have default value');

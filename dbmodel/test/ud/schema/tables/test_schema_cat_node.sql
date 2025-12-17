@@ -22,7 +22,7 @@ SELECT has_table('cat_node'::name, 'Table cat_node should exist');
 SELECT columns_are(
     'cat_node',
     ARRAY[
-        'id', 'node_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'descript', 'link', 'brand_id', 'model_id', 'svg', 
+        'id', 'code', 'node_type', 'matcat_id', 'shape', 'geom1', 'geom2', 'geom3', 'descript', 'link', 'brand_id', 'model_id', 'svg', 
         'estimated_y', 'cost_unit', 'cost', 'active', 'label', 'acoeff'
     ],
     'Table cat_node should have the correct columns'
@@ -46,6 +46,7 @@ SELECT col_type_is('cat_node', 'cost', 'varchar(16)', 'Column cost should be var
 SELECT col_type_is('cat_node', 'active', 'bool', 'Column active should be bool DEFAULT true');
 SELECT col_type_is('cat_node', 'label', 'varchar(255)', 'Column label should be varchar(255)');
 SELECT col_type_is('cat_node', 'acoeff', 'float8', 'Column acoeff should be float8');
+SELECT col_type_is('cat_node', 'code', 'text', 'Column code should be text');
 
 
 --check default values
