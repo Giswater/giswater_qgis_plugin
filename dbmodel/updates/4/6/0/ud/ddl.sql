@@ -314,3 +314,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"pattern_id", "dataType":"varchar(16)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"avg_press", "dataType":"numeric(12,2)"}}$$);
 ALTER TABLE dma ADD CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_gully", "column":"code", "dataType":"text", "isUtils":"False"}}$$);

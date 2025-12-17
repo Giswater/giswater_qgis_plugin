@@ -66,3 +66,11 @@ ALTER TABLE macroomzone ALTER COLUMN descript TYPE varchar(255);
 ALTER TABLE dma ALTER COLUMN code TYPE varchar(100);
 ALTER TABLE dma ALTER COLUMN name TYPE varchar(100);
 ALTER TABLE dma ALTER COLUMN descript TYPE varchar(255);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_arc", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_node", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_connec", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_link", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_element", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_pavement", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_soil", "column":"code", "dataType":"text", "isUtils":"False"}}$$);
