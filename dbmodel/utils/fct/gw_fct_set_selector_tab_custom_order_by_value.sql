@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 
 
---FUNCTION CODE: 3524
+--FUNCTION CODE: 3526
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_selector_tab_custom_order_by_value(p_tabname text, p_value boolean)
   RETURNS json AS
