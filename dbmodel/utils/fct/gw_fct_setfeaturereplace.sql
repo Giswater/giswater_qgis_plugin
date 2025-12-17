@@ -411,6 +411,10 @@ BEGIN
 			END IF;
 		END LOOP;
 
+		-- update sys_code to avoid crushing unique cosntraint of sys_code
+		EXECUTE 'UPDATE  '||v_feature_type||' SET sys_code = '||v_feature_type||'_id WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||'';
+
+
 		-- updating values on table man_table from values of old feature
 		IF v_old_featuretype = v_feature_type_new AND (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) THEN
 			v_sql:='select column_name    FROM information_schema.columns 
