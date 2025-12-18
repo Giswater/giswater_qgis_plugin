@@ -2362,7 +2362,6 @@ class GwInfo(QObject):
 
         if widget.property('isfilter'):
             return widget
-        
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
