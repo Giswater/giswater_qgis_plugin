@@ -284,3 +284,7 @@ UPDATE config_toolbox
   }
 ]'::json
 	WHERE id=2768;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3526, 'gw_trg_autoupdate_arc_topology', 'ud', 'trigger', NULL, 'trigger', 'Automatic elevation updates when node data changes', NULL, NULL, 'core', NULL);
+

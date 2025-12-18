@@ -277,3 +277,100 @@ VALUES('inp_dscenario_shortpipe', 'form_feature', 'tab_none', 'to_arc', NULL, 5,
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('inp_dscenario_valve', 'form_feature', 'tab_none', 'to_arc', NULL, 5, 'integer', 'text', 'To arc:', 'To arc:', NULL, false, false, true, false, false, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_fluid', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_fluid', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_category', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_category', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_function', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_function', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_location', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_location', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);

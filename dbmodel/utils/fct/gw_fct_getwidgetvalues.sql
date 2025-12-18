@@ -76,12 +76,8 @@ BEGIN
 
 	-- Return
 	RETURN ('{"ymax":{"min":'||v_min||',"max":'||v_max||'},'||
-	  '"custom_ymax":{"min":'||v_min||',"max":'||v_max||'},'||
 			   '"y1":{"min":'||v_min1||',"max":'||v_max1||'},'||
-		'"custom_y1":{"min":'||v_min1||',"max":'||v_max1||'},'||
-			   '"y2":{"min":'||v_min2||',"max":'||v_max2||'},'||
-		'"custom_y2":{"min":'||v_min2||',"max":'||v_max2||'}}');
-
+			   '"y2":{"min":'||v_min2||',"max":'||v_max2||'}}');
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

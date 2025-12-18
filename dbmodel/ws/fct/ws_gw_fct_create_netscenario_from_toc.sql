@@ -115,7 +115,6 @@ BEGIN
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'Mapzones configuration (graphconfig) related to selected exploitation has been copied to new netscenario.');
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"message":"3768", "function":"3262", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 	END IF;

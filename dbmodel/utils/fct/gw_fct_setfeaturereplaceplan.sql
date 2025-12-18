@@ -139,13 +139,13 @@ BEGIN
 					(arccat_id, arc_type, epa_type, expl_id, sector_id, state, state_type,  dma_id, soilcat_id,
 					function_type, category_type, fluid_type, location_type, workcat_id_plan, ownercat_id, the_geom,
 					muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
-					label_x,label_y,label_rotation, inventory, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2,
+					label_x,label_y,label_rotation, inventory, y1, y2, elev1, elev2, custom_elev1, custom_elev2,
 					matcat_id, inverted_slope)
 					VALUES
 					(v_catalog, v_arc_type, rec.epa_type, rec.expl_id, rec.sector_id, 2, rec.state_type, rec.dma_id, rec.soilcat_id,
 					rec.function_type, rec.category_type, rec.fluid_type, rec.location_type, rec.workcat_id_plan, rec.ownercat_id, rec.the_geom,
 					rec.muni_id, rec.postcode, rec.district_id, rec.postnumber, rec.postcomplement, rec.postnumber2, rec.postcomplement2,
-					rec.label_x, rec.label_y, rec.label_rotation, false, rec.y1, rec.y2, rec.custom_y1, rec.custom_y2,
+					rec.label_x, rec.label_y, rec.label_rotation, false, rec.y1, rec.y2,
 					rec.elev1, rec.elev2, rec.custom_elev1, rec.custom_elev2, rec.matcat_id, rec.inverted_slope)
 					RETURNING arc_id INTO v_arc;
 				END IF;
