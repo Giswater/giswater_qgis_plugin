@@ -1427,6 +1427,11 @@ def load_layer_in_hidden_group(layer_name):
             tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True)
             return layer
 
+    # Select the layer called 've_node'
+    layer = tools_qgis.get_layer_by_tablename('ve_node')
+    if layer:
+        global_vars.iface.setActiveLayer(layer)
+
     return tools_qgis.get_layer_by_tablename(layer_name)
 
 
