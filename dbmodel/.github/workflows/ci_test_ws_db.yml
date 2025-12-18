@@ -2,9 +2,9 @@ name: CI Test WS database
 
 on:
   push:
-    branches: [dev, master, release/**, feature/**]
+    branches: [main, release/**, feature/**]
   pull_request:
-    branches: [dev, master, release/**, feature/**]
+    branches: [main, release/**, feature/**]
   workflow_dispatch:
     inputs:
       tests:
