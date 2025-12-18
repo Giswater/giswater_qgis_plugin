@@ -7,3 +7,6 @@
 - feat(ud, link): rename column expl_id2 to _expl_id2, drop on sample
 - refactor(ud): improve topology columns and logic
 - perf(views): improve ve_* views, remove unecessaty union all
+- perf(profile): improve getprofilevalues, linkexitgenerator functions
+- feat(catalog): restrict catalog only for its feature_type
+- feat(selector): add option to customize selector order
