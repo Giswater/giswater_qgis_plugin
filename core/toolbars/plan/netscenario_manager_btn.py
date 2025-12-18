@@ -336,8 +336,10 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Get selected netscenario id
         index = self.tbl_netscenario.selectionModel().currentIndex()
-        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_id')
-        value = index.sibling(index.row(), col_idx).data()
+        netscenario_col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_id')
+        exploitation_col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'expl_id')
+        netscenario_value = index.sibling(index.row(), netscenario_col_idx).data()
+        exploitation_value = index.sibling(index.row(), exploitation_col_idx).data()
 
         # Execute toolbox function
         connect = [
@@ -347,8 +349,10 @@ class GwNetscenarioManagerButton(GwAction):
         ]
         dlg_functions = self._open_toolbox_function(3256, connect=connect)
         # Set netscenario_id in combo netscenario
-        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{value}", 0)
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{netscenario_value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'netscenario', False)
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'exploitation'), f"{exploitation_value}", 0)
+        tools_qt.set_widget_enabled(dlg_functions, 'exploitation', False)
 
     def _delete_selected_netscenario(self):
         """ Deletes the selected netscenario """
