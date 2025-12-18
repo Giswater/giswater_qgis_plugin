@@ -1,7 +1,7 @@
 4.6.0
 *************
-- refactor(netscenario): rename expl_id2 to expl_id and convert to _int4 array
-- feat(netscenario): add muni_id and sector_id columns as _int4 arrays
+- refactor(netscenario_dma, netscenario_presszone): rename expl_id2 to expl_id and convert to _int4 array
+- feat(netscenario_dma, netscenario_presszone): add muni_id and sector_id columns as _int4 arrays
 - feat(netscenario): add commitChanges and fromZero widgets to the dialog
 - feat(mincut): add modification_user and change modification_date. Update them for any change made on the key fields of om_mincut
 - feat(ud, link): rename column expl_id2 to _expl_id2, drop on sample
