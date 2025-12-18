@@ -10,3 +10,4 @@
 - perf(profile): improve getprofilevalues, linkexitgenerator functions
 - feat(catalog): restrict catalog only for its feature_type
 - feat(selector): add option to customize selector order
+- feat(mincut): add all dialog widgets as input parameters

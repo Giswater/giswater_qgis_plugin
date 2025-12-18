@@ -230,10 +230,10 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT vn.node_id INTO v_valve_node_id 
-		FROM ve_node vn 
-		JOIN cat_feature_node cfn ON vn.node_type = cfn.id 
-		WHERE ST_DWithin(vn.the_geom, v_point,v_sensibility) 
+		SELECT vn.node_id INTO v_valve_node_id
+		FROM ve_node vn
+		JOIN cat_feature_node cfn ON vn.node_type = cfn.id
+		WHERE ST_DWithin(vn.the_geom, v_point,v_sensibility)
 		AND 'MINSECTOR' = ANY(cfn.graph_delimiter) LIMIT 1;
 	END IF;
 
@@ -300,7 +300,7 @@ BEGIN
 			), 0);
 		', v_arc_id)
 		INTO v_node;
-	END IF;	
+	END IF;
 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
@@ -331,15 +331,22 @@ BEGIN
 			END LOOP;
 			p_data = jsonb_set(p_data::jsonb, '{data,mincutId}', to_jsonb(v_mincut_id))::json;
 
+			-- Build dynamic UPDATE with only passed parameters
 			v_query_text := format(
-				'UPDATE om_mincut SET mincut_class = %s, anl_the_geom = %L, anl_user = %L, anl_feature_type = %L, anl_feature_id = %s WHERE id = %s',
+				'UPDATE om_mincut SET mincut_class = %s, anl_the_geom = %L, anl_user = %L, anl_feature_type = %L, anl_feature_id = %s',
 				v_mincut_network_class,
 				ST_SetSRID(ST_Point(v_xcoord, v_ycoord), v_client_epsg),
 				v_cur_user,
 				'ARC',
-				v_arc_id,
-				v_mincut_id
+				v_arc_id
 			);
+			IF p_data->'data' ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
+			IF p_data->'data' ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
+			IF p_data->'data' ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
+			IF p_data->'data' ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
+			IF p_data->'data' ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
+			IF p_data->'data' ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
+			v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 			EXECUTE v_query_text;
 		END IF;
 
@@ -423,6 +430,16 @@ BEGIN
 			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) IN (v_mincut_plannified_state, v_mincut_on_planning_state) THEN
 				UPDATE om_mincut SET mincut_state = 1 WHERE id = v_mincut_id;
 			END IF;
+			-- Update planning fields if passed
+			v_query_text := 'UPDATE om_mincut SET id = id';
+			IF p_data->'data' ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
+			IF p_data->'data' ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
+			IF p_data->'data' ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
+			IF p_data->'data' ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
+			IF p_data->'data' ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
+			IF p_data->'data' ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
+			v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
+			EXECUTE v_query_text;
 		END IF;
 
 		IF (SELECT json_extract_path_text(value::json, 'redoOnStart','status')::boolean FROM config_param_system WHERE parameter='om_mincut_settings') is true THEN
@@ -461,11 +478,48 @@ BEGIN
 			IF v_action = 'mincutAccept' THEN
 				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
 				EXECUTE v_querytext;
+				-- Update planning fields if mincutAccept and state = 0 (plannified)
+				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_plannified_state THEN
+					v_query_text := 'UPDATE om_mincut SET id = id';
+					IF p_data->'data' ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
+					IF p_data->'data' ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
+					IF p_data->'data' ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
+					IF p_data->'data' ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
+					IF p_data->'data' ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
+					IF p_data->'data' ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
+					v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
+					EXECUTE v_query_text;
+				-- Update execution fields if mincutAccept and state = 1 (in progress)
+				ELSIF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_in_progress_state THEN
+					v_query_text := 'UPDATE om_mincut SET id = id';
+					IF p_data->'data' ? 'execStart' THEN v_query_text := concat(v_query_text, ', exec_start = ', quote_nullable(v_exec_start)); END IF;
+					IF p_data->'data' ? 'execEnd' THEN v_query_text := concat(v_query_text, ', exec_end = ', quote_nullable(v_exec_end)); END IF;
+					IF p_data->'data' ? 'execDescript' THEN v_query_text := concat(v_query_text, ', exec_descript = ', quote_nullable(v_exec_descript)); END IF;
+					IF p_data->'data' ? 'execUser' THEN v_query_text := concat(v_query_text, ', exec_user = ', quote_nullable(v_exec_user)); END IF;
+					IF p_data->'data' ? 'execFromPlot' THEN v_query_text := concat(v_query_text, ', exec_from_plot = ', quote_nullable(v_exec_from_plot)); END IF;
+					IF p_data->'data' ? 'execDepth' THEN v_query_text := concat(v_query_text, ', exec_depth = ', quote_nullable(v_exec_depth)); END IF;
+					IF p_data->'data' ? 'execAppropiate' THEN v_query_text := concat(v_query_text, ', exec_appropiate = ', quote_nullable(v_exec_appropiate)); END IF;
+					IF p_data->'data' ? 'execTheGeom' THEN v_query_text := concat(v_query_text, ', exec_the_geom = ', quote_nullable(v_exec_the_geom)); END IF;
+					v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
+					EXECUTE v_query_text;
+				END IF;
 				IF (select mincut_state from om_mincut where id = v_mincut_id) = v_mincut_on_planning_state THEN
 					UPDATE om_mincut SET mincut_state = v_mincut_plannified_state WHERE id = v_mincut_id;
 				END IF;
 			ELSIF v_action = 'mincutEnd' THEN
+				-- Update execution fields for mincutEnd
 				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_in_progress_state THEN
+					v_query_text := 'UPDATE om_mincut SET id = id';
+					IF p_data->'data' ? 'execStart' THEN v_query_text := concat(v_query_text, ', exec_start = ', quote_nullable(v_exec_start)); END IF;
+					IF p_data->'data' ? 'execEnd' THEN v_query_text := concat(v_query_text, ', exec_end = ', quote_nullable(v_exec_end)); END IF;
+					IF p_data->'data' ? 'execDescript' THEN v_query_text := concat(v_query_text, ', exec_descript = ', quote_nullable(v_exec_descript)); END IF;
+					IF p_data->'data' ? 'execUser' THEN v_query_text := concat(v_query_text, ', exec_user = ', quote_nullable(v_exec_user)); END IF;
+					IF p_data->'data' ? 'execFromPlot' THEN v_query_text := concat(v_query_text, ', exec_from_plot = ', quote_nullable(v_exec_from_plot)); END IF;
+					IF p_data->'data' ? 'execDepth' THEN v_query_text := concat(v_query_text, ', exec_depth = ', quote_nullable(v_exec_depth)); END IF;
+					IF p_data->'data' ? 'execAppropiate' THEN v_query_text := concat(v_query_text, ', exec_appropiate = ', quote_nullable(v_exec_appropiate)); END IF;
+					IF p_data->'data' ? 'execTheGeom' THEN v_query_text := concat(v_query_text, ', exec_the_geom = ', quote_nullable(v_exec_the_geom)); END IF;
+					v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
+					EXECUTE v_query_text;
 					UPDATE om_mincut SET mincut_state = v_mincut_finished_state WHERE id = v_mincut_id;
 				END IF;
 			END IF;
@@ -704,7 +758,7 @@ BEGIN
 	IF v_init_mincut THEN
 		-- Initialize process
 		-- =======================
-		
+
 		v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'mapzone_name', 'MINCUT',
