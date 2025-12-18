@@ -1872,6 +1872,7 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             widget = set_widget_size(widget, field)
             widget = set_data_type(field, widget)
             widget = set_typeahead(field, dialog, widget, completer)
+            #widget.setProperty('widgetname', (field['widgetname']+'lineedit'))
 
             # Create filtered value relation widget
             kwargs = {"dialog": dialog, "field": field}
@@ -1885,7 +1886,10 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             label.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         if 'ismandatory' in field and widget is not None:
-            widget.setProperty('ismandatory', field['ismandatory'])
+            if field['widgettype'] == 'multiple_option':
+                widget.findChild(QListWidget).setProperty('ismandatory', field['ismandatory'])
+            else:
+                widget.setProperty('ismandatory', field['ismandatory'])
 
         # Gestió de posicions millorada - mantenir la lògica original però amb millores
         if 'layoutorder' in field and field['layoutorder'] is not None:
@@ -2356,7 +2360,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
                 value.append(v)
     elif isinstance(widget, QWidget):
         # Handle filtered value relation widgets
-        if widget.objectName() == 'multiple_option':
+        if widget.property('widgettype') == 'multiple_option':
             # Get the list widget child that contains the actual values
             widget = widget.findChild(QListWidget)
 
@@ -2853,6 +2857,7 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
     """
     # Create list widget to show selected values
     widget = QListWidget()
+    widget.setObjectName(field['widgetname'])
 
     # Setup type-ahead search with completer
     completer = QCompleter()
@@ -2867,7 +2872,6 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
         type_ahead.textChanged.connect(partial(make_list_multiple_option, completer, model, type_ahead, field, widget))
 
     # Set widget properties from field config
-    widget.setObjectName(field['columnname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
@@ -2899,7 +2903,8 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
 
     # Create container widget to hold layout
     container = QWidget()
-    container.setObjectName('multiple_option')
+    container.setObjectName(field['widgetname'])
+    container.setProperty('widgettype', 'multiple_option')
     container.setLayout(layout)
 
     return container

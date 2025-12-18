@@ -12,7 +12,7 @@ from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QDateTime
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton, QHeaderView
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton, QHeaderView, QListWidget
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
 
@@ -1433,55 +1433,22 @@ class GwMapzoneManager:
         if not my_json:
             return
 
-        # Change format when expl_id is an array
-        if tablename != 've_macrodma' and tablename != 've_drainzone' and tablename != 've_dwfzone':
-            if 'expl_id' in my_json:
-                expl_id = my_json['expl_id']
-                if expl_id is not None:
-                    expl_id = expl_id.replace('[', '{')
-                    expl_id = expl_id.replace(']', '}')
-                    if not expl_id[0] == '{':
-                        expl_id = '{' + expl_id
-                    if not expl_id[len(expl_id) - 1] == '}':
-                        expl_id = expl_id + '}'
-                    my_json['expl_id'] = expl_id
-
-        # Change format when muni_id is an array
-        if 'muni_id' in my_json:
-            muni_id = my_json['muni_id']
-            if muni_id is not None:
-                muni_id = muni_id.replace('[', '{')
-                muni_id = muni_id.replace(']', '}')
-                if not muni_id[0] == '{':
-                    muni_id = '{' + muni_id
-                if not muni_id[len(muni_id) - 1] == '}':
-                    muni_id = muni_id + '}'
-                my_json['muni_id'] = muni_id
-
-        # Change format when sector_id is an array
-        if tablename != 've_sector':
-            if 'sector_id' in my_json:
-                sector_id = my_json['sector_id']
-                if sector_id is not None:
-                    sector_id = sector_id.replace('[', '{')
-                    sector_id = sector_id.replace(']', '}')
-                    if not sector_id[0] == '{':
-                        sector_id = '{' + sector_id
-                    if not sector_id[len(sector_id) - 1] == '}':
-                        sector_id = sector_id + '}'
-                    my_json['sector_id'] = sector_id
-
         list_mandatory = []
         list_filter = []
 
         for field in complet_result['body']['data']['fields']:
             if field['ismandatory']:
-                widget = dialog.findChild(QWidget, field['widgetname'])
-                if not widget:
+                if field['widgettype'] == 'multiple_option':
+                    widget = dialog.findChild(QWidget, field['widgetname'])
+                    if widget:
+                        widget = widget.findChild(QListWidget, field['widgetname'])
+                else:
+                    widget = dialog.findChild(QWidget, field['widgetname'])
+                if widget is None:
                     continue
                 widget.setStyleSheet(None)
-                value = tools_qt.get_text(dialog, widget)
-                if value in ('null', None, ''):
+                value = tools_qt.get_widget_value(dialog, widget)
+                if value in ('null', None, '', []):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(field['widgetname'])
                 else:

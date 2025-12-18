@@ -764,7 +764,7 @@ class GwInfo(QObject):
         prev_layout = ""
         widget_dict = {'text': 'lineedit', 'typeahead': 'lineedit', 'textarea': 'textarea', 'combo': 'combobox',
                        'check': 'checkbox', 'datetime': 'dateedit', 'hyperlink': 'hyperlink', 'spinbox': 'spinbox',
-                       'doublespinbox': 'spinbox'}
+                       'doublespinbox': 'spinbox', 'multiple_option': 'multiple_option', 'multiple_checkbox': 'multiple_checkbox'}
 
         for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
             orientation = layout_info.get('lytOrientation')
@@ -790,6 +790,8 @@ class GwInfo(QObject):
                 if field['widgettype'] == 'hyperlink':
                     if type(widget) is GwHyperLinkLineEdit:
                         widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
+                elif field['widgettype'] == 'multiple_option':
+                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget.findChild(QListWidget), new_feature)
                 else:
                     widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
 
@@ -2355,6 +2357,13 @@ class GwInfo(QObject):
             # TODO: Make autoupdate widgets work
 
         return widget
+
+    def _set_auto_update_multiple_option(self, field, dialog, widget, new_feature):
+
+        if widget.property('isfilter'):
+            return widget
+        
+
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
