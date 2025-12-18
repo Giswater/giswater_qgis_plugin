@@ -3,14 +3,12 @@ name: 🐍 CI
 on:
   push:
     branches:
-      - 'dev'
-      - 'master'
+      - 'main'
       - 'release/**'
       - 'feature/**'
   pull_request:
     branches:
-      - 'dev'
-      - 'master'
+      - 'main'
       - 'release/**'
       - 'feature/**'
 
