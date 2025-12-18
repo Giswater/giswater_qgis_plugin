@@ -1872,7 +1872,6 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
             widget = set_widget_size(widget, field)
             widget = set_data_type(field, widget)
             widget = set_typeahead(field, dialog, widget, completer)
-            #widget.setProperty('widgetname', (field['widgetname']+'lineedit'))
 
             # Create filtered value relation widget
             kwargs = {"dialog": dialog, "field": field}
