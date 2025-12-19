@@ -203,6 +203,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", 
 -- 16/12/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_shortpipe", "column":"to_arc", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_valve", "column":"to_arc", "dataType":"integer", "isUtils":"False"}}$$);
-
--- 18/12/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"shutoff_required", "dataType":"boolean", "defaultValue":"true", "isUtils":"False"}}$$);
