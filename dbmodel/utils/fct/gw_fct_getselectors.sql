@@ -219,7 +219,7 @@ BEGIN
 		WHERE m.active and m.macrosector_id > 0;
 
 		CREATE TEMP TABLE temp_municipality as
-		select distinct on (muni_id) muni_id, em.name, descript, em.active from ext_municipality em
+		select distinct on (muni_id) em.muni_id, em.name, descript, em.active from ext_municipality em
 		JOIN (SELECT DISTINCT expl_id, muni_id FROM node)n USING (muni_id)
 		JOIN exploitation e ON e.expl_id=n.expl_id
 		JOIN config_user_x_expl c ON c.expl_id=n.expl_id
