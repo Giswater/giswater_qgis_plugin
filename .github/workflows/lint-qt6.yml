@@ -1,0 +1,40 @@
+name: 🎨 Qt6 Linting
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release/**'
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactor/**'
+  pull_request:
+    branches:
+      - 'main'
+      - 'release/**'
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactor/**'
+
+jobs:
+  # Run linting for PyQt6
+  lint-qt6:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker:latest
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dry run lint (log only)
+        run: pyqt5_to_pyqt6.py --dry_run --logfile pyqt6_checker.log ./ 
+
+      - name: Upload log artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyqt6_checker-log
+          path: pyqt6_checker.log
+          retention-days: 3
+
+      - name: Lint and fix
+        run: pyqt5_to_pyqt6.py ./
