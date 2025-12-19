@@ -1243,7 +1243,7 @@ class GwDscenarioManagerButton(GwAction):
                 sql += ", ''"
             sql += ");"
         else:
-            sql = f"INSERT INTO ve_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+            sql = f"INSERT INTO ve_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
