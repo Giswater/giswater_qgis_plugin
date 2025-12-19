@@ -74,8 +74,8 @@ BEGIN
 
 				IF object_rec.colname IN ('arc', 'node') THEN
 
-					EXECUTE 'INSERT INTO t_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
-					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), ve_inp_dscenario_'||object_rec.tabname||'.the_geom 
+					EXECUTE 'INSERT INTO t_'||object_rec.colname||' ('||object_rec.colname||'_id, descript, the_geom) 
+					SELECT '||object_rec.colname||'_id, concat(''Present on '',count(*),'' enabled dscenarios''), ve_inp_dscenario_'||object_rec.tabname||'.the_geom 
 					FROM ve_inp_dscenario_'||object_rec.tabname||' JOIN '||	object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP 
 					BY '||object_rec.colname||'_id, ve_inp_dscenario_'||object_rec.tabname||'.the_geom having count(arc_id) > 1';
 

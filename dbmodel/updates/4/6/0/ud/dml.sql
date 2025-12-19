@@ -282,3 +282,49 @@ UPDATE config_toolbox
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3528, 'gw_trg_autoupdate_arc_topology', 'ud', 'trigger', NULL, 'trigger', 'Automatic elevation updates when node data changes', NULL, NULL, 'core', NULL);
 
+CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom, y1, y2, elev1, elev2, custom_elev1, custom_elev2, state, inverted_slope ON
+arc FOR EACH ROW EXECUTE FUNCTION gw_trg_topocontrol_arc();
+
+CREATE TRIGGER gw_trg_autoupdate_arc_topology BEFORE INSERT OR UPDATE OF node_top_elev_1, node_top_elev_2, node_elev_1, node_elev_2 ON
+arc FOR EACH ROW EXECUTE FUNCTION gw_trg_autoupdate_arc_topology();
+
+-- node_1
+UPDATE arc SET node_top_elev_1 = top_elev
+FROM node WHERE node.node_id = arc.node_1 AND node.top_elev IS NOT NULL;
+
+UPDATE arc SET node_custom_top_elev_1 = custom_top_elev
+FROM node WHERE node.node_id = arc.node_1 AND node.custom_top_elev IS NOT NULL;
+
+UPDATE arc SET node_elev_1 = elev
+FROM node WHERE node.node_id = arc.node_1 AND node.elev IS NOT NULL;
+
+UPDATE arc SET node_custom_elev_1 = custom_elev
+FROM node WHERE node.node_id = arc.node_1 AND node.custom_elev IS NOT NULL;
+
+UPDATE arc SET elev1 = sys_elev1
+WHERE elev1 IS NULL;
+
+-- node_2
+UPDATE arc SET node_top_elev_2 = top_elev
+FROM node WHERE node.node_id = arc.node_2 AND node.top_elev IS NOT NULL;
+
+UPDATE arc SET node_custom_top_elev_2 = custom_top_elev
+FROM node WHERE node.node_id = arc.node_2 AND node.custom_top_elev IS NOT NULL;
+
+UPDATE arc SET node_elev_2 = elev
+FROM node WHERE node.node_id = arc.node_2 AND node.elev IS NOT NULL;
+
+UPDATE arc SET node_custom_elev_2 = custom_elev
+FROM node WHERE node.node_id = arc.node_2 AND node.custom_elev IS NOT NULL;
+
+UPDATE arc SET elev2 = sys_elev2
+WHERE elev2 IS NULL;
+
+-- drop columns
+-- node_1
+ALTER TABLE arc drop column sys_elev1;
+ALTER TABLE arc drop column custom_y1;
+
+-- node_2
+ALTER TABLE arc drop column sys_elev2;
+ALTER TABLE arc drop column custom_y2;

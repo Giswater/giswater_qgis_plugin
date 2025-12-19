@@ -108,12 +108,12 @@ DROP VIEW IF EXISTS v_om_mincut_current_hydrometer;
 -- Add link column to ext_rtc_hydrometer table
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
 
+-- Update code column to id column
+UPDATE ext_rtc_hydrometer SET code = id;
+
 -- Create sequence and add constraint to ext_rtc_hydrometer table
 CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
 ALTER TABLE ext_rtc_hydrometer ADD CONSTRAINT ext_rtc_hydrometer_code_unique UNIQUE (code);
-
--- Update code column to id column
-UPDATE ext_rtc_hydrometer SET code = id;
 
 -- Create constraints to autoupdate the hydrometer_id column
 ALTER TABLE ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -203,3 +203,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", 
 -- 16/12/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_shortpipe", "column":"to_arc", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_valve", "column":"to_arc", "dataType":"integer", "isUtils":"False"}}$$);
+
+-- 18/12/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"shutoff_required", "dataType":"boolean", "defaultValue":"true", "isUtils":"False"}}$$);
