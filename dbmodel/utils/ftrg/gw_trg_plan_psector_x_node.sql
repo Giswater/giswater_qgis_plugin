@@ -30,7 +30,7 @@ BEGIN
     FROM node 
         WHERE node_id = NEW.node_id;
 
-    v_combined_visibility := array_append(v_node_expl_visibility, v_node_expl_id);
+    v_combined_visibility := array_append(COALESCE(v_node_expl_visibility, ARRAY[]::int[]), v_node_expl_id);
 
     -- Do not allow to insert features with expl different from psector expl
     IF v_plan_psector_expl_id <> ALL(v_combined_visibility) THEN

@@ -36,7 +36,7 @@ BEGIN
 	SELECT expl_id INTO v_plan_psector_expl_id FROM plan_psector WHERE psector_id=NEW.psector_id;
 	SELECT arc.state, arc.expl_id, arc.expl_visibility INTO v_arc_state, v_arc_expl_id, v_arc_expl_visibility FROM arc WHERE arc_id=NEW.arc_id;
 
-	v_combined_visibility := array_append(v_arc_expl_visibility, v_arc_expl_id);
+	v_combined_visibility := array_append(COALESCE(v_arc_expl_visibility, ARRAY[]::int[]), v_arc_expl_id);
 
 	-- do not allow to insert features with expl diferent from psector expl
 	IF v_plan_psector_expl_id <> ALL(v_combined_visibility) THEN
