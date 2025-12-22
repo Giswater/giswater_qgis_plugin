@@ -1840,6 +1840,7 @@ class GwAdminButton:
         self.postgresql_version = tools_db.get_pg_version()
         self.postgis_version = tools_db.get_postgis_version()
         self.pgrouting_version = tools_db.get_pgrouting_version()
+        tools_db.check_pg_extension('postgis_raster')
         tools_db.check_pg_extension('tablefunc')
         tools_db.check_pg_extension('unaccent')
         tools_db.check_pg_extension('fuzzystrmatch')
