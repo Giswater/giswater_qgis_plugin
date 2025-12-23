@@ -1751,7 +1751,11 @@ BEGIN
 						FROM selector_expl se 
 						WHERE se.expl_id = ANY(s.expl_id) AND se.cur_user = sm.cur_user
 					)
-					ON CONFLICT (sector_id, cur_user) DO NOTHING;
+					AND NOT EXISTS (
+						SELECT 1
+						FROM selector_sector ss
+						WHERE ss.sector_id = s.sector_id AND ss.cur_user = ss.cur_user
+					);
 			END IF;
 
 			-- for DISCONNECTED, mapzone_id is 0, for  CONFLICT mapzone_id is -1
