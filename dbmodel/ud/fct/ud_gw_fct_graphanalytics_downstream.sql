@@ -133,7 +133,7 @@ BEGIN
 				AND a.is_operative = TRUE
 			)
 		SELECT 
-			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
+			a.arc_id AS id, '||v_source||' AS source, '||v_target||' AS target,
 			1 as cost, -1 as reverse_cost
 			FROM arc_selected a
 	';
@@ -162,12 +162,11 @@ BEGIN
 				AND a.initoverflowpath IS DISTINCT FROM TRUE
 				AND EXISTS (
 					SELECT 1 FROM t_anl_node an 
-					WHERE an.fid = '''||v_fid||'''
-					AND an.node_id = a.'||v_source||'::text
+					WHERE an.node_id::int = a.'||v_source||'
 				)
 			)
 		SELECT 
-			a.arc_id::int AS id, '||v_source||'::int AS source, '||v_target||'::int AS target,
+			a.arc_id AS id, '||v_source||' AS source, '||v_target||' AS target,
 			1 as cost, -1 as reverse_cost
 			FROM arc_selected a
 	';
@@ -177,13 +176,13 @@ BEGIN
 		SELECT node
 		FROM pgr_drivingdistance(v_query, v_node, v_distance)
 	) p
-	WHERE n.node_id::int4 = p.node;
+	WHERE n.node_id::int = p.node;
 
 	INSERT INTO t_anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
 	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
 	FROM ve_arc a
-	JOIN t_anl_node n1 ON a.node_1::text = n1.node_id
-	JOIN t_anl_node n2 ON a.node_2::text = n2.node_id;
+	JOIN t_anl_node n1 ON a.node_1 = n1.node_id::int
+	JOIN t_anl_node n2 ON a.node_2 = n2.node_id::int;
 
 	v_result_line := jsonb_build_object(
 		'type', 'FeatureCollection',
@@ -213,16 +212,16 @@ BEGIN
 					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 					'properties', to_jsonb(row) - 'the_geom'
 				) AS feature
-				FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id as feature_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, ST_Transform(the_geom, 4326) as the_geom
+				FROM (SELECT v_context as context, expl_id, node_id::int as feature_id, state, nodecat_id as feature_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, ST_Transform(the_geom, 4326) as the_geom
 				FROM  t_anl_node
 				UNION
-				SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' as feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
-				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
+				SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' as feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
+				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id = a.arc_id::int
 				WHERE c.state > 0
 				AND c.is_operative = TRUE
 				UNION
-				SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' as feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
-				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
+				SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' as feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
+				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id = a.arc_id::int
 				WHERE g.state > 0
 				AND g.is_operative = TRUE) row
 			) features
