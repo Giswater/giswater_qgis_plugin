@@ -74,7 +74,7 @@ DECLARE
 
 
     -- parameters
-    v_pgr_distance INTEGER;
+    v_pgr_distance float;
 
 BEGIN
 
@@ -740,7 +740,7 @@ BEGIN
             SELECT node_id, pgr_node_id FROM temp_pgr_node_minsector WHERE graph_delimiter = ''MINSECTOR''
         ';
 
-        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_minsector;
+        SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_minsector;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
 

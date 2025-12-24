@@ -83,7 +83,7 @@ v_id integer;
 v_version text;
 v_days integer;
 v_querytext text;
-v_pgr_distance integer;
+v_pgr_distance float;
 v_pgr_root_vids int[];
 
 -- mincut details
@@ -944,7 +944,7 @@ BEGIN
 		', v_temp_arc_table, v_mincut_id, v_query_text);
 
 		-- mincut
-		EXECUTE format('SELECT count(*)::int FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
+		EXECUTE format('SELECT count(*)::float FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
 		IF v_mode = 'MINSECTOR' THEN
 			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_pgr_node_id;
 		ELSE

@@ -91,7 +91,7 @@ v_query_text TEXT;
 v_mode TEXT;
 
 -- parameters
-v_pgr_distance INTEGER;
+v_pgr_distance float;
 v_root_vids int[];
 
 -- temporary tables for core
