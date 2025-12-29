@@ -29,6 +29,8 @@ CREATE TABLE cso_inp_system_subc (
 	expl_name text NULL,
 	calib_coeff_runoff numeric NULL,
 	calib_imperv_area numeric NULL,
+	weight_factor NUMERIC NULL,
+	real_demand NUMERIC NULL,
 	CONSTRAINT cso_inp_system_subc_pkey PRIMARY KEY (node_id),
 	CONSTRAINT unique_node_id_drainzone_id UNIQUE (node_id, drainzone_id)
 );
@@ -97,7 +99,6 @@ CREATE TABLE cso_out_vol (
 	rf_volume float4 NULL,
 	vol_residual float4 NULL,
 	vol_max_epi float4 NULL,
-	vol_res_epi float4 NULL,
 	vol_rainfall float4 NULL,
 	vol_total float4 NULL,
 	vol_runoff float4 NULL,
@@ -112,7 +113,32 @@ CREATE TABLE cso_out_vol (
 	efficiency float4 NULL,
 	rf_intensity float4 NULL,
 	lastupdate timestamp NULL,
+	expl_id integer,
 	CONSTRAINT pkey PRIMARY KEY (drainzone_id, rf_name, rf_tstep)
+);
+
+CREATE TABLE cso_inp_weir (
+	node_id varchar(16) NOT NULL,
+	qmax NUMERIC,
+	vmax NUMERIC, 
+	weight_factor NUMERIC, 
+	custom_qmax NUMERIC, 
+	custom_vmax NUMERIC,
+	CONSTRAINT cso_inp_weir_node_id_pkey PRIMARY KEY (node_id),
+	CONSTRAINT cso_inp_weir_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+CREATE TABLE cso_inp_wwtp (
+	node_id varchar(16) NOT NULL,
+	habitants integer,
+	eq_habitants integer,
+	qmed NUMERIC,
+	qmax NUMERIC,
+	qmin NUMERIC,
+	unit_demand NUMERIC,
+	CONSTRAINT cso_inp_wwtp_node_id_pkey PRIMARY KEY (node_id),
+	CONSTRAINT cso_inp_wwtp_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
