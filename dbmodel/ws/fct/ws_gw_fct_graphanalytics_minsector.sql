@@ -610,6 +610,9 @@ BEGIN
         -- PREPARE tables for Massive Mincut
         -- Initialize process
 		-- =======================
+        TRUNCATE temp_pgr_node;
+        TRUNCATE temp_pgr_arc;
+
         v_data := jsonb_build_object(
             'data', jsonb_build_object(
                 'expl_id_array', array_to_string(v_expl_id_array, ','),
@@ -626,7 +629,7 @@ BEGIN
 		END IF;
 
         --UPDATE to_arc, closed, broken and cost, new arcs when the node is SECTOR
-		UPDATE temp_pgr_node_minsector t
+		UPDATE temp_pgr_node t
 		SET modif = TRUE
 		WHERE graph_delimiter = 'SECTOR';
 
@@ -646,13 +649,13 @@ BEGIN
 		END IF;
 
         -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut)
-        UPDATE temp_pgr_arc_minsector a
+        UPDATE temp_pgr_arc a
         SET cost_mincut = -1, reverse_cost_mincut = -1
         WHERE a.graph_delimiter IN ('MINSECTOR', 'SECTOR');
 
         -- the broken open valves
         IF v_ignore_broken_valves THEN
-            UPDATE temp_pgr_arc_minsector a
+            UPDATE temp_pgr_arc a
             SET cost_mincut = 0, reverse_cost_mincut = 0
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.closed = FALSE
@@ -661,13 +664,13 @@ BEGIN
 
         -- check valves
         IF v_ignore_check_valves THEN
-            UPDATE temp_pgr_arc_minsector a
+            UPDATE temp_pgr_arc a
             SET cost_mincut = 0, reverse_cost_mincut = 0
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.closed = FALSE
             AND a.cost <> a.reverse_cost;
 		ELSE
-            UPDATE temp_pgr_arc_minsector a
+            UPDATE temp_pgr_arc a
             SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.closed = FALSE
@@ -687,7 +690,7 @@ BEGIN
 						AND o.forecast_start <= o.forecast_end 
 						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
 				)
-                UPDATE temp_pgr_arc_minsector tpa
+                UPDATE temp_pgr_arc tpa
                 SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
                 WHERE tpa.graph_delimiter = ''MINSECTOR''
                 AND tpa.closed = FALSE 
@@ -717,7 +720,7 @@ BEGIN
 						AND o.forecast_start <= o.forecast_end 
 						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
 				)
-                UPDATE temp_pgr_arc_minsector tpa
+                UPDATE temp_pgr_arc tpa
                 SET changestatus = TRUE, cost = 0, reverse_cost = 0
                 WHERE tpa.graph_delimiter = ''MINSECTOR''
                 AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
@@ -737,16 +740,16 @@ BEGIN
 
         -- CORE MASSIVE MINCUT
         v_query_text = '
-            SELECT node_id, pgr_node_id FROM temp_pgr_node_minsector WHERE graph_delimiter = ''MINSECTOR''
+            SELECT node_id, pgr_node_id FROM temp_pgr_node WHERE graph_delimiter = ''MINSECTOR''
         ';
 
-        SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_minsector;
+        SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
 
-            UPDATE temp_pgr_arc_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_node_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_arc_minsector SET proposed = FALSE WHERE proposed;
+            UPDATE temp_pgr_arc SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_node SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_arc SET proposed = FALSE WHERE proposed;
 
             v_data := jsonb_build_object(
                 'data', jsonb_build_object(
@@ -766,13 +769,13 @@ BEGIN
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT v_record_minsector.node_id, n.node_id
-            FROM temp_pgr_node_minsector n
+            FROM temp_pgr_node n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
 
             INSERT INTO temp_pgr_minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
             SELECT v_record_minsector.node_id, a.arc_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc[1], changestatus
-            FROM temp_pgr_arc_minsector a
+            FROM temp_pgr_arc a
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.mapzone_id <> 0;
         END LOOP;

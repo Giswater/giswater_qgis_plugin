@@ -245,13 +245,11 @@ BEGIN
 
 	IF v_mincut_version = '6.1' THEN
 		v_mode := 'MINSECTOR';
-        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
-        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
     ELSE
 		v_mode := '';
-        v_temp_arc_table = 'temp_pgr_arc'::regclass;
-        v_temp_node_table = 'temp_pgr_node'::regclass;
     END IF;
+	v_temp_arc_table = 'temp_pgr_arc'::regclass;
+    v_temp_node_table = 'temp_pgr_node'::regclass;
 
 	--check if arc exists in database or look for a new arc_id in the same location
 	IF v_arc_id IS NULL THEN
