@@ -100,6 +100,21 @@ BEGIN
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_node1_idx ON temp_pgr_arc USING btree (node_1);
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_node2_idx ON temp_pgr_arc USING btree (node_2);
 
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_linegraph (
+            pgr_arc_id INTEGER NOT NULL,
+            node_id INTEGER NULL,
+            pgr_node_1 INTEGER NULL,
+            pgr_node_2 INTEGER NULL,
+            mapzone_id INTEGER DEFAULT 0,
+            graph_delimiter VARCHAR(30) DEFAULT 'NONE',
+            "cost" FLOAT8 NULL,
+            reverse_cost FLOAT8 NULL,
+            CONSTRAINT temp_pgr_arc_linegraph_pkey PRIMARY KEY (pgr_arc_id)
+        );
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_1_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_1);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_2_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_2);
+        CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_node_id_idx ON temp_pgr_arc_linegraph USING btree (node_id);
+
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance (
                 seq INTEGER NOT NULL,
                 "depth" INTEGER NULL,
@@ -182,21 +197,6 @@ BEGIN
             IF v_fct_name = 'OMUNIT' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
                 CREATE INDEX IF NOT EXISTS temp_pgr_arc_macromapzone_id_idx ON temp_pgr_arc USING btree ("macromapzone_id");
-
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_linegraph (
-                    pgr_arc_id INTEGER NOT NULL,
-                    node_id INTEGER NULL,
-                    pgr_node_1 INTEGER NULL,
-                    pgr_node_2 INTEGER NULL,
-                    mapzone_id INTEGER DEFAULT 0,
-                    graph_delimiter VARCHAR(30) DEFAULT 'NONE',
-                    "cost" FLOAT8 NULL,
-                    reverse_cost FLOAT8 NULL,
-                    CONSTRAINT temp_pgr_arc_linegraph_pkey PRIMARY KEY (pgr_arc_id)
-                );
-                CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_1_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_1);
-                CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_2_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_2);
-                CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_node_id_idx ON temp_pgr_arc_linegraph USING btree (node_id);
                 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_omunit (LIKE SCHEMA_NAME.omunit INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_macroomunit (LIKE SCHEMA_NAME.macroomunit INCLUDING ALL);
