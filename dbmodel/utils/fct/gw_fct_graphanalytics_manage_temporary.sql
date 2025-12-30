@@ -141,6 +141,12 @@ BEGIN
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INTEGER DEFAULT 1;
                 ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INTEGER DEFAULT 1;
+                
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS cost_mincut INTEGER DEFAULT 1;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS reverse_cost_mincut INTEGER DEFAULT 1;
             END IF;
             IF v_fct_name = 'MINSECTOR' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
@@ -177,17 +183,20 @@ BEGIN
                 ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
                 CREATE INDEX IF NOT EXISTS temp_pgr_arc_macromapzone_id_idx ON temp_pgr_arc USING btree ("macromapzone_id");
 
-                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_linegraph (
-                    seq INTEGER NOT NULL,
-                    "source" INTEGER NULL,
-                    "target" INTEGER NULL,
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_linegraph (
+                    pgr_arc_id INTEGER NOT NULL,
+                    node_id INTEGER NULL,
+                    pgr_node_1 INTEGER NULL,
+                    pgr_node_2 INTEGER NULL,
+                    mapzone_id INTEGER DEFAULT 0,
+                    graph_delimiter VARCHAR(30) DEFAULT 'NONE',
                     "cost" FLOAT8 NULL,
                     reverse_cost FLOAT8 NULL,
-                    graph_delimiter VARCHAR(30) DEFAULT 'NONE',
-                    CONSTRAINT temp_pgr_linegraph_pkey PRIMARY KEY (seq)
+                    CONSTRAINT temp_pgr_arc_linegraph_pkey PRIMARY KEY (pgr_arc_id)
                 );
-                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_source_idx ON temp_pgr_linegraph USING btree ("source");
-                CREATE INDEX IF NOT EXISTS temp_pgr_linegraph_target_idx ON temp_pgr_linegraph USING btree ("target");
+                CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_1_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_1);
+                CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_2_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_2);
+                CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_node_id_idx ON temp_pgr_arc_linegraph USING btree (node_id);
                 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_omunit (LIKE SCHEMA_NAME.omunit INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_macroomunit (LIKE SCHEMA_NAME.macroomunit INCLUDING ALL);
@@ -1011,7 +1020,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector_mincut_valve;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
-        DROP TABLE IF EXISTS temp_pgr_linegraph;
+        DROP TABLE IF EXISTS temp_pgr_arc_linegraph;
         DROP TABLE IF EXISTS temp_pgr_omunit;
         DROP TABLE IF EXISTS temp_pgr_macroomunit;
 
