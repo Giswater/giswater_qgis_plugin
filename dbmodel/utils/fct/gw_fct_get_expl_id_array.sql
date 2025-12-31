@@ -37,9 +37,7 @@ BEGIN
         WHERE cur_user = current_user;
     -- For all exploitations
     ELSIF p_expl_id = '-902' THEN
-        SELECT string_to_array(string_agg(DISTINCT expl_id::text, ','), ',') INTO v_expl_id_array
-        FROM exploitation
-        WHERE active;
+        v_expl_id_array := NULL;
     -- For a specific exploitation/s
     ELSE
         v_expl_id_array = string_to_array(p_expl_id, ',');
