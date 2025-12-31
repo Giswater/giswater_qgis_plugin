@@ -244,8 +244,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = a.state_type
+                JOIN exploitation e ON e.expl_id = a.expl_id
                 WHERE COALESCE(pp.state, a.state) = 1 
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -278,8 +280,10 @@ BEGIN
                 JOIN cat_node cn ON cn.id = n.nodecat_id
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN exploitation e ON e.expl_id = n.expl_id
                 WHERE COALESCE(pp.state, n.state) = 1 
-                AND vst.is_operative = TRUE;
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 SELECT 
@@ -312,8 +316,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = c.state_type
+                JOIN exploitation e ON e.expl_id = c.expl_id
                 WHERE COALESCE(pp.state, c.state) = 1 
-                AND vst.is_operative = TRUE;
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
@@ -352,8 +358,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1 
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
 
             ELSIF v_project_type = 'UD' THEN
@@ -391,8 +399,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = a.state_type
+                JOIN exploitation e ON e.expl_id = a.expl_id
                 WHERE COALESCE(pp.state, a.state) = 1 
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -425,8 +435,10 @@ BEGIN
                 JOIN cat_node cn ON cn.id = n.nodecat_id
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN exploitation e ON e.expl_id = n.expl_id
                 WHERE COALESCE(pp.state, n.state) = 1 
-                AND vst.is_operative = TRUE;            
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;            
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 SELECT 
@@ -459,8 +471,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = c.state_type
+                JOIN exploitation e ON e.expl_id = c.expl_id
                 WHERE COALESCE(pp.state, c.state) = 1 
-                AND vst.is_operative = TRUE;
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
                 SELECT 
@@ -491,8 +505,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = g.state_type
+                JOIN exploitation e ON e.expl_id = g.expl_id
                 WHERE COALESCE(pp.state, g.state) = 1 
-                AND vst.is_operative = TRUE;
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
@@ -530,8 +546,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1 
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
@@ -570,8 +588,10 @@ BEGIN
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1 
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND l.feature_type = 'GULLY';
 
             END IF;
@@ -600,7 +620,10 @@ BEGIN
                     vst.is_operative
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
-                WHERE a.state = 1 AND vst.is_operative = TRUE
+                JOIN exploitation e ON e.expl_id = a.expl_id
+                WHERE a.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -619,9 +642,12 @@ BEGIN
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN exploitation e ON e.expl_id = n.expl_id
                 JOIN cat_node cn ON cn.id = n.nodecat_id
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
-                WHERE n.state = 1 AND vst.is_operative = TRUE;
+                WHERE n.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 SELECT
@@ -636,13 +662,16 @@ BEGIN
                     c.plot_code,
                     c.supplyzone_id,
                     c.muni_id,
-                    c.minsector_id,
                     c.conneccat_id,
                     c.state,
+                    c.minsector_id,
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
-                WHERE c.state = 1 AND vst.is_operative = TRUE;
+                JOIN exploitation e ON e.expl_id = c.expl_id
+                WHERE c.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
@@ -662,8 +691,10 @@ BEGIN
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
                 JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE l.state = 1
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
 
             ELSIF v_project_type = 'UD' THEN
@@ -689,7 +720,10 @@ BEGIN
                     vst.is_operative
                 FROM arc a
                 JOIN value_state_type vst ON vst.id = a.state_type
-                WHERE a.state = 1 AND vst.is_operative = TRUE;
+                JOIN exploitation e ON e.expl_id = a.expl_id
+                WHERE a.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
                 SELECT
@@ -707,9 +741,12 @@ BEGIN
                     n.the_geom
                 FROM node n
                 JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN exploitation e ON e.expl_id = n.expl_id
                 JOIN cat_node cn ON cn.id = n.nodecat_id
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
-                WHERE n.state = 1 AND vst.is_operative = TRUE;
+                WHERE n.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
                 SELECT
@@ -730,7 +767,10 @@ BEGIN
                     c.the_geom
                 FROM connec c
                 JOIN value_state_type vst ON vst.id = c.state_type
-                WHERE c.state = 1 AND vst.is_operative = TRUE;
+                JOIN exploitation e ON e.expl_id = c.expl_id
+                WHERE c.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
                 SELECT
@@ -749,7 +789,10 @@ BEGIN
                     g.the_geom
                 FROM gully g
                 JOIN value_state_type vst ON vst.id = g.state_type
-                WHERE g.state = 1 AND vst.is_operative = TRUE;
+                JOIN exploitation e ON e.expl_id = g.expl_id
+                WHERE g.state = 1 
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
@@ -761,15 +804,17 @@ BEGIN
                     l.sector_id,
                     l.dwfzone_id,
                     l.omzone_id,
-                    --l.omunit_id,
+                    l.omunit_id,
                     l.fluid_type,
                     l.muni_id,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
                 JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE l.state = 1
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
 
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
@@ -782,15 +827,17 @@ BEGIN
                     l.sector_id,
                     l.dwfzone_id,
                     l.omzone_id,
-                    --l.omunit_id,
+                    l.omunit_id,
                     l.fluid_type,
                     l.muni_id,
                     l.the_geom
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
                 JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE l.state = 1
                 AND vst.is_operative = TRUE
+                AND e.active = TRUE
                 AND l.feature_type = 'GULLY';
 
             END IF;
