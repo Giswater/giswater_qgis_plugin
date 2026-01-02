@@ -19,20 +19,6 @@ SELECT gw_fct_mincut_core('{"data":{
 	"ignoreCheckValvesMincut":true
 }}') INTO v_response;
 
-The mincut arcs:
-
-SELECT p.*, a.the_geom
-FROM ws_github.temp_pgr_arc p
-JOIN ws_github.arc a on p.arc_id =a.arc_id
-WHERE p.mapzone_id <>0;
-
-The mincut valves MINCUT:
-
-SELECT a.*, n.the_geom
-FROM ws_github.temp_pgr_arc a
-JOIN ws_github.node n ON n.node_id = COALESCE(a.node_1, a.node_2)
-WHERE a.graph_delimiter = 'MINSECTOR' AND a.mapzone_id <>0;
-
 */
 
 DECLARE
