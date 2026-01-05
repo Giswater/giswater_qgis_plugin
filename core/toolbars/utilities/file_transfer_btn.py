@@ -12,7 +12,7 @@ from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup, QWidget, QFileDialog
-from qgis.PyQt.QtCore import QPoint, QDate
+from qgis.PyQt.QtCore import QPoint
 from qgis.core import Qgis
 from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi, EpaExportUi
@@ -218,7 +218,6 @@ class GwFileTransferButton(GwAction):
         except Exception as e:
             msg = f"Failed to write export file:\n{str(e)}"
             tools_qgis.show_warning(msg)
-
 
     def _open_csv(self):
 
