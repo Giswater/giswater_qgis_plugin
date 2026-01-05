@@ -265,22 +265,7 @@ BEGIN
 	    a.setting,
 	    a.minorloss,
 	    concat(';', a.sector_id, ' ', COALESCE(a.presszone_id, '0'::text), ' ', COALESCE(a.dma_id, 0), ' ', COALESCE(a.dqa_id, 0), ' ', COALESCE(a.minsector_id, 0), ' ', a.arccat_id) AS other
-	   FROM ( SELECT arc_id::text AS arc_id,
-		    node_1,
-		    node_2,
-		    diameter,
-		    ((addparam::json ->> 'valve_type'::text))::character varying(18) AS valve_type,
-		    addparam::json ->> 'setting'::text AS setting,
-		    minorloss,
-		    sector_id,
-		    dma_id,
-		    presszone_id,
-		    dqa_id,
-		    minsector_id,
-		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'PRV'::text OR (addparam::json ->> 'valve_type'::text) = 'PSV'::text OR (addparam::json ->> 'valve_type'::text) = 'PBV'::text
-		UNION
-		 SELECT arc_id,
+	   FROM (SELECT arc_id,
 		    node_1,
 		    node_2,
 		    diameter,
@@ -293,37 +278,7 @@ BEGIN
 		    dqa_id,
 		    minsector_id,
 		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'FCV'::text
-		UNION
-		 SELECT arc_id,
-		    node_1,
-		    node_2,
-		    diameter,
-		    addparam::json ->> 'valve_type'::text AS valve_type,
-		    addparam::json ->> 'setting'::text AS setting,
-		    minorloss,
-		    sector_id,
-		    dma_id,
-		    presszone_id,
-		    dqa_id,
-		    minsector_id,
-		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'TCV'::text
-		UNION
-		 SELECT arc_id,
-		    node_1,
-		    node_2,
-		    diameter,
-		    addparam::json ->> 'valve_type'::text AS valve_type,
-		    addparam::json ->> 'setting'::text AS setting,
-		    minorloss,
-		    sector_id,
-		    dma_id,
-		    presszone_id,
-		    dqa_id,
-		    minsector_id,
-		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'GPV'::text
+		   FROM temp_t_arc WHERE addparam::json ->> 'valve_type'::text IN ('PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV')
 		UNION
 		 SELECT arc_id,
 		    node_1,

@@ -273,7 +273,7 @@ BEGIN
 
 	RAISE NOTICE 'vnodetrimarcs 12 - new arcs on temp_t_arc table';
 	INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status,
-	the_geom, flw_code, minorloss, addparam, arcparent, dma_id, presszone_id, dqa_id, minsector_id)
+	the_geom, flw_code, minorloss, addparam, arcparent, dma_id, presszone_id, dqa_id, minsector_id, family, builtdate)
 
 	WITH a AS (SELECT  a.idmin, a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
 			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
@@ -301,7 +301,7 @@ BEGIN
 		temp_t_arc.flw_code,
 		0,
 		temp_t_arc.addparam,
-		a.arc_id, dma_id, presszone_id, dqa_id, minsector_id
+		a.arc_id, dma_id, presszone_id, dqa_id, minsector_id, family, builtdate
 		FROM a
 		JOIN temp_t_arc USING (arc_id)
 		WHERE (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%' OR a.node_1 ilike 'VC%' or a.node_2 ilike 'VC%')
