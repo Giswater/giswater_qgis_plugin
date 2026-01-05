@@ -70,7 +70,7 @@ BEGIN
 		    rel.relname AS table_name,
 		    nsp.nspname AS schema_name,
 		    pg_get_constraintdef(con.oid) AS half_def,
-		    concat('ALTER TABLE ', rel.relname, ' ADD CONSTRAINT ', con.conname, ' ',  pg_get_constraintdef(con.oid)) AS full_def
+		    NULL::text AS ddl_constraint
 		FROM pg_constraint con
 		JOIN pg_class rel ON rel.oid = con.conrelid
 		JOIN pg_namespace nsp ON nsp.oid = con.connamespace
@@ -93,11 +93,12 @@ BEGIN
 		      SELECT DISTINCT
 		        v.table_schema AS view_schema,
 		        v.table_name AS view_name,
-		        view_definition,
+		        view_definition AS half_def,
+				NULL::TEXT AS ddl_view,		        
 		        CASE 
 		          WHEN v.table_name IN (SELECT DISTINCT parent_layer FROM %I.cat_feature) THEN 1
 		          WHEN v.table_name IN (SELECT DISTINCT child_layer FROM %I.cat_feature) THEN NULL
-		          WHEN v.table_name ILIKE 'v_plan_*' THEN 3
+		          WHEN v.table_name ILIKE 'v_plan_%%' THEN 3
 		          WHEN v.table_name ILIKE 'v_plan_psector%%' THEN 4
 		          WHEN v.table_name = 'v_price_compost' THEN 5
 		          WHEN v.table_name ILIKE 'v_price_%%' THEN 6
@@ -122,46 +123,37 @@ BEGIN
 		    n.nspname AS schema_name,
 		    c.relname AS table_name,
 		    tg.tgname AS trigger_name,
-		    REPLACE(concat(pg_get_triggerdef(tg.oid, true), ';'), 'CREATE', 'CREATE OR REPLACE') AS exec_trg
+		    pg_get_triggerdef(tg.oid, true) AS ddl_trg
 		FROM pg_trigger tg
 		JOIN pg_class c ON c.oid = tg.tgrelid
 		JOIN pg_namespace n ON n.oid = c.relnamespace
 		WHERE NOT tg.tgisinternal;
 
 
-	
-	ELSIF v_action = 'DROP-ALL-VIEWS' THEN
-	
-		RAISE NOTICE 'v_action %', v_action;
-
-		FOR rec IN 
-			SELECT view_name FROM _bkp_views 
-			WHERE view_schema = v_target_schema ORDER BY exec_order ASC
-					
-		LOOP 
+		RAISE NOTICE 'Built DDL sentence and clean';
 		
-			RAISE NOTICE 'Drop view %', rec.view_name;
-			
-			 EXECUTE format(
-		        'DROP VIEW IF EXISTS %I.%I CASCADE',
-		        rec.view_schema,
-		        rec.view_name
-		    );
-			
-		END LOOP;
-			
+		UPDATE _bkp_constraints SET ddl_constraint = concat('ALTER TABLE ',table_name, ' ADD CONSTRAINT ', constraint_name, ' ', half_def, ';');
+		UPDATE _bkp_constraints SET ddl_constraint = replace(ddl_constraint, concat(schema_name, '.'), '');
 
+		UPDATE _bkp_views SET ddl_view = concat('CREATE OR REPLACE VIEW ', view_name, ' AS ', half_def);
+		UPDATE _bkp_views SET ddl_view = replace(ddl_view, concat(view_schema, '.'), '');
+
+		UPDATE _bkp_trg SET ddl_trg = REPLACE(ddl_trg, concat(schema_name, '.'), '');
+		UPDATE _bkp_trg SET ddl_trg = replace(ddl_trg, 'CREATE', 'CREATE OR REPLACE');
+		UPDATE _bkp_trg SET ddl_trg = concat(ddl_trg, ';');
+	
+	
+	
 	ELSIF v_action = 'POST-UPDATE' THEN -- recrear DDLs y ejecutarlo desde un schema_source a un schema_target.
 	
 		IF v_action_type = 'CONSTRAINTS' THEN
 	
-			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built missing constraints ---------- --';
-			-- constraints que estan al esquema de ref i no estan al esquema a updatejar.
-			-- las que apuntan a tablas del mismo esquema (por ejemplo: ud y ud_ref_454)
+			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built constraints from ref schema (%) into updated schema (%) ---------- --', v_ref_schema, v_target_schema;
+			-- nuevas constraints que han aparecido en la updated version (y que no estaban en el updated schema)
 			FOR rec IN 
-				SELECT table_name, constraint_name, concat('ALTER TABLE ', v_target_schema, '.', table_name, ' ADD CONSTRAINT ', constraint_name, ' ', replace(half_def, concat(schema_name, '.'), 
-				concat(v_target_schema, '.')), ';') AS exec_constr
-				FROM "_bkp_constraints" bc WHERE schema_name = v_ref_schema
+				SELECT *
+				FROM "_bkp_constraints" bc
+				WHERE schema_name = v_ref_schema
 				AND constraint_name NOT IN (
 					SELECT conname FROM pg_constraint con JOIN pg_namespace nsp ON nsp.oid = con.connamespace 
 					WHERE nsp.nspname = v_target_schema
@@ -170,11 +162,11 @@ BEGIN
 			
 				BEGIN 
 					
-					EXECUTE rec.exec_constr;
+					EXECUTE rec.ddl_constraint;
 					
-				EXCEPTION WHEN OTHERS THEN 
+					EXCEPTION WHEN OTHERS THEN 
 					RAISE NOTICE '[ERR] % -> %: %', rec.table_name, rec.constraint_name, SQLERRM;
-					v_errs_constr := array_append(v_errs_constr, concat(rec.exec_constr, ' - ', SQLERRM));
+					v_errs_constr := array_append(v_errs_constr, concat(rec.ddl_constraint, ' - ', SQLERRM));
 				
 				END;
 			
@@ -187,22 +179,18 @@ BEGIN
 	
 		ELSIF v_action_type = 'VIEWS-TRG' THEN 
 		
-			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built all views ---------- --';
+			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built all views from ref schema (%) into updated schema (%) ---------- --', v_ref_schema, v_target_schema;
 			-- todas las que son del esquema de ref + childs
 			FOR rec IN 		
 				
-				WITH mec AS ( -- gw views
-					SELECT * FROM _bkp_views WHERE view_schema = v_ref_schema -- REF views
-				), moc AS ( -- ext views
-					SELECT * FROM _bkp_views WHERE view_schema = v_target_schema 
-					AND view_name IN (SELECT id FROM sys_table WHERE ("source" IS NULL OR "source" != 'core'))
-					AND view_name NOT IN (SELECT DISTINCT child_layer FROM cat_feature) 
+				WITH mec AS (
+					SELECT * FROM _bkp_views WHERE view_schema = v_ref_schema AND exec_order IS NOT NULL -- REF views
+				), moc AS (
+					SELECT * FROM _bkp_views WHERE view_schema = v_target_schema AND exec_order IS NOT NULL AND view_name NOT IN (SELECT id FROM sys_table) -- ext views
 				), mic AS (
-				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
-				FROM moc WHERE view_name NOT IN (SELECT view_name FROM mec) AND (view_name NOT ILIKE 'v_%' OR view_name NOT ILIKE 've_%') 
-				UNION
-				SELECT *, concat('CREATE OR REPLACE VIEW ', v_target_schema, '.', view_name, ' AS ', REPLACE(view_definition, concat(v_ref_schema, '.'), concat(v_target_schema, '.')), ';') AS exec_view 
-				FROM mec
+					SELECT * FROM mec
+					UNION 
+					SELECT * FROM moc
 				)
 				SELECT*FROM mic ORDER BY exec_order, view_name
 	
@@ -210,7 +198,7 @@ BEGIN
 			
 				BEGIN
 					
-					EXECUTE rec.exec_view;
+					EXECUTE rec.ddl_view;
 				
 					EXCEPTION WHEN OTHERS THEN
 					RAISE NOTICE '[ERR] %: % ', rec.view_name, SQLERRM;
@@ -226,15 +214,17 @@ BEGIN
 			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built all triggers ---------- --';
 			
 			FOR rec IN 
-				SELECT table_name, trigger_name, REPLACE(exec_trg, schema_name, v_target_schema) AS exec_trg FROM "_bkp_trg" bt
-				WHERE schema_name = v_ref_schema AND table_name IN (SELECT table_name FROM information_schema.TABLES WHERE table_schema = v_target_schema)
+				SELECT * FROM "_bkp_trg" bt
+				WHERE schema_name = v_ref_schema AND table_name IN (
+					SELECT table_name FROM information_schema.TABLES WHERE table_schema = v_target_schema
+				)
 			LOOP
 			
 				BEGIN 
 					
-					EXECUTE rec.exec_trg;
+					EXECUTE rec.ddl_trg;
 				
-				EXCEPTION WHEN OTHERS THEN
+					EXCEPTION WHEN OTHERS THEN
 					RAISE NOTICE '[ERR] % -> %: % ', rec.table_name, rec.trigger_name, SQLERRM;
 					v_errs_trgs := array_append(v_errs_trgs, concat(rec.table_name, '(', rec.trigger_name, ')', ' - ', SQLERRM));
 				END;
@@ -256,6 +246,34 @@ BEGIN
 	
 	ELSIF v_action = 'CHECK-DATA' THEN
 	
+		-- MISSING CONSTRAINTS from OLD version to NEW version
+		create table _report_missing_constraints_old2new as
+		SELECT * FROM "_bkp_constraints" bc 
+		WHERE schema_name = v_target_schema
+		AND constraint_name NOT IN (
+			SELECT conname FROM pg_constraint con JOIN pg_namespace nsp ON nsp.oid = con.connamespace 
+			WHERE nsp.nspname = v_ref_schema
+		);
+		
+		
+		-- MISSING VIEWS from OLD version to NEW version
+		create table _report_missing_views_old2new as	
+		SELECT*FROM ws._bkp_views WHERE view_schema = v_target_schema and view_name NOT IN (
+			SELECT view_name FROM information_schema.views WHERE table_schema = v_ref_schema
+		);
+		
+		
+		-- MISSING TRIGGERS from OLD version to NEW version
+		create table _report_missing_trg_old2new as
+		SELECT * FROM "_bkp_trg" bt
+		WHERE schema_name = v_target_schema AND trigger_name NOT IN (
+			SELECT t.tgname FROM pg_trigger t
+			JOIN pg_class c      ON t.tgrelid = c.oid
+			JOIN pg_namespace n  ON c.relnamespace = n.oid
+			WHERE n.nspname = v_ref_schema
+			AND NOT t.tgisinternal
+		);
+		
 	
 	END IF;
 
