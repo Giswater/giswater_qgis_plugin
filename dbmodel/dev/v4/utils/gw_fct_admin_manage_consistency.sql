@@ -11,13 +11,15 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_consistency(p_data js
 AS $function$
 
 /*
-* EXAMPLE
+ * EXAMPLE
 
--- Se puede ejecutar para un caso concreto:
+-- "action" parameter does not have any action_type. Setting an action_type will not have any effect
+
+-- For specific "actionType":
 SELECT gw_fct_admin_manage_consistency($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "data":{"parameters":{"action":"POST-UPDATE", "actionType":"CONSTRAINTS", "referenceSchema":"ud_ref_454", "targetSchema":"ud"}}}$$);
 
-... o para todos los action_type (lo que sería el ALL):
+... For all the action_types (=ALL)
 SELECT gw_fct_admin_manage_consistency(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "data":{"parameters":{"action":"POST-UPDATE", "actionType":"', action_type, '", "referenceSchema":"ud_ref_454", "targetSchema":"ud"}}}')::JSON) 
 FROM (SELECT 'CONSTRAINTS' AS action_type UNION SELECT 'VIEWS-TRG');
@@ -61,7 +63,7 @@ BEGIN
 		DROP TABLE IF EXISTS _bkp_trg;
 	
 	
-		RAISE NOTICE 'Crear meta-tabla de constraints de TOTA la BASE DE DADES';
+		RAISE NOTICE 'Create metatable of constraints of ALL the DATABASE';
 
 		CREATE TABLE _bkp_constraints as 
 		SELECT 
@@ -85,7 +87,7 @@ BEGIN
 	
 	
 	
-		RAISE NOTICE 'Crear meta-tabla de vistes de TOTA la BASE DE DADES';
+		RAISE NOTICE 'Create metatable of views of ALL the DATABASE';
 		
 		EXECUTE format($sql$
 		    CREATE TABLE _bkp_views AS
@@ -116,7 +118,7 @@ BEGIN
 		    v_ref_schema
 		);
 	
-		RAISE NOTICE 'Crear meta-tabla de trg de TOTA la BASE DE DADES';
+		RAISE NOTICE 'Create metatable of triggers of ALL the DATABASE';
 	
 		CREATE TABLE _bkp_trg as
 		SELECT
@@ -130,7 +132,7 @@ BEGIN
 		WHERE NOT tg.tgisinternal;
 
 
-		RAISE NOTICE 'Built DDL sentence and clean';
+		RAISE NOTICE 'Built and clean DDL sentence';
 		
 		UPDATE _bkp_constraints SET ddl_constraint = concat('ALTER TABLE ',table_name, ' ADD CONSTRAINT ', constraint_name, ' ', half_def, ';');
 		UPDATE _bkp_constraints SET ddl_constraint = replace(ddl_constraint, concat(schema_name, '.'), '');
@@ -144,12 +146,12 @@ BEGIN
 	
 	
 	
-	ELSIF v_action = 'POST-UPDATE' THEN -- recrear DDLs y ejecutarlo desde un schema_source a un schema_target.
+	ELSIF v_action = 'POST-UPDATE' THEN -- re-build objects using DDL
 	
 		IF v_action_type = 'CONSTRAINTS' THEN
 	
 			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built constraints from ref schema (%) into updated schema (%) ---------- --', v_ref_schema, v_target_schema;
-			-- nuevas constraints que han aparecido en la updated version (y que no estaban en el updated schema)
+			-- Build only new constraints that appeared in the updated version
 			FOR rec IN 
 				SELECT *
 				FROM "_bkp_constraints" bc
@@ -175,12 +177,12 @@ BEGIN
 			END LOOP;
 		
 		
-			-- TO DO: las que apuntan a tablas de otro esquema (por ejemplo: ud --> utils/om/crm y ud)
+			-- TO DO: CONSTRAINTS that point to tables of other schemas in the database
 	
 		ELSIF v_action_type = 'VIEWS-TRG' THEN 
 		
 			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built all views from ref schema (%) into updated schema (%) ---------- --', v_ref_schema, v_target_schema;
-			-- todas las que son del esquema de ref + childs
+			-- Build views from the ref schema into the updated schema.
 			FOR rec IN 		
 				
 				WITH mec AS (
@@ -212,7 +214,7 @@ BEGIN
 			
 		
 			RAISE NOTICE '-- ---------- POST-UPDATE: Re-built all triggers ---------- --';
-			
+			-- Build triggers only for the existing tables of the updated schema
 			FOR rec IN 
 				SELECT * FROM "_bkp_trg" bt
 				WHERE schema_name = v_ref_schema AND table_name IN (
@@ -240,7 +242,7 @@ BEGIN
 	
 		ELSE
 		
-			RAISE EXCEPTION 'action type "%" no existe ', v_action_type;
+			RAISE EXCEPTION 'action type "%" does not exist ', v_action_type;
 		
 		END IF;
 	
