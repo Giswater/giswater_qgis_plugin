@@ -23,7 +23,7 @@ SELECT columns_are(
         'id', 'result_id', 'arc_id', 'node_1', 'node_2', 'arc_type', 'arccat_id', 'epa_type',
         'sector_id', 'state', 'state_type', 'annotation', 'diameter', 'roughness', 'length',
         'status', 'the_geom', 'expl_id', 'flw_code', 'minorloss', 'addparam', 'arcparent',
-        'flag', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age', 'omzone_id'
+        'flag', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age', 'omzone_id', 'family', 'builtdate'
     ],
     'Table temp_arc should have the correct columns'
 );
@@ -61,6 +61,8 @@ SELECT col_type_is('temp_arc', 'dqa_id', 'integer', 'Column dqa_id should be int
 SELECT col_type_is('temp_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('temp_arc', 'age', 'integer', 'Column age should be integer');
 SELECT col_type_is('temp_arc', 'omzone_id', 'integer', 'Column omzone_id should be integer');
+SELECT col_type_is('temp_arc', 'family', 'varchar(100)', 'Column family should be varchar(100)');
+SELECT col_type_is('temp_arc', 'builtdate', 'date', 'Column builtdate should be date');
 
 -- Check default values
 SELECT col_has_default('temp_arc', 'id', 'Column id should have a default value');

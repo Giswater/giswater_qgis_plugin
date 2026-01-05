@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'id', 'result_id', 'arc_id', 'node_1', 'node_2', 'arc_type', 'arccat_id', 'epa_type', 'sector_id', 'state',
         'state_type', 'annotation', 'diameter', 'roughness', 'length', 'status', 'the_geom', 'expl_id', 'flw_code',
-        'minorloss', 'addparam', 'arcparent', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age'
+        'minorloss', 'addparam', 'arcparent', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age', 'family', 'builtdate'
     ],
     'Table rpt_inp_arc should have the correct columns'
 );
@@ -58,6 +58,8 @@ SELECT col_type_is('rpt_inp_arc', 'presszone_id', 'text', 'Column presszone_id s
 SELECT col_type_is('rpt_inp_arc', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'age', 'integer', 'Column age should be integer');
+SELECT col_type_is('rpt_inp_arc', 'family', 'varchar(100)', 'Column family should be varchar(100)');
+SELECT col_type_is('rpt_inp_arc', 'builtdate', 'date', 'Column builtdate should be date');
 
 -- Check default values
 SELECT col_has_default('rpt_inp_arc', 'id', 'Column id should have a default value');
