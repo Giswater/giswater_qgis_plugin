@@ -613,6 +613,15 @@ class GwCsvUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
+UINAME = "epa_export"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class EpaExportUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "print"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 

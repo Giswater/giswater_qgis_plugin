@@ -11,11 +11,11 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QIcon
-from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup, QWidget
-from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup, QWidget, QFileDialog
+from qgis.PyQt.QtCore import QPoint, QDate
 from qgis.core import Qgis
 from ..dialog import GwAction
-from ...ui.ui_manager import GwCsvUi
+from ...ui.ui_manager import GwCsvUi, EpaExportUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_log, tools_db, tools_qgis, tools_os
 from .... import global_vars
@@ -76,7 +76,8 @@ class GwFileTransferButton(GwAction):
         menu_actions = [
             # Import section
             (import_menu, ('ud', 'ws'), tools_qt.tr('Import CSV'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}66_1.png")),
-            (import_menu, ('ud', 'ws'), tools_qt.tr('Import INP file'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
+            (import_menu, ('ud', 'ws'), tools_qt.tr('Import INP file'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png")),
+            (export_menu, ('ws'), tools_qt.tr('Export EPA result families'), None)
         ]
         # Add actions to menu
         for menu, types, action, icon in menu_actions:
@@ -107,6 +108,8 @@ class GwFileTransferButton(GwAction):
                 import_inp = GwImportSwmm()
                 import_inp.clicked_event()
                 return
+        elif name == tools_qt.tr('Export EPA result families'):
+            self._export_epa_result_families()
 
     def _save_last_selection(self, menu, button_function):
         menu.setProperty("last_selection", button_function)
@@ -126,6 +129,96 @@ class GwFileTransferButton(GwAction):
         tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_period', f"{self.dlg_csv.rb_dec_period.isChecked()}")
 
     # region private functions
+
+    def _export_epa_result_families(self):
+        # Use dialog from ui_manager as for other dialogs (mimicking approach from _open_csv)
+        dlg_epa = EpaExportUi(self)
+        tools_gw.load_settings(dlg_epa)
+
+        # Fill combo from db
+        sql = "SELECT result_id FROM rpt_cat_result ORDER BY result_id"
+        results = tools_db.get_rows(sql)
+        dlg_epa.cmb_result_id.clear()
+        if results:
+            for row in results:
+                result_id = row[0] if isinstance(row, (tuple, list)) else row
+                dlg_epa.cmb_result_id.addItem(str(result_id))
+        else:
+            # No EPA results found, show message and close dialog
+            msg = "No EPA results found. You must first simulate with Go2Epa."
+            tools_qgis.show_warning(msg)
+            tools_gw.close_dialog(dlg_epa)
+            return
+
+        # Default date
+        dlg_epa.date_limit.setDisplayFormat("dd-MM-yyyy")
+
+        # Connect browse signal
+        dlg_epa.btn_browse.clicked.connect(
+            lambda: self._browse_export_path_epa(dlg_epa)
+        )
+
+        dlg_epa.btn_cancel.clicked.connect(lambda: tools_gw.close_dialog(dlg_epa))
+        dlg_epa.rejected.connect(lambda: tools_gw.close_dialog(dlg_epa))
+        dlg_epa.btn_accept.clicked.connect(partial(self._do_export_epa_families, dlg_epa))
+
+        tools_gw.open_dialog(dlg_epa, dlg_name='epa_result_export')
+
+    def _browse_export_path_epa(self, dlg):
+        file_path, _ = QFileDialog.getSaveFileName(
+            dlg,
+            tools_qt.tr("Select Export File"),
+            "",
+            tools_qt.tr("JSON Files (*.json);;All Files (*)")
+        )
+        if file_path:
+            if not file_path.lower().endswith('.json'):
+                file_path += ".json"
+            dlg.edit_path.setText(file_path)
+
+    def _do_export_epa_families(self, dlg):
+        result_id = dlg.cmb_result_id.currentText()
+        date_obj = dlg.date_limit.date()
+        
+        # Validate date
+        if not date_obj.isValid():
+            msg = "Please enter a valid date."
+            tools_qgis.show_warning(msg, dialog=dlg)
+            return
+        
+        # Convert date to format expected by database (dd-MM-yyyy)
+        date_limit = date_obj.toString("dd-MM-yyyy")
+        file_path = dlg.edit_path.text().strip()
+        
+        if not result_id or not file_path:
+            msg = "Please select a result and an export path."
+            tools_qgis.show_warning(msg, dialog=dlg)
+            return
+        tools_gw.close_dialog(dlg)
+
+        sql = f"SELECT gw_fct_get_epa_result_families('{result_id}', '{date_limit}')"
+        row = tools_db.get_row(sql)
+        if not row or not row[0]:
+            msg = "No results returned from the database."
+            tools_qgis.show_warning(msg)
+            return
+
+        json_result = row[0]
+        # Convert to string if it's a dict
+        if isinstance(json_result, dict):
+            json_str = json.dumps(json_result, ensure_ascii=False, indent=2)
+        else:
+            json_str = str(json_result)
+
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(json_str)
+            msg = f"EPA Result Families exported successfully:\n{file_path}"
+            tools_qgis.show_info(msg)
+        except Exception as e:
+            msg = f"Failed to write export file:\n{str(e)}"
+            tools_qgis.show_warning(msg)
+
 
     def _open_csv(self):
 
