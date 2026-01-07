@@ -18,3 +18,9 @@ CREATE INDEX IF NOT EXISTS link_omunit_id_idx ON link USING btree (omunit_id);
 CREATE INDEX IF NOT EXISTS gully_omunit_id_idx ON gully USING btree (omunit_id);
 
 CREATE INDEX IF NOT EXISTS gully_dma_id_idx ON gully USING btree (dma_id);
+
+ALTER TABLE node ADD CONSTRAINT node_omunit_id_fkey FOREIGN KEY (omunit_id) REFERENCES omunit(omunit_id);
+ALTER TABLE arc ADD CONSTRAINT arc_omunit_id_fkey FOREIGN KEY (omunit_id) REFERENCES omunit(omunit_id);
+ALTER TABLE connec ADD CONSTRAINT connec_omunit_id_fkey FOREIGN KEY (omunit_id) REFERENCES omunit(omunit_id);
+ALTER TABLE link ADD CONSTRAINT link_omunit_id_fkey FOREIGN KEY (omunit_id) REFERENCES omunit(omunit_id);
+ALTER TABLE gully ADD CONSTRAINT gully_omunit_id_fkey FOREIGN KEY (omunit_id) REFERENCES omunit(omunit_id);
