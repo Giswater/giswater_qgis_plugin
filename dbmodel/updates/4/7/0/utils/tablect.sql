@@ -20,4 +20,3 @@ CREATE INDEX IF NOT EXISTS node_dma_id_idx ON node USING btree (dma_id);
 CREATE INDEX IF NOT EXISTS arc_dma_id_idx ON arc USING btree (dma_id);
 CREATE INDEX IF NOT EXISTS connec_dma_id_idx ON connec USING btree (dma_id);
 CREATE INDEX IF NOT EXISTS link_dma_id_idx ON link USING btree (dma_id);
-CREATE INDEX IF NOT EXISTS gully_dma_id_idx ON gully USING btree (dma_id);
