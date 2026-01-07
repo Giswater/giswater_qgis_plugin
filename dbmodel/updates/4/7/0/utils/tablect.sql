@@ -15,3 +15,7 @@ CREATE INDEX connec_minsector_id_idx ON connec USING btree (minsector_id);
 CREATE INDEX node_supplyzone_id_idx ON node USING btree (supplyzone_id);
 CREATE INDEX arc_supplyzone_id_idx ON arc USING btree (supplyzone_id);
 CREATE INDEX connec_supplyzone_id_idx ON connec USING btree (supplyzone_id);
+
+ALTER TABLE node ADD CONSTRAINT node_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
+ALTER TABLE arc ADD CONSTRAINT arc_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
+ALTER TABLE connec ADD CONSTRAINT connec_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);

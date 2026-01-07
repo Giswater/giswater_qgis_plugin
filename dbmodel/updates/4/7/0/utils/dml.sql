@@ -5,6 +5,4 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-CREATE INDEX gully_minsector_id_idx ON gully USING btree (minsector_id);
-
-ALTER TABLE gully ADD CONSTRAINT gully_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
+INSERT INTO minsector (minsector_id) VALUES(0) ON CONFLICT (minsector_id) DO NOTHING;
