@@ -32,8 +32,6 @@ v_device integer;
 v_tiled boolean;
 v_mincut integer;
 v_mincut_class integer;
-v_node integer;
-v_arc integer;
 v_use_psectors boolean;
 v_ignore_check_valves boolean;
 
@@ -81,9 +79,6 @@ v_pgr_distance float;
 v_root_vids int[];
 
 -- temporary tables for core
-v_temp_arc_table regclass;
-v_temp_node_table regclass;
-
 
 -- core variables
 v_root_with_water int[];
@@ -106,14 +101,12 @@ BEGIN
     v_mode := p_data->'data'->>'mode';
     v_ignore_check_valves := p_data->'data'->>'ignoreCheckValvesMincut';
 
-    v_temp_arc_table := 'temp_pgr_arc'::regclass;
-    v_temp_node_table := 'temp_pgr_node'::regclass;
-
-
     -- STEP 1 flood with INVERTED cost_mincut/reverse_cost_mincut for finding the borders
     -- the flood is reversed; the one-way valves that don't stop the water will stay inside the minsector, they cannot be borders because they cannot be closed
-    v_query_text='SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, reverse_cost_mincut as cost, cost_mincut as reverse_cost
-    FROM ' || v_temp_arc_table;
+    v_query_text='
+        SELECT pgr_arc_id as id, pgr_node_2 as source, pgr_node_1 as target, cost_mincut as cost, reverse_cost_mincut as reverse_cost
+        FROM temp_pgr_arc_linegraph
+    ';
     TRUNCATE temp_pgr_drivingdistance;
     INSERT INTO  temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
     (SELECT seq,"depth",start_vid,pred,node,edge,"cost",agg_cost
@@ -122,49 +115,41 @@ BEGIN
 
     -- update mapzone_id with value 1
     -- for the nodes
-    EXECUTE format(
-        'UPDATE %I n SET mapzone_id = 1
-        FROM temp_pgr_drivingdistance d
-        WHERE n.pgr_node_id =d.node;', 
-        v_temp_node_table
-    );
+    UPDATE temp_pgr_node_minsector n
+    SET mapzone_id = 1
+    FROM temp_pgr_drivingdistance d
+    WHERE n.pgr_node_id = d.node;
 
    	-- for the arcs that connect with the nodes;
-
-    EXECUTE format(
-        'UPDATE %I a set mapzone_id = 1
+    UPDATE temp_pgr_arc_linegraph a 
+    SET mapzone_id = 1
+    WHERE EXISTS (
+        SELECT 1 
         FROM temp_pgr_drivingdistance d
-        WHERE d.node IN  (a.pgr_node_1, a.pgr_node_2);',
-        v_temp_arc_table
+        WHERE d.node IN  (a.pgr_node_1, a.pgr_node_2)
     );
 
     -- v_root_vids - for open valves + chk valves (if v_ignore_check_valves =FALSE)
-    EXECUTE format(
-        'SELECT COALESCE(array_agg(n.pgr_node_id), ARRAY[]::int[])
-        FROM %I n
-        WHERE n.graph_delimiter = ''MINSECTOR''
-        AND n.mapzone_id = 0
-        AND EXISTS
-            (SELECT 1 FROM %I a
-            WHERE a.mapzone_id = 1
-            AND a.graph_delimiter =''MINSECTOR''
-            AND (a.cost >= 0 OR a.reverse_cost >=0)
-            AND n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-            );', 
-        v_temp_node_table, v_temp_arc_table
-    ) INTO v_root_vids;
+    SELECT COALESCE(array_agg(n.pgr_node_id), ARRAY[]::int[])
+    INTO v_root_vids
+    FROM temp_pgr_node_minsector n
+    WHERE n.mapzone_id = 0
+    AND EXISTS (
+        SELECT 1
+        FROM temp_pgr_arc_linegraph a
+        WHERE a.mapzone_id = 1
+        AND (a.cost >= 0 OR a.reverse_cost >= 0)
+        AND n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+    );
 
     -- STEP 2 flood with DIRECT cost/reverse_cost without considering the checkvalves (using pgr_drivingdistance with UNDIRECTED GRAPH, a check valve is an open valve)
     IF cardinality(v_root_vids) >0 THEN
 
-        v_query_text = format(
-            'SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, 
-            cost, reverse_cost
-            FROM %I a 
-            WHERE a.mapzone_id = 0
-            AND a.graph_delimiter <> ''SECTOR'';',
-            v_temp_arc_table
-        );
+        v_query_text = '
+            SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, cost, reverse_cost
+            FROM temp_pgr_arc_linegraph  
+            WHERE mapzone_id = 0
+        ';
 
         TRUNCATE temp_pgr_drivingdistance;
         INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
@@ -172,99 +157,81 @@ BEGIN
         );
 
         -- border valves (open + chk) that have on the other side a water source
-        EXECUTE format(
-            'SELECT COALESCE(array_agg(DISTINCT d.start_vid), ARRAY[]::int[])
-            FROM temp_pgr_drivingdistance d
-            JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
-            WHERE a.graph_delimiter = ''SECTOR''
-            AND (d.node = a.pgr_node_1 AND a.reverse_cost >= 0 OR d.node = a.pgr_node_2 AND a."cost" >= 0);',
-            v_temp_arc_table
-        ) INTO v_root_with_water;
+        SELECT COALESCE(array_agg(DISTINCT d.start_vid), ARRAY[]::int[])
+        INTO v_root_with_water
+        FROM temp_pgr_drivingdistance d
+        JOIN temp_pgr_node_minsector n ON d.node = n.pgr_node_id
+        WHERE n.graph_delimiter = 'SECTOR';
 
         -- border valves (open + chk) that have on the other side a checkvalve
-        EXECUTE format(
-            'SELECT COALESCE(array_agg(DISTINCT d.start_vid), ARRAY[]::int[])
-            FROM temp_pgr_drivingdistance d
-            JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
-            WHERE a.graph_delimiter = ''MINSECTOR''
-            AND a.cost <> a.reverse_cost
-            AND d.node <> d.start_vid;',
-            v_temp_arc_table
-        ) INTO v_root_with_chk;
+        SELECT COALESCE(array_agg(DISTINCT d.start_vid), ARRAY[]::int[])
+        INTO v_root_with_chk
+        FROM temp_pgr_drivingdistance d
+        JOIN temp_pgr_arc_linegraph a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
+        WHERE a.cost <> a.reverse_cost
+        AND a.mapzone_id = 0;
 
         -- close the border open valves (not the border checkvalves) when the zones are with water and without checkvalves
-        EXECUTE format(
-            'UPDATE %I a SET proposed = TRUE
-             FROM (
-                SELECT DISTINCT start_vid
-                FROM temp_pgr_drivingdistance
-                WHERE start_vid = ANY ($1)
-                AND start_vid <> ALL ($2)
-            ) d
-            WHERE a.graph_delimiter = ''MINSECTOR''
-            AND a.mapzone_id = 1
-            AND a.cost >= 0 AND a.reverse_cost >= 0
-            AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);',
-            v_temp_arc_table
-        )
-        USING v_root_with_water, v_root_with_chk;
+        UPDATE temp_pgr_arc_linegraph a
+        SET proposed = TRUE
+        FROM (
+            SELECT DISTINCT start_vid
+            FROM temp_pgr_drivingdistance
+            WHERE start_vid = ANY (v_root_with_water)
+            AND NOT (start_vid = ANY (v_root_with_chk))
+        ) d
+        WHERE a.mapzone_id = 1
+        AND a.cost >= 0
+        AND a.reverse_cost >= 0
+        AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);
+
 
         -- update mapzone_id with value 2 for the border open valves and check valves when the zones are without water and without checkvalves
-        EXECUTE format(
-            'UPDATE %I n SET mapzone_id = 2
-            FROM (
-                SELECT DISTINCT node
-                FROM temp_pgr_drivingdistance
-                WHERE start_vid <> ALL ($1)
-            ) d
-            WHERE n.pgr_node_id =d.node
-            AND n.mapzone_id = 0;', 
-            v_temp_node_table
-        )
-        USING v_root_with_water;
+        UPDATE temp_pgr_node_minsector n
+        SET mapzone_id = 2
+        FROM (
+            SELECT DISTINCT node
+            FROM temp_pgr_drivingdistance
+            WHERE start_vid <> ALL (v_root_with_water)
+        ) d
+        WHERE n.pgr_node_id = d.node
+        AND n.mapzone_id = 0;
 
         -- for the arcs that connect with the nodes;
-        EXECUTE format(
-            'UPDATE %I a set mapzone_id = 2
-            WHERE a.mapzone_id = 0
-            AND EXISTS (
-                SELECT  1 FROM %I n
-                WHERE n.mapzone_id = 2
-                AND n.pgr_node_id  IN (a.pgr_node_1, a.pgr_node_2)
-            );',
-            v_temp_arc_table, v_temp_node_table
+        UPDATE temp_pgr_arc_linegraph a
+        SET mapzone_id = 2
+        WHERE a.mapzone_id = 0
+        AND EXISTS (
+            SELECT 1
+            FROM temp_pgr_node_minsector n
+            WHERE n.mapzone_id = 2
+            AND n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         );
 
         -- v_root_vids - for the border open valves that have zones with water and with checkvalves
-        EXECUTE format(
-            'SELECT COALESCE(array_agg(d.start_vid), ARRAY[]::int[])
-            FROM (
-                SELECT DISTINCT start_vid 
-                FROM temp_pgr_drivingdistance
-                WHERE start_vid = ANY ($1)
-                AND start_vid = ANY ($2)
-            ) d
-            JOIN %I a ON d.start_vid IN (a.pgr_node_1, a.pgr_node_2)
-            WHERE a.graph_delimiter = ''MINSECTOR''
-            AND a.mapzone_id = 1
-            AND a.cost >= 0 AND a.reverse_cost >= 0;',
-            v_temp_arc_table
-        )
-        USING v_root_with_water, v_root_with_chk
-        INTO v_root_vids;
+        SELECT COALESCE(array_agg(d.start_vid), ARRAY[]::int[])
+        INTO v_root_vids
+        FROM (
+            SELECT DISTINCT start_vid
+            FROM temp_pgr_drivingdistance
+            WHERE start_vid = ANY (v_root_with_water)
+            AND start_vid = ANY (v_root_with_chk)
+        ) d
+        JOIN temp_pgr_arc_linegraph a
+        ON d.start_vid IN (a.pgr_node_1, a.pgr_node_2)
+        WHERE a.mapzone_id = 1
+        AND a.cost >= 0
+        AND a.reverse_cost >= 0;
 
         -- STEP 3 INVERTED flood with cost/reverse_cost for the borders that have wet zones with checkvalves inside
         IF  cardinality (v_root_vids) > 0 THEN
 
             -- query pgr_drivingdistance
-            v_query_text = format(
-                'SELECT pgr_arc_id as id, pgr_node_1 as source, pgr_node_2 as target, 
-                reverse_cost AS cost, cost as reverse_cost
-                FROM %I a 
+            v_query_text = 
+                'SELECT pgr_arc_id as id, pgr_node_2 as source, pgr_node_1 as target, cost, reverse_cost
+                FROM temp_pgr_arc_linegraph a 
                 WHERE a.mapzone_id = 0
-                AND a.graph_delimiter <> ''SECTOR'';',
-                v_temp_arc_table
-            );
+            ';
 
             TRUNCATE temp_pgr_drivingdistance;
             INSERT INTO temp_pgr_drivingdistance(seq,"depth",start_vid,pred,node,edge,"cost",agg_cost)
@@ -272,75 +239,63 @@ BEGIN
             );
 
             -- border valves that have on the other side a water source
-            EXECUTE format(
-                'SELECT COALESCE(array_agg(DISTINCT start_vid), ARRAY[]::int[])
-                FROM temp_pgr_drivingdistance d
-                JOIN %I a ON d.node IN (a.pgr_node_1, a.pgr_node_2)
-                WHERE a.graph_delimiter = ''SECTOR''
-                AND (d.node = a.pgr_node_1 AND a.cost >= 0 OR d.node = a.pgr_node_2 AND a.reverse_cost >= 0);',
-                v_temp_arc_table
-            ) INTO v_root_with_water;
+            SELECT COALESCE(array_agg(DISTINCT d.start_vid), ARRAY[]::int[])
+            INTO v_root_with_water
+            FROM temp_pgr_drivingdistance d
+            JOIN temp_pgr_node_minsector n ON d.node = n.pgr_node_id
+            WHERE n.graph_delimiter = 'SECTOR';
 
             -- close the valves that have on the other side a water source
-            EXECUTE format(
-                'UPDATE %I a SET proposed = TRUE
+            UPDATE temp_pgr_arc_linegraph a
+            SET proposed = TRUE
+            FROM (
+                SELECT DISTINCT start_vid
+                FROM temp_pgr_drivingdistance
+                WHERE start_vid = ANY (v_root_with_water)
+            ) d
+            WHERE a.mapzone_id = 1
+            AND a.cost >= 0
+            AND a.reverse_cost >= 0
+            AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);
+
+            -- si v_ignore_check_valves is TRUE, close also the valves that seem without water because of a checkvalve
+            IF v_ignore_check_valves THEN
+                UPDATE temp_pgr_arc_linegraph a
+                SET proposed = TRUE
                 FROM (
                     SELECT DISTINCT start_vid
                     FROM temp_pgr_drivingdistance
-                    WHERE start_vid = ANY ($1)
+                    WHERE start_vid <> ALL (v_root_with_water)
                 ) d
-                WHERE a.graph_delimiter = ''MINSECTOR''
-                AND a.mapzone_id = 1
-                AND a.cost >= 0 AND a.reverse_cost >= 0
-                AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);',
-                v_temp_arc_table
-            )
-            USING v_root_with_water;
-
-            -- si v_ignore_check_valves is TRUE, close also the valves that seems without water because of a checkvalve
-            IF v_ignore_check_valves THEN
-                EXECUTE format(
-                    'UPDATE %I a SET proposed = TRUE
-                    FROM (
-                        SELECT DISTINCT start_vid
-                        FROM temp_pgr_drivingdistance
-                        WHERE start_vid <> ALL ($1)
-                    ) d
-                    WHERE a.graph_delimiter = ''MINSECTOR''
-                    AND a.mapzone_id = 1
-                    AND a.cost >= 0 AND a.reverse_cost >= 0
-                    AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);',
-                    v_temp_arc_table
-                )
-                USING v_root_with_water;
+                WHERE a.mapzone_id = 1
+                AND a.cost >= 0
+                AND a.reverse_cost >= 0
+                AND d.start_vid IN (a.pgr_node_1, a.pgr_node_2);
             END IF;
 
             -- update mapzone_id with value 2 for the border open valves when the zones are without water
             -- for the nodes
-            EXECUTE format(
-                'UPDATE %I n SET mapzone_id = 2
-                FROM (
-                    SELECT DISTINCT node
-                    FROM temp_pgr_drivingdistance
-                    WHERE start_vid <> ALL ($1)
-                ) d
-                WHERE n.pgr_node_id =d.node
-                AND n.mapzone_id = 0;', 
-                v_temp_node_table
-            )
-            USING v_root_with_water;
+            UPDATE temp_pgr_node_minsector n
+            SET mapzone_id = 2
+            FROM (
+                SELECT DISTINCT node
+                FROM temp_pgr_drivingdistance
+                WHERE start_vid <> ALL (v_root_with_water)
+            ) d
+            WHERE n.pgr_node_id = d.node
+            AND n.mapzone_id = 0;
 
             -- for the arcs that connect with the nodes
-            EXECUTE format(
-                'UPDATE %I a set mapzone_id = 2
-                WHERE a.mapzone_id = 0
-                AND EXISTS (
-                    SELECT  1 FROM %I n
-                    WHERE n.mapzone_id = 2
-                    AND n.pgr_node_id  IN (a.pgr_node_1, a.pgr_node_2)
-                );',
-                v_temp_arc_table, v_temp_node_table
+            UPDATE temp_pgr_arc_linegraph a
+            SET mapzone_id = 2
+            WHERE a.mapzone_id = 0
+            AND EXISTS (
+                SELECT 1
+                FROM temp_pgr_node_minsector n
+                WHERE n.mapzone_id = 2
+                AND n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
             );
+
         END IF;
     END IF;
 

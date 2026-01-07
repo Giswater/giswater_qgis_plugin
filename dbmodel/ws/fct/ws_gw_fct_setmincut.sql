@@ -1,4 +1,4 @@
-/*
+/*)
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -41,15 +41,17 @@ v_action text;
 v_mincut_id integer;
 v_mincut_class integer;
 v_valve_node_id integer;
-v_pgr_node_id integer;
+v_pgr_root_vid integer;
 v_arc_id integer;
+v_arc_exists boolean;
+v_node integer;
+v_init_node integer;
 v_use_plan_psectors boolean;
 v_mincut_version text;
 -- 6.0 - normal mincut
 -- 6.1 - mincut with minsectors
 v_vdefault json;
 v_ignore_check_valves boolean;
-v_node integer;
 
 v_action_aux text;
 
@@ -82,9 +84,8 @@ v_point public.geometry;
 v_id integer;
 v_version text;
 v_days integer;
-v_querytext text;
+v_query_text text;
 v_pgr_distance float;
-v_pgr_root_vids int[];
 
 -- mincut details
 v_mincut_details json;
@@ -121,7 +122,6 @@ v_mincut_conflict_state integer := 5; -- Conflict mincut state
 
 v_mincut_network_class integer := 1; -- Network mincut class
 
-v_query_text text;
 v_data json;
 v_result json;
 v_result_info json;
@@ -137,11 +137,9 @@ v_prepare_mincut boolean := FALSE;
 v_core_mincut boolean := FALSE;
 
 v_mode text;
-v_temp_arc_table regclass;
-v_temp_node_table regclass;
 
 v_update_map_zone integer := 0;
-v_concave_hull float = 0.9;
+v_concave_hull float := 0.9;
 v_srid integer;
 v_geom_param_update float := 10;
 v_geom_param_update_divide float;
@@ -192,8 +190,8 @@ BEGIN
 	v_update_map_zone := (SELECT value::json->>'bufferType' FROM config_param_system WHERE parameter = 'om_mincut_config');
 	v_geom_param_update := (SELECT value::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'om_mincut_config');
 
-	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
-	IF v_cur_user IS NULL THEN v_cur_user = current_user; END IF;
+	IF v_client_epsg IS NULL THEN v_client_epsg := v_epsg; END IF;
+	IF v_cur_user IS NULL THEN v_cur_user := current_user; END IF;
 
 
 	-- Create temporary tables if not exists
@@ -214,33 +212,46 @@ BEGIN
 	-- get arc_id from click
 	IF v_xcoord IS NOT NULL THEN
 		v_sensibility_f := (SELECT (value::json->>'web')::float FROM config_param_system WHERE parameter = 'basic_info_sensibility_factor');
-		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
+		v_sensibility := (v_zoomratio / 500 * v_sensibility_f);
 
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT arc_id INTO v_arc_id FROM v_temp_arc WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
-	END IF;
-
-	-- get node_id from coordinates
+		SELECT va.arc_id INTO v_arc_id 
+		FROM ve_arc va
+		WHERE ST_DWithin(va.the_geom, v_point,v_sensibility)
+		AND EXISTS (
+			SELECT 1 
+			FROM v_temp_arc vta 
+			WHERE va.arc_id = vta.arc_id
+		) 
+		LIMIT 1;
+	END IF; 
+ 
+	-- get valve from coordinates
 	IF v_valve_node_id IS NULL AND v_xcoord IS NOT NULL THEN
 		v_sensibility_f := (SELECT (value::json->>'web')::float FROM config_param_system WHERE parameter = 'basic_info_sensibility_factor');
-		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
+		v_sensibility := (v_zoomratio / 500 * v_sensibility_f);
 
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
 		SELECT vn.node_id INTO v_valve_node_id
 		FROM ve_node vn
-		JOIN cat_feature_node cfn ON vn.node_type = cfn.id
-		WHERE ST_DWithin(vn.the_geom, v_point,v_sensibility)
-		AND 'MINSECTOR' = ANY(cfn.graph_delimiter) LIMIT 1;
+		WHERE ST_DWithin(vn.the_geom, v_point, v_sensibility)
+		AND EXISTS (
+			SELECT 1
+			FROM v_temp_node vtn
+			WHERE vtn.node_id = vn.node_id
+				AND 'MINSECTOR' = ANY (vtn.graph_delimiter)
+		)
+		LIMIT 1;
 	END IF;
 
 	-- CHECK
 	-- check if use psectors is active with minsector version
 	IF v_use_plan_psectors AND v_mincut_version = '6.1' THEN
-		v_mincut_version = '6';
+		v_mincut_version := '6';
 	END IF;
 
 	IF v_mincut_version = '6.1' THEN
@@ -248,33 +259,44 @@ BEGIN
     ELSE
 		v_mode := '';
     END IF;
-	v_temp_arc_table = 'temp_pgr_arc'::regclass;
-    v_temp_node_table = 'temp_pgr_node'::regclass;
 
 	--check if arc exists in database or look for a new arc_id in the same location
 	IF v_arc_id IS NULL THEN
-		SELECT anl_feature_id INTO v_arc_id FROM om_mincut WHERE id = v_mincut_id;
+		SELECT om.anl_feature_id INTO v_arc_id 
+			FROM om_mincut om
+			WHERE om.id = v_mincut_id
+			AND EXISTS (
+				SELECT 1 
+				FROM v_temp_arc vta 
+				WHERE om.anl_feature_id::integer = vta.arc_id
+			) ;
+		
+		IF v_arc_id IS NULL THEN
+			SELECT a.arc_id INTO v_arc_id
+			FROM v_temp_arc a
+			WHERE EXISTS (
+				SELECT 1 
+				FROM om_mincut om 
+				WHERE om.id = v_mincut_id 
+				AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1)
+			)
+			LIMIT 1;
+		END IF;	
 	END IF;
 
-	IF (SELECT count(*) FROM v_temp_arc WHERE arc_id = v_arc_id) = 0 THEN
-		SELECT a.arc_id INTO v_arc_id
-		FROM v_temp_arc a
-		WHERE EXISTS (SELECT 1 FROM om_mincut om WHERE om.id = v_mincut_id AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1))
-		LIMIT 1;
-
-		IF v_arc_id IS NULL THEN
-			RETURN ('{"status":"Failed", "message":{"level":2, "text":"Arc not found."}}')::json;
-		ELSE
-			UPDATE om_mincut SET
-				anl_feature_id = v_arc_id,
-				anl_feature_type = 'ARC',
-				anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
-			WHERE id = v_mincut_id;
-		END IF;
+	IF v_arc_id IS NULL THEN
+		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Arc not found."}}')::json;
+	ELSE
+		UPDATE om_mincut SET
+			anl_feature_id = v_arc_id,
+			anl_feature_type = 'ARC',
+			anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
+		WHERE id = v_mincut_id;
 	END IF;
 
 	IF v_mode = 'MINSECTOR' THEN
-		v_node := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+		SELECT minsector_id INTO v_node 
+		FROM v_temp_arc WHERE arc_id = v_arc_id;
 
 		IF v_node IS NULL OR v_node = 0 THEN
 			RETURN jsonb_build_object(
@@ -286,31 +308,52 @@ BEGIN
 			);
 		END IF;
 	ELSE
-		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 0 if both of the nodes are water source
-		EXECUTE format('
-			SELECT COALESCE(
-				(SELECT node_id
-				FROM v_temp_node n
-				JOIN v_temp_arc a ON n.node_id IN (a.node_1, node_2)
-				WHERE a.arc_id = %L
-				AND ''SECTOR'' <> ALL(n.graph_delimiter)
-				LIMIT 1
-			), 0);
-		', v_arc_id)
-		INTO v_node;
+		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 
+		SELECT node_id INTO v_node
+		FROM v_temp_node n
+		JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+		WHERE a.arc_id = v_arc_id
+		AND 'SECTOR' <> ALL(n.graph_delimiter)
+		LIMIT 1;
+		-- TODO: is not an error, is a mincut that is an arc in between 2 water sources
+		IF v_node IS NULL THEN
+			RETURN jsonb_build_object(
+				'status', 'Failed',
+				'message', jsonb_build_object(
+					'level', 2,
+					'text', 'Arc in between two water sources.'
+				)
+			);           
+		END IF;
 	END IF;
 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
 	END IF;
 
+	-- check if the arc exists in the cluster:
+		-- true: refresh mincut
+		-- false: init and refresh mincut
+	IF v_mode = 'MINSECTOR' THEN
+		SELECT EXISTS (
+			SELECT 1
+			FROM temp_pgr_node_minsector
+			WHERE pgr_node_id = v_node
+		)
+		INTO v_arc_exists;
+	ELSE
+		SELECT EXISTS (
+			SELECT 1
+			FROM temp_pgr_arc
+			WHERE pgr_arc_id = v_arc_id
+		)
+		INTO v_arc_exists;
+	END IF;
+
 	-- manage actions
+	------------------
 	IF v_action = 'mincutNetwork' THEN
-		-- check if the arc exists in the cluster:
-			-- true: refresh mincut
-			-- false: init and refresh mincut
-		EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
-		IF v_row_count = 0 THEN
+		IF v_arc_exists IS FALSE THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
 		ELSE
@@ -327,7 +370,7 @@ BEGIN
 			FOR v_default_key, v_default_value IN SELECT * FROM jsonb_each_text(v_vdefault::jsonb) LOOP
 				EXECUTE 'UPDATE om_mincut SET '||v_default_key||' = '||v_default_value||' WHERE id = '||v_mincut_id||';';
 			END LOOP;
-			p_data = jsonb_set(p_data::jsonb, '{data,mincutId}', to_jsonb(v_mincut_id))::json;
+			p_data := jsonb_set(p_data::jsonb, '{data,mincutId}', to_jsonb(v_mincut_id))::json;
 
 			-- Build dynamic UPDATE with only passed parameters
 			v_query_text := format(
@@ -349,11 +392,7 @@ BEGIN
 		END IF;
 
 	ELSIF v_action = 'mincutRefresh' THEN
-		-- check if the arc exists in the cluster:
-			-- true: refresh mincut
-			-- false: init and refresh mincut
-		EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
-		IF v_row_count = 0 THEN
+		IF v_arc_exists IS FALSE THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
 		ELSE
@@ -381,8 +420,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
-			IF v_row_count = 0 THEN
+			IF v_arc_exists IS FALSE THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
 			ELSE
@@ -409,8 +447,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
-			IF v_row_count = 0 THEN
+			IF v_arc_exists IS FALSE THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
 			ELSE
@@ -420,7 +457,7 @@ BEGIN
 			v_core_mincut := TRUE;
 		END IF;
 	ELSIF v_action = 'mincutStart' THEN
-		v_message = json_build_object(
+		v_message := json_build_object(
 			'text', 'Start mincut',
 			'level', 3
 		);
@@ -445,8 +482,7 @@ BEGIN
 			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
 
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
-				EXECUTE format('SELECT count(*) FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_row_count;
-				IF v_row_count = 0 THEN
+				IF v_arc_exists IS FALSE THEN
 					v_init_mincut := TRUE;
 					v_prepare_mincut := FALSE;
 				ELSE
@@ -468,14 +504,14 @@ BEGIN
 	ELSIF v_action IN ('mincutAccept', 'mincutEnd') THEN
 
 		-- call setfields
-		v_message = json_build_object(
+		v_message := json_build_object(
 			'text', 'Mincut accepted.',
 			'level', 3
 		);
 		IF v_device = 5 THEN
 			IF v_action = 'mincutAccept' THEN
-				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
-				EXECUTE v_querytext;
+				v_query_text := concat('SELECT gw_fct_setfields($$', p_data, '$$);');
+				EXECUTE v_query_text;
 				-- Update planning fields if mincutAccept and state = 0 (plannified)
 				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_plannified_state THEN
 					v_query_text := 'UPDATE om_mincut SET id = id';
@@ -554,9 +590,9 @@ BEGIN
 
 		SELECT * INTO v_mincut_record FROM om_mincut WHERE id = v_mincut_id;
 
-        DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
+        DELETE FROM audit_check_data WHERE cur_user = current_user AND fid=216;
 		IF v_mincut_conflict_group_id IS NOT NULL THEN
-			v_has_overlap = TRUE;
+			v_has_overlap := TRUE;
 
 			-- creating log
 			SELECT string_agg(result_id::text, ',') INTO v_mincut_affected_ids FROM selector_mincut_result WHERE cur_user = current_user AND result_type = 'affected';
@@ -601,7 +637,7 @@ BEGIN
 			END LOOP;
 
 		ELSE
-			v_has_overlap = FALSE;
+			v_has_overlap := FALSE;
 
 			-- mincut details
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4362", "function":"2244", "fid":"216", "criticity":"3", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -618,11 +654,11 @@ BEGIN
 
 		-- get results
 		-- info
-		v_result = null;
+		v_result := null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
+		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user = current_user AND fid=216 order by id) row;
 		v_result := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"values":',v_result, '}');
+		v_result_info := concat ('{"values":',v_result, '}');
 
 		-- bbox (the boundary of mincut using arcs and valves)
 		SELECT jsonb_build_object(
@@ -644,12 +680,12 @@ BEGIN
 
 		-- Set message based on overlap status
 		IF v_has_overlap THEN
-			v_message = json_build_object(
+			v_message := json_build_object(
 				'level', 1,
 				'text', 'Mincut has overlapping conflicts'
 			);
 		ELSE
-			v_message = json_build_object(
+			v_message := json_build_object(
 				'level', 3,
 				'text', 'Analysis done successfully'
 			);
@@ -675,7 +711,7 @@ BEGIN
 		);
 
 	ELSIF v_action = 'mincutCancel' THEN
-		v_message = json_build_object(
+		v_message := json_build_object(
 			'text', 'Mincut to cancel not found.',
 			'level', 1
 		);
@@ -703,16 +739,16 @@ BEGIN
 			ELSE
 				UPDATE om_mincut SET mincut_state = v_mincut_cancel_state WHERE id = v_mincut_id;
 			END IF;
-			v_message = json_build_object(
+			v_message := json_build_object(
 				'text', 'Mincut cancelled.',
 				'level', 0
 			);
 
 		END IF;
 		-- manage null values
-		v_message = COALESCE(v_message, '{}');
+		v_message := COALESCE(v_message, '{}');
 
-		v_response = json_build_object(
+		v_response := json_build_object(
 			'status', 'Accepted',
 			'message', v_message,
 			'version', v_version,
@@ -724,22 +760,22 @@ BEGIN
 		);
 		RETURN v_response;
 	ELSIF v_action = 'mincutDelete' THEN
-		v_message = json_build_object(
+		v_message := json_build_object(
 			'text', 'Mincut to delete not found.',
 			'level', 1
 		);
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			DELETE FROM om_mincut WHERE id = v_mincut_id;
-			v_message = json_build_object(
+			v_message := json_build_object(
 				'text', 'Mincut deleted.',
 				'level', 0
 			);
 		END IF;
 
 		-- manage null values
-		v_message = COALESCE(v_message, '{}');
+		v_message := COALESCE(v_message, '{}');
 
-		v_response = json_build_object(
+		v_response := json_build_object(
 			'status', 'Accepted',
 			'message', v_message,
 			'version', v_version,
@@ -756,226 +792,516 @@ BEGIN
 	IF v_init_mincut THEN
 		-- Initialize process
 		-- =======================
+		IF v_mode = 'MINSECTOR' THEN 
+			TRUNCATE temp_pgr_node_minsector;
+			TRUNCATE temp_pgr_arc_linegraph;
 
-		v_data := jsonb_build_object(
-			'data', jsonb_build_object(
-				'mapzone_name', 'MINCUT',
-				'node', v_node,
-				'mode', v_mode,
-				'cost', 1,
-				'reverse_cost', 1
-			)
-		)::text;
-		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+			-- insert MINSECTOR nodes
+			SELECT count(*)::float FROM  minsector_graph INTO v_pgr_distance;
+			v_query_text := '
+				SELECT node_id AS id, minsector_1 AS source, minsector_2 AS target, 1 AS cost
+            	FROM minsector_graph
+			';
+			INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter)
+			SELECT node, 'MINSECTOR'
+			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
-		END IF;
+			-- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE (graph_delimiter as 'SECTOR')
+			-- TANK
+			UPDATE temp_pgr_node_minsector t
+			SET graph_delimiter = 'SECTOR'
+			WHERE EXISTS (
+				SELECT 1
+				FROM v_temp_node n
+				JOIN man_tank m USING (node_id)
+				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+				WHERE 'SECTOR' = ANY (n.graph_delimiter)
+				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+				AND t.pgr_node_id =a.minsector_id
+			);
 
-		IF v_node = 0 THEN
-            -- the arc is between 2 water source nodes, v_temp_node_table(temp_pgr_node) has no nodes, insert them
-			EXECUTE format('
-                INSERT INTO temp_pgr_node (node_id, graph_delimiter)
-                SELECT n.node_id, ''SECTOR''
-                FROM v_temp_node n
-                JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
-                WHERE a.arc_id = %L
-            ', v_arc_id);
+			-- SOURCE
+			UPDATE temp_pgr_node_minsector t
+			SET graph_delimiter = 'SECTOR'
+			WHERE EXISTS (
+				SELECT 1
+				FROM v_temp_node n
+				JOIN man_source m USING (node_id)
+				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+				WHERE 'SECTOR' = ANY (n.graph_delimiter)
+				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+				AND t.pgr_node_id =a.minsector_id
+			);
 
-			INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, cost, reverse_cost)
-			SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, 1 as cost, 1 as reverse_cost
+			-- WATERWELL
+			UPDATE temp_pgr_node_minsector t
+			SET graph_delimiter = 'SECTOR'
+			WHERE EXISTS (
+				SELECT 1
+				FROM v_temp_node n
+				JOIN man_waterwell m USING (node_id)
+				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+				WHERE 'SECTOR' = ANY (n.graph_delimiter)
+				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+				AND t.pgr_node_id =a.minsector_id
+			);
+
+			-- WTP
+			UPDATE temp_pgr_node_minsector t
+			SET graph_delimiter = 'SECTOR'
+			WHERE EXISTS (
+				SELECT 1
+				FROM v_temp_node n
+				JOIN man_wtp m USING (node_id)
+				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+				WHERE 'SECTOR' = ANY (n.graph_delimiter)
+				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+				AND t.pgr_node_id =a.minsector_id
+			);
+
+			-- temp_pgr_arc is not used
+
+			-- insert the valves as arcs;
+			-- the table that is used: temp_pgr_arc_linegraph where pgr_node_id is the valve and pgr_node_1/pgr_node_2 are the connected minsectors
+			INSERT INTO temp_pgr_arc_linegraph (pgr_node_id, pgr_node_1, pgr_node_2, graph_delimiter)
+			SELECT a.node_id, a.minsector_1, a.minsector_2, 'MINSECTOR'
+			FROM minsector_graph a
+			WHERE EXISTS (SELECT 1 FROM temp_pgr_node_minsector n WHERE n.pgr_node_id = a.minsector_1)
+			AND EXISTS (SELECT 1 FROM temp_pgr_node_minsector n WHERE n.pgr_node_id = a.minsector_2);
+
+		ELSE
+			TRUNCATE temp_pgr_node;
+			TRUNCATE temp_pgr_arc;
+			TRUNCATE temp_pgr_node_minsector;
+			TRUNCATE temp_pgr_arc_linegraph;
+
+			-- insert nodes (the graph is without water sources that are SECTOR)
+			SELECT count(*)::float FROM  v_temp_arc INTO v_pgr_distance;
+			v_query_text := '
+				SELECT
+					arc_id AS id,
+					node_1 AS source,
+					node_2 AS target,
+					1 AS cost
+				FROM v_temp_arc a
+				WHERE NOT EXISTS (
+					SELECT 1 
+					FROM v_temp_node n 
+					JOIN man_tank m USING (node_id)
+					WHERE n.node_id IN (a.node_1, a.node_2) 
+					AND ''SECTOR''= any (n.graph_delimiter)
+				)
+				AND NOT EXISTS (
+					SELECT 1 
+					FROM v_temp_node n 
+					JOIN man_source m USING (node_id)
+					WHERE n.node_id IN (a.node_1, a.node_2) 
+					AND ''SECTOR''= any (n.graph_delimiter)
+				)
+				AND NOT EXISTS (
+					SELECT 1 
+					FROM v_temp_node n 
+					JOIN man_waterwell m USING (node_id)
+					WHERE n.node_id IN (a.node_1, a.node_2) 
+					AND ''SECTOR''= any (n.graph_delimiter)
+				)
+				AND NOT EXISTS (
+					SELECT 1 
+					FROM v_temp_node n 
+					JOIN man_wtp m USING (node_id)
+					WHERE n.node_id IN (a.node_1, a.node_2) 
+					AND ''SECTOR''= any (n.graph_delimiter)
+				)
+			';
+			INSERT INTO temp_pgr_node (pgr_node_id)
+			SELECT node
+			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
+
+			-- nodes that are valve MINSECTOR
+			UPDATE temp_pgr_node t 
+			SET graph_delimiter = 'MINSECTOR'
+			FROM v_temp_node n 
+			JOIN man_valve m ON n.node_id = m.node_id
+			WHERE t.pgr_node_id = n.node_id
+			AND 'MINSECTOR' = ANY (n.graph_delimiter);
+
+			-- insert arcs
+			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
+			SELECT a.arc_id, a.node_1, a.node_2
 			FROM v_temp_arc a
-			JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
-			JOIN temp_pgr_node n2 ON n2.node_id = a.node_2;
-		END IF;
+			WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
+			AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
 
-		-- Generate new arcs and update to_arc, closed, broken and cost
-		-- =======================
-		IF v_mode = 'MINSECTOR' THEN
-			EXECUTE format('
-				UPDATE %I t
-				SET modif = TRUE
-				WHERE graph_delimiter = ''SECTOR'';
-			', v_temp_node_table);
-		ELSE
-			EXECUTE format('
-				UPDATE %I t
-				SET modif = TRUE
-				WHERE graph_delimiter = ''MINSECTOR''
-				OR graph_delimiter = ''SECTOR'';
-			', v_temp_node_table);
-		END IF;
-
-		v_data := jsonb_build_object(
-			'data', jsonb_build_object(
-				'mapzone_name', 'MINCUT',
-				'mode', v_mode,
-				'cost', 0,
-				'reverse_cost', 0
+			-- insert the arcs that connect with WATER SOURCE and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
+			-- TANKS
+			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
+			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
+			FROM v_temp_arc a
+        	WHERE EXISTS (
+            	SELECT 1 
+				FROM v_temp_node n
+				JOIN man_tank m USING (node_id)
+				WHERE n.node_id IN (a.node_1, a.node_2)
+				AND 'SECTOR' = ANY (n.graph_delimiter)
+            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
 			)
-		)::text;
-		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
+            AND EXISTS (
+				SELECT 1 
+				FROM temp_pgr_node n 
+				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
+			);
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
+			-- SOURCE
+			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
+			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
+			FROM v_temp_arc a
+        	WHERE EXISTS (
+            	SELECT 1 
+				FROM v_temp_node n
+				JOIN man_source m USING (node_id)
+				WHERE n.node_id IN (a.node_1, a.node_2)
+				AND 'SECTOR' = ANY (n.graph_delimiter)
+            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+			)
+            AND EXISTS (
+				SELECT 1 
+				FROM temp_pgr_node n 
+				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
+			);
+
+			-- WATERWELL
+			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
+			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
+			FROM v_temp_arc a
+        	WHERE EXISTS (
+            	SELECT 1 
+				FROM v_temp_node n
+				JOIN man_waterwell m USING (node_id)
+				WHERE n.node_id IN (a.node_1, a.node_2)
+				AND 'SECTOR' = ANY (n.graph_delimiter)
+            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+			)
+            AND EXISTS (
+				SELECT 1 
+				FROM temp_pgr_node n 
+				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
+			);
+
+			-- WTP
+			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
+			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
+			FROM v_temp_arc a
+        	WHERE EXISTS (
+            	SELECT 1 
+				FROM v_temp_node n
+				JOIN man_wtp m USING (node_id)
+				WHERE n.node_id IN (a.node_1, a.node_2)
+				AND 'SECTOR' = ANY (n.graph_delimiter)
+            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+			)
+            AND EXISTS (
+				SELECT 1 
+				FROM temp_pgr_node n 
+				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
+			);
+
+			-- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
+			v_query_text := 
+			'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 AS cost
+			FROM temp_pgr_arc';
+
+			INSERT INTO temp_pgr_arc_linegraph (
+				pgr_arc_id, pgr_node_1, pgr_node_2, cost, reverse_cost
+			)
+			SELECT seq, source, target, cost, -1
+			FROM pgr_linegraph(
+				v_query_text,
+				directed => FALSE
+			);
+
+			-- update cost = -1 for graph_delimiter = MINSECTOR
+			--checking node_1 for arc_1
+			UPDATE temp_pgr_arc_linegraph t
+			SET cost = -1
+			FROM temp_pgr_arc_linegraph ta
+			JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
+			JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
+			WHERE EXISTS (
+				SELECT 1
+				FROM temp_pgr_node n
+				WHERE n.graph_delimiter = 'MINSECTOR'
+				AND n.pgr_node_id = a1.pgr_node_1
+			)
+			AND a1.pgr_node_1 IN (a2.pgr_node_1, a2.pgr_node_2)
+			AND ta.pgr_arc_id = t.pgr_arc_id;
+
+			--checking node_2 for arc_1
+			UPDATE temp_pgr_arc_linegraph t
+			SET cost = -1
+			FROM temp_pgr_arc_linegraph ta
+			JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
+			JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
+			WHERE EXISTS (
+				SELECT 1
+				FROM temp_pgr_node n
+				WHERE n.graph_delimiter = 'MINSECTOR'
+				AND n.pgr_node_id = a1.pgr_node_2
+			)
+			AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
+			AND ta.pgr_arc_id = t.pgr_arc_id;
+
+			-- Generate the minsectors
+			--------------------------
+			v_query_text :=
+			'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost 
+			FROM temp_pgr_arc_linegraph';
+
+			TRUNCATE temp_pgr_connectedcomponents;
+			INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
+			SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
+
+			-- Update the mapzone_id field for arcs (mapzone_id = min(arc_id) for the connected arcs)
+			UPDATE temp_pgr_arc a 
+			SET mapzone_id = c.component
+			FROM temp_pgr_connectedcomponents c
+			WHERE a.pgr_arc_id = c.node;
+
+			-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters 
+			UPDATE temp_pgr_arc 
+			SET mapzone_id = pgr_arc_id
+			WHERE mapzone_id = 0;
+
+			-- Update the mapzone_id field for nodes (temp_pgr_node doesn't contain nodes 'SECTOR')
+			UPDATE temp_pgr_node t
+			SET mapzone_id = n.mapzone_id
+			FROM (
+				SELECT n.pgr_node_id, min(a.mapzone_id) AS mapzone_id
+				FROM temp_pgr_node n
+				JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+				GROUP BY n.pgr_node_id
+				HAVING count(DISTINCT a.mapzone_id) = 1
+			) n
+			WHERE t.pgr_node_id = n.pgr_node_id;
+
+			-- Initialize tables for mincut
+			------------------------------
+			TRUNCATE temp_pgr_arc_linegraph;
+
+			-- fill the new temp_pgr_arc_linegraph
+			INSERT INTO temp_pgr_arc_linegraph (pgr_node_id, pgr_node_1, pgr_node_2, graph_delimiter)
+			SELECT n.pgr_node_id, min(a.mapzone_id), max(a.mapzone_id), 'MINSECTOR'
+			FROM temp_pgr_node n
+			JOIN man_valve m ON m.node_id = n.pgr_node_id
+			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+			WHERE n.graph_delimiter = 'MINSECTOR'
+			GROUP BY n.pgr_node_id
+			HAVING count(DISTINCT a.mapzone_id) = 2;
+
+			-- fill temp_pgr_node_minsector
+			INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter)
+			SELECT DISTINCT mapzone_id, 'MINSECTOR'
+			FROM temp_pgr_arc
+			WHERE mapzone_id > 0;
+
+			-- Update minsector temporary num_border for the minsectors that exist in temp_pgr_arc_linegraph
+			UPDATE temp_pgr_node_minsector tn
+			SET num_border = ta.num_border 
+			FROM (
+				SELECT n.pgr_node_id, count(*) AS num_border
+				FROM temp_pgr_node_minsector n
+				JOIN temp_pgr_arc_linegraph a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+				GROUP BY n.pgr_node_id
+			) ta
+			WHERE tn.pgr_node_id = ta.pgr_node_id;
+
+			 -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE (graph_delimiter as 'SECTOR')
+			UPDATE temp_pgr_node_minsector t
+			SET graph_delimiter = 'SECTOR'
+			WHERE EXISTS (
+				SELECT 1 FROM temp_pgr_arc a 
+				WHERE a.graph_delimiter = 'SECTOR'
+				AND a.mapzone_id = t.pgr_node_id
+			);
+
 		END IF;
 
-		-- the broken valves
-		EXECUTE format('
-			UPDATE %I a
-			SET cost = 0, reverse_cost = 0
-			WHERE a.graph_delimiter = ''MINSECTOR''
-			AND a.closed = FALSE 
-			AND a.to_arc IS NOT NULL
-			AND a.broken = TRUE;
-		', v_temp_arc_table);
+		-- UPDATE closed, broken, to_arc, costs for valves-minsector
+		UPDATE temp_pgr_arc_linegraph t
+		SET 
+			closed = m.closed,
+			broken = m.broken,
+			to_arc =
+				CASE
+					WHEN m.to_arc IS NULL THEN NULL
+					ELSE ARRAY[m.to_arc]
+				END,
+			cost_mincut = -1,
+			reverse_cost_mincut = -1
+		FROM man_valve m 
+		WHERE t.pgr_node_id = m.node_id;
 
-		-- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut for the new arcs)
-		-- new arcs MINSECTOR AND SECTOR
-		EXECUTE format('
-			UPDATE %I a
-			SET cost_mincut = -1, reverse_cost_mincut = -1
-			WHERE a.graph_delimiter IN (''MINSECTOR'', ''SECTOR'');
-		', v_temp_arc_table);
+		-- UPDATE cost/reverse_cost
+        -- close valves
+        UPDATE temp_pgr_arc_linegraph t
+        SET cost = -1, reverse_cost = -1
+        WHERE t.closed = TRUE;
 
-		-- the broken open valves
-		EXECUTE format('
-			UPDATE %I a
-			SET cost_mincut = 0, reverse_cost_mincut = 0
-			WHERE a.graph_delimiter = ''MINSECTOR''
-			AND a.closed = FALSE 
-			AND a.broken = TRUE;
-		', v_temp_arc_table);
+		-- operative checkvalves
+		IF v_mode = 'MINSECTOR' THEN
+			UPDATE temp_pgr_arc_linegraph t
+			SET 
+				cost = CASE WHEN EXISTS (SELECT 1 FROM v_temp_arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM v_temp_arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN -1 ELSE 1 END
+			WHERE t.closed = FALSE 
+			AND t.broken = FALSE
+			AND t.to_arc IS NOT NULL;
+		ELSE 
+			UPDATE temp_pgr_arc_linegraph t
+			SET 
+				cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
+			WHERE t.closed = FALSE 
+			AND t.broken = FALSE
+			AND t.to_arc IS NOT NULL;
+		END IF;
 
-		-- check valves
+		-- UPDATE cost_mincut/reverse_cost_mincut
+		-- ignore_broken_valves 
+		UPDATE temp_pgr_arc_linegraph t
+		SET cost_mincut = 1, reverse_cost_mincut = 1
+		WHERE t.closed = FALSE
+		AND t.broken = TRUE;
+
+		-- ignore check_valves
 		IF v_ignore_check_valves THEN
-			EXECUTE format('
-				UPDATE %I a
-				SET cost_mincut = 0, reverse_cost_mincut = 0
-				WHERE a.graph_delimiter = ''MINSECTOR''
-				AND a.closed = FALSE 
-				AND a.cost <> a.reverse_cost
-			', v_temp_arc_table);
-		ELSE
-			EXECUTE format('
-				UPDATE %I a
-				SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
-				WHERE a.graph_delimiter = ''MINSECTOR''
-				AND a.closed = FALSE 
-				AND a.cost <> a.reverse_cost
-			', v_temp_arc_table);
-		END IF;
+            UPDATE temp_pgr_arc_linegraph t
+            SET cost_mincut = 1, reverse_cost_mincut = 1
+            WHERE t.closed = FALSE
+            AND t.broken = FALSE
+            AND t.to_arc IS NOT NULL;
+        ELSE
+            UPDATE temp_pgr_arc_linegraph t
+            SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
+            WHERE t.closed = FALSE
+            AND t.broken = FALSE
+            AND t.to_arc IS NOT NULL;
+        END IF;
+
 	END IF;
 
 	IF v_prepare_mincut THEN
 		-- prepare mincut
-		EXECUTE format('
-			UPDATE %I 
-			SET mapzone_id = 0 
-			WHERE mapzone_id <> 0;
-		', v_temp_arc_table);
+		UPDATE temp_pgr_node_minsector 
+		SET mapzone_id = 0 
+		WHERE mapzone_id <> 0;
 
-		EXECUTE format('
-			UPDATE %I 
-			SET mapzone_id = 0 
-			WHERE mapzone_id <> 0;
-		', v_temp_node_table);
+		UPDATE temp_pgr_arc_linegraph 
+		SET mapzone_id = 0 
+		WHERE mapzone_id <> 0;
 
 		-- set the default values for proposed valves for current mincut (old_mapzone_id = 0) and adjacents mincuts, if they exist (old_mapzone_id <> 0)
-		EXECUTE format('
-			UPDATE %I 
-			SET proposed = FALSE
-			WHERE proposed = TRUE
-				AND old_mapzone_id = 0;
-		', v_temp_arc_table);
+		UPDATE temp_pgr_arc_linegraph
+		SET proposed = FALSE
+		WHERE proposed = TRUE
+		AND old_mapzone_id = 0;
 
-		EXECUTE format('
-			UPDATE %I 
-			SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
-            WHERE proposed = TRUE
-                AND old_mapzone_id <> 0;
-		', v_temp_arc_table);
+		UPDATE temp_pgr_arc_linegraph
+		SET proposed = FALSE,
+			cost = 1,
+			reverse_cost = 1,
+			old_mapzone_id = 0
+		WHERE proposed = TRUE
+		AND old_mapzone_id <> 0;
 
-		-- set the default values for unaccess valves for current mincut, the unaccess valves of the adjacents valves are not taken in account
-		EXECUTE format('
-            UPDATE %I 
-            SET unaccess = FALSE, cost_mincut = -1, reverse_cost_mincut = -1
-            WHERE unaccess = TRUE;
-        ', v_temp_arc_table);
+		-- set the default values for unaccess valves for current mincut,
+		-- the unaccess valves of the adjacent valves are not taken into account
+		UPDATE temp_pgr_arc_linegraph
+		SET unaccess = FALSE,
+			cost_mincut = -1,
+			reverse_cost_mincut = -1
+		WHERE unaccess = TRUE;
 
-		-- set the default values for changestatus valves for current mincut (old_mapzone_id = 0) and adjacents mincuts, if they exist (old_mapzone_id <> 0)
-		EXECUTE format('
-            UPDATE %I 
-            SET changestatus = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
-            WHERE changestatus = TRUE;
-        ', v_temp_arc_table);
+		-- set the default values for changestatus valves 
+		--for current mincut (old_mapzone_id = 0)
+		-- and adjacent mincuts, if they exist (old_mapzone_id <> 0)
+		UPDATE temp_pgr_arc_linegraph
+		SET changestatus = FALSE,
+			cost = -1,
+			reverse_cost = -1,
+			old_mapzone_id = 0
+		WHERE changestatus = TRUE;
+
 	END IF;
 
 	IF v_core_mincut THEN
 
 		-- update unaccess valves
-		IF v_mode = 'MINSECTOR' THEN
-			v_query_text := 'tpa.arc_id';
-		ELSE
-			v_query_text := 'COALESCE(tpa.node_1, tpa.node_2)';
-		END IF;
-		EXECUTE format('
-			UPDATE %I tpa
-			SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
-			FROM om_mincut_valve omv
-			WHERE omv.result_id = %L
-			AND omv.unaccess = TRUE
-			AND omv.node_id = %s
-			AND tpa.graph_delimiter = ''MINSECTOR'';
-		', v_temp_arc_table, v_mincut_id, v_query_text);
+		UPDATE temp_pgr_arc_linegraph tpa
+		SET unaccess = TRUE,
+			cost_mincut = 1,
+			reverse_cost_mincut = 1
+		FROM om_mincut_valve omv
+		WHERE omv.result_id = v_mincut_id
+		AND omv.unaccess = TRUE
+		AND omv.node_id = tpa.pgr_node_id
+		AND tpa.graph_delimiter = 'MINSECTOR';
 
 		-- update changestatus valves (temporary open the closed valves that belong to the mincut)
-		EXECUTE format('
-			UPDATE %I tpa
-			SET changestatus = TRUE, cost = 0, reverse_cost = 0
-			FROM om_mincut_valve omv
-			WHERE omv.result_id = %L
-			AND omv.node_id = %s
-			AND omv.changestatus = TRUE
-			AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
-			AND tpa.graph_delimiter = ''MINSECTOR'';
-		', v_temp_arc_table, v_mincut_id, v_query_text);
+		UPDATE temp_pgr_arc_linegraph tpa
+		SET changestatus = TRUE,
+			cost = 1,
+			reverse_cost = 1
+		FROM om_mincut_valve omv
+		WHERE omv.result_id = v_mincut_id
+		AND omv.node_id = tpa.pgr_node_id
+		AND omv.changestatus = TRUE
+		AND tpa.closed = TRUE
+		AND tpa.broken = FALSE
+		AND tpa.to_arc IS NULL
+		AND tpa.graph_delimiter = 'MINSECTOR';
 
 		-- mincut
-		EXECUTE format('SELECT count(*)::float FROM %I;', v_temp_arc_table) INTO v_pgr_distance;
+		---------
+		SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_linegraph;
+
 		IF v_mode = 'MINSECTOR' THEN
-			EXECUTE format('SELECT pgr_node_id FROM %I WHERE node_id = %L;', v_temp_node_table, v_node) INTO v_pgr_node_id;
+			v_pgr_root_vid := v_node;
 		ELSE
-			EXECUTE format('SELECT pgr_node_1 FROM %I WHERE arc_id = %L;', v_temp_arc_table, v_arc_id) INTO v_pgr_node_id;
+			SELECT mapzone_id INTO v_pgr_root_vid
+			FROM temp_pgr_arc 
+			WHERE pgr_arc_id = v_arc_id;
 		END IF;
 
 		-- Use jsonb_build_object for cleaner and safer JSON construction
 		v_data := jsonb_build_object(
 			'data', jsonb_build_object(
 				'pgrDistance', v_pgr_distance,
-				'pgrRootVids', ARRAY[v_pgr_node_id],
+				'pgrRootVids', ARRAY[v_pgr_root_vid],
 				'ignoreCheckValvesMincut', v_ignore_check_valves,
 				'mode', v_mode
 			)
 		)::text;
 		v_response := gw_fct_mincut_core(v_data);
 
+		IF v_response->>'status' <> 'Accepted' THEN
+			RETURN v_response;
+		END IF;
+
 		-- include in the mincut the valves with changestatus TRUE that are out of the mincut
-		EXECUTE format('
-			UPDATE %I tpa
-			SET mapzone_id = %L
-			WHERE tpa.mapzone_id = 0
-			AND tpa.changestatus = TRUE;
-		', v_temp_arc_table, v_mincut_id);
+		UPDATE temp_pgr_arc_linegraph tpa
+		SET mapzone_id = v_mincut_id
+		WHERE tpa.mapzone_id = 0
+		AND tpa.changestatus = TRUE;
 
 		-- if a valve with changestatus = TRUE is proposed, remove changestatus
-		EXECUTE format('
-			UPDATE %I tpa
-			SET changestatus = FALSE, cost = -1, reverse_cost = -1
-			WHERE tpa.changestatus = TRUE
-				AND tpa.proposed = TRUE;
-		', v_temp_arc_table);
+		UPDATE temp_pgr_arc_linegraph tpa
+		SET changestatus = FALSE,
+			cost = -1,
+			reverse_cost = -1
+		WHERE tpa.changestatus = TRUE
+		AND tpa.proposed = TRUE;
 
+		-- delete this rows, and for the mincut conflict delete it in the om_mincut table. CASCADE.
 		DELETE FROM om_mincut_node where result_id=v_mincut_id;
 		DELETE FROM om_mincut_arc where result_id=v_mincut_id;
 		DELETE FROM om_mincut_connec where result_id=v_mincut_id;
@@ -1003,62 +1329,65 @@ BEGIN
 		DELETE FROM om_mincut_conflict
 		WHERE id IN (SELECT id FROM groups_conflict);
 
-		-- delete this rows, and for the mincut conflict delete it in the om_mincut table. CASCADE.
-
+		-- insert the arcs, nodes and valves for the mincut
 		IF v_mode = 'MINSECTOR' THEN
-			EXECUTE format('
-				INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
-				SELECT %L, vta.arc_id, vta.the_geom 
-				FROM %I tpn
-				JOIN v_temp_arc vta ON vta.minsector_id = tpn.node_id
-				WHERE tpn.mapzone_id <> 0
-				AND tpn.graph_delimiter = ''MINSECTOR'';
-			', v_mincut_id, v_temp_node_table);
+			-- insert arcs
+			INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
+			SELECT v_mincut_id, a.arc_id, a.the_geom
+			FROM temp_pgr_node_minsector m
+			JOIN v_temp_arc a ON a.minsector_id = m.pgr_node_id
+			WHERE m.mapzone_id <> 0;
 
-			EXECUTE format('
-				INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
-				SELECT %L, vtn.node_id, vtn.the_geom, vtn.node_type
-				FROM %I tpn
-				JOIN v_temp_node vtn ON vtn.minsector_id = tpn.node_id
-				WHERE tpn.mapzone_id <> 0
-				AND tpn.graph_delimiter = ''MINSECTOR'';
-			', v_mincut_id, v_temp_node_table);
+			-- insert nodes
+			INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
+			SELECT v_mincut_id, n.node_id, n.the_geom, n.node_type
+			FROM temp_pgr_node_minsector m
+			JOIN v_temp_node n ON n.minsector_id = m.pgr_node_id
+			WHERE m.mapzone_id <> 0;
 
-			EXECUTE format('
-				INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, changestatus, proposed, the_geom, to_arc)
-				SELECT %L, tpa.arc_id AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.changestatus, tpa.proposed, vtn.the_geom, tpa.to_arc[1]
-				FROM %I tpa
-				JOIN v_temp_node vtn ON vtn.node_id = tpa.arc_id
-				WHERE tpa.mapzone_id <> 0
-				AND tpa.graph_delimiter = ''MINSECTOR'';
-			', v_mincut_id, v_temp_arc_table);
 		ELSE
+			-- insert arcs
+			INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
+			SELECT v_mincut_id, a.arc_id, a.the_geom
+			FROM temp_pgr_node_minsector m
+			JOIN temp_pgr_arc tpa ON tpa.mapzone_id = m.pgr_node_id
+			JOIN v_temp_arc a ON a.arc_id = tpa.pgr_arc_id
+			WHERE m.mapzone_id <> 0;
 
-			EXECUTE format('
-				INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
-				SELECT %L, vta.arc_id, vta.the_geom 
-				FROM %I tpa
-				JOIN v_temp_arc vta ON vta.arc_id = tpa.arc_id
-				WHERE tpa.mapzone_id <> 0;
-			', v_mincut_id, v_temp_arc_table);
+			-- insert nodes
+			INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
+			SELECT v_mincut_id, n.node_id, n.the_geom, n.node_type
+			FROM temp_pgr_node_minsector m
+			JOIN temp_pgr_node tpn ON tpn.mapzone_id = m.pgr_node_id
+			JOIN v_temp_node n ON n.node_id = tpn.pgr_node_id
+			WHERE m.mapzone_id <> 0;
 
-			EXECUTE format('
-				INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
-				SELECT %L, vtn.node_id, vtn.the_geom, vtn.node_type
-				FROM %I tpn
-				JOIN v_temp_node vtn ON vtn.node_id = tpn.node_id
-				WHERE tpn.mapzone_id <> 0;
-			', v_mincut_id, v_temp_node_table);
-
-			EXECUTE format('
-				INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, unaccess, changestatus, proposed, the_geom, to_arc)
-				SELECT %L, COALESCE(tpa.node_1, tpa.node_2) AS node_id, tpa.closed, tpa.broken, tpa.unaccess, tpa.changestatus, tpa.proposed, vtn.the_geom, tpa.to_arc[1]
-				FROM %I tpa
-				JOIN v_temp_node vtn ON vtn.node_id = COALESCE(tpa.node_1, tpa.node_2)
-				WHERE tpa.mapzone_id <> 0
-				AND tpa.graph_delimiter = ''MINSECTOR'';
-			', v_mincut_id, v_temp_arc_table);
 		END IF;
+
+		-- insert valves
+			INSERT INTO om_mincut_valve (
+				result_id,
+				node_id,
+				closed,
+				broken,
+				unaccess,
+				changestatus,
+				proposed,
+				the_geom,
+				to_arc
+			)
+			SELECT v_mincut_id,
+				tpa.pgr_node_id AS node_id,
+				tpa.closed,
+				tpa.broken,
+				tpa.unaccess,
+				tpa.changestatus,
+				tpa.proposed,
+				vtn.the_geom,
+				tpa.to_arc[1]
+			FROM temp_pgr_arc_linegraph tpa
+			JOIN v_temp_node vtn ON vtn.node_id = tpa.pgr_node_id
+			WHERE tpa.mapzone_id <> 0;
 
 		IF v_update_map_zone = 0 THEN
 			-- do nothing
@@ -1169,17 +1498,15 @@ BEGIN
 
 		-- fill connnec & hydrometer details on om_mincut.output
 		-- count arcs
-		SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
+		SELECT count(arc_id), sum(ST_Length(the_geom))::numeric(12,2) INTO v_num_arcs, v_length
 		FROM om_mincut_arc
-		JOIN arc USING (arc_id)
-		WHERE result_id = v_mincut_id
-		GROUP BY result_id;
-
-		SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
-		FROM om_mincut_arc
-		JOIN arc USING (arc_id)
-		JOIN cat_arc ON arccat_id = cat_arc.id
 		WHERE result_id = v_mincut_id;
+
+		SELECT sum(pi() * (ca.dint * ca.dint / 4_000_000) * ST_Length(oma.the_geom))::numeric(12,2) INTO v_volume
+		FROM om_mincut_arc oma
+		JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
+		JOIN cat_arc ca ON vta.arccat_id = ca.id
+		WHERE oma.result_id = v_mincut_id;
 
 		-- count valves
 		SELECT count(node_id) INTO v_num_valve_proposed
@@ -1226,11 +1553,11 @@ BEGIN
 			) a
 		);
 
-		IF v_priority IS NULL THEN v_priority='{}'; END IF;
+		IF v_priority IS NULL THEN v_priority := '{}'; END IF;
 		v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
 
 
-		v_mincut_details = json_build_object(
+		v_mincut_details := json_build_object(
 			'arcs', json_build_object(
 				'number', v_num_arcs,
 				'length', v_length,
@@ -1329,73 +1656,67 @@ BEGIN
 			v_mincut_plannified_state, v_mincut_in_progress_state,
 			v_mincut_network_class,
 			v_forecast_start, v_forecast_end,
-			v_mincut_id,
-			v_temp_arc_table,
-			v_forecast_start, v_forecast_end
+			v_mincut_id
 			);
 
 			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
 
 				-- prepare mincut
-				EXECUTE format('
-					UPDATE %I 
-					SET mapzone_id = 0 
-					WHERE mapzone_id <> 0;
-				', v_temp_arc_table);
+				UPDATE temp_pgr_node_minsector 
+				SET mapzone_id = 0 
+				WHERE mapzone_id <> 0;
+
+				UPDATE temp_pgr_arc_linegraph 
+				SET mapzone_id = 0 
+				WHERE mapzone_id <> 0;
+
+				-- set the default values for proposed valves 
+				-- for current mincut (old_mapzone_id = 0)
+				UPDATE temp_pgr_arc_linegraph
+				SET proposed = FALSE
+				WHERE proposed = TRUE
+				AND old_mapzone_id = 0;
+
+				-- set the default values for proposed valves 
+				-- for adjacents mincuts, if they exist (old_mapzone_id <> 0)
+				UPDATE temp_pgr_arc_linegraph
+				SET proposed = FALSE,
+					cost = 1,
+					reverse_cost = 1,
+					old_mapzone_id = 0
+				WHERE proposed = TRUE
+				AND old_mapzone_id <> 0;
+
+				-- set the default values for changestatus valves
+				-- for adjacent mincuts, if they exist (old_mapzone_id <> 0)
+				UPDATE temp_pgr_arc_linegraph
+				SET changestatus = FALSE,
+					cost = -1,
+					reverse_cost = -1,
+					old_mapzone_id = 0
+				WHERE changestatus = TRUE
+				AND old_mapzone_id <> 0;
 
 				EXECUTE format('
-					UPDATE %I 
-					SET mapzone_id = 0 
-					WHERE mapzone_id <> 0;
-				', v_temp_node_table);
-
-				EXECUTE format('
-					UPDATE %I 
-					SET proposed = FALSE 
-					WHERE proposed = TRUE
-						AND old_mapzone_id = 0;
-				', v_temp_arc_table);
-
-				EXECUTE format('
-					UPDATE %I
-					SET proposed = FALSE, cost = 0, reverse_cost = 0, old_mapzone_id = 0
-					WHERE proposed = TRUE
-						AND old_mapzone_id <> 0;
-				', v_temp_arc_table);
-
-				EXECUTE format('
-					UPDATE %I
-					SET changestatus = FALSE, cost = -1, reverse_cost = -1, old_mapzone_id = 0
-					WHERE changestatus = TRUE
-						AND old_mapzone_id <> 0;
-				', v_temp_arc_table);
-
-				IF v_mode = 'MINSECTOR' THEN
-					v_query_text := 'tpa.arc_id';
-				ELSE
-					v_query_text := 'COALESCE(tpa.node_1, tpa.node_2)';
-				END IF;
-
-				EXECUTE format('
-					UPDATE %I tpa
-					SET changestatus = omv.changestatus, cost = 0, reverse_cost = 0, old_mapzone_id = omv.result_id
+					UPDATE temp_pgr_arc_linegraph tpa
+					SET changestatus = omv.changestatus, cost = 1, reverse_cost = 1, old_mapzone_id = omv.result_id
 					FROM om_mincut_valve omv
 					WHERE omv.result_id = ANY(%L)
-						AND omv.node_id = %s
+						AND omv.node_id = tpa.pgr_node_id
 						AND omv.changestatus = TRUE
 						AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
 						AND tpa.graph_delimiter = ''MINSECTOR'';
-				', v_temp_arc_table, v_mincut_group_record.mincut_group, v_query_text);
+				', v_mincut_group_record.mincut_group);
 
 				EXECUTE format('
-					UPDATE %I tpa
+					UPDATE temp_pgr_arc_linegraph tpa
 					SET proposed = omv.proposed, cost = -1, reverse_cost = -1, old_mapzone_id = omv.result_id
 					FROM om_mincut_valve omv
 					WHERE omv.result_id = ANY(%L)
 						AND omv.proposed = TRUE
-						AND omv.node_id = %s
+						AND omv.node_id = tpa.pgr_node_id
 						AND tpa.graph_delimiter = ''MINSECTOR'';
-				', v_temp_arc_table, v_mincut_group_record.mincut_group, v_query_text);
+				', v_mincut_group_record.mincut_group);
 
 				GET DIAGNOSTICS v_row_count = ROW_COUNT;
 
@@ -1406,7 +1727,7 @@ BEGIN
 				v_data := jsonb_build_object(
 					'data', jsonb_build_object(
 						'pgrDistance', v_pgr_distance,
-						'pgrRootVids', ARRAY[v_pgr_node_id],
+						'pgrRootVids', ARRAY[v_pgr_root_vid],
 						'ignoreCheckValvesMincut', v_ignore_check_valves,
 						'mode', v_mode
 					)
@@ -1421,82 +1742,90 @@ BEGIN
 				IF v_mode = 'MINSECTOR' THEN
 					EXECUTE format('
 						SELECT count(*)
-						FROM %I tpn
+						FROM temp_pgr_node_minsector tpn
 						WHERE tpn.mapzone_id <> 0
 						AND NOT EXISTS (
 							SELECT 1
 							FROM om_mincut_arc oma
 							JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
 							WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
-								AND vta.minsector_id = tpn.node_id
+								AND vta.minsector_id = tpn.pgr_node_id
 						);
-					', v_temp_node_table, v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
+					', v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
 				ELSE
 					EXECUTE format('
 						SELECT count(*)
-						FROM %I tpa
-						WHERE tpa.mapzone_id <> 0
-							AND tpa.arc_id IS NOT NULL
-							AND NOT EXISTS (
-								SELECT 1
-								FROM om_mincut_arc oma
-								WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
-									AND oma.arc_id = tpa.arc_id
-							);
-					', v_temp_arc_table, v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
+						FROM temp_pgr_node_minsector tpn
+						WHERE tpn.mapzone_id <> 0
+						AND NOT EXISTS (
+							SELECT 1
+							FROM om_mincut_arc oma
+							JOIN temp_pgr_arc tpa ON oma.arc_id = tpa.pgr_arc_id
+							WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
+								AND tpa.mapzone_id = tpn.pgr_node_id
+						);
+					', v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
 				END IF;
 
 				IF v_arc_count > 0 THEN
-					v_has_overlap = TRUE;
+					v_has_overlap := TRUE;
 
 					IF v_mode = 'MINSECTOR' THEN
 						v_query_text := format($fmt$
 							SELECT tpa.pgr_arc_id AS id, tpa.pgr_node_1 AS source, tpa.pgr_node_2 AS target, 1 as cost
-							FROM %I tpa
+							FROM temp_pgr_arc_linegraph tpa
 							WHERE tpa.mapzone_id <> 0
-								AND NOT EXISTS (
+							AND (
+								NOT EXISTS (
 									SELECT 1
-									FROM %I tpn
-									JOIN v_temp_arc vta ON vta.minsector_id = tpn.node_id
+									FROM v_temp_arc vta
 									JOIN om_mincut_arc oma ON oma.arc_id = vta.arc_id
-									WHERE tpn.pgr_node_id = tpa.pgr_node_1
-										AND oma.result_id = %L
+									WHERE oma.result_id = %L 
+									AND vta.minsector_id = tpa.pgr_node_1
 								)
-								AND NOT EXISTS (
+								OR 
+								NOT EXISTS (
 									SELECT 1
-									FROM %I tpn
-									JOIN v_temp_arc vta ON vta.minsector_id = tpn.node_id
+									FROM v_temp_arc vta
 									JOIN om_mincut_arc oma ON oma.arc_id = vta.arc_id
-									WHERE tpn.pgr_node_id = tpa.pgr_node_2
-										AND oma.result_id = %L
+									WHERE oma.result_id = %L 
+									AND vta.minsector_id = tpa.pgr_node_2
 								)
-						$fmt$, v_temp_arc_table, v_temp_node_table, v_mincut_id, v_temp_node_table, v_mincut_id);
+							)
+						$fmt$, v_mincut_id);
 					ELSE
 						v_query_text := format($fmt$
 							SELECT tpa.pgr_arc_id AS id, tpa.pgr_node_1 AS source, tpa.pgr_node_2 AS target, 1 as cost
-							FROM %I tpa
+							FROM temp_pgr_arc_linegraph tpa
 							WHERE tpa.mapzone_id <> 0
-								AND NOT EXISTS (
+							AND (
+								NOT EXISTS (
 									SELECT 1
-									FROM om_mincut_arc oma
-									WHERE oma.result_id = %s
-										AND oma.arc_id = tpa.arc_id
+									FROM temp_pgr_arc a
+									JOIN om_mincut_arc oma ON oma.arc_id = a.pgr_arc_id
+									WHERE oma.result_id = %L 
+									AND a.mapzone_id = tpa.pgr_node_1
 								)
-						$fmt$, v_temp_arc_table, v_mincut_id);
+								OR 
+								NOT EXISTS (
+									SELECT 1
+									FROM temp_pgr_arc a
+									JOIN om_mincut_arc oma ON oma.arc_id = a.pgr_arc_id
+									WHERE oma.result_id = %L 
+									AND a.mapzone_id = tpa.pgr_node_2
+								)
+							)
+						$fmt$, v_mincut_id);
 					END IF;
+
 					TRUNCATE temp_pgr_connectedcomponents;
 					INSERT INTO temp_pgr_connectedcomponents (seq, component, node)
 					SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
 
-					v_query_text := format('
-						SELECT DISTINCT c1.component
-						FROM %I a
-						JOIN temp_pgr_connectedcomponents c1 ON a.pgr_node_1 = c1.node
-						JOIN temp_pgr_connectedcomponents c2 ON a.pgr_node_2 = c2.node
-						WHERE a.mapzone_id <> 0 AND a.arc_id IS NOT NULL
-						AND c1.component = c2.component
-					', v_temp_arc_table);
-
+					v_query_text :='
+						SELECT DISTINCT component
+						FROM temp_pgr_connectedcomponents 
+					';
 
 					FOR v_mincut_conflict_record IN EXECUTE v_query_text LOOP
 						-- create the new mincut virtual: [onPlanning and Conflict]
@@ -1505,120 +1834,148 @@ BEGIN
 						RETURNING id INTO v_mincut_affected_id;
 
 						IF v_mode = 'MINSECTOR' THEN
+							-- insert arcs
 							EXECUTE format('
 								INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
 								SELECT %L, vta.arc_id, vta.the_geom
-								FROM %I tpn
-								JOIN v_temp_arc vta ON vta.minsector_id = tpn.node_id
+								FROM temp_pgr_node_minsector tpn
+								JOIN v_temp_arc vta ON vta.minsector_id = tpn.pgr_node_id
 								WHERE tpn.mapzone_id <> 0
-									AND tpn.graph_delimiter = ''MINSECTOR''
-									AND EXISTS (SELECT 1 FROM temp_pgr_connectedcomponents c WHERE c.node = tpn.pgr_node_id AND c.component = %L)
-							', v_mincut_affected_id, v_temp_node_table, v_mincut_conflict_record.component);
+								AND EXISTS (
+									SELECT 1 
+									FROM temp_pgr_connectedcomponents c 
+									WHERE c.node = tpn.pgr_node_id 
+									AND c.component = %L
+								)
+								AND NOT EXISTS (
+									SELECT 1
+									FROM v_temp_arc va
+									JOIN om_mincut_arc oma ON oma.arc_id = va.arc_id
+									WHERE oma.result_id = %L 
+									AND va.minsector_id = tpn.pgr_node_id
+								)
+							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
+							-- insert nodes
 							EXECUTE format('
 								INSERT INTO om_mincut_node (result_id, node_id, node_type, the_geom) 
 								SELECT %L, vtn.node_id, vtn.node_type, vtn.the_geom
-								FROM %I tpn
-								JOIN v_temp_node vtn ON vtn.minsector_id = tpn.node_id
+								FROM temp_pgr_node_minsector tpn
+								JOIN v_temp_node vtn ON vtn.minsector_id = tpn.pgr_node_id
 								WHERE tpn.mapzone_id <> 0
-									AND tpn.graph_delimiter = ''MINSECTOR''
-									AND EXISTS (SELECT 1 FROM temp_pgr_connectedcomponents c WHERE c.node = tpn.pgr_node_id AND c.component = %L)
-							', v_mincut_affected_id, v_temp_node_table, v_mincut_conflict_record.component);
+								AND EXISTS (
+									SELECT 1 
+									FROM temp_pgr_connectedcomponents c 
+									WHERE c.node = tpn.pgr_node_id
+									AND c.component = %L
+								)
+								AND NOT EXISTS (
+									SELECT 1 
+									FROM v_temp_node vn
+									JOIN om_mincut_node omn ON omn.node_id = vn.node_id
+									WHERE omn.result_id = %L 
+									AND vn.minsector_id = tpn.pgr_node_id
+								);
+							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
-							EXECUTE format('
-								INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, changestatus, proposed) 
-								SELECT %L, arc_id, closed, broken, to_arc[0], unaccess, changestatus, proposed
-								FROM %I tpa
-								WHERE tpa.mapzone_id <> 0 
-									AND tpa.graph_delimiter = ''MINSECTOR''
-									AND EXISTS (
-										SELECT 1 
-										FROM temp_pgr_connectedcomponents c 
-										WHERE c.node = tpa.pgr_node_1 
-											AND c.component = %L
-										)
-									AND EXISTS (
-										SELECT 1 
-										FROM temp_pgr_connectedcomponents c 
-										WHERE c.node = tpa.pgr_node_2 
-											AND c.component = %L
-										)
-									AND NOT EXISTS (
-										SELECT 1 
-										FROM om_mincut_valve om 
-										WHERE (
-												om.result_id = %L OR om.result_id = ANY(%L)
-											) 
-											AND om.node_id = tpa.arc_id 
-										);
-							', v_mincut_affected_id, v_temp_arc_table,
-							v_mincut_conflict_record.component, v_mincut_conflict_record.component,
-							v_mincut_id, v_mincut_group_record.mincut_group);
 						ELSE
+							-- insert arcs
 							EXECUTE format('
 								INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
-								SELECT %L, a.arc_id, the_geom
-								FROM %I a
-								JOIN v_temp_arc va USING (arc_id)
-								WHERE a.mapzone_id <> 0
-									AND EXISTS (SELECT 1 FROM temp_pgr_connectedcomponents c WHERE c.node = a.pgr_node_1 AND c.component = %L)
-									AND EXISTS (SELECT 1 FROM temp_pgr_connectedcomponents c WHERE c.node = a.pgr_node_2 AND c.component = %L); 
-							', v_mincut_affected_id, v_temp_arc_table, v_mincut_conflict_record.component, v_mincut_conflict_record.component);
+								SELECT %L, vta.arc_id, vta.the_geom
+								FROM temp_pgr_node_minsector tpn
+								JOIN temp_pgr_arc tpa ON tpa.mapzone_id = tpn.pgr_node_id
+								JOIN v_temp_arc vta ON vta.arc_id = tpa.pgr_arc_id
+								WHERE tpn.mapzone_id <> 0
+								AND EXISTS (
+									SELECT 1 
+									FROM temp_pgr_connectedcomponents c 
+									WHERE c.node = tpn.pgr_node_id 
+									AND c.component = %L
+								)
+								AND NOT EXISTS (
+									SELECT 1
+									FROM temp_pgr_arc va
+									JOIN om_mincut_arc oma ON oma.arc_id = va.pgr_arc_id
+									WHERE oma.result_id = %L 
+									AND va.mapzone_id = tpn.pgr_node_id
+								)
+							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
+							-- insert nodes
 							EXECUTE format('
 								INSERT INTO om_mincut_node (result_id, node_id, node_type, the_geom) 
-								SELECT %L, n.node_id, node_type, the_geom
-								FROM %I n
-								JOIN v_temp_node vn USING (node_id)
-								WHERE n.mapzone_id <> 0
-									AND EXISTS (
-										SELECT 1 
-										FROM temp_pgr_connectedcomponents c 
-										WHERE c.node = n.pgr_node_id 
-											AND c.component = %L
-										)
-									AND NOT EXISTS (
-										SELECT 1 
-										FROM om_mincut_node om 
-										WHERE (
-											om.result_id = %L OR om.result_id = ANY(%L)
-											) 
-											AND n.node_id = om.node_id
-										);
-							', v_mincut_affected_id, v_temp_node_table,
+								SELECT %L, vtn.node_id, vtn.node_type, vtn.the_geom
+								FROM temp_pgr_node_minsector tpn
+								JOIN temp_pgr_node tn ON tn.mapzone_id = tpn.pgr_node_id
+								JOIN v_temp_node vtn ON vtn.node_id = tn.pgr_node_id
+								WHERE tpn.mapzone_id <> 0
+								AND EXISTS (
+									SELECT 1 
+									FROM temp_pgr_connectedcomponents c 
+									WHERE c.node = tpn.pgr_node_id
+									AND c.component = %L
+								)
+								AND NOT EXISTS (
+									SELECT 1 
+									FROM temp_pgr_node vn
+									JOIN om_mincut_node omn ON omn.node_id = vn.pgr_node_id
+									WHERE omn.result_id = %L 
+									AND vn.mapzone_id = tpn.pgr_node_id
+								);
+							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
+
+						END IF;
+
+						-- insert valves
+						EXECUTE format('
+							INSERT INTO om_mincut_valve (
+								result_id, 
+								node_id, 
+								closed, 
+								broken,  
+								unaccess, 
+								changestatus, 
+								proposed,
+								the_geom,
+								to_arc
+							) 
+							SELECT %L, 
+								tpa.pgr_node_id AS node_id, 
+								tpa.closed, 
+								tpa.broken,
+								tpa.unaccess,
+								tpa.changestatus,
+								tpa.proposed,
+								vtn.the_geom,
+								tpa.to_arc[1]
+							FROM temp_pgr_arc_linegraph tpa
+							JOIN v_temp_node vtn ON vtn.node_id = tpa.pgr_node_id
+							WHERE tpa.mapzone_id <> 0 
+							AND EXISTS (
+								SELECT 1 
+								FROM temp_pgr_connectedcomponents c 
+								WHERE c.node = tpa.pgr_node_1 
+								AND c.component = %L
+							)
+							AND EXISTS (
+								SELECT 1 
+								FROM temp_pgr_connectedcomponents c 
+								WHERE c.node = tpa.pgr_node_2 
+									AND c.component = %L
+							)
+							AND NOT EXISTS (
+								SELECT 1 
+								FROM om_mincut_valve om 
+								WHERE (
+										om.result_id = %L OR om.result_id = ANY(%L)
+									) 
+								AND om.node_id = tpa.pgr_node_id
+							);',
+							v_mincut_affected_id,
+							v_mincut_conflict_record.component, 
 							v_mincut_conflict_record.component,
 							v_mincut_id, v_mincut_group_record.mincut_group);
-
-							EXECUTE format('
-								INSERT INTO om_mincut_valve (result_id, node_id, closed, broken, to_arc, unaccess, changestatus, proposed) 
-								SELECT %L, COALESCE (node_1, node_2), closed, broken, to_arc[0], unaccess, changestatus, proposed
-								FROM %I a
-								WHERE a.mapzone_id <> 0 
-									AND graph_delimiter = ''MINSECTOR''
-									AND EXISTS (
-										SELECT 1 
-										FROM temp_pgr_connectedcomponents c 
-										WHERE c.node = a.pgr_node_1 
-											AND c.component = %L
-										)
-									AND EXISTS (
-										SELECT 1 
-										FROM temp_pgr_connectedcomponents c 
-										WHERE c.node = a.pgr_node_2 
-											AND c.component = %L
-										)
-									AND NOT EXISTS (
-										SELECT 1 
-										FROM om_mincut_valve om 
-										WHERE (
-												om.result_id = %L OR om.result_id = ANY(%L)
-											) 
-											AND om.node_id = COALESCE(a.node_1, a.node_2) 
-										);
-							', v_mincut_affected_id, v_temp_arc_table,
-							v_mincut_conflict_record.component, v_mincut_conflict_record.component,
-							v_mincut_id, v_mincut_group_record.mincut_group);
-						END IF;
 
 						INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 						SELECT v_mincut_affected_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
@@ -1655,20 +2012,14 @@ BEGIN
 						INSERT INTO om_mincut_conflict (id, mincut_id)
 						VALUES (v_mincut_conflict_group_id, v_mincut_id);
 
-						-- insert conflict mincut
-						IF v_mode = 'MINSECTOR' THEN
-							v_query_text := 'a.arc_id';
-						ELSE
-							v_query_text := 'COALESCE(a.node_1, a.node_2)';
-						END IF;
+						-- insert conflict mincuts
 						EXECUTE format('
 							WITH mincuts_conflicts AS (
 								SELECT DISTINCT om.result_id
-								FROM %I a
-								JOIN om_mincut_valve om ON om.node_id = %s
+								FROM temp_pgr_arc_linegraph a
+								JOIN om_mincut_valve om ON om.node_id = a.pgr_node_id
 									AND om.result_id = ANY(%L)
 								WHERE a.mapzone_id <> 0 
-									AND graph_delimiter = ''MINSECTOR''
 									AND EXISTS (
 										SELECT 1 
 										FROM temp_pgr_connectedcomponents c 
@@ -1685,7 +2036,7 @@ BEGIN
 							INSERT INTO om_mincut_conflict (id, mincut_id)
 							SELECT %L, m.result_id
 							FROM mincuts_conflicts m;
-						', v_temp_arc_table, v_query_text, v_mincut_group_record.mincut_group,
+						', v_mincut_group_record.mincut_group,
 						v_mincut_conflict_record.component, v_mincut_conflict_record.component,
 						v_mincut_conflict_group_id::uuid);
 
@@ -1711,28 +2062,26 @@ BEGIN
 
 						-- fill connnec & hydrometer details on om_mincut.output
 						-- count arcs
-						SELECT count(arc_id), sum(ST_Length(arc.the_geom))::numeric(12,2) INTO v_num_arcs, v_length
+						SELECT count(arc_id), sum(ST_Length(the_geom))::numeric(12,2) INTO v_num_arcs, v_length
 						FROM om_mincut_arc
-						JOIN arc USING (arc_id)
-						WHERE result_id = v_mincut_affected_id
-						GROUP BY result_id;
-
-						SELECT sum(pi() * (dint * dint / 4_000_000) * ST_Length(arc.the_geom))::numeric(12,2) INTO v_volume
-						FROM om_mincut_arc
-						JOIN arc USING (arc_id)
-						JOIN cat_arc ON arccat_id = cat_arc.id
 						WHERE result_id = v_mincut_affected_id;
+
+						SELECT sum(pi() * (ca.dint * ca.dint / 4_000_000) * ST_Length(oma.the_geom))::numeric(12,2) INTO v_volume
+						FROM om_mincut_arc oma
+						JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
+						JOIN cat_arc ca ON vta.arccat_id = ca.id
+						WHERE oma.result_id = v_mincut_affected_id;
 
 						-- count valves
 						SELECT count(node_id) INTO v_num_valve_proposed
 						FROM om_mincut_valve
 						WHERE result_id = v_mincut_affected_id
-							AND proposed IS TRUE;
+						AND proposed IS TRUE;
 
 						SELECT count(node_id) INTO v_num_valve_closed
 						FROM om_mincut_valve
 						WHERE result_id = v_mincut_affected_id
-							AND closed IS TRUE AND changestatus IS FALSE;
+						AND closed IS TRUE AND changestatus IS FALSE;
 
 						-- count connec
 						SELECT count(connec_id) INTO v_num_connecs
@@ -1776,10 +2125,10 @@ BEGIN
 						AND omc.mincut_id <> v_mincut_id
 						AND omc.mincut_id <> v_mincut_affected_id;
 
-						IF v_priority IS NULL THEN v_priority='{}'; END IF;
+						IF v_priority IS NULL THEN v_priority := '{}'; END IF;
 						v_count_unselected_psectors := COALESCE(v_count_unselected_psectors, 0);
 
-						v_mincut_details = json_build_object(
+						v_mincut_details := json_build_object(
 							'arcs', json_build_object(
 								'number', v_num_arcs,
 								'length', v_length,
@@ -1818,7 +2167,7 @@ BEGIN
 					END LOOP;
 
 				ELSE
-					v_has_overlap = FALSE;
+					v_has_overlap := FALSE;
 				END IF;
 
 			END LOOP;
@@ -1838,15 +2187,15 @@ BEGIN
 
 	-- Set message based on overlap status
 	IF v_has_overlap THEN
-		v_message = json_build_object(
+		v_message := json_build_object(
 			'level', 1,
 			'text', 'Mincut has overlapping conflicts'
 		);
 	ELSE
-		v_message = COALESCE(v_message, '{}');
+		v_message := COALESCE(v_message, '{}');
 	END IF;
 
-	v_response = ('{
+	v_response := ('{
 	    "status": "Accepted",
         "message": ' || v_message || ',
 	    "version": "' || v_version || '",

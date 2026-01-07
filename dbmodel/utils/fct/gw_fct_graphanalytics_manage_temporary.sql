@@ -107,9 +107,11 @@ BEGIN
             pgr_node_1 INTEGER NULL,
             pgr_node_2 INTEGER NULL,
             mapzone_id INTEGER DEFAULT 0,
+            old_mapzone_id INTEGER DEFAULT 0,
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             "cost" INTEGER NOT NULL DEFAULT 1,
             reverse_cost INTEGER NOT NULL DEFAULT 1,
+            to_arc INTEGER[],
             CONSTRAINT temp_pgr_arc_linegraph_pkey PRIMARY KEY (pgr_arc_id)
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_arc_linegraph_pgr_node_1_idx ON temp_pgr_arc_linegraph USING btree (pgr_node_1);
@@ -150,14 +152,14 @@ BEGIN
             ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS closed BOOL;
             ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS broken BOOL;
 
+            ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS closed BOOL;
+            ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS broken BOOL;
+
             -- for specific functions
-            IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS cost_mincut INTEGER NOT NULL DEFAULT 1;
-                ALTER TABLE temp_pgr_arc ADD COLUMN IF NOT EXISTS reverse_cost_mincut INTEGER NOT NULL DEFAULT 1;
-                
+            IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN  
+                CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
+                ALTER TABLE temp_pgr_node_minsector ADD COLUMN IF NOT EXISTS num_border INTEGER NOT NULL DEFAULT 0; 
+
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
@@ -949,6 +951,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_minsector_mincut_valve;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance;
         DROP TABLE IF EXISTS temp_pgr_drivingdistance_initoverflowpath;
+        DROP TABLE IF EXISTS temp_pgr_node_minsector;
         DROP TABLE IF EXISTS temp_pgr_arc_linegraph;
         DROP TABLE IF EXISTS temp_pgr_omunit;
         DROP TABLE IF EXISTS temp_pgr_macroomunit;
