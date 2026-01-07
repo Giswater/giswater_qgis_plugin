@@ -315,15 +315,10 @@ BEGIN
 		WHERE a.arc_id = v_arc_id
 		AND 'SECTOR' <> ALL(n.graph_delimiter)
 		LIMIT 1;
-		-- TODO: is not an error, is a mincut that is an arc in between 2 water sources
-		IF v_node IS NULL THEN
-			RETURN jsonb_build_object(
-				'status', 'Failed',
-				'message', jsonb_build_object(
-					'level', 2,
-					'text', 'Arc in between two water sources.'
-				)
-			);           
+
+		-- v_node = 0 if arc in between 2 water sources
+		IF v_node IS NULL THEN 
+			v_node := 0::integer;         
 		END IF;
 	END IF;
 
@@ -1011,9 +1006,9 @@ BEGIN
 			FROM temp_pgr_arc';
 
 			INSERT INTO temp_pgr_arc_linegraph (
-				pgr_arc_id, pgr_node_1, pgr_node_2, cost, reverse_cost
+				pgr_arc_id, pgr_node_1, pgr_node_2, cost
 			)
-			SELECT seq, source, target, cost, -1
+			SELECT seq, source, target, cost
 			FROM pgr_linegraph(
 				v_query_text,
 				directed => FALSE
@@ -1084,6 +1079,7 @@ BEGIN
 			WHERE t.pgr_node_id = n.pgr_node_id;
 
 			-- Initialize tables for mincut
+			-- tables used: temp_pgr_node_minsector and temp_pgr_arc_linegraph
 			------------------------------
 			TRUNCATE temp_pgr_arc_linegraph;
 
@@ -1262,29 +1258,46 @@ BEGIN
 
 		-- mincut
 		---------
-		SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_linegraph;
 
 		IF v_mode = 'MINSECTOR' THEN
 			v_pgr_root_vid := v_node;
 		ELSE
-			SELECT mapzone_id INTO v_pgr_root_vid
-			FROM temp_pgr_arc 
-			WHERE pgr_arc_id = v_arc_id;
+			-- arc between 2 diposits, the value for minsector_id for this arc is arc_id
+			IF v_node = 0 THEN	
+				v_pgr_root_vid := v_arc_id;
+			ELSE
+				SELECT mapzone_id INTO v_pgr_root_vid
+				FROM temp_pgr_arc 
+				WHERE pgr_arc_id = v_arc_id;
+			END IF;
 		END IF;
 
-		-- Use jsonb_build_object for cleaner and safer JSON construction
-		v_data := jsonb_build_object(
-			'data', jsonb_build_object(
-				'pgrDistance', v_pgr_distance,
-				'pgrRootVids', ARRAY[v_pgr_root_vid],
-				'ignoreCheckValvesMincut', v_ignore_check_valves,
-				'mode', v_mode
-			)
-		)::text;
-		v_response := gw_fct_mincut_core(v_data);
+		SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_linegraph;
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
+		IF v_pgr_distance = 0 THEN
+			IF v_node = 0 THEN
+				-- the choosen arc is between 2 water sources, temp_pgr_node_minsector and temp_pgr_arc_linegraph don't have rows
+				INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter, mapzone_id)
+				VALUES (v_pgr_root_vid, 'SECTOR', 1); 
+			ELSE
+				-- the choosen arc is in an isolated minsector; temp_pgr_arc_linegraph doesn't have rows
+				UPDATE temp_pgr_node_minsector SET mapzone_id = 1 WHERE pgr_node_id = v_pgr_root_vid;
+			END IF;
+		ELSE
+			-- Use jsonb_build_object for cleaner and safer JSON construction
+			v_data := jsonb_build_object(
+				'data', jsonb_build_object(
+					'pgrDistance', v_pgr_distance,
+					'pgrRootVids', ARRAY[v_pgr_root_vid],
+					'ignoreCheckValvesMincut', v_ignore_check_valves,
+					'mode', v_mode
+				)
+			)::text;
+			v_response := gw_fct_mincut_core(v_data);
+
+			IF v_response->>'status' <> 'Accepted' THEN
+				RETURN v_response;
+			END IF;
 		END IF;
 
 		-- include in the mincut the valves with changestatus TRUE that are out of the mincut
