@@ -12,3 +12,7 @@ CREATE INDEX IF NOT EXISTS node_supplyzone_id_idx ON node USING btree (supplyzon
 CREATE INDEX IF NOT EXISTS arc_supplyzone_id_idx ON arc USING btree (supplyzone_id);
 CREATE INDEX IF NOT EXISTS connec_supplyzone_id_idx ON connec USING btree (supplyzone_id);
 CREATE INDEX IF NOT EXISTS link_supplyzone_id_idx ON link USING btree (supplyzone_id);
+
+ALTER TABLE link ADD CONSTRAINT link_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
+
+CREATE INDEX IF NOT EXISTS link_minsector_id_idx ON link USING btree (minsector_id);

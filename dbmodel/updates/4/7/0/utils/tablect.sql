@@ -11,9 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE INDEX IF NOT EXISTS node_minsector_id_idx ON node USING btree (minsector_id);
 CREATE INDEX IF NOT EXISTS arc_minsector_id_idx ON arc USING btree (minsector_id);
 CREATE INDEX IF NOT EXISTS connec_minsector_id_idx ON connec USING btree (minsector_id);
-CREATE INDEX IF NOT EXISTS link_minsector_id_idx ON link USING btree (minsector_id);
 
 ALTER TABLE node ADD CONSTRAINT node_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
 ALTER TABLE arc ADD CONSTRAINT arc_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
 ALTER TABLE connec ADD CONSTRAINT connec_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
-ALTER TABLE link ADD CONSTRAINT link_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
