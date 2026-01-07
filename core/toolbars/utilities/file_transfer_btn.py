@@ -204,15 +204,33 @@ class GwFileTransferButton(GwAction):
             return
 
         json_result = row[0]
-        # Convert to string if it's a dict
+        # Parse JSON if it's a string
+        if isinstance(json_result, str):
+            try:
+                json_result = json.loads(json_result)
+            except json.JSONDecodeError:
+                msg = "Failed to parse JSON result from database."
+                tools_qgis.show_warning(msg)
+                return
+        
+        # Extract only the features array from body.data.features
+        features = None
         if isinstance(json_result, dict):
-            json_str = json.dumps(json_result, ensure_ascii=False, indent=2)
-        else:
-            json_str = str(json_result)
+            body = json_result.get('body', {})
+            if isinstance(body, dict):
+                data = body.get('data', {})
+                if isinstance(data, dict):
+                    features = data.get('features', [])
+        
+        if features is None:
+            msg = "No features found in the result."
+            tools_qgis.show_warning(msg)
+            return
 
+        # Write only the features array to the file
         try:
             with open(file_path, "w", encoding="utf-8") as f:
-                f.write(json_str)
+                json.dump(features, f, ensure_ascii=False, indent=2)
             msg = f"EPA Result Families exported successfully:\n{file_path}"
             tools_qgis.show_info(msg)
         except Exception as e:
