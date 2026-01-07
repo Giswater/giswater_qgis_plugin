@@ -10,3 +10,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE INDEX gully_minsector_id_idx ON gully USING btree (minsector_id);
 
 ALTER TABLE gully ADD CONSTRAINT gully_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
+
+CREATE INDEX IF NOT EXISTS node_omunit_id_idx ON node USING btree (omunit_id);
+CREATE INDEX IF NOT EXISTS arc_omunit_id_idx ON arc USING btree (omunit_id);
+CREATE INDEX IF NOT EXISTS connec_omunit_id_idx ON connec USING btree (omunit_id);
+CREATE INDEX IF NOT EXISTS link_omunit_id_idx ON link USING btree (omunit_id);
+CREATE INDEX IF NOT EXISTS gully_omunit_id_idx ON gully USING btree (omunit_id);
+
+CREATE INDEX IF NOT EXISTS gully_dma_id_idx ON gully USING btree (dma_id);
