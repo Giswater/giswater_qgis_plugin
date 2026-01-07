@@ -150,8 +150,6 @@ class GwFileTransferButton(GwAction):
             tools_gw.close_dialog(dlg_epa)
             return
 
-        # Default date
-        dlg_epa.date_limit.setDisplayFormat("dd-MM-yyyy")
 
         # Connect browse signal
         dlg_epa.btn_browse.clicked.connect(
@@ -178,25 +176,16 @@ class GwFileTransferButton(GwAction):
 
     def _do_export_epa_families(self, dlg):
         result_id = dlg.cmb_result_id.currentText()
-        date_obj = dlg.date_limit.date()
-        
-        # Validate date
-        if not date_obj.isValid():
-            msg = "Please enter a valid date."
-            tools_qgis.show_warning(msg, dialog=dlg)
-            return
-        
-        # Convert date to format expected by database (dd-MM-yyyy)
-        date_limit = date_obj.toString("dd-MM-yyyy")
+        age = dlg.age.text().strip()
         file_path = dlg.edit_path.text().strip()
         
-        if not result_id or not file_path:
-            msg = "Please select a result and an export path."
+        if not result_id or not age or not file_path:
+            msg = "Please select a result, enter an age, and an export path."
             tools_qgis.show_warning(msg, dialog=dlg)
             return
         tools_gw.close_dialog(dlg)
 
-        sql = f"SELECT gw_fct_get_epa_result_families('{result_id}', '{date_limit}')"
+        sql = f"SELECT gw_fct_get_epa_result_families('{result_id}', {age})"
         row = tools_db.get_row(sql)
         if not row or not row[0]:
             msg = "No results returned from the database."
@@ -219,18 +208,11 @@ class GwFileTransferButton(GwAction):
             body = json_result.get('body', {})
             if isinstance(body, dict):
                 data = body.get('data', {})
-                if isinstance(data, dict):
-                    features = data.get('features', [])
-        
-        if features is None:
-            msg = "No features found in the result."
-            tools_qgis.show_warning(msg)
-            return
-
         # Write only the features array to the file
         try:
+            indent = 2 if dlg.chk_format_json.isChecked() else None
             with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(features, f, ensure_ascii=False, indent=2)
+                json.dump(data, f, ensure_ascii=False, indent=indent)
             msg = f"EPA Result Families exported successfully:\n{file_path}"
             tools_qgis.show_info(msg)
         except Exception as e:
