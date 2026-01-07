@@ -5,4 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
 INSERT INTO minsector (minsector_id) VALUES(0) ON CONFLICT (minsector_id) DO NOTHING;

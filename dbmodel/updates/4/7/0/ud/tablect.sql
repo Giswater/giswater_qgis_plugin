@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
 CREATE INDEX gully_minsector_id_idx ON gully USING btree (minsector_id);
 
 ALTER TABLE gully ADD CONSTRAINT gully_minsector_id_fkey FOREIGN KEY (minsector_id) REFERENCES minsector(minsector_id);
