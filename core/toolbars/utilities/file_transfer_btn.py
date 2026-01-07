@@ -136,7 +136,7 @@ class GwFileTransferButton(GwAction):
         tools_gw.load_settings(dlg_epa)
 
         # Fill combo from db
-        sql = "SELECT result_id FROM rpt_cat_result ORDER BY result_id"
+        sql = "SELECT result_id FROM rpt_cat_result ORDER BY exec_date DESC"
         results = tools_db.get_rows(sql)
         dlg_epa.cmb_result_id.clear()
         if results:
@@ -150,6 +150,12 @@ class GwFileTransferButton(GwAction):
             tools_gw.close_dialog(dlg_epa)
             return
 
+        age = tools_gw.get_config_parser('btn_export_epa_families', 'age', 'user', 'session', False)
+        if age:
+            dlg_epa.age.setText(age)
+        json_format = tools_gw.get_config_parser('btn_export_epa_families', 'json_format', 'user', 'session', False)
+        if json_format:
+            dlg_epa.chk_format_json.setChecked(bool(json_format))
 
         # Connect browse signal
         dlg_epa.btn_browse.clicked.connect(
@@ -215,6 +221,8 @@ class GwFileTransferButton(GwAction):
                 json.dump(data, f, ensure_ascii=False, indent=indent)
             msg = f"EPA Result Families exported successfully:\n{file_path}"
             tools_qgis.show_info(msg)
+            tools_gw.set_config_parser('btn_export_epa_families', 'age', f'{age}', prefix=False)
+            tools_gw.set_config_parser('btn_export_epa_families', 'json_format', f'{dlg.chk_format_json.isChecked()}', prefix=False)
         except Exception as e:
             msg = f"Failed to write export file:\n{str(e)}"
             tools_qgis.show_warning(msg)
