@@ -2443,8 +2443,25 @@ class GwMincut:
             project = QgsProject.instance()
             comp_view = QgsPrintLayout(project)
             comp_view.loadFromTemplate(document, QgsReadWriteContext())
+            # Set name AFTER loading template (template may have its own name)
+            comp_view.setName(str(self.template))
             layout_manager = project.layoutManager()
             layout_manager.addLayout(comp_view)
+            
+            # Get layout from manager to ensure correct ownership
+            comp_view = layout_manager.layoutByName(str(self.template))
+            if comp_view is None:
+                # Fallback: try to get the last added layout
+                layouts = layout_manager.layouts()
+                if layouts:
+                    comp_view = layouts[-1]
+                    # Update name if it's different
+                    if comp_view.name() != str(self.template):
+                        comp_view.setName(str(self.template))
+                else:
+                    msg = "Failed to create layout from template"
+                    tools_qgis.show_warning(msg, dialog=self.dlg_comp)
+                    return
 
         else:
             comp_view = composers[index]
@@ -2470,11 +2487,29 @@ class GwMincut:
         self.iface.openLayoutDesigner(layout)
 
         # Zoom map to extent, rotation, title
+        missing_items = []
         map_item = layout.itemById('Mapa')
-        map_item.zoomToExtent(self.canvas.extent())
-        map_item.setMapRotation(rotation)
+        if map_item is not None:
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+        else:
+            missing_items.append("Mapa")
+            tools_log.log_warning("Map item 'Mapa' not found in template. Template may be empty or use different item IDs.")
+        
         profile_title = layout.itemById('title')
-        profile_title.setText(str(title))
+        if profile_title is not None:
+            profile_title.setText(str(title))
+        else:
+            missing_items.append("title")
+            tools_log.log_warning("Title item 'title' not found in template. Template may be empty or use different item IDs.")
+
+        # Show user-friendly message if items are missing
+        if missing_items:
+            items_list = ", ".join(missing_items)
+            msg = (f"The template '{self.template}' is missing some expected items: {items_list}. "
+                   f"The layout will open, but these features won't be automatically configured. "
+                   f"Make sure your template includes items with IDs: 'Mapa' (for the map) and 'title' (for the title).")
+            tools_qgis.show_info(msg)
 
         # Refresh items
         layout.refresh()
