@@ -153,6 +153,8 @@ class GwFileTransferButton(GwAction):
         age = tools_gw.get_config_parser('btn_export_epa_families', 'age', 'user', 'session', False)
         if age:
             dlg_epa.age.setText(age)
+        else:
+            dlg_epa.age.setText('10')
         json_format = tools_gw.get_config_parser('btn_export_epa_families', 'json_format', 'user', 'session', False)
         if json_format:
             dlg_epa.chk_format_json.setChecked(bool(json_format))
