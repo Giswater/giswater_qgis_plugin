@@ -1293,9 +1293,10 @@ BEGIN
 		WHERE tpa.mapzone_id = 0
 		AND tpa.changestatus = TRUE;
 
-		-- if a valve with changestatus = TRUE is proposed, remove changestatus
+		-- if a valve with changestatus = TRUE is proposed, remove changestatus and also proposed
 		UPDATE temp_pgr_arc_linegraph tpa
 		SET changestatus = FALSE,
+			proposed = FALSE,
 			cost = -1,
 			reverse_cost = -1
 		WHERE tpa.changestatus = TRUE
