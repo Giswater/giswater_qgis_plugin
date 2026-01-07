@@ -286,3 +286,32 @@ INSERT INTO sector (sector_id, code, "name", sector_type, muni_id, expl_id, macr
 
 INSERT INTO plan_psector VALUES (1, 'Masterplan 01', 1, 'Expanding the capacity of the pipes located on Francesc Layret street.', 1, '2', NULL, NULL, 'Action caused by the headloss of the pipe.', 0.0000, 750.00, '01', 19.00, 21.00, 0.00, false, '0106000020E76400000100000001030000000100000005000000DF7F8D6B2696194126CF305B4A755141DF7F8D6B269619412117DBD63D7551411988DCCE469419412117DBD63D7551411988DCCE4694194126CF305B4A755141DF7F8D6B2696194126CF305B4A755141', false, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-02-21 12:08:16.880558', current_user, NULL, NULL);
 INSERT INTO plan_psector VALUES (2, 'Masterplan 02', 1, 'Expanding the capacity of the pipes located on Legalitat street.', 1, '3', NULL, NULL, 'Action caused by the headloss of the pipe.', 90.0000, 750.00, '02', 19.00, 21.00, 0.00, false, 'SRID=25831;MULTIPOLYGON (((419077.6619419637 4576838.663100324, 419077.6619419637 4576761.052890681, 419029.32346890226 4576761.052890681, 419029.32346890226 4576838.663100324, 419077.6619419637 4576838.663100324)))'::public.geometry, false, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-02-21 12:08:16.880558', current_user, NULL, NULL);
+
+INSERT INTO minsector (minsector_id) VALUES(0) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2007) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2034) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2037) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2047) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2051) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2078) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(2079) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(113854) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(113875) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(113921) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(113935) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114028) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114034) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114045) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114050) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114051) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114059) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114061) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114064) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114072) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114076) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114082) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114088) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114092) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114093) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114112) ON CONFLICT (minsector_id) DO NOTHING;
+INSERT INTO minsector (minsector_id) VALUES(114182) ON CONFLICT (minsector_id) DO NOTHING;
