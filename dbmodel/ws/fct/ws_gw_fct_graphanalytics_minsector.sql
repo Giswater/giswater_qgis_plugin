@@ -814,12 +814,12 @@ BEGIN
         -- CORE MASSIVE MINCUT
         -- insert minsectors with num_border = 0
         INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
-        SELECT minsector_id, minsector_id
+        SELECT pgr_node_id, pgr_node_id
         FROM temp_pgr_node_minsector
         WHERE num_border = 0;
 
         v_query_text = '
-            SELECT n.pgr_node_id
+            SELECT pgr_node_id
             FROM temp_pgr_node_minsector
             WHERE num_border > 0
         ';
