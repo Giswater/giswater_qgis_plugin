@@ -211,7 +211,6 @@ class GwFileTransferButton(GwAction):
                 return
         
         # Extract only the features array from body.data.features
-        features = None
         if isinstance(json_result, dict):
             body = json_result.get('body', {})
             if isinstance(body, dict):
