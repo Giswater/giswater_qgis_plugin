@@ -21,3 +21,11 @@ CREATE INDEX arc_expl_visibility_gin ON arc USING gin(expl_visibility) WHERE exp
 CREATE INDEX connec_expl_visibility_gin ON connec USING gin(expl_visibility) WHERE expl_visibility IS NOT NULL;
 CREATE INDEX link_expl_visibility_gin ON link USING gin(expl_visibility) WHERE expl_visibility IS NOT NULL;
 CREATE INDEX element_expl_visibility_gin ON element USING gin(expl_visibility) WHERE expl_visibility IS NOT NULL;
+
+-- Create cat_material trigger on cat_link
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('link');
+
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_link
+FOR EACH ROW WHEN (((OLD.matcat_id)::TEXT IS DISTINCT
+FROM (NEW.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('link');
