@@ -100,6 +100,7 @@ SELECT fk_ok('element', 'workcat_id', 'cat_work', 'id', 'FK element_workcat_id_f
 SELECT has_trigger('element', 'gw_trg_edit_controls', 'Table should have gw_trg_edit_controls trigger');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
+SELECT has_trigger('element', 'element_expl_visibility_gin', 'Table should have element_expl_visibility_gin trigger');
 
 -- Check rules
 

@@ -82,7 +82,7 @@ SELECT col_default_is('link', 'created_by', 'CURRENT_USER', 'Column created_by s
 
 -- Check indexes
 SELECT has_index('link', 'link_exit_id', 'Should have index on exit_id');
-SELECT has_index('link', 'link_expl_visibility_idx', 'Should have index on expl_visibility');
+SELECT has_index('link', 'link_expl_visibility_gin', 'Should have index on expl_visibility');
 SELECT has_index('link', 'link_feature_id', 'Should have index on feature_id');
 SELECT has_index('link', 'link_index', 'Should have index on the_geom');
 SELECT has_index('link', 'link_muni', 'Should have index on muni_id');

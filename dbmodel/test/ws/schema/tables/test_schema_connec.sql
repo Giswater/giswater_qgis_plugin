@@ -170,7 +170,7 @@ SELECT col_default_is('connec', 'created_by', 'CURRENT_USER', 'Column created_by
 -- Check indexes
 SELECT has_index('connec', 'connec_sys_code_idx', 'Table should have index on sys_code');
 SELECT has_index('connec', 'connec_asset_id_idx', 'Table should have index on asset_id');
-SELECT has_index('connec', 'connec_expl_visibility_idx', 'Table should have index on expl_visibility');
+SELECT has_index('connec', 'connec_expl_visibility_gin', 'Table should have index on expl_visibility');
 
 SELECT col_has_check('connec', 'epa_type', 'Column epa_type should have check constraint');
 

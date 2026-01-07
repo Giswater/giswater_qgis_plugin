@@ -197,7 +197,7 @@ SELECT fk_ok('arc','workcat_id','cat_work','id','Table should have foreign key f
 SELECT has_index('arc', 'arc_arccat', ARRAY['arccat_id'], 'Table should have index on arccat_id');
 SELECT has_index('arc', 'arc_pkey', ARRAY['arc_id'], 'Table should have index on arc_id');
 SELECT has_index('arc', 'arc_asset_id_idx', ARRAY['asset_id'], 'Table should have index on asset_id');
-SELECT has_index('arc', 'arc_expl_visibility_idx', ARRAY['expl_visibility'], 'Table should have index on expl_visibility');
+SELECT has_index('arc', 'arc_expl_visibility_gin', ARRAY['expl_visibility'], 'Table should have index on expl_visibility');
 SELECT has_index('arc', 'arc_exploitation', ARRAY['expl_id'], 'Table should have index on expl_id');
 SELECT has_index('arc', 'arc_index', ARRAY['the_geom'], 'Table should have index on the_geom');
 SELECT has_index('arc', 'arc_muni', ARRAY['muni_id'], 'Table should have index on muni_id');
