@@ -7,13 +7,14 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3528
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_epa_result_families(v_result_id text, date_limit date)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_epa_result_families(v_result_id text, v_age integer)
 RETURNS json AS
 $BODY$
 DECLARE
 
 v_version text;
 v_result json;
+v_date_limit date;
 
 BEGIN
 
@@ -21,6 +22,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+
+	v_date_limit := CURRENT_DATE - (v_age || ' years')::INTERVAL;
 
 	WITH arcs AS (
 		SELECT arc_id,
@@ -37,7 +40,7 @@ BEGIN
 		END AS "family",
 		CASE
 			WHEN builtdate IS NULL THEN NULL
-			WHEN builtdate > date_limit THEN 'NEW'
+			WHEN builtdate > v_date_limit THEN 'NEW'
 			ELSE 'OLD'
 		END AS cal_age,
 		dma_id,
@@ -91,10 +94,10 @@ BEGIN
 	
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "features":'||v_result||
-			'}}'||
-	    '}')::json, 2302, null, null, null);
+			',"body":{"form":{}'||
+			',"data":{"result_id": "'||v_result_id||'", "age": "'||v_age||'", "features":'||v_result||
+		'}}'||
+	'}')::json, 2302, null, null, null);
 
 END;
 $BODY$
