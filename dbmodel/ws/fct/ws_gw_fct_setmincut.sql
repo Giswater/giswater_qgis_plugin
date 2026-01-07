@@ -1099,17 +1099,6 @@ BEGIN
 			FROM temp_pgr_arc
 			WHERE mapzone_id > 0;
 
-			-- Update minsector temporary num_border for the minsectors that exist in temp_pgr_arc_linegraph
-			UPDATE temp_pgr_node_minsector tn
-			SET num_border = ta.num_border 
-			FROM (
-				SELECT n.pgr_node_id, count(*) AS num_border
-				FROM temp_pgr_node_minsector n
-				JOIN temp_pgr_arc_linegraph a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-				GROUP BY n.pgr_node_id
-			) ta
-			WHERE tn.pgr_node_id = ta.pgr_node_id;
-
 			 -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE (graph_delimiter as 'SECTOR')
 			UPDATE temp_pgr_node_minsector t
 			SET graph_delimiter = 'SECTOR'
