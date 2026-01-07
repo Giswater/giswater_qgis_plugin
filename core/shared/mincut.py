@@ -2292,7 +2292,6 @@ class GwMincut:
                 self._custom_mincut_execute(element_id)
             elif action.objectName() == "actionChangeValveStatus":
                 self._change_valve_status_execute(element_id)
-                self._refresh_mincut(zoom=False)
             tools_qgis.refresh_map_canvas(True)
             self.set_visible_mincut_layers()
             self._remove_selection()
