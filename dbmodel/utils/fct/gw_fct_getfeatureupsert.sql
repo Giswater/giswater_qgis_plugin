@@ -235,7 +235,7 @@ BEGIN
  	END IF;
 
 	-- get user parameters
-	SELECT (value)::boolean INTO ve_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
+	SELECT (value)::boolean INTO ve_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_show_elevation_from_dem' AND cur_user = current_user;
 	SELECT (value)::boolean INTO v_arc_insert_automatic_endpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 
 	-- get tablename and formname
