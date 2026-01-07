@@ -8,6 +8,7 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE INDEX node_supplyzone_id_idx ON node USING btree (supplyzone_id);
-CREATE INDEX arc_supplyzone_id_idx ON arc USING btree (supplyzone_id);
-CREATE INDEX connec_supplyzone_id_idx ON connec USING btree (supplyzone_id);
+CREATE INDEX IF NOT EXISTS node_supplyzone_id_idx ON node USING btree (supplyzone_id);
+CREATE INDEX IF NOT EXISTS arc_supplyzone_id_idx ON arc USING btree (supplyzone_id);
+CREATE INDEX IF NOT EXISTS connec_supplyzone_id_idx ON connec USING btree (supplyzone_id);
+CREATE INDEX IF NOT EXISTS link_supplyzone_id_idx ON link USING btree (supplyzone_id);
