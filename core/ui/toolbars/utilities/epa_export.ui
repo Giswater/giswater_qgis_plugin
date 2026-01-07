@@ -40,7 +40,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="lbl_age">
         <property name="text">
-         <string>Age:</string>
+         <string>Age (years):</string>
         </property>
        </widget>
       </item>
