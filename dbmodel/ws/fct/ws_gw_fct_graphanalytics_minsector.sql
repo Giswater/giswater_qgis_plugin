@@ -515,44 +515,34 @@ BEGIN
         UPDATE node SET minsector_id = 0 WHERE EXISTS (
             SELECT 1 FROM v_temp_pgr_mapzone_old
             WHERE node.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-        );
-       
-    	UPDATE node SET minsector_id = 0 WHERE EXISTS (
+        	) OR EXISTS (
             SELECT 1 FROM temp_pgr_minsector
             WHERE node.minsector_id = temp_pgr_minsector.minsector_id
         );
        
-        UPDATE arc SET minsector_id = 0 WHERE EXISTS (
+    	UPDATE arc SET minsector_id = 0 WHERE EXISTS (
             SELECT 1 FROM v_temp_pgr_mapzone_old
             WHERE arc.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-        );
-       
-    	UPDATE arc SET minsector_id = 0 WHERE EXISTS (
+        	) OR EXISTS (
             SELECT 1 FROM temp_pgr_minsector
             WHERE arc.minsector_id = temp_pgr_minsector.minsector_id
         );
-    
-    
+       
     	UPDATE connec SET minsector_id = 0 WHERE EXISTS (
             SELECT 1 FROM v_temp_pgr_mapzone_old
             WHERE connec.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-        );
-       
-    	UPDATE connec SET minsector_id = 0 WHERE EXISTS (
+        	) OR EXISTS (
             SELECT 1 FROM temp_pgr_minsector
             WHERE connec.minsector_id = temp_pgr_minsector.minsector_id
         );
        
-       
-       	UPDATE link SET minsector_id = 0 WHERE EXISTS (
+    	UPDATE link SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM v_temp_pgr_mapzone_old
+            WHERE link.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
+        	) OR EXISTS (
             SELECT 1 FROM temp_pgr_minsector
             WHERE link.minsector_id = temp_pgr_minsector.minsector_id
-       	);
-    
-       	UPDATE link SET minsector_id = 0 WHERE EXISTS (
-            SELECT 1 FROM temp_pgr_minsector
-            WHERE link.minsector_id = temp_pgr_minsector.minsector_id
-       	);
+        );
 
 
         -- Update minsector
