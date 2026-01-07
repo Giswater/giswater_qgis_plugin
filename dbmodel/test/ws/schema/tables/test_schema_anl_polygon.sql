@@ -40,7 +40,7 @@ SELECT col_type_is('anl_polygon', 'state', 'integer', 'Column state should be in
 SELECT col_type_is('anl_polygon', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('anl_polygon', 'fid', 'integer', 'Column fid should be integer');
 SELECT col_type_is('anl_polygon', 'cur_user', 'character varying(50)', 'Column cur_user should be varchar(50)');
-SELECT col_type_is('anl_polygon', 'the_geom', 'geometry(MultiPolygon)', 'Column the_geom should be geometry(MultiPolygon)');
+SELECT col_type_is('anl_polygon', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('anl_polygon', 'result_id', 'character varying(16)', 'Column result_id should be varchar(16)');
 SELECT col_type_is('anl_polygon', 'descript', 'text', 'Column descript should be text');
 
