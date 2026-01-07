@@ -511,6 +511,50 @@ BEGIN
 
     ELSE
 
+        -- Avoid crashing the foreign key table(minsector_id) by setting minsector_id = 0 before deleting the minsector from the parent table
+        UPDATE node SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM v_temp_pgr_mapzone_old
+            WHERE node.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
+        );
+       
+    	UPDATE node SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector
+            WHERE node.minsector_id = temp_pgr_minsector.minsector_id
+        );
+       
+        UPDATE arc SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM v_temp_pgr_mapzone_old
+            WHERE arc.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
+        );
+       
+    	UPDATE arc SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector
+            WHERE arc.minsector_id = temp_pgr_minsector.minsector_id
+        );
+    
+    
+    	UPDATE connec SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM v_temp_pgr_mapzone_old
+            WHERE connec.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
+        );
+       
+    	UPDATE connec SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector
+            WHERE connec.minsector_id = temp_pgr_minsector.minsector_id
+        );
+       
+       
+       	UPDATE link SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector
+            WHERE link.minsector_id = temp_pgr_minsector.minsector_id
+       	);
+    
+       	UPDATE link SET minsector_id = 0 WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector
+            WHERE link.minsector_id = temp_pgr_minsector.minsector_id
+       	);
+
+
         -- Update minsector
         DELETE FROM minsector
         WHERE EXISTS (
