@@ -100,7 +100,6 @@ SELECT fk_ok('element', 'workcat_id', 'cat_work', 'id', 'FK element_workcat_id_f
 SELECT has_trigger('element', 'gw_trg_edit_controls', 'Table should have gw_trg_edit_controls trigger');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_insert', 'Table should have gw_trg_typevalue_fk_insert trigger');
 SELECT has_trigger('element', 'gw_trg_typevalue_fk_update', 'Table should have gw_trg_typevalue_fk_update trigger');
-SELECT has_trigger('element', 'element_expl_visibility_gin', 'Table should have element_expl_visibility_gin trigger');
 
 -- Check rules
 
@@ -118,6 +117,9 @@ SELECT col_default_is('element', 'created_at', 'now()', 'Column created_at shoul
 SELECT col_default_is('element', 'created_by', 'CURRENT_USER', 'Column created_by should have default value');
 SELECT col_default_is('element', 'trace_featuregeom', 'true', 'Column trace_featuregeom should have default value');
 SELECT col_default_is('element', 'sector_id', '0', 'Column sector_id should have default value');
+
+-- Check indexes
+SELECT has_index('element', 'element_expl_visibility_gin', 'Table should have index on expl_visibility');
 
 SELECT * FROM finish();
 
