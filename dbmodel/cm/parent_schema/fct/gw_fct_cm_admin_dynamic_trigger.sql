@@ -106,6 +106,10 @@ BEGIN
 	
 	DELETE FROM temp_new_vals 
 	WHERE table_name in ('om_campaign_x_node', 'om_campaign_x_arc', 'om_campaign_x_connec', 'om_campaign_lot');
+	
+	-- discard id, we will use the serial sequences
+	DELETE FROM temp_new_vals
+	WHERE col = 'id';
 
 
 	-- adjust geometry column

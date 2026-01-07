@@ -49,11 +49,6 @@ BEGIN
 	FROM mec WHERE esquema NOT ILIKE '%$%' AND esquema <> 'public';
 
 	IF TG_OP = 'INSERT' THEN
-		IF NEW.id is null THEN
-			EXECUTE 'SELECT nextval(''om_campaign_lot_x_'||v_feature||'_id_seq'')'
-			INTO NEW.id;
-		END IF;
-
 		IF v_feature = 'node' THEN
 		    NEW.node_id := nextval('cm_urn_id_seq');
 		ELSIF v_feature = 'arc' THEN
