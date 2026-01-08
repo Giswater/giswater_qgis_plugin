@@ -158,7 +158,6 @@ BEGIN
             -- for specific functions
             IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN  
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
-                ALTER TABLE temp_pgr_node_minsector ADD COLUMN IF NOT EXISTS num_border INTEGER NOT NULL DEFAULT 0; 
 
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
