@@ -24615,7 +24615,7 @@ INSERT INTO cat_feature VALUES ('SEWER_STORAGE', 'STORAGE', 'NODE', NULL, 'v_edi
 INSERT INTO cat_feature VALUES ('OWERFLOW_STORAGE', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_owerflow_storage', NULL, NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('PUMP_STATION', 'CHAMBER', 'NODE', NULL, 'v_edit_node', 've_node_pump_station', NULL, NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
-
+INSERT INTO cat_feature VALUES('OUT_MANHOLE', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_out_manhole', 'Out_manhole', NULL, true, false, NULL) ON CONFLICT (id) DO NOTHING;
 
 --
 -- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
@@ -24669,6 +24669,7 @@ INSERT INTO cat_feature_node VALUES ('WEIR', 'CHAMBER', 'JUNCTION', 2, true, tru
 INSERT INTO cat_feature_node VALUES ('SEWER_STORAGE', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('OWERFLOW_STORAGE', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('PUMP_STATION', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('OUT_MANHOLE', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 
 
 --
