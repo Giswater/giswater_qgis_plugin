@@ -311,7 +311,7 @@ BEGIN
 		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 
 		SELECT node_id INTO v_node
 		FROM v_temp_node n
-		JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
+		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2
 		WHERE a.arc_id = v_arc_id
 		AND 'SECTOR' <> ALL(n.graph_delimiter)
 		LIMIT 1;
@@ -801,57 +801,43 @@ BEGIN
 			SELECT node, 'MINSECTOR'
 			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
 
-			-- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE (graph_delimiter as 'SECTOR')
-			-- TANK
+			-- MINSECTORS that contain an arc that connects to a node SECTOR-WATER and is not inlet_arc will have graph_delimiter = 'SECTOR'
+			-- TANK, SOURCE, WATERWELL, WTP
+			WITH 
+				sector_water AS ( 
+					SELECT m.node_id, m.inlet_arc
+					FROM man_tank m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
+					UNION ALL  
+					SELECT m.node_id, m.inlet_arc
+					FROM man_source m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
+					UNION ALL
+					SELECT m.node_id, m.inlet_arc
+					FROM man_waterwell m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter) 
+					UNION ALL
+					SELECT m.node_id, m.inlet_arc
+					FROM man_wtp m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
+				)
 			UPDATE temp_pgr_node_minsector t
 			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
 				SELECT 1
-				FROM v_temp_node n
-				JOIN man_tank m USING (node_id)
-				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
-				WHERE 'SECTOR' = ANY (n.graph_delimiter)
-				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-				AND t.pgr_node_id =a.minsector_id
-			);
-
-			-- SOURCE
-			UPDATE temp_pgr_node_minsector t
-			SET graph_delimiter = 'SECTOR'
-			WHERE EXISTS (
-				SELECT 1
-				FROM v_temp_node n
-				JOIN man_source m USING (node_id)
-				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
-				WHERE 'SECTOR' = ANY (n.graph_delimiter)
-				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-				AND t.pgr_node_id =a.minsector_id
-			);
-
-			-- WATERWELL
-			UPDATE temp_pgr_node_minsector t
-			SET graph_delimiter = 'SECTOR'
-			WHERE EXISTS (
-				SELECT 1
-				FROM v_temp_node n
-				JOIN man_waterwell m USING (node_id)
-				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
-				WHERE 'SECTOR' = ANY (n.graph_delimiter)
-				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-				AND t.pgr_node_id =a.minsector_id
-			);
-
-			-- WTP
-			UPDATE temp_pgr_node_minsector t
-			SET graph_delimiter = 'SECTOR'
-			WHERE EXISTS (
-				SELECT 1
-				FROM v_temp_node n
-				JOIN man_wtp m USING (node_id)
-				JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
-				WHERE 'SECTOR' = ANY (n.graph_delimiter)
-				AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-				AND t.pgr_node_id =a.minsector_id
+				FROM v_temp_arc a
+			  	LEFT JOIN sector_water s1 ON a.node_1 = s1.node_id
+			  	LEFT JOIN sector_water s2 ON a.node_2 = s2.node_id
+			  	WHERE t.pgr_node_id = a.minsector_id
+			    AND (
+			      (s1.node_id IS NOT NULL AND a.arc_id <> ALL(COALESCE(s1.inlet_arc,ARRAY[]::int[])))
+			      OR
+			      (s2.node_id IS NOT NULL AND a.arc_id <> ALL(COALESCE(s2.inlet_arc,ARRAY[]::int[])))
+			    )
 			);
 
 			-- temp_pgr_arc is not used
@@ -873,41 +859,37 @@ BEGIN
 			-- insert nodes (the graph is without water sources that are SECTOR)
 			SELECT count(*)::float FROM  v_temp_arc INTO v_pgr_distance;
 			v_query_text := '
-				SELECT
-					arc_id AS id,
-					node_1 AS source,
-					node_2 AS target,
-					1 AS cost
-				FROM v_temp_arc a
-				WHERE NOT EXISTS (
-					SELECT 1 
-					FROM v_temp_node n 
-					JOIN man_tank m USING (node_id)
-					WHERE n.node_id IN (a.node_1, a.node_2) 
-					AND ''SECTOR''= any (n.graph_delimiter)
-				)
-				AND NOT EXISTS (
-					SELECT 1 
-					FROM v_temp_node n 
-					JOIN man_source m USING (node_id)
-					WHERE n.node_id IN (a.node_1, a.node_2) 
-					AND ''SECTOR''= any (n.graph_delimiter)
-				)
-				AND NOT EXISTS (
-					SELECT 1 
-					FROM v_temp_node n 
-					JOIN man_waterwell m USING (node_id)
-					WHERE n.node_id IN (a.node_1, a.node_2) 
-					AND ''SECTOR''= any (n.graph_delimiter)
-				)
-				AND NOT EXISTS (
-					SELECT 1 
-					FROM v_temp_node n 
-					JOIN man_wtp m USING (node_id)
-					WHERE n.node_id IN (a.node_1, a.node_2) 
-					AND ''SECTOR''= any (n.graph_delimiter)
-				)
-			';
+				WITH 
+					sector_water AS ( 
+						SELECT m.node_id
+						FROM man_tank m
+						JOIN v_temp_node n USING (node_id)
+						WHERE ''SECTOR'' = ANY(n.graph_delimiter)
+						UNION ALL  
+						SELECT m.node_id
+						FROM man_source m
+						JOIN v_temp_node n USING (node_id)
+						WHERE ''SECTOR'' = ANY(n.graph_delimiter)
+						UNION ALL
+						SELECT m.node_id
+						FROM man_waterwell m
+						JOIN v_temp_node n USING (node_id)
+						WHERE ''SECTOR'' = ANY(n.graph_delimiter) 
+						UNION ALL
+						SELECT m.node_id
+						FROM man_wtp m
+						JOIN v_temp_node n USING (node_id)
+						WHERE ''SECTOR'' = ANY(n.graph_delimiter)
+					)
+					SELECT
+						arc_id AS id,
+						node_1 AS source,
+						node_2 AS target,
+						1 AS cost
+					FROM v_temp_arc a
+					WHERE NOT EXISTS (SELECT 1 FROM sector_water s WHERE s.node_id = a.node_1)
+  					AND NOT EXISTS (SELECT 1 FROM sector_water s WHERE s.node_id = a.node_2)
+				';
 			INSERT INTO temp_pgr_node (pgr_node_id)
 			SELECT node
 			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
@@ -927,79 +909,45 @@ BEGIN
 			WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
 			AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
 
-			-- insert the arcs that connect with WATER SOURCE and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
-			-- TANKS
+			-- insert the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
+			-- TANKS, SOURCE, WATERWELL, WTP
+			WITH 
+				sector_water AS ( 
+					SELECT m.node_id, m.inlet_arc
+					FROM man_tank m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
+					UNION ALL  
+					SELECT m.node_id, m.inlet_arc
+					FROM man_source m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
+					UNION ALL
+					SELECT m.node_id, m.inlet_arc
+					FROM man_waterwell m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter) 
+					UNION ALL
+					SELECT m.node_id, m.inlet_arc
+					FROM man_wtp m
+					JOIN v_temp_node n USING (node_id)
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
+				)
 			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
 			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
 			FROM v_temp_arc a
-        	WHERE EXISTS (
-            	SELECT 1 
-				FROM v_temp_node n
-				JOIN man_tank m USING (node_id)
-				WHERE n.node_id IN (a.node_1, a.node_2)
-				AND 'SECTOR' = ANY (n.graph_delimiter)
-            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
+			WHERE EXISTS (
+				SELECT 1 
+				FROM sector_water s
+				WHERE (s.node_id = a.node_1 OR s.node_id = a.node_2)
+        		AND a.arc_id <> ALL(COALESCE(s.inlet_arc,ARRAY[]::int[]))
 			)
-            AND EXISTS (
+			AND EXISTS (
 				SELECT 1 
 				FROM temp_pgr_node n 
-				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
+				WHERE (n.pgr_node_id = a.node_1 OR n.pgr_node_id = a.node_2)
 			);
-
-			-- SOURCE
-			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
-			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
-			FROM v_temp_arc a
-        	WHERE EXISTS (
-            	SELECT 1 
-				FROM v_temp_node n
-				JOIN man_source m USING (node_id)
-				WHERE n.node_id IN (a.node_1, a.node_2)
-				AND 'SECTOR' = ANY (n.graph_delimiter)
-            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-			)
-            AND EXISTS (
-				SELECT 1 
-				FROM temp_pgr_node n 
-				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
-			);
-
-			-- WATERWELL
-			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
-			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
-			FROM v_temp_arc a
-        	WHERE EXISTS (
-            	SELECT 1 
-				FROM v_temp_node n
-				JOIN man_waterwell m USING (node_id)
-				WHERE n.node_id IN (a.node_1, a.node_2)
-				AND 'SECTOR' = ANY (n.graph_delimiter)
-            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-			)
-            AND EXISTS (
-				SELECT 1 
-				FROM temp_pgr_node n 
-				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
-			);
-
-			-- WTP
-			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
-			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
-			FROM v_temp_arc a
-        	WHERE EXISTS (
-            	SELECT 1 
-				FROM v_temp_node n
-				JOIN man_wtp m USING (node_id)
-				WHERE n.node_id IN (a.node_1, a.node_2)
-				AND 'SECTOR' = ANY (n.graph_delimiter)
-            	AND (m.inlet_arc IS NULL OR a.arc_id <> ALL(m.inlet_arc))
-			)
-            AND EXISTS (
-				SELECT 1 
-				FROM temp_pgr_node n 
-				WHERE n.pgr_node_id IN (a.node_1, a.node_2)
-			);
-
+			
 			-- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
 			v_query_text := 
 			'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 AS cost
@@ -1027,7 +975,7 @@ BEGIN
 				WHERE n.graph_delimiter = 'MINSECTOR'
 				AND n.pgr_node_id = a1.pgr_node_1
 			)
-			AND a1.pgr_node_1 IN (a2.pgr_node_1, a2.pgr_node_2)
+			AND (a1.pgr_node_1 = a2.pgr_node_1 OR a1.pgr_node_1 = a2.pgr_node_2)
 			AND ta.pgr_arc_id = t.pgr_arc_id;
 
 			--checking node_2 for arc_1
@@ -1042,7 +990,7 @@ BEGIN
 				WHERE n.graph_delimiter = 'MINSECTOR'
 				AND n.pgr_node_id = a1.pgr_node_2
 			)
-			AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
+			AND (a1.pgr_node_2 = a2.pgr_node_1 OR a1.pgr_node_2 = a2.pgr_node_2)
 			AND ta.pgr_arc_id = t.pgr_arc_id;
 
 			-- Generate the minsectors
@@ -1072,7 +1020,7 @@ BEGIN
 			FROM (
 				SELECT n.pgr_node_id, min(a.mapzone_id) AS mapzone_id
 				FROM temp_pgr_node n
-				JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+				JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
 				GROUP BY n.pgr_node_id
 				HAVING count(DISTINCT a.mapzone_id) = 1
 			) n
@@ -1088,7 +1036,7 @@ BEGIN
 			SELECT n.pgr_node_id, min(a.mapzone_id), max(a.mapzone_id), 'MINSECTOR'
 			FROM temp_pgr_node n
 			JOIN man_valve m ON m.node_id = n.pgr_node_id
-			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+			JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
 			WHERE n.graph_delimiter = 'MINSECTOR'
 			GROUP BY n.pgr_node_id
 			HAVING count(DISTINCT a.mapzone_id) = 2;
