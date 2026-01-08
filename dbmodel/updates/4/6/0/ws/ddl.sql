@@ -108,6 +108,11 @@ DROP VIEW IF EXISTS v_om_mincut_current_hydrometer;
 -- Add link column to ext_rtc_hydrometer table
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
 
+-- Fix missing hydrometers before creating foreign key
+INSERT INTO ext_rtc_hydrometer (id)
+SELECT hydrometer_id FROM ext_rtc_hydrometer_x_data erhxd WHERE hydrometer_id::text NOT IN (SELECT id FROM ext_rtc_hydrometer)
+ON CONFLICT (id) DO NOTHING;
+
 -- Update code column to id column
 UPDATE ext_rtc_hydrometer SET code = id;
 
