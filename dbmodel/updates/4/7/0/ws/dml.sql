@@ -10,3 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 05/01/2026
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3528, 'gw_fct_get_epa_result_families', 'ws', 'function', 'text, integer', 'json', 'Function to get json with EPA result families.', NULL, NULL, 'core', NULL);
+
+-- 08/01/2026
+UPDATE config_form_fields
+	SET dv_isnullvalue=true
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
