@@ -503,7 +503,7 @@ BEGIN
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
-            WHERE ta.mapzone_id = a.minsector_id
+            WHERE ta.pgr_arc_id = a.arc_id
         )
         AND a.minsector_id IS DISTINCT FROM 0;
 
@@ -514,7 +514,7 @@ BEGIN
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_node tn
-            WHERE tn.mapzone_id = n.minsector_id
+            WHERE tn.pgr_node_id = n.node_id
         )
         AND n.minsector_id IS DISTINCT FROM 0;
 
@@ -525,8 +525,8 @@ BEGIN
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
-            JOIN v_temp_connec vc USING (arc_id) 
-            WHERE ta.mapzone_id = c.minsector_id
+            JOIN v_temp_connec vc ON ta.pgr_arc_id = vc.arc_id
+            WHERE vc.connec_id = c.connec_id
         )
         AND c.minsector_id IS DISTINCT FROM 0;
 
@@ -537,8 +537,8 @@ BEGIN
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
-            JOIN v_temp_link_connec vl USING (arc_id) 
-            WHERE ta.mapzone_id = l.minsector_id
+            JOIN v_temp_link_connec vl ON ta.pgr_arc_id = vl.arc_id
+            WHERE vl.link_id = l.link_id
         )
         AND l.minsector_id IS DISTINCT FROM 0;
 
@@ -550,7 +550,7 @@ BEGIN
         )
         AND EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
-            WHERE ta.mapzone_id = a.minsector_id
+            WHERE ta.pgr_arc_id = a.arc_id
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_minsector tpm
@@ -565,7 +565,7 @@ BEGIN
         )
         AND EXISTS (
             SELECT 1 FROM temp_pgr_node tn
-            WHERE tn.mapzone_id = n.minsector_id
+            WHERE tn.pgr_node_id = n.node_id
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_minsector tpm
@@ -580,7 +580,7 @@ BEGIN
         )
         AND EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
-            JOIN v_temp_connec vc USING (arc_id) 
+            JOIN v_temp_connec vc ON ta.pgr_arc_id = vc.arc_id
             WHERE ta.mapzone_id = c.minsector_id
         )
         AND NOT EXISTS (
@@ -596,7 +596,7 @@ BEGIN
         )
         AND EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
-            JOIN v_temp_link_connec vl USING (arc_id) 
+            JOIN v_temp_link_connec vl ON ta.pgr_arc_id = vl.arc_id
             WHERE ta.mapzone_id = l.minsector_id
         )
         AND NOT EXISTS (
