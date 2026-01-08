@@ -9,7 +9,8 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...libs import tools_db, tools_qt, tools_log
+from ...libs import tools_db, tools_qt, tools_log, lib_vars
+from qgis.utils import iface
 
 
 class GwAutoMincutTask(GwTask):
@@ -24,6 +25,10 @@ class GwAutoMincutTask(GwTask):
         self.mincut_action = action
         self.exception = None
         self.timer = timer
+        self.body = None
+        self.complet_result = None
+        # Don't create our own aux_conn, use the mincut cursor instead
+        self.use_aux_conn = False
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
@@ -67,9 +72,10 @@ class GwAutoMincutTask(GwTask):
                       f'"forecastEnd":"{forecast_end_predict}"')
             self.body = tools_gw.create_body(extras=extras)
             msg = "Task 'Mincut execute' execute procedure '{0}' with parameters: '{1}', '{2}', '{3}'"
-            msg_params = ("gw_fct_setmincut", self.body, f"aux_conn={self.aux_conn}", "is_thread=True",)
+            msg_params = ("gw_fct_setmincut", self.body, "using mincut cursor", "is_thread=True",)
             tools_log.log_info(msg, msg_params=msg_params)
-            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', self.body, aux_conn=self.aux_conn, is_thread=True)
+            # Use the mincut cursor to execute setmincut so temporal tables are visible
+            self.complet_result = self.mincut_class._execute_setmincut_with_cursor(self.body, commit=True)
             if self.isCanceled():
                 return False
             if not self.complet_result or self.complet_result['status'] == 'Failed':
@@ -83,10 +89,52 @@ class GwAutoMincutTask(GwTask):
             self.exception = e
             return False
 
+    def cancel(self):
+        """ Cancel task - use mincut cursor connection instead of aux_conn """
+        
+        # Use mincut cursor connection if available
+        if hasattr(self.mincut_class, 'mincut_aux_conn') and self.mincut_class.mincut_aux_conn:
+            try:
+                pid = self.mincut_class.mincut_aux_conn.get_backend_pid()
+                if isinstance(pid, int):
+                    result = tools_db.cancel_pid(pid)
+                    if result['last_error'] is not None:
+                        tools_log.log_warning(result['last_error'])
+                    tools_db.dao.rollback(self.mincut_class.mincut_aux_conn)
+            except Exception as e:
+                tools_log.log_warning(f"Error canceling mincut task: {e}")
+        
+        msg = "Task '{0}' was cancelled"
+        msg_params = (self.description(),)
+        tools_log.log_info(msg, msg_params=msg_params)
+        super().cancel()
+
     def finished(self, result):
 
-        super().finished(result)
+        # Call parent finished but skip aux_conn cleanup since we use mincut cursor
+        # We need to manually do the cleanup that parent does, except aux_conn deletion
+        try:
+            lib_vars.session_vars['threads'].remove(self)
+        except ValueError:
+            pass
+        # Don't delete aux_conn - we're using mincut cursor instead
+        iface.actionOpenProject().setEnabled(True)
+        iface.actionNewProject().setEnabled(True)
+        if result:
+            msg = "Task '{0}' completed"
+            msg_params = (self.description(),)
+            tools_log.log_info(msg, msg_params=msg_params)
+        else:
+            if self.exception is None:
+                msg = "Task '{0}' not successful but without exception"
+                msg_params = (self.description(),)
+                tools_log.log_info(msg, msg_params=msg_params)
+            else:
+                msg = "Task '{0}' Exception: {1}"
+                msg_params = (self.description(), self.exception,)
+                tools_log.log_info(msg, msg_params=msg_params)
 
+        # Build SQL and manage json response (body/complet_result already initialized in __init__)
         sql = "SELECT gw_fct_setmincut("
         if self.body:
             sql += f"{self.body}"
@@ -94,7 +142,8 @@ class GwAutoMincutTask(GwTask):
         msg = "Task 'Mincut execute' manage json response with parameters: '{0}', '{1}', '{2}'"
         msg_params = (self.complet_result, sql, "None",)
         tools_log.log_info(msg, msg_params=msg_params)
-        tools_gw.manage_json_response(self.complet_result, sql, None)
+        if self.complet_result:
+            tools_gw.manage_json_response(self.complet_result, sql, None)
 
         if self.timer:
             self.timer.stop()

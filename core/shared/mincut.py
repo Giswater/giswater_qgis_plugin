@@ -73,6 +73,10 @@ class GwMincut:
         self.col2 = "hydrometer_customer_code"
         self.lbl1 = "Connec customer code:"
         self.lbl2 = "Hydrometer customer code:"
+        
+        # Cursor management for setmincut function
+        self.mincut_aux_conn = None
+        self.mincut_cursor = None
 
     def manage_mincuts(self, dialog):
         """ Button 12: Mincut management """
@@ -348,6 +352,9 @@ class GwMincut:
         result = tools_gw.execute_procedure('gw_fct_graphanalytics_manage_temporary', body)
         if not result or result['status'] == 'Failed':
             return
+
+        # Create auxiliary connection and cursor for setmincut function
+        self._create_mincut_cursor()
 
         # Setting lists
         self.mincut_class = 1
@@ -742,6 +749,8 @@ class GwMincut:
             # If client don't touch nothing just rejected dialog or press cancel
             if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
                 tools_gw.close_dialog(self.dlg_mincut)
+                # Close cursor and auxiliary connection
+                self._close_mincut_cursor()
                 return
 
             self.dlg_mincut.closeMainWin = True
@@ -770,6 +779,9 @@ class GwMincut:
             tools_gw.disconnect_signal('mincut')
             self._remove_selection()
             tools_qgis.refresh_map_canvas()
+            
+            # Close cursor and auxiliary connection
+            self._close_mincut_cursor()
 
     def _real_start(self):
 
@@ -1052,7 +1064,7 @@ class GwMincut:
         extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, '
         extras += f'"mincutId":"{result_mincut_id_text}", "usePsectors":"{use_planified}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+        result = self._execute_setmincut_with_cursor(body)
         if not result or result['status'] == 'Failed':
             return
 
@@ -1067,6 +1079,114 @@ class GwMincut:
         self._save_widgets_values()
         self.iface.actionPan().trigger()
         self._remove_selection()
+
+    def _create_mincut_cursor(self):
+        """ Create auxiliary connection and cursor for setmincut function """
+        
+        try:
+            # Close existing cursor and connection if they exist
+            self._close_mincut_cursor()
+            
+            # Create new auxiliary connection
+            self.mincut_aux_conn = tools_db.dao.get_aux_conn()
+            if not self.mincut_aux_conn:
+                return
+            
+            # Get cursor from the connection
+            self.mincut_cursor = tools_db.dao.get_cursor(self.mincut_aux_conn)
+            if self.mincut_cursor and tools_db.dao.set_search_path:
+                # Set search path if configured
+                self.mincut_cursor.execute(tools_db.dao.set_search_path)
+        except Exception as e:
+            msg = "Error creating mincut cursor: {0}"
+            msg_params = (str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
+            self._close_mincut_cursor()
+
+    def _close_mincut_cursor(self):
+        """ Close cursor and auxiliary connection for setmincut function """
+        
+        try:
+            if self.mincut_cursor:
+                self.mincut_cursor.close()
+                self.mincut_cursor = None
+            if self.mincut_aux_conn:
+                tools_db.dao.delete_aux_con(self.mincut_aux_conn)
+                self.mincut_aux_conn = None
+        except Exception as e:
+            msg = "Error closing mincut cursor: {0}"
+            msg_params = (str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
+
+    def _execute_setmincut_with_cursor(self, body, commit=True):
+        """ Execute gw_fct_setmincut function using the stored cursor """
+        
+        if not self.mincut_cursor or not self.mincut_aux_conn:
+            tools_log.log_warning("Mincut cursor not available, using regular execution")
+            return tools_gw.execute_procedure('gw_fct_setmincut', body, commit=commit)
+        
+        try:
+            # Build SQL similar to execute_procedure
+            schema_name = lib_vars.schema_name
+            if schema_name:
+                sql = f"SELECT {schema_name}.gw_fct_setmincut("
+            else:
+                sql = "SELECT gw_fct_setmincut("
+            
+            if body:
+                sql += f"{body}"
+            sql += ");"
+            
+            # Execute using the stored cursor
+            self.mincut_cursor.execute(sql)
+            row = self.mincut_cursor.fetchone()
+            
+            if commit:
+                self.mincut_aux_conn.commit()
+            
+            if not row or not row[0]:
+                tools_log.log_warning(f"Function error: gw_fct_setmincut")
+                tools_log.log_warning(sql)
+                return None
+
+            json_result = row[0]
+            
+            # Log SQL if enabled
+            if tools_gw.get_config_parser('log', 'log_sql', "user", "init", False) == "True":
+                tools_log.log_db(json_result, header="SERVER RESPONSE")
+
+            if 'status' not in json_result:
+                tools_gw.manage_json_exception(json_result, sql, is_thread=False)
+                return False
+            
+            # If failed, manage exception (but don't rollback - commit already happened)
+            if json_result.get('status') == 'Failed':
+                tools_gw.manage_json_exception(json_result, sql, is_thread=False)
+                return json_result
+            
+            # Manage geometry transformation if needed
+            try:
+                if json_result.get("body", {}).get("feature", {}).get("geometry") and lib_vars.data_epsg != lib_vars.project_epsg:
+                    json_result = tools_gw.manage_json_geometry(json_result)
+            except Exception:
+                pass
+            
+            tools_gw.manage_json_response(json_result, sql, None)
+            return json_result
+            
+        except Exception as e:
+            msg = "Error executing setmincut with cursor: {0}"
+            msg_params = (str(e),)
+            tools_log.log_warning(msg, msg_params=msg_params)
+            sql_error = sql if 'sql' in locals() else 'N/A'
+            tools_log.log_warning(f"SQL: {sql_error}")
+            if commit:
+                try:
+                    self.mincut_aux_conn.rollback()
+                except Exception:
+                    pass
+            # Fallback to regular execution
+            return tools_gw.execute_procedure('gw_fct_setmincut', body, commit=commit)
 
     def _mincut_ok(self, result):
 
@@ -2316,7 +2436,7 @@ class GwMincut:
                       f'"mincutType":"{mincut_result_type}", "forecastStart":"{forecast_start_predict}", '
                       f'"forecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+            result = self._execute_setmincut_with_cursor(body)
 
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
@@ -2691,7 +2811,7 @@ class GwMincut:
                       f'"mincutType":"{mincut_result_type}", "forecastStart":"{forecast_start_predict}", '
                       f'"forecastEnd":"{forecast_end_predict}"')
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+            result = self._execute_setmincut_with_cursor(body)
 
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
