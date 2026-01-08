@@ -10,3 +10,123 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO minsector (minsector_id) VALUES(0) ON CONFLICT (minsector_id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3530, 'gw_fct_exception_others', 'utils', 'function', 'text, text, text, text, text', 'json', 'Function to return exception information.', NULL, NULL, 'core', NULL);
+
+-- 08/01/2026
+UPDATE config_form_list
+	SET addparam='{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+    {
+      "name": "btn_create_empty",
+      "widgetfunction": {
+        "functionName": "getCreateFunctions",
+        "params": {}
+      },
+      "color": "success",
+      "text": "Create empty Dscenario",
+      "disableOnSelect": false,
+      "moreThanOneDisable": false
+    },
+    {
+      "name": "btn_toggle_active",
+      "widgetfunction": {
+        "functionName": "toggle_active",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Toggle active",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_create_crm",
+      "widgetfunction": {
+        "functionName": "create_crm",
+        "params": {}
+      },
+      "color": "success",
+      "text": "Create from CRM",
+      "disableOnSelect": false,
+      "moreThanOneDisable": false
+    },
+    {
+      "name": "btn_create_mincut",
+      "widgetfunction": {
+        "functionName": "create_mincut",
+        "params": {}
+      },
+      "color": "success",
+      "text": "Create from Mincut",
+      "disableOnSelect": false,
+      "moreThanOneDisable": false
+    },
+    {
+      "name": "btn_delete",
+      "widgetfunction": {
+        "functionName": "delete",
+        "params": {}
+      },
+      "color": "error",
+      "text": "Delete",
+      "disableOnSelect": true,
+      "moreThanOneDisable": false
+    }
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json
+	WHERE listname='dscenario_results' AND device=5;
