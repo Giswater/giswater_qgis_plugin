@@ -2282,6 +2282,7 @@ update sys_param_user set id = 'edit_connec_linkcat_vdefault' where id = 'edit_l
 INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRSHORTPIPE', 'ELEMENT', 'inp_frshortpipe', NULL, true);
 
 INSERT INTO cat_feature (id,feature_class,feature_type,parent_layer,child_layer,code_autofill,active) VALUES ('EMETER','FRELEM','ELEMENT','ve_element','ve_element_emeter',true,true);
+INSERT INTO cat_feature_element (id, epa_default) VALUES ('EMETER', 'UNDEFINED') ON CONFLICT (id) DO NOTHING;
 
 -- FRSHORTPIPE
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden)

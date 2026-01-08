@@ -140,7 +140,7 @@ VALUES('v_edit_link', 'form_feature', 'tab_data', 'macrodma_id', 'lyt_data_1', 2
 
 INSERT INTO man_pipelink (link_id)
 SELECT link_id
-FROM v_edit_link;
+FROM link;
 
 -- 22/04/2025
 UPDATE config_param_system
