@@ -1145,7 +1145,7 @@ class GwMincut:
                 self.mincut_aux_conn.commit()
             
             if not row or not row[0]:
-                tools_log.log_warning(f"Function error: gw_fct_setmincut")
+                tools_log.log_warning("Function error: gw_fct_setmincut")
                 tools_log.log_warning(sql)
                 return None
 
