@@ -106,6 +106,7 @@ class GwSelectManager(QgsMapTool):
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
+
     def canvasPressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             point = self.toMapCoordinates(event.pos())

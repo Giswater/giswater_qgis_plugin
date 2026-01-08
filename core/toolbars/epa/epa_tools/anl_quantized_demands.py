@@ -21,7 +21,6 @@ from ....utils import tools_gw
 class QuantizedDemands:
     def __init__(self):
         self.message = ""
-        pass
 
     def clicked_event(self):
 

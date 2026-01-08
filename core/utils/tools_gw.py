@@ -378,7 +378,6 @@ def open_help_link(context, uiname, dlg=None):
 
 
 def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
-
     """ Open dialog """
     # Check database connection before opening dialog
     if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
@@ -3423,7 +3422,6 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=True, rubber_band=None,
         aux_conn=None, is_thread=False, check_function=True):
-
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -4196,7 +4194,6 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     except AttributeError as e:
         # In case the dialog has no tab
         tools_log.log_info(f"selection_init: {e}")
-        pass
     if class_object.rel_feature_type in ('all', None):
         class_object.rel_feature_type = 'arc'
 

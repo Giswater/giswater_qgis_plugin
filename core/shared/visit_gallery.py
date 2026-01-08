@@ -23,8 +23,6 @@ class GwVisitGallery:
     def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
 
-        pass
-
     def manage_gallery(self):
 
         # Create the dialog and signals

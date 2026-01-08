@@ -10,16 +10,15 @@ import psycopg2
 import psycopg2.extras
 from functools import partial
 import datetime
-import ast
 import json
 from collections import defaultdict
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_db, tools_log, tools_qgis
-from ... import global_vars
+from ...libs import lib_vars, tools_qt, tools_db, tools_log
 from qgis.PyQt.QtWidgets import QApplication, QListWidget, QCompleter, QLineEdit, QVBoxLayout, QWidget, QLabel, QCheckBox
 from qgis.PyQt.QtGui import QStandardItemModel
+
 
 class GwSchemaI18NUpdate:
 
@@ -524,7 +523,6 @@ class GwSchemaI18NUpdate:
             text = json.dumps(row["text"]).replace("'", "''")
             # Set key depending on context
             if row["context"] == "config_form_fields":
-                closing = True
                 key = (row["source"], row["context"], text, row["formname"], row["formtype"], row["tabname"])
             else:
                 key = (row["source"], row["context"], text)
@@ -683,8 +681,8 @@ class GwSchemaI18NUpdate:
         port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "session", False)
         db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "session", False)
         user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "session", False)
-        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "session", False)
-        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "session", False)
+        tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "session", False)
+        tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "session", False)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
@@ -705,7 +703,6 @@ class GwSchemaI18NUpdate:
         """ Close database connection """
 
         try:
-            status = True
             if self.cursor_i18n:
                 self.cursor_i18n.close()
             if self.conn_i18n:
@@ -714,7 +711,6 @@ class GwSchemaI18NUpdate:
             del self.conn_i18n
         except Exception as e:
             self.last_error = e
-            status = False
 
     def _close_db_dest(self):
         """ Close database connection """
@@ -862,7 +858,6 @@ class GwSchemaI18NUpdate:
         
         return json_data
 
-
     def tables_dic(self):
         self.dbtables_dic = {
             "ws": {
@@ -873,7 +868,7 @@ class GwSchemaI18NUpdate:
                     "su_basic_tables", "dbjson", "dbconfig_form_fields_json"
                  ],
                  "project_type": ["ws", "utils"]
-                 #"dbtables": ["dbtable"]
+                 # "dbtables": ["dbtable"]
             },
             "ud": {
                 "dbtables": ["dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue",
@@ -912,10 +907,9 @@ class GwSchemaI18NUpdate:
         self.make_list_multiple_option(completer, model, type_ahead, widget)
         type_ahead.textChanged.connect(partial(self.make_list_multiple_option, completer, model, type_ahead, widget))
         
-
         widget.itemDoubleClicked.connect(partial(tools_gw.delete_item_on_doubleclick, widget))
         widget.model().rowsInserted.connect(partial(self.update_selected_table_dic))
-        #widget.model().modelReset.connect(partial(self.update_selected_table_dic))
+        # widget.model().modelReset.connect(partial(self.update_selected_table_dic))
         self.dlg_qm.cmb_projecttype.currentTextChanged.connect(widget.clear)
 
         # Create layout to hold both widgets
@@ -936,7 +930,6 @@ class GwSchemaI18NUpdate:
         label.setObjectName('lbl_tables')
         self.dlg_qm.verticalLayout.addWidget(label)
         self.dlg_qm.verticalLayout.addWidget(container)
-
 
     def make_list_multiple_option(self, completer, model, widget, list_widget):
         if widget is None:
@@ -963,7 +956,6 @@ class GwSchemaI18NUpdate:
             # Update completer with sorted display list
             tools_qt.set_completer_object(completer, model, widget, sorted(display_list, key=lambda x: x["idval"]))
 
-
     def update_selected_table_dic(self):
         if not hasattr(self, 'dlg_qm'):
             return
@@ -988,7 +980,6 @@ class GwSchemaI18NUpdate:
                     "project_type": ["cm"]
                 },
             }
-
 
     def check_box_use_selected_tables(self):
         # Create checkbox for using selected tables

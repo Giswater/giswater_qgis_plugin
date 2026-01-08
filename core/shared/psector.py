@@ -2988,7 +2988,6 @@ class GwPsector:
                         selection_model.select(index, (QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows))
         except Exception as e:
             print(f"Error in _manage_selection_changed: {e}")
-            pass
 
     def callback_values(self):
         return self, self.dlg_plan_psector, "psector"

@@ -11,16 +11,16 @@ import subprocess
 from functools import partial
 import json
 from collections import defaultdict
-import ast
 
 import psycopg2
 import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log
 
 from qgis.PyQt.QtWidgets import QApplication
+
 
 class GwI18NGenerator:
 
@@ -252,8 +252,10 @@ class GwI18NGenerator:
                 # Convert to dict to ensure iteration works for all cursor types
                 row_dict = dict(row)
                 for k, v in row_dict.items():
-                    if not v: continue
-                    if k == key or k == f'auto_{key}': continue
+                    if not v:
+                        continue
+                    if k == key or k == f'auto_{key}':
+                        continue
                     
                     if k.startswith(prefix):
                         candidates.append((1, v))
@@ -599,7 +601,7 @@ class GwI18NGenerator:
             order_by.extend(['source_code', 'project_type', 'context', 'formname', 'formtype', 'tabname', 'source', 'id'])
 
         elif table == 'dbconfig_form_fields_feat':
-            columns = ["feature_type","source", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            columns = ["feature_type", "source", "formtype", "tabname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_columns = self._generate_lang_columns(table, ['lb', 'tt'])
             order_by.extend(['source_code', 'project_type', 'context', 'formtype', 'tabname', 'source', 'id'])
 
@@ -643,7 +645,7 @@ class GwI18NGenerator:
             lang_columns = self._generate_lang_columns(table, ['lb'])
             order_by.extend(['source_code', 'context', 'layername', 'source', 'hint'])
         # Make the query
-        sql=""
+        sql = ""
         try:
             if self.lower_lang == 'en_us':
                 sql = (f"SELECT {', '.join(columns)} "
@@ -897,6 +899,7 @@ class GwI18NGenerator:
         return ""
     # endregion
     # region Write dbstyle values
+
     def _write_dbstyle_values(self, rows, path, file_type):
         updates = defaultdict(list)
 

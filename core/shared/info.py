@@ -2040,7 +2040,6 @@ class GwInfo(QObject):
             getattr(self, f"_check_{widget.property('datatype')}")(value, widget, btn)
         except AttributeError:
             """ If the function called by getattr don't exist raise this exception """
-            pass
 
     def _check_double(self, value, widget, btn_accept):
         """ Check if the value is double or not.
@@ -2137,7 +2136,6 @@ class GwInfo(QObject):
         return widget
 
     def _accept_auto_update(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
-
         """
         :param dialog:
         :param complet_result:

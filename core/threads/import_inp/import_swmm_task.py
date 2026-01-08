@@ -42,7 +42,6 @@ except ImportError:
 
     Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile = None, None, None, None, None
     InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber = object, object, object
-    pass
 
 from qgis.PyQt.QtCore import pyqtSignal
 

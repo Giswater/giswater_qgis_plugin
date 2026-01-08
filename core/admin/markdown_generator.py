@@ -7,19 +7,17 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import re
-import subprocess
 from functools import partial
 import json
 import ast
 
-import psycopg2
-import psycopg2.extras
 
 from ..ui.ui_manager import GwAdminMarkdownGeneratorUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
+from ...libs import lib_vars, tools_qt, tools_db
 
 from qgis.PyQt.QtWidgets import QApplication, QFileDialog
+
 
 class GwAdminMarkdownGenerator:
 

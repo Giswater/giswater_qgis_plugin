@@ -11,7 +11,6 @@ import json
 import psycopg2
 import psycopg2.extras
 from functools import partial
-from datetime import datetime, date
 from itertools import product
 import sys
 from collections import defaultdict
@@ -63,7 +62,6 @@ class GwSchemaI18NManager:
         self.dlg_qm.rejected.connect(self._close_db_org)
         self.dlg_qm.rejected.connect(self._close_db_i18n)
         self.dlg_qm.chk_all.clicked.connect(self._check_all)
-
 
     def _check_all(self):
         if not tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_all):
@@ -253,8 +251,8 @@ class GwSchemaI18NManager:
         msg = "Process completed"
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
 
-
     # region Missing DB Dialogs
+
     def _update_db_tables(self):
         """ Update the database tables (ws or ud or am or cm or su_tables)"""
 
@@ -364,7 +362,6 @@ class GwSchemaI18NManager:
             text_return += "\n"
         return text_return
 
-
     def _update_any_table(self, table_i18n, table_org):
         """Insert and update rows in a classical translation table."""
 
@@ -415,7 +412,7 @@ class GwSchemaI18NManager:
             for row in rows_org:
                 sid = f"{row['layername']}_{row['styleconfig_id']}"
                 hints_per_id[sid].add(row['hint'])
-                rows_per_id[sid] = row # Keep one row to access other columns if needed
+                rows_per_id[sid] = row  # Keep one row to access other columns if needed
 
             # Check each id
             for sid, valid_hints in hints_per_id.items():
@@ -430,7 +427,6 @@ class GwSchemaI18NManager:
                     query_insert += self.get_hints(table_i18n, row, pk_column_org, pk_column_i18n, hints_to_delete)
 
         return query_insert
-
 
     def _get_columns_to_compare(self, table_i18n, table_org):
         """ Get the columns and rows to compare """
@@ -546,7 +542,7 @@ class GwSchemaI18NManager:
 
         if table_i18n == "i18n.dbstyle":
             rows_org = self._get_dbstyle_rows(rows_org)
-            self.values_en_us.extend(["org_text"]) # Important because we extract the en_us values from the org_text, so it is needed to control a correct behaivor
+            self.values_en_us.extend(["org_text"])  # Important because we extract the en_us values from the org_text, so it is needed to control a correct behaivor
             columns_org.extend(["hint", "lb_en_us"])
 
         # Rewrite the columns to get the name. Also determine diferent kinds of columns useful in the future
@@ -604,7 +600,6 @@ class GwSchemaI18NManager:
 
         return diff_rows, columns_i18n, rows_org
 
-
     def _get_rows_to_compare(self, table_i18n, columns_i18n, columns_org, table_org):
         """ Get the rows to compare """
 
@@ -631,7 +626,7 @@ class GwSchemaI18NManager:
 
         if table_i18n.split('.')[1] == "dbconfig_form_fields_json":
             self.conflict_project_type = ["source_code", "context", "formname", "formtype", "tabname", "source", "hint", "lb_en_us"]
-            pk_column_org =["formname", "formtype", "tabname", "columnname"]
+            pk_column_org = ["formname", "formtype", "tabname", "columnname"]
             pk_column_i18n = ["formname", "formtype", "tabname", "source"]
         elif table_i18n.split('.')[1] == "dbjson":
             self.conflict_project_type = ["source_code", "context", "hint", "source", "lb_en_us"]
@@ -739,7 +734,6 @@ class GwSchemaI18NManager:
                     value_list.append(f"'{val}'")
             values_parts.append(f"({', '.join(value_list)})")
             
-        
         # Construct final query
         query = f"""
             INSERT INTO {table_i18n} ({', '.join(columns)})
@@ -785,7 +779,6 @@ class GwSchemaI18NManager:
         return hints_i18n_set
 
     # endregion
-
 
     # region Dbstyle
 
@@ -942,14 +935,12 @@ class GwSchemaI18NManager:
 
         return "Rows updated succesfully (Rename proj.type)\n"
 
-
     def _update_fake_utils(self, table):
         """Update labels of old utils rows"""
 
         values_en_us_ud = []
         values_en_us_ws = []
         values_en_us_utils = []
-
 
         fake_pks_ud = self._get_fake_primary_keys(table, "ud")
         if fake_pks_ud:
@@ -980,7 +971,6 @@ class GwSchemaI18NManager:
 
             if delete_values_en_us:
                self._delete_fake_utils(table, delete_values_en_us)
-
 
     def _get_values_en_us(self, table, fake_pks, project_type):
         """Get the values of the en_us column using a single query"""
@@ -1013,7 +1003,6 @@ class GwSchemaI18NManager:
         rows = self._get_rows(query, self.cursor_i18n)
 
         return rows
-
 
     def _update_utils_values(self, table, rows_values_en_us, project_type):
         """Update the project_type values when two similar rows (ws and utils) no longer have the same en_us value"""
@@ -1068,7 +1057,6 @@ class GwSchemaI18NManager:
         self.cursor_i18n.execute(query)
         self.conn_i18n.commit()
 
-
     def _update_values_en_us(self, table, rows_values_en_us):
         """Bulk update the values of the en_us columns for rows with project_type = 'utils' and matching primary keys, using a single optimized query."""
         if not rows_values_en_us:
@@ -1112,7 +1100,6 @@ class GwSchemaI18NManager:
         self.cursor_i18n.execute(query)
         self.conn_i18n.commit()
 
-
     def _get_fake_primary_keys(self, table, project_type):
         columns = ",".join(self.primary_keys_no_project_type_i18n)
         in_project_type = project_type if project_type != 'utils' else "ws', 'ud"
@@ -1140,7 +1127,6 @@ class GwSchemaI18NManager:
 
         return fake_rows
 
-
     def _get_duplicates_rows(self, table):
         """Get the duplicated rows"""
         columns = ",".join(self.conflict_project_type)
@@ -1153,11 +1139,10 @@ class GwSchemaI18NManager:
         """
         return query
 
-
     def _update_project_type(self, table, duplicated_rows):
         """Update the project_type to the correct value"""
 
-        all_columns = self._get_all_columns(table)
+        self._get_all_columns(table)
         pk_columns = []
         update_query = ""
         delete_query = ""
@@ -1283,7 +1268,7 @@ class GwSchemaI18NManager:
                 delete_values.append(f"(source = '{esc_actual_source}' AND dialog_name = '{esc_dialog_name}' AND toolbar_name = '{esc_toolbar_name}')")
 
             # Single delete query for all old keys
-            if delete_values: # Ensure there's something to delete
+            if delete_values:  # Ensure there's something to delete
                 delete_query = f"DELETE FROM {self.schema_i18n}.pydialog WHERE {' OR '.join(delete_values)}"
                 try:
                     self.cursor_i18n.execute(delete_query)
@@ -1424,13 +1409,12 @@ class GwSchemaI18NManager:
         self.conn_i18n.commit()
     # endregion
 
-    #region python functions
+    # region python functions
     def _search_for_lines(self, message):
         if '\\n' in message:
             return message.split('\\n')
         else:
             return [message]
-
 
     def _find_files(self, path, file_type):
         """ Find all files with the given file type in the given path """
@@ -1445,7 +1429,6 @@ class GwSchemaI18NManager:
                     py_files.append(file_path)
 
         return py_files
-
 
     def _search_lines(self, file, key, avoid_keys=None):
         """ Search for the lines with the key in the file """
@@ -1489,7 +1472,6 @@ class GwSchemaI18NManager:
             tools_qt.show_exception_message(title, msg, msg_params=msg_params)
         return found_lines
 
-
     def _msg_multines_end(self, found_lines, full_text, num_line):
         """ Extract the message from the multiline """
 
@@ -1505,7 +1487,6 @@ class GwSchemaI18NManager:
                 tools_qt.show_exception_message(title, msg, msg_params=msg_params)
             found_lines.append((num_line, full_text.strip()))
         return found_lines
-
 
     def _search_dialog_info(self, file, key_row, key_text, num_line, avoid_keys=None):
         """ Search for the dialog info in the file """
@@ -1539,7 +1520,7 @@ class GwSchemaI18NManager:
 
             return dialog_name, toolbar_name, source
 
-    #endregion
+    # endregion
 
     # region cat_version
     def _update_cat_version(self):
@@ -1652,7 +1633,6 @@ class GwSchemaI18NManager:
         result = ''.join(result_parts)
         return result
 
-
     def _detect_schema(self, schema_name):
         """ Detect if the schema exists """
 
@@ -1723,7 +1703,7 @@ class GwSchemaI18NManager:
             row_project_type = row.get("project_type")
             if context not in seen_contexts and row_project_type == self.project_type:
                 tables_org.append(context)
-                seen_contexts.add(context) # Use .get() to avoid KeyError if 'context' doesn't exist
+                seen_contexts.add(context)  # Use .get() to avoid KeyError if 'context' doesn't exist
         if tables_org is None:
             return None  # Or some fallback behavior
         return tables_org
@@ -1792,7 +1772,6 @@ class GwSchemaI18NManager:
             return False
         return True
 
-
     def save_and_open_text_error(self, text_error, filename="i18n_error_log.txt"):
         # Save the text_error to a file in the user's home directory or temp directory
         file_path = os.path.join(os.path.expanduser("~"), filename)
@@ -1829,7 +1808,7 @@ class GwSchemaI18NManager:
         else:
             raise ValueError(f"Unsupported compare mode: {mode}")
 
-    def _set_operation_on_dict(self,rows1, rows2, op='&', compare='items'):
+    def _set_operation_on_dict(self, rows1, rows2, op='&', compare='items'):
         """
         Perform set-like operations on lists of dictionaries, with optional partial matching.
         """
@@ -1854,7 +1833,6 @@ class GwSchemaI18NManager:
         else:
             raise ValueError(f"Unsupported compare mode: {compare}")
 
-
     def _get_all_columns(self, table_i18n):
         """ Get all columns from the table """
         query = f"""
@@ -1865,7 +1843,6 @@ class GwSchemaI18NManager:
             ORDER BY ordinal_position;"""
         self.cursor_i18n.execute(query)
         return [row[0] for row in self.cursor_i18n.fetchall()]
-
 
     def tables_dic(self, schema_type):
         """ Define the tables to be translated in a dictionary """
@@ -1909,7 +1886,6 @@ class GwSchemaI18NManager:
             self.no_beautify_keys = []
 
     # endregion
-
 
     def _extra_messages_to_find():
         # writen to be detected by the automatical finder of pymessages
@@ -2025,11 +2001,3 @@ class GwSchemaI18NManager:
         message = "Hydrology scenario manager"
         message = "DWF scenario manager"
         message = "Psector could not be updated because of the following errors: "
-        message = "Scale must be a number."
-        message = "Rotation must be a number."
-        message = "Atlas ID must be an integer."
-        message = "Parent ID must be an integer."
-        message = "Parent ID does not exist."
-        message = "The start date must be before the end date"
-        message = "The start date real must be before the end date real"
-        message = "Filter"

@@ -20,7 +20,6 @@ class GwCatalog:
 
     def __init__(self):
         """ Class to control toolbar 'om_ws' """
-        pass
 
     def open_catalog(self, previous_dialog, widget_name, feature_type, child_type):
         """ Main function of catalog """

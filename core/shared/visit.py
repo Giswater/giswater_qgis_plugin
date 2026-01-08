@@ -57,7 +57,6 @@ class GwVisit(QObject):
 
     def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                   open_dlg=True, is_new_from_cf=False):
-
         """ Button 16. Add visit.
         if visit_id => load record related to the visit_id
         if feature_type => lock feature_type in relations tab
@@ -355,7 +354,6 @@ class GwVisit(QObject):
     # region private functions
 
     def _update_table_visit(self, widget, table_name, expr_filter=None, cmb_visitclass=None, id=None):
-
         """ Set a model with selected filter.
                 Attach that model to selected table """
         if self.schema_name not in table_name:

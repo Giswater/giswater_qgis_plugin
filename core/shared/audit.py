@@ -21,7 +21,6 @@ class GwAudit:
 
     def __init__(self):
         """ Class to control toolbar 'om_ws' """
-        pass
 
     def open_audit_manager(self, feature_id, table_name):
         """ Open Audit Manager Dialog dynamic """

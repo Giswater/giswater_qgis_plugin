@@ -175,7 +175,6 @@ class GwMincutTools:
 
 
 def close_mincut_manager(**kwargs):
-
     """ Function called in class tools_gw.add_button(...) -->
             widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
     dialog = kwargs['dialog']
