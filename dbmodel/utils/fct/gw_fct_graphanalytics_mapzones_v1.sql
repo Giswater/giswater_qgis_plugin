@@ -90,7 +90,7 @@ DECLARE
 	v_gullies_count integer;
 	v_mapzones_ids text;
 
-	v_mapzone_name text;
+	v_graph_delimiter text;
 	v_table_name text;
 	v_mapzone_field text;
 	v_visible_layer text;
@@ -167,16 +167,15 @@ BEGIN
 	END IF;
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
-	v_mapzone_name = LOWER(v_class);
-	v_table_name = v_mapzone_name;
-    v_mapzone_field = v_mapzone_name || '_id';
-	v_visible_layer = 've_' || v_mapzone_name;
+	v_table_name = LOWER(v_class);
+	v_graph_delimiter = v_class;
+    v_mapzone_field = v_table_name || '_id';
+	v_visible_layer = 've_' || v_table_name;
 	IF v_netscenario IS NOT NULL THEN
-		v_table_name = 'plan_netscenario_' || v_mapzone_name;
-		v_visible_layer = 've_plan_netscenario_' || v_mapzone_name;
+		v_table_name = 'plan_netscenario_' || v_table_name;
+		v_visible_layer = 've_plan_netscenario_' || v_table_name;
 		v_from_zero = FALSE; -- from zero is not allowed for netscenario
 	END IF;
-	v_mapzone_name = UPPER(v_mapzone_name);
 
     -- Get exploitation ID array
     v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
@@ -189,7 +188,7 @@ BEGIN
 		EXECUTE v_query_text INTO v_mapzone_count;
 		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_mapzone_name ||'"}, "is_process":true}}$$)';
+	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_class ||'"}, "is_process":true}}$$)';
 		END IF;
 	END IF;
 
@@ -239,7 +238,7 @@ BEGIN
     v_data := jsonb_build_object(
         'data', jsonb_build_object(
             'expl_id_array', array_to_string(v_expl_id_array, ','),
-            'mapzone_name', v_mapzone_name,
+            'mapzone_name', v_class,
 			'cost', 1,
 			'reverse_cost', v_reverse_cost
         )
@@ -338,7 +337,7 @@ BEGIN
             FROM v_temp_node n
             WHERE %L = ANY(n.graph_delimiter)
             AND t.node_id = n.node_id;
-        $$, v_mapzone_name, v_mapzone_name);
+        $$, v_graph_delimiter, v_graph_delimiter);
 
 		IF v_project_type = 'WS' THEN
 			-- water source (SECTOR) graph_delimiter
@@ -364,7 +363,7 @@ BEGIN
                     GROUP BY m.node_id
                 ) a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_mapzone_name);
+            $$, v_graph_delimiter);
 
 			-- SET TO_ARC from SOURCE
             EXECUTE format($$
@@ -378,7 +377,7 @@ BEGIN
                     GROUP BY m.node_id
                     )a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_mapzone_name);
+            $$, v_graph_delimiter);
 
 			-- SET TO_ARC from WATERWELL
             EXECUTE format($$
@@ -392,7 +391,7 @@ BEGIN
                     GROUP BY m.node_id
                     )a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_mapzone_name);
+            $$, v_graph_delimiter);
 
             -- SET TO_ARC from WTP
             EXECUTE format($$
@@ -406,7 +405,7 @@ BEGIN
                     GROUP BY m.node_id
                     )a
                 WHERE t.graph_delimiter IN (%L, 'SECTOR') AND t.node_id = a.node_id;
-            $$, v_mapzone_name);
+            $$, v_graph_delimiter);
 
 			-- SET TO_ARC from METER
             EXECUTE format($$
@@ -420,7 +419,7 @@ BEGIN
                     FROM man_meter m
                     ) a
                 WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
-            $$, v_mapzone_name);
+            $$, v_graph_delimiter);
 
             -- SET TO_ARC from PUMP
             EXECUTE format($$
@@ -434,7 +433,7 @@ BEGIN
                     FROM man_pump m
                     ) a
                 WHERE t.graph_delimiter = %L AND t.node_id = a.node_id;
-            $$, v_mapzone_name);	
+            $$, v_graph_delimiter);	
 
 		ELSE
 			EXECUTE format($$
@@ -448,7 +447,7 @@ BEGIN
 				) a
 				WHERE t.graph_delimiter = %L
 				AND t.pgr_node_id = a.pgr_node_1;
-			$$, v_mapzone_name);
+			$$, v_graph_delimiter);
 		END IF;
 	ELSE
 		-- netscenario query
@@ -487,7 +486,7 @@ BEGIN
 					GROUP BY mapzone_id, node_id
 				) s
 				WHERE n.node_id = s.node_id;
-			$$, v_mapzone_field, v_table_name, v_query_text_aux, v_mapzone_name);
+			$$, v_mapzone_field, v_table_name, v_query_text_aux, v_graph_delimiter);
 		ELSE
 			EXECUTE format($$
 				UPDATE temp_pgr_node n
@@ -505,7 +504,7 @@ BEGIN
 					%s
 				) AS s
 				WHERE n.node_id = s.node_id;
-			$$, v_mapzone_name, v_mapzone_field, v_table_name, v_query_text_aux);
+			$$, v_graph_delimiter, v_mapzone_field, v_table_name, v_query_text_aux);
 			
 			EXECUTE format($$
 				UPDATE temp_pgr_node t
@@ -518,7 +517,7 @@ BEGIN
 				) a
 				WHERE t.graph_delimiter = %L
 				AND t.pgr_node_id = a.pgr_node_1;
-			$$, v_mapzone_name);
+			$$, v_graph_delimiter);
 		END IF;
 
 		-- Nodes forceClosed acording init parameters - for ws; for ud forceClosed are arcs
@@ -631,7 +630,7 @@ BEGIN
 	-- =======================
 	v_data := jsonb_build_object(
         'data', jsonb_build_object(
-            'mapzone_name', v_mapzone_name,
+            'mapzone_name', v_class,
 			'cost', 0,
 			'reverse_cost', v_reverse_cost_new_arcs
         )
@@ -645,7 +644,7 @@ BEGIN
 	-- Note: node_id IS NULL AND arc_id IS NULL for the new nodes/arcs generated
 
 	-- calculate to_arc of nodeParents in from zero mode
-    IF v_from_zero AND v_project_type = 'WS' AND v_mapzone_name <> 'SECTOR' THEN
+    IF v_from_zero AND v_project_type = 'WS' AND v_class <> 'SECTOR' THEN
 
 		-- for mapzone graph_delimiter - the inlet arcs behave also like checkvalves
 		EXECUTE format('
@@ -654,12 +653,12 @@ BEGIN
 				reverse_cost = CASE WHEN a.node_2 IS NOT NULL THEN -1 ELSE a.reverse_cost END
 			WHERE a.graph_delimiter = %L
 			AND a.old_arc_id <> ALL (a.to_arc);
-		', v_mapzone_name);
+		', v_graph_delimiter);
 
         EXECUTE format('
             SELECT COUNT(*)::INT FROM temp_pgr_arc
             WHERE to_arc IS NULL AND graph_delimiter = %L
-        ', v_mapzone_name)
+        ', v_graph_delimiter)
         INTO v_count;
 
         IF v_count > 0 THEN
@@ -703,8 +702,7 @@ BEGIN
                 FROM nodes_to_update n
                 WHERE t.pgr_node_id = n.pgr_node_id;
             ',
-            v_mapzone_name,
-            v_mapzone_name);
+            v_graph_delimiter);
 
             EXECUTE format('
                 UPDATE temp_pgr_node t
@@ -714,7 +712,7 @@ BEGIN
                 AND t.graph_delimiter = %L
                 AND t.to_arc IS NULL
 				AND n.to_arc IS NOT NULL;
-            ', v_mapzone_name);
+            ', v_graph_delimiter);
 
             EXECUTE format('
                 UPDATE temp_pgr_arc t
@@ -725,7 +723,7 @@ BEGIN
                 AND n.graph_delimiter = %L
                 AND t.to_arc IS NULL
                 AND n.to_arc IS NOT NULL;
-            ', v_mapzone_name, v_mapzone_name);
+            ', v_graph_delimiter, v_graph_delimiter);
         END IF;
     END IF;
 
@@ -733,12 +731,12 @@ BEGIN
     IF v_project_type = 'WS' THEN
 		-- disconect InletArcs for nodes graph_delimiter
 		UPDATE temp_pgr_arc  SET cost = -1, reverse_cost = -1
-		WHERE graph_delimiter = v_mapzone_name
+		WHERE graph_delimiter = v_graph_delimiter
 		AND old_arc_id <> ALL (to_arc);
 	ELSE
 		-- for UD - disconnect the to_arc arcs
         UPDATE temp_pgr_arc  SET cost = -1, reverse_cost = -1
-        WHERE graph_delimiter = v_mapzone_name
+        WHERE graph_delimiter = v_graph_delimiter
         AND old_arc_id = ANY (to_arc);
 	END IF;
 
@@ -752,7 +750,7 @@ BEGIN
 
 	EXECUTE 'SELECT array_agg(pgr_node_id)::INT[] 
 			FROM temp_pgr_node 
-			WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
+			WHERE graph_delimiter = ''' || v_graph_delimiter || ''' 
 			AND modif = TRUE'
 	INTO v_pgr_root_vids;
 
@@ -765,7 +763,7 @@ BEGIN
 	END IF;
 
 	-- Execute pgr_drivingDistance function
-	IF v_project_type = 'UD' AND v_mapzone_name = 'DWFZONE' THEN
+	IF v_project_type = 'UD' AND v_class = 'DWFZONE' THEN
 		v_query_text := 'SELECT pgr_arc_id AS id, ' || v_source || ' AS source, ' || v_target || ' AS target, cost, reverse_cost 
 			FROM temp_pgr_arc
 			WHERE graph_delimiter <> ''INITOVERFLOWPATH''';
@@ -794,7 +792,7 @@ BEGIN
 	SELECT component, array_agg(DISTINCT n.mapzone_id ORDER BY n.mapzone_id)
 	FROM temp_pgr_connectedcomponents c
 	JOIN temp_pgr_node n ON n.pgr_node_id = c.node
-	WHERE n.graph_delimiter = v_mapzone_name AND modif = TRUE
+	WHERE n.graph_delimiter = v_graph_delimiter AND modif = TRUE
 	GROUP BY c.component
 	ORDER BY c.component;
 
@@ -803,18 +801,18 @@ BEGIN
 		IF v_project_type = 'WS' AND v_class IN ('DMA', 'PRESSZONE') THEN
 			EXECUTE
 				'SELECT GREATEST(
-					(SELECT max(' || v_mapzone_field || ') FROM '|| v_mapzone_name || '),
-					(SELECT max(' || v_mapzone_field || ') FROM plan_netscenario_'|| v_mapzone_name || ')
+					(SELECT max(' || v_mapzone_field || ') FROM '|| v_table_name|| '),
+					(SELECT max(' || v_mapzone_field || ') FROM plan_netscenario_'|| v_table_name || ')
 				)'
 			INTO v_mapzone_id;
 		ELSE
 			EXECUTE 'SELECT max(' || v_mapzone_field || ') FROM '|| v_table_name
 			INTO v_mapzone_id;
 		END IF;
-		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_mapzone_name), (v_mapzone_id + m.id));
+		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_class), (v_mapzone_id + m.id));
 	ELSE
 		IF v_netscenario IS NOT NULL THEN
-			IF v_mapzone_name = 'DMA' THEN
+			IF v_class = 'DMA' THEN
 				EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.'||LOWER(v_class)||'_name, pattern_id = mz.pattern_id
 				FROM ' || v_table_name || ' mz
 				WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
@@ -877,7 +875,7 @@ BEGIN
 		FROM boundary AS s
 		WHERE n.node_id = s.node_id AND n.graph_delimiter = 'MINSECTOR';
 	ELSE
-		IF v_mapzone_name = 'DWFZONE' THEN
+		IF v_class = 'DWFZONE' THEN
 			UPDATE temp_pgr_mapzone m SET min_node = agg.min_node
 			FROM (
 				SELECT c.component, MIN(n.node_id) AS min_node
@@ -952,7 +950,7 @@ BEGIN
 
 	IF v_arcs_count > 0 OR v_connecs_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
-		VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',v_mapzone_name,'''s (',v_mapzones_ids,') with ',v_arcs_count,' arc(s) and ',v_connecs_count,' connec(s) affected.'));
+		VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',v_class,'''s (',v_mapzones_ids,') with ',v_arcs_count,' arc(s) and ',v_connecs_count,' connec(s) affected.'));
 	END IF;
 
 	IF v_project_type='UD' THEN
@@ -1523,7 +1521,7 @@ BEGIN
 			END IF;
 		ELSE
 			IF v_from_zero = TRUE THEN
-				IF v_project_type = 'WS' AND v_mapzone_name <> 'SECTOR' THEN
+				IF v_project_type = 'WS' AND v_graph_delimiter <> 'SECTOR' THEN
 					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
 					SELECT m.mapzone_id[1], m.mapzone_id[1], m.name, ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
@@ -1536,28 +1534,28 @@ BEGIN
 					) as graphconfig
 					FROM temp_pgr_mapzone m
 					JOIN temp_pgr_node n ON n.mapzone_id = m.component
-					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
+					WHERE n.graph_delimiter = ''' || v_graph_delimiter || ''' AND n.modif = TRUE
 					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 
 					-- update to_arc in man_ tables due to the new to_arc getted from the arrange network
 					UPDATE man_pump m SET to_arc = tn.to_arc[1]
 					FROM temp_pgr_node tn
 					WHERE tn.node_id = m.node_id
-					AND tn.graph_delimiter = v_mapzone_name
+					AND tn.graph_delimiter = v_graph_delimiter
 					AND tn.to_arc IS NOT NULL
 					AND m.to_arc IS NULL;
 
 					UPDATE man_meter m SET to_arc = tn.to_arc[1]
 					FROM temp_pgr_node tn
 					WHERE tn.node_id = m.node_id
-					AND tn.graph_delimiter = v_mapzone_name
+					AND tn.graph_delimiter = v_graph_delimiter
 					AND tn.to_arc IS NOT NULL
 					AND m.to_arc IS NULL;
 
 					UPDATE man_valve m SET to_arc = tn.to_arc[1]
 					FROM temp_pgr_node tn
 					WHERE tn.node_id = m.node_id
-					AND tn.graph_delimiter = v_mapzone_name
+					AND tn.graph_delimiter = v_graph_delimiter
 					AND tn.to_arc IS NOT NULL
 					AND m.to_arc IS NULL;
 
@@ -1573,7 +1571,7 @@ BEGIN
 					) as graphconfig
 					FROM temp_pgr_mapzone m
 					JOIN temp_pgr_node n ON n.mapzone_id = m.component
-					WHERE n.graph_delimiter = ''' || v_mapzone_name || ''' AND n.modif = TRUE
+					WHERE n.graph_delimiter = ''' || v_graph_delimiter || ''' AND n.modif = TRUE
 					GROUP BY m.mapzone_id[1], m.name, m.the_geom';
 				END IF;
 				EXECUTE v_query_text;
@@ -1633,7 +1631,7 @@ BEGIN
 				EXECUTE v_query_text;
 			END IF;
 
-			IF v_mapzone_name <> 'SECTOR' THEN
+			IF v_class <> 'SECTOR' THEN
 				v_query_text_aux := '
 					sector_id = CASE
 						WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.sector_ids
@@ -1850,9 +1848,9 @@ BEGIN
 			END IF;
 
 			IF EXISTS (SELECT 1 FROM v_temp_pgr_mapzone_old LIMIT 1) THEN
-				IF v_mapzone_name = 'PRESSZONE' THEN
+				IF v_class = 'PRESSZONE' THEN
 					v_query_text_aux := ', staticpressure1 = NULL, staticpressure2 = NULL';
-				ELSIF v_mapzone_name = 'DWFZONE' THEN
+				ELSIF v_class = 'DWFZONE' THEN
 					v_query_text_aux := ', drainzone_outfall = NULL, dwfzone_outfall = NULL';
 				ELSE
 					v_query_text_aux := '';
@@ -1887,9 +1885,9 @@ BEGIN
 				';
 				EXECUTE v_query_text;
 
-				IF v_mapzone_name = 'PRESSZONE' THEN
+				IF v_class = 'PRESSZONE' THEN
 					v_query_text_aux := ', staticpressure = NULL';
-				ELSIF v_mapzone_name = 'DWFZONE' THEN
+				ELSIF v_class = 'DWFZONE' THEN
 					v_query_text_aux := ', drainzone_outfall = NULL, dwfzone_outfall = NULL';
 				ELSE
 					v_query_text_aux := '';
@@ -1957,7 +1955,7 @@ BEGIN
 			END IF;
 
 			-- static pressure
-			IF v_mapzone_name = 'PRESSZONE' THEN
+			IF v_class = 'PRESSZONE' THEN
 				-- nodes
 				v_query_text = '
 					UPDATE node n SET staticpressure = t.staticpressure
@@ -2110,7 +2108,7 @@ BEGIN
 				WHERE dma_id <> -1
 				ON CONFLICT (dma_id, node_id) DO NOTHING;
 
-			ELSIF v_mapzone_name = 'DWFZONE' THEN
+			ELSIF v_class = 'DWFZONE' THEN
 				-- update dwfzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.dwfzone_outfall = NULL)
 				WITH outfalls AS (
 					SELECT d.node AS pgr_node_id, array_agg(n.node_id  ORDER BY n.node_id) AS dwfzone_outfall
