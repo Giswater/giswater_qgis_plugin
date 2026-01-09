@@ -2419,7 +2419,7 @@ class GwMincut:
                 action.setChecked(False)
 
     def _custom_mincut_execute(self, elem_id):
-        """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
+        """ Custom mincut. Execute function 'gw_fct_setmincut' with action 'mincutValveUnaccess' """
 
         # Change cursor to 'WaitCursor'
         tools_qgis.set_cursor_wait()
