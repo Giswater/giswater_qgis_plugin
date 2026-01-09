@@ -49,21 +49,21 @@ BEGIN
         END IF;
 
         INSERT INTO cm_audit.log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
-        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, new_json, current_user, clock_timestamp());
+        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, LEFT(current_query(), 100), old_json, new_json, current_user, clock_timestamp());
         PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
 
     ELSIF TG_OP = 'INSERT' THEN
         new_json := to_jsonb(NEW);
         INSERT INTO cm_audit.log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
-        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), NULL, new_json, current_user, clock_timestamp());
+        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, LEFT(current_query(), 100), NULL, new_json, current_user, clock_timestamp());
         PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
         old_json := to_jsonb(OLD);
         INSERT INTO cm_audit.log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
-        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, current_query(), old_json, NULL, current_user, clock_timestamp());
+        VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, LEFT(current_query(), 100), old_json, NULL, current_user, clock_timestamp());
         PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN OLD;
     END IF;

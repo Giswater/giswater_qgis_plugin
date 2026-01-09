@@ -24,33 +24,7 @@ DROP TRIGGER IF EXISTS trg_validate_campaign_x_link_feature ON cm.om_campaign_x_
 CREATE TRIGGER trg_validate_campaign_x_link_feature BEFORE INSERT ON cm.om_campaign_x_link
 FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_campaign_x_feature_validate_type('link');
 
-DROP TRIGGER IF EXISTS gw_trg_ui_doc_x_arc ON cm.v_ui_doc_x_arc;
-CREATE TRIGGER gw_trg_ui_doc_x_arc
-INSTEAD OF INSERT OR DELETE OR UPDATE
-ON cm.v_ui_doc_x_arc
-FOR EACH ROW
-EXECUTE FUNCTION cm.gw_trg_ui_doc('arc');
-
-DROP TRIGGER IF EXISTS gw_trg_ui_doc_x_connec ON cm.v_ui_doc_x_connec;
-CREATE TRIGGER gw_trg_ui_doc_x_connec
-INSTEAD OF INSERT OR DELETE OR UPDATE
-ON cm.v_ui_doc_x_connec
-FOR EACH ROW
-EXECUTE FUNCTION cm.gw_trg_ui_doc('connec');
-
-DROP TRIGGER IF EXISTS gw_trg_ui_doc_x_link ON cm.v_ui_doc_x_link;
-CREATE TRIGGER gw_trg_ui_doc_x_link
-INSTEAD OF INSERT OR DELETE OR UPDATE
-ON cm.v_ui_doc_x_link
-FOR EACH ROW
-EXECUTE FUNCTION cm.gw_trg_ui_doc('link');
-
-DROP TRIGGER IF EXISTS gw_trg_ui_doc_x_node ON cm.v_ui_doc_x_node;
-CREATE TRIGGER gw_trg_ui_doc_x_node
-INSTEAD OF INSERT OR DELETE OR UPDATE
-ON cm.v_ui_doc_x_node
-FOR EACH ROW
-EXECUTE FUNCTION cm.gw_trg_ui_doc('node');
+-- Doc view triggers are now created dynamically per-feature in parent_schema/utils/ddlview.sql
 
 DROP TRIGGER IF EXISTS doc_path_prefix ON cm.doc;
 CREATE TRIGGER doc_path_prefix

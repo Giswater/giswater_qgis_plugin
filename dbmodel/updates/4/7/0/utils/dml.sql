@@ -130,3 +130,5 @@ UPDATE config_form_list
   ]
 }'::json
 	WHERE listname='dscenario_results' AND device=5;
+
+UPDATE sys_function SET "source"='cm' WHERE id=3426;

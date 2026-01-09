@@ -25,6 +25,7 @@ SELECT cm.apply_cm_rls(
 */
 DECLARE
   r jsonb;
+  rec RECORD;
   case_sql text := '';
   ft text;
   role_csv text;
@@ -338,6 +339,351 @@ BEGIN
     tbls := tbls || format(', cm.om_campaign_x_%1$s, cm.om_campaign_lot_x_%1$s', ft);
   END LOOP;
 
+  -- Doc tables RLS policies (documents are linked to features which are linked to campaigns/lots)
+  EXECUTE 'ALTER TABLE cm.doc ENABLE ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc FORCE  ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_node ENABLE ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_node FORCE  ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_arc ENABLE ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_arc FORCE  ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_connec ENABLE ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_connec FORCE  ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_link ENABLE ROW LEVEL SECURITY';
+  EXECUTE 'ALTER TABLE cm.doc_x_link FORCE  ROW LEVEL SECURITY';
+
+  -- Doc policies: accessible if linked to features in campaigns/lots accessible to user's org
+  EXECUTE 'DROP POLICY IF EXISTS doc_sel ON cm.doc';
+  EXECUTE 'DROP POLICY IF EXISTS doc_ins ON cm.doc';
+  EXECUTE 'DROP POLICY IF EXISTS doc_upd ON cm.doc';
+  EXECUTE 'DROP POLICY IF EXISTS doc_del ON cm.doc';
+  EXECUTE $sql$ CREATE POLICY doc_sel ON cm.doc
+    FOR SELECT USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_x_node ocn ON ocn.node_id = dxn.node_id
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_x_arc oca ON oca.arc_id = dxa.arc_id
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_lot_x_node ocln ON ocln.node_id = dxn.node_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_lot_x_arc ocla ON ocla.arc_id = dxa.arc_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY doc_ins ON cm.doc
+    FOR INSERT WITH CHECK (cm.current_org_id() IS NULL); $sql$;
+  EXECUTE $sql$ CREATE POLICY doc_upd ON cm.doc
+    FOR UPDATE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_x_node ocn ON ocn.node_id = dxn.node_id
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_x_arc oca ON oca.arc_id = dxa.arc_id
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_lot_x_node ocln ON ocln.node_id = dxn.node_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_lot_x_arc ocla ON ocla.arc_id = dxa.arc_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()))
+    WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_x_node ocn ON ocn.node_id = dxn.node_id
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_x_arc oca ON oca.arc_id = dxa.arc_id
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_lot_x_node ocln ON ocln.node_id = dxn.node_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_lot_x_arc ocla ON ocla.arc_id = dxa.arc_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY doc_del ON cm.doc
+    FOR DELETE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_x_node ocn ON ocn.node_id = dxn.node_id
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_x_arc oca ON oca.arc_id = dxa.arc_id
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_node dxn
+      JOIN cm.om_campaign_lot_x_node ocln ON ocln.node_id = dxn.node_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxn.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.doc_x_arc dxa
+      JOIN cm.om_campaign_lot_x_arc ocla ON ocla.arc_id = dxa.arc_id
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE dxa.doc_id = cm.doc.id AND c.organization_id = cm.current_org_id())); $sql$;
+
+  -- doc_x_node, doc_x_arc policies (inherit from doc)
+  EXECUTE 'DROP POLICY IF EXISTS dxn_sel ON cm.doc_x_node';
+  EXECUTE 'DROP POLICY IF EXISTS dxn_ins ON cm.doc_x_node';
+  EXECUTE 'DROP POLICY IF EXISTS dxn_upd ON cm.doc_x_node';
+  EXECUTE 'DROP POLICY IF EXISTS dxn_del ON cm.doc_x_node';
+  EXECUTE $sql$ CREATE POLICY dxn_sel ON cm.doc_x_node
+    FOR SELECT USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.doc d
+      WHERE d.id = cm.doc_x_node.doc_id
+        AND (EXISTS (
+          SELECT 1 FROM cm.om_campaign_x_node ocn
+          JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+          WHERE ocn.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id())
+        OR EXISTS (
+          SELECT 1 FROM cm.om_campaign_lot_x_node ocln
+          JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+          JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+          WHERE ocln.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id())))); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxn_ins ON cm.doc_x_node
+    FOR INSERT WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_node ocn
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE ocn.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_node ocln
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocln.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxn_upd ON cm.doc_x_node
+    FOR UPDATE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_node ocn
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE ocn.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_node ocln
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocln.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id()))
+    WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_node ocn
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE ocn.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_node ocln
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocln.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxn_del ON cm.doc_x_node
+    FOR DELETE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_node ocn
+      JOIN cm.om_campaign c ON c.campaign_id = ocn.campaign_id
+      WHERE ocn.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_node ocln
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocln.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocln.node_id = cm.doc_x_node.node_id AND c.organization_id = cm.current_org_id())); $sql$;
+
+  EXECUTE 'DROP POLICY IF EXISTS dxa_sel ON cm.doc_x_arc';
+  EXECUTE 'DROP POLICY IF EXISTS dxa_ins ON cm.doc_x_arc';
+  EXECUTE 'DROP POLICY IF EXISTS dxa_upd ON cm.doc_x_arc';
+  EXECUTE 'DROP POLICY IF EXISTS dxa_del ON cm.doc_x_arc';
+  EXECUTE $sql$ CREATE POLICY dxa_sel ON cm.doc_x_arc
+    FOR SELECT USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_arc oca
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE oca.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_arc ocla
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocla.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxa_ins ON cm.doc_x_arc
+    FOR INSERT WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_arc oca
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE oca.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_arc ocla
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocla.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxa_upd ON cm.doc_x_arc
+    FOR UPDATE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_arc oca
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE oca.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_arc ocla
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocla.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id()))
+    WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_arc oca
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE oca.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_arc ocla
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocla.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxa_del ON cm.doc_x_arc
+    FOR DELETE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_arc oca
+      JOIN cm.om_campaign c ON c.campaign_id = oca.campaign_id
+      WHERE oca.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_arc ocla
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocla.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocla.arc_id = cm.doc_x_arc.arc_id AND c.organization_id = cm.current_org_id())); $sql$;
+
+  -- doc_x_connec and doc_x_link: same pattern but simpler (no featurecat_id)
+  EXECUTE 'DROP POLICY IF EXISTS dxc_sel ON cm.doc_x_connec';
+  EXECUTE 'DROP POLICY IF EXISTS dxc_ins ON cm.doc_x_connec';
+  EXECUTE 'DROP POLICY IF EXISTS dxc_upd ON cm.doc_x_connec';
+  EXECUTE 'DROP POLICY IF EXISTS dxc_del ON cm.doc_x_connec';
+  EXECUTE $sql$ CREATE POLICY dxc_sel ON cm.doc_x_connec
+    FOR SELECT USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_connec occ
+      JOIN cm.om_campaign c ON c.campaign_id = occ.campaign_id
+      WHERE occ.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_connec oclc
+      JOIN cm.om_campaign_lot l ON l.lot_id = oclc.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE oclc.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxc_ins ON cm.doc_x_connec
+    FOR INSERT WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_connec occ
+      JOIN cm.om_campaign c ON c.campaign_id = occ.campaign_id
+      WHERE occ.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_connec oclc
+      JOIN cm.om_campaign_lot l ON l.lot_id = oclc.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE oclc.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxc_upd ON cm.doc_x_connec
+    FOR UPDATE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_connec occ
+      JOIN cm.om_campaign c ON c.campaign_id = occ.campaign_id
+      WHERE occ.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_connec oclc
+      JOIN cm.om_campaign_lot l ON l.lot_id = oclc.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE oclc.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id()))
+    WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_connec occ
+      JOIN cm.om_campaign c ON c.campaign_id = occ.campaign_id
+      WHERE occ.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_connec oclc
+      JOIN cm.om_campaign_lot l ON l.lot_id = oclc.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE oclc.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxc_del ON cm.doc_x_connec
+    FOR DELETE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_connec occ
+      JOIN cm.om_campaign c ON c.campaign_id = occ.campaign_id
+      WHERE occ.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_connec oclc
+      JOIN cm.om_campaign_lot l ON l.lot_id = oclc.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE oclc.connec_id = cm.doc_x_connec.connec_id AND c.organization_id = cm.current_org_id())); $sql$;
+
+  EXECUTE 'DROP POLICY IF EXISTS dxl_sel ON cm.doc_x_link';
+  EXECUTE 'DROP POLICY IF EXISTS dxl_ins ON cm.doc_x_link';
+  EXECUTE 'DROP POLICY IF EXISTS dxl_upd ON cm.doc_x_link';
+  EXECUTE 'DROP POLICY IF EXISTS dxl_del ON cm.doc_x_link';
+  EXECUTE $sql$ CREATE POLICY dxl_sel ON cm.doc_x_link
+    FOR SELECT USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_link ocl
+      JOIN cm.om_campaign c ON c.campaign_id = ocl.campaign_id
+      WHERE ocl.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_link ocll
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocll.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocll.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxl_ins ON cm.doc_x_link
+    FOR INSERT WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_link ocl
+      JOIN cm.om_campaign c ON c.campaign_id = ocl.campaign_id
+      WHERE ocl.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_link ocll
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocll.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocll.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxl_upd ON cm.doc_x_link
+    FOR UPDATE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_link ocl
+      JOIN cm.om_campaign c ON c.campaign_id = ocl.campaign_id
+      WHERE ocl.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_link ocll
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocll.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocll.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id()))
+    WITH CHECK (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_link ocl
+      JOIN cm.om_campaign c ON c.campaign_id = ocl.campaign_id
+      WHERE ocl.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_link ocll
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocll.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocll.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id())); $sql$;
+  EXECUTE $sql$ CREATE POLICY dxl_del ON cm.doc_x_link
+    FOR DELETE USING (cm.current_org_id() IS NULL OR EXISTS (
+      SELECT 1 FROM cm.om_campaign_x_link ocl
+      JOIN cm.om_campaign c ON c.campaign_id = ocl.campaign_id
+      WHERE ocl.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id()
+      UNION
+      SELECT 1 FROM cm.om_campaign_lot_x_link ocll
+      JOIN cm.om_campaign_lot l ON l.lot_id = ocll.lot_id
+      JOIN cm.om_campaign c ON c.campaign_id = l.campaign_id
+      WHERE ocll.link_id = cm.doc_x_link.link_id AND c.organization_id = cm.current_org_id())); $sql$;
+
+  -- Helpful indexes for doc tables
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_node_node_id_idx ON cm.doc_x_node (node_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_node_doc_id_idx ON cm.doc_x_node (doc_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_arc_arc_id_idx ON cm.doc_x_arc (arc_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_arc_doc_id_idx ON cm.doc_x_arc (doc_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_connec_connec_id_idx ON cm.doc_x_connec (connec_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_connec_doc_id_idx ON cm.doc_x_connec (doc_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_link_link_id_idx ON cm.doc_x_link (link_id)';
+  EXECUTE 'CREATE INDEX IF NOT EXISTS doc_x_link_doc_id_idx ON cm.doc_x_link (doc_id)';
+
+  -- Collect doc tables for GRANT list
+  tbls := tbls || ', cm.doc, cm.doc_x_node, cm.doc_x_arc, cm.doc_x_connec, cm.doc_x_link';
+
   -- Build role CSV for GRANTs
   SELECT string_agg(quote_ident((e->>'role')), ', ')
   INTO role_csv
@@ -347,9 +693,24 @@ BEGIN
   EXECUTE format('GRANT USAGE ON SCHEMA cm TO %s', role_csv);
   EXECUTE format('GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA cm TO %s', role_csv);
 
-  -- Specific cm tables: campaign, lot, selectors, catalogs (exclude cat_role), x_*, lot_x_*
+  -- Specific cm tables: campaign, lot, selectors, catalogs (exclude cat_role), x_*, lot_x_*, doc tables
   tbls := 'cm.om_campaign, cm.om_campaign_lot, cm.selector_campaign, cm.selector_lot, cm.cat_team, cm.cat_user, cm.cat_organization' || tbls;
   EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON %s TO %s', tbls, role_csv);
+
+  -- Grant on doc views (v_ui_doc_x_* are created dynamically in parent_schema/utils/ddlview.sql)
+  -- Views inherit permissions from underlying tables, but explicit GRANT ensures consistency
+  FOR rec IN
+    SELECT format('v_ui_doc_x_%s', lower(id)) as view_name
+    FROM PARENT_SCHEMA.cat_feature
+    WHERE feature_type IN ('NODE', 'ARC')
+  LOOP
+    BEGIN
+      EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON cm.%I TO %s', rec.view_name, role_csv);
+    EXCEPTION WHEN undefined_table THEN
+      -- View might not exist yet (created in ddlview.sql), skip silently
+      NULL;
+    END;
+  END LOOP;
 
   -- Configure audit schema visibility (INSERT allowed to all mapped roles, SELECT restricted via per-role MVs)
   PERFORM cm.apply_cm_audit_rls(role_org_map);
