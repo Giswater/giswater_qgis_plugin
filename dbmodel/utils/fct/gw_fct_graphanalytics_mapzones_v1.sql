@@ -60,7 +60,7 @@ DECLARE
 	-- dialog variables
 	v_class text;
 	v_expl_id text;
-	v_expl_id_array text[];
+	v_expl_id_array integer[];
 	v_update_map_zone integer = 0;
 	v_geom_param_update float;
 	v_use_plan_psector boolean;
@@ -137,18 +137,16 @@ BEGIN
 	v_commit_changes := p_data->'data'->'parameters'->>'commitChanges';
 	v_netscenario := p_data->'data'->'parameters'->>'netscenario';
 
-	-- TODO: add new param to calculate mapzones from zero
 	v_from_zero := p_data->'data'->'parameters'->>'fromZero';
 
 	-- extra parameters
 	v_parameters := p_data->'data'->'parameters';
 
-
 	-- it's not allowed to commit changes when psectors are used
  	IF v_use_plan_psector THEN
+		-- TODO write a message like in the line 192 "IF v_mapzone_count > 0 AND v_commit_changes = TRUE"
 		v_commit_changes := FALSE;
 	END IF;
-
 
 	IF v_class = 'PRESSZONE' THEN
 		v_fid=146;
@@ -167,8 +165,8 @@ BEGIN
 	END IF;
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
-	v_mapzone_table = LOWER(v_class);
 	v_graph_delimiter = v_class;
+	v_mapzone_table = LOWER(v_class);
     v_mapzone_field = v_mapzone_table || '_id';
 	v_visible_layer = 've_' || v_mapzone_table;
 	IF v_netscenario IS NOT NULL THEN
@@ -178,14 +176,19 @@ BEGIN
 	END IF;
 
     -- Get exploitation ID array
-    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
+    v_expl_id_array := string_to_array(gw_fct_get_expl_id_array(v_expl_id), ',')::integer[];
 
 	IF v_from_zero THEN
-		v_query_text := 'SELECT count (*) FROM '|| v_mapzone_table ||' 
-		WHERE active
-		AND '|| v_mapzone_field ||' NOT IN (0, -1) -- 0 and -1 are conflict and undefined
-		AND expl_id && ARRAY['||array_to_string(v_expl_id_array, ',')||']';
-		EXECUTE v_query_text INTO v_mapzone_count;
+		EXECUTE format($sql$
+			SELECT count(*)
+			FROM %I
+			WHERE active
+			AND %I NOT IN (0, -1) -- 0 and -1 are conflict and undefined
+			AND ($1 IS NULL OR expl_id = ANY($1))
+		$sql$, v_mapzone_table, v_mapzone_field)
+		INTO v_mapzone_count
+		USING v_expl_id_array;
+		
 		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_class ||'"}, "is_process":true}}$$)';
@@ -225,8 +228,6 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
 
-
-
 	-- Initialize process
 	-- =======================
 	IF v_project_type = 'WS' THEN
@@ -235,30 +236,54 @@ BEGIN
 		v_reverse_cost := -1;
     END IF;
 
-    v_data := jsonb_build_object(
-        'data', jsonb_build_object(
-            'expl_id_array', array_to_string(v_expl_id_array, ','),
-            'mapzone_name', v_class,
-			'cost', 1,
-			'reverse_cost', v_reverse_cost
+	v_query_text := $q$
+        SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
+        FROM v_temp_arc
+    $q$;
+
+    EXECUTE format($sql$
+        WITH connectedcomponents AS (
+            SELECT *
+            FROM pgr_connectedcomponents($q$%s$q$)
+        ),
+        components AS (
+            SELECT c.component
+            FROM connectedcomponents c
+            WHERE $1 IS NULL
+            OR EXISTS (
+                SELECT 1
+                FROM v_temp_arc v
+                WHERE v.expl_id = ANY($1)
+                AND v.node_1 = c.node
+            )
+            GROUP BY c.component
         )
-    )::text;
+        INSERT INTO temp_pgr_node (node_id)
+        SELECT c.node
+        FROM connectedcomponents c
+        WHERE EXISTS (
+            SELECT 1
+            FROM components cc
+            WHERE cc.component = c.component
+        )
+    $sql$, v_query_text)
+    USING v_expl_id_array;
 
-    SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+	EXECUTE format($sql$
+		UPDATE temp_pgr_node n
+		SET old_mapzone_id = t.%I
+		FROM v_temp_node t
+		WHERE n.node_id = t.node_id
+	$sql$, v_mapzone_field);
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
-
-	EXECUTE '
-		UPDATE temp_pgr_node n SET old_mapzone_id = ' || v_mapzone_field || '
-		FROM v_temp_node t WHERE n.node_id = t.node_id; 
-	';
-
-	EXECUTE '
-		UPDATE temp_pgr_arc a SET old_mapzone_id = ' || v_mapzone_field || '
-		FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
-	';
+	EXECUTE format($sql$
+		INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, pgr_node_1, pgr_node_2, old_mapzone_id, cost, reverse_cost)
+		SELECT a.arc_id, n1.node_id, n2.node_id, n1.pgr_node_id, n2.pgr_node_id, a.%I, 1, $1
+		FROM v_temp_arc a
+		JOIN temp_pgr_node n1 ON n1.node_id = a.node_1
+        JOIN temp_pgr_node n2 ON n2.node_id = a.node_2
+	$sql$, v_mapzone_field)
+	USING v_reverse_cost;
 
 	-- NODES TO MODIFY
 	IF v_project_type = 'WS' THEN
