@@ -1137,6 +1137,10 @@ class GwMincut:
                 sql += f"{body}"
             sql += ");"
             
+            # Log SQL if enabled (similar to execute_procedure)
+            if sql:
+                tools_log.log_db(sql, bold='b', stack_level_increase=2)
+            
             # Execute using the stored cursor
             self.mincut_cursor.execute(sql)
             row = self.mincut_cursor.fetchone()
