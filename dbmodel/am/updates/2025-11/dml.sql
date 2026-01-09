@@ -38,15 +38,15 @@ VALUES('ext_arc_asset', 'id', 'role_om', NULL, '34', 7, 'Existing Assets', NULL,
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('leaks', 'id', 'role_om', NULL, '34', 6, 'Leaks', NULL, NULL, NULL, 'am', NULL) ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_arc_input', 'id', 'role_om', NULL, '34', 5, 'Input Assets', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthersName": "No leak"}') ON CONFLICT (id) DO NOTHING;
+VALUES('v_asset_arc_input', 'id', 'role_om', NULL, '34', 5, 'Input Assets', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthersName": "No leak", "symbolField": "rleak"}') ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('arc_output', 'id', 'role_om', NULL, '34', 4, 'Assets Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false}') ON CONFLICT (id) DO NOTHING;
+VALUES('arc_output', 'id', 'role_om', NULL, '34', 4, 'Assets Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}') ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_arc_corporate', 'id', 'role_om', NULL, '34', 3, 'Corporate Assets', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false}') ON CONFLICT (id) DO NOTHING;
+VALUES('v_asset_arc_corporate', 'id', 'role_om', NULL, '34', 3, 'Corporate Assets', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}') ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_arc_output', 'id', 'role_om', NULL, '34', 2, 'Result - Main', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false}') ON CONFLICT (id) DO NOTHING;
+VALUES('v_asset_arc_output', 'id', 'role_om', NULL, '34', 2, 'Result - Main', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}') ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_arc_output_compare', 'id', 'role_om', NULL, '34', 1, 'Result - Compare', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false}') ON CONFLICT (id) DO NOTHING;
+VALUES('v_asset_arc_output_compare', 'id', 'role_om', NULL, '34', 1, 'Result - Compare', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO PARENT_SCHEMA.sys_style (layername, styleconfig_id, styletype, stylevalue, active)
 VALUES ('ext_arc_asset', 101, 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
