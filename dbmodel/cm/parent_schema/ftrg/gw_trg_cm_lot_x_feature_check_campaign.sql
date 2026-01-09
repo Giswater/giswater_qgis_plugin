@@ -55,14 +55,27 @@ BEGIN
 	USING NEW;
 	
 	IF v_new_feature THEN
-		EXECUTE format('INSERT INTO cm.om_campaign_x_%I (campaign_id, %I_id, status)
-		     VALUES ($1, $2, $3)',
-		    v_feature, v_feature)
-		USING v_campaign_id, v_feature_id, NEW.status;
-
-		PERFORM set_config('search_path', v_prev_search_path, true);
-	    RETURN NEW;
+	    EXECUTE format(
+	        'INSERT INTO cm.om_campaign_x_%I (campaign_id, %I_id, status)
+	         VALUES ($1, $2, $3)
+	         ON CONFLICT (campaign_id, %I_id) DO NOTHING',
+	        v_feature, v_feature, v_feature
+	    )
+	    USING v_campaign_id, v_feature_id, NEW.status;
+	
+	ELSIF NOT v_new_feature THEN
+	    EXECUTE format(
+	        'UPDATE cm.om_campaign_x_%I
+	         SET status = $3
+	         WHERE campaign_id = $1
+	           AND %I_id = $2',
+	        v_feature, v_feature
+	    )
+	    USING v_campaign_id, v_feature_id, NEW.status;
 	END IF;
+	
+	PERFORM set_config('search_path', v_prev_search_path, true);
+	RETURN NEW;
 
     IF NOT v_exists THEN
         PERFORM set_config('search_path', v_prev_search_path, true);
