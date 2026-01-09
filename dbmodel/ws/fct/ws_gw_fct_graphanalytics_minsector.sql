@@ -26,7 +26,7 @@ DECLARE
 
     -- dialog
     v_expl_id TEXT;
-    v_expl_id_array TEXT[];
+    v_expl_id_array INTEGER[];
     v_usepsector BOOLEAN;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
@@ -109,7 +109,7 @@ BEGIN
 	END IF;
 
     -- Get exploitation ID array
-    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
+    v_expl_id_array := string_to_array(gw_fct_get_expl_id_array(v_expl_id), ',')::integer[];
 
 	-- Get user variable for disabling lock level
     SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
@@ -150,32 +150,26 @@ BEGIN
 
     -- Initialize process
     -- =======================
-    v_query_text := '
-        SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost 
+    v_query_text := $q$
+        SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
         FROM v_temp_arc
-    ';
+    $q$;
 
-    IF v_expl_id_array IS NOT NULL THEN
-        v_query_text_components := '
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM v_temp_arc v
-                    WHERE v.expl_id = ANY (ARRAY['||array_to_string(v_expl_id_array, ',')||']) 
-                    AND v.node_1 = c.node
-                )
-            ';
-    ELSE
-        v_query_text_components := '';
-    END IF;
-
-    EXECUTE format('
+    EXECUTE format($sql$
         WITH connectedcomponents AS (
-            SELECT * FROM pgr_connectedcomponents($q$ %s $q$)
+            SELECT *
+            FROM pgr_connectedcomponents($q$%s$q$)
         ),
         components AS (
             SELECT c.component
             FROM connectedcomponents c
-            %s
+            WHERE $1 IS NULL
+            OR EXISTS (
+                SELECT 1
+                FROM v_temp_arc v
+                WHERE v.expl_id = ANY($1)
+                AND v.node_1 = c.node
+            )
             GROUP BY c.component
         )
         INSERT INTO temp_pgr_node (pgr_node_id)
@@ -185,8 +179,9 @@ BEGIN
             SELECT 1
             FROM components cc
             WHERE cc.component = c.component
-        );
-    ', v_query_text, v_query_text_components);
+        )
+    $sql$, v_query_text)
+    USING v_expl_id_array;
 
     INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
     SELECT a.arc_id, a.node_1, a.node_2
