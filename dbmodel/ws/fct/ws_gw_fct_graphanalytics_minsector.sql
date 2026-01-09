@@ -486,7 +486,38 @@ BEGIN
     WHERE sub.minsector_id = t.minsector_id;
 
     IF v_commitchanges IS FALSE THEN
-        -- (sin cambios aquí: no hay referencias a temp_pgr_node/temp_pgr_arc con campos antiguos)
+        -- Polygons
+        EXECUTE 'SELECT jsonb_build_object(
+                ''type'', ''FeatureCollection'',
+                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+            )
+        FROM (
+            SELECT jsonb_build_object(
+                ''type'',       ''Feature'',
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+                ''properties'', to_jsonb(row) - ''the_geom''
+            ) AS feature
+            FROM (
+                SELECT 
+                    minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
+                    num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector'' AS layer 
+                FROM temp_pgr_minsector
+            ) row
+            UNION
+            SELECT jsonb_build_object(
+                ''type'',       ''Feature'',
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+                ''properties'', to_jsonb(row) - ''the_geom''
+            ) AS feature
+            FROM (
+                SELECT 
+                    minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
+                    num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector_mincut'' AS layer 
+                FROM v_temp_minsector_mincut
+            ) row
+        ) features' INTO v_result;
+
+        v_result_polygon := v_result;
 
         v_visible_layer = NULL;
 
