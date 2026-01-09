@@ -739,6 +739,19 @@ BEGIN
 				'level', 0
 			);
 
+			-- Drop temporary tables if exist
+			-- =======================
+			v_data := jsonb_build_object(
+				'data', jsonb_build_object(
+					'action', 'DROP',
+					'fct_name', 'MINCUT'
+				)
+			)::text;
+			SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+			IF v_response->>'status' <> 'Accepted' THEN
+				RETURN v_response;
+			END IF;
 		END IF;
 		-- manage null values
 		v_message := COALESCE(v_message, '{}');
