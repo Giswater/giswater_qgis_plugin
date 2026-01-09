@@ -430,6 +430,7 @@ class GwResultManagerButton(GwAction):
                 """
             )
             table.model().select()
+            self._update_symbology()
             return
 
         # Get the exploitations of result_id
@@ -468,6 +469,7 @@ class GwResultManagerButton(GwAction):
                 """
             )
             table.model().select()
+            self._update_symbology()
             return
 
         conflict_results_str = ", ".join(str(x) for x in conflict_results)
@@ -491,6 +493,27 @@ class GwResultManagerButton(GwAction):
             """
         )
         table.model().select()
+        self._update_symbology()
+
+    def _update_symbology(self):
+        try:
+            # Update symbology of layers currently loaded in the project
+            target_layers = []
+            sql = "SELECT id, addparam FROM sys_table WHERE source = 'am' AND addparam ->> 'refreshSymbology' = 'true'"
+            rows = tools_db.get_rows(sql)
+            for row in rows:
+                target_layer = tools_qgis.get_layer_by_tablename(row[0], schema_name="am")
+                if target_layer is None:
+                    continue
+                target_layers.append((target_layer, row[1]))
+
+            if len(target_layers) > 0:
+                result = tools_qt.show_question("Do you want to update the symbology of the layers currently loaded in the project?", "Update AM Layers Symbology", force_action=True)
+                if result:
+                    for layer, addparam in target_layers:
+                        tools_gw.refresh_categorized_layer_symbology_classes(layer, addparam)
+        except Exception:
+            pass
 
     def _set_signals(self):
         dlg = self.dlg_priority_manager

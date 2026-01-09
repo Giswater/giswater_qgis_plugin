@@ -38,7 +38,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, \
     QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, QgsCoordinateTransformContext, \
     QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, \
-    QgsEditFormConfig, QgsSymbolLayer, QgsProperty, QgsSimpleLineSymbolLayer, QgsSimpleMarkerSymbolLayer
+    QgsEditFormConfig, QgsSymbolLayer, QgsProperty, QgsSimpleLineSymbolLayer, QgsSimpleMarkerSymbolLayer, QgsStyle
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -872,11 +872,19 @@ def refresh_categorized_layer_symbology_classes(layer, addparam=None):
         :param addparam: Addparams of the layer (dict)
     """
 
+    field_name = addparam.get('symbolField')
+
     renderer = layer.renderer()
 
     # Symbology type must be categorized
-    if renderer is None or renderer.type() != 'categorizedSymbol':
-        return
+    if (renderer is None or renderer.type() != 'categorizedSymbol') and field_name:
+        # Create categorized symbol renderer
+        renderer = QgsCategorizedSymbolRenderer(field_name, [])
+        layer.setRenderer(renderer)
+        # Set color ramp to default (Spectral)
+        style = QgsStyle().defaultStyle()
+        spectral = style.colorRamp('Spectral')
+        renderer.setSourceColorRamp(spectral.clone())
 
     field_name = renderer.classAttribute()
     if not field_name:
