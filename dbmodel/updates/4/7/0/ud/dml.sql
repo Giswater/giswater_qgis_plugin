@@ -17,3 +17,6 @@ INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_insert
 
 UPDATE sys_param_user SET descript = 'If elev, try to recalculate elev if ymax is not null. If ymax, try to recalculate ymax if elev is not null.'
 WHERE id = 'edit_node_topelev_options';
+
+UPDATE sys_feature_class SET epa_default = 'UNDEFINED' WHERE id = 'CJOIN' or id = 'VGULLY';
+UPDATE sys_feature_class SET epa_default = 'GULLY' WHERE id = 'GINLET';

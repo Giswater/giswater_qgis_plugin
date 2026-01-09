@@ -15,3 +15,6 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 UPDATE config_form_fields
 	SET dv_isnullvalue=true
 	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
+
+-- 09/01/2026
+UPDATE sys_feature_class SET epa_default = 'JUNCTION' WHERE type IN ('CONNEC');
