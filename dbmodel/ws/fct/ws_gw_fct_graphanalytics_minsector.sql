@@ -183,25 +183,19 @@ BEGIN
     $sql$, v_query_text)
     USING v_expl_id_array;
 
-    INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
-    SELECT a.arc_id, a.node_1, a.node_2
+    UPDATE temp_pgr_node n
+    SET old_mapzone_id = t.minsector_id
+    FROM v_temp_node t
+    WHERE n.pgr_node_id = t.node_id;
+
+    INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, old_mapzone_id)
+    SELECT a.arc_id, a.node_1, a.node_2, a.minsector_id 
     FROM v_temp_arc a
     WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
     AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
 
     -- Preparing minsectors
     -- =======================
-
-    UPDATE temp_pgr_node n
-    SET old_mapzone_id = t.minsector_id
-    FROM v_temp_node t
-    WHERE n.pgr_node_id = t.node_id;
-
-    UPDATE temp_pgr_arc a
-    SET old_mapzone_id = t.minsector_id 
-    FROM v_temp_arc t
-    WHERE a.pgr_arc_id = t.arc_id;
-
     -- nodes water sources (SECTOR)
     -- tank, source, waterwell, wtp
     UPDATE temp_pgr_node t
