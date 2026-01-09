@@ -901,6 +901,12 @@ def refresh_categorized_layer_symbology_classes(layer, addparam=None):
             print(f"Error getting source symbol: {e}")
             src_symbol = QgsSymbol.defaultSymbol(layer.geometryType())
 
+    # Set solid line style to the source symbol
+    src_symbol = src_symbol.clone()
+    sl = src_symbol.symbolLayer(0)
+    if isinstance(sl, QgsSimpleLineSymbolLayer):
+        sl.setPenStyle(Qt.PenStyle.SolidLine)
+
     # Configure dnom symbol if it exists
     if addparam:
         dnom_symbol = addparam.get('dnomSymbol')
@@ -943,18 +949,26 @@ def refresh_categorized_layer_symbology_classes(layer, addparam=None):
     if src_color_ramp:
         new_renderer.updateColorRamp(src_color_ramp.clone())
 
-    # Add "all others" category
-    all_others_symbol = src_symbol.clone()
-    s = all_others_symbol.symbolLayer(0)
-    if isinstance(s, QgsSimpleLineSymbolLayer):
-        s.setPenStyle(Qt.PenStyle.DashLine)
-        s.setColor(QColor("red"))
-    elif isinstance(s, QgsSimpleMarkerSymbolLayer):
-        s.setColor(QColor("red"))
-    elif isinstance(s, QgsSimpleFillSymbolLayer):
-        s.setFillColor(QColor("red"))
-    all_others_cat = QgsRendererCategory(None, all_others_symbol, "All Others")
-    new_renderer.addCategory(all_others_cat)
+    all_others = addparam.get('allOthers')
+    if all_others is None:
+        all_others = True
+    all_others_name = addparam.get('allOthersName')
+    if all_others_name is None:
+        all_others_name = "All Others"
+
+    if all_others:
+        # Add "all others" category
+        all_others_symbol = src_symbol.clone()
+        s = all_others_symbol.symbolLayer(0)
+        if isinstance(s, QgsSimpleLineSymbolLayer):
+            s.setPenStyle(Qt.PenStyle.DashLine)
+            s.setColor(QColor("red"))
+        elif isinstance(s, QgsSimpleMarkerSymbolLayer):
+            s.setColor(QColor("red"))
+        elif isinstance(s, QgsSimpleFillSymbolLayer):
+            s.setFillColor(QColor("red"))
+        all_others_cat = QgsRendererCategory(None, all_others_symbol, all_others_name)
+        new_renderer.addCategory(all_others_cat)
 
     # Replace renderer entirely
     layer.setRenderer(new_renderer)
