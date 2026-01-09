@@ -47,36 +47,6 @@ SELECT gw_fct_graphanalytics_mapzones('
 		}
 	}
 ');
-
-Query to visualize arcs with their geometries:
-
-SELECT p.*, a.the_geom
-FROM temp_pgr_arc p
-JOIN arc a ON p.arc_id = a.arc_id;
-
-Query to visualize nodes with their geometries:
-
-SELECT p.*, n.the_geom
-FROM temp_pgr_node p
-JOIN node n ON p.node_id = n.node_id;
-
-Query to calculate the factor for adding/subtracting flow in a DMA:
-
-WITH
-temp_dma_graph AS (
-	SELECT
-		COALESCE (a.node_1, a.node_2) AS node_id,
-		n.mapzone_id AS dma_id,
-		CASE WHEN n.node_id IS NOT NULL THEN 1 ELSE -1 END AS flow_sign
-	FROM temp_pgr_node n
-	JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-	WHERE n.graph_delimiter = 'dma'
-	AND a.graph_delimiter ='dma'
-	AND n.mapzone_id::int > 0
-	)
-SELECT DISTINCT ON (node_id, dma_id) node_id, dma_id, flow_sign
-FROM temp_dma_graph
-ORDER BY node_id, dma_id;
 */
 
 DECLARE
