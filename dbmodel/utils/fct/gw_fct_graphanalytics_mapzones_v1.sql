@@ -91,7 +91,7 @@ DECLARE
 	v_mapzones_ids text;
 
 	v_graph_delimiter text;
-	v_table_name text;
+	v_mapzone_table text;
 	v_mapzone_field text;
 	v_visible_layer text;
 	v_mapzone_id int4;
@@ -167,13 +167,13 @@ BEGIN
 	END IF;
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
-	v_table_name = LOWER(v_class);
+	v_mapzone_table = LOWER(v_class);
 	v_graph_delimiter = v_class;
-    v_mapzone_field = v_table_name || '_id';
-	v_visible_layer = 've_' || v_table_name;
+    v_mapzone_field = v_mapzone_table || '_id';
+	v_visible_layer = 've_' || v_mapzone_table;
 	IF v_netscenario IS NOT NULL THEN
-		v_table_name = 'plan_netscenario_' || v_table_name;
-		v_visible_layer = 've_plan_netscenario_' || v_table_name;
+		v_mapzone_table = 'plan_netscenario_' || v_mapzone_table;
+		v_visible_layer = 've_plan_netscenario_' || v_mapzone_table;
 		v_from_zero = FALSE; -- from zero is not allowed for netscenario
 	END IF;
 
@@ -181,7 +181,7 @@ BEGIN
     v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
 
 	IF v_from_zero THEN
-		v_query_text := 'SELECT count (*) FROM '|| v_table_name ||' 
+		v_query_text := 'SELECT count (*) FROM '|| v_mapzone_table ||' 
 		WHERE active
 		AND '|| v_mapzone_field ||' NOT IN (0, -1) -- 0 and -1 are conflict and undefined
 		AND expl_id && ARRAY['||array_to_string(v_expl_id_array, ',')||']';
@@ -486,7 +486,7 @@ BEGIN
 					GROUP BY mapzone_id, node_id
 				) s
 				WHERE n.node_id = s.node_id;
-			$$, v_mapzone_field, v_table_name, v_query_text_aux, v_graph_delimiter);
+			$$, v_mapzone_field, v_mapzone_table, v_query_text_aux, v_graph_delimiter);
 		ELSE
 			EXECUTE format($$
 				UPDATE temp_pgr_node n
@@ -504,7 +504,7 @@ BEGIN
 					%s
 				) AS s
 				WHERE n.node_id = s.node_id;
-			$$, v_graph_delimiter, v_mapzone_field, v_table_name, v_query_text_aux);
+			$$, v_graph_delimiter, v_mapzone_field, v_mapzone_table, v_query_text_aux);
 			
 			EXECUTE format($$
 				UPDATE temp_pgr_node t
@@ -526,7 +526,7 @@ BEGIN
 				'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''FORCECLOSED'' 
 				FROM (
 					SELECT (json_array_elements_text(graphconfig->''forceClosed''))::int4 AS node_id
-					FROM ' || v_table_name || ' 
+					FROM ' || v_mapzone_table || ' 
 				';
 
 			-- netscenario query
@@ -545,7 +545,7 @@ BEGIN
 				'UPDATE temp_pgr_arc a SET graph_delimiter = ''FORCECLOSED'' 
 				FROM (
 					SELECT (json_array_elements_text(graphconfig->''forceClosed''))::int4 AS arc_id
-					FROM ' || v_table_name || ' 
+					FROM ' || v_mapzone_table || ' 
 				';
 
 			-- netscenario query
@@ -566,7 +566,7 @@ BEGIN
 				'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''IGNORE'' 
 				FROM (
 					SELECT (json_array_elements_text(graphconfig->''ignore''))::int4 AS node_id
-					FROM ' || v_table_name || ' 
+					FROM ' || v_mapzone_table || ' 
 				';
 
 			-- netscenario query
@@ -584,7 +584,7 @@ BEGIN
 				'UPDATE temp_pgr_arc a SET cost = 1, reverse_cost = 1, graph_delimiter = ''IGNORE'' 
 				FROM (
 					SELECT (json_array_elements_text(graphconfig->''ignore''))::int4 AS arc_id
-					FROM ' || v_table_name || ' 
+					FROM ' || v_mapzone_table || ' 
 				';
 
 			-- netscenario query
@@ -801,12 +801,12 @@ BEGIN
 		IF v_project_type = 'WS' AND v_class IN ('DMA', 'PRESSZONE') THEN
 			EXECUTE
 				'SELECT GREATEST(
-					(SELECT max(' || v_mapzone_field || ') FROM '|| v_table_name|| '),
-					(SELECT max(' || v_mapzone_field || ') FROM plan_netscenario_'|| v_table_name || ')
+					(SELECT max(' || v_mapzone_field || ') FROM '|| v_mapzone_table|| '),
+					(SELECT max(' || v_mapzone_field || ') FROM plan_netscenario_'|| v_mapzone_table || ')
 				)'
 			INTO v_mapzone_id;
 		ELSE
-			EXECUTE 'SELECT max(' || v_mapzone_field || ') FROM '|| v_table_name
+			EXECUTE 'SELECT max(' || v_mapzone_field || ') FROM '|| v_mapzone_table
 			INTO v_mapzone_id;
 		END IF;
 		UPDATE temp_pgr_mapzone m SET mapzone_id = ARRAY[v_mapzone_id + m.id], name = concat(LOWER(v_class), (v_mapzone_id + m.id));
@@ -814,18 +814,18 @@ BEGIN
 		IF v_netscenario IS NOT NULL THEN
 			IF v_class = 'DMA' THEN
 				EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.'||LOWER(v_class)||'_name, pattern_id = mz.pattern_id
-				FROM ' || v_table_name || ' mz
+				FROM ' || v_mapzone_table || ' mz
 				WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
 				AND CARDINALITY(m.mapzone_id) = 1';
 			ELSE
 				EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.'||LOWER(v_class)||'_name
-				FROM ' || v_table_name || ' mz
+				FROM ' || v_mapzone_table || ' mz
 				WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
 				AND CARDINALITY(m.mapzone_id) = 1';
 			END IF;
 		ELSE
 			EXECUTE 'UPDATE temp_pgr_mapzone m SET name = mz.name
-			FROM ' || v_table_name || ' mz
+			FROM ' || v_mapzone_table || ' mz
 			WHERE m.mapzone_id[1] = mz.' || v_mapzone_field || '
 			AND CARDINALITY(m.mapzone_id) = 1
 			';
@@ -1389,7 +1389,7 @@ BEGIN
 						FROM temp_pgr_mapzone
 						GROUP BY mapzone_id, the_geom
 					)
-				UPDATE '||v_table_name||' m SET the_geom = tm.the_geom
+				UPDATE '||v_mapzone_table||' m SET the_geom = tm.the_geom
 				FROM mapzone tm
 				WHERE m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)';
 			EXECUTE v_query_text;
@@ -1470,7 +1470,7 @@ BEGIN
 						END AS staticpressure
 						FROM plan_netscenario_node pn 
 						JOIN node n ON pn.node_id = n.node_id
-						JOIN '||v_table_name||' p ON pn.'||v_mapzone_field||' = p.'||v_mapzone_field||'
+						JOIN '||v_mapzone_table||' p ON pn.'||v_mapzone_field||' = p.'||v_mapzone_field||'
 						WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
 					) t
 					WHERE n.node_id = t.node_id
@@ -1490,7 +1490,7 @@ BEGIN
 							END AS staticpressure
 						FROM plan_netscenario_connec pc
 						JOIN connec c ON pc.connec_id = c.connec_id
-						JOIN ' || v_table_name || ' p ON pc.' || v_mapzone_field || ' = p.' || v_mapzone_field || '
+						JOIN ' || v_mapzone_table || ' p ON pc.' || v_mapzone_field || ' = p.' || v_mapzone_field || '
 						WHERE EXISTS (
 							SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id
 						)
@@ -1522,7 +1522,7 @@ BEGIN
 		ELSE
 			IF v_from_zero = TRUE THEN
 				IF v_project_type = 'WS' AND v_graph_delimiter <> 'SECTOR' THEN
-					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
+					v_query_text := 'INSERT INTO '||v_mapzone_table||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
 					SELECT m.mapzone_id[1], m.mapzone_id[1], m.name, ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
@@ -1560,7 +1560,7 @@ BEGIN
 					AND m.to_arc IS NULL;
 
 				ELSE
-					v_query_text := 'INSERT INTO '||v_table_name||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
+					v_query_text := 'INSERT INTO '||v_mapzone_table||' ('||v_mapzone_field||',code, name, expl_id, the_geom, created_at, created_by, graphconfig)
 					SELECT m.mapzone_id[1], m.mapzone_id[1], m.name, ARRAY[0], m.the_geom, now(), current_user,
 					json_build_object(
 						''use'', json_agg(
@@ -1578,7 +1578,7 @@ BEGIN
 
 				-- ignore
 				v_query_text := '
-					UPDATE '||v_table_name||' m
+					UPDATE '||v_mapzone_table||' m
 					SET graphconfig = jsonb_set(
 						graphconfig::jsonb,
 						''{ignore}'',
@@ -1596,7 +1596,7 @@ BEGIN
 
 				-- forceclosed
 				v_query_text := '
-					UPDATE '||v_table_name||' m
+					UPDATE '||v_mapzone_table||' m
 					SET graphconfig = jsonb_set(
 						graphconfig::jsonb,
 						''{forceClosed}'',
@@ -1625,7 +1625,7 @@ BEGIN
 							FROM temp_pgr_mapzone
 							GROUP BY mapzone_id, the_geom
 						)
-					UPDATE '||v_table_name||' m SET the_geom = tm.the_geom
+					UPDATE '||v_mapzone_table||' m SET the_geom = tm.the_geom
 					FROM mapzone tm
 					WHERE m.'||v_mapzone_field || ' = ANY (tm.mapzone_id)';
 				EXECUTE v_query_text;
@@ -1643,7 +1643,7 @@ BEGIN
 			END IF;
 
 			v_query_text := '
-			UPDATE '||v_table_name||' m
+			UPDATE '||v_mapzone_table||' m
 				SET expl_id = CASE
     				WHEN CARDINALITY(subq.mapzone_id) = 1 THEN subq.expl_ids
     				ELSE ARRAY[0] 
@@ -1675,7 +1675,7 @@ BEGIN
 
 			-- Update mapzone addparam with kmLength calculation
 			v_query_text := '
-				UPDATE '||v_table_name||' m SET addparam = 
+				UPDATE '||v_mapzone_table||' m SET addparam = 
 					(COALESCE(addparam::jsonb, ''{}''::jsonb) || jsonb_build_object(''kmLength'', COALESCE(a.km, 0)))::json
 				FROM (
 					SELECT mz.mapzone_id[1] AS '||v_mapzone_field||', 
@@ -1967,7 +1967,7 @@ BEGIN
 							ELSE NULL
 						END AS staticpressure
 						FROM node n
-						JOIN '||v_table_name||' p USING ('||v_mapzone_field||')
+						JOIN '||v_mapzone_table||' p USING ('||v_mapzone_field||')
 						WHERE EXISTS (SELECT 1 FROM temp_pgr_node t WHERE t.node_id= n.node_id)
 					) t
 					WHERE n.node_id = t.node_id
@@ -1993,7 +1993,7 @@ BEGIN
 								ELSE NULL
 							END AS staticpressure2
 						FROM arc a
-						JOIN ' || v_table_name || ' p USING (' || v_mapzone_field || ')
+						JOIN ' || v_mapzone_table || ' p USING (' || v_mapzone_field || ')
 						WHERE EXISTS (
 							SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = a.arc_id
 						)
@@ -2017,7 +2017,7 @@ BEGIN
 								ELSE NULL
 							END AS staticpressure
 						FROM connec c
-						JOIN ' || v_table_name || ' p USING (' || v_mapzone_field || ')
+						JOIN ' || v_mapzone_table || ' p USING (' || v_mapzone_field || ')
 						WHERE EXISTS (
 							SELECT 1 FROM temp_pgr_arc t WHERE t.arc_id = c.arc_id
 						)
@@ -2047,7 +2047,7 @@ BEGIN
 								ELSE NULL
 							END AS staticpressure2
 						FROM link l
-						JOIN ' || v_table_name || ' p USING (' || v_mapzone_field || ')
+						JOIN ' || v_mapzone_table || ' p USING (' || v_mapzone_field || ')
 						WHERE EXISTS (
 							SELECT 1 FROM v_temp_link_connec c
 							JOIN temp_pgr_arc t USING (arc_id)
@@ -2349,18 +2349,18 @@ BEGIN
 
 		-- clear geometries of mapzones that are not assigned to any featureNG EXISTS IN v_temp_pgr_mapzone_old and NOT EXISTS in temp_pgr_mapzone
 		v_query_text = '
-			UPDATE '||v_table_name||' SET the_geom = NULL,
+			UPDATE '||v_mapzone_table||' SET the_geom = NULL,
 				updated_at = now(),
 				updated_by = current_user
 			WHERE EXISTS (
 				SELECT 1
 				FROM v_temp_pgr_mapzone_old m
-				WHERE m.old_mapzone_id = '||v_table_name||'.'||v_mapzone_field||'
+				WHERE m.old_mapzone_id = '||v_mapzone_table||'.'||v_mapzone_field||'
 			)
 			AND NOT EXISTS (
 				SELECT 1
 				FROM temp_pgr_mapzone m
-				WHERE '||v_table_name||'.'||v_mapzone_field||' = ANY(m.mapzone_id)
+				WHERE '||v_mapzone_table||'.'||v_mapzone_field||' = ANY(m.mapzone_id)
 			);';
 		EXECUTE v_query_text;
 	END IF;
