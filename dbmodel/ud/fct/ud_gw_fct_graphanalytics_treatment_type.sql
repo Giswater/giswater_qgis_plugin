@@ -64,7 +64,10 @@ SELECT gw_fct_graphanalytics_treatment_type($${
 	}
 }$$);
 
-
+SELECT gw_fct_graphanalytics_treatment_type($${"client":{"device":4, "lang":"es_ES", "version":"4.7.0",
+"infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+"parameters":{"processName":"TREATMENT_TYPE", "exploitation":"-902", "usePlanPsector":"false",
+"commitChanges":"false"}, "aux_params":null}}$$);
 
 */
 
@@ -94,7 +97,7 @@ DECLARE
 	v_status text;
 	v_message text;
 
-	v_querytext text;
+	v_query_text text;
 	v_data json;
 
 	v_result text;
@@ -116,10 +119,10 @@ BEGIN
 	SELECT giswater, epsg, UPPER(project_type) INTO v_version, v_srid, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get variables from input JSON
-	v_process_name = p_data->'data'->'parameters'->>'processName'::text;
-	v_expl_id = p_data->'data'->'parameters'->>'exploitation'::text;
-	v_usepsector = p_data->'data'->'parameters'->>'usePlanPsector'::boolean;
-	v_commitchanges = p_data->'data'->'parameters'->>'commitChanges'::boolean;
+	v_process_name := p_data->'data'->'parameters'->>'processName'::text;
+	v_expl_id := p_data->'data'->'parameters'->>'exploitation'::text;
+	v_usepsector = (p_data->'data'->'parameters'->>'usePlanPsector')::BOOLEAN;
+	v_commitchanges = (p_data->'data'->'parameters'->>'commitChanges')::BOOLEAN;
 	-- for extra parameters
 	v_parameters = p_data->'data'->'parameters';
 
@@ -128,13 +131,12 @@ BEGIN
 		v_commitchanges := FALSE;
 	END IF;
 
-
     -- Get exploitation ID array
-    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
+    v_expl_id_array := string_to_array(gw_fct_get_expl_id_array(v_expl_id), ',')::integer[];
 
 	-- Delete temporary tables
 	-- =======================
-	v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_process_name ||'"}}';
+	v_data := '{"data":{"action":"DROP", "fct_name":"treatment_type"}}';
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
 	IF v_response->>'status' <> 'Accepted' THEN
@@ -151,6 +153,7 @@ BEGIN
     END IF;
 
 	-- Start Building Log Message
+	/*
 	-- =======================
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "is_header":"true", "tempTable":"temp_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"data":{"message":"4460", "function":"3424", "criticity":"3", "tempTable":"temp_", "parameters":{"v_psectors":"'||v_usepsector||'"}}$$)';
@@ -160,163 +163,166 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"2", "is_header":"true", "label_id":"3002", "separator_id":"2009", "tempTable":"temp_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"1", "is_header":"true", "label_id":"3001", "separator_id":"2009", "tempTable":"temp_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"0", "is_header":"true", "label_id":"3012", "separator_id":"2010", "tempTable":"temp_"}}$$)';
-
+*/
 	-- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id_array":"' || array_to_string(v_expl_id_array, ',') || '", "mapzone_name":"'|| v_process_name ||'"}}';
-    SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+	v_query_text := $q$
+        SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
+        FROM v_temp_arc
+    $q$;
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
+	EXECUTE format($sql$
+        WITH connectedcomponents AS (
+            SELECT *
+            FROM pgr_connectedcomponents($q$%s$q$)
+        ),
+        components AS (
+            SELECT c.component
+            FROM connectedcomponents c
+            WHERE $1 IS NULL
+            OR EXISTS (
+                SELECT 1
+                FROM v_temp_arc v
+                WHERE v.expl_id = ANY($1)
+                AND v.node_1 = c.node
+            )
+            GROUP BY c.component
+        )
+        INSERT INTO temp_pgr_node (pgr_node_id)
+        SELECT c.node
+        FROM connectedcomponents c
+        WHERE EXISTS (
+            SELECT 1
+            FROM components cc
+            WHERE cc.component = c.component
+        )
+    $sql$, v_query_text)
+    USING v_expl_id_array;
 
+	UPDATE temp_pgr_node n
+	SET  mapzone_id = t.treatment_type, old_mapzone_id = t.treatment_type 
+	FROM v_temp_node t
+	WHERE n.pgr_node_id = t.node_id;
 
+	INSERT INTO temp_pgr_arc (pgr_arc_id,pgr_node_1, pgr_node_2, mapzone_id, old_mapzone_id, cost, reverse_cost)
+	SELECT a.arc_id, a.node_1, a.node_2,  a.treatment_type, a.treatment_type, 1, -1
+	FROM v_temp_arc a
+	WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
+    AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
 
-	-- WITH feature_type AS (
-	-- 	SELECT
-	-- 		a.arc_id,
-	-- 		CASE WHEN a.initoverflowpath = FALSE THEN n.mapzone_id
-	-- 		WHEN n.mapzone_id >= 2 THEN 2
-	-- 		ELSE n.mapzone_id -- rainwater or Not Informed
-	-- 		END AS fluid_type
-	-- 	FROM temp_pgr_node n
-	-- 	JOIN v_temp_arc a ON a.node_1 = n.node_id
-	-- 	UNION ALL
-	-- 	SELECT
-	-- 		c.arc_id, c.fluid_type
-	-- 	FROM v_temp_connec c
-	-- 	WHERE EXISTS (
-	-- 		SELECT 1
-	-- 		FROM temp_pgr_arc a
-	-- 		WHERE a.arc_id = c.arc_id
-	-- 	)
-	-- 	UNION ALL
-	-- 	SELECT
-	-- 		g.arc_id, g.fluid_type
-	-- 	FROM v_temp_gully g
-	-- 	WHERE EXISTS (
-	-- 		SELECT 1
-	-- 		FROM temp_pgr_arc a
-	-- 		WHERE a.arc_id = g.arc_id
-	-- 	)
-	-- ), arc_type AS (
-	-- 	SELECT
-	-- 		arc_id,
-	-- 		max(fluid_type) AS fluid_type,
-	-- 		count(DISTINCT fluid_type) FILTER (WHERE fluid_type >0) AS nr
-	-- 	FROM feature_type
-	-- 	GROUP BY arc_id
-	-- ), arc_modif AS (
-	-- 	SELECT
-	-- 		arc_id,
-	-- 		CASE
-	-- 		WHEN nr <= 1 THEN fluid_type -- 0 when fluid_type is not informed
-	-- 		WHEN fluid_type IN (3,4) THEN 4
-	-- 		ELSE fluid_type
-	-- 		END AS fluid_type
-	-- 	FROM arc_type
-	-- )
-	-- UPDATE temp_pgr_arc t
-	-- SET mapzone_id = a.fluid_type
-	-- FROM arc_modif a
-	-- WHERE a.arc_id = t.arc_id
-	-- AND a.fluid_type <> t.mapzone_id;
+	v_count := 1;
 
-	-- WITH node_type AS (
-	-- 	SELECT
-	-- 		node_2 AS node_id,
-	-- 		max(mapzone_id) AS fluid_type,
-	-- 		count(DISTINCT mapzone_id) FILTER (WHERE mapzone_id > 0) AS nr
-	-- 	FROM temp_pgr_arc
-	-- 	GROUP BY node_2
-	-- ), node_modif AS (
-	-- 	SELECT
-	-- 		node_id,
-	-- 		CASE
-	-- 		WHEN nr <= 1 THEN fluid_type -- 0 when fluid_type is not informed
-	-- 		WHEN fluid_type IN (3,4) THEN 4
-	-- 		ELSE fluid_type
-	-- 		END AS fluid_type
-	-- 	FROM node_type
-	-- )
-	-- UPDATE temp_pgr_node t
-	-- SET mapzone_id = n.fluid_type
-	-- FROM node_modif n
-	-- WHERE n.node_id = t.node_id
-	-- AND n.fluid_type <> t.mapzone_id;
+	WHILE v_count > 0 LOOP
+
+	GET DIAGNOSTICS v_count = ROW_COUNT;
+
+  	END LOOP;
 
 	IF v_commitchanges IS TRUE THEN
-		RAISE NOTICE 'Updating treatment type on real tables';
+		RAISE NOTICE 'Updating treatment_type on real tables';
 
-		-- v_querytext = 'UPDATE node SET treatment_type = t.mapzone_id FROM temp_pgr_node t WHERE t.node_id = node.node_id AND t.mapzone_id <> node.treatment_type;';
-		-- EXECUTE v_querytext;
+		UPDATE node n
+		SET treatment_type = t.mapzone_id 
+		FROM temp_pgr_node t 
+		WHERE t.pgr_node_id = n.node_id 
+		AND t.mapzone_id IS DISTINCT FROM n.treatment_type;
 
-		-- v_querytext = 'UPDATE arc SET treatment_type = t.mapzone_id FROM temp_pgr_arc t WHERE t.arc_id = arc.arc_id AND t.mapzone_id <> arc.treatment_type;';
-		-- EXECUTE v_querytext;
+		UPDATE arc a
+		SET treatment_type = t.mapzone_id 
+		FROM temp_pgr_arc t 
+		WHERE t.pgr_arc_id = a.arc_id 
+		AND t.mapzone_id IS DISTINCT FROM arc.treatment_type;
+
+		UPDATE link l
+		SET treatment_type = t.treatment_type
+		FROM v_temp_connec t
+		WHERE l.feature_id = t.connec_id;
+
+		UPDATE link l
+		SET treatment_type = t.treatment_type
+		FROM v_temp_gully t
+		WHERE l.feature_id = t.gully_id;
+
 	ELSE
-		RAISE NOTICE 'Showing temporal layers with treatment type and geometry';
+		RAISE NOTICE 'Showing temporal layers with treatment_type and geometry';
 
-		-- SELECT jsonb_agg(features.feature) INTO v_result
-		-- FROM (
-		-- SELECT jsonb_build_object(
-		-- 	'type',       'Feature',
-		-- 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		-- 	'properties', to_jsonb(row) - 'the_geom',
-		-- 	'crs',concat('EPSG:',ST_SRID(the_geom))
-		-- ) AS feature
-		-- FROM (
-		-- 	SELECT v.arc_id AS feature_id, 'ARC' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-		-- 	FROM v_temp_arc v
-		-- 	JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-		-- 	JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-		-- 	WHERE ot.typevalue = 'fluid_type'
-		-- 	UNION
-		-- 	SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-		-- 	FROM v_temp_link_connec v
-		-- 	JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-		-- 	JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-		-- 	WHERE ot.typevalue = 'fluid_type'
-		-- 	UNION
-		-- 	SELECT v.link_id AS feature_id, 'LINK' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-		-- 	FROM v_temp_link_gully v
-		-- 	JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-		-- 	JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-		-- 	WHERE ot.typevalue = 'fluid_type'
-		-- ) row) features;
+		v_result_line := jsonb_build_object(
+			'type', 'FeatureCollection',
+			'layerName', 'Lines',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type',       'Feature',
+						'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id as treatment_type, ot.idval as treatment_type_name, t.old_mapzone_id as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM temp_pgr_arc t 
+						JOIN v_temp_arc v ON  v.arc_id = t.pgr_arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
+						WHERE ot.typevalue = 'treatment_type' 
+						AND oto.typevalue = 'treatment_type'
+						UNION
+						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vc.treatment_type as treatment_type, ot.idval as treatment_type_name, vl.treatment_type as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
+						FROM temp_pgr_arc t 
+						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id
+						JOIN v_temp_link_connec vl ON vl.feature_id = vc.connec_id
+						JOIN om_typevalue ot ON ot.id::int4 = vc.treatment_type
+						JOIN om_typevalue oto ON oto.id::int4 = vl.treatment_type
+						WHERE ot.typevalue = 'treatment_type'
+						AND oto.typevalue = 'treatment_type'
+						UNION
+						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vg.treatment_type as treatment_type, ot.idval as treatment_type_name, vl.treatment_type as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
+						FROM temp_pgr_arc t 
+						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
+						JOIN v_temp_link_gully vl ON vl.feature_id = vg.gully_id
+						JOIN om_typevalue ot ON ot.id::int4 = vg.treatment_type
+						JOIN om_typevalue oto ON oto.id::int4 = vl.treatment_type
+						WHERE ot.typevalue = 'treatment_type'
+						AND oto.typevalue = 'treatment_type'
+					) row
+				) features
+			), '[]'::jsonb)
+		)::text;
 
-		-- v_result := COALESCE(v_result, '{}');
-		-- v_result_line = concat ('{"geometryT1ype":"LineString", "layerName": "Lines", "features":',v_result, '}');
-
-		-- SELECT jsonb_agg(features.feature) INTO v_result
-		-- FROM (
-		-- SELECT jsonb_build_object(
-		-- 	'type',       'Feature',
-		-- 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		-- 	'properties', to_jsonb(row) - 'the_geom',
-		-- 	'crs',concat('EPSG:',ST_SRID(the_geom))
-		-- ) AS feature
-		-- FROM (
-		-- 	SELECT v.node_id AS feature_id, 'NODE' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-		-- 	FROM v_temp_node v
-		-- 	JOIN temp_pgr_node t ON t.node_id = v.node_id
-		-- 	JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-		-- 	WHERE ot.typevalue = 'fluid_type'
-		-- 	UNION
-		-- 	SELECT v.connec_id AS feature_id, 'CONNECT' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-		-- 	FROM v_temp_connec v
-		-- 	JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-		-- 	JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-		-- 	WHERE ot.typevalue = 'fluid_type'
-		-- 	UNION
-		-- 	SELECT v.gully_id AS feature_id, 'GULLY' AS feature_type, v.fluid_type, ot.idval as fluid_type_name, v.the_geom
-		-- 	FROM v_temp_gully v
-		-- 	JOIN temp_pgr_arc t ON t.arc_id = v.arc_id
-		-- 	JOIN om_typevalue ot ON ot.id::int4 = v.fluid_type
-		-- 	WHERE ot.typevalue = 'fluid_type'
-		-- ) row) features;
-
-		v_result := COALESCE(v_result, '[]');
-		v_result_point = concat ('{"type":"FeatureCollection", "layerName": "Points", "features":',v_result, '}');
+		v_result_point := jsonb_build_object(
+			'type', 'FeatureCollection',
+			'layerName', 'Points',
+			'features', COALESCE((
+				SELECT jsonb_agg(features.feature)
+				FROM (
+					SELECT jsonb_build_object(
+						'type',       'Feature',
+						'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+						'properties', to_jsonb(row) - 'the_geom'
+					) AS feature
+					FROM (
+						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, t.mapzone_id as treatment_type, ot.idval as treatment_type_name, t.old_mapzone_id as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(v.the_geom, 4326) as the_geom
+						FROM temp_pgr_node t 
+						JOIN v_temp_node v ON v.node_id = t.pgr_node_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
+						WHERE ot.typevalue = 'treatment_type' 
+						AND oto.typevalue = 'treatment_type'
+						UNION
+						SELECT vc.connec_id AS feature_id, 'CONNECT' AS feature_type, vc.treatment_type, ot.idval as treatment_type_name, vc.treatment_type AS old_treatment_type, ot.idval as old_treatment_type_name, ST_Transform(vc.the_geom, 4326) as the_geom
+						FROM temp_pgr_arc t 
+						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id 
+						JOIN om_typevalue ot ON ot.id::int4 = vc.treatment_type
+						WHERE ot.typevalue = 'treatment_type'
+						UNION
+						SELECT vg.gully_id AS feature_id, 'GULLY' AS feature_type, vg.treatment_type, ot.idval as treatment_type_name, vg.treatment_type AS old_treatment_type, ot.idval as old_treatment_type_name, ST_Transform(vg.the_geom, 4326) as the_geom
+						FROM temp_pgr_arc t  
+						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
+						JOIN om_typevalue ot ON ot.id::int4 = vg.treatment_type
+						WHERE ot.typevalue = 'treatment_type'
+					) row
+				) features
+			), '[]'::jsonb)
+		)::text;
 
 		v_result_polygon = '{}';
 
@@ -326,40 +332,66 @@ BEGIN
 
 	END IF;
 
-
-	-- Treatment type equal to zero
+		-- treatment_type equal to zero
 	v_count = 0;
-	SELECT count(DISTINCT arc_id) INTO v_count FROM v_temp_arc WHERE treatment_type = 0;
+
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_arc 
+	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
-	SELECT count(DISTINCT node_id) INTO v_count FROM v_temp_node WHERE treatment_type = 0;
+
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_node 
+	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
-	SELECT count(DISTINCT connec_id) INTO v_count FROM v_temp_connec WHERE treatment_type = 0;
+
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_arc a 
+	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
+	WHERE COALESCE (v.treatment_type, 0) = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
-	SELECT count(DISTINCT gully_id) INTO v_count FROM v_temp_gully WHERE treatment_type = 0;
+
+	SELECT count(DISTINCT gully_id) INTO v_count 
+	FROM temp_pgr_arc a 
+	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
+	WHERE COALESCE (v.treatment_type, 0) = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	-- Treatment type different to zero
-	SELECT count(DISTINCT arc_id) INTO v_count FROM v_temp_arc WHERE treatment_type > 0;
+	-- treatment_type different to zero
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_arc 
+	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
-	SELECT count(DISTINCT node_id) INTO v_count FROM v_temp_node WHERE treatment_type > 0;
+
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_node 
+	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
-	SELECT count(DISTINCT connec_id) INTO v_count FROM v_temp_connec WHERE treatment_type > 0;
+
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_arc a 
+	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
+	WHERE v.treatment_type > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
-	SELECT count(DISTINCT gully_id) INTO v_count FROM v_temp_gully WHERE treatment_type > 0;
+
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_arc a 
+	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
+	WHERE v.treatment_type > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
@@ -369,8 +401,6 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  0, '');
-
-
 
 	-- Get Info for the audit
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
@@ -405,7 +435,7 @@ BEGIN
 				"polygon":'||v_result_polygon||'
 			}
 		}
-	}')::json, 3520, null, null, null)::json;
+	}')::json, 2710, null, null, null)::json;
 
 END;
 $BODY$
