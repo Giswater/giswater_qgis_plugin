@@ -72,7 +72,7 @@ SELECT gw_fct_graphanalytics_fluid_type($${
 SELECT gw_fct_graphanalytics_fluid_type($${"client":{"device":4, "lang":"es_ES", "version":"4.7.0",
 "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
 "parameters":{"processName":"FLUID_TYPE", "exploitation":"-902", "usePlanPsector":"false",
-"commitChanges":"false", "updateMapZone":"2", "geomParamUpdate":"5"}, "aux_params":null}}$$);
+"commitChanges":"false"}, "aux_params":null}}$$);
 
 */
 
@@ -135,7 +135,6 @@ BEGIN
  	IF v_usepsector THEN
 		v_commitchanges := FALSE;
 	END IF;
-
 
     -- Get exploitation ID array
 	v_expl_id_array := string_to_array(gw_fct_get_expl_id_array(v_expl_id), ',')::integer[];
@@ -301,10 +300,10 @@ BEGIN
 
 		GET DIAGNOSTICS v_count = ROW_COUNT;
 
-  END LOOP;
+  	END LOOP;
 
 	IF v_commitchanges IS TRUE THEN
-		RAISE NOTICE 'Updating fluid type on real tables';
+		RAISE NOTICE 'Updating fluid_type on real tables';
 
 		UPDATE node n
 		SET fluid_type = t.mapzone_id 
@@ -329,7 +328,7 @@ BEGIN
 		WHERE l.feature_id = t.gully_id;
 
 	ELSE
-		RAISE NOTICE 'Showing temporal layers with fluid type and geometry';
+		RAISE NOTICE 'Showing temporal layers with fluid_type and geometry';
 
 		v_result_line := jsonb_build_object(
 			'type', 'FeatureCollection',
@@ -417,7 +416,7 @@ BEGIN
 
 	END IF;
 
-	-- Fluid type equal to zero
+	-- Fluid_type equal to zero
 	v_count = 0;
 
 	SELECT count(*) INTO v_count 
@@ -450,7 +449,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	-- Fluid type different to zero
+	-- Fluid_type different to zero
 	SELECT count(*) INTO v_count 
 	FROM temp_pgr_arc 
 	WHERE mapzone_id > 0;
@@ -486,8 +485,6 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  0, '');
-
-
 
 	-- Get Info for the audit
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
