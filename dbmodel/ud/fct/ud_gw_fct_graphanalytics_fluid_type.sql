@@ -176,6 +176,7 @@ BEGIN
         FROM v_temp_arc
     $q$;
 
+	-- INSERT
 	EXECUTE format($sql$
         WITH connectedcomponents AS (
             SELECT *
@@ -204,22 +205,79 @@ BEGIN
     $sql$, v_query_text)
     USING v_expl_id_array;
 
-	UPDATE temp_pgr_node n
-	SET  mapzone_id = t.fluid_type, old_mapzone_id = t.fluid_type 
-	FROM v_temp_node t
-	WHERE n.pgr_node_id = t.node_id;
-
-	INSERT INTO temp_pgr_arc (pgr_arc_id,pgr_node_1, pgr_node_2, mapzone_id, old_mapzone_id)
-	SELECT a.arc_id, a.node_1, a.node_2,  a.fluid_type, a.fluid_type
+	INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
+	SELECT a.arc_id, a.node_1, a.node_2
 	FROM v_temp_arc a
-	WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
-    AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
+	JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.node_1
+	JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.node_2;
+
+	INSERT INTO temp_pgr_connec (pgr_connec_id, pgr_arc_id)
+	SELECT c.connec_id, c.arc_id
+	FROM v_temp_connec c
+	JOIN temp_pgr_arc a ON a.pgr_arc_id = c.arc_id;
+
+	INSERT INTO temp_pgr_gully (pgr_gully_id, pgr_arc_id)
+	SELECT g.gully_id, g.arc_id
+	FROM v_temp_gully g
+	JOIN temp_pgr_arc a ON a.pgr_arc_id = g.arc_id;
+
+	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
+	SELECT link_id, feature_id, feature_type
+	FROM v_temp_link_connec l
+	JOIN temp_pgr_connec c ON c.pgr_connec_id = l.feature_id;
+
+	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
+	SELECT link_id, feature_id, feature_type
+	FROM v_temp_link_gully l
+	JOIN temp_pgr_gully g ON g.pgr_gully_id = l.feature_id;
+
+	-- UPDATE fluid_type
+	UPDATE temp_pgr_node t
+	SET mapzone_id = n.fluid_type
+	FROM node n
+	WHERE t.pgr_node_id = n.node_id
+	AND n.fluid_type <> 0;
 
 	UPDATE temp_pgr_arc t
+	SET mapzone_id = a.fluid_type
+	FROM arc a
+	WHERE t.pgr_arc_id = a.arc_id
+	AND a.fluid_type <> 0;
+
+	UPDATE temp_pgr_connec t
+	SET mapzone_id = c.fluid_type
+	FROM connec c
+	WHERE t.pgr_connec_id = c.connec_id
+	AND c.fluid_type <> 0;
+
+	UPDATE temp_pgr_gully t
+	SET mapzone_id = g.fluid_type
+	FROM gully g
+	WHERE t.pgr_gully_id = g.gully_id
+	AND g.fluid_type <> 0;
+
+	-- save as mapzone_id for links the fluid_type of the connec/gully
+	UPDATE temp_pgr_link t
+	SET mapzone_id = c.mapzone_id
+	FROM temp_pgr_connec c
+	WHERE t.feature_type = 'CONNEC' AND t.pgr_feature_id = c.pgr_connec_id
+	AND c.mapzone_id <> 0;
+
+	UPDATE temp_pgr_link t
+	SET mapzone_id = g.mapzone_id
+	FROM temp_pgr_gully g
+	WHERE t.feature_type = 'GULLY'
+	AND t.pgr_feature_id = g.pgr_gully_id
+	AND g.mapzone_id <> 0;
+
+	-- UPDATE como graph_delimiter INITOVERFLOWPATH
+	UPDATE temp_pgr_arc t
 	SET graph_delimiter = 'INITOVERFLOWPATH'
-	FROM v_temp_arc v
-	WHERE v.initoverflowpath = TRUE 
-	AND t.pgr_arc_id = v.arc_id;
+	FROM arc a
+	WHERE a.initoverflowpath = TRUE 
+	AND t.pgr_arc_id = a.arc_id;
+
+	-- calculate fluid_type for nodes/arcs
 
 	v_count := 1;
 
@@ -232,29 +290,27 @@ BEGIN
 					WHEN a.graph_delimiter <> 'INITOVERFLOWPATH' THEN n.mapzone_id
 					WHEN n.mapzone_id >= 2 THEN 2
 					ELSE n.mapzone_id
-				END AS fluid_type
+				END AS mapzone_id
 			FROM temp_pgr_arc a 
 			JOIN  temp_pgr_node n ON n.pgr_node_id = a.pgr_node_1
 			UNION ALL
 			SELECT
-				a.pgr_arc_id,
-				max(c.fluid_type) AS fluid_type
-			FROM temp_pgr_arc a
-			JOIN v_temp_connec c ON c.arc_id = a.pgr_arc_id
-			GROUP BY a.pgr_arc_id
+				c.pgr_arc_id,
+				max(c.mapzone_id) AS mapzone_id
+			FROM temp_pgr_connec c
+			GROUP BY c.pgr_arc_id
 			UNION ALL
 			SELECT
-				a.pgr_arc_id,
-				max(g.fluid_type) AS fluid_type
-			FROM temp_pgr_arc a
-			JOIN v_temp_gully g ON g.arc_id = a.pgr_arc_id
-			GROUP BY a.pgr_arc_id
+				g.pgr_arc_id,
+				max(g.mapzone_id) AS mapzone_id
+			FROM temp_pgr_gully g
+			GROUP BY g.pgr_arc_id
 		),
-		arc_fluid AS (
+		arc_mapzone AS (
 			SELECT
 				pgr_arc_id,
-				max(fluid_type) AS fluid_type,
-				count(DISTINCT fluid_type) FILTER (WHERE fluid_type > 0) AS nr
+				max(mapzone_id) AS mapzone_id,
+				count(DISTINCT mapzone_id) FILTER (WHERE mapzone_id > 0) AS nr
 			FROM feature
 			GROUP BY pgr_arc_id
 		),
@@ -262,22 +318,22 @@ BEGIN
 			SELECT
 				pgr_arc_id,
 				CASE
-					WHEN nr <= 1 THEN fluid_type
-					WHEN fluid_type IN (3, 4) THEN 4
-					ELSE fluid_type
-				END AS fluid_type
-			FROM arc_fluid
+					WHEN nr <= 1 THEN mapzone_id
+					WHEN mapzone_id IN (3, 4) THEN 4
+					ELSE mapzone_id
+				END AS mapzone_id
+			FROM arc_mapzone
 		)
 		UPDATE temp_pgr_arc t
-		SET mapzone_id = a.fluid_type
+		SET mapzone_id = a.mapzone_id
 		FROM arc_modif a
 		WHERE a.pgr_arc_id = t.pgr_arc_id
-		AND a.fluid_type <> t.mapzone_id;
+		AND a.mapzone_id <> t.mapzone_id;
 
-		WITH node_fluid AS (
+		WITH node_mapzone AS (
 			SELECT
 				pgr_node_2 AS pgr_node_id,
-				max(mapzone_id) AS fluid_type,
+				max(mapzone_id) AS mapzone_id,
 				count(DISTINCT mapzone_id) FILTER (WHERE mapzone_id > 0) AS nr
 			FROM temp_pgr_arc
 			GROUP BY pgr_node_2
@@ -286,17 +342,17 @@ BEGIN
 			SELECT
 				pgr_node_id,
 				CASE
-					WHEN nr <= 1 THEN fluid_type
-					WHEN fluid_type IN (3, 4) THEN 4
-					ELSE fluid_type
-				END AS fluid_type
-			FROM node_fluid
+					WHEN nr <= 1 THEN mapzone_id
+					WHEN mapzone_id IN (3, 4) THEN 4
+					ELSE mapzone_id
+				END AS mapzone_id
+			FROM node_mapzone
 		)
 		UPDATE temp_pgr_node t
-		SET mapzone_id = n.fluid_type
+		SET mapzone_id = n.mapzone_id
 		FROM node_modif n
 		WHERE n.pgr_node_id = t.pgr_node_id
-		AND n.fluid_type <> t.mapzone_id;
+		AND n.mapzone_id <> t.mapzone_id;
 
 		GET DIAGNOSTICS v_count = ROW_COUNT;
 
@@ -306,30 +362,22 @@ BEGIN
 		RAISE NOTICE 'Updating fluid_type on real tables';
 
 		UPDATE node n
-		SET fluid_type = t.mapzone_id 
-		FROM temp_pgr_node t 
-		WHERE t.pgr_node_id = n.node_id 
+		SET fluid_type = t.mapzone_id
+		FROM temp_pgr_node t
+		WHERE t.pgr_node_id = n.node_id
 		AND t.mapzone_id IS DISTINCT FROM n.fluid_type;
 
 		UPDATE arc a
-		SET fluid_type = t.mapzone_id 
-		FROM temp_pgr_arc t 
-		WHERE t.pgr_arc_id = a.arc_id 
+		SET fluid_type = t.mapzone_id
+		FROM temp_pgr_arc t
+		WHERE t.pgr_arc_id = a.arc_id
 		AND t.mapzone_id IS DISTINCT FROM a.fluid_type;
 
 		UPDATE link l
-		SET fluid_type = t.fluid_type
-		FROM  temp_pgr_arc a 
-		JOIN v_temp_connec t ON a.pgr_arc_id = t.arc_id
-		WHERE l.feature_id = t.connec_id
-		AND t.fluid_type IS DISTINCT FROM l.fluid_type;
-
-		UPDATE link l
-		SET fluid_type = t.fluid_type
-		FROM  temp_pgr_arc a 
-		JOIN v_temp_gully t ON a.pgr_arc_id = t.arc_id
-		WHERE l.feature_id = t.gully_id
-		AND t.fluid_type IS DISTINCT FROM l.fluid_type;
+		SET fluid_type = t.mapzone_id
+		FROM temp_pgr_link t
+		WHERE t.pgr_link_id = l.link_id
+		AND t.mapzone_id IS DISTINCT FROM l.fluid_type;
 
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with fluid_type and geometry';
@@ -346,29 +394,19 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id as fluid_type, ot.idval as fluid_type_name, t.old_mapzone_id as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN arc v ON  v.arc_id = t.pgr_arc_id
+						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, a.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(a.the_geom, 4326) AS the_geom
+						FROM temp_pgr_arc t
+						JOIN arc a ON a.arc_id = t.pgr_arc_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
-						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
-						WHERE ot.typevalue = 'fluid_type' 
-						AND oto.typevalue = 'fluid_type'
-						UNION
-						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vc.fluid_type as fluid_type, ot.idval as fluid_type_name, vl.fluid_type as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id
-						JOIN link vl ON vl.feature_id = vc.connec_id
-						JOIN om_typevalue ot ON ot.id::int4 = vc.fluid_type
-						JOIN om_typevalue oto ON oto.id::int4 = vl.fluid_type
+						JOIN om_typevalue oto ON oto.id::int4 = a.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
 						AND oto.typevalue = 'fluid_type'
 						UNION
-						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vg.fluid_type as fluid_type, ot.idval as fluid_type_name, vl.fluid_type as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
-						JOIN link vl ON vl.feature_id = vg.gully_id
-						JOIN om_typevalue ot ON ot.id::int4 = vg.fluid_type
-						JOIN om_typevalue oto ON oto.id::int4 = vl.fluid_type
+						SELECT t.pgr_link_id AS feature_id, 'LINK-' || t.feature_type AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, l.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(l.the_geom, 4326) AS the_geom
+						FROM temp_pgr_link t
+						JOIN link l ON l.link_id = t.pgr_link_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = l.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
 						AND oto.typevalue = 'fluid_type'
 					) row
@@ -388,25 +426,29 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, t.mapzone_id as fluid_type, ot.idval as fluid_type_name, t.old_mapzone_id as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
-						FROM temp_pgr_node t 
-						JOIN node v ON v.node_id = t.pgr_node_id
+						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, n.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(n.the_geom, 4326) AS the_geom
+						FROM temp_pgr_node t
+						JOIN node n ON n.node_id = t.pgr_node_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
-						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
-						WHERE ot.typevalue = 'fluid_type' 
+						JOIN om_typevalue oto ON oto.id::int4 = n.fluid_type
+						WHERE ot.typevalue = 'fluid_type'
 						AND oto.typevalue = 'fluid_type'
 						UNION
-						SELECT vc.connec_id AS feature_id, 'CONNECT' AS feature_type, vc.fluid_type, ot.idval as fluid_type_name, vc.fluid_type AS old_fluid_type, ot.idval as old_fluid_type_name, ST_Transform(vc.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id 
-						JOIN om_typevalue ot ON ot.id::int4 = vc.fluid_type
+						SELECT t.pgr_connec_id AS feature_id, 'CONNEC' AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, c.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(c.the_geom, 4326) AS the_geom
+						FROM temp_pgr_connec t
+						JOIN connec c ON c.connec_id = t.pgr_connec_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = c.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
+						AND oto.typevalue = 'fluid_type'
 						UNION
-						SELECT vg.gully_id AS feature_id, 'GULLY' AS feature_type, vg.fluid_type, ot.idval as fluid_type_name, vg.fluid_type AS old_fluid_type, ot.idval as old_fluid_type_name, ST_Transform(vg.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t  
-						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
-						JOIN om_typevalue ot ON ot.id::int4 = vg.fluid_type
+						SELECT t.pgr_gully_id AS feature_id, 'GULLY' AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, g.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(g.the_geom, 4326) AS the_geom
+						FROM temp_pgr_gully t
+						JOIN gully g ON g.gully_id = t.pgr_gully_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = g.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
+						AND oto.typevalue = 'fluid_type'
 					) row
 				) features
 			), '[]'::jsonb)
@@ -437,18 +479,16 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	SELECT count(*) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
-	WHERE COALESCE (v.fluid_type, 0) = 0;
+	SELECT count(*) INTO v_count
+	FROM temp_pgr_connec
+	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	SELECT count(DISTINCT gully_id) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
-	WHERE COALESCE (v.fluid_type, 0) = 0;
+	SELECT count(*) INTO v_count
+	FROM temp_pgr_gully
+	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
@@ -468,18 +508,16 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	SELECT count(*) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
-	WHERE v.fluid_type > 0;
+	SELECT count(*) INTO v_count
+	FROM temp_pgr_connec
+	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	SELECT count(*) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
-	WHERE v.fluid_type > 0;
+	SELECT count(*) INTO v_count
+	FROM temp_pgr_gully
+	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;

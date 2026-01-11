@@ -199,22 +199,91 @@ BEGIN
     $sql$, v_query_text)
     USING v_expl_id_array;
 
-	UPDATE temp_pgr_node n
-	SET  mapzone_id = t.treatment_type, old_mapzone_id = t.treatment_type 
-	FROM v_temp_node t
-	WHERE n.pgr_node_id = t.node_id;
+	INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
+	SELECT a.arc_id, a.node_1, a.node_2
+	FROM v_temp_arc a
+	JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.node_1
+	JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.node_2;
 
+	INSERT INTO temp_pgr_connec (pgr_connec_id, pgr_arc_id)
+	SELECT c.connec_id, c.arc_id
+	FROM v_temp_connec c
+	JOIN temp_pgr_arc a ON a.pgr_arc_id = c.arc_id;
+
+	INSERT INTO temp_pgr_gully (pgr_gully_id, pgr_arc_id)
+	SELECT g.gully_id, g.arc_id
+	FROM v_temp_gully g
+	JOIN temp_pgr_arc a ON a.pgr_arc_id = g.arc_id;
+
+	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
+	SELECT link_id, feature_id, feature_type
+	FROM v_temp_link_connec l
+	JOIN temp_pgr_connec c ON c.pgr_connec_id = l.feature_id;
+
+	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
+	SELECT link_id, feature_id, feature_type
+	FROM v_temp_link_gully l
+	JOIN temp_pgr_gully g ON g.pgr_gully_id = l.feature_id;
+
+	-- UPDATE treatment_type
+	UPDATE temp_pgr_node t
+	SET mapzone_id = n.treatment_type
+	FROM node n
+	WHERE t.pgr_node_id = n.node_id
+	AND n.treatment_type <> 0;
+
+	UPDATE temp_pgr_arc t
+	SET mapzone_id = a.treatment_type
+	FROM arc a
+	WHERE t.pgr_arc_id = a.arc_id
+	AND a.treatment_type <> 0;
+
+	UPDATE temp_pgr_connec t
+	SET mapzone_id = c.treatment_type
+	FROM connec c
+	WHERE t.pgr_connec_id = c.connec_id
+	AND c.treatment_type <> 0;
+
+	UPDATE temp_pgr_gully t
+	SET mapzone_id = g.treatment_type
+	FROM gully g
+	WHERE t.pgr_gully_id = g.gully_id
+	AND g.treatment_type <> 0;
+
+	-- save as mapzone_id for links the treatment_type of the connec/gully
+	UPDATE temp_pgr_link t
+	SET mapzone_id = c.mapzone_id
+	FROM temp_pgr_connec c
+	WHERE t.feature_type = 'CONNEC' AND t.pgr_feature_id = c.pgr_connec_id
+	AND c.mapzone_id <> 0;
+
+	UPDATE temp_pgr_link t
+	SET mapzone_id = g.mapzone_id
+	FROM temp_pgr_gully g
+	WHERE t.feature_type = 'GULLY'
+	AND t.pgr_feature_id = g.pgr_gully_id
+	AND g.mapzone_id <> 0;
+
+	-- UPDATE como graph_delimiter HAS_TREATMENT
 	UPDATE temp_pgr_node n
 	SET  graph_delimiter = 'HAS_TREATMENT'
 	FROM v_temp_node t
 	WHERE n.pgr_node_id = t.node_id
 	AND t.has_treatment = TRUE;
 
-	INSERT INTO temp_pgr_arc (pgr_arc_id,pgr_node_1, pgr_node_2, mapzone_id, old_mapzone_id)
-	SELECT a.arc_id, a.node_1, a.node_2,  a.treatment_type, a.treatment_type
-	FROM v_temp_arc a
-	WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
-    AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
+	-- UPDATE mapzone_id = 3 (NOT TREATED) if treatment_type is not informed 
+	-- nodes 
+	UPDATE temp_pgr_node
+	SET mapzone_id = 3
+	WHERE mapzone_id = 0
+	AND graph_delimiter <> 'HAS_TREATMENT';
+  
+	-- arcs
+	UPDATE temp_pgr_arc a
+	SET mapzone_id = n.mapzone_id
+	FROM temp_pgr_node n
+	WHERE n.pgr_node_id = a.pgr_node_1
+	AND a.mapzone_id = 0;
 
 	v_count := 1;
 
@@ -223,50 +292,48 @@ BEGIN
 		WITH feature AS (
 			SELECT
 				a.pgr_arc_id,
-				n.mapzone_id AS treatment_type
+				n.mapzone_id AS mapzone_id
 			FROM temp_pgr_arc a 
 			JOIN  temp_pgr_node n ON n.pgr_node_id = a.pgr_node_1
 			UNION ALL
 			SELECT
-				a.pgr_arc_id,
-				max(c.treatment_type) AS treatment_type
-			FROM temp_pgr_arc a
-			JOIN v_temp_connec c ON c.arc_id = a.pgr_arc_id
-			GROUP BY a.pgr_arc_id
+				c.pgr_arc_id,
+				max(c.mapzone_id) AS mapzone_id
+			FROM temp_pgr_connec c
+			GROUP BY c.pgr_arc_id
 			UNION ALL
 			SELECT
-				a.pgr_arc_id,
-				max(g.treatment_type) AS treatment_type
-			FROM temp_pgr_arc a
-			JOIN v_temp_gully g ON g.arc_id = a.pgr_arc_id
-			GROUP BY a.pgr_arc_id
+				g.pgr_arc_id,
+				max(g.mapzone_id) AS mapzone_id
+			FROM temp_pgr_gully g
+			GROUP BY g.pgr_arc_id
 		),
-		arc_treatment AS (
+		arc_mapzone AS (
 			SELECT
 				pgr_arc_id,
-				max(treatment_type) AS treatment_type
+				max(mapzone_id) AS mapzone_id
 			FROM feature
 			GROUP BY pgr_arc_id
 		)
 		UPDATE temp_pgr_arc t
-		SET mapzone_id = a.treatment_type
-		FROM arc_treatment a
+		SET mapzone_id = a.mapzone_id
+		FROM arc_mapzone a
 		WHERE a.pgr_arc_id = t.pgr_arc_id
-		AND a.treatment_type <> t.mapzone_id;
+		AND a.mapzone_id <> t.mapzone_id;
 
 		-- nodes with graph_delimiter ='HAS_TREATMENT' will NOT be updated
-		WITH node_treatment AS (
+		WITH node_mapzone AS (
 			SELECT
 				pgr_node_2 AS pgr_node_id,
-				max(mapzone_id) AS treatment_type
+				max(mapzone_id) AS mapzone_id
 			FROM temp_pgr_arc
 			GROUP BY pgr_node_2
 		)
 		UPDATE temp_pgr_node t
-		SET mapzone_id = n.treatment_type
-		FROM node_treatment n
+		SET mapzone_id = n.mapzone_id
+		FROM node_mapzone n
 		WHERE n.pgr_node_id = t.pgr_node_id
-		AND n.treatment_type <> t.mapzone_id
+		AND n.mapzone_id <> t.mapzone_id
 		AND t.graph_delimiter <> 'HAS_TREATMENT';
 
 		GET DIAGNOSTICS v_count = ROW_COUNT;
@@ -289,11 +356,16 @@ BEGIN
 		AND t.mapzone_id IS DISTINCT FROM a.treatment_type;
 
 		UPDATE connec c
-		SET treatment_type = 3
-		FROM temp_pgr_arc t 
-		JOIN v_temp_connec v ON t.pgr_arc_id = v.arc_id
-		WHERE c.connec_id = v.connec_id
-		AND COALESCE(c.treatment_type, 0) = 0; 
+		SET treatment_type = t.mapzone_id
+		FROM temp_pgr_connec t
+		WHERE t.pgr_connec_id = c.connec_id
+		AND t.mapzone_id IS DISTINCT FROM c.treatment_type;
+
+		UPDATE gully g
+		SET treatment_type = t.mapzone_id
+		FROM temp_pgr_gully t
+		WHERE t.pgr_gully_id = g.gully_id
+		AND t.mapzone_id IS DISTINCT FROM g.treatment_type;
 
 		UPDATE gully g
 		SET treatment_type = 3
@@ -303,18 +375,10 @@ BEGIN
 		AND COALESCE(g.treatment_type, 0) = 0; 
 
 		UPDATE link l
-		SET treatment_type = t.treatment_type
-		FROM  temp_pgr_arc a 
-        JOIN v_temp_connec t ON a.pgr_arc_id = t.arc_id
-		WHERE l.feature_id = t.connec_id
-		AND t.treatment_type IS DISTINCT FROM l.treatment_type;
-
-		UPDATE link l
-		SET treatment_type = t.treatment_type
-		FROM  temp_pgr_arc a 
-        JOIN v_temp_gully t ON a.pgr_arc_id = t.arc_id
-		WHERE l.feature_id = t.gully_id
-		AND t.treatment_type IS DISTINCT FROM l.treatment_type;
+		SET treatment_type = t.mapzone_id
+		FROM temp_pgr_link t
+		WHERE t.pgr_link_id = l.link_id
+		AND t.mapzone_id IS DISTINCT FROM l.treatment_type;
 
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with treatment_type and geometry';
@@ -331,29 +395,19 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id as treatment_type, ot.idval as treatment_type_name, t.old_mapzone_id as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(v.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN arc v ON  v.arc_id = t.pgr_arc_id
+						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, a.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(a.the_geom, 4326) AS the_geom
+						FROM temp_pgr_arc t
+						JOIN arc a ON a.arc_id = t.pgr_arc_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
-						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
-						WHERE ot.typevalue = 'treatment_type' 
-						AND oto.typevalue = 'treatment_type'
-						UNION
-						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vc.treatment_type as treatment_type, ot.idval as treatment_type_name, vl.treatment_type as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id
-						JOIN link vl ON vl.feature_id = vc.connec_id
-						JOIN om_typevalue ot ON ot.id::int4 = vc.treatment_type
-						JOIN om_typevalue oto ON oto.id::int4 = vl.treatment_type
+						JOIN om_typevalue oto ON oto.id::int4 = a.treatment_type
 						WHERE ot.typevalue = 'treatment_type'
 						AND oto.typevalue = 'treatment_type'
 						UNION
-						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vg.treatment_type as treatment_type, ot.idval as treatment_type_name, vl.treatment_type as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
-						JOIN link vl ON vl.feature_id = vg.gully_id
-						JOIN om_typevalue ot ON ot.id::int4 = vg.treatment_type
-						JOIN om_typevalue oto ON oto.id::int4 = vl.treatment_type
+						SELECT t.pgr_link_id AS feature_id, 'LINK-' || t.feature_type AS feature_type, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, l.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(l.the_geom, 4326) AS the_geom
+						FROM temp_pgr_link t
+						JOIN link l ON l.link_id = t.pgr_link_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = l.treatment_type
 						WHERE ot.typevalue = 'treatment_type'
 						AND oto.typevalue = 'treatment_type'
 					) row
@@ -373,25 +427,29 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, t.mapzone_id as treatment_type, ot.idval as treatment_type_name, t.old_mapzone_id as old_treatment_type, oto.idval as old_treatment_type_name, ST_Transform(v.the_geom, 4326) as the_geom
-						FROM temp_pgr_node t 
-						JOIN node v ON v.node_id = t.pgr_node_id
+						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, n.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(n.the_geom, 4326) AS the_geom
+						FROM temp_pgr_node t
+						JOIN node n ON n.node_id = t.pgr_node_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
-						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
-						WHERE ot.typevalue = 'treatment_type' 
+						JOIN om_typevalue oto ON oto.id::int4 = n.treatment_type
+						WHERE ot.typevalue = 'treatment_type'
 						AND oto.typevalue = 'treatment_type'
 						UNION
-						SELECT vc.connec_id AS feature_id, 'CONNECT' AS feature_type, vc.treatment_type, ot.idval as treatment_type_name, vc.treatment_type AS old_treatment_type, ot.idval as old_treatment_type_name, ST_Transform(vc.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t 
-						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id 
-						JOIN om_typevalue ot ON ot.id::int4 = vc.treatment_type
+						SELECT t.pgr_connec_id AS feature_id, 'CONNEC' AS feature_type, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, c.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(c.the_geom, 4326) AS the_geom
+						FROM temp_pgr_connec t
+						JOIN connec c ON c.connec_id = t.pgr_connec_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = c.treatment_type
 						WHERE ot.typevalue = 'treatment_type'
+						AND oto.typevalue = 'treatment_type'
 						UNION
-						SELECT vg.gully_id AS feature_id, 'GULLY' AS feature_type, vg.treatment_type, ot.idval as treatment_type_name, vg.treatment_type AS old_treatment_type, ot.idval as old_treatment_type_name, ST_Transform(vg.the_geom, 4326) as the_geom
-						FROM temp_pgr_arc t  
-						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
-						JOIN om_typevalue ot ON ot.id::int4 = vg.treatment_type
+						SELECT t.pgr_gully_id AS feature_id, 'GULLY' AS feature_type, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, g.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(g.the_geom, 4326) AS the_geom
+						FROM temp_pgr_gully t
+						JOIN gully g ON g.gully_id = t.pgr_gully_id
+						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
+						JOIN om_typevalue oto ON oto.id::int4 = g.treatment_type
 						WHERE ot.typevalue = 'treatment_type'
+						AND oto.typevalue = 'treatment_type'
 					) row
 				) features
 			), '[]'::jsonb)
