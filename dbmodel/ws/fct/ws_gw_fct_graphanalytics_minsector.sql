@@ -19,6 +19,12 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"comm
 
 --fid: 125,134
 
+- temp_pgr_node and pgr_temp_arc - temporary table
+- v_temp_arc, v_temp_node, v_temp_connec, v_temp_gully, v_temp_link_connec, v_temp_link_gully 
+are temporary views for active explotation and for is_operatiu = TRUE, with psectors or not, depending of usePlanPsector
+- Use the views for building temporary table;
+- Use the tables node, arc, connec, gully or link to get the_geom, are faster then the views
+
 
 */
 
@@ -393,7 +399,7 @@ BEGIN
                     WITH polygon AS (
                         SELECT ST_Collect(v.the_geom) AS g, t.mapzone_id AS minsector_id
                         FROM temp_pgr_arc t
-                        JOIN v_temp_arc v ON v.arc_id = t.pgr_arc_id
+                        JOIN arc v ON v.arc_id = t.pgr_arc_id
                         GROUP BY t.mapzone_id
                     )
                     SELECT 
@@ -415,7 +421,7 @@ BEGIN
             FROM (
                 SELECT t.mapzone_id AS minsector_id, (ST_Buffer(ST_Collect(v.the_geom),'||v_geomparamupdate||')) AS geom 
                 FROM temp_pgr_arc t
-                JOIN v_temp_arc v ON v.arc_id = t.pgr_arc_id
+                JOIN arc v ON v.arc_id = t.pgr_arc_id
                 WHERE mapzone_id > 0 
                 GROUP BY t.mapzone_id
             ) b 
@@ -433,7 +439,7 @@ BEGIN
                 FROM (
                     SELECT t.mapzone_id AS minsector_id, ST_Buffer(ST_Collect(v.the_geom), '||v_geomparamupdate||') AS geom 
                     FROM temp_pgr_arc t
-                    JOIN v_temp_arc v ON v.arc_id = t.pgr_arc_id
+                    JOIN arc v ON v.arc_id = t.pgr_arc_id
                     WHERE mapzone_id::integer > 0
                     GROUP BY t.mapzone_id 
                     UNION
@@ -491,18 +497,6 @@ BEGIN
                     minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
                     num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector'' AS layer 
                 FROM temp_pgr_minsector
-            ) row
-            UNION
-            SELECT jsonb_build_object(
-                ''type'',       ''Feature'',
-                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-                ''properties'', to_jsonb(row) - ''the_geom''
-            ) AS feature
-            FROM (
-                SELECT 
-                    minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
-                    num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector_mincut'' AS layer 
-                FROM v_temp_minsector_mincut
             ) row
         ) features' INTO v_result;
 
