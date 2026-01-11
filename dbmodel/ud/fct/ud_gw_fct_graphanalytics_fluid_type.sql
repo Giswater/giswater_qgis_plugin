@@ -209,8 +209,8 @@ BEGIN
 	FROM v_temp_node t
 	WHERE n.pgr_node_id = t.node_id;
 
-	INSERT INTO temp_pgr_arc (pgr_arc_id,pgr_node_1, pgr_node_2, mapzone_id, old_mapzone_id, cost, reverse_cost)
-	SELECT a.arc_id, a.node_1, a.node_2,  a.fluid_type, a.fluid_type, 1, -1
+	INSERT INTO temp_pgr_arc (pgr_arc_id,pgr_node_1, pgr_node_2, mapzone_id, old_mapzone_id)
+	SELECT a.arc_id, a.node_1, a.node_2,  a.fluid_type, a.fluid_type
 	FROM v_temp_arc a
 	WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
     AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
@@ -250,7 +250,7 @@ BEGIN
 			JOIN v_temp_gully g ON g.arc_id = a.pgr_arc_id
 			GROUP BY a.pgr_arc_id
 		),
-		arc AS (
+		arc_fluid AS (
 			SELECT
 				pgr_arc_id,
 				max(fluid_type) AS fluid_type,
@@ -266,7 +266,7 @@ BEGIN
 					WHEN fluid_type IN (3, 4) THEN 4
 					ELSE fluid_type
 				END AS fluid_type
-			FROM arc
+			FROM arc_fluid
 		)
 		UPDATE temp_pgr_arc t
 		SET mapzone_id = a.fluid_type
@@ -274,7 +274,7 @@ BEGIN
 		WHERE a.pgr_arc_id = t.pgr_arc_id
 		AND a.fluid_type <> t.mapzone_id;
 
-		WITH node AS (
+		WITH node_fluid AS (
 			SELECT
 				pgr_node_2 AS pgr_node_id,
 				max(mapzone_id) AS fluid_type,
@@ -290,7 +290,7 @@ BEGIN
 					WHEN fluid_type IN (3, 4) THEN 4
 					ELSE fluid_type
 				END AS fluid_type
-			FROM node
+			FROM node_fluid
 		)
 		UPDATE temp_pgr_node t
 		SET mapzone_id = n.fluid_type
@@ -315,17 +315,21 @@ BEGIN
 		SET fluid_type = t.mapzone_id 
 		FROM temp_pgr_arc t 
 		WHERE t.pgr_arc_id = a.arc_id 
-		AND t.mapzone_id IS DISTINCT FROM arc.fluid_type;
+		AND t.mapzone_id IS DISTINCT FROM a.fluid_type;
 
 		UPDATE link l
 		SET fluid_type = t.fluid_type
-		FROM v_temp_connec t
-		WHERE l.feature_id = t.connec_id;
+		FROM  temp_pgr_arc a 
+		JOIN v_temp_connec t ON a.pgr_arc_id = t.arc_id
+		WHERE l.feature_id = t.connec_id
+		AND t.fluid_type IS DISTINCT FROM l.fluid_type;
 
 		UPDATE link l
 		SET fluid_type = t.fluid_type
-		FROM v_temp_gully t
-		WHERE l.feature_id = t.gully_id;
+		FROM  temp_pgr_arc a 
+		JOIN v_temp_gully t ON a.pgr_arc_id = t.arc_id
+		WHERE l.feature_id = t.gully_id
+		AND t.fluid_type IS DISTINCT FROM l.fluid_type;
 
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with fluid_type and geometry';
@@ -344,7 +348,7 @@ BEGIN
 					FROM (
 						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id as fluid_type, ot.idval as fluid_type_name, t.old_mapzone_id as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
 						FROM temp_pgr_arc t 
-						JOIN v_temp_arc v ON  v.arc_id = t.pgr_arc_id
+						JOIN arc v ON  v.arc_id = t.pgr_arc_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
 						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
 						WHERE ot.typevalue = 'fluid_type' 
@@ -353,7 +357,7 @@ BEGIN
 						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vc.fluid_type as fluid_type, ot.idval as fluid_type_name, vl.fluid_type as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
 						FROM temp_pgr_arc t 
 						JOIN v_temp_connec vc ON vc.arc_id = t.pgr_arc_id
-						JOIN v_temp_link_connec vl ON vl.feature_id = vc.connec_id
+						JOIN link vl ON vl.feature_id = vc.connec_id
 						JOIN om_typevalue ot ON ot.id::int4 = vc.fluid_type
 						JOIN om_typevalue oto ON oto.id::int4 = vl.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
@@ -362,7 +366,7 @@ BEGIN
 						SELECT vl.link_id AS feature_id, 'LINK' AS feature_type, vg.fluid_type as fluid_type, ot.idval as fluid_type_name, vl.fluid_type as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(vl.the_geom, 4326) as the_geom
 						FROM temp_pgr_arc t 
 						JOIN v_temp_gully vg ON vg.arc_id = t.pgr_arc_id
-						JOIN v_temp_link_gully vl ON vl.feature_id = vg.gully_id
+						JOIN link vl ON vl.feature_id = vg.gully_id
 						JOIN om_typevalue ot ON ot.id::int4 = vg.fluid_type
 						JOIN om_typevalue oto ON oto.id::int4 = vl.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
@@ -386,7 +390,7 @@ BEGIN
 					FROM (
 						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, t.mapzone_id as fluid_type, ot.idval as fluid_type_name, t.old_mapzone_id as old_fluid_type, oto.idval as old_fluid_type_name, ST_Transform(v.the_geom, 4326) as the_geom
 						FROM temp_pgr_node t 
-						JOIN v_temp_node v ON v.node_id = t.pgr_node_id
+						JOIN node v ON v.node_id = t.pgr_node_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
 						JOIN om_typevalue oto ON oto.id::int4 = t.old_mapzone_id
 						WHERE ot.typevalue = 'fluid_type' 
