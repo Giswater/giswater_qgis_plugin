@@ -182,8 +182,8 @@ update plan_psector set active=true;
 ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 
 -- update is_last
-UPDATE om_visit_x_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
-UPDATE om_visit_x_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
 
 UPDATE om_visit_x_arc SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
 UPDATE om_visit_x_node SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
