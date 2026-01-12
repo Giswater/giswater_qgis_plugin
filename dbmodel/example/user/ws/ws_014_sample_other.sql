@@ -41,8 +41,14 @@ INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp
 INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom) VALUES('Demo document 3', 'Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762', current_user, '2018-03-14 17:09:59.762', NULL);
 INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom) VALUES('Demo document 2', 'Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Readme.txt', NULL, '2018-03-14 17:09:19.852', current_user, '2018-03-14 17:09:19.852', NULL);
 
+ALTER TABLE om_visit DISABLE TRIGGER gw_trg_om_visit;
+
 SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();
+
+ALTER TABLE om_visit ENABLE TRIGGER gw_trg_om_visit;
+
+UPDATE om_visit set "status"="status";
 
 INSERT INTO doc_x_visit (doc_id, visit_id)
 SELECT
