@@ -170,29 +170,16 @@ DELETE FROM plan_psector_x_connec WHERE connec_id IN (3105);
 UPDATE om_visit_x_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
 UPDATE om_visit_x_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
 
-DO $$
+-- update is_last
+UPDATE om_visit_x_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_x_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
 
-	DECLARE
-	rec record
+UPDATE om_visit_x_arc SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
+UPDATE om_visit_x_node SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
+UPDATE om_visit_x_connec SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
+UPDATE om_visit_x_link SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
 
-	BEGIN
-		FOR rec IN SELECT lower(id) AS feature_type FROM sys_feature_type WHERE id <> 'ELEMENT'
-		LOOP 
-			
-			EXECUTE format(
-				'UPDATE %I SET is_last = TRUE WHERE id IN (SELECT max(id) FROM %I GROUP BY %I)',
-				'om_visit_x_' || rec.feature_type,
-				'om_visit_x_' || rec.feature_type,
-				rec.feature || '_id'
-			);
-		
-			EXECUTE format(
-				'UPDATE %I SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM %I GROUP BY %I)',
-				'om_visit_x_' || rec.feature_type,
-				'om_visit_x_' || rec.feature_type,
-				rec.feature || '_id'
-			);
-		
-		END LOOP
-
-END $$;
+UPDATE om_visit_x_arc SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
+UPDATE om_visit_x_node SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
+UPDATE om_visit_x_connec SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
+UPDATE om_visit_x_link SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
