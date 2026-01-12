@@ -393,19 +393,11 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, a.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(a.the_geom, 4326) AS the_geom
+						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, a.initoverflowpath, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, a.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(a.the_geom, 4326) AS the_geom
 						FROM temp_pgr_arc t
 						JOIN arc a ON a.arc_id = t.pgr_arc_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
 						JOIN om_typevalue oto ON oto.id::int4 = a.fluid_type
-						WHERE ot.typevalue = 'fluid_type'
-						AND oto.typevalue = 'fluid_type'
-						UNION
-						SELECT t.pgr_link_id AS feature_id, 'LINK-' || t.feature_type AS feature_type, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, l.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(l.the_geom, 4326) AS the_geom
-						FROM temp_pgr_link t
-						JOIN link l ON l.link_id = t.pgr_link_id
-						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
-						JOIN om_typevalue oto ON oto.id::int4 = l.fluid_type
 						WHERE ot.typevalue = 'fluid_type'
 						AND oto.typevalue = 'fluid_type'
 					) row
