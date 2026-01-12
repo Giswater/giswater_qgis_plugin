@@ -7,10 +7,6 @@ on:
   release:
     types:
       - created
-  # Trigger on push to master branch
-  push:
-    branches:
-      - master
 
 jobs:
   build:
