@@ -68,7 +68,6 @@ BEGIN
             old_node_id INTEGER,
             mapzone_id INTEGER DEFAULT 0,
             old_mapzone_id INTEGER DEFAULT 0,
-            node_type VARCHAR(30),
             modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             to_arc INTEGER[],
@@ -134,7 +133,7 @@ BEGIN
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
             CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (pgr_link_id)
         );
-        CREATE INDEX IF NOT EXISTS temp_pgr_link_feature_idx ON temp_pgr_link USING btree (feature_type, pgr_feature_id);
+        CREATE INDEX IF NOT EXISTS temp_pgr_link_pgr_feature_id_idx ON temp_pgr_link USING btree (pgr_feature_id);
         CREATE INDEX IF NOT EXISTS temp_pgr_link_mapzone_id_idx ON temp_pgr_link USING btree (mapzone_id);
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_arc_linegraph (
@@ -197,7 +196,7 @@ BEGIN
             IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN  
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
 
-                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS conflict_mincut_id INTEGER;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS adjacent_mincut_id INTEGER;
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
