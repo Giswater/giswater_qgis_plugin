@@ -202,16 +202,9 @@ BEGIN
 	JOIN temp_pgr_arc a ON a.pgr_arc_id = c.arc_id;
 
 	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
-	SELECT link_id, feature_id, feature_type
+	SELECT link_id, feature_id, 'CONNEC'
 	FROM v_temp_link_connec l
 	JOIN temp_pgr_connec c ON c.pgr_connec_id = l.feature_id;
-
-    -- UPDATE node_type
-    UPDATE temp_pgr_node t
-    SET node_type = cn.node_type
-    FROM node n
-    JOIN cat_node cn ON n.nodecat_id = cn.id
-    WHERE t.pgr_node_id = n.node_id;
 
     -- Preparing minsectors
     -- =======================
@@ -219,8 +212,7 @@ BEGIN
     -- tank, source, waterwell, wtp
     UPDATE temp_pgr_node t
     SET graph_delimiter = 'SECTOR'
-    FROM temp_pgr_node n
-    JOIN cat_feature_node cf ON n.node_type = cf.id
+    FROM v_temp_node n
     JOIN (
         SELECT node_id FROM man_tank
         UNION ALL
@@ -229,18 +221,17 @@ BEGIN
         SELECT node_id FROM man_waterwell
         UNION ALL
         SELECT node_id FROM man_wtp
-    ) m ON m.node_id = n.pgr_node_id
-    WHERE 'SECTOR' = ANY(cf.graph_delimiter) 
-    AND t.pgr_node_id = n.pgr_node_id;
+    ) m ON m.node_id = n.node_id
+    WHERE 'SECTOR' = ANY(n.graph_delimiter) 
+    AND t.pgr_node_id = n.node_id;
 
     -- nodes valves (MINSECTOR)
     UPDATE temp_pgr_node t
     SET graph_delimiter = 'MINSECTOR'
-    FROM temp_pgr_node n
-    JOIN cat_feature_node cf ON n.node_type = cf.id
-    JOIN man_valve m ON n.pgr_node_id = m.node_id
-    WHERE 'MINSECTOR' = ANY(cf.graph_delimiter)
-    AND t.pgr_node_id = n.pgr_node_id;  
+    FROM v_temp_node n
+    JOIN man_valve m ON n.node_id = m.node_id
+    WHERE 'MINSECTOR' = ANY(n.graph_delimiter)
+    AND t.pgr_node_id = n.node_id;  
 
     -- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
     INSERT INTO temp_pgr_arc_linegraph (
