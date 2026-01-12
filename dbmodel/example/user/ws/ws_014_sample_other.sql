@@ -7,6 +7,8 @@ or (at your option) any later version.
 
 SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 
+ALTER TABLE om_visit DISABLE TRIGGER gw_trg_om_visit;
+
 UPDATE config_param_system SET VALUE = '{"SECTOR":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true, "DMA":true}' WHERE parameter = 'utils_graphanalytics_status';
 
 INSERT INTO sys_function VALUES (2888, 'gw_fct_fill_om_tables','ws','function','void','void','Create example visits (used on sample creation)','role_admin',false);
