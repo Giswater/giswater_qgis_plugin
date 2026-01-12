@@ -165,3 +165,34 @@ UPDATE plan_psector_x_node set psector_id = 1 WHERE node_id IN (10761);
 UPDATE plan_psector_x_arc set psector_id = 1 WHERE arc_id IN (20851,20861);
 UPDATE plan_psector_x_connec set psector_id = 1 WHERE connec_id IN (114462,114461);
 DELETE FROM plan_psector_x_connec WHERE connec_id IN (3105);
+
+-- update is_last
+UPDATE om_visit_x_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_x_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+
+DO $$
+
+	DECLARE
+	rec record
+
+	BEGIN
+		FOR rec IN SELECT lower(id) AS feature_type FROM sys_feature_type WHERE id <> 'ELEMENT'
+		LOOP 
+			
+			EXECUTE format(
+				'UPDATE %I SET is_last = TRUE WHERE id IN (SELECT max(id) FROM %I GROUP BY %I)',
+				'om_visit_x_' || rec.feature_type,
+				'om_visit_x_' || rec.feature_type,
+				rec.feature || '_id'
+			);
+		
+			EXECUTE format(
+				'UPDATE %I SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM %I GROUP BY %I)',
+				'om_visit_x_' || rec.feature_type,
+				'om_visit_x_' || rec.feature_type,
+				rec.feature || '_id'
+			);
+		
+		END LOOP
+
+END $$;

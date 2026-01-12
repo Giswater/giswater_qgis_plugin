@@ -180,3 +180,34 @@ INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 update plan_psector set active=true;
 
 ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
+
+-- update is_last
+UPDATE om_visit_x_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_x_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+
+DO $$
+
+	DECLARE
+	rec record
+
+	BEGIN
+		FOR rec IN SELECT lower(id) AS feature_type FROM sys_feature_type WHERE id <> 'ELEMENT'
+		LOOP 
+			
+			EXECUTE format(
+				'UPDATE %I SET is_last = TRUE WHERE id IN (SELECT max(id) FROM %I GROUP BY %I)',
+				'om_visit_x_' || rec.feature_type,
+				'om_visit_x_' || rec.feature_type,
+				rec.feature || '_id'
+			);
+		
+			EXECUTE format(
+				'UPDATE %I SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM %I GROUP BY %I)',
+				'om_visit_x_' || rec.feature_type,
+				'om_visit_x_' || rec.feature_type,
+				rec.feature || '_id'
+			);
+		
+		END LOOP
+
+END $$;
