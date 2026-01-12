@@ -196,3 +196,5 @@ UPDATE om_visit_x_node SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM 
 UPDATE om_visit_x_connec SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
 UPDATE om_visit_x_link SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
 UPDATE om_visit_x_gully SET is_last = TRUE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_gully GROUP BY gully_id);
+
+UPDATE cat_feature_node set isprofilesurface = FALSE WHERE isprofilesurface IS NULL;
