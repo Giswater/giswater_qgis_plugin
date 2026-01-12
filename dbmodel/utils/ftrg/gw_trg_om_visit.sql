@@ -83,6 +83,7 @@ BEGIN
 			UPDATE om_visit SET expl_id=v_expl_id WHERE id=NEW.visit_id AND expl_id IS NULL;
 
 			-- update is_last visit from each feature_type
+			/*
 			UPDATE om_visit_event SET is_last = TRUE WHERE id = NEW.id;
 			UPDATE om_visit_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
 		
@@ -97,7 +98,7 @@ BEGIN
 			    'om_visit_x_' || v_featuretype,
 			    v_featuretype || '_id'
 			);
-
+*/
 		END IF;
 
 		RETURN NEW;
