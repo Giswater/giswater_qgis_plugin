@@ -218,7 +218,7 @@ BEGIN
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
 		SELECT va.arc_id INTO v_arc_id 
-		FROM ve_arc va
+		FROM v_temp_arc va
 		WHERE ST_DWithin(va.the_geom, v_point,v_sensibility)
 		AND EXISTS (
 			SELECT 1 
@@ -282,6 +282,13 @@ BEGIN
 			)
 			LIMIT 1;
 		END IF;	
+	ELSE
+		-- check if arc_id from ve_arc exists in v_temp_arc
+		IF NOT EXISTS (
+			SELECT 1 FROM v_temp_arc WHERE arc_id = v_arc_id
+		) THEN
+			v_arc_id := NULL;
+		END IF;
 	END IF;
 
 	IF v_arc_id IS NULL THEN
@@ -311,7 +318,7 @@ BEGIN
 		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 
 		SELECT node_id INTO v_node
 		FROM v_temp_node n
-		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2
+		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
 		WHERE a.arc_id = v_arc_id
 		AND 'SECTOR' <> ALL(n.graph_delimiter)
 		LIMIT 1;
@@ -1057,8 +1064,7 @@ BEGIN
 			-- fill temp_pgr_node_minsector
 			INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter)
 			SELECT DISTINCT mapzone_id, 'MINSECTOR'
-			FROM temp_pgr_arc
-			WHERE mapzone_id > 0;
+			FROM temp_pgr_arc;
 
 			 -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE (graph_delimiter as 'SECTOR')
 			UPDATE temp_pgr_node_minsector t
@@ -1096,8 +1102,8 @@ BEGIN
 		IF v_mode = 'MINSECTOR' THEN
 			UPDATE temp_pgr_arc_linegraph t
 			SET 
-				cost = CASE WHEN EXISTS (SELECT 1 FROM v_temp_arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN 1 ELSE -1 END,
-				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM v_temp_arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN -1 ELSE 1 END
+				cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN -1 ELSE 1 END
 			WHERE t.closed = FALSE 
 			AND t.broken = FALSE
 			AND t.to_arc IS NOT NULL;
@@ -1145,19 +1151,19 @@ BEGIN
 		SET mapzone_id = 0 
 		WHERE mapzone_id <> 0;
 
-		-- set the default values for proposed valves for current mincut (old_mapzone_id = 0) and adjacents mincuts, if they exist (old_mapzone_id <> 0)
+		-- set the default values for proposed valves for current mincut (adjacent_mincut_id = 0) and adjacents mincuts, if they exist (adjacent_mincut_id <> 0)
 		UPDATE temp_pgr_arc_linegraph
 		SET proposed = FALSE
 		WHERE proposed = TRUE
-		AND old_mapzone_id = 0;
+		AND adjacent_mincut_id = 0;
 
 		UPDATE temp_pgr_arc_linegraph
 		SET proposed = FALSE,
 			cost = 1,
 			reverse_cost = 1,
-			old_mapzone_id = 0
+			adjacent_mincut_id = 0
 		WHERE proposed = TRUE
-		AND old_mapzone_id <> 0;
+		AND adjacent_mincut_id <> 0;
 
 		-- set the default values for unaccess valves for current mincut,
 		-- the unaccess valves of the adjacent valves are not taken into account
@@ -1168,13 +1174,13 @@ BEGIN
 		WHERE unaccess = TRUE;
 
 		-- set the default values for changestatus valves 
-		--for current mincut (old_mapzone_id = 0)
-		-- and adjacent mincuts, if they exist (old_mapzone_id <> 0)
+		--for current mincut (adjacent_mincut_id = 0)
+		-- and adjacent mincuts, if they exist (adjacent_mincut_id <> 0)
 		UPDATE temp_pgr_arc_linegraph
 		SET changestatus = FALSE,
 			cost = -1,
 			reverse_cost = -1,
-			old_mapzone_id = 0
+			adjacent_mincut_id = 0
 		WHERE changestatus = TRUE;
 
 	END IF;
@@ -1299,14 +1305,15 @@ BEGIN
 			INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
 			SELECT v_mincut_id, a.arc_id, a.the_geom
 			FROM temp_pgr_node_minsector m
-			JOIN v_temp_arc a ON a.minsector_id = m.pgr_node_id
+			JOIN arc a ON a.minsector_id = m.pgr_node_id
 			WHERE m.mapzone_id <> 0;
 
 			-- insert nodes
 			INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
-			SELECT v_mincut_id, n.node_id, n.the_geom, n.node_type
+			SELECT v_mincut_id, n.node_id, n.the_geom, cn.node_type
 			FROM temp_pgr_node_minsector m
-			JOIN v_temp_node n ON n.minsector_id = m.pgr_node_id
+			JOIN node n ON n.minsector_id = m.pgr_node_id
+			JOIN cat_node cn ON n.nodecat_id = cn.id
 			WHERE m.mapzone_id <> 0;
 
 		ELSE
@@ -1315,43 +1322,51 @@ BEGIN
 			SELECT v_mincut_id, a.arc_id, a.the_geom
 			FROM temp_pgr_node_minsector m
 			JOIN temp_pgr_arc tpa ON tpa.mapzone_id = m.pgr_node_id
-			JOIN v_temp_arc a ON a.arc_id = tpa.pgr_arc_id
+			JOIN arc a ON a.arc_id = tpa.pgr_arc_id
 			WHERE m.mapzone_id <> 0;
 
 			-- insert nodes
 			INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
-			SELECT v_mincut_id, n.node_id, n.the_geom, n.node_type
+			SELECT v_mincut_id, n.node_id, n.the_geom, cn.node_type
 			FROM temp_pgr_node_minsector m
 			JOIN temp_pgr_node tpn ON tpn.mapzone_id = m.pgr_node_id
-			JOIN v_temp_node n ON n.node_id = tpn.pgr_node_id
+			JOIN node n ON n.node_id = tpn.pgr_node_id
+			JOIN cat_node cn ON n.nodecat_id = cn.id
 			WHERE m.mapzone_id <> 0;
 
 		END IF;
 
 		-- insert valves
-			INSERT INTO om_mincut_valve (
-				result_id,
-				node_id,
-				closed,
-				broken,
-				unaccess,
-				changestatus,
-				proposed,
-				the_geom,
-				to_arc
-			)
-			SELECT v_mincut_id,
-				tpa.pgr_node_id AS node_id,
-				tpa.closed,
-				tpa.broken,
-				tpa.unaccess,
-				tpa.changestatus,
-				tpa.proposed,
-				vtn.the_geom,
-				tpa.to_arc[1]
-			FROM temp_pgr_arc_linegraph tpa
-			JOIN v_temp_node vtn ON vtn.node_id = tpa.pgr_node_id
-			WHERE tpa.mapzone_id <> 0;
+		INSERT INTO om_mincut_valve (
+			result_id,
+			node_id,
+			closed,
+			broken,
+			unaccess,
+			changestatus,
+			proposed,
+			the_geom,
+			to_arc
+		)
+		SELECT v_mincut_id,
+			tpa.pgr_node_id AS node_id,
+			tpa.closed,
+			tpa.broken,
+			tpa.unaccess,
+			tpa.changestatus,
+			tpa.proposed,
+			n.the_geom,
+			tpa.to_arc[1]
+		FROM temp_pgr_arc_linegraph tpa
+		JOIN node n ON n.node_id = tpa.pgr_node_id
+		WHERE tpa.mapzone_id <> 0;
+
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
+		SELECT v_mincut_id, c.connec_id, c.the_geom, c.customer_code
+		FROM om_mincut_arc oma
+		JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
+		JOIN connec c ON c.connec_id = vtc.connec_id
+		WHERE oma.result_id = v_mincut_id;
 
 		IF v_update_map_zone = 0 THEN
 			-- do nothing
@@ -1401,8 +1416,8 @@ BEGIN
 						WHERE result_id = '||v_mincut_id||'
 						UNION
 						SELECT ST_Collect(ep.the_geom) AS the_geom 
-						FROM om_mincut_arc a
-						JOIN connec c ON a.arc_id = c.arc_id
+						FROM om_mincut_connec co
+						JOIN connec c ON c.connec_id = co.connec_id
 						LEFT JOIN ext_plot ep ON c.plot_code = ep.plot_code 
 							AND ST_DWithin(c.the_geom, ep.the_geom, 0.001)
 						WHERE a.result_id = '||v_mincut_id||'
@@ -1435,12 +1450,6 @@ BEGIN
 			EXECUTE v_query_text;
 		END IF;
 
-		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
-		SELECT v_mincut_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
-		FROM om_mincut_arc oma
-		JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
-		WHERE oma.result_id = v_mincut_id;
-
 		-- insert hydrometer from connec
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, rhxc.hydrometer_id
@@ -1466,10 +1475,11 @@ BEGIN
 		FROM om_mincut_arc
 		WHERE result_id = v_mincut_id;
 
-		SELECT sum(pi() * (ca.dint * ca.dint / 4_000_000) * ST_Length(oma.the_geom))::numeric(12,2) INTO v_volume
+		SELECT sum(pi() * (ca.dint * ca.dint / 4_000_000) * ST_Length(oma.the_geom))::numeric(12,2)
+		INTO v_volume
 		FROM om_mincut_arc oma
-		JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
-		JOIN cat_arc ca ON vta.arccat_id = ca.id
+		JOIN arc a ON oma.arc_id = a.arc_id
+		JOIN cat_arc ca ON a.arccat_id = ca.id
 		WHERE oma.result_id = v_mincut_id;
 
 		-- count valves
@@ -1635,35 +1645,35 @@ BEGIN
 				WHERE mapzone_id <> 0;
 
 				-- set the default values for proposed valves 
-				-- for current mincut (old_mapzone_id = 0)
+				-- for current mincut (adjacent_mincut_id = 0)
 				UPDATE temp_pgr_arc_linegraph
 				SET proposed = FALSE
 				WHERE proposed = TRUE
-				AND old_mapzone_id = 0;
+				AND adjacent_mincut_id = 0;
 
 				-- set the default values for proposed valves 
-				-- for adjacents mincuts, if they exist (old_mapzone_id <> 0)
+				-- for adjacents mincuts, if they exist (adjacent_mincut_id <> 0)
 				UPDATE temp_pgr_arc_linegraph
 				SET proposed = FALSE,
 					cost = 1,
 					reverse_cost = 1,
-					old_mapzone_id = 0
+					adjacent_mincut_id = 0
 				WHERE proposed = TRUE
-				AND old_mapzone_id <> 0;
+				AND adjacent_mincut_id <> 0;
 
 				-- set the default values for changestatus valves
-				-- for adjacent mincuts, if they exist (old_mapzone_id <> 0)
+				-- for adjacent mincuts, if they exist (adjacent_mincut_id <> 0)
 				UPDATE temp_pgr_arc_linegraph
 				SET changestatus = FALSE,
 					cost = -1,
 					reverse_cost = -1,
-					old_mapzone_id = 0
+					adjacent_mincut_id = 0
 				WHERE changestatus = TRUE
-				AND old_mapzone_id <> 0;
+				AND adjacent_mincut_id <> 0;
 
 				EXECUTE format('
 					UPDATE temp_pgr_arc_linegraph tpa
-					SET changestatus = omv.changestatus, cost = 1, reverse_cost = 1, old_mapzone_id = omv.result_id
+					SET changestatus = omv.changestatus, cost = 1, reverse_cost = 1, adjacent_mincut_id = omv.result_id
 					FROM om_mincut_valve omv
 					WHERE omv.result_id = ANY(%L)
 						AND omv.node_id = tpa.pgr_node_id
@@ -1674,7 +1684,7 @@ BEGIN
 
 				EXECUTE format('
 					UPDATE temp_pgr_arc_linegraph tpa
-					SET proposed = omv.proposed, cost = -1, reverse_cost = -1, old_mapzone_id = omv.result_id
+					SET proposed = omv.proposed, cost = -1, reverse_cost = -1, adjacent_mincut_id = omv.result_id
 					FROM om_mincut_valve omv
 					WHERE omv.result_id = ANY(%L)
 						AND omv.proposed = TRUE
@@ -1711,9 +1721,9 @@ BEGIN
 						AND NOT EXISTS (
 							SELECT 1
 							FROM om_mincut_arc oma
-							JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
+							JOIN arc a ON oma.arc_id = a.arc_id
 							WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
-								AND vta.minsector_id = tpn.pgr_node_id
+								AND a.minsector_id = tpn.pgr_node_id
 						);
 					', v_mincut_id, v_mincut_group_record.mincut_group) INTO v_arc_count;
 				ELSE
@@ -1742,18 +1752,18 @@ BEGIN
 							AND (
 								NOT EXISTS (
 									SELECT 1
-									FROM v_temp_arc vta
-									JOIN om_mincut_arc oma ON oma.arc_id = vta.arc_id
+									FROM arc a
+									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
 									WHERE oma.result_id = %L 
-									AND vta.minsector_id = tpa.pgr_node_1
+									AND a.minsector_id = tpa.pgr_node_1
 								)
 								OR 
 								NOT EXISTS (
 									SELECT 1
-									FROM v_temp_arc vta
-									JOIN om_mincut_arc oma ON oma.arc_id = vta.arc_id
+									FROM arc a
+									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
 									WHERE oma.result_id = %L 
-									AND vta.minsector_id = tpa.pgr_node_2
+									AND a.minsector_id = tpa.pgr_node_2
 								)
 							)
 						$fmt$, v_mincut_id);
@@ -1801,9 +1811,9 @@ BEGIN
 							-- insert arcs
 							EXECUTE format('
 								INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
-								SELECT %L, vta.arc_id, vta.the_geom
+								SELECT %L, a.arc_id, a.the_geom
 								FROM temp_pgr_node_minsector tpn
-								JOIN v_temp_arc vta ON vta.minsector_id = tpn.pgr_node_id
+								JOIN arc a ON a.minsector_id = tpn.pgr_node_id
 								WHERE tpn.mapzone_id <> 0
 								AND EXISTS (
 									SELECT 1 
@@ -1813,19 +1823,20 @@ BEGIN
 								)
 								AND NOT EXISTS (
 									SELECT 1
-									FROM v_temp_arc va
-									JOIN om_mincut_arc oma ON oma.arc_id = va.arc_id
+									FROM arc a
+									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
 									WHERE oma.result_id = %L 
-									AND va.minsector_id = tpn.pgr_node_id
+									AND a.minsector_id = tpn.pgr_node_id
 								)
 							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
 							-- insert nodes
 							EXECUTE format('
 								INSERT INTO om_mincut_node (result_id, node_id, node_type, the_geom) 
-								SELECT %L, vtn.node_id, vtn.node_type, vtn.the_geom
+								SELECT %L, n.node_id, cn.node_type, n.the_geom
 								FROM temp_pgr_node_minsector tpn
-								JOIN v_temp_node vtn ON vtn.minsector_id = tpn.pgr_node_id
+								JOIN node n ON n.minsector_id = tpn.pgr_node_id
+								JOIN cat_node cn ON n.nodecat_id = cn.id
 								WHERE tpn.mapzone_id <> 0
 								AND EXISTS (
 									SELECT 1 
@@ -1835,10 +1846,10 @@ BEGIN
 								)
 								AND NOT EXISTS (
 									SELECT 1 
-									FROM v_temp_node vn
-									JOIN om_mincut_node omn ON omn.node_id = vn.node_id
+									FROM node n
+									JOIN om_mincut_node omn ON omn.node_id = n.node_id
 									WHERE omn.result_id = %L 
-									AND vn.minsector_id = tpn.pgr_node_id
+									AND n.minsector_id = tpn.pgr_node_id
 								);
 							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
@@ -1846,10 +1857,10 @@ BEGIN
 							-- insert arcs
 							EXECUTE format('
 								INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
-								SELECT %L, vta.arc_id, vta.the_geom
+								SELECT %L, a.arc_id, a.the_geom
 								FROM temp_pgr_node_minsector tpn
 								JOIN temp_pgr_arc tpa ON tpa.mapzone_id = tpn.pgr_node_id
-								JOIN v_temp_arc vta ON vta.arc_id = tpa.pgr_arc_id
+								JOIN arc a ON a.arc_id = tpa.pgr_arc_id
 								WHERE tpn.mapzone_id <> 0
 								AND EXISTS (
 									SELECT 1 
@@ -1859,20 +1870,21 @@ BEGIN
 								)
 								AND NOT EXISTS (
 									SELECT 1
-									FROM temp_pgr_arc va
-									JOIN om_mincut_arc oma ON oma.arc_id = va.pgr_arc_id
+									FROM temp_pgr_arc a
+									JOIN om_mincut_arc oma ON oma.arc_id = a.pgr_arc_id
 									WHERE oma.result_id = %L 
-									AND va.mapzone_id = tpn.pgr_node_id
+									AND a.mapzone_id = tpn.pgr_node_id
 								)
 							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
 							-- insert nodes
 							EXECUTE format('
 								INSERT INTO om_mincut_node (result_id, node_id, node_type, the_geom) 
-								SELECT %L, vtn.node_id, vtn.node_type, vtn.the_geom
+								SELECT %L, n.node_id, cn.node_type, n.the_geom
 								FROM temp_pgr_node_minsector tpn
 								JOIN temp_pgr_node tn ON tn.mapzone_id = tpn.pgr_node_id
-								JOIN v_temp_node vtn ON vtn.node_id = tn.pgr_node_id
+								JOIN node n ON n.node_id = tn.pgr_node_id
+								JOIN cat_node cn ON n.nodecat_id = cn.id
 								WHERE tpn.mapzone_id <> 0
 								AND EXISTS (
 									SELECT 1 
@@ -1882,10 +1894,10 @@ BEGIN
 								)
 								AND NOT EXISTS (
 									SELECT 1 
-									FROM temp_pgr_node vn
-									JOIN om_mincut_node omn ON omn.node_id = vn.pgr_node_id
+									FROM temp_pgr_node n
+									JOIN om_mincut_node omn ON omn.node_id = n.pgr_node_id
 									WHERE omn.result_id = %L 
-									AND vn.mapzone_id = tpn.pgr_node_id
+									AND n.mapzone_id = tpn.pgr_node_id
 								);
 							', v_mincut_affected_id, v_mincut_conflict_record.component, v_mincut_id);
 
@@ -1911,10 +1923,10 @@ BEGIN
 								tpa.unaccess,
 								tpa.changestatus,
 								tpa.proposed,
-								vtn.the_geom,
+								n.the_geom,
 								tpa.to_arc[1]
 							FROM temp_pgr_arc_linegraph tpa
-							JOIN v_temp_node vtn ON vtn.node_id = tpa.pgr_node_id
+							JOIN node n ON n.node_id = tpa.pgr_node_id
 							WHERE tpa.mapzone_id <> 0 
 							AND EXISTS (
 								SELECT 1 
@@ -1942,10 +1954,10 @@ BEGIN
 							v_mincut_id, v_mincut_group_record.mincut_group);
 
 						INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
-						SELECT v_mincut_affected_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
-						FROM om_mincut_arc oma
-						JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
-						WHERE oma.result_id = v_mincut_affected_id;
+                        SELECT v_mincut_affected_id, vtc.connec_id, vtc.the_geom, vtc.customer_code
+                        FROM om_mincut_arc oma
+                        JOIN v_temp_connec vtc ON vtc.arc_id = oma.arc_id
+                        WHERE oma.result_id = v_mincut_affected_id;
 
 						-- insert hydrometer from connec
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
@@ -2032,8 +2044,8 @@ BEGIN
 
 						SELECT sum(pi() * (ca.dint * ca.dint / 4_000_000) * ST_Length(oma.the_geom))::numeric(12,2) INTO v_volume
 						FROM om_mincut_arc oma
-						JOIN v_temp_arc vta ON oma.arc_id = vta.arc_id
-						JOIN cat_arc ca ON vta.arccat_id = ca.id
+						JOIN arc a ON oma.arc_id = a.arc_id
+						JOIN cat_arc ca ON a.arccat_id = ca.id
 						WHERE oma.result_id = v_mincut_affected_id;
 
 						-- count valves
