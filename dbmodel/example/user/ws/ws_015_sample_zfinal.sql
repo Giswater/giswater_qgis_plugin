@@ -179,5 +179,3 @@ UPDATE om_visit_x_arc SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM o
 UPDATE om_visit_x_node SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
 UPDATE om_visit_x_connec SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
 UPDATE om_visit_x_link SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
-
-ALTER TABLE om_visit ENABLE TRIGGER gw_trg_om_visit;

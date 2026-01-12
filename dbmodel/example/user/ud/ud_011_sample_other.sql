@@ -7,8 +7,6 @@ or (at your option) any later version.
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-ALTER TABLE om_visit DISABLE TRIGGER gw_trg_om_visit;
-
 INSERT INTO inp_gully VALUES ('30046', 'To_network', NULL, NULL, NULL, NULL, 'W_O', 1.6, 0.7, NULL, NULL, 90);
 INSERT INTO inp_gully VALUES ('30131', 'To_network', NULL, NULL, NULL, NULL, 'W_O', 1.6, 0.7, NULL, NULL, 90);
 INSERT INTO inp_gully VALUES ('30130', 'To_network', NULL, NULL, NULL, NULL, 'W_O', 1.6, 0.7, NULL, NULL, 90);
