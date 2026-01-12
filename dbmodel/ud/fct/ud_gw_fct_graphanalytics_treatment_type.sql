@@ -155,14 +155,14 @@ BEGIN
 	-- Start Building Log Message
 	/*
 	-- =======================
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "is_header":"true", "tempTable":"temp_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"data":{"message":"4460", "function":"3424", "criticity":"3", "tempTable":"temp_", "parameters":{"v_psectors":"'||v_usepsector||'"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"data":{"message":"4462", "function":"3424", "criticity":"3", "tempTable":"temp_", "parameters":{"v_commit_changes":"'||v_commitchanges||'"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"3424", "criticity":"3", "tempTable":"temp_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"3", "is_header":"true", "label_id":"3003", "separator_id":"2008", "tempTable":"temp_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"2", "is_header":"true", "label_id":"3002", "separator_id":"2009", "tempTable":"temp_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"1", "is_header":"true", "label_id":"3001", "separator_id":"2009", "tempTable":"temp_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3424", "fid":"'||v_fid||'", "criticity":"0", "is_header":"true", "label_id":"3012", "separator_id":"2010", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3522", "fid":"'||v_fid||'", "is_header":"true", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"data":{"message":"4460", "function":"3522", "criticity":"3", "tempTable":"temp_", "parameters":{"v_psectors":"'||v_usepsector||'"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"data":{"message":"4462", "function":"3522", "criticity":"3", "tempTable":"temp_", "parameters":{"v_commit_changes":"'||v_commitchanges||'"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"separator_id": "2000", "function":"3522", "criticity":"3", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3522", "fid":"'||v_fid||'", "criticity":"3", "is_header":"true", "label_id":"3003", "separator_id":"2008", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3522", "fid":"'||v_fid||'", "criticity":"2", "is_header":"true", "label_id":"3002", "separator_id":"2009", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3522", "fid":"'||v_fid||'", "criticity":"1", "is_header":"true", "label_id":"3001", "separator_id":"2009", "tempTable":"temp_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3522", "fid":"'||v_fid||'", "criticity":"0", "is_header":"true", "label_id":"3012", "separator_id":"2010", "tempTable":"temp_"}}$$)';
 */
 	-- Initialize process
 	-- =======================
@@ -451,7 +451,7 @@ BEGIN
 
 		v_status = 'Accepted';
 		v_level = 3;
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4210", "function":"3424", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4210", "function":"3522", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
 
 	END IF;
 
@@ -462,14 +462,14 @@ BEGIN
 	FROM temp_pgr_arc 
 	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3522", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(*) INTO v_count 
 	FROM temp_pgr_node 
 	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3522", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(*) INTO v_count 
@@ -477,7 +477,7 @@ BEGIN
 	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
 	WHERE COALESCE (v.treatment_type, 0) = 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3522", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(DISTINCT gully_id) INTO v_count 
@@ -485,7 +485,7 @@ BEGIN
 	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
 	WHERE COALESCE (v.treatment_type, 0) = 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3424", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3522", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	-- treatment_type different to zero
@@ -493,14 +493,14 @@ BEGIN
 	FROM temp_pgr_arc 
 	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3522", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"arc"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(*) INTO v_count 
 	FROM temp_pgr_node 
 	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3522", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"node"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(*) INTO v_count 
@@ -508,7 +508,7 @@ BEGIN
 	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
 	WHERE v.treatment_type > 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3522", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(*) INTO v_count 
@@ -516,7 +516,7 @@ BEGIN
 	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
 	WHERE v.treatment_type > 0;
 	IF v_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3424", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3522", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	-- insert spacer for warning and info
