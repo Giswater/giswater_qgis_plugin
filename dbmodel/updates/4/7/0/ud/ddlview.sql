@@ -372,7 +372,8 @@ AS WITH typevalue AS (
     l.the_geom,
     COALESCE(pp.state, l.state) AS p_state,
     l.uuid,
-    l.omunit_id
+    l.omunit_id,
+    l.treatment_type
    FROM link l
      LEFT JOIN LATERAL ( SELECT p.psector_id
            FROM ( SELECT pp1.connec_id AS feature_id,

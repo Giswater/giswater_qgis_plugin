@@ -23,3 +23,6 @@ UPDATE sys_feature_class SET epa_default = 'GULLY' WHERE id = 'GINLET';
 
 UPDATE om_typevalue SET idval = 'NOT TREATED' WHERE id = '3' AND typevalue = 'treatment_type';
 UPDATE om_typevalue SET idval = 'PRETREATED' WHERE id = '2' AND typevalue = 'treatment_type';
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES('om_typevalue', 'treatment_type', 'link', 'treatment_type', NULL, true);

@@ -47,3 +47,18 @@ CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('connec');
 CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_connec
 FOR EACH ROW WHEN (((OLD.matcat_id)::TEXT IS DISTINCT FROM (NEW.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('connec');
+
+-- 13/01/2026
+DROP TRIGGER IF EXISTS gw_trg_typevalue_fk_update ON link;
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER
+UPDATE
+    OF fluid_type,
+    treatment_type ON
+    link FOR EACH ROW
+    WHEN ((old.fluid_type IS DISTINCT
+    FROM
+    new.fluid_type)
+    OR (old.treatment_type IS DISTINCT
+    FROM
+    new.treatment_type))
+    EXECUTE FUNCTION gw_trg_typevalue_fk('link');
