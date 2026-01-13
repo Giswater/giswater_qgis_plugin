@@ -20,3 +20,6 @@ WHERE id = 'edit_node_topelev_options';
 
 UPDATE sys_feature_class SET epa_default = 'UNDEFINED' WHERE id = 'CJOIN' or id = 'VGULLY';
 UPDATE sys_feature_class SET epa_default = 'GULLY' WHERE id = 'GINLET';
+
+UPDATE om_typevalue SET idval = 'NOT TREATED' WHERE id = '3' AND typevalue = 'treatment_type';
+UPDATE om_typevalue SET idval = 'PRETREATED' WHERE id = '2' AND typevalue = 'treatment_type';
