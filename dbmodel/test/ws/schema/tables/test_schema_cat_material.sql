@@ -41,7 +41,7 @@ SELECT col_type_is('cat_material', 'active', 'boolean', 'Column active should be
 SELECT col_type_is('cat_material', 'family', 'varchar(100)', 'Column family should be varchar(100)');
 
 -- Check foreign keys
-SELECT hasnt_fk('cat_material', 'Table cat_material should have no foreign keys');
+SELECT fk_ok('cat_material','family','inp_family','family_id','Table should have foreign key from family to inp_family.family_id');
 
 -- Check triggers
 SELECT has_trigger('cat_material', 'gw_trg_config_control', 'Table cat_material should have trigger gw_trg_config_control');

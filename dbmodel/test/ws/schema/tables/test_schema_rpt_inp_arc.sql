@@ -54,7 +54,7 @@ SELECT col_type_is('rpt_inp_arc', 'minorloss', 'numeric(12,6)', 'Column minorlos
 SELECT col_type_is('rpt_inp_arc', 'addparam', 'text', 'Column addparam should be text');
 SELECT col_type_is('rpt_inp_arc', 'arcparent', 'character varying(16)', 'Column arcparent should be varchar(16)');
 SELECT col_type_is('rpt_inp_arc', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('rpt_inp_arc', 'presszone_id', 'text', 'Column presszone_id should be text');
+SELECT col_type_is('rpt_inp_arc', 'presszone_id', 'integer', 'Column presszone_id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('rpt_inp_arc', 'age', 'integer', 'Column age should be integer');

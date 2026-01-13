@@ -51,7 +51,7 @@ SELECT col_type_is('rpt_inp_node', 'addparam', 'text', 'Column addparam should b
 SELECT col_type_is('rpt_inp_node', 'nodeparent', 'character varying(16)', 'Column nodeparent should be varchar(16)');
 SELECT col_type_is('rpt_inp_node', 'arcposition', 'smallint', 'Column arcposition should be smallint');
 SELECT col_type_is('rpt_inp_node', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('rpt_inp_node', 'presszone_id', 'text', 'Column presszone_id should be text');
+SELECT col_type_is('rpt_inp_node', 'presszone_id', 'integer', 'Column presszone_id should be integer');
 SELECT col_type_is('rpt_inp_node', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('rpt_inp_node', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('rpt_inp_node', 'age', 'integer', 'Column age should be integer');

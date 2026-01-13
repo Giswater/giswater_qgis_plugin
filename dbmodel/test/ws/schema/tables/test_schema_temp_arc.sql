@@ -56,7 +56,7 @@ SELECT col_type_is('temp_arc', 'addparam', 'text', 'Column addparam should be te
 SELECT col_type_is('temp_arc', 'arcparent', 'character varying(16)', 'Column arcparent should be varchar(16)');
 SELECT col_type_is('temp_arc', 'flag', 'boolean', 'Column flag should be boolean');
 SELECT col_type_is('temp_arc', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('temp_arc', 'presszone_id', 'text', 'Column presszone_id should be text');
+SELECT col_type_is('temp_arc', 'presszone_id', 'integer', 'Column presszone_id should be integer');
 SELECT col_type_is('temp_arc', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('temp_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('temp_arc', 'age', 'integer', 'Column age should be integer');
