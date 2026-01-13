@@ -11,6 +11,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getarcauditvalues(p_data json)
  LANGUAGE plpgsql
 AS $function$
 
+-- Function id: 3534
+
 /*
 EXAMPLE
 

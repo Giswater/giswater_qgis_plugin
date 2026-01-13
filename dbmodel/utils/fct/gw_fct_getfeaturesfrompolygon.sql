@@ -12,6 +12,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeaturesfrompolygon(p_data json
  LANGUAGE plpgsql
 AS $function$
 
+-- Function id: 3532
+
 /*
 EXAMPLE:
 
