@@ -132,3 +132,5 @@ UPDATE config_form_list
 	WHERE listname='dscenario_results' AND device=5;
 
 UPDATE sys_function SET "source"='cm' WHERE id=3426;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3532, 'gw_fct_getfeaturesfrompolygon', 'utils', 'function', 'json', 'json', 'Function to return the feature id that intersect with a given polygon', NULL, NULL, 'core', NULL);
