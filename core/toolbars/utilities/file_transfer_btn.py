@@ -150,11 +150,6 @@ class GwFileTransferButton(GwAction):
             tools_gw.close_dialog(dlg_epa)
             return
 
-        age = tools_gw.get_config_parser('btn_export_epa_families', 'age', 'user', 'session', False)
-        if age:
-            dlg_epa.age.setText(age)
-        else:
-            dlg_epa.age.setText('10')
         json_format = tools_gw.get_config_parser('btn_export_epa_families', 'json_format', 'user', 'session', False)
         if json_format:
             dlg_epa.chk_format_json.setChecked(bool(json_format))
@@ -184,16 +179,15 @@ class GwFileTransferButton(GwAction):
 
     def _do_export_epa_families(self, dlg):
         result_id = dlg.cmb_result_id.currentText()
-        age = dlg.age.text().strip()
         file_path = dlg.edit_path.text().strip()
         
-        if not result_id or not age or not file_path:
-            msg = "Please select a result, enter an age, and an export path."
+        if not result_id or not file_path:
+            msg = "Please select a result and an export path."
             tools_qgis.show_warning(msg, dialog=dlg)
             return
         tools_gw.close_dialog(dlg)
 
-        sql = f"SELECT gw_fct_get_epa_result_families('{result_id}', {age})"
+        sql = f"SELECT gw_fct_get_epa_result_families('{result_id}')"
         row = tools_db.get_row(sql)
         if not row or not row[0]:
             msg = "No results returned from the database."
@@ -222,7 +216,6 @@ class GwFileTransferButton(GwAction):
                 json.dump(data, f, ensure_ascii=False, indent=indent)
             msg = f"EPA Result Families exported successfully:\n{file_path}"
             tools_qgis.show_info(msg)
-            tools_gw.set_config_parser('btn_export_epa_families', 'age', f'{age}', prefix=False)
             tools_gw.set_config_parser('btn_export_epa_families', 'json_format', f'{dlg.chk_format_json.isChecked()}', prefix=False)
         except Exception as e:
             msg = f"Failed to write export file:\n{str(e)}"
