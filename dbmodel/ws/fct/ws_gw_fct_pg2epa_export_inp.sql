@@ -171,7 +171,7 @@ BEGIN
 		END AS elevation,
 	    temp_t_node.demand,
 	    temp_t_node.pattern_id,
-	    concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, '0'::text), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
+	    concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, 0), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
 	   FROM temp_t_node
 	  WHERE temp_t_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying::text, 'TANK'::character varying::text])
 	  ORDER BY temp_t_node.node_id;
@@ -251,7 +251,7 @@ BEGIN
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS
 	 SELECT arc_id, node_1, node_2, length, diameter, roughness, minorloss, status::character varying(30) AS status,
-	 concat(';', sector_id, ' ', COALESCE(presszone_id, '0'::text), ' ', COALESCE(dma_id, 0), ' ', COALESCE(dqa_id, 0), ' ', COALESCE(minsector_id, 0), ' ', arccat_id) AS other
+	 concat(';', sector_id, ' ', COALESCE(presszone_id, 0), ' ', COALESCE(dma_id, 0), ' ', COALESCE(dqa_id, 0), ' ', COALESCE(minsector_id, 0), ' ', arccat_id) AS other
 	 FROM temp_t_arc  WHERE epa_type::text = ANY (ARRAY['PIPE'::character varying::text, 'SHORTPIPE'::character varying::text, 'NODE2NODE'::character varying::text, 'FRSHORTPIPE'::character varying::text]);
 
 
@@ -264,7 +264,7 @@ BEGIN
 	    a.valve_type,
 	    a.setting,
 	    a.minorloss,
-	    concat(';', a.sector_id, ' ', COALESCE(a.presszone_id, '0'::text), ' ', COALESCE(a.dma_id, 0), ' ', COALESCE(a.dqa_id, 0), ' ', COALESCE(a.minsector_id, 0), ' ', a.arccat_id) AS other
+	    concat(';', a.sector_id, ' ', COALESCE(a.presszone_id, 0), ' ', COALESCE(a.dma_id, 0), ' ', COALESCE(a.dqa_id, 0), ' ', COALESCE(a.minsector_id, 0), ' ', a.arccat_id) AS other
 	   FROM (SELECT arc_id,
 		    node_1,
 		    node_2,

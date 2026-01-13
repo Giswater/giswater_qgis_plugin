@@ -712,3 +712,7 @@ UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHE
 
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 107, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 108, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+
+INSERT INTO inp_family (family_id, descript, age) VALUES('METAL', 'Metallic pipes', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;
+INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pipes', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;
+INSERT INTO inp_family (family_id, descript, age) VALUES('OTHER', 'Other', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;

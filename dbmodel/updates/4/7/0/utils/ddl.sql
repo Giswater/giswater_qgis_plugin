@@ -10,3 +10,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 07/01/2026
 ALTER TABLE anl_polygon ALTER COLUMN the_geom TYPE geometry(MULTIPOLYGON, SRID_VALUE) USING the_geom;
+
+-- 13/01/2026
+CREATE TABLE inp_family(
+    family_id character varying(100) NOT NULL,
+    descript text,
+    age integer,
+    PRIMARY KEY (family_id)
+);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_material", "column":"family", "dataType":"varchar(100)", "isUtils":"False"}}$$);
+
+ALTER TABLE cat_material ADD CONSTRAINT fk_cat_material_family FOREIGN KEY (family) REFERENCES inp_family(family_id);

@@ -12,7 +12,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"shutoff_required", "dataType":"boolean", "defaultValue":"true", "isUtils":"False"}}$$);
 
 -- add columns to tables for EPA families export
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_material", "column":"family", "dataType":"varchar(100)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"family", "dataType":"varchar(100)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"builtdate", "dataType":"date", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"family", "dataType":"varchar(100)", "isUtils":"False"}}$$);
@@ -22,3 +21,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node","column":"builtdate","dataType":"date","isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc","column":"builtdate","dataType":"date","isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc","column":"family","dataType":"varchar(100)","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"rpt_inp_node", "column":"presszone_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"rpt_inp_arc", "column":"presszone_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_arc", "column":"presszone_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_node", "column":"presszone_id", "dataType":"int4"}}$$);
