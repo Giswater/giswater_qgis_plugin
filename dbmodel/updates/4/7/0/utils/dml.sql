@@ -134,3 +134,6 @@ UPDATE config_form_list
 UPDATE sys_function SET "source"='cm' WHERE id=3426;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3532, 'gw_fct_getfeaturesfrompolygon', 'utils', 'function', 'json', 'json', 'Function to return the feature id that intersect with a given polygon', NULL, NULL, 'core', NULL);
+
+-- 13/01/2026
+UPDATE sys_fprocess SET except_level = 3 WHERE fid = 153;
