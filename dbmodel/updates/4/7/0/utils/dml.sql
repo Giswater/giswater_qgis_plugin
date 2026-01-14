@@ -146,4 +146,4 @@ INSERT INTO inp_family (family_id, descript, age) VALUES('METAL', 'Metallic pipe
 INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pipes', NULL);
 INSERT INTO inp_family (family_id, descript, age) VALUES('OTHER', 'Other', NULL);
 
-UPDATE sys_fprocess SET project_type='utils', query_text='select link_id as arc_id, linkcat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')', active=true WHERE fid=404;
+UPDATE sys_fprocess SET project_type='utils', query_text='select link_id as arc_id, linkcat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')', active=true, function_name='[gw_fct_pg2epa_check_networkmode_connec]' WHERE fid=404;
