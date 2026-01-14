@@ -3762,7 +3762,10 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         color_values = {}
                         for item in return_manager['style'][key].get('values', []):
                             color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
-                            color_values[item['id']] = color
+                            color_values[item['id']] = {
+                                'color': color,
+                                'layer_id': item.get('layer_id')
+                            }
                         cat_field = str(style_type[key]['field'])
                         size = style_type[key]['width'] if style_type[key].get('width') else 2
                         tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))

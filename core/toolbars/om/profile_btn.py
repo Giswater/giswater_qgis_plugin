@@ -249,7 +249,7 @@ class GwProfileButton(GwAction):
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
         # Create variable with all the content of the form
-        extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", ' \
+        extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", "midNodes":"{self.add_points_list}", ' \
             f'"endNode":"{self.endNode}", ' \
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, ' \
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
@@ -304,13 +304,25 @@ class GwProfileButton(GwAction):
             if profile['profile_id'] == profile_id:
                 # Get data
                 self.initNode = profile['values']['initNode']
+                self.add_points_list = profile['values']['midNodes']
                 self.endNode = profile['values']['endNode']
-                list_arcs = profile['values']['listArcs']
+
+                # Populate list arcs
+                links_distance = profile.get('values').get('linksDistance')
+                if links_distance in ("", "None", None):
+                    links_distance = 1
+                extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
+                f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
+                if self.add_points_list:
+                    points_list = str(self.add_points_list).replace("'", "")
+                    extras += f', "midNodes":{points_list}'
+                body = tools_gw.create_body(extras=extras)
+                result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
 
                 # Get arcs from profile
                 expr_filter = "\"arc_id\" IN ("
-                for arc in list_arcs.strip('][').split(', '):
-                    expr_filter += f"'{arc}', "
+                for arc in result['body']['data']['arc']:
+                    expr_filter += f"'{arc['arc_id']}', "
                 expr_filter = expr_filter[:-2] + ")"
                 expr = QgsExpression(expr_filter)
                 # Get a featureIterator from this expression:
@@ -322,14 +334,16 @@ class GwProfileButton(GwAction):
                     msg = "Couldn't draw profile. You may need to select another exploitation."
                     tools_qgis.show_warning(msg)
                     return
+                self.layer_arc.selectByIds(self.id_list)
 
                 # Set data in dialog
                 self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
                 self.dlg_draw_profile.tbl_list_arc.clear()
 
-                for arc in list_arcs.strip('][').split(', '):
-                    item_arc = QListWidgetItem(str(arc))
+                for arc in result['body']['data']['arc']:
+                    item_arc = QListWidgetItem(str(arc['arc_id']))
                     self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
+        
                 self.dlg_draw_profile.txt_min_distance.setText(str(profile['values']['linksDistance']))
 
                 self.dlg_draw_profile.txt_title.setText(str(profile['values']['title']))
@@ -440,7 +454,11 @@ class GwProfileButton(GwAction):
                         self.dlg_draw_profile.tbl_list_arc.clear()
 
                         # Populate list arcs
-                        extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
+                        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
+                        if links_distance in ("", "None", None):
+                            links_distance = 1
+                        extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
+                        f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
                         if self.add_points and self.add_points_list:
                             points_list = str(self.add_points_list).replace("'", "")
                             extras += f', "midNodes":{points_list}'
