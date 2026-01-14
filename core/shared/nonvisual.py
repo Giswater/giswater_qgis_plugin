@@ -908,11 +908,11 @@ class GwNonVisual:
 
     def _manage_curve_type(self, dialog, curve_type_headers, table, index):
         """ Manage curve values table headers """
-
-        curve_type = tools_qt.get_text(dialog, 'cmb_curve_type', return_string_null=False)
+        curve_type = tools_qt.get_combo_value(dialog, 'cmb_curve_type', 0)
         if curve_type:
             headers = curve_type_headers.get(curve_type)
-            table.setHorizontalHeaderLabels(headers)
+            if headers:
+                table.setHorizontalHeaderLabels(headers)
 
     def _manage_curve_value(self, dialog, table, row, column):
         """ Validate data in curve values table """
