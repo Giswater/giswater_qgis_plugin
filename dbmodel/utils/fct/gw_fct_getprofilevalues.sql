@@ -199,8 +199,8 @@ BEGIN
 		sector_id integer,
 		exit_topelev double precision,
 		exit_elev double precision,
-		the_geom geometry(LineString,SRID_VALUE),
-		the_geom_endpoint geometry(Point,SRID_VALUE),
+		the_geom geometry(LineString,25831),
+		the_geom_endpoint geometry(Point,25831),
 		flag boolean,
 		CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
 	);
@@ -344,7 +344,7 @@ BEGIN
 				fid, arc_id, code, node_1, 
 				node_2, 
 				sys_type, arccat_id, cat_geom1, length, 
-				slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom
+				slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, omunit_id, the_geom
 			)
 			SELECT  
 				222, arc_id, b.code, e.node, 
@@ -353,7 +353,7 @@ BEGIN
 				END AS node_2,
 				sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
 				'||v_fslope||', e.route_agg_cost, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-				||v_elev1||', '||v_elev2||', expl_id, the_geom 
+				||v_elev1||', '||v_elev2||', expl_id, omunit_id, the_geom 
 			FROM temp_pgr_dijkstra e
 			JOIN temp_ve_arc b ON e.edge = b.arc_id
 			JOIN cat_arc ON arccat_id = id';
@@ -708,7 +708,7 @@ BEGIN
 
 		-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM temp_anl_arc ORDER BY total_length) row;
+		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2, omunit_id FROM temp_anl_arc ORDER BY total_length) row;
 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM temp_anl_node WHERE nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
@@ -820,6 +820,5 @@ BEGIN
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$function$
+;

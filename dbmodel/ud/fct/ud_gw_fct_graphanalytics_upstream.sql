@@ -212,8 +212,8 @@ BEGIN
 		USING v_mainstream, v_query, v_node, v_distance;
     END IF;
 
-	INSERT INTO t_anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
-	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
+	INSERT INTO t_anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom, omunit_id)
+	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom, a.omunit_id
 	FROM ve_arc a
 	JOIN t_anl_node n1 ON a.node_1 = n1.node_id
 	JOIN t_anl_node n2 ON a.node_2 = n2.node_id;
@@ -229,7 +229,7 @@ BEGIN
 					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 					'properties', to_jsonb(row) - 'the_geom'
 				) AS feature
-				FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
+				FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, omunit_id, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
 				FROM t_anl_arc) row
 			) features
 		), '[]'::jsonb)
