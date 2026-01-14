@@ -1085,45 +1085,65 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
         elif k in ('point', 'line', 'polygon'):
             if 'features' not in data[k]:
                 continue
-            counter = len(data[k]['features'])
-            if counter > 0:
-                counter = len(data[k]['features'])
-                geometry_type = data[k]['geometryType']
-                aux_layer_name = layer_name
-                try:
-                    if not layer_name:
-                        aux_layer_name = data[k]['layerName']
-                except KeyError:
-                    aux_layer_name = str(k)
-                if del_old_layers:
-                    tools_qgis.remove_layer_from_toc(aux_layer_name, group)
-                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
-                # This function already works with GeoJson
-                fill_layer_temp(v_layer, data, k, counter, group=group, sort_val=i)
+            if data[k]['features'] is None or len(data[k]['features']) == 0:
+                continue
+            
+            aux_layer_name = layer_name
+            try:
+                if not layer_name:
+                    aux_layer_name = data[k]['layerName']
+            except KeyError:
+                aux_layer_name = str(k)
+            
+            if del_old_layers:
+                tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+            
+            # Use GeoJSON approach like manage_json_return
+            geojson_str = json.dumps(data[k])
+            vsipath = f"/vsimem/{aux_layer_name}.geojson"
+            gdal.FileFromMemBuffer(vsipath, geojson_str)
+            v_layer = QgsVectorLayer(vsipath, aux_layer_name, 'ogr')
+            
+            # Set CRS if not valid
+            if not v_layer.crs().isValid():
+                v_layer.setCrs(QgsCoordinateReferenceSystem(f'EPSG:{srid}'))
+            v_layer.updateExtents()
+            
+            # Get geometry type from layer (like manage_json_return)
+            geometry_type = v_layer.geometryType()
+            
+            # Add layer to project and group
+            QgsProject.instance().addMapLayer(v_layer, False)
+            root = QgsProject.instance().layerTreeRoot()
+            my_group = root.findGroup(group)
+            if my_group is None:
+                my_group = root.insertGroup(0, group)
+            my_group.insertLayer(i, v_layer)
 
-                # Increase iterator
-                i = i + 1
+            # Increase iterator
+            i = i + 1
 
-                qml_path = data[k].get('qmlPath')
-                category_field = data[k].get('category_field')
-                if qml_path:
-                    tools_qgis.load_qml(v_layer, qml_path)
-                elif category_field:
-                    cat_field = data[k]['category_field']
-                    size = data[k].get('size', default=2)
-                    color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
-                                    'EXISTS': QColor(240, 150, 0)}
-                    tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
-                else:
-                    if geometry_type == 'Point':
-                        v_layer.renderer().symbol().setSize(3.5)
-                        v_layer.renderer().symbol().setColor(QColor("red"))
-                    elif geometry_type == 'LineString':
-                        v_layer.renderer().symbol().setWidth(1.5)
-                        v_layer.renderer().symbol().setColor(QColor("red"))
-                    v_layer.renderer().symbol().setOpacity(0.7)
-                temp_layers_added.append(v_layer)
-                global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+            # Apply styling
+            qml_path = data[k].get('qmlPath')
+            category_field = data[k].get('category_field')
+            if qml_path:
+                tools_qgis.load_qml(v_layer, qml_path)
+            elif category_field:
+                cat_field = data[k]['category_field']
+                size = data[k].get('size', default=2)
+                color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
+                                'EXISTS': QColor(240, 150, 0)}
+                tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
+            else:
+                if geometry_type == Qgis.GeometryType.Point:
+                    v_layer.renderer().symbol().setSize(3.5)
+                    v_layer.renderer().symbol().setColor(QColor("red"))
+                elif geometry_type == Qgis.GeometryType.Line:
+                    v_layer.renderer().symbol().setWidth(1.5)
+                    v_layer.renderer().symbol().setColor(QColor("red"))
+                v_layer.renderer().symbol().setOpacity(0.7)
+            temp_layers_added.append(v_layer)
+            global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
