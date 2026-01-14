@@ -65,6 +65,15 @@ BEGIN
             v_lot_id := OLD.lot_id;
             EXECUTE format('SELECT ($1).%I', v_feature_id_column) INTO v_feature_id_value USING OLD;
         END IF;
+		
+		-- set status ON GOING when the first object is reviewed
+		IF (SELECT COUNT(*) FROM (SELECT 1 FROM om_campaign_lot_x_node WHERE lot_id = NEW.lot_id AND status = 3
+		    UNION ALL
+		    SELECT 1 FROM om_campaign_lot_x_arc WHERE lot_id = NEW.lot_id AND status = 3) t) = 1 THEN
+		  UPDATE om_campaign_lot
+		  SET status = 4
+		  WHERE lot_id = NEW.lot_id;
+		END IF;
 
         IF TG_OP = 'INSERT' OR TG_OP = 'DELETE' THEN
             v_querytext := format(
