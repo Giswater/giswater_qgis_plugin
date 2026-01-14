@@ -199,8 +199,8 @@ BEGIN
 		sector_id integer,
 		exit_topelev double precision,
 		exit_elev double precision,
-		the_geom geometry(LineString,25831),
-		the_geom_endpoint geometry(Point,25831),
+		the_geom geometry(LineString,SRID_VALUE),
+		the_geom_endpoint geometry(Point,SRID_VALUE),
 		flag boolean,
 		CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
 	);
@@ -820,5 +820,6 @@ BEGIN
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
-$function$
-;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
