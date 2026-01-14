@@ -144,7 +144,7 @@ BEGIN
         -- Build dynamic SQL to get JSON for this table
         sql := format($f$
             SELECT json_build_object(
-                '%s',
+                concat('%s', 's'),
                 json_agg(json_build_object(
                     'id', %I,
                     'name', name,

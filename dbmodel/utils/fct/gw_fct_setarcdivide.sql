@@ -202,10 +202,9 @@ BEGIN
                        "data":{"message":"3348", "function":"2114", "parameters":{"v_arc_id":"'||v_arc_id||'"}, "fid":"212", "criticity":"1", "is_process":true}}$$)';
 
 				-- Get arctype
-				v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||');';
+				v_sql := 'SELECT arc_type FROM ve_arc WHERE arc_id = '||v_arc_id||';';
 				EXECUTE v_sql
 				INTO v_arc_type;
-
 
 				--  Locate position of the nearest point
 				v_intersect_loc := ST_LineLocatePoint(v_arc_geom, v_node_geom);
