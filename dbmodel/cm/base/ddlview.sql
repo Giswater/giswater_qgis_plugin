@@ -63,7 +63,7 @@ AS SELECT row_number() OVER () AS id,
     selector_lot.cur_user
    FROM selector_lot
      JOIN om_campaign_lot USING (lot_id)
-  WHERE selector_lot.cur_user = CURRENT_USER;
+  WHERE status in (3,4) AND selector_lot.cur_user = CURRENT_USER;
 
 CREATE OR REPLACE VIEW v_filter_lot AS 
  SELECT ocl.lot_id, name, status, campaign_id, the_geom 
