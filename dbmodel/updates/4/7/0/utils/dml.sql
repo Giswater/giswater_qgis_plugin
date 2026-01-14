@@ -147,3 +147,11 @@ INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pip
 INSERT INTO inp_family (family_id, descript, age) VALUES('OTHER', 'Other', NULL);
 
 UPDATE sys_fprocess SET project_type='utils', query_text='select link_id as arc_id, linkcat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')', active=true, function_name='[gw_fct_pg2epa_check_networkmode_connec]' WHERE fid=404;
+
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_create_temptables';
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_delete_temptables';
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_settempgeom';
+
+DROP FUNCTION IF EXISTS gw_fct_graphanalytics_create_temptables(json);
+DROP FUNCTION IF EXISTS gw_fct_graphanalytics_delete_temptables(json);
+DROP FUNCTION IF EXISTS gw_fct_graphanalytics_settempgeom(json);
