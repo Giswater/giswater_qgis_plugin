@@ -9,6 +9,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
 	VALUES
 	(107, 'nodos orphans listos para exportar (epa_type y state_type). Si en realidad son huérfanos, puedes cambiar epa_type para solucionarlo.', 'No se encontraron nodos huérfanos.', 'Nodo huérfano (EPA)'),
     (228, NULL, NULL, 'Go2epa comprueba los nodos huérfanos'),
+    (233, 'nodos/connecs secos con demanda que se han puesto a cero en el proceso go2epa.', 'No se han encontrado conexiones en seco con demanda asociada', 'Nodo/connec seco con demanda asociada (go2epa)'),
     (292, NULL, NULL, 'Bombas EPANET con más de dos acs'),
     (377, 'valor de rugosidad fuera de rango según la fórmula de pérdida de carga utilizada.', 'Los valores de rugosidad se han contrastado con la fórmula de pérdida de carga utilizando los valores mínimo y máximo del manual del usuario de EPANET. Se ha detectado cualquier valor fuera de rango.', 'Arco con longitud inferior a la mínima configurada (go2epa)'),
     (381, NULL, NULL, 'Comprobar y0 en los datos de almacenamiento'),
@@ -49,6 +50,8 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'virtualpumps with null values at least on mandatory column curve_id. bombas virtuales con valores nulos al menos en la columna obligatoria curve_id.', 'Bombas virtuales comprobadas. No faltan valores obligatorios para curve_id. Bombas virtuales comprobadas. No se han omitido valores obligatorios para curve_id.', 'Valores nulos en virtualpump curve_id'),
     (637, NULL, NULL, 'Cálculo del tipo de fluido'),
     (638, 'nodos con reguladores de caudal con longitudes diferentes y el mismo to_arc.', 'Todos los elementos del regulador de caudal con el mismo node_id y to_arc tienen la misma longitud', 'Compruebe que todos los elementos del regulador de caudal tienen la misma longitud'),
+    (640, NULL, NULL, 'Dynamic omunit analysis'),
+    (642, NULL, NULL, 'Treatment type calculation	'),
     (644, 'barranco cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todas las características de los barrancos con id entero.', 'Barranco cuyo id no es un entero'),
     (-1, NULL, NULL, 'Hay'),
     (101, NULL, NULL, 'Comprobación del proyecto Qgis'),
@@ -133,7 +136,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (183, NULL, NULL, 'sector-arco según topología'),
     (184, NULL, NULL, 'dma-toarc según la topología'),
     (185, NULL, NULL, 'dqa-toarc según la topología'),
-    (186, NULL, NULL, 'zona de prensado al arco según la topología'),
+    (186, NULL, NULL, 'Fijar los cruces como salida'),
     (187, 'nodos con estado > 0 y state_type.is_operative en FALSO. Por favor, comprueba tus datos antes de continuar.', 'No se encontraron nodos con estado > 0 Y state_type.is_operative en FALSO.', 'Nodos con state_type is_operative false'),
     (188, 'arcos con estado > 0 y state_type.is_operative en FALSO. Por favor, comprueba tus datos antes de continuar.', 'No se encontraron arcos con estado > 0 Y state_type.is_operative en FALSO.', 'Arcos con tipo de estado is_operative false'),
     (190, NULL, NULL, 'Arcos con dma=0'),
@@ -177,7 +180,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (230, 'tuberías de longitud inferior a la longitud mínima configurada.', 'Todos los documentos están relacionados con las objetos.', 'arcos inferiores a 5 cm.'),
     (231, 'arcos desconectados de cualquier emisario que hayan sido eliminados en el proceso go2epa.', 'No se han encontrado arcos desconectados de ningún emisario', 'Arco desconectado de cualquier emisario (go2epa)'),
     (232, 'arcos secos porque elementos cerrados (go2epa).', 'No se secan los arcos porque se han encontrado elementos cerrados', 'Arco seco por elementos cerrados (go2epa)'),
-    (233, 'nodos/connecs secos con demanda que se han puesto a cero en el proceso go2epa.', 'No se han encontrado conexiones en seco con demanda asociada', 'Nodo seco/connec con demanda asociada (go2epa)'),
     (234, NULL, NULL, 'Precios db importación'),
     (235, NULL, NULL, 'Importar elementos'),
     (236, NULL, NULL, 'Importar addfields'),
@@ -190,7 +192,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (243, NULL, NULL, 'Objetos state=2 participan en psector'),
     (244, NULL, NULL, 'Importar series temporales'),
     (245, NULL, NULL, 'Importar archivo de visita'),
-    (246, NULL, NULL, 'Cebolla de exportación'),
+    (246, NULL, NULL, 'Exportar ui'),
     (247, NULL, NULL, 'Importar ui'),
     (248, NULL, NULL, 'Actualización diaria'),
     (250, NULL, NULL, 'Consistencia de la pendiente'),
@@ -305,7 +307,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (365, NULL, NULL, 'Valores de Clorinathor'),
     (366, NULL, NULL, 'Valores de temperatura'),
     (367, 'arcos que están configurados como toArc para v_prefix_ pero no están operativos en la tabla de arcos. Arc_id - '', string_agg(concat(v_prefix_:,zone_id,-,a.arc_id), nodos que están configurados como nodeParent para v_prefix_ pero no están operativos en la tabla de nodos. Node_id - , string_agg(concat(v_prefix_:,zone_id,-,a.node_id::text),, ).', 'Todos los arcos definidos como nodeParent en v_prefix_ existen en la base de datos.', 'Comprobar si los nodos y arcos definidos existen en una base de datos'),
-    (368, 'nodos que están configurados como nodeParent para v_prefix_ pero no son operativos en la tabla de nodos. Node_id - , string_agg(concat(v_prefix_:,zone_id,-,a.node_id::text),, ).', 'Valores faltantes de válvula to_arc verificados. No se perdieron valores obligatorios.', 'Valores nulos en las válvulas to_arc'),
+    (368, 'válvulas con valores faltantes en la columna obligatoria to_arc.', 'Valores faltantes de válvula to_arc verificados. No se perdieron valores obligatorios.', 'Valores nulos en las válvulas to_arc'),
     (369, NULL, NULL, 'Comprobar la configuración de la subcuenca'),
     (370, NULL, NULL, 'Comprobar características con sector_id=0'),
     (371, 'válvulas con valores faltantes en la columna obligatoria to_arc.', 'No se encontraron registros sin material en la tabla cat_arc.', 'Comprobar catálogo de arcos con matcat_id null'),
@@ -325,7 +327,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (391, 'nodos con epa_type SIN DEFINIR actuando como node_1 o node_2 de arcos. Por favor, verifica tus datos antes de continuar.', 'No hay arcos más cortos que el valor establecido como proximidad de nodo.', 'Arcos más cortos que el valor establecido como proximidad del nodo'),
     (393, NULL, NULL, 'Comprobar barranco duplicado'),
     (394, NULL, NULL, 'Compruebe el enlace en topocontrol'),
-    (395, 'arcos con longitud menor que el valor establecido como proximidad de nodo. Por favor, verifica tus datos antes de continuar.', 'Valores faltantes de bomba to_arc verificados. No se perdieron valores obligatorios.', 'Comprobar to_arc missed VALUES para bombas'),
+    (395, 'bombas con valores faltantes en la columna obligatoria to_arc.', 'Valores faltantes de bomba to_arc verificados. No se perdieron valores obligatorios.', 'Comprobar to_arc missed VALUES para bombas'),
     (396, NULL, NULL, 'Comprobación de la duplicidad de funciones cuando se activa más de un escenario'),
     (397, NULL, NULL, 'Se fuerza el psector padre cuando se activa el psector hijo'),
     (402, 'Los controles con enlaces (arc o nodarc) no están presentes en este resultado.', 'Todos los Controles tienen valores correctos de id de enlace (arc o nodarc).', 'Comprobar los controles para ARC'),
@@ -484,9 +486,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (633, NULL, NULL, 'Bomba presente en más de un escenario habilitado'),
     (634, NULL, NULL, 'Vertedero presente en más de un escenario habilitado'),
     (635, NULL, NULL, 'Empalme presente en más de un escenario habilitado'),
-    (636, 'nodos con ''DMA'' está en cat_feature_node.graph_delimiter array configurado para unactive mapzone.', 'Todos los nodos con cat_feature_node.graphdelimiter=''DMA'' se definen como nodeParent en dma.graphconfig.', 'dma-nodeparent según graph_delimiter (dma inactivo)'),
-    (640, 'cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todas las características de los nodos con id entero.', 'Nodo cuyo id no es un entero'),
-    (642, 'connec cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todas las características connecs con id entero.', 'Connec cuyo id no es un entero')
+    (636, 'nodos con ''DMA'' está en cat_feature_node.graph_delimiter array configurado para unactive mapzone.', 'Todos los nodos con cat_feature_node.graphdelimiter=''DMA'' se definen como nodeParent en dma.graphconfig.', 'dma-nodeparent según graph_delimiter (dma inactivo)')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 
