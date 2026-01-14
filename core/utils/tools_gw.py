@@ -3764,7 +3764,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                             color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                             color_values[item['id']] = {
                                 'color': color,
-                                'layer_id': item.get('layer_id')
+                                'legend_id': item.get('legend_id')
                             }
                         cat_field = str(style_type[key]['field'])
                         size = style_type[key]['width'] if style_type[key].get('width') else 2
