@@ -26,3 +26,53 @@ UPDATE om_typevalue SET idval = 'PRETREATED' WHERE id = '2' AND typevalue = 'tre
 
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
 VALUES('om_typevalue', 'treatment_type', 'link', 'treatment_type', NULL, true);
+
+UPDATE config_function SET style=
+'{
+  "style": {
+    "point": {
+      "style": "categorized",
+      "field": "feature_type",
+      "transparency": 0.5,
+      "width": 2,
+      "values": [
+        {
+          "id": "NODE",
+          "color": [255, 0, 0],
+		  "legend_id": "NODE (profile)"
+        },
+        {
+          "id": "GULLY",
+          "color": [216, 197, 52],
+		  "legend_id": "GULLY (profile)"
+        },
+        {
+          "id": "CONNEC",
+          "color": [166, 206, 227],
+		  "legend_id": "CONNEC (profile)"
+        }
+      ]
+    },
+    "line": {
+      "style": "categorized",
+      "field": "feature_type",
+      "transparency": 0.5,
+      "width": 2,
+      "values": [
+        {
+          "id": "ARC",
+          "color": [176, 250, 248],
+		  "legend_id": "ARC (profile)"
+        },
+        {
+          "id": "LINK",
+          "color": [255, 116, 130],
+		  "legend_id": "LINK (profile)"
+        }
+      ]
+    },
+    "polygon": {}
+  }
+}'::json
+WHERE id=2832;
+

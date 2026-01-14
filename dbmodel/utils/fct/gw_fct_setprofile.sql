@@ -37,6 +37,7 @@ SELECT "SCHEMA_NAME".gw_fct_setprofile($${
     v_profile_id text;
     v_init_node integer;
     v_end_node integer;
+    v_mid_nodes text;
     v_message text;
     v_list_arcs text;
     v_arc_id text;
@@ -66,6 +67,7 @@ BEGIN
 	v_device := ((p_data ->>'client')::json->>'device')::text;
 	v_profile_id := ((p_data ->>'data')::json->>'profile_id')::text;
 	v_init_node := ((p_data ->>'data')::json->>'initNode')::text;
+	v_mid_nodes := ((p_data ->>'data')::json->>'midNodes')::text;
 	v_end_node := ((p_data ->>'data')::json->>'endNode')::text;
 	v_list_arcs := ((p_data ->>'data')::json->>'listArcs')::text;
 	v_linksDistance := ((p_data ->>'data')::json->>'linksDistance')::integer;
@@ -93,7 +95,7 @@ BEGIN
 		EXECUTE 'SELECT DISTINCT(profile_id) FROM om_profile WHERE profile_id = ''' || v_profile_id || '''::text' INTO v_profile;
 		IF v_profile IS NULL THEN
 			-- Populate values
-			v_values = '{"initNode":'||v_init_node||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'","linksDistance":'||COALESCE(v_linksDistance::text, '""')||', "legendFactor":'||COALESCE(v_legendFactor::text, '""')||', "papersize":{"id":'||COALESCE(v_papersize_id::text, '""')||', "customDim":{"xdim":'||COALESCE(v_papersize_xdim::text, '""')||', "ydim":'||COALESCE(v_papersize_ydim::text, '""')||'}}, "title":"'||COALESCE(v_title, '""')||'","date":"'||COALESCE(v_date::text, '""')||'", "scale":{"scaleToFit":'||COALESCE(v_scaletofit::text, '""')||', "eh":'||COALESCE(v_scale_eh::text,'""')||', "ev":'||COALESCE(v_scale_ev::text, '""')||'}}';
+			v_values = '{"initNode":'||v_init_node||', "midNodes":'||v_mid_nodes||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'","linksDistance":'||COALESCE(v_linksDistance::text, '""')||', "legendFactor":'||COALESCE(v_legendFactor::text, '""')||', "papersize":{"id":'||COALESCE(v_papersize_id::text, '""')||', "customDim":{"xdim":'||COALESCE(v_papersize_xdim::text, '""')||', "ydim":'||COALESCE(v_papersize_ydim::text, '""')||'}}, "title":"'||COALESCE(v_title, '""')||'","date":"'||COALESCE(v_date::text, '""')||'", "scale":{"scaleToFit":'||COALESCE(v_scaletofit::text, '""')||', "eh":'||COALESCE(v_scale_eh::text,'""')||', "ev":'||COALESCE(v_scale_ev::text, '""')||'}}';
 			EXECUTE 'INSERT INTO om_profile (profile_id, values) VALUES ('''||v_profile_id||''', '''||v_values||''')';
 
 			v_message := 'Values has been updated';

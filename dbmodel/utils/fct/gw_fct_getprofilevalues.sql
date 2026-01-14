@@ -735,46 +735,59 @@ BEGIN
 
 	END IF;
 
-	IF v_device = 5 THEN
-		SELECT jsonb_build_object(
-		    'type', 'FeatureCollection',
-		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-		) INTO v_result
-		FROM (
-	  	SELECT jsonb_build_object(
-	     'type',       'Feature',
-	    'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom'
-	  	) AS feature
-	  	FROM (SELECT arc_id, arccat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-	  	FROM  temp_anl_arc) row) features;
+	
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Profile line',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+		'type',       'Feature',
+	'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+	'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (
+		SELECT arc_id, arccat_id, descript::jsonb,expl_id, ST_Transform(the_geom, 4326) as the_geom, 'ARC' as feature_type
+		FROM  temp_anl_arc
+		UNION
+		SELECT l.link_id::text, linkcat_id, descript::jsonb, expl_id, ST_Transform(the_geom, 4326) as the_geom, 'LINK' as feature_type
+		FROM link l
+		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
 
 
-		v_result_line = v_result;
+	v_result_line = v_result;
 
-		SELECT jsonb_build_object(
-			'type', 'FeatureCollection',
-			'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-		) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM (SELECT node_id, nodecat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-		FROM  temp_anl_node WHERE nodecat_id!='VNODE') row) features;
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Profile point',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+		'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (
+		SELECT node_id, nodecat_id, descript::jsonb,expl_id, ST_Transform(the_geom, 4326) as the_geom, 'NODE' as feature_type
+		FROM temp_anl_node
+		WHERE nodecat_id!='VNODE'
+		UNION
+		SELECT c.connec_id::text, conneccat_id, c.descript::jsonb, c.expl_id, ST_Transform(c.the_geom, 4326) as the_geom, 'CONNEC' as feature_type
+		FROM connec c
+		JOIN link l ON c.connec_id = l.feature_id
+		JOIN temp_link_x_arc la ON l.link_id = la.link_id
+		UNION
+		SELECT g.gully_id::text, gullycat_id, g.descript::jsonb, g.expl_id, ST_Transform(g.the_geom, 4326) as the_geom, 'GULLY' as feature_type
+		FROM gully g
+		JOIN link l ON g.gully_id = l.feature_id
+		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
 
-		v_result_point = v_result;
+	v_result_point = v_result;
 
-		v_result_polygon = '{}';
+	v_result_polygon = '{}';
 
-	ELSE
-		v_result_polygon = '{}';
-		v_result_line = '{}';
-		v_result_point = '{}';
-
-	END IF;
 
 	IF v_arc IS NULL THEN
 		v_message = 'Unable to create a Profile. Check your path continuity before continue!';
@@ -801,7 +814,7 @@ BEGIN
 	DROP TABLE IF EXISTS temp_pgr_dijkstra;
 
 	--  Return
-	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
                ',"data":{"legend":'||v_guitarlegend||','||
 			'"scale":"'||v_scale||'",'||
@@ -813,7 +826,7 @@ BEGIN
 			'"arc":'||v_arc||','||
 			'"point":'||v_result_point||','||
 			'"line":'||v_result_line||','||
-			'"polygon":'||v_result_polygon||'}}}')::json;
+			'"polygon":'||v_result_polygon||'}}}')::json, 2832, null, null, null);
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
