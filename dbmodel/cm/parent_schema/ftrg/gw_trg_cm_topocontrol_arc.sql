@@ -110,26 +110,18 @@ BEGIN
     END IF;
 
     -- Find the nearest start and end nodes for the working geometry
-    SELECT node.*, cfn.isarcdivide INTO v_node_start 
-    FROM PARENT_SCHEMA.node
-    JOIN PARENT_SCHEMA.cat_node ON cat_node.id = node.nodecat_id
-    JOIN PARENT_SCHEMA.cat_feature_node cfn ON cfn.id = cat_node.node_type
-    WHERE ST_DWithin(ST_StartPoint(v_working_geom), node.the_geom, v_search_tolerance)
-      AND (node.state = 1 OR v_state_filter = FALSE) -- Only active nodes unless disabled
-    ORDER BY (CASE WHEN COALESCE(cfn.isarcdivide, FALSE) IS TRUE THEN 1 ELSE 2 END),
-             ST_Distance(ST_StartPoint(v_working_geom), node.the_geom) LIMIT 1;
+	select node_id, the_geom INTO v_node_start
+	from cm.om_campaign_x_node n
+	WHERE n.campaign_id=NEW.campaign_id and ST_DWithin(ST_StartPoint(v_working_geom), n.the_geom, v_search_tolerance)
+	ORDER BY ST_Distance(ST_StartPoint(v_working_geom), n.the_geom) LIMIT 1;
 
-    SELECT node.*, cfn.isarcdivide INTO v_node_end 
-    FROM PARENT_SCHEMA.node
-    JOIN PARENT_SCHEMA.cat_node ON cat_node.id = node.nodecat_id
-    JOIN PARENT_SCHEMA.cat_feature_node cfn ON cfn.id = cat_node.node_type
-    WHERE ST_DWithin(ST_EndPoint(v_working_geom), node.the_geom, v_search_tolerance)
-      AND (node.state = 1 OR v_state_filter = FALSE) -- Only active nodes unless disabled
-    ORDER BY (CASE WHEN COALESCE(cfn.isarcdivide, FALSE) IS TRUE THEN 1 ELSE 2 END),
-             ST_Distance(ST_EndPoint(v_working_geom), node.the_geom) LIMIT 1;
+	select node_id, the_geom INTO v_node_end
+	from cm.om_campaign_x_node n
+	WHERE n.campaign_id=NEW.campaign_id and ST_DWithin(ST_EndPoint(v_working_geom), n.the_geom, v_search_tolerance)
+	ORDER BY ST_Distance(ST_EndPoint(v_working_geom), n.the_geom) LIMIT 1;
 
     -- Validate the nodes found
-    IF v_node_start.node_id IS NULL OR v_node_end.node_id IS NULL THEN
+    /*IF v_node_start.node_id IS NULL OR v_node_end.node_id IS NULL THEN
         -- For INSERT operations, be more lenient - just log a warning instead of raising exception
         IF TG_OP = 'INSERT' THEN
             RAISE WARNING 'Topology Warning: Campaign arc endpoints not within % units of a node. Arc will be inserted without topology control.', v_search_tolerance;
@@ -150,8 +142,7 @@ BEGIN
             PERFORM set_config('search_path', v_prev_search_path, true);
             RAISE EXCEPTION 'Topology Error: Campaign arc cannot start and end at the same node (ID: %)', v_node_start.node_id;
         END IF;
-    END IF;
-
+    END IF;*/
 
     -- ACTION - MODIFY THE INCOMING RECORD
     NEW.node_1 := v_node_start.node_id;
