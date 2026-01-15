@@ -787,12 +787,10 @@ class GwInfo(QObject):
 
             # Create connections
             if field['widgettype'] not in ('tableview', 'vspacer', 'list', 'hspacer', 'button', 'label'):
-                if field['widgettype'] == 'hyperlink':
+                if field['widgettype'] in ('hyperlink'):
                     if type(widget) is GwHyperLinkLineEdit:
                         widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
-                elif field['widgettype'] == 'multiple_option':
-                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
-                else:
+                elif field['widgettype'] in ('multiple_option', 'multiple_checkbox'):
                     widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
 
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
@@ -2380,6 +2378,27 @@ class GwInfo(QObject):
         else:  # Other tabs
             widget.findChild(QListWidget).model().rowsRemoved.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
             widget.findChild(QListWidget).model().rowsInserted.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+        return widget
+
+    def _set_auto_update_multiple_checkbox(self, field, dialog, widget, new_feature):
+
+        if widget.property('isfilter'):
+            return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
+        if self._check_tab_data(field):
+            if field['isautoupdate'] and self.new_feature_id is None:
+                _json = {}
+                widget.itemChanged.connect(partial(self._clean_my_json, widget))
+
+                widget.itemChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
+
+                widget.itemChanged.connect(partial(self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+            else:
+                widget.itemChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        else:  # Other tabs
+            widget.itemChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
         return widget
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
