@@ -1549,7 +1549,7 @@ BEGIN
 		FOR rec IN SELECT DISTINCT expl_id FROM temp_t_node
 		LOOP
 			
-			EXECUTE 'SELECT gw_fct_dma_graph($${"client":{"device":4, "infoType":1, "lang":"ES"},
+			EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
 			
 		END LOOP;
