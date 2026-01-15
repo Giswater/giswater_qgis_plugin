@@ -791,7 +791,7 @@ class GwInfo(QObject):
                     if type(widget) is GwHyperLinkLineEdit:
                         widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
                 elif field['widgettype'] == 'multiple_option':
-                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget.findChild(QListWidget), new_feature)
+                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
                 else:
                     widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
 
@@ -2360,6 +2360,27 @@ class GwInfo(QObject):
 
         if widget.property('isfilter'):
             return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
+        if self._check_tab_data(field):
+            if field['isautoupdate'] and self.new_feature_id is None:
+                _json = {}
+                widget.findChild(QListWidget).model().rowsRemoved.connect(partial(self._clean_my_json, widget))
+                widget.findChild(QListWidget).model().rowsInserted.connect(partial(self._clean_my_json, widget))
+
+                widget.findChild(QListWidget).model().rowsRemoved.connect(partial(tools_gw.get_values, dialog, widget, _json))
+                widget.findChild(QListWidget).model().rowsInserted.connect(partial(tools_gw.get_values, dialog, widget, _json))
+
+                widget.findChild(QListWidget).model().rowsRemoved.connect(partial(self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                widget.findChild(QListWidget).model().rowsInserted.connect(partial(self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+            else:
+                widget.findChild(QListWidget).model().rowsRemoved.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.findChild(QListWidget).model().rowsInserted.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        else:  # Other tabs
+            widget.findChild(QListWidget).model().rowsRemoved.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            widget.findChild(QListWidget).model().rowsInserted.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+        return widget
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 

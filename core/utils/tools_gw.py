@@ -1625,6 +1625,8 @@ def enable_widgets(dialog, result, enable):
                         # but giving preference to the configuration when iseditable is True
                         if not field['iseditable']:
                             widget.setEnabled(field['iseditable'])
+                    elif type(widget) is QListWidget:
+                        widget.setEnabled(enable)
                     break
 
     except RuntimeError:
@@ -1660,6 +1662,8 @@ def enable_all(dialog, result, from_apply=False):
                     elif type(widget) in (QCheckBox, QPushButton):
                         widget.setEnabled(field['iseditable'])
                         widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus if field['iseditable'] else Qt.FocusPolicy.NoFocus)
+                    elif type(widget) is QListWidget:
+                        widget.setEnabled(field['iseditable'])
     except RuntimeError:
         pass
 
