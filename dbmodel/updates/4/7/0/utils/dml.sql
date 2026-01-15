@@ -155,3 +155,5 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_settempgeo
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_create_temptables(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_delete_temptables(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_settempgeom(json);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3538, 'gw_fct_getdmagraph', 'ws', 'function', 'json', 'json', 'Function to return and generate a graph for the calculated DMAs of a exploitation', 'role_om', NULL, 'core', NULL);
