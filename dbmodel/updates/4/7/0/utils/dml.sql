@@ -138,9 +138,9 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 -- 13/01/2026
 UPDATE sys_fprocess SET except_level = 3 WHERE fid = 153;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3534, 'gw_fct_getarcauditvalues', 'utils', 'function', 'json', 'json', 'Function to return the arc divides and arc fusion within a given period of time.', NULL, NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3534, 'gw_fct_getarcauditvalues', 'utils', 'function', 'json', 'json', 'Function to return the arc divides and arc fusion within a given period of time.', 'role_basic', NULL, 'core', NULL);
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3536, 'gw_fct_getmincutminsector', 'utils', 'function', 'json', 'json', 'Function to return stats from a mincut minsector', NULL, NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3536, 'gw_fct_getmincutminsector', 'utils', 'function', 'json', 'json', 'Function to return stats from a mincut minsector', 'role_basic', NULL, 'core', NULL);
 
 INSERT INTO inp_family (family_id, descript, age) VALUES('METAL', 'Metallic pipes', NULL);
 INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pipes', NULL);
