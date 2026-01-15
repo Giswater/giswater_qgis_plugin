@@ -162,13 +162,17 @@ BEGIN
 	-- drop temp tables
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"ANL"}}}$$)';
 
-	-- Drop possible duplicated values
-	DELETE FROM t_audit_check_data WHERE id IN (
-		WITH mec AS (
-			SELECT id, ROW_NUMBER() OVER(PARTITION BY error_message ORDER BY error_message) AS rowid
-			FROM t_audit_check_data WHERE cur_user = current_user
-		) SELECT id FROM mec WHERE rowid = 2
-	);
+	-- Drop possible duplicated values (if temp table exists)
+	IF to_regclass('pg_temp.t_audit_check_data') IS NOT NULL THEN
+  	
+		DELETE FROM t_audit_check_data WHERE id IN (
+			WITH mec AS (
+				SELECT id, ROW_NUMBER() OVER(PARTITION BY error_message ORDER BY error_message) AS rowid
+				FROM t_audit_check_data WHERE cur_user = current_user
+			) SELECT id FROM mec WHERE rowid = 2
+		);
+
+	END IF;
 
 	DROP TABLE IF EXISTS t_temp_values;
 
