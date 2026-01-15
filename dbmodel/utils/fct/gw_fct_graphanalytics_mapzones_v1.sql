@@ -105,6 +105,7 @@ DECLARE
 	v_data json;
 	rec_man record;
 
+	rec record;
 	-- result variables
 	v_result text;
 	v_result_info json;
@@ -2389,6 +2390,19 @@ BEGIN
 			);';
 		EXECUTE v_query_text;
 	END IF;
+
+	IF v_class = 'DMA' THEN -- Execute DMA graph
+	
+		FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
+		LOOP
+			
+			EXECUTE 'SELECT gw_fct_dma_graph($${"client":{"device":4, "infoType":1, "lang":"ES"},
+			"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
+			
+		END LOOP;
+	
+	END IF;
+
 
 
     IF v_response->>'status' <> 'Accepted' THEN

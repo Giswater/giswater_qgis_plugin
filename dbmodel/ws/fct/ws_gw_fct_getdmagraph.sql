@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_dma_graph(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getdmagraph(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -15,7 +15,7 @@ AS $function$
 /*
 EXAMPLE:
 
-SELECT gw_fct_dma_graph($${"client":{"device":4, "infoType":1, "lang":"ES"},
+SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"explId":1, "searchDistRouting":999}}}$$);
 
 */
@@ -78,8 +78,6 @@ BEGIN
 	-- Get the flooding order of the dma's USING previous query
 	FOR rec in execute 'SELECT DISTINCT "source" from ('||v_sql_pgrouting||')a'
 	LOOP
-		
-		RAISE NOTICE 'rec %', rec;
 		
 		v_sql = '
 		INSERT INTO temp_dma_order (meter_id, dma_1, dma_2, agg_cost)
