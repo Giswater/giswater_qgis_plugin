@@ -157,3 +157,22 @@ DROP FUNCTION IF EXISTS gw_fct_graphanalytics_delete_temptables(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_settempgeom(json);
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3538, 'gw_fct_getdmagraph', 'ws', 'function', 'json', 'json', 'Function to return and generate a graph for the calculated DMAs of a exploitation', 'role_om', NULL, 'core', NULL);
+
+UPDATE sys_fprocess SET query_text='SELECT array_agg(a.list::text) AS arr_list FROM (
+	SELECT concat(''Formname: '',formname, '', layoutname: '',layoutname, '', layoutorder: '',layoutorder) as list 
+	FROM config_form_fields 
+	WHERE formtype = ''form_feature'' AND hidden is FALSE AND tabname <> ''tab_none''
+	group by layoutorder,formname,layoutname having count(*)>1)a HAVING count(*)>0' WHERE fid=322;
+
+UPDATE sys_fprocess SET query_text='SELECT string_agg(concat(formname, '': '', columnname), ''; '') FROM config_form_fields WHERE datatype IS NULL AND formtype=''form_feature'' AND widgettype NOT IN (''hspacer'', ''tableview'', ''button'') HAVING count(*)>0' 
+WHERE fid=318;
+
+UPDATE sys_fprocess SET query_text='WITH subq_1 as (
+SELECT a.id, feature_class, a.feature_type, child_layer from cat_feature a JOIN sys_addfields b ON a.id = b.cat_feature_id
+), subq_2 as (
+select*from information_schema.views a join subq_1 m on m.child_layer = a.table_name
+where a.table_schema = current_schema
+), subq_3 as (
+select *, concat(''man_'',lower(feature_type)), position(concat(''man_'',lower(feature_type)) in view_definition) from subq_2
+)
+select*from subq_3 where position = 0' WHERE fid=311;
