@@ -162,8 +162,15 @@ BEGIN
 	-- drop temp tables
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"ANL"}}}$$)';
 
-	DROP TABLE IF EXISTS t_temp_values;
+	-- Drop possible duplicated values
+	DELETE FROM t_audit_check_data WHERE id IN (
+		WITH mec AS (
+			SELECT id, ROW_NUMBER() OVER(PARTITION BY error_message ORDER BY error_message) AS rowid
+			FROM t_audit_check_data WHERE cur_user = current_user
+		) SELECT id FROM mec WHERE rowid = 2
+	);
 
+	DROP TABLE IF EXISTS t_temp_values;
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
