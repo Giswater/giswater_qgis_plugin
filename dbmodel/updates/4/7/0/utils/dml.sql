@@ -176,3 +176,5 @@ where a.table_schema = current_schema
 select *, concat(''man_'',lower(feature_type)), position(concat(''man_'',lower(feature_type)) in view_definition) from subq_2
 )
 select*from subq_3 where position = 0' WHERE fid=311;
+
+UPDATE sys_fprocess SET query_text='SELECT c.connec_id FROM plan_psector_x_connec c JOIN connec b USING (connec_id) WHERE link_id IS NULL AND pjoint_id IS NULL' WHERE fid=356;
