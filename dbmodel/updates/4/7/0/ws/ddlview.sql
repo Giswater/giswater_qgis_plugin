@@ -1232,3 +1232,21 @@ AND EXISTS (SELECT 1 FROM selector_state ss WHERE ss.state_id = p.state AND ss.c
 AND EXISTS (SELECT 1 FROM selector_sector ssec WHERE ssec.sector_id = e.sector_id AND ssec.cur_user = CURRENT_USER)
 AND EXISTS (SELECT 1 FROM selector_municipality sm WHERE sm.muni_id = e.muni_id AND sm.cur_user = CURRENT_USER)
 AND EXISTS (SELECT 1 FROM selector_expl se WHERE (se.expl_id = ANY (array_append(e.expl_visibility, e.expl_id))) AND se.cur_user = CURRENT_USER);
+
+
+CREATE OR REPLACE VIEW v_om_mincut_valve
+AS SELECT om_mincut_valve.id,
+    om_mincut_valve.result_id,
+    om_mincut.work_order,
+    om_mincut_valve.node_id,
+    om_mincut_valve.closed,
+    om_mincut_valve.broken,
+    om_mincut_valve.unaccess,
+    om_mincut_valve.proposed,
+    om_mincut_valve.to_arc,
+    om_mincut_valve.the_geom,
+    om_mincut_valve.changestatus
+   FROM selector_mincut_result,
+    om_mincut_valve
+     JOIN om_mincut ON om_mincut_valve.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_valve.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
