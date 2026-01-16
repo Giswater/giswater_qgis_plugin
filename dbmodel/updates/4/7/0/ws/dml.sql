@@ -18,3 +18,9 @@ UPDATE config_form_fields
 
 -- 09/01/2026
 UPDATE sys_feature_class SET epa_default = 'JUNCTION' WHERE type IN ('CONNEC');
+
+-- 16/01/2026
+INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,vdefault,layoutname,iseditable,"source")
+VALUES ('inp_options_demand_weight_factor','epaoptions','Use demand in DMA weight factor format','role_epa','Demand weight factor format:',true,(SELECT MAX(layoutorder) + 1 FROM sys_param_user WHERE formname='epaoptions' AND layoutname='lyt_general_2'),'ws',false,false,'boolean','check',true,'FALSE','lyt_general_2',true,'core');
+
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('inp_options_demand_weight_factor', 'FALSE', 'postgres') ON CONFLICT DO NOTHING;
