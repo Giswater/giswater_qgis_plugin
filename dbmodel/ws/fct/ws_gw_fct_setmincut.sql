@@ -217,17 +217,17 @@ BEGIN
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
-		SELECT va.arc_id INTO v_arc_id 
+		SELECT va.arc_id INTO v_arc_id
 		FROM v_temp_arc va
 		WHERE ST_DWithin(va.the_geom, v_point,v_sensibility)
 		AND EXISTS (
-			SELECT 1 
-			FROM v_temp_arc vta 
+			SELECT 1
+			FROM v_temp_arc vta
 			WHERE va.arc_id = vta.arc_id
-		) 
+		)
 		LIMIT 1;
-	END IF; 
- 
+	END IF;
+
 	-- get valve from coordinates
 	IF v_valve_node_id IS NULL AND v_xcoord IS NOT NULL THEN
 		v_sensibility_f := (SELECT (value::json->>'web')::float FROM config_param_system WHERE parameter = 'basic_info_sensibility_factor');
@@ -262,26 +262,26 @@ BEGIN
 
 	--check if arc exists in database or look for a new arc_id in the same location
 	IF v_arc_id IS NULL THEN
-		SELECT om.anl_feature_id INTO v_arc_id 
+		SELECT om.anl_feature_id INTO v_arc_id
 			FROM om_mincut om
 			WHERE om.id = v_mincut_id
 			AND EXISTS (
-				SELECT 1 
-				FROM v_temp_arc vta 
+				SELECT 1
+				FROM v_temp_arc vta
 				WHERE om.anl_feature_id::integer = vta.arc_id
 			) ;
-		
+
 		IF v_arc_id IS NULL THEN
 			SELECT a.arc_id INTO v_arc_id
 			FROM v_temp_arc a
 			WHERE EXISTS (
-				SELECT 1 
-				FROM om_mincut om 
-				WHERE om.id = v_mincut_id 
+				SELECT 1
+				FROM om_mincut om
+				WHERE om.id = v_mincut_id
 				AND ST_DWithin(a.the_geom, om.anl_the_geom,0.1)
 			)
 			LIMIT 1;
-		END IF;	
+		END IF;
 	ELSE
 		-- check if arc_id from ve_arc exists in v_temp_arc
 		IF NOT EXISTS (
@@ -302,7 +302,7 @@ BEGIN
 	END IF;
 
 	IF v_mode = 'MINSECTOR' THEN
-		SELECT minsector_id INTO v_node 
+		SELECT minsector_id INTO v_node
 		FROM v_temp_arc WHERE arc_id = v_arc_id;
 
 		IF v_node IS NULL OR v_node = 0 THEN
@@ -315,17 +315,17 @@ BEGIN
 			);
 		END IF;
 	ELSE
-		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR); 
+		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR);
 		SELECT node_id INTO v_node
 		FROM v_temp_node n
-		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
+		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2
 		WHERE a.arc_id = v_arc_id
 		AND 'SECTOR' <> ALL(n.graph_delimiter)
 		LIMIT 1;
 
 		-- v_node = 0 if arc in between 2 water sources
-		IF v_node IS NULL THEN 
-			v_node := 0::integer;         
+		IF v_node IS NULL THEN
+			v_node := 0::integer;
 		END IF;
 	END IF;
 
@@ -807,7 +807,7 @@ BEGIN
 	IF v_init_mincut THEN
 		-- Initialize process
 		-- =======================
-		IF v_mode = 'MINSECTOR' THEN 
+		IF v_mode = 'MINSECTOR' THEN
 			TRUNCATE temp_pgr_node_minsector;
 			TRUNCATE temp_pgr_arc_linegraph;
 
@@ -823,13 +823,13 @@ BEGIN
 
 			-- MINSECTORS that contain an arc that connects to a node SECTOR-WATER and is not inlet_arc will have graph_delimiter = 'SECTOR'
 			-- TANK, SOURCE, WATERWELL, WTP
-			WITH 
-				sector_water AS ( 
+			WITH
+				sector_water AS (
 					SELECT m.node_id, m.inlet_arc
 					FROM man_tank m
 					JOIN v_temp_node n USING (node_id)
 					WHERE 'SECTOR' = ANY(n.graph_delimiter)
-					UNION ALL  
+					UNION ALL
 					SELECT m.node_id, m.inlet_arc
 					FROM man_source m
 					JOIN v_temp_node n USING (node_id)
@@ -838,7 +838,7 @@ BEGIN
 					SELECT m.node_id, m.inlet_arc
 					FROM man_waterwell m
 					JOIN v_temp_node n USING (node_id)
-					WHERE 'SECTOR' = ANY(n.graph_delimiter) 
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
 					UNION ALL
 					SELECT m.node_id, m.inlet_arc
 					FROM man_wtp m
@@ -915,9 +915,9 @@ BEGIN
 			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
 
 			-- nodes that are valve MINSECTOR
-			UPDATE temp_pgr_node t 
+			UPDATE temp_pgr_node t
 			SET graph_delimiter = 'MINSECTOR'
-			FROM v_temp_node n 
+			FROM v_temp_node n
 			JOIN man_valve m ON n.node_id = m.node_id
 			WHERE t.pgr_node_id = n.node_id
 			AND 'MINSECTOR' = ANY (n.graph_delimiter);
@@ -931,13 +931,13 @@ BEGIN
 
 			-- insert the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
 			-- TANKS, SOURCE, WATERWELL, WTP
-			WITH 
-				sector_water AS ( 
+			WITH
+				sector_water AS (
 					SELECT m.node_id, m.inlet_arc
 					FROM man_tank m
 					JOIN v_temp_node n USING (node_id)
 					WHERE 'SECTOR' = ANY(n.graph_delimiter)
-					UNION ALL  
+					UNION ALL
 					SELECT m.node_id, m.inlet_arc
 					FROM man_source m
 					JOIN v_temp_node n USING (node_id)
@@ -946,7 +946,7 @@ BEGIN
 					SELECT m.node_id, m.inlet_arc
 					FROM man_waterwell m
 					JOIN v_temp_node n USING (node_id)
-					WHERE 'SECTOR' = ANY(n.graph_delimiter) 
+					WHERE 'SECTOR' = ANY(n.graph_delimiter)
 					UNION ALL
 					SELECT m.node_id, m.inlet_arc
 					FROM man_wtp m
@@ -957,19 +957,19 @@ BEGIN
 			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
 			FROM v_temp_arc a
 			WHERE EXISTS (
-				SELECT 1 
+				SELECT 1
 				FROM sector_water s
 				WHERE (s.node_id = a.node_1 OR s.node_id = a.node_2)
         		AND a.arc_id <> ALL(COALESCE(s.inlet_arc,ARRAY[]::int[]))
 			)
 			AND EXISTS (
-				SELECT 1 
-				FROM temp_pgr_node n 
+				SELECT 1
+				FROM temp_pgr_node n
 				WHERE (n.pgr_node_id = a.node_1 OR n.pgr_node_id = a.node_2)
 			);
-			
+
 			-- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
-			v_query_text := 
+			v_query_text :=
 			'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 AS cost
 			FROM temp_pgr_arc';
 
@@ -1024,13 +1024,13 @@ BEGIN
 			SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
 
 			-- Update the mapzone_id field for arcs (mapzone_id = min(arc_id) for the connected arcs)
-			UPDATE temp_pgr_arc a 
+			UPDATE temp_pgr_arc a
 			SET mapzone_id = c.component
 			FROM temp_pgr_connectedcomponents c
 			WHERE a.pgr_arc_id = c.node;
 
-			-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters 
-			UPDATE temp_pgr_arc 
+			-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters
+			UPDATE temp_pgr_arc
 			SET mapzone_id = pgr_arc_id
 			WHERE mapzone_id = 0;
 
@@ -1070,7 +1070,7 @@ BEGIN
 			UPDATE temp_pgr_node_minsector t
 			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
-				SELECT 1 FROM temp_pgr_arc a 
+				SELECT 1 FROM temp_pgr_arc a
 				WHERE a.graph_delimiter = 'SECTOR'
 				AND a.mapzone_id = t.pgr_node_id
 			);
@@ -1079,7 +1079,7 @@ BEGIN
 
 		-- UPDATE closed, broken, to_arc, costs for valves-minsector
 		UPDATE temp_pgr_arc_linegraph t
-		SET 
+		SET
 			closed = m.closed,
 			broken = m.broken,
 			to_arc =
@@ -1089,7 +1089,7 @@ BEGIN
 				END,
 			cost_mincut = -1,
 			reverse_cost_mincut = -1
-		FROM man_valve m 
+		FROM man_valve m
 		WHERE t.pgr_node_id = m.node_id;
 
 		-- UPDATE cost/reverse_cost
@@ -1101,24 +1101,24 @@ BEGIN
 		-- operative checkvalves
 		IF v_mode = 'MINSECTOR' THEN
 			UPDATE temp_pgr_arc_linegraph t
-			SET 
+			SET
 				cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN -1 ELSE 1 END
-			WHERE t.closed = FALSE 
+			WHERE t.closed = FALSE
 			AND t.broken = FALSE
 			AND t.to_arc IS NOT NULL;
-		ELSE 
+		ELSE
 			UPDATE temp_pgr_arc_linegraph t
-			SET 
+			SET
 				cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
-			WHERE t.closed = FALSE 
+			WHERE t.closed = FALSE
 			AND t.broken = FALSE
 			AND t.to_arc IS NOT NULL;
 		END IF;
 
 		-- UPDATE cost_mincut/reverse_cost_mincut
-		-- ignore_broken_valves 
+		-- ignore_broken_valves
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost_mincut = 1, reverse_cost_mincut = 1
 		WHERE t.closed = FALSE
@@ -1143,12 +1143,12 @@ BEGIN
 
 	IF v_prepare_mincut THEN
 		-- prepare mincut
-		UPDATE temp_pgr_node_minsector 
-		SET mapzone_id = 0 
+		UPDATE temp_pgr_node_minsector
+		SET mapzone_id = 0
 		WHERE mapzone_id <> 0;
 
-		UPDATE temp_pgr_arc_linegraph 
-		SET mapzone_id = 0 
+		UPDATE temp_pgr_arc_linegraph
+		SET mapzone_id = 0
 		WHERE mapzone_id <> 0;
 
 		-- set the default values for proposed valves for current mincut (adjacent_mincut_id = 0) and adjacents mincuts, if they exist (adjacent_mincut_id <> 0)
@@ -1173,7 +1173,7 @@ BEGIN
 			reverse_cost_mincut = -1
 		WHERE unaccess = TRUE;
 
-		-- set the default values for changestatus valves 
+		-- set the default values for changestatus valves
 		--for current mincut (adjacent_mincut_id = 0)
 		-- and adjacent mincuts, if they exist (adjacent_mincut_id <> 0)
 		UPDATE temp_pgr_arc_linegraph
@@ -1219,11 +1219,11 @@ BEGIN
 			v_pgr_root_vid := v_node;
 		ELSE
 			-- arc between 2 diposits, the value for minsector_id for this arc is arc_id
-			IF v_node = 0 THEN	
+			IF v_node = 0 THEN
 				v_pgr_root_vid := v_arc_id;
 			ELSE
 				SELECT mapzone_id INTO v_pgr_root_vid
-				FROM temp_pgr_arc 
+				FROM temp_pgr_arc
 				WHERE pgr_arc_id = v_arc_id;
 			END IF;
 		END IF;
@@ -1234,7 +1234,7 @@ BEGIN
 			IF v_node = 0 THEN
 				-- the choosen arc is between 2 water sources, temp_pgr_node_minsector and temp_pgr_arc_linegraph don't have rows
 				INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter, mapzone_id)
-				VALUES (v_pgr_root_vid, 'SECTOR', 1); 
+				VALUES (v_pgr_root_vid, 'SECTOR', 1);
 			ELSE
 				-- the choosen arc is in an isolated minsector; temp_pgr_arc_linegraph doesn't have rows
 				UPDATE temp_pgr_node_minsector SET mapzone_id = 1 WHERE pgr_node_id = v_pgr_root_vid;
@@ -1636,22 +1636,22 @@ BEGIN
 			FOR v_mincut_group_record IN EXECUTE v_query_text LOOP
 
 				-- prepare mincut
-				UPDATE temp_pgr_node_minsector 
-				SET mapzone_id = 0 
+				UPDATE temp_pgr_node_minsector
+				SET mapzone_id = 0
 				WHERE mapzone_id <> 0;
 
-				UPDATE temp_pgr_arc_linegraph 
-				SET mapzone_id = 0 
+				UPDATE temp_pgr_arc_linegraph
+				SET mapzone_id = 0
 				WHERE mapzone_id <> 0;
 
-				-- set the default values for proposed valves 
+				-- set the default values for proposed valves
 				-- for current mincut (adjacent_mincut_id = 0)
 				UPDATE temp_pgr_arc_linegraph
 				SET proposed = FALSE
 				WHERE proposed = TRUE
 				AND adjacent_mincut_id = 0;
 
-				-- set the default values for proposed valves 
+				-- set the default values for proposed valves
 				-- for adjacents mincuts, if they exist (adjacent_mincut_id <> 0)
 				UPDATE temp_pgr_arc_linegraph
 				SET proposed = FALSE,
@@ -1754,15 +1754,15 @@ BEGIN
 									SELECT 1
 									FROM arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
-									WHERE oma.result_id = %L 
+									WHERE oma.result_id = %L
 									AND a.minsector_id = tpa.pgr_node_1
 								)
-								OR 
+								OR
 								NOT EXISTS (
 									SELECT 1
 									FROM arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
-									WHERE oma.result_id = %L 
+									WHERE oma.result_id = %L
 									AND a.minsector_id = tpa.pgr_node_2
 								)
 							)
@@ -1777,15 +1777,15 @@ BEGIN
 									SELECT 1
 									FROM temp_pgr_arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.pgr_arc_id
-									WHERE oma.result_id = %L 
+									WHERE oma.result_id = %L
 									AND a.mapzone_id = tpa.pgr_node_1
 								)
-								OR 
+								OR
 								NOT EXISTS (
 									SELECT 1
 									FROM temp_pgr_arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.pgr_arc_id
-									WHERE oma.result_id = %L 
+									WHERE oma.result_id = %L
 									AND a.mapzone_id = tpa.pgr_node_2
 								)
 							)
@@ -1949,7 +1949,7 @@ BEGIN
 								AND om.node_id = tpa.pgr_node_id
 							);',
 							v_mincut_affected_id,
-							v_mincut_conflict_record.component, 
+							v_mincut_conflict_record.component,
 							v_mincut_conflict_record.component,
 							v_mincut_id, v_mincut_group_record.mincut_group);
 
