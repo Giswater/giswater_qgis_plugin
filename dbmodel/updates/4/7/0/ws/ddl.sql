@@ -33,7 +33,6 @@ DROP VIEW IF EXISTS v_ui_mincut;
 DROP VIEW IF EXISTS v_om_mincut_initpoint;
 DROP VIEW IF EXISTS v_om_mincut_polygon;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"om_mincut", "column":"anl_feature_id", "dataType":"int4"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"inlet_arc", "dataType":"int4[]", "isUtils":"False"}}$$);
 
 CREATE TABLE dma_graph_object (
 	object_id INTEGER NOT NULL,
