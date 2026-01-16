@@ -787,10 +787,10 @@ class GwInfo(QObject):
 
             # Create connections
             if field['widgettype'] not in ('tableview', 'vspacer', 'list', 'hspacer', 'button', 'label'):
-                if field['widgettype'] in ('hyperlink'):
+                if field['widgettype'] == 'hyperlink':
                     if type(widget) is GwHyperLinkLineEdit:
                         widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
-                elif field['widgettype'] in ('multiple_option', 'multiple_checkbox'):
+                else:
                     widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
 
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
