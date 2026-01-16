@@ -266,9 +266,9 @@ BEGIN
 			FROM om_mincut om
 			WHERE om.id = v_mincut_id
 			AND EXISTS (
-				SELECT 1
-				FROM v_temp_arc vta
-				WHERE om.anl_feature_id::integer = vta.arc_id
+				SELECT 1 
+				FROM v_temp_arc vta 
+				WHERE om.anl_feature_id = vta.arc_id
 			) ;
 
 		IF v_arc_id IS NULL THEN

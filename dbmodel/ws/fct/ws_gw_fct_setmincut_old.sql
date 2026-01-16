@@ -147,19 +147,19 @@ BEGIN
 		END IF;
 
 		--check if arc exists in database or look for a new arc_id in the same location
-		IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc) IS NULL THEN
-			SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
+		IF (SELECT arc_id FROM arc WHERE arc_id=v_arc) IS NULL THEN
+			SELECT arc_id INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
 
 			IF v_arc IS NULL AND v_usepsectors is true then
-				SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=2;
+				SELECT arc_id INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=2;
 			end if;
 		END IF;
 
 		IF v_device = 4 THEN
 			IF v_mincut_version = 5 THEN
-				RETURN gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors);
+				RETURN gw_fct_mincut_minsector(v_arc, v_mincut, v_usepsectors);
 			ELSE
-				RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+				RETURN gw_fct_mincut(v_arc, 'arc'::text, v_mincut, v_usepsectors);
 			END IF;
 
 		ELSIF v_device = 5 THEN
@@ -168,9 +168,9 @@ BEGIN
 			IF v_arc IS NOT NULL THEN
 				v_mincut_class = 1;
 				IF v_mincut_version = 5 THEN
-					SELECT gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors) INTO v_response;
+					SELECT gw_fct_mincut_minsector(v_arc, v_mincut, v_usepsectors) INTO v_response;
 				ELSE
-					SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_response;
+					SELECT gw_fct_mincut(v_arc, 'arc'::text, v_mincut, v_usepsectors) INTO v_response;
 				END IF;
 
 				v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ',
@@ -225,18 +225,18 @@ BEGIN
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id=v_mincut) <= date(now()) THEN
 
 				--check if arc exists in database or look for a new arc_id in the same location
-				IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc) IS NULL THEN
-					SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
+				IF (SELECT arc_id FROM arc WHERE arc_id=v_arc) IS NULL THEN
+					SELECT arc_id INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
 
 					IF v_arc IS NULL AND v_usepsectors is true then
-						SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=2;
+						SELECT arc_id INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=2;
 					end if;
 				END IF;
 
 				IF v_mincut_version = 5 THEN
-					SELECT gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors) INTO v_result;
+					SELECT gw_fct_mincut_minsector(v_arc, v_mincut, v_usepsectors) INTO v_result;
 				ELSE
-					SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_result;
+					SELECT gw_fct_mincut(v_arc, 'arc'::text, v_mincut, v_usepsectors) INTO v_result;
 				END IF;
 
 				if v_device = 5 THEN

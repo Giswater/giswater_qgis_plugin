@@ -166,7 +166,7 @@ BEGIN
 			UPDATE anl_arc SET result_id='flag' WHERE descript=v_arc AND fid=134 AND cur_user=current_user;
 
 			--call engine function
-			PERFORM gw_fct_mincut(v_arc, 'arc', -1, false);
+			PERFORM gw_fct_mincut(v_arc::integer, 'arc', -1, false);
 
 			-- insert results into audit table
 			INSERT INTO audit_log_data (fid, feature_id, log_message)

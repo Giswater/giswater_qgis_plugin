@@ -8,7 +8,8 @@ or (at your option) any later version.
 --FUNCTION CODE: 3262
 
 drop function if exists SCHEMA_NAME.gw_fct_mincut_minsector(character varying, integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_minsector(p_arc_id character varying, p_mincut_id integer, p_usepsectors boolean)
+drop function if exists SCHEMA_NAME.gw_fct_mincut_minsector(integer, integer, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_minsector(p_arc_id integer, p_mincut_id integer, p_usepsectors boolean)
 RETURNS json AS
 $BODY$
 

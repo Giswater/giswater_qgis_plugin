@@ -14,7 +14,7 @@ $BODY$
 
 DECLARE
 
-feature_id_aux text;
+feature_id_aux integer;
 feature_type_aux text;
 v_flag boolean = false;
 v_node_id integer;

@@ -26,7 +26,7 @@ v_mincut_id INTEGER;
 v_minsector_affected INTEGER;
 v_minsector_dependent_arcs JSON;
 v_proposed_valves JSON;
-v_arc_id TEXT;
+v_arc_id INTEGER;
 v_version TEXT;
 
 v_status TEXT;
@@ -45,7 +45,7 @@ BEGIN
 	SELECT anl_feature_id INTO v_arc_id FROM om_mincut WHERE id = v_mincut_id;
 
     -- Minsector affected
-	SELECT minsector_id INTO v_minsector_affected FROM arc WHERE arc_id::text = v_arc_id;
+	SELECT minsector_id INTO v_minsector_affected FROM arc WHERE arc_id = v_arc_id;
 
     -- Dependent arcs from the minsector
 	SELECT json_agg(arc_id) INTO v_minsector_dependent_arcs FROM arc WHERE minsector_id IN (

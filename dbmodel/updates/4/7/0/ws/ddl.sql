@@ -26,6 +26,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"rpt_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_arc", "column":"presszone_id", "dataType":"int4"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"temp_node", "column":"presszone_id", "dataType":"int4"}}$$);
 
+-- 14/01/2026
+DROP VIEW IF EXISTS v_om_mincut;
+DROP VIEW IF EXISTS v_om_mincut_current_initpoint;
+DROP VIEW IF EXISTS v_ui_mincut;
+DROP VIEW IF EXISTS v_om_mincut_initpoint;
+DROP VIEW IF EXISTS v_om_mincut_polygon;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"om_mincut", "column":"anl_feature_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_register", "column":"inlet_arc", "dataType":"int4[]", "isUtils":"False"}}$$);
+
 CREATE TABLE dma_graph_object (
 	object_id INTEGER NOT NULL,
 	expl_id INTEGER,
@@ -50,3 +59,6 @@ CREATE TABLE dma_graph_meter(
 	order_id int4 NULL,
 	the_geom public.geometry(LINESTRING, SRID_VALUE),
 	CONSTRAINT dma_graph_meter_pkey PRIMARY KEY (meter_id));
+
+ALTER TABLE cat_element DROP CONSTRAINT IF EXISTS cat_element_fkey_element_type;
+ALTER TABLE cat_element ADD CONSTRAINT cat_element_fkey_element_type FOREIGN KEY (element_type) REFERENCES cat_feature_element(id) ON DELETE RESTRICT ON UPDATE CASCADE;
