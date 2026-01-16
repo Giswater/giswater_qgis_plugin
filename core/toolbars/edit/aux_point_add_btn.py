@@ -51,8 +51,8 @@ class GwAuxPointAddButton(GwMaptool):
 
     def cancel(self):
 
-        tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
-        tools_gw.set_config_parser('btn_auxpoint', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
+        tools_gw.set_config_parser("btn_auxpoint", "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser("btn_auxpoint", "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
 
         self._reset_rubberbands()
         if self.dialog_created:
@@ -124,7 +124,7 @@ class GwAuxPointAddButton(GwMaptool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_points = tools_qgis.get_layer_by_tablename('ve_cad_auxpoint', True, True)
+        self.layer_points = tools_qgis.get_layer_by_tablename("ve_cad_auxpoint", True, True)
         if self.layer_points is None:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
@@ -133,7 +133,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         # Check for default base layer
         self.vdefault_layer = None
-        row = tools_gw.get_config_value('edit_cadtools_baselayer_vdefault')
+        row = tools_gw.get_config_value("edit_cadtools_baselayer_vdefault")
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = tools_qgis.get_layer_by_tablename(row[0], True)
@@ -172,11 +172,11 @@ class GwAuxPointAddButton(GwMaptool):
             for tablename, alias in rows:
                 lyr = tools_qgis.get_layer_by_tablename(tablename)
                 if not lyr:
-                    if tablename == 've_cad_auxcircle':
-                        geom = 'geom_multicurve'
+                    if tablename == "ve_cad_auxcircle":
+                        geom = "geom_multicurve"
                     else:
-                        geom_type = tablename.replace('ve_cad_aux', '')
-                        geom = f'geom_{geom_type.lower()}'
+                        geom_type = tablename.replace("ve_cad_aux", "")
+                        geom = f"geom_{geom_type.lower()}"
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 
     def _init_create_point_form(self, point_1=None, point_2=None):
@@ -198,12 +198,12 @@ class GwAuxPointAddButton(GwMaptool):
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_point.rejected.connect(self.cancel)
 
-        if tools_gw.get_config_parser('btn_auxpoint', "rb_left", "user", "session") in ("True", True):
+        if tools_gw.get_config_parser("btn_auxpoint", "rb_left", "user", "session") in ("True", True):
             self.dlg_create_point.rb_left.setChecked(True)
-        elif tools_gw.get_config_parser('btn_auxpoint', "rb_right", "user", "session") in ("True", True):
+        elif tools_gw.get_config_parser("btn_auxpoint", "rb_right", "user", "session") in ("True", True):
             self.dlg_create_point.rb_right.setChecked(True)
 
-        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
+        tools_gw.open_dialog(self.dlg_create_point, dlg_name="auxpoint")
         self.dialog_created = True
         self.dlg_create_point.dist_x.setFocus()
 
@@ -211,8 +211,8 @@ class GwAuxPointAddButton(GwMaptool):
 
         tools_gw.reset_rubberband(self.rb_final_point, "point")
 
-        value_x = tools_qt.get_text(dialog, 'dist_x')
-        value_y = tools_qt.get_text(dialog, 'dist_y')
+        value_x = tools_qt.get_text(dialog, "dist_x")
+        value_y = tools_qt.get_text(dialog, "dist_y")
         try:
             distance_x = float(value_x)
         except ValueError:
@@ -267,8 +267,8 @@ class GwAuxPointAddButton(GwMaptool):
 
     def _get_values(self, point_1, point_2):
 
-        tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
-        tools_gw.set_config_parser('btn_auxpoint', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
+        tools_gw.set_config_parser("btn_auxpoint", "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser("btn_auxpoint", "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
 
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:

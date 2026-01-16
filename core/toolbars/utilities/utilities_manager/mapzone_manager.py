@@ -39,7 +39,7 @@ class GwMapzoneManager:
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
-        self.feature_types = ['sector_id', 'dma_id', 'presszone_id', 'dqa_id', 'drainzone_id']
+        self.feature_types = ["sector_id", "dma_id", "presszone_id", "dqa_id", "drainzone_id"]
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
@@ -50,7 +50,7 @@ class GwMapzoneManager:
         }
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
-        self.user_selected_exploitation = '-901'
+        self.user_selected_exploitation = "-901"
 
     def manage_mapzones(self):
 
@@ -64,13 +64,13 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = []
-        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'macroomzone'],
-                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone']}
+        project_tabs = {"ws": ["macrosector", "sector", "presszone", "macrodma", "dma", "macrodqa", "dqa", "macroomzone"],
+                        "ud": ["macrosector", "sector", "drainzone", "dwfzone", "dma", "macroomzone"]}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
 
         for tab in tabs:
-            view = f'v_ui_{tab}'
+            view = f"v_ui_{tab}"
             qtableview = QTableView()
             qtableview.setObjectName(f"tbl_{view}")
             qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
@@ -106,26 +106,26 @@ class GwMapzoneManager:
 
         # Connect checkbox state change to save settings
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(self._save_show_inactive_state)
-        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, 'mapzone_manager'))
+        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, "mapzone_manager"))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
 
         self._manage_current_changed()
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg, None))
 
-        tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
+        tools_gw.open_dialog(self.mapzone_mng_dlg, "mapzone_manager")
 
     def _manage_highlight(self, qtableview, view, index):
         """Creates rubberband to indicate which feature is selected"""
         tools_gw.reset_rubberband(self.rubber_band)
         table = view
-        feature_type = 'feature_id'
+        feature_type = "feature_id"
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
             if col_idx is not None and col_idx is not False:
                 feature_type = x
                 break
-        if feature_type != 'feature_id':
+        if feature_type != "feature_id":
             table = f"v_ui_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
@@ -144,7 +144,7 @@ class GwMapzoneManager:
         show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
 
         # Refresh txt_feature_id
-        tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
+        tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, "")
 
         # Reset rubberband
         tools_gw.reset_rubberband(self.rubber_band)
@@ -157,8 +157,8 @@ class GwMapzoneManager:
 
         # Enable/Disable config button on macrodma and macrosector
         list_tabs_no_config = []
-        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, 'v_ui_macrodma'))
-        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, 'v_ui_macrosector'))
+        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, "v_ui_macrodma"))
+        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, "v_ui_macrosector"))
         if self.mapzone_mng_dlg.main_tab.currentIndex() in list_tabs_no_config:
             self.mapzone_mng_dlg.btn_config.setEnabled(False)
         else:
@@ -201,7 +201,7 @@ class GwMapzoneManager:
 
         # Check for errors
         if model.lastError().isValid():
-            if 'Unable to find table' in model.lastError().text():
+            if "Unable to find table" in model.lastError().text():
                 tools_db.reset_qsqldatabase_connection(self.mapzone_mng_dlg)
             else:
                 tools_qgis.show_warning(model.lastError().text(), dialog=self.mapzone_mng_dlg)
@@ -221,11 +221,11 @@ class GwMapzoneManager:
         tools_gw.set_tablemodel_config(self.mapzone_mng_dlg, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
-        col_idx = tools_qt.get_col_index_by_col_name(widget, 'dscenario_id')
+        col_idx = tools_qt.get_col_index_by_col_name(widget, "dscenario_id")
         if col_idx not in (None, False):
             widget.setColumnHidden(col_idx, True)
 
-        geom_col_idx = tools_qt.get_col_index_by_col_name(widget, 'the_geom')
+        geom_col_idx = tools_qt.get_col_index_by_col_name(widget, "the_geom")
         if geom_col_idx not in (None, False):
             widget.setColumnHidden(geom_col_idx, True)
 
@@ -269,11 +269,11 @@ class GwMapzoneManager:
 
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
-        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
-        tools_qt.set_widget_enabled(dlg_functions, 'graphClass', False)
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, "graphClass"), f"{mapzone_type.upper()}", 0)
+        tools_qt.set_widget_enabled(dlg_functions, "graphClass", False)
 
         # Connect btn 'Run' to enable btn_flood when pressed
-        run_button = dlg_functions.findChild(QPushButton, 'btn_run')
+        run_button = dlg_functions.findChild(QPushButton, "btn_run")
         if run_button and self.mapzone_mng_dlg.btn_flood:
             run_button.clicked.connect(partial(self.mapzone_mng_dlg.btn_flood.setEnabled, True))
 
@@ -290,20 +290,20 @@ class GwMapzoneManager:
         # Call gw_fct_getgraphinundation
         extras = f'"parameters":{{"mapzone": "{mapzone_name}"}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
-        if not json_result or json_result.get('status') != 'Accepted':
+        json_result = tools_gw.execute_procedure("gw_fct_getgraphinundation", body)
+        if not json_result or json_result.get("status") != "Accepted":
             msg = "No valid data received from the SQL function."
             tools_qgis.show_warning(msg, dialog=dialog)
             return
         # Extract mapzone_ids with data from json_result
         valid_mapzone_ids = set()
-        if 'body' in json_result and 'data' in json_result['body'] and 'line' in json_result['body']['data']:
+        if "body" in json_result and "data" in json_result["body"] and "line" in json_result["body"]["data"]:
             # Access the 'features' list in 'line'
-            features = json_result['body']['data']['line'].get('features', [])
+            features = json_result["body"]["data"]["line"].get("features", [])
             if features is not None:
                 for feature in features:
-                    properties = feature.get('properties', {})
-                    mapzone_id = properties.get('mapzone_id')
+                    properties = feature.get("properties", {})
+                    mapzone_id = properties.get("mapzone_id")
                     if mapzone_id is not None:
                         valid_mapzone_ids.add(mapzone_id)
 
@@ -313,8 +313,8 @@ class GwMapzoneManager:
         config_body = tools_gw.create_body(extras=config_extras)
 
         # Call gw_fct_getgraphconfig
-        config_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', config_body)
-        if not config_result or config_result.get('status') != 'Accepted':
+        config_result = tools_gw.execute_procedure("gw_fct_getgraphconfig", config_body)
+        if not config_result or config_result.get("status") != "Accepted":
             msg = "Failed to retrieve graph configuration."
             tools_qgis.show_warning(msg, dialog=dialog)
             return
@@ -323,19 +323,19 @@ class GwMapzoneManager:
         style_extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
         style_body = tools_gw.create_body(extras=style_extras)
 
-        style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
-        if not style_result or style_result.get('status') != 'Accepted':
+        style_result = tools_gw.execute_procedure("gw_fct_getstylemapzones", style_body)
+        if not style_result or style_result.get("status") != "Accepted":
             msg = "Failed to retrieve mapzone styles."
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Add the flooding data to a temporal layer
-        layer_name = json_result['body']['data']['line'].get('layerName')
+        layer_name = json_result["body"]["data"]["line"].get("layerName")
         vlayer = tools_qgis.get_layer_by_layername(layer_name)
 
         if vlayer and vlayer.isValid():
             # Apply styling only to valid mapzones
-            self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
+            self._apply_styles_to_layer(vlayer, style_result["body"]["data"]["mapzones"], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
             msg = "Temporal layer created successfully."
             tools_qgis.show_success(msg, dialog=dialog)
@@ -350,10 +350,10 @@ class GwMapzoneManager:
         if vlayer.isValid():
             temporal_properties = vlayer.temporalProperties()
 
-            if 'timestep' in [field.name() for field in vlayer.fields()]:
+            if "timestep" in [field.name() for field in vlayer.fields()]:
 
-                temporal_properties.setStartField('timestep')
-                temporal_properties.setEndField('timestep')
+                temporal_properties.setStartField("timestep")
+                temporal_properties.setEndField("timestep")
 
                 # Set mode to Single Field with Date/Time
                 temporal_properties.setMode(Qgis.VectorTemporalMode.FeatureDateTimeInstantFromField)
@@ -372,29 +372,29 @@ class GwMapzoneManager:
 
         for mapzone in mapzones:
             try:
-                transparency = float(mapzone.get('transparency', 1.0))
+                transparency = float(mapzone.get("transparency", 1.0))
             except (TypeError, ValueError):
                 transparency = 1.0
 
-            values = mapzone.get('values', [])
+            values = mapzone.get("values", [])
 
             # Only include values that match the `mapzone_id`s present in valid_mapzone_ids
-            filtered_values = [value for value in values if value['id'] in valid_mapzone_ids]
+            filtered_values = [value for value in values if value["id"] in valid_mapzone_ids]
             if not filtered_values:
                 continue
 
             # Process each filtered value to apply styling
             for value in filtered_values:
-                mapzone_id = value['id']
-                color_str = value['stylesheet']['featureColor']
-                r, g, b = map(int, color_str.split(','))
+                mapzone_id = value["id"]
+                color_str = value["stylesheet"]["featureColor"]
+                r, g, b = map(int, color_str.split(","))
 
                 # Create color with full opacity
                 color = QColor(r, g, b)
                 color.setAlphaF(transparency)
 
                 # Create a line symbol with a visible stroke width and solid style
-                symbol = QgsLineSymbol.createSimple({'line_style': 'solid', 'width': '2', 'color': color.name()})
+                symbol = QgsLineSymbol.createSimple({"line_style": "solid", "width": "2", "color": color.name()})
 
                 # Apply categorized style to the layer. In this case each unique mapzone_id will have a different color
                 category = QgsRendererCategory(mapzone_id, symbol, str(mapzone_id))
@@ -429,7 +429,7 @@ class GwMapzoneManager:
             return
 
         # Close the temporal controller tab if it's open
-        action = self.iface.mainWindow().findChild(QAction, 'mActionTemporalController')
+        action = self.iface.mainWindow().findChild(QAction, "mActionTemporalController")
         if action.isChecked():
             action.trigger()
 
@@ -465,7 +465,7 @@ class GwMapzoneManager:
         # Set navigation mode to Animated for dynamic playback
         temporal_controller.setNavigationMode(QgsTemporalNavigationObject.NavigationMode.Animated)
 
-        action = self.iface.mainWindow().findChild(QAction, 'mActionTemporalController')
+        action = self.iface.mainWindow().findChild(QAction, "mActionTemporalController")
         action.trigger()
 
     def _identify_node_and_run_flood_analysis(self, dialog, point, event):
@@ -489,7 +489,7 @@ class GwMapzoneManager:
         snapped_feature = self.snapper_manager.get_snapped_feature(result)
 
         # Extract node information from the snapped feature
-        node_id = snapped_feature.attribute('node_id')
+        node_id = snapped_feature.attribute("node_id")
 
         # Check that node_id is valid
         if not node_id:
@@ -548,10 +548,10 @@ class GwMapzoneManager:
         )
 
         # Execute the procedure
-        result = tools_gw.execute_procedure('gw_fct_graphanalytics_mapzones_advanced', body)
+        result = tools_gw.execute_procedure("gw_fct_graphanalytics_mapzones_advanced", body)
 
         # Check if a valid result was returned
-        if not result or result.get('status') != 'Accepted':
+        if not result or result.get("status") != "Accepted":
             msg = "Failed to execute the mapzones analysis."
             tools_qgis.show_warning(msg)
         else:
@@ -575,14 +575,14 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        self.mapzone_type = tableview.objectName().split('_')[-1].lower()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_id')
+        self.mapzone_type = tableview.objectName().split("_")[-1].lower()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f"{self.mapzone_type}_id")
         self.mapzone_id = index.sibling(index.row(), col_idx).data()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'name')
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, "name")
         if col_idx is None:
-            col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_name')
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, f"{self.mapzone_type}_name")
         mapzone_name = index.sibling(index.row(), col_idx).data()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, "graphconfig")
         graphconfig = index.sibling(index.row(), col_idx).data()
 
         # Build dialog
@@ -604,25 +604,25 @@ class GwMapzoneManager:
 
         # Fill preview
         if graphconfig:
-            tools_qt.set_widget_text(self.config_dlg, 'txt_preview', graphconfig)
+            tools_qt.set_widget_text(self.config_dlg, "txt_preview", graphconfig)
 
         # Connect signals
         self.child_type = None
         # nodeParent
         self.config_dlg.btn_snapping_nodeParent.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent,
-                    've_node', 'nodeParent', None,
+                    "ve_node", "nodeParent", None,
                     self.child_type))
         self.config_dlg.btn_expr_nodeParent.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, 'nodeParent'))
+            partial(self._select_with_expression_dialog, self.config_dlg, "nodeParent"))
         self.config_dlg.txt_nodeParent.textEdited.connect(partial(self._txt_node_parent_finished))
         # toArc
         self.config_dlg.btn_snapping_toArc.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 've_arc',
-                    'toArc', None,
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, "ve_arc",
+                    "toArc", None,
                     self.child_type))
         self.config_dlg.btn_expr_toArc.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, 'toArc'))
+            partial(self._select_with_expression_dialog, self.config_dlg, "toArc"))
         self.config_dlg.btn_add_nodeParent.clicked.connect(
             partial(self._add_node_parent, self.config_dlg)
         )
@@ -631,14 +631,14 @@ class GwMapzoneManager:
         )
         # Force closed
         # Set variables based on project type
-        layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
+        layer = "ve_node" if global_vars.project_type == "ws" else "ve_arc"
 
         self.config_dlg.btn_snapping_forceClosed.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
-                    layer, 'forceClosed', None,
+                    layer, "forceClosed", None,
                     self.child_type))
         self.config_dlg.btn_expr_forceClosed.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, 'forceClosed'))
+            partial(self._select_with_expression_dialog, self.config_dlg, "forceClosed"))
         self.config_dlg.btn_add_forceClosed.clicked.connect(
             partial(self._add_force_closed, self.config_dlg)
         )
@@ -647,13 +647,13 @@ class GwMapzoneManager:
         )
         # Ignore
         # Set variables based on project type
-        layer = 've_node' if global_vars.project_type == 'ws' else 've_arc'
+        layer = "ve_node" if global_vars.project_type == "ws" else "ve_arc"
 
         self.config_dlg.btn_snapping_ignore.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
-                    layer, 'ignore', None, self.child_type))
+                    layer, "ignore", None, self.child_type))
         self.config_dlg.btn_expr_ignore.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, 'ignore'))
+            partial(self._select_with_expression_dialog, self.config_dlg, "ignore"))
         self.config_dlg.btn_add_ignore.clicked.connect(
             partial(self._add_ignore, self.config_dlg)
         )
@@ -681,7 +681,7 @@ class GwMapzoneManager:
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_clear_preview, True)
 
         # Hide widgets for UD projects
-        if global_vars.project_type == 'ud':
+        if global_vars.project_type == "ud":
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.lbl_toArc, False)
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.btn_snapping_toArc, False)
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.btn_expr_toArc, False)
@@ -691,7 +691,7 @@ class GwMapzoneManager:
         dlg_title = f"Mapzone config - {mapzone_name}"
         if self.netscenario_id is not None:
             dlg_title += f" (Netscenario {self.netscenario_id})"
-        tools_gw.open_dialog(self.config_dlg, 'mapzone_config', title=dlg_title)
+        tools_gw.open_dialog(self.config_dlg, "mapzone_config", title=dlg_title)
 
     def _config_dlg_finished(self, dialog):
 
@@ -706,23 +706,23 @@ class GwMapzoneManager:
         """
         if mode in (0, 1):
             self.node_parent = None
-            tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', '')
-            tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
-            tools_qt.set_widget_enabled(self.config_dlg, 'btn_expr_toArc', False)
-            tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
+            tools_qt.set_widget_text(self.config_dlg, "txt_nodeParent", "")
+            tools_qt.set_widget_enabled(self.config_dlg, "btn_snapping_toArc", False)
+            tools_qt.set_widget_enabled(self.config_dlg, "btn_expr_toArc", False)
+            tools_qt.set_widget_enabled(self.config_dlg, "btn_add_nodeParent", False)
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, False)
         if mode in (0, 1, 2):
             self.to_arc_list = set()
-            tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', '')
+            tools_qt.set_widget_text(self.config_dlg, "txt_toArc", "")
         if mode in (0, 3):
             self.force_closed_list = set()
-            tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', '')
-            tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_forceClosed', False)
+            tools_qt.set_widget_text(self.config_dlg, "txt_forceClosed", "")
+            tools_qt.set_widget_enabled(self.config_dlg, "btn_add_forceClosed", False)
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, False)
         if mode in (0, 4):
             self.ignore_list = set()
-            tools_qt.set_widget_text(self.config_dlg, 'txt_ignore', '')
-            tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_ignore', False)
+            tools_qt.set_widget_text(self.config_dlg, "txt_ignore", "")
+            tools_qt.set_widget_enabled(self.config_dlg, "btn_add_ignore", False)
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_ignore, False)
 
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
@@ -735,16 +735,16 @@ class GwMapzoneManager:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set signals
-        tools_gw.disconnect_signal('mapzone_manager_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+        tools_gw.disconnect_signal("mapzone_manager_snapping", "get_snapped_feature_id_xyCoordinates_mouse_moved")
         tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
-                                'mapzone_manager_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+                                "mapzone_manager_snapping", "get_snapped_feature_id_xyCoordinates_mouse_moved")
 
-        tools_gw.disconnect_signal('mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
+        tools_gw.disconnect_signal("mapzone_manager_snapping", "get_snapped_feature_id_ep_canvasClicked_get_id")
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
         tools_gw.connect_signal(emit_point.canvasClicked,
                                 partial(self._get_id, dialog, action, option, emit_point, child_type),
-                                'mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
+                                "mapzone_manager_snapping", "get_snapped_feature_id_ep_canvasClicked_get_id")
 
     def _show_context_menu(self, qtableview):
         """Show custom context menu"""
@@ -791,11 +791,11 @@ class GwMapzoneManager:
         """Get selected attribute from snapped feature"""
         # @options{'key':['att to get from snapped feature', 'function to call']}
         # Set ID field based on project type for forceClosed and ignore
-        force_closed_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
-        ignore_id_field = 'node_id' if global_vars.project_type == 'ws' else 'arc_id'
+        force_closed_id_field = "node_id" if global_vars.project_type == "ws" else "arc_id"
+        ignore_id_field = "node_id" if global_vars.project_type == "ws" else "arc_id"
 
-        options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
-                   'forceClosed': [force_closed_id_field, '_set_force_closed'], 'ignore': [ignore_id_field, '_set_ignore']}
+        options = {"nodeParent": ["node_id", "_set_node_parent"], "toArc": ["arc_id", "_set_to_arc"],
+                   "forceClosed": [force_closed_id_field, "_set_force_closed"], "ignore": [ignore_id_field, "_set_ignore"]}
 
         if event == Qt.MouseButton.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -812,13 +812,13 @@ class GwMapzoneManager:
                 return
             # Get the point. Leave selection
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            feat_id = snapped_feat.attribute(f'{options[option][0]}')
+            feat_id = snapped_feat.attribute(f"{options[option][0]}")
             getattr(self, options[option][1])(feat_id)
         except Exception as e:
             msg = "Exception in info (def _get_id)"
             tools_qgis.show_warning(msg, parameter=e)
         finally:
-            if option == 'nodeParent':
+            if option == "nodeParent":
                 self._cancel_snapping_tool(dialog, action)
 
     def _txt_node_parent_finished(self, text):
@@ -833,11 +833,11 @@ class GwMapzoneManager:
         self.node_parent = feat_id
 
         if set_text:
-            tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
+            tools_qt.set_widget_text(self.config_dlg, "txt_nodeParent", f"{feat_id}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, bool(feat_id))
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_expr_toArc, bool(feat_id))
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, bool(feat_id))
-        if global_vars.project_type == 'ud':
+        if global_vars.project_type == "ud":
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, bool(feat_id))
 
         self._reset_config_vars(2 if bool(feat_id) else 1)
@@ -852,7 +852,7 @@ class GwMapzoneManager:
 
         self.to_arc_list.add(feat_id)
         to_arc_list_aux = [int(to_arc) for to_arc in self.to_arc_list]
-        tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{to_arc_list_aux}")
+        tools_qt.set_widget_text(self.config_dlg, "txt_toArc", f"{to_arc_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, True)
 
@@ -866,7 +866,7 @@ class GwMapzoneManager:
 
         self.force_closed_list.add(feat_id)
         force_closed_list_aux = [int(force_closed) for force_closed in self.force_closed_list]
-        tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{force_closed_list_aux}")
+        tools_qt.set_widget_text(self.config_dlg, "txt_forceClosed", f"{force_closed_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, True)
 
@@ -879,7 +879,7 @@ class GwMapzoneManager:
         # Set variable, set widget text and enable add button
         self.ignore_list.add(feat_id)
         ignore_list_aux = [int(ignore) for ignore in self.ignore_list]
-        tools_qt.set_widget_text(self.config_dlg, 'txt_ignore', f"{ignore_list_aux}")
+        tools_qt.set_widget_text(self.config_dlg, "txt_ignore", f"{ignore_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_ignore, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_ignore, True)
 
@@ -887,7 +887,7 @@ class GwMapzoneManager:
         """ADD button for nodeParent"""
         node_parent_id = self.node_parent
         to_arc_list = json.dumps(list(self.to_arc_list))
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
         if self.netscenario_id is not None:
@@ -896,22 +896,22 @@ class GwMapzoneManager:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
         if json_result is None:
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
-            preview = json_result['body']['data'].get('preview')
+            preview = json_result["body"]["data"].get("preview")
             if preview:
-                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+                tools_qt.set_widget_text(dialog, "txt_preview", json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_nodeParent)
             self._reset_config_vars(1)
@@ -919,7 +919,7 @@ class GwMapzoneManager:
     def _remove_node_parent(self, dialog):
         """REMOVE button for nodeParent"""
         node_parent_id = self.node_parent
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}"'
@@ -929,22 +929,22 @@ class GwMapzoneManager:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
         if json_result is None:
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
-            preview = json_result['body']['data'].get('preview')
+            preview = json_result["body"]["data"].get("preview")
             if preview:
-                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+                tools_qt.set_widget_text(dialog, "txt_preview", json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_remove_nodeParent)
             self._reset_config_vars(1)
@@ -952,7 +952,7 @@ class GwMapzoneManager:
     def _add_force_closed(self, dialog):
         """ADD button for forceClosed"""
         force_closed_list = json.dumps(list(self.force_closed_list))
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
 
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
@@ -962,22 +962,22 @@ class GwMapzoneManager:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
         if json_result is None:
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
-            preview = json_result['body']['data'].get('preview')
+            preview = json_result["body"]["data"].get("preview")
             if preview:
-                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+                tools_qt.set_widget_text(dialog, "txt_preview", json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
             self._reset_config_vars(3)
@@ -985,7 +985,7 @@ class GwMapzoneManager:
     def _remove_force_closed(self, dialog):
         """ADD button for forceClosed"""
         force_closed_list = json.dumps(list(self.force_closed_list))
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
@@ -995,22 +995,22 @@ class GwMapzoneManager:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
         if json_result is None:
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
-            preview = json_result['body']['data'].get('preview')
+            preview = json_result["body"]["data"].get("preview")
             if preview:
-                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+                tools_qt.set_widget_text(dialog, "txt_preview", json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
             self._reset_config_vars(3)
@@ -1018,7 +1018,7 @@ class GwMapzoneManager:
     def _add_ignore(self, dialog):
         """ADD button for ignore"""
         ignore_list = json.dumps(list(self.ignore_list))
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
 
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"ignore": {ignore_list}'
@@ -1028,22 +1028,22 @@ class GwMapzoneManager:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
         if json_result is None:
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
-            preview = json_result['body']['data'].get('preview')
+            preview = json_result["body"]["data"].get("preview")
             if preview:
-                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+                tools_qt.set_widget_text(dialog, "txt_preview", json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_ignore)
             self._reset_config_vars(4)
@@ -1051,7 +1051,7 @@ class GwMapzoneManager:
     def _remove_ignore(self, dialog):
         """REMOVE button for ignore"""
         ignore_list = json.dumps(list(self.ignore_list))
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"ignore": {ignore_list}'
@@ -1061,33 +1061,33 @@ class GwMapzoneManager:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
         if json_result is None:
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level, dialog=dialog)
 
-            preview = json_result['body']['data'].get('preview')
+            preview = json_result["body"]["data"].get("preview")
             if preview:
-                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+                tools_qt.set_widget_text(dialog, "txt_preview", json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_remove_ignore)
             self._reset_config_vars(4)
 
     def _clear_preview(self, dialog):
         """Set preview textbox to ''"""
-        tools_qt.set_widget_text(dialog, 'txt_preview', '')
+        tools_qt.set_widget_text(dialog, "txt_preview", "")
 
     def _accept_config(self, dialog):
         """Accept button for config dialog"""
-        preview = tools_qt.get_text(dialog, 'txt_preview')
+        preview = tools_qt.get_text(dialog, "txt_preview")
 
         if not preview:
             return
@@ -1097,22 +1097,22 @@ class GwMapzoneManager:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
-        if not json_result or 'status' not in json_result:
+        json_result = tools_gw.execute_procedure("gw_fct_config_mapzones", body)
+        if not json_result or "status" not in json_result:
             msg = "Failed to get a valid response from gw_fct_config_mapzones."
             tools_qgis.show_message(msg, level=Qgis.MessageLevel.Critical)
             return
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
-            if json_result['message']:
+        if "status" in json_result and json_result["status"] == "Accepted":
+            if json_result["message"]:
                 level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                    msg = json_result['message']['text']
+                if "level" in json_result["message"]:
+                    level = int(json_result["message"]["level"])
+                    msg = json_result["message"]["text"]
                 level = Qgis.MessageLevel(level)
                 tools_qgis.show_message(msg, level)
 
-            if global_vars.project_type != 'ud':
+            if global_vars.project_type != "ud":
                 self._get_graph_config()
             self._reset_config_vars(0)
             tools_gw.close_dialog(dialog)
@@ -1124,7 +1124,7 @@ class GwMapzoneManager:
         if self.netscenario_id is not None:
             extras += f', "netscenarioId": {self.netscenario_id}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
+        json_result = tools_gw.execute_procedure("gw_fct_getgraphconfig", body)
         if json_result is None:
             return
 
@@ -1132,10 +1132,10 @@ class GwMapzoneManager:
         """Cancel snapping tool and reset the state."""
         # Disconnect snapping and signals
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
-        tools_gw.disconnect_signal('mapzone_manager_snapping')
+        tools_gw.disconnect_signal("mapzone_manager_snapping")
 
         # Hide markers or cross cursor
-        if hasattr(self, 'vertex_marker') and self.vertex_marker:
+        if hasattr(self, "vertex_marker") and self.vertex_marker:
             self.vertex_marker.hide()
 
         # Unblock signals for dialog
@@ -1152,10 +1152,10 @@ class GwMapzoneManager:
     def _select_with_expression_dialog(self, dialog, option):
         """Select features by expression for mapzone config"""
         # Get current layer and feature type
-        layer_name = 've_node'  # Default to node layer
-        if option == 'toArc':
-            layer_name = 've_arc'
-        self.feature_type = layer_name.split('_')[-1]
+        layer_name = "ve_node"  # Default to node layer
+        if option == "toArc":
+            layer_name = "ve_arc"
+        self.feature_type = layer_name.split("_")[-1]
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:
             return
@@ -1189,28 +1189,28 @@ class GwMapzoneManager:
             return
 
         # Get the appropriate field name based on the option
-        field_name = 'node_id'
-        if option == 'toArc':
-            field_name = 'arc_id'
+        field_name = "node_id"
+        if option == "toArc":
+            field_name = "arc_id"
 
         # Extract IDs from selected features
         selected_ids = [str(feature.attribute(field_name)) for feature in selected_features]
 
         # Update the appropriate line edit based on the option
-        if option == 'nodeParent':
+        if option == "nodeParent":
             self._set_node_parent(selected_ids[0] if selected_ids else None)
-        elif option == 'toArc':
+        elif option == "toArc":
             for arc_id in selected_ids:
                 self._set_to_arc(arc_id)
-        elif option == 'forceClosed':
+        elif option == "forceClosed":
             for feat_id in selected_ids:
                 self._set_force_closed(feat_id)
-        elif option == 'ignore':
+        elif option == "ignore":
             for feat_id in selected_ids:
                 self._set_ignore(feat_id)
 
         # Clean up
-        tools_gw.disconnect_signal('mapzone_manager_snapping')
+        tools_gw.disconnect_signal("mapzone_manager_snapping")
         tools_gw.remove_selection()
         tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
@@ -1218,7 +1218,7 @@ class GwMapzoneManager:
     def _manage_toggle_active(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        view = tableview.objectName().replace("tbl_", "")
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1228,7 +1228,7 @@ class GwMapzoneManager:
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
         mapzone_id = index.sibling(index.row(), 0).data()
-        active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
+        active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, "active")).data()
         active = tools_os.set_boolean(active)
         field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
 
@@ -1241,14 +1241,14 @@ class GwMapzoneManager:
     def manage_create(self, dialog, tableview=None):
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl', '').replace('v_ui_', 've_')
+        tablename = tableview.objectName().replace("tbl", "").replace("v_ui_", "ve_")
         field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
 
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
         body = tools_gw.create_body(feature=feature)
-        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
-        if json_result is None or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getinfofromid", body)
+        if json_result is None or json_result["status"] == "Failed":
             return
         result = json_result
 
@@ -1260,7 +1260,7 @@ class GwMapzoneManager:
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
+        tablename = tableview.objectName().replace("tbl_", "").replace("v_ui_", "ve_")
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1270,8 +1270,8 @@ class GwMapzoneManager:
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
         col_name = f"{tablename.split('_')[-1].lower()}_id"
-        if col_name == 'valve_id':
-            col_name = 'node_id'
+        if col_name == "valve_id":
+            col_name = "node_id"
         col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
 
         mapzone_id = index.sibling(index.row(), col_idx).data()
@@ -1283,8 +1283,8 @@ class GwMapzoneManager:
             _id = f"{self.netscenario_id}, {mapzone_id}"
         feature = f'"tableName":"{tablename}", "id": "{_id}"'
         body = tools_gw.create_body(feature=feature)
-        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
-        if json_result is None or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getinfofromid", body)
+        if json_result is None or json_result["status"] == "Failed":
             return
         result = json_result
 
@@ -1295,7 +1295,7 @@ class GwMapzoneManager:
     def _manage_delete(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
+        view = tableview.objectName().replace("tbl_", "").replace("v_ui_", "ve_")
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1331,27 +1331,27 @@ class GwMapzoneManager:
         layout_positions = {}
 
         # Ordenar els camps per layoutorder abans de construir el diàleg
-        if 'body' in result and 'data' in result['body'] and 'fields' in result['body']['data']:
-            sorted_fields = sorted(result['body']['data']['fields'],
-                                    key=lambda x: x.get('layoutorder', 0))
-            result['body']['data']['fields'] = sorted_fields
+        if "body" in result and "data" in result["body"] and "fields" in result["body"]["data"]:
+            sorted_fields = sorted(result["body"]["data"]["fields"],
+                                    key=lambda x: x.get("layoutorder", 0))
+            result["body"]["data"]["fields"] = sorted_fields
 
         # Construir el diàleg amb la versió millorada
-        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions, tab_name='tab_none')
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions, tab_name="tab_none")
 
-        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+        layout = self.add_dlg.findChild(QGridLayout, "lyt_main_1")
         self.add_dlg.actionEdit.setVisible(False)
 
         # Disable widgets if updating
         if force_action == "UPDATE":
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)
+            tools_qt.set_widget_enabled(self.add_dlg, f"tab_none_{field_id}", False)
 
         # Populate netscenario_id
         if self.netscenario_id is not None:
-            tools_qt.set_widget_text(self.add_dlg, 'tab_none_netscenario_id', self.netscenario_id)
-            tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_netscenario_id', False)
-            tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
-            field_id = ['netscenario_id', field_id]
+            tools_qt.set_widget_text(self.add_dlg, "tab_none_netscenario_id", self.netscenario_id)
+            tools_qt.set_widget_enabled(self.add_dlg, "tab_none_netscenario_id", False)
+            tools_qt.set_checked(self.add_dlg, "tab_none_active", True)
+            field_id = ["netscenario_id", field_id]
 
         # Get every widget in the layout
         widgets = []
@@ -1368,14 +1368,14 @@ class GwMapzoneManager:
             object_name = widget.objectName()
             tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
 
-            if object_name == 'tab_none_created_at':
+            if object_name == "tab_none_created_at":
                 value = widget.text()
-                if value is not None and 'T' in value and '.' in value:
-                    widget.setText(value.split('.')[0].replace('T', ' - ') + '.' + value.split('.')[1][0:2])
-            if object_name == 'tab_none_updated_at':
+                if value is not None and "T" in value and "." in value:
+                    widget.setText(value.split(".")[0].replace("T", " - ") + "." + value.split(".")[1][0:2])
+            if object_name == "tab_none_updated_at":
                 value = widget.text()
-                if value is not None and 'T' in value and '.' in value:
-                    widget.setText(value.split('.')[0].replace('T', ' - ') + '.' + value.split('.')[1][0:2])
+                if value is not None and "T" in value and "." in value:
+                    widget.setText(value.split(".")[0].replace("T", " - ") + "." + value.split(".")[1][0:2])
 
         # Remove Nones from self.my_json_add
         keys_to_remove = []
@@ -1393,7 +1393,7 @@ class GwMapzoneManager:
             partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
 
         # Open dlg
-        tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
+        tools_gw.open_dialog(self.add_dlg, dlg_name="info_generic", title=dlg_title)
 
     def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
 
@@ -1403,23 +1403,23 @@ class GwMapzoneManager:
         list_mandatory = []
         list_filter = []
 
-        for field in complet_result['body']['data']['fields']:
-            if field['ismandatory']:
-                if field['widgettype'] == 'multiple_option':
-                    widget = dialog.findChild(QWidget, field['widgetname'])
+        for field in complet_result["body"]["data"]["fields"]:
+            if field["ismandatory"]:
+                if field["widgettype"] == "multiple_option":
+                    widget = dialog.findChild(QWidget, field["widgetname"])
                     if widget:
-                        widget = widget.findChild(QListWidget, field['widgetname'])
+                        widget = widget.findChild(QListWidget, field["widgetname"])
                 else:
-                    widget = dialog.findChild(QWidget, field['widgetname'])
+                    widget = dialog.findChild(QWidget, field["widgetname"])
                 if widget is None:
                     continue
                 widget.setStyleSheet(None)
                 value = tools_qt.get_widget_value(dialog, widget)
-                if value in ('null', None, '', []):
+                if value in ("null", None, "", []):
                     widget.setStyleSheet("border: 1px solid red")
-                    list_mandatory.append(field['widgetname'])
+                    list_mandatory.append(field["widgetname"])
                 else:
-                    elem = [field['columnname'], value]
+                    elem = [field["columnname"], value]
                     list_filter.append(elem)
 
         if list_mandatory:
@@ -1434,7 +1434,7 @@ class GwMapzoneManager:
             if not isinstance(pkey, list):
                 pkey = [pkey]
             for pk in pkey:
-                results = pk.split(',')
+                results = pk.split(",")
                 for result in results:
                     widget_name = f"tab_none_{result}"
                     value = tools_qt.get_widget_value(dialog, widget_name)
@@ -1448,8 +1448,8 @@ class GwMapzoneManager:
         if force_action:
             extras += f', "force_action":"{force_action}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
-        if json_result and json_result.get('status') == 'Accepted':
+        json_result = tools_gw.execute_procedure("gw_fct_upsertfields", body)
+        if json_result and json_result.get("status") == "Accepted":
             tools_gw.close_dialog(dialog)
             return
 
@@ -1461,7 +1461,7 @@ class GwMapzoneManager:
         try:
             # Get the last active tab from configuration using existing tools_gw functions
             dlg_name = self.mapzone_mng_dlg.objectName()
-            last_active_tab_name = tools_gw.get_config_parser('dialogs_tab', f"{dlg_name}_mapzone_manager", 'user', 'session')
+            last_active_tab_name = tools_gw.get_config_parser("dialogs_tab", f"{dlg_name}_mapzone_manager", "user", "session")
 
             if last_active_tab_name:
                 # Find the tab index by name

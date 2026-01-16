@@ -26,23 +26,23 @@ class GwDialog(QDialog):
     def __init__(self, class_obj, subtag=None, parent=None):
 
         # If parent is not null the dialog is integrated into parent
-        if sys.platform == 'darwin':
+        if sys.platform == "darwin":
             super().__init__()
         else:
             super().__init__(iface.mainWindow())
         self.setupUi(self)
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly
-        context = getattr(self, 'CONTEXT', None)
-        uiname = getattr(self, 'UINAME', None)
+        context = getattr(self, "CONTEXT", None)
+        uiname = getattr(self, "UINAME", None)
 
         if context and uiname:
             # Use provided CONTEXT and UINAME
-            self.setProperty('context', context)
-            self.setProperty('uiname', uiname)
+            self.setProperty("context", context)
+            self.setProperty("uiname", uiname)
 
         # Always set class_obj and subtag
-        self.setProperty('class_obj', class_obj)
+        self.setProperty("class_obj", class_obj)
         self.subtag = subtag
 
         # Create message bar
@@ -85,12 +85,12 @@ class GwDialog(QDialog):
 
     def eventFilter(self, object, event):
         if hasattr(self, "subtag") and self.subtag is not None:
-            tag = f'{self.objectName()}_{self.subtag}'
+            tag = f"{self.objectName()}_{self.subtag}"
         else:
             tag = str(self.objectName())
 
         if event.type() == QtCore.QEvent.Type.ActivationChange and self.isActiveWindow():
-            lib_vars.session_vars['last_focus'] = tag
+            lib_vars.session_vars["last_focus"] = tag
             return True
         return False
 

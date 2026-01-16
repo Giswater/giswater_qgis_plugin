@@ -148,7 +148,7 @@ class GwImportEpanet:
         checked = tools_qt.is_checked(self.dlg_config, "chk_psector")
         if checked:
             # Check if there is a current psector
-            result = tools_gw.get_config_value('plan_psector_current')
+            result = tools_gw.get_config_value("plan_psector_current")
             if result is None or result[0] is None:
                 msg = "No current psector selected"
                 tools_qgis.show_message(msg, dialog=self.dlg_config)
@@ -162,16 +162,16 @@ class GwImportEpanet:
                 msg = "Error getting current psector"
                 tools_qgis.show_message(msg)
                 return
-            psector_name = row['name']
-            workcat_id = row['workcat_id']
-            exploitation_id = row['expl_id']
+            psector_name = row["name"]
+            workcat_id = row["workcat_id"]
+            exploitation_id = row["expl_id"]
             sql = "SELECT name FROM exploitation WHERE expl_id = %s"
             row = tools_db.get_row(sql, params=(exploitation_id,))
             if row is None:
                 msg = "Error getting exploitation"
                 tools_qgis.show_message(msg)
                 return
-            exploitation_name = row['name']
+            exploitation_name = row["name"]
             # Set text
             self.dlg_config.chk_psector.setText(psector_name)
             tools_qt.set_widget_text(self.dlg_config, "txt_workcat", workcat_id)
@@ -242,21 +242,21 @@ class GwImportEpanet:
             # Delete the network before importing
             queries = [
                 'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
-                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
-                'DELETE FROM ext_rtc_scada_x_data;',
-                'DELETE FROM config_graph_checkvalve;',
-                'DELETE FROM connec CASCADE;',
-                'DELETE FROM node CASCADE;',
-                'DELETE FROM inp_pump CASCADE;',
-                'DELETE FROM inp_virtualpump CASCADE;',
-                'DELETE FROM inp_virtualvalve CASCADE;',
-                'DELETE FROM inp_dscenario_demand CASCADE;',
-                'DELETE FROM inp_curve CASCADE;',
-                'DELETE FROM inp_pattern_value CASCADE;',
-                'DELETE FROM inp_pattern CASCADE;',
-                'DELETE FROM inp_controls CASCADE;',
-                'DELETE FROM inp_rules CASCADE;',
-                'DELETE FROM arc CASCADE;',
+                "UPDATE arc SET node_1 = NULL, node_2 = NULL;",
+                "DELETE FROM ext_rtc_scada_x_data;",
+                "DELETE FROM config_graph_checkvalve;",
+                "DELETE FROM connec CASCADE;",
+                "DELETE FROM node CASCADE;",
+                "DELETE FROM inp_pump CASCADE;",
+                "DELETE FROM inp_virtualpump CASCADE;",
+                "DELETE FROM inp_virtualvalve CASCADE;",
+                "DELETE FROM inp_dscenario_demand CASCADE;",
+                "DELETE FROM inp_curve CASCADE;",
+                "DELETE FROM inp_pattern_value CASCADE;",
+                "DELETE FROM inp_pattern CASCADE;",
+                "DELETE FROM inp_controls CASCADE;",
+                "DELETE FROM inp_rules CASCADE;",
+                "DELETE FROM arc CASCADE;",
                 "DELETE FROM cat_work WHERE id = 'import_inp_test';",
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",
                 "DELETE FROM cat_arc CASCADE;",
@@ -284,14 +284,14 @@ class GwImportEpanet:
             sector = 0
             municipality = 999999  # Spatial intersect
             dscenario = "import_inp_demands"
-            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
-                        'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
-                        'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
-                        'junctions': 'JUNCTION DN110',
-                        'reservoirs': 'SOURCE-01',
-                        'tanks': 'TANK_01',
-                        'pumps': 'INP-PUMP',
-                        'valves': 'INP-VALVE'}
+            catalogs = {"pipes": {(57.0, 0.0025): "INP-PIPE01", (57.0, 0.025): "INP-PIPE02", (99.0, 0.0025): "PELD110-PN10", (99.0, 0.025): "FC110-PN10", (144.0, 0.0025): "PVC160-PN16", (144.0, 0.025): "FC160-PN10", (153.0, 0.03): "INP-PIPE03", (204.0, 0.03): "INP-PIPE04"},
+                        "materials": {0.025: "FC", 0.0025: "PVC", 0.03: "FD"},
+                        "features": {"junctions": "JUNCTION", "pipes": "PIPE", "pumps": "VARC", "reservoirs": "SOURCE", "tanks": "TANK", "valves": "VARC"},
+                        "junctions": "JUNCTION DN110",
+                        "reservoirs": "SOURCE-01",
+                        "tanks": "TANK_01",
+                        "pumps": "INP-PUMP",
+                        "valves": "INP-VALVE"}
 
             save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs)
 
@@ -785,7 +785,7 @@ class GwImportEpanet:
             if element_type in ("pumps", "prv", "psv", "pbv", "fcv", "tcv", "gpv"):
                 tools_gw.connect_signal(combo.currentTextChanged,
                                         partial(self._update_table_based_on_feature_type, element_type, combo),
-                                        'import_inp', f'cmb_{element_type.lower()}_update_table_based_on_feature_type')
+                                        "import_inp", f"cmb_{element_type.lower()}_update_table_based_on_feature_type")
 
     def _update_table_based_on_feature_type(self, element_type: str, combo: QComboBox):
         if element_type not in ("pumps", "prv", "psv", "pbv", "fcv", "tcv", "gpv"):
@@ -848,7 +848,7 @@ class GwImportEpanet:
                 continue
 
             # Disconnect old combo signal
-            tools_gw.disconnect_signal('import_inp', f'tbl_{element.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
+            tools_gw.disconnect_signal("import_inp", f"tbl_{element.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field")
 
             # Add a new row
             row: int = tbl.rowCount()
@@ -872,7 +872,7 @@ class GwImportEpanet:
             # Connect signal to the new combo
             tools_gw.connect_signal(combo_cat.currentTextChanged,
                                     partial(self._toggle_enabled_new_catalog_field, new_cat_name),
-                                    'import_inp', f'tbl_{feature_type.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
+                                    "import_inp", f"tbl_{feature_type.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field")
 
             self.tbl_elements[element] = (combo_cat, new_cat_name)
 
@@ -997,7 +997,7 @@ class GwImportEpanet:
             self.dlg_config.progressBar.setValue(progress)
 
         # TextEdit log
-        txt_infolog = self.dlg_config.findChild(QTextEdit, 'tab_log_txt_infolog')
+        txt_infolog = self.dlg_config.findChild(QTextEdit, "tab_log_txt_infolog")
         cur_text = tools_qt.get_text(self.dlg_config, txt_infolog, return_string_null=False)
         if process and process not in (self.cur_process, "Generate INP algorithm"):
             cur_text = f"{cur_text}\n" \
@@ -1014,7 +1014,7 @@ class GwImportEpanet:
         if self.cur_text:
             cur_text = self.cur_text
 
-        end_line = '\n' if new_line else ''
+        end_line = "\n" if new_line else ""
         txt_infolog.setText(f"{cur_text}{text}{end_line}")
         txt_infolog.show()
         # Scroll to the bottom
@@ -1025,6 +1025,6 @@ class GwImportEpanet:
         """Cleanup all import_inp signals when dialog closes"""
         try:
             # Disconnect all import_inp section signals
-            tools_gw.disconnect_signal('import_inp')
+            tools_gw.disconnect_signal("import_inp")
         except Exception:
             pass

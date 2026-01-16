@@ -838,7 +838,7 @@ class GwCalculatePriority(GwTask):
 
         for arc in arcs:
             # Check if the arc is in second_iteration, and update it
-            matching_arc = next((arc_2 for arc_2 in second_iteration if arc_2['arc_id'] == arc['arc_id']), None)
+            matching_arc = next((arc_2 for arc_2 in second_iteration if arc_2["arc_id"] == arc["arc_id"]), None)
             if matching_arc:
                 # Update the arc in arcs with the modified data from second_iteration
                 arc.update(matching_arc)

@@ -44,7 +44,7 @@ class GwConnectLink(GwTask):
         self.connect_link_class.manage_result(self.json_result)
 
         # Refresh psector's relations tables
-        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
+        tools_gw.execute_class_function(GwPsectorUi, "_refresh_tables_relations")
 
     def _link_selected_features(self, feature_type, selected_arcs=None):
         """Link selected @feature_type to the pipe"""
@@ -91,8 +91,8 @@ class GwConnectLink(GwTask):
             # Process single connec
             feature_id = f'"id":[{connec_id}]'
 
-            pipe_diameter = 'null' if not self.connect_link_class.pipe_diameter.text() else f'"{self.connect_link_class.pipe_diameter.text()}"'
-            max_distance = 'null' if not self.connect_link_class.max_distance.text() else f'"{self.connect_link_class.max_distance.text()}"'
+            pipe_diameter = "null" if not self.connect_link_class.pipe_diameter.text() else f'"{self.connect_link_class.pipe_diameter.text()}"'
+            max_distance = "null" if not self.connect_link_class.max_distance.text() else f'"{self.connect_link_class.max_distance.text()}"'
             linkcat_id = tools_qt.get_combo_value(self.connect_link_class.dlg_connect_link, "tab_none_linkcat")
 
             extras = (
@@ -105,21 +105,21 @@ class GwConnectLink(GwTask):
             if selected_arcs:
                 # Convert list to proper JSON array format for forcedArcs
                 arcs_str_list = [f'"{str(arc)}"' for arc in selected_arcs]
-                arcs_json = ', '.join(arcs_str_list)
+                arcs_json = ", ".join(arcs_str_list)
                 extras += f', "forcedArcs":[{arcs_json}]'
 
             # Check if psector mode is active and add psector_id
-            psector_active = global_vars.psignals.get('psector_active', False)
-            psector_id = global_vars.psignals.get('psector_id', None)
+            psector_active = global_vars.psignals.get("psector_active", False)
+            psector_id = global_vars.psignals.get("psector_id", None)
             if psector_active and psector_id:
                 extras += f', "psectorId":"{psector_id}"'
 
             body = tools_gw.create_body(feature=feature_id, extras=extras)
 
             # Execute SQL function for this connec
-            result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body, aux_conn=self.aux_conn, is_thread=True)
+            result = tools_gw.execute_procedure("gw_fct_setlinktonetwork", body, aux_conn=self.aux_conn, is_thread=True)
 
-            if result and result.get('status') == 'Accepted':
+            if result and result.get("status") == "Accepted":
                 success_count += 1
                 last_result = result  # Keep the last successful result
 
@@ -127,7 +127,7 @@ class GwConnectLink(GwTask):
         if last_result:
             self.json_result = last_result
         else:
-            self.json_result = {'status': 'Failed', 'message': {'level': 1, 'text': 'No connecs processed successfully'}}
+            self.json_result = {"status": "Failed", "message": {"level": 1, "text": "No connecs processed successfully"}}
 
         return success_count > 0
 
@@ -140,8 +140,8 @@ class GwConnectLink(GwTask):
         # Get selected features from layers of selected @feature_type
         feature_id = f'"id":{self.connect_link_class.ids}'
 
-        pipe_diameter = 'null' if not self.connect_link_class.pipe_diameter.text() else f'"{self.connect_link_class.pipe_diameter.text()}"'
-        max_distance = 'null' if not self.connect_link_class.max_distance.text() else f'"{self.connect_link_class.max_distance.text()}"'
+        pipe_diameter = "null" if not self.connect_link_class.pipe_diameter.text() else f'"{self.connect_link_class.pipe_diameter.text()}"'
+        max_distance = "null" if not self.connect_link_class.max_distance.text() else f'"{self.connect_link_class.max_distance.text()}"'
         linkcat_id = tools_qt.get_combo_value(self.connect_link_class.dlg_connect_link, "tab_none_linkcat")
 
         extras = (
@@ -154,12 +154,12 @@ class GwConnectLink(GwTask):
         if selected_arcs:
             # Convert list to proper JSON array format for forcedArcs
             arcs_str_list = [f'"{str(arc)}"' for arc in selected_arcs]
-            arcs_json = ', '.join(arcs_str_list)
+            arcs_json = ", ".join(arcs_str_list)
             extras += f', "forcedArcs":[{arcs_json}]'
 
         # Check if psector mode is active and add psector_id
-        psector_active = global_vars.psignals.get('psector_active', False)
-        psector_id = global_vars.psignals.get('psector_id', None)
+        psector_active = global_vars.psignals.get("psector_active", False)
+        psector_id = global_vars.psignals.get("psector_id", None)
         if psector_active and psector_id:
             extras += f', "psectorId":"{psector_id}"'
 
@@ -169,6 +169,6 @@ class GwConnectLink(GwTask):
         msg = "Task 'Connect link' execute procedure '{0}' with parameters: '{1}', '{2}', '{3}'"
         msg_params = ("gw_fct_setlinktonetwork", body, f"aux_conn={self.aux_conn}", "is_thread=True",)
         tools_log.log_info(msg, msg_params=msg_params)
-        self.json_result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body, aux_conn=self.aux_conn, is_thread=True)
+        self.json_result = tools_gw.execute_procedure("gw_fct_setlinktonetwork", body, aux_conn=self.aux_conn, is_thread=True)
 
-        return self.json_result is not None and self.json_result.get('status') == 'Accepted'
+        return self.json_result is not None and self.json_result.get("status") == "Accepted"

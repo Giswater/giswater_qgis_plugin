@@ -47,17 +47,17 @@ class GwAddChildLayerButton(GwAction):
             layer_list.append(tools_qgis.get_layer_source_table_name(layer))
 
         body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getaddlayervalues", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         dict_menu = {}
         load_all_text = "Load all     "
 
-        for field in json_result['body']['data']['fields']:
-            if field['context'] is not None:
-                context = json.loads(field['context'])
-                levels = context.get(tools_qt.tr('levels')) or context.get('levels')
+        for field in json_result["body"]["data"]["fields"]:
+            if field["context"] is not None:
+                context = json.loads(field["context"])
+                levels = context.get(tools_qt.tr("levels")) or context.get("levels")
 
                 # Check if schema exists for am and cm
                 if levels[0] == "AM" or levels[0] == "CM":
@@ -75,7 +75,7 @@ class GwAddChildLayerButton(GwAction):
                     menu_level_3 = dict_menu[f"{levels[0]}_{levels[1]}"].addMenu(f"{levels[2]}")
                     dict_menu[f"{levels[0]}_{levels[1]}_{levels[2]}"] = menu_level_3
 
-                alias = field['layerName'] if field['layerName'] is not None else field['tableName']
+                alias = field["layerName"] if field["layerName"] is not None else field["tableName"]
                 alias = f"{alias}     "
                 if len(levels) > 2 and levels[2] is not None:
                     menu = dict_menu[f"{levels[0]}_{levels[1]}_{levels[2]}"]
@@ -118,12 +118,12 @@ class GwAddChildLayerButton(GwAction):
                     widget.setChecked(True)
                 widget.setStyleSheet("margin: 5px 5px 5px 8px;")
 
-                layer_name = field['tableName']
-                if field['geomField'] == "None":
+                layer_name = field["tableName"]
+                if field["geomField"] == "None":
                     the_geom = None
                 else:
-                    the_geom = field['geomField']
-                geom_field = field['tableId']
+                    the_geom = field["geomField"]
+                geom_field = field["tableId"]
                 # If layer is configured but it doesn't exist in schema, ignore it
                 if not geom_field:
                     continue
@@ -158,8 +158,8 @@ class GwAddChildLayerButton(GwAction):
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                if lib_vars.project_vars['current_style'] is not None:
-                    style_id = lib_vars.project_vars['current_style']
+                if lib_vars.project_vars["current_style"] is not None:
+                    style_id = lib_vars.project_vars["current_style"]
                 schema = None
                 if group == "AM" or group == "CM":
                     schema = "am" if group == "AM" else "cm"

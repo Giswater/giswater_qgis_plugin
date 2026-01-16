@@ -25,10 +25,10 @@ class GwCreateSchemaUtilsTask(GwTask):
         """"""
 
         super().run()
-        self.is_test = self.params['is_test']
-        schema_version = self.params['schema_version']
+        self.is_test = self.params["is_test"]
+        schema_version = self.params["schema_version"]
 
-        self.finish_execution = {'import_data': False}
+        self.finish_execution = {"import_data": False}
         try:
             # Common execution
             status = self.admin._load_base_utils()
@@ -86,12 +86,12 @@ class GwCreateSchemaUtilsTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 
-        self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'], is_utils=True)
+        self.admin.manage_process_result(self.params["project_name_schema"], self.params["project_type"], is_utils=True)
 

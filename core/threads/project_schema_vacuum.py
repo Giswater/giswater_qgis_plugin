@@ -23,9 +23,9 @@ class GwVacuumSchemaTask(GwTask):
 
     def run(self):
         super().run()
-        schema_name = self.params.get('schema_name')
-        logs = self.params.get('logs', False)
-        verbose = self.params.get('verbose', False)
+        schema_name = self.params.get("schema_name")
+        logs = self.params.get("logs", False)
+        verbose = self.params.get("verbose", False)
         msg = "Starting execute_vacuum method"
         msg_params = ("execute_vacuum",)
         tools_log.log_info(msg, msg_params=msg_params)

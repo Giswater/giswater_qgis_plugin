@@ -37,7 +37,7 @@ class GwProjectCheckButton(GwAction):
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
         # Fetch dialog configuration from the database
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+        json_result = tools_gw.execute_procedure("gw_fct_get_dialog", body)
 
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
@@ -61,30 +61,30 @@ class GwProjectCheckButton(GwAction):
         self.plan_check = self.dialog.findChild(QCheckBox, "tab_data_plan_check")
         self.admin_check = self.dialog.findChild(QCheckBox, "tab_data_admin_check")
 
-        versions_check_value = tools_gw.get_config_parser('admin_checkproject', 'versions_check', "user", "session")
-        qgisproj_check_value = tools_gw.get_config_parser('admin_checkproject', 'qgisproj_check', "user", "session")
-        verified_exceptions_value = tools_gw.get_config_parser('admin_checkproject', 'verified_exceptions', "user", "session")
-        om_check_value = tools_gw.get_config_parser('admin_checkproject', 'om_check', "user", "session")
-        graph_check_value = tools_gw.get_config_parser('admin_checkproject', 'graph_check', "user", "session")
-        epa_check_value = tools_gw.get_config_parser('admin_checkproject', 'epa_check', "user", "session")
-        plan_check_value = tools_gw.get_config_parser('admin_checkproject', 'plan_check', "user", "session")
-        admin_check_value = tools_gw.get_config_parser('admin_checkproject', 'admin_check', "user", "session")
+        versions_check_value = tools_gw.get_config_parser("admin_checkproject", "versions_check", "user", "session")
+        qgisproj_check_value = tools_gw.get_config_parser("admin_checkproject", "qgisproj_check", "user", "session")
+        verified_exceptions_value = tools_gw.get_config_parser("admin_checkproject", "verified_exceptions", "user", "session")
+        om_check_value = tools_gw.get_config_parser("admin_checkproject", "om_check", "user", "session")
+        graph_check_value = tools_gw.get_config_parser("admin_checkproject", "graph_check", "user", "session")
+        epa_check_value = tools_gw.get_config_parser("admin_checkproject", "epa_check", "user", "session")
+        plan_check_value = tools_gw.get_config_parser("admin_checkproject", "plan_check", "user", "session")
+        admin_check_value = tools_gw.get_config_parser("admin_checkproject", "admin_check", "user", "session")
 
-        if versions_check_value not in (None, 'None', ''):
+        if versions_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.versions_check, versions_check_value)
-        if qgisproj_check_value not in (None, 'None', ''):
+        if qgisproj_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.qgisproj_check, qgisproj_check_value)
-        if verified_exceptions_value not in (None, 'None', ''):
+        if verified_exceptions_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.verified_exceptions, verified_exceptions_value)
-        if om_check_value not in (None, 'None', ''):
+        if om_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.om_check, om_check_value)
-        if graph_check_value not in (None, 'None', ''):
+        if graph_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.graph_check, graph_check_value)
-        if epa_check_value not in (None, 'None', ''):
+        if epa_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.epa_check, epa_check_value)
-        if plan_check_value not in (None, 'None', ''):
+        if plan_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.plan_check, plan_check_value)
-        if admin_check_value not in (None, 'None', ''):
+        if admin_check_value not in (None, "None", ""):
             tools_qt.set_checked(self.dialog, self.admin_check, admin_check_value)
 
         # Disable the "Log" tab initially
@@ -107,7 +107,7 @@ class GwProjectCheckButton(GwAction):
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""
         # Enable the "Log" tab after pressing Accept
-        qtabwidget = self.dialog.findChild(QTabWidget, 'mainTab')
+        qtabwidget = self.dialog.findChild(QTabWidget, "mainTab")
         if qtabwidget:
             tools_qt.enable_tab_by_tab_name(qtabwidget, "tab_log", True)  # Enable Log tab
 
@@ -134,7 +134,7 @@ class GwProjectCheckButton(GwAction):
         # Save dialog values
         self._save_dlg_values()
 
-        self.project_check_task = GwProjectCheckTask('check_project', params)
+        self.project_check_task = GwProjectCheckTask("check_project", params)
 
         # Connect task completion to execute checkdatabase
         self.project_check_task.taskCompleted.connect(self._execute_checkdatabase)
@@ -151,17 +151,17 @@ class GwProjectCheckButton(GwAction):
             return
 
         # Format parameters properly
-        parameters = ', '.join([f'"{key}": {str(value).lower()}' for key, value in check_parameters.items()])
+        parameters = ", ".join([f'"{key}": {str(value).lower()}' for key, value in check_parameters.items()])
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
 
         # Execute procedure
-        json_result = tools_gw.execute_procedure('gw_fct_setcheckdatabase', body)
+        json_result = tools_gw.execute_procedure("gw_fct_setcheckdatabase", body)
 
         if not json_result or json_result.get("status") != "Accepted":
             print(f"Failed to execute gw_fct_setcheckdatabase: {json_result}")
             return
-        tools_gw.fill_tab_log(self.dialog, json_result['body']['data'], reset_text=False)
+        tools_gw.fill_tab_log(self.dialog, json_result["body"]["data"], reset_text=False)
 
     def _get_selected_checks(self):
         """Returns a dictionary of the selected checkboxes using `is_checked` from tools_qt,
@@ -204,13 +204,13 @@ class GwProjectCheckButton(GwAction):
         plan_check = self.plan_check.isChecked() if self.plan_check else False
         admin_check = self.admin_check.isChecked() if self.admin_check else False
 
-        tools_gw.set_config_parser('admin_checkproject', 'versions_check', versions_check)
-        tools_gw.set_config_parser('admin_checkproject', 'qgisproj_check', qgisproj_check)
-        tools_gw.set_config_parser('admin_checkproject', 'verified_exceptions', verified_exceptions)
-        tools_gw.set_config_parser('admin_checkproject', 'om_check', om_check)
-        tools_gw.set_config_parser('admin_checkproject', 'graph_check', graph_check)
-        tools_gw.set_config_parser('admin_checkproject', 'epa_check', epa_check)
-        tools_gw.set_config_parser('admin_checkproject', 'plan_check', plan_check)
-        tools_gw.set_config_parser('admin_checkproject', 'admin_check', admin_check)
+        tools_gw.set_config_parser("admin_checkproject", "versions_check", versions_check)
+        tools_gw.set_config_parser("admin_checkproject", "qgisproj_check", qgisproj_check)
+        tools_gw.set_config_parser("admin_checkproject", "verified_exceptions", verified_exceptions)
+        tools_gw.set_config_parser("admin_checkproject", "om_check", om_check)
+        tools_gw.set_config_parser("admin_checkproject", "graph_check", graph_check)
+        tools_gw.set_config_parser("admin_checkproject", "epa_check", epa_check)
+        tools_gw.set_config_parser("admin_checkproject", "plan_check", plan_check)
+        tools_gw.set_config_parser("admin_checkproject", "admin_check", admin_check)
 
     # endregion

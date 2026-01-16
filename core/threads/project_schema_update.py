@@ -80,8 +80,8 @@ class GwUpdateSchemaTask(GwTask):
             self.admin._manage_result_message(status, parameter="Update project")
             # Set info project
             self.admin._set_info_project()
-            if 'body' in self.status:
-                tools_gw.fill_tab_log(self.admin.dlg_readsql_show_info, self.status['body']['data'], True, True, 1)
+            if "body" in self.status:
+                tools_gw.fill_tab_log(self.admin.dlg_readsql_show_info, self.status["body"]["data"], True, True, 1)
             else:
                 msg = "Key not found: '{0}'"
                 msg_params = ("body",)
@@ -100,10 +100,10 @@ class GwUpdateSchemaTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 
@@ -115,6 +115,6 @@ class GwUpdateSchemaTask(GwTask):
         sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
         tools_db.execute_sql(sql, commit=False)
         # Get all updates folders, to update
-        self.dict_folders_process['updates'] = self.admin.folder_updates
-        self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name)
+        self.dict_folders_process["updates"] = self.admin.folder_updates
+        self.status = self.admin.load_updates(self.params["project_type"], update_changelog=True, schema_name=schema_name)
         return True

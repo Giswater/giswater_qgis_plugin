@@ -15,6 +15,6 @@ class GwFlowExitButton(GwFlow):
         self.help_message = "Click on node to compute its downstream network"
 
     def canvasReleaseEvent(self, event):
-        self._set_flow(event, 'gw_fct_graphanalytics_downstream')
+        self._set_flow(event, "gw_fct_graphanalytics_downstream")
 
 

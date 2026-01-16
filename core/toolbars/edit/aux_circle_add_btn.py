@@ -102,7 +102,7 @@ class GwAuxCircleAddButton(GwMaptool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_circle = tools_qgis.get_layer_by_tablename('ve_cad_auxcircle', True, True)
+        self.layer_circle = tools_qgis.get_layer_by_tablename("ve_cad_auxcircle", True, True)
         if self.layer_circle is None:
             self.iface.actionPan().trigger()
             self.cancel_circle = True
@@ -114,7 +114,7 @@ class GwAuxCircleAddButton(GwMaptool):
         # Check for default base layer
         self.vdefault_layer = None
 
-        row = tools_gw.get_config_value('edit_cadtools_baselayer_vdefault')
+        row = tools_gw.get_config_value("edit_cadtools_baselayer_vdefault")
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = tools_qgis.get_layer_by_tablename(row[0], True)
@@ -145,11 +145,11 @@ class GwAuxCircleAddButton(GwMaptool):
             for tablename, alias in rows:
                 lyr = tools_qgis.get_layer_by_tablename(tablename)
                 if not lyr:
-                    if tablename == 've_cad_auxcircle':
-                        geom = 'geom_multicurve'
+                    if tablename == "ve_cad_auxcircle":
+                        geom = "geom_multicurve"
                     else:
-                        geom_type = tablename.replace('ve_cad_aux', '')
-                        geom = f'geom_{geom_type.lower()}'
+                        geom_type = tablename.replace("ve_cad_aux", "")
+                        geom = f"geom_{geom_type.lower()}"
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 
     def _init_create_circle_form(self, point):
@@ -167,7 +167,7 @@ class GwAuxCircleAddButton(GwMaptool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.rejected.connect(self.cancel)
 
-        tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
+        tools_gw.open_dialog(self.dlg_create_circle, dlg_name="auxcircle")
         self.dialog_created = True
         self.dlg_create_circle.radius.setFocus()
 

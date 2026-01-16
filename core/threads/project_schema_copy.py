@@ -43,15 +43,15 @@ class GwCopySchemaTask(GwTask):
 
         super().run()
 
-        schema = self.params.get('schema')
+        schema = self.params.get("schema")
         new_schema_name = tools_qt.get_text(self.admin.dlg_readsql_copy, self.admin.dlg_readsql_copy.schema_rename_copy)
         self.new_schema_name = new_schema_name
 
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body, schema, commit=False,
+        result = tools_gw.execute_procedure("gw_fct_admin_schema_clone", body, schema, commit=False,
                                             is_thread=True, aux_conn=self.aux_conn)
-        if not result or result['status'] == 'Failed':
+        if not result or result["status"] == "Failed":
             return False
 
         # Show message

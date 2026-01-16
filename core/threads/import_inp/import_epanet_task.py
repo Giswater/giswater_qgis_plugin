@@ -169,7 +169,7 @@ class GwImportInpTask(GwTask):
 
         # Get man tables
         self.man_tables: dict[str, str] = {}
-        for k, v in self.catalogs['features'].items():
+        for k, v in self.catalogs["features"].items():
             sql = f"SELECT feature_class FROM cat_feature WHERE id = '{v}';"
             row = get_row(sql, commit=self.force_commit)
             if not row:
@@ -219,14 +219,14 @@ class GwImportInpTask(GwTask):
     def _enable_triggers(self, enable: bool, plan_trigger: bool = False, geometry_trigger: bool = False) -> None:
         op = "ENABLE" if enable else "DISABLE"
         queries = [
-            f'ALTER TABLE arc {op} TRIGGER ALL;',
-            f'ALTER TABLE node {op} TRIGGER ALL;',
+            f"ALTER TABLE arc {op} TRIGGER ALL;",
+            f"ALTER TABLE node {op} TRIGGER ALL;",
         ]
         if plan_trigger:
-            queries.append('ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
-            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
+            queries.append("ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;")
+            queries.append("ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;")
         if geometry_trigger:
-            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
+            queries.append("ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;")
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)
             if not result:
@@ -377,14 +377,14 @@ class GwImportInpTask(GwTask):
         extras += '"type": "DEMAND",'
         extras += '"active": "true",'
         extras += f'"expl": "{self.exploitation}"'
-        extras += '}'
+        extras += "}"
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_create_dscenario_empty', body, commit=self.force_commit, is_thread=True)
-        if not json_result or json_result.get('status') != 'Accepted':
+        json_result = tools_gw.execute_procedure("gw_fct_create_dscenario_empty", body, commit=self.force_commit, is_thread=True)
+        if not json_result or json_result.get("status") != "Accepted":
             message = "Error executing gw_fct_create_dscenario_empty"
             raise ValueError(message)
 
-        self.dscenario_id = json_result['body']['data'].get('dscenario_id')
+        self.dscenario_id = json_result["body"]["data"].get("dscenario_id")
         if self.dscenario_id is None:
             message = "Function gw_fct_create_dscenario_empty returned no dscenario_id"
             raise ValueError(message)
@@ -621,28 +621,28 @@ class GwImportInpTask(GwTask):
             value = control_action._value
             attribute = control_action._attribute.lower()
 
-            if attribute == 'status':
+            if attribute == "status":
                 setting = LinkStatus(value).name
-            elif attribute == 'base_speed':
+            elif attribute == "base_speed":
                 setting = str(value)
-            elif attribute == 'setting' and isinstance(control_action._target_obj, Valve):
+            elif attribute == "setting" and isinstance(control_action._target_obj, Valve):
                 valve = control_action._target_obj
                 valve_type = valve.valve_type
-                if valve_type in ('PRV', 'PSV', 'PBV'):
+                if valve_type in ("PRV", "PSV", "PBV"):
                     setting = str(from_si(FlowUnits[self.db_units], value, HydParam.Pressure))
-                elif valve_type == 'FCV':
+                elif valve_type == "FCV":
                     setting = str(from_si(FlowUnits[self.db_units], value, HydParam.Flow))
-                elif valve_type == 'TCV':
+                elif valve_type == "TCV":
                     setting = str(value)
-                elif valve_type == 'GPV':
+                elif valve_type == "GPV":
                     setting = value
                 else:
-                    raise ValueError(f'Valve type not recognized: {valve_type}')
-            elif attribute == 'setting':
+                    raise ValueError(f"Valve type not recognized: {valve_type}")
+            elif attribute == "setting":
                 setting = value
             else:
                 setting = None
-                self._log_message(f'Could not write control {control_name} - skipping')
+                self._log_message(f"Could not write control {control_name} - skipping")
 
             return setting
 
@@ -684,13 +684,13 @@ class GwImportInpTask(GwTask):
                 link_name = link_obj.name
                 link_id = self.arc_ids.get(link_name, link_name)
                 # Add _n2a because in go2epa valves/pumps are transformed to nodes
-                if link_type.lower() in ['valve', 'pump']:
+                if link_type.lower() in ["valve", "pump"]:
                     link_id = f"{link_id}_n2a"
 
                 # Format based on condition type
                 if isinstance(control._condition, (SimTimeCondition, TimeOfDayCondition)):
                     threshold_time = control._condition._threshold / 3600.0
-                    compare = 'CLOCKTIME' if isinstance(control._condition, TimeOfDayCondition) else 'TIME'
+                    compare = "CLOCKTIME" if isinstance(control._condition, TimeOfDayCondition) else "TIME"
                     text = f"{link_type} {link_id} {setting} AT {compare} {threshold_time:g}"
 
                 elif isinstance(control._condition, ValueCondition):
@@ -705,7 +705,7 @@ class GwImportInpTask(GwTask):
                         is_below = relation in [np.less, np.less_equal, Comparison.le, Comparison.lt]
                     else:
                         is_below = relation in [np.less, np.less_equal]
-                    compare = 'BELOW' if is_below else 'ABOVE'
+                    compare = "BELOW" if is_below else "ABOVE"
 
                     # Convert threshold based on node type
                     threshold = control._condition._threshold
@@ -714,11 +714,11 @@ class GwImportInpTask(GwTask):
                     elif isinstance(source_obj, Junction):
                         thresh_value = from_si(FlowUnits[self.db_units], threshold, HydParam.Pressure)
                     else:
-                        raise RuntimeError(f'Unknown control for EPANET INP files: {type(control)}')
+                        raise RuntimeError(f"Unknown control for EPANET INP files: {type(control)}")
 
                     text = f"{link_type} {link_id} {setting} IF {node_type} {node_id} {compare} {thresh_value}"
                 else:
-                    raise RuntimeError(f'Unknown control for EPANET INP files: {type(control)}')
+                    raise RuntimeError(f"Unknown control for EPANET INP files: {type(control)}")
 
                 if text in controls_db:
                     msg = f"The control '{control_name}' is already on database. Skipping..."
@@ -892,7 +892,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_reservoirs(self) -> None:
-        man_table = self.man_tables['reservoirs']
+        man_table = self.man_tables["reservoirs"]
 
         node_sql = """ 
             INSERT INTO node (
@@ -996,7 +996,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_tanks(self) -> None:
-        man_table = self.man_tables['tanks']
+        man_table = self.man_tables["tanks"]
 
         node_sql = """ 
             INSERT INTO node (
@@ -1112,7 +1112,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pumps(self) -> None:
-        man_table = self.man_tables['pumps']
+        man_table = self.man_tables["pumps"]
         arccat_id = self.catalogs["pumps"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_nodarcs["pumps"]:
@@ -1356,7 +1356,7 @@ class GwImportInpTask(GwTask):
             )
 
     def _save_pipes(self) -> None:
-        man_table = self.man_tables['pipes']
+        man_table = self.man_tables["pipes"]
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1517,15 +1517,15 @@ class GwImportInpTask(GwTask):
             extras = extras[:-1]
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure(fct_name, body, commit=self.force_commit, is_thread=True)
-            if not json_result or json_result.get('status') != 'Accepted':
+            if not json_result or json_result.get("status") != "Accepted":
                 message = f"Error executing {fct_name} - {json_result.get('message')}"
                 raise ValueError(message)
             try:
-                if json_result['body']['data']['info']:
-                    info = json_result['body']['data']['info']
+                if json_result["body"]["data"]["info"]:
+                    info = json_result["body"]["data"]["info"]
                     if isinstance(info, list):
-                        logs = [x.get('message') for x in info]
-                        logs_str = '\n'.join(logs)
+                        logs = [x.get("message") for x in info]
+                        logs_str = "\n".join(logs)
                         return logs_str
             except KeyError:
                 pass

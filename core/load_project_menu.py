@@ -144,8 +144,8 @@ class GwMenuLoad(QObject):
         tools_gw.load_settings(self.dlg_manage_menu)
 
         # Manage widgets
-        self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, 'tree_config_files')
-        self.btn_close = self.dlg_manage_menu.findChild(QPushButton, 'btn_close')
+        self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, "tree_config_files")
+        self.btn_close = self.dlg_manage_menu.findChild(QPushButton, "btn_close")
 
         # Fill table_config_files
         self._fill_tbl_config_files()
@@ -168,7 +168,7 @@ class GwMenuLoad(QObject):
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
+        tools_gw.open_dialog(self.dlg_manage_menu, dlg_name="load_menu", title="Advanced Menu")
 
     def _reset_position_dialog(self):
         """Reset position dialog x/y"""
@@ -183,13 +183,13 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
         path = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config"
-        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f != 'user_params.config'
-                 and '.bak' not in f]
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f != "user_params.config"
+                 and ".bak" not in f]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
-            project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
-            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True, strict=False)
+            project_types = tools_gw.get_config_parser("system", "project_types", "project", "giswater")
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
             parser.read(f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}")
 
             # For each section we create a sub-item and add all the parameters to that sub-item
@@ -230,7 +230,7 @@ class GwMenuLoad(QObject):
             section = item.parent().text(0)
             parameter = item.text(1)
             value = item.text(2)
-            if value == '':
+            if value == "":
                 value = "None"
             tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False, chk_user_params=False)
 
@@ -263,7 +263,7 @@ class GwMenuLoad(QObject):
     def _reload_layers(self):
         """Reloads all the layers"""
         # Manage if task is already running
-        if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
+        if hasattr(self, "task_get_layers") and self.task_get_layers is not None:
             try:
                 if self.task_get_layers.isActive():
                     msg = "{0} task is already active!"
@@ -273,7 +273,7 @@ class GwMenuLoad(QObject):
             except RuntimeError:
                 pass
 
-        schema_name = lib_vars.schema_name.replace('"', '')
+        schema_name = lib_vars.schema_name.replace('"', "")
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
                f"UNION "
                f"SELECT DISTINCT(child_layer) FROM cat_feature "
@@ -283,7 +283,7 @@ class GwMenuLoad(QObject):
         rows = tools_db.get_rows(sql)
         description = "ConfigLayerFields"
         params = {"project_type": global_vars.project_type, "schema_name": lib_vars.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": lib_vars.project_vars['info_type']}
+                  "qgis_project_infotype": lib_vars.project_vars["info_type"]}
         self.task_get_layers = GwProjectLayersConfig(description, params)
         QgsApplication.taskManager().addTask(self.task_get_layers)
         QgsApplication.taskManager().triggerTask(self.task_get_layers)

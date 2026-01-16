@@ -27,7 +27,7 @@ class GwArcAddButton(GwAction):
         if toolbar is not None:
             toolbar.removeAction(self.action)
 
-        self.info_feature = GwInfo('data')
+        self.info_feature = GwInfo("data")
 
         self.menu = QMenu()
         self.menu.setObjectName("GW_arc_menu")
@@ -44,8 +44,8 @@ class GwArcAddButton(GwAction):
         # Refresh cat feature list
         self._fill_arc_menu()
 
-        if self.menu.property('last_selection') is not None:
-            self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
+        if self.menu.property("last_selection") is not None:
+            self.info_feature.add_feature(self.menu.property("last_selection"), action=self)
 
     # region private functions
 
@@ -57,7 +57,7 @@ class GwArcAddButton(GwAction):
             action.disconnect()
             self.menu.removeAction(action)
             del action
-        action_group = self.action.property('action_group')
+        action_group = self.action.property("action_group")
 
         # Update featurecatvalues
 
@@ -67,10 +67,10 @@ class GwArcAddButton(GwAction):
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'ARC':
+                if feature_cat.feature_type.upper() == "ARC":
                     obj_action = QAction(str(feature_cat.id), action_group)
                     obj_action.setObjectName(feature_cat.id)
-                    obj_action.setProperty('action_group', action_group)
+                    obj_action.setProperty("action_group", action_group)
                     if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                     try:
@@ -85,10 +85,10 @@ class GwArcAddButton(GwAction):
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'LINK':
+                if feature_cat.feature_type.upper() == "LINK":
                     obj_action = QAction(str(feature_cat.id), action_group)
                     obj_action.setObjectName(feature_cat.id)
-                    obj_action.setProperty('action_group', action_group)
+                    obj_action.setProperty("action_group", action_group)
                     if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                     try:
@@ -103,10 +103,10 @@ class GwArcAddButton(GwAction):
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'FLWREG':
+                if feature_cat.feature_type.upper() == "FLWREG":
                     obj_action = QAction(str(feature_cat.id), action_group)
                     obj_action.setObjectName(feature_cat.id)
-                    obj_action.setProperty('action_group', action_group)
+                    obj_action.setProperty("action_group", action_group)
                     if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                     try:

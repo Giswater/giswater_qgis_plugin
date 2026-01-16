@@ -27,7 +27,7 @@ class GwTask(QgsTask, QObject):
 
     def run(self) -> bool:
 
-        lib_vars.session_vars['threads'].append(self)
+        lib_vars.session_vars["threads"].append(self)
 
         if self.use_aux_conn:
             self.aux_conn = tools_db.dao.get_aux_conn()
@@ -42,7 +42,7 @@ class GwTask(QgsTask, QObject):
     def finished(self, result):
 
         try:
-            lib_vars.session_vars['threads'].remove(self)
+            lib_vars.session_vars["threads"].remove(self)
         except ValueError:
             pass
         tools_db.dao.delete_aux_con(self.aux_conn)
@@ -67,8 +67,8 @@ class GwTask(QgsTask, QObject):
         pid = self.aux_conn.get_backend_pid()
         if isinstance(pid, int):
             result = tools_db.cancel_pid(pid)
-            if result['last_error'] is not None:
-                tools_log.log_warning(result['last_error'])
+            if result["last_error"] is not None:
+                tools_log.log_warning(result["last_error"])
             tools_db.dao.rollback(self.aux_conn)
         msg = "Task '{0}' was cancelled"
         msg_params = (self.description(),)

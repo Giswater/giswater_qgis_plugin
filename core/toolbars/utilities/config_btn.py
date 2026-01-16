@@ -57,15 +57,15 @@ class GwConfigButton(GwAction):
 
         # Call function gw_fct_getconfig and get json_result
         body = tools_gw.create_body(form='"formName":"config"', extras=result)
-        self.json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
-        if not self.json_result or self.json_result['status'] == 'Failed':
+        self.json_result = tools_gw.execute_procedure("gw_fct_getconfig", body)
+        if not self.json_result or self.json_result["status"] == "Failed":
             return False
 
         # Get widget controls
         self._get_widget_controls()
 
         # Event on change from combo parent
-        self._get_event_combo_parent(self.json_result['body']['form']['formTabs'])
+        self._get_event_combo_parent(self.json_result["body"]["form"]["formTabs"])
 
         # Load first tab (Basic tab)
         self.tab_basic_loaded = True
@@ -75,7 +75,7 @@ class GwConfigButton(GwAction):
         layout_list = self.tab_main.widget(initial_index).findChildren(QGridLayout)
         for layout in layout_list:
             layoutname_list.append(layout.objectName())
-        self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        self._build_dialog_options(self.json_result["body"]["form"]["formTabs"][0], "user", layoutname_list)
         self._hide_void_tab_groupbox(grbox_list)
 
         # Check user/role and remove tabs
@@ -90,13 +90,13 @@ class GwConfigButton(GwAction):
         self.dlg_config.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_config))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_config, dlg_name='config')
+        tools_gw.open_dialog(self.dlg_config, dlg_name="config")
 
     def _get_widget_controls(self):
         """Control the current tab, to load widgets"""
         self.tab_main = self.dlg_config.findChild(QTabWidget, "tab_main")
 
-        self._hide_void_tab(self.json_result['body']['form']['formTabs'][0], 'tab_addfields', 'lyt_addfields')
+        self._hide_void_tab(self.json_result["body"]["form"]["formTabs"][0], "tab_addfields", "lyt_addfields")
 
         self.tab_main.currentChanged.connect(partial(self._tab_activation))
 
@@ -111,28 +111,28 @@ class GwConfigButton(GwAction):
             layoutname_list.append(layout.objectName())
 
         # Tab 'Basic'
-        if self.tab_main.widget(index_tab).objectName() == 'tab_basic' and not self.tab_basic_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        if self.tab_main.widget(index_tab).objectName() == "tab_basic" and not self.tab_basic_loaded:
+            self._build_dialog_options(self.json_result["body"]["form"]["formTabs"][0], "user", layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_basic_loaded = True
         # Tab 'Featurecat'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_featurecat' and not self.tab_featurecat_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        elif self.tab_main.widget(index_tab).objectName() == "tab_featurecat" and not self.tab_featurecat_loaded:
+            self._build_dialog_options(self.json_result["body"]["form"]["formTabs"][0], "user", layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_featurecat_loaded = True
         # Tab 'Man Type'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_mantype' and not self.tab_mantype_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        elif self.tab_main.widget(index_tab).objectName() == "tab_mantype" and not self.tab_mantype_loaded:
+            self._build_dialog_options(self.json_result["body"]["form"]["formTabs"][0], "user", layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_mantype_loaded = True
         # Tab 'Additional Fields'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_addfields' and not self.tab_addfields_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        elif self.tab_main.widget(index_tab).objectName() == "tab_addfields" and not self.tab_addfields_loaded:
+            self._build_dialog_options(self.json_result["body"]["form"]["formTabs"][0], "user", layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_addfields_loaded = True
         # Tab 'Admin'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_admin' and not self.tab_admin_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][1], 'system', layoutname_list)
+        elif self.tab_main.widget(index_tab).objectName() == "tab_admin" and not self.tab_admin_loaded:
+            self._build_dialog_options(self.json_result["body"]["form"]["formTabs"][1], "system", layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_admin_loaded = True
 
@@ -148,7 +148,7 @@ class GwConfigButton(GwAction):
 
     def _hide_void_tab(self, row, tab_name, lyt_name):
 
-        self.hide_tab = any(field['layoutname'] in lyt_name for field in row['fields'])
+        self.hide_tab = any(field["layoutname"] in lyt_name for field in row["fields"])
 
         if not self.hide_tab:
             tools_qt.remove_tab(self.tab_main, tab_name)
@@ -173,18 +173,18 @@ class GwConfigButton(GwAction):
     def _get_event_combo_parent(self, row):
 
         for field in row[0]["fields"]:
-            if field['isparent']:
-                widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
+            if field["isparent"]:
+                widget = self.dlg_config.findChild(QComboBox, field["widgetname"])
                 if widget:
-                    widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_config, widget, 'config'))
+                    widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_config, widget, "config"))
 
     def _update_values(self):
 
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = tools_gw.create_body(form='"formName":"config"', extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setconfig', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_setconfig", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         msg = "Values has been updated"
@@ -196,76 +196,76 @@ class GwConfigButton(GwAction):
 
         self.tab = tab
 
-        for field in row['fields']:
+        for field in row["fields"]:
             try:
                 widget = None
                 self.chk = None
-                if field['label'] and field['layoutname'] in list:
+                if field["label"] and field["layoutname"] in list:
                     lbl = QLabel()
-                    lbl.setObjectName('lbl' + field['widgetname'])
-                    lbl.setText(field['label'])
+                    lbl.setObjectName("lbl" + field["widgetname"])
+                    lbl.setText(field["label"])
                     lbl.setMinimumSize(160, 0)
                     lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-                    lbl.setToolTip(field['tooltip'])
+                    lbl.setToolTip(field["tooltip"])
 
-                    if self.tab == 'user':
+                    if self.tab == "user":
                         self.chk = QCheckBox()
-                        self.chk.setObjectName('chk_' + field['widgetname'])
-                        if field['checked'] in ('true', 'True', 'TRUE', True):
+                        self.chk.setObjectName("chk_" + field["widgetname"])
+                        if field["checked"] in ("true", "True", "TRUE", True):
                             self.chk.setChecked(True)
-                        elif field['checked'] in ('false', 'False', 'FALSE', False):
+                        elif field["checked"] in ("false", "False", "FALSE", False):
                             self.chk.setChecked(False)
                         self.chk.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
-                    if field['widgettype'] in ('text', 'linetext', 'typeahead'):
+                    if field["widgettype"] in ("text", "linetext", "typeahead"):
                         widget = QLineEdit()
-                        widget.setText(field['value'])
+                        widget.setText(field["value"])
                         widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                        if field['widgettype'] == 'typeahead':
+                        if field["widgettype"] == "typeahead":
                             completer = QCompleter()
-                            if field.get('dv_querytext'):
-                                widget.setProperty('typeahead', True)
+                            if field.get("dv_querytext"):
+                                widget.setProperty("typeahead", True)
                                 model = QStandardItemModel()
                                 widget.textChanged.connect(
                                     partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
 
-                    elif field['widgettype'] == 'textarea':
+                    elif field["widgettype"] == "textarea":
                         widget = QTextEdit()
-                        widget.setText(field['value'])
+                        widget.setText(field["value"])
                         widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-                    elif field['widgettype'] == 'combo':
+                    elif field["widgettype"] == "combo":
                         widget = QComboBox()
                         self._fill_combo(widget, field)
                         widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-                    elif field['widgettype'] == 'check':
+                    elif field["widgettype"] == "check":
                         self.chk = QCheckBox()
-                        self.chk.setObjectName(field['widgetname'])
-                        if self.tab == 'user' and field['checked'] in ('true', 'True', 'TRUE', True):
+                        self.chk.setObjectName(field["widgetname"])
+                        if self.tab == "user" and field["checked"] in ("true", "True", "TRUE", True):
                             self.chk.setChecked(True)
-                        elif self.tab == 'user' and field['checked'] in ('false', 'False', 'FALSE', False):
+                        elif self.tab == "user" and field["checked"] in ("false", "False", "FALSE", False):
                             self.chk.setChecked(False)
-                        elif field['value'] in ('true', 'True', 'TRUE', True):
+                        elif field["value"] in ("true", "True", "TRUE", True):
                             self.chk.setChecked(True)
-                        elif field['value'] in ('false', 'False', 'FALSE', False):
+                        elif field["value"] in ("false", "False", "FALSE", False):
                             self.chk.setChecked(False)
                         self.chk.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                         self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, self.chk, self.tab, self.chk))
 
-                    elif field['widgettype'] == 'datetime':
+                    elif field["widgettype"] == "datetime":
                         widget = QgsDateTimeEdit()
                         widget.setAllowNull(True)
                         widget.setCalendarPopup(True)
-                        widget.setDisplayFormat('dd/MM/yyyy')
+                        widget.setDisplayFormat("dd/MM/yyyy")
                         if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
                             widget.setDisplayFormat(lib_vars.date_format)
-                        if field['value']:
-                            field['value'] = field['value'].replace('/', '-')
-                        date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+                        if field["value"]:
+                            field["value"] = field["value"].replace("/", "-")
+                        date = QDate.fromString(field["value"], "yyyy-MM-dd")
                         if date:
                             widget.setDate(date)
                         else:
@@ -274,19 +274,19 @@ class GwConfigButton(GwAction):
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-                    elif field['widgettype'] == 'spinbox':
+                    elif field["widgettype"] == "spinbox":
                         widget = QDoubleSpinBox()
-                        if field.get('value') is not None:
-                            value = float(str(field['value']))
+                        if field.get("value") is not None:
+                            value = float(str(field["value"]))
                             widget.setValue(value)
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
                     if widget:
-                        widget.setObjectName(field['widgetname'])
+                        widget.setObjectName(field["widgetname"])
 
                     # Set signals
-                    if self.tab == 'user' and widget is not None:
+                    if self.tab == "user" and widget is not None:
                         self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
 
                     if widget is None:
@@ -296,7 +296,7 @@ class GwConfigButton(GwAction):
 
             except Exception as e:
                 msg = "{0}: {1}. widgetname='{2}' AND widgettype='{3}'"
-                msg_params = (type(e).__name__, e, field['widgetname'], field['widgettype'],)
+                msg_params = (type(e).__name__, e, field["widgetname"], field["widgettype"],)
                 tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, dialog=self.dlg_config, msg_params=msg_params)
 
     def populate_typeahead(self, completer, model, field, dialog, widget):
@@ -308,12 +308,12 @@ class GwConfigButton(GwAction):
         extras += f', "queryTextFilter":"{field["dv_querytext_filterc"]}"'
         extras += f', "textToSearch":"{tools_qt.get_text(dialog, widget)}"'
         body = tools_gw.create_body(extras=extras)
-        complet_list = tools_gw.execute_procedure('gw_fct_gettypeahead', body)
+        complet_list = tools_gw.execute_procedure("gw_fct_gettypeahead", body)
 
         if not complet_list:
             return False
 
-        tools_qt.set_completer_object(completer, model, widget, complet_list['body']['data'])
+        tools_qt.set_completer_object(completer, model, widget, complet_list["body"]["data"])
 
     def _check_child_to_parent(self, widget_child, widget_parent):
 
@@ -332,8 +332,8 @@ class GwConfigButton(GwAction):
         widget.clear()
         widget.blockSignals(False)
         combolist = []
-        comboIds = field.get('comboIds')
-        comboNames = field.get('comboNames')
+        comboIds = field.get("comboIds")
+        comboNames = field.get("comboNames")
         if None not in (comboIds, comboNames):
             for i in range(0, len(comboIds)):
                 if comboIds[i] is not None and comboNames[i] is not None:
@@ -344,8 +344,8 @@ class GwConfigButton(GwAction):
             # Populate combo
             for record in records_sorted:
                 widget.addItem(record[1], record)
-        value = field.get('value')
-        if value not in (None, 'None'):
+        value = field.get("value")
+        if value not in (None, "None"):
             tools_qt.set_combo_value(widget, value, 0)
 
     def _get_dialog_changed_values(self, widget, tab, chk):
@@ -354,32 +354,32 @@ class GwConfigButton(GwAction):
         elem = {}
         if type(widget) is QLineEdit:
             value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
-            elem['widget_type'] = 'text'
+            elem["widget_type"] = "text"
         elif isinstance(widget, QComboBox):
             value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
-            elem['widget_type'] = 'combo'
+            elem["widget_type"] = "combo"
         elif type(widget) is QCheckBox:
             value = tools_qt.is_checked(self.dlg_config, widget)
-            elem['widget_type'] = 'check'
+            elem["widget_type"] = "check"
         elif type(widget) is QDateEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
-            elem['widget_type'] = 'datetime'
+            elem["widget_type"] = "datetime"
         elif isinstance(widget, QgsDateTimeEdit):
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
-            elem['widget_type'] = 'datetime'
+            elem["widget_type"] = "datetime"
         elif type(widget) is QDoubleSpinBox:
             value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
 
-        elem['widget'] = str(widget.objectName())
-        elem['value'] = value
+        elem["widget"] = str(widget.objectName())
+        elem["value"] = value
 
-        if tab == 'user':
-            elem['isChecked'] = str(tools_qt.is_checked(self.dlg_config, chk))
-            elem['chk'] = str(chk.objectName())
+        if tab == "user":
+            elem["isChecked"] = str(tools_qt.is_checked(self.dlg_config, chk))
+            elem["chk"] = str(chk.objectName())
         else:
-            elem['isChecked'] = ''
-            elem['chk'] = ''
-            elem['sysRoleId'] = 'role_admin'
+            elem["isChecked"] = ""
+            elem["chk"] = ""
+            elem["sysRoleId"] = "role_admin"
 
         self.list_update.append(elem)
 
@@ -387,42 +387,42 @@ class GwConfigButton(GwAction):
 
         elem = {}
 
-        elem['widget'] = str(widget.objectName())
-        elem['chk'] = str(chk.objectName())
+        elem["widget"] = str(widget.objectName())
+        elem["chk"] = str(chk.objectName())
 
         if type(widget) is QLineEdit:
             value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
-            elem['widget_type'] = 'text'
+            elem["widget_type"] = "text"
         elif isinstance(widget, QComboBox):
             value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
-            elem['widget_type'] = 'combo'
+            elem["widget_type"] = "combo"
         elif type(widget) is QCheckBox:
             value = tools_qt.is_checked(self.dlg_config, chk)
-            elem['widget_type'] = 'check'
+            elem["widget_type"] = "check"
         elif type(widget) is QDateEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
-            elem['widget_type'] = 'datetime'
+            elem["widget_type"] = "datetime"
         elif isinstance(widget, QgsDateTimeEdit):
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
-            elem['widget_type'] = 'datetime'
+            elem["widget_type"] = "datetime"
 
-        elem['isChecked'] = str(tools_qt.is_checked(self.dlg_config, chk))
-        elem['value'] = value
+        elem["isChecked"] = str(tools_qt.is_checked(self.dlg_config, chk))
+        elem["value"] = value
 
         self.list_update.append(elem)
 
     def _order_widgets(self, field, lbl, widget):
 
-        layout = self.dlg_config.tab_main.findChild(QGridLayout, field['layoutname'])
-        if layout is not None and field['layoutorder'] is not None:
-            layout.addWidget(lbl, field['layoutorder'], 0)
+        layout = self.dlg_config.tab_main.findChild(QGridLayout, field["layoutname"])
+        if layout is not None and field["layoutorder"] is not None:
+            layout.addWidget(lbl, field["layoutorder"], 0)
 
-            if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
-                layout.addWidget(widget, field['layoutorder'], 1)
-            elif self.tab == 'user':
-                layout.addWidget(self.chk, field['layoutorder'], 1)
-                layout.addWidget(widget, field['layoutorder'], 2)
+            if field["widgettype"] == "checkbox" or field["widgettype"] == "check":
+                layout.addWidget(widget, field["layoutorder"], 1)
+            elif self.tab == "user":
+                layout.addWidget(self.chk, field["layoutorder"], 1)
+                layout.addWidget(widget, field["layoutorder"], 2)
             else:
-                layout.addWidget(widget, field['layoutorder'], 2)
+                layout.addWidget(widget, field["layoutorder"], 2)
 
     # endregion

@@ -37,8 +37,8 @@ class GwGo2IberTask(GwTask):
         self.timer = timer
         self.initialize_variables()
         self.set_variables_from_go2iber()
-        self.ig_execute_model = importlib.import_module('.execute_model', package=f'{self.ibergis_folder}.core.threads')
-        self.ig_feedback_class = importlib.import_module('.feedback', package=f'{self.ibergis_folder}.core.utils')
+        self.ig_execute_model = importlib.import_module(".execute_model", package=f"{self.ibergis_folder}.core.threads")
+        self.ig_feedback_class = importlib.import_module(".feedback", package=f"{self.ibergis_folder}.core.utils")
         self.cur_process = None
         self.cur_text = None
         self.ig_feedback = None
@@ -82,10 +82,10 @@ class GwGo2IberTask(GwTask):
         os.makedirs(self.folder_path, exist_ok=True)
         self.go2epa_task.main_process()
 
-        pgully_geojson = tools_gw.execute_procedure('gw_fct_pg2iber_pgully')
-        geojson_str: str = json.dumps(pgully_geojson['body']['data']['result'])
+        pgully_geojson = tools_gw.execute_procedure("gw_fct_pg2iber_pgully")
+        geojson_str: str = json.dumps(pgully_geojson["body"]["data"]["result"])
         if geojson_str:
-            pgully_layer: QgsVectorLayer = QgsVectorLayer(geojson_str, 'pgully', 'ogr')
+            pgully_layer: QgsVectorLayer = QgsVectorLayer(geojson_str, "pgully", "ogr")
         else:
             pgully_layer = None
 
@@ -128,7 +128,7 @@ class GwGo2IberTask(GwTask):
             self.dlg_go2iber.progress_bar.setValue(progress)
 
         # TextEdit log
-        txt_infolog = self.dlg_go2iber.findChild(QTextEdit, 'tab_log_txt_infolog')
+        txt_infolog = self.dlg_go2iber.findChild(QTextEdit, "tab_log_txt_infolog")
         cur_text = tools_qt.get_text(self.dlg_go2iber, txt_infolog, return_string_null=False)
         if process and process != self.cur_process:
             cur_text = f"{cur_text}\n" \
@@ -141,7 +141,7 @@ class GwGo2IberTask(GwTask):
         if self.cur_text:
             cur_text = self.cur_text
 
-        end_line = '\n' if new_line else ''
+        end_line = "\n" if new_line else ""
         if text:
             txt_infolog.setText(f"{cur_text}{text}{end_line}")
         else:
@@ -172,10 +172,10 @@ class GwGo2IberTask(GwTask):
                 msg = "Function failed finished"
                 tools_log.log_warning(msg)
             if self.complet_result:
-                if self.complet_result.get('status') == "Failed":
+                if self.complet_result.get("status") == "Failed":
                     tools_gw.manage_json_exception(self.complet_result)
             if self.rpt_result:
-                if "Failed" in self.rpt_result.get('status'):
+                if "Failed" in self.rpt_result.get("status"):
                     tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
@@ -191,8 +191,8 @@ class GwGo2IberTask(GwTask):
             raise self.exception
 
         # If Database exception, show dialog after task has finished
-        if lib_vars.session_vars['last_error']:
-            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+        if lib_vars.session_vars["last_error"]:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars["last_error_msg"])
 
     def cancel(self):
         msg = "Task canceled - {0}"
@@ -207,10 +207,10 @@ class GwGo2IberTask(GwTask):
         sql = "SELECT value FROM config_param_user WHERE parameter in ('inp_options_start_time', 'inp_options_end_time', 'inp_options_start_date', 'inp_options_end_date') ORDER BY parameter"
         rows = tools_db.get_rows(sql)
         if rows:
-            end_date_str = rows[0]['value']
-            end_time_str = rows[1]['value']
-            start_date_str = rows[2]['value']
-            start_time_str = rows[3]['value']
+            end_date_str = rows[0]["value"]
+            end_time_str = rows[1]["value"]
+            start_date_str = rows[2]["value"]
+            start_time_str = rows[3]["value"]
 
         # Parse time strings (HH:MM:SS, HH:MM)
         def parse_time(time_str: str) -> tuple[int, int, int]:
@@ -218,7 +218,7 @@ class GwGo2IberTask(GwTask):
             if not time_str or time_str.strip() == "":
                 return 0, 0, 0
 
-            time_parts = time_str.strip().split(':')
+            time_parts = time_str.strip().split(":")
             if len(time_parts) == 2:
                 # Format: HH:MM
                 hours = int(time_parts[0])
@@ -237,8 +237,8 @@ class GwGo2IberTask(GwTask):
         # Parse dates and times
         if start_date_str and end_date_str:
             # Parse date strings (dd/MM/yyyy) into QDate objects
-            start_date_obj = QDate.fromString(start_date_str, 'dd/MM/yyyy')
-            end_date_obj = QDate.fromString(end_date_str, 'dd/MM/yyyy')
+            start_date_obj = QDate.fromString(start_date_str, "dd/MM/yyyy")
+            end_date_obj = QDate.fromString(end_date_str, "dd/MM/yyyy")
 
             if start_date_obj.isValid() and end_date_obj.isValid():
                 start_h, start_m, start_s = parse_time(start_time_str)

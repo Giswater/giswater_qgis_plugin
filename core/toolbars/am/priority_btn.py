@@ -625,7 +625,7 @@ class CalculatePriority:
 
     def _manage_calculate(self):
         dlg = self.dlg_priority
-        tools_qt.set_widget_text(dlg, 'tab_log_txt_infolog', '')
+        tools_qt.set_widget_text(dlg, "tab_log_txt_infolog", "")
         inputs = self._validate_inputs()
         if not inputs:
             return
@@ -905,7 +905,7 @@ class CalculatePriority:
         if not hasattr(self.thread, "df"):
             return
 
-        file_path = tools_qt.get_save_file_path(self.dlg_priority, '', "*.xlsx", "Save file")
+        file_path = tools_qt.get_save_file_path(self.dlg_priority, "", "*.xlsx", "Save file")
         fp = Path(file_path)
         self.thread.df.to_excel(file_path)
 

@@ -28,8 +28,8 @@ class GwMaptool(QgsMapTool):
         self.settings = global_vars.giswater_settings
         self.plugin_dir = lib_vars.plugin_dir
         self.project_type = global_vars.project_type
-        self.gw_name = toolbar.property('gw_name')
-        self.show_help = tools_gw.get_config_parser('system', 'show_help', "project", "giswater")
+        self.gw_name = toolbar.property("gw_name")
+        self.show_help = tools_gw.get_config_parser("system", "show_help", "project", "giswater")
         self.layer_arc = None
         self.layer_connec = None
         self.layer_gully = None
@@ -98,7 +98,7 @@ class GwMaptool(QgsMapTool):
         self.canvas.setCursor(self.std_cursor)
 
         # Remove highlight
-        if hasattr(self, 'vertex_marker') and self.vertex_marker and hasattr(self.vertex_marker, 'hide'):
+        if hasattr(self, "vertex_marker") and self.vertex_marker and hasattr(self.vertex_marker, "hide"):
             self.vertex_marker.hide()
 
     def canvasMoveEvent(self, event):
@@ -109,7 +109,7 @@ class GwMaptool(QgsMapTool):
             self.iface.setActiveLayer(self.layer_node)
 
         # Hide highlight and get coordinates
-        if hasattr(self, 'vertex_marker') and self.vertex_marker and hasattr(self.vertex_marker, 'hide'):
+        if hasattr(self, "vertex_marker") and self.vertex_marker and hasattr(self.vertex_marker, "hide"):
             self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 
@@ -176,7 +176,7 @@ class GwMaptool(QgsMapTool):
 
     def manage_active_maptool(self):
         """Check in init config file if user wants to keep map tool active or not"""
-        value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init", prefix=True)
+        value = tools_gw.get_config_parser("user_edit_tricks", "keep_maptool_active", "user", "init", prefix=True)
         keep_maptool_active = tools_os.set_boolean(value, False)
         if not keep_maptool_active:
             self.cancel_map_tool()

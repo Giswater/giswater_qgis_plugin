@@ -14,7 +14,7 @@ class Workorder:
     """Handles workorder management and dynamic CRUD via JSON-driven forms"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        self.date_format = 'yyyy-MM-dd'
+        self.date_format = "yyyy-MM-dd"
         self.manager_dialog = None
         self.fields_form = []
         self.workorder_id = None
@@ -108,7 +108,7 @@ class Workorder:
 
         for row_idx, row in enumerate(data):
             for col_idx, col_name in enumerate(columns):
-                value = str(row.get(col_name, ''))
+                value = str(row.get(col_name, ""))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
         qtable.setModel(model)
@@ -145,8 +145,8 @@ class Workorder:
                 return
 
         p_data = tools_gw.create_body(body=body)
-        res = tools_gw.execute_procedure('gw_fct_cm_getworkorder', p_data, schema_name='cm')
-        if not res or res.get('status') != 'Accepted':
+        res = tools_gw.execute_procedure("gw_fct_cm_getworkorder", p_data, schema_name="cm")
+        if not res or res.get("status") != "Accepted":
             msg = tools_qt.tr("Failed to load workorder form.", context_name="cm")
             tools_qgis.show_warning(msg)
             return
@@ -177,7 +177,7 @@ class Workorder:
         self.dialog.btn_accept.clicked.connect(lambda: self.save_workorder(from_manager=False))
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
 
-        tools_gw.open_dialog(self.dialog, dlg_name='workorder_edit')
+        tools_gw.open_dialog(self.dialog, dlg_name="workorder_edit")
 
     def save_workorder(self, from_manager=True):
         """Read back all widgets, convert empty strings to None,

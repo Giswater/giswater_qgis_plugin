@@ -90,7 +90,7 @@ class GwRecursiveEpa(GwTask):
                 for l1o in list1:
                     query = query1.replace("$list1object", l1o)  # Replace `$list1object` for actual `list{i}` object
                     tools_db.execute_sql(query, is_thread=True)  # Execute `query{i}` from `list1` section
-                    if self.stop or lib_vars.session_vars['last_error']:
+                    if self.stop or lib_vars.session_vars["last_error"]:
                         return False
                     if not queries2 or not lists2:
                         self.run_go2epa(l1o)
@@ -102,7 +102,7 @@ class GwRecursiveEpa(GwTask):
                         for l2o in list2:
                             query = query2.replace("$list2object", l2o)  # Replace `$list2object` for actual `list{i}` object
                             tools_db.execute_sql(query, is_thread=True)  # Execute `query{i}` from `list2` section
-                            if self.stop or lib_vars.session_vars['last_error']:
+                            if self.stop or lib_vars.session_vars["last_error"]:
                                 return False
                             if not queries3 or not lists3:
                                 self.run_go2epa(l1o, l2o)
@@ -115,7 +115,7 @@ class GwRecursiveEpa(GwTask):
                                     query = query3.replace("$list3object", l3o)  # Replace `$list3object` for actual `list{i}` object
                                     tools_db.execute_sql(query, is_thread=True)  # Execute `query{i}` from `list3` section
                                     self.run_go2epa(l1o, l2o, l3o)
-                                    if self.stop or lib_vars.session_vars['last_error']:
+                                    if self.stop or lib_vars.session_vars["last_error"]:
                                         return False
 
         except Exception as e:
@@ -215,12 +215,12 @@ class GwRecursiveEpa(GwTask):
                 msg_params = (self.function_name,)
                 tools_log.log_warning(msg, msg_params=msg_params)
             if self.complet_result:
-                if 'status' in self.complet_result:
-                    if "Failed" in self.complet_result['status']:
+                if "status" in self.complet_result:
+                    if "Failed" in self.complet_result["status"]:
                         tools_gw.manage_json_exception(self.complet_result)
             if self.rpt_result:
-                if 'status' in self.rpt_result:
-                    if "Failed" in self.rpt_result['status']:
+                if "status" in self.rpt_result:
+                    if "Failed" in self.rpt_result["status"]:
                         tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
@@ -236,8 +236,8 @@ class GwRecursiveEpa(GwTask):
             raise self.exception
 
         # If Database exception, show dialog after task has finished
-        if lib_vars.session_vars['last_error']:
-            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+        if lib_vars.session_vars["last_error"]:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars["last_error_msg"])
 
     def cancel(self):
         self.stop_task()
@@ -258,7 +258,7 @@ class GwRecursiveEpa(GwTask):
         status = self._exec_function_pg2epa(resultname)
         tools_db.dao.reset_db()
         if not status:
-            self.function_name = 'gw_fct_pg2epa_main'
+            self.function_name = "gw_fct_pg2epa_main"
             return False
 
         # Export inp
@@ -274,7 +274,7 @@ class GwRecursiveEpa(GwTask):
         self.setProgress(0)
 
         extras = f'"resultId":"{resultname}"'
-        if global_vars.project_type == 'ud':
+        if global_vars.project_type == "ud":
             extras += f', "dumpSubcatch":"{self.export_subcatch}"'
 
         for i in range(1, 8):
@@ -283,7 +283,7 @@ class GwRecursiveEpa(GwTask):
             msg_params = ("gw_fct_pg2epa_main", i, self.body, "log_sql=True", f"aux_conn={self.aux_conn}",
                           "is_thread=True",)
             tools_log.log_info(msg, msg_params=msg_params)
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+            json_result = tools_gw.execute_procedure("gw_fct_pg2epa_main", self.body, log_sql=True,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if i == 6:
                 self.json_result = json_result
@@ -294,8 +294,8 @@ class GwRecursiveEpa(GwTask):
         # Manage json result
         if self.json_result is None or not self.json_result:
             self.function_failed = True
-        elif 'status' in self.json_result:
-            if self.json_result['status'] == 'Failed':
+        elif "status" in self.json_result:
+            if self.json_result["status"] == "Failed":
                 tools_log.log_warning(self.json_result)
                 self.function_failed = True
             else:
@@ -316,7 +316,7 @@ class GwRecursiveEpa(GwTask):
         tools_log.log_info(msg)
 
         # Get values from complet_result['body']['file'] and insert into INP file
-        if 'file' not in self.complet_result['body']:
+        if "file" not in self.complet_result["body"]:
             return False
 
         self.file_inp = inpfilename
@@ -327,8 +327,8 @@ class GwRecursiveEpa(GwTask):
             self.error_msg_params = (message,)
             return False
 
-        self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
-        self.message = self.complet_result['message']['text']
+        self._fill_inp_file(self.file_inp, self.complet_result["body"]["file"])
+        self.message = self.complet_result["message"]["text"]
         self.common_msg += tools_qt.tr("Export INP finished. ")
 
         return True
@@ -344,39 +344,39 @@ class GwRecursiveEpa(GwTask):
         read = True
         for row in all_rows:
             # Use regexp to check which targets to read (everyone except GULLY)
-            if bool(re.match(r'\[(.*?)\]', row['text'])) and \
-                    ('GULLY' in row['text'] or 'LINK' in row['text'] or
-                     'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+            if bool(re.match(r"\[(.*?)\]", row["text"])) and \
+                    ("GULLY" in row["text"] or "LINK" in row["text"] or
+                     "GRATE" in row["text"] or "LXSECTIONS" in row["text"]):
                 read = False
-            elif bool(re.match(r'\[(.*?)\]', row['text'])):
+            elif bool(re.match(r"\[(.*?)\]", row["text"])):
                 read = True
-            if 'text' in row and row['text'] is not None and read:
-                line = row['text'].rstrip() + "\n"
+            if "text" in row and row["text"] is not None and read:
+                line = row["text"].rstrip() + "\n"
                 file_inp.write(line)
 
         self._close_file(file_inp)
 
-        networkmode = tools_gw.get_config_value('inp_options_networkmode')
-        if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
+        networkmode = tools_gw.get_config_value("inp_options_networkmode")
+        if global_vars.project_type == "ud" and networkmode and networkmode[0] == "2":
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', '.gul')
+            aditional_path = folder_path.replace(".inp", ".gul")
             aditional_file = open(aditional_path, "w")
             read = True
             save_file = False
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
-                if bool(re.match(r'\[(.*?)\]', row['text'])) and \
-                        ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
-                         'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+                if bool(re.match(r"\[(.*?)\]", row["text"])) and \
+                        ("TITLE" in row["text"] or "GULLY" in row["text"] or "LINK" in row["text"] or
+                         "GRATE" in row["text"] or "LXSECTIONS" in row["text"]):
                     read = True
-                    if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
-                       'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
+                    if "GULLY" in row["text"] or "LINK" in row["text"] or \
+                       "GRATE" in row["text"] or "LXSECTIONS" in row["text"]:
                         save_file = True
-                elif bool(re.match(r'\[(.*?)\]', row['text'])):
+                elif bool(re.match(r"\[(.*?)\]", row["text"])):
                     read = False
-                if 'text' in row and row['text'] is not None and read:
-                    line = row['text'].rstrip() + "\n"
+                if "text" in row and row["text"] is not None and read:
+                    line = row["text"].rstrip() + "\n"
                     aditional_file.write(line)
 
             self._close_file(aditional_file)
@@ -408,9 +408,9 @@ class GwRecursiveEpa(GwTask):
 
         # Set file to execute
         opener = None
-        if global_vars.project_type in 'ws':
+        if global_vars.project_type in "ws":
             opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
-        elif global_vars.project_type in 'ud':
+        elif global_vars.project_type in "ud":
             opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
 
         if opener is None:
@@ -490,8 +490,8 @@ class GwRecursiveEpa(GwTask):
         rows = tools_db.get_rows(sql, is_thread=True, aux_conn=self.aux_conn)
         sources = {}
         for row in rows:
-            json_elem = row[1].replace('{', '').replace('}', '')
-            item = json_elem.split(',')
+            json_elem = row[1].replace("{", "").replace("}", "")
+            item = json_elem.split(",")
             for i in item:
                 sources[i.strip()] = row[0].strip()
 
@@ -510,24 +510,24 @@ class GwRecursiveEpa(GwTask):
                 return False
 
             progress += 1
-            if '**' in row or '--' in row:
+            if "**" in row or "--" in row:
                 continue
 
-            if global_vars.project_type == 'ud' and '>50' in row:
-                row = row.replace('>50', '50')
+            if global_vars.project_type == "ud" and ">50" in row:
+                row = row.replace(">50", "50")
 
             row = row.rstrip()
-            dirty_list = row.split(' ')
+            dirty_list = row.split(" ")
 
             # Clean unused items
             for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '':
+                if dirty_list[x] == "":
                     dirty_list.pop(x)
 
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
-                    if bool(re.search(r'[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
+                    if bool(re.search(r"[0-9][-]\d{1,2}[.]]*", str(dirty_list[x]))):
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -539,8 +539,8 @@ class GwRecursiveEpa(GwTask):
                         json_elem = dirty_list[x][last_index:i]
                         sp_n.append(json_elem)
 
-                    elif bool(re.search(r'(\d\..*\.\d)', str(dirty_list[x]))):
-                        if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
+                    elif bool(re.search(r"(\d\..*\.\d)", str(dirty_list[x]))):
+                        if "Version" not in dirty_list and "VERSION" not in dirty_list:
                             msg = "Error near line {0} -> {1}"
                             msg_params = (line_number + 1, dirty_list,)
                             tools_log.log_info(msg, msg_params=msg_params)
@@ -554,7 +554,7 @@ class GwRecursiveEpa(GwTask):
                             self._close_file()
                             del full_file
                             return False
-                    elif bool(re.search('>50', str(dirty_list[x]))):
+                    elif bool(re.search(">50", str(dirty_list[x]))):
                         msg = "Error near line {0} -> {1}"
                         msg_params = (line_number + 1, dirty_list,)
                         tools_log.log_info(msg, msg_params=msg_params)
@@ -574,9 +574,9 @@ class GwRecursiveEpa(GwTask):
             # Find strings into dict and set target column
             for k, v in sources.items():
                 try:
-                    if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
+                    if k in (f"{sp_n[0]} {sp_n[1]}", f"{sp_n[0]}"):
                         target = "'" + v + "'"
-                        _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
+                        _time = re.compile("^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")
                         if _time.search(sp_n[3]):
                             col40 = "'" + sp_n[3] + "'"
                 except IndexError:
@@ -592,10 +592,10 @@ class GwRecursiveEpa(GwTask):
                         value = '"' + sp_n[x].strip().replace("\n", "") + '", '
                         value = value.replace("''", "null")
                     else:
-                        value = 'null, '
+                        value = "null, "
                     json_elem += value
 
-                json_elem = '{' + str(json_elem[:-2]) + '}, '
+                json_elem = "{" + str(json_elem[:-2]) + "}, "
                 json_rpt += json_elem
 
             # Update progress bar
@@ -603,7 +603,7 @@ class GwRecursiveEpa(GwTask):
                 self.setProgress((line_number * 100) / row_count)
 
         # Manage JSON
-        json_rpt = '[' + str(json_rpt[:-2]) + ']'
+        json_rpt = "[" + str(json_rpt[:-2]) + "]"
         self.json_rpt = json_rpt
 
         self.json_rpt = self.json_rpt.replace("\\", "/")
@@ -619,14 +619,14 @@ class GwRecursiveEpa(GwTask):
             extras += f', "file": {self.json_rpt}'
         for i in range(1, 3):
             self.body = tools_gw.create_body(extras=extras + f', "step": {i}')
-            self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body,
+            self.json_result = tools_gw.execute_procedure("gw_fct_rpt2pg_main", self.body,
                                                           aux_conn=self.aux_conn, is_thread=True)
             self.rpt_result = self.json_result
             if self.json_result is None or not self.json_result:
                 self.function_failed = True
                 return False
 
-            if 'status' in self.json_result and self.json_result['status'] == 'Failed':
+            if "status" in self.json_result and self.json_result["status"] == "Failed":
                 tools_log.log_warning(self.json_result)
                 self.function_failed = True
                 return False

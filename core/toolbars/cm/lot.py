@@ -37,11 +37,11 @@ class AddNewLot:
         self.rb_list: List[Any] = []
         self.schema_parent = lib_vars.schema_name
         # self.cm_schema = lib_vars.project_vars['cm_schema']
-        self.lot_date_format = 'yyyy-MM-dd'
+        self.lot_date_format = "yyyy-MM-dd"
         self.max_id = 0
         self.signal_selectionChanged = False
         self.param_options: Optional[Any] = None
-        self.plugin_name = 'Giswater'
+        self.plugin_name = "Giswater"
         self.plugin_dir = lib_vars.plugin_dir
         self.schemaname = lib_vars.schema_name
         self.iface = global_vars.iface
@@ -59,7 +59,7 @@ class AddNewLot:
         self.lot_id_value = None
         self.ids = []
         self.rb_list = []
-        self.rel_feature_type = 'arc'
+        self.rel_feature_type = "arc"
         self.signal_selectionChanged = False
         self.cmb_position = 17
         self.srid = lib_vars.data_epsg
@@ -71,12 +71,12 @@ class AddNewLot:
             self.is_new_lot = False
             self.lot_saved = True
 
-        self.rel_list_ids = {ft: [] for ft in ['arc', 'node', 'connec', 'gully', 'link']}
+        self.rel_list_ids = {ft: [] for ft in ["arc", "node", "connec", "gully", "link"]}
         self.excluded_layers = [f"ve_{ft}" for ft in self.rel_list_ids]
 
-        self.rel_layers = {ft: tools_gw.get_layers_from_feature_type(ft) for ft in ['arc', 'node', 'connec', 'link']}
-        if tools_gw.get_project_type() == 'ud':
-            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.rel_layers = {ft: tools_gw.get_layers_from_feature_type(ft) for ft in ["arc", "node", "connec", "link"]}
+        if tools_gw.get_project_type() == "ud":
+            self.rel_layers["gully"] = tools_gw.get_layers_from_feature_type("gully")
 
         # Create dialog and load base settings
         self.dlg_lot = AddLotUi(self)
@@ -117,12 +117,12 @@ class AddNewLot:
             self.enable_feature_tabs_by_campaign(lot_id)
             self._check_and_disable_campaign_combo()
 
-        if tools_gw.get_project_type() == 'ws':
-            tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, 'LoadsTab', False)
+        if tools_gw.get_project_type() == "ws":
+            tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, "LoadsTab", False)
 
         # Icon buttons
-        tools_gw.add_icon(self.dlg_lot.btn_insert, '111')
-        tools_gw.add_icon(self.dlg_lot.btn_delete, '112')
+        tools_gw.add_icon(self.dlg_lot.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_lot.btn_delete, "112")
 
         # Create a widget and layout to hold the buttons
         self.corner_widget = QWidget()
@@ -148,7 +148,7 @@ class AddNewLot:
             name_widget.textChanged.connect(self._check_enable_tab_relations)
             self._check_enable_tab_relations()
 
-        if tools_gw.get_project_type() == 'ws':
+        if tools_gw.get_project_type() == "ws":
             index = self.dlg_lot.tab_feature.indexOf(self.dlg_lot.tab_gully)
             if index != -1:
                 self.dlg_lot.tab_feature.removeTab(index)
@@ -178,7 +178,7 @@ class AddNewLot:
             "tbl_campaign_lot_x_connec",
             "tbl_campaign_lot_x_link"
         ]
-        if tools_gw.get_project_type() == 'ud':
+        if tools_gw.get_project_type() == "ud":
             relation_table_names.append("tbl_campaign_lot_x_gully")
 
         for table_name in relation_table_names:
@@ -248,7 +248,7 @@ class AddNewLot:
         if teams:
             team_combo.blockSignals(True)
             for team in teams:
-                team_combo.addItem(str(team['idval']), team['id'])
+                team_combo.addItem(str(team["idval"]), team["id"])
             # Restore the lot's original team_id if it exists
             if self.initial_lot_data.get("team_id"):
                 self.set_widget_value(team_combo, self.initial_lot_data["team_id"])
@@ -258,16 +258,16 @@ class AddNewLot:
         campaign_details_sql = f"SELECT organization_id, expl_id, sector_id FROM cm.om_campaign WHERE campaign_id = {campaign_id}"
         campaign_data = tools_db.get_row(campaign_details_sql)
 
-        if not campaign_data or campaign_data.get('organization_id') is None:
+        if not campaign_data or campaign_data.get("organization_id") is None:
             return
 
-        org_id = campaign_data['organization_id']
+        org_id = campaign_data["organization_id"]
 
         allowed_ids_sql = f"SELECT expl_id, sector_id FROM cm.cat_organization WHERE organization_id = {org_id}"
         allowed_ids_data = tools_db.get_row(allowed_ids_sql)
 
-        allowed_expl_ids = allowed_ids_data.get('expl_id') if allowed_ids_data else None
-        allowed_sector_ids = allowed_ids_data.get('sector_id') if allowed_ids_data else None
+        allowed_expl_ids = allowed_ids_data.get("expl_id") if allowed_ids_data else None
+        allowed_sector_ids = allowed_ids_data.get("sector_id") if allowed_ids_data else None
 
         # Populate exploitation combo
         sql_expl = f"SELECT expl_id, name FROM {self.schema_parent}.exploitation"
@@ -300,12 +300,12 @@ class AddNewLot:
                 self.set_widget_value(sector_combo, self.initial_lot_data["sector_id"])
 
         # Set pre-selected values from campaign
-        campaign_expl_id = campaign_data.get('expl_id')
+        campaign_expl_id = campaign_data.get("expl_id")
         if campaign_expl_id is not None:
             self.set_widget_value(expl_combo, campaign_expl_id)
             expl_combo.setEnabled(False)
 
-        campaign_sector_id = campaign_data.get('sector_id')
+        campaign_sector_id = campaign_data.get("sector_id")
         if campaign_sector_id is not None:
             self.set_widget_value(sector_combo, campaign_sector_id)
             sector_combo.setEnabled(False)
@@ -424,9 +424,9 @@ class AddNewLot:
         if not campaign_id:
             return
 
-        feature_types = ['arc', 'node', 'connec', 'link']
-        if tools_gw.get_project_type() == 'ud':
-            feature_types.append('gully')
+        feature_types = ["arc", "node", "connec", "link"]
+        if tools_gw.get_project_type() == "ud":
+            feature_types.append("gully")
 
         for feature in feature_types:
             count_row = tools_db.get_row(
@@ -442,7 +442,7 @@ class AddNewLot:
         Includes 'gully' only if project type is UD.
         """
         features = ["arc", "node", "connec", "link"]
-        if tools_gw.get_project_type() == 'ud':
+        if tools_gw.get_project_type() == "ud":
             features.append("gully")
 
         for feature in features:
@@ -465,7 +465,7 @@ class AddNewLot:
                 tools_gw.connect_signal(
                     view.selectionModel().selectionChanged,
                     partial(self._select_layers_from_table, feature, view),
-                    'lot', f"lot_select_layers_{feature}"
+                    "lot", f"lot_select_layers_{feature}"
                 )
 
     def get_widget_by_columnname(self, dialog: QWidget, columnname: str) -> Optional[QWidget]:
@@ -528,7 +528,7 @@ class AddNewLot:
         has_relations = False
         if campaign_id:
             features = ["arc", "node", "connec", "link"]
-            if tools_gw.get_project_type() == 'ud':
+            if tools_gw.get_project_type() == "ud":
                 features.append("gully")
             for feature in features:
                 sql = f"SELECT 1 FROM cm.om_campaign_x_{feature} WHERE campaign_id = {campaign_id} LIMIT 1"
@@ -639,11 +639,11 @@ class AddNewLot:
         # Post-process fields to extract the integer ID from list values
         expl_val = fields.get("expl_id")
         if isinstance(expl_val, (list, tuple)) and expl_val:
-            fields['expl_id'] = expl_val[0]
+            fields["expl_id"] = expl_val[0]
 
         sector_val = fields.get("sector_id")
         if isinstance(sector_val, (list, tuple)) and sector_val:
-            fields['sector_id'] = sector_val[0]
+            fields["sector_id"] = sector_val[0]
 
         if list_mandatory:
             msg = tools_qt.tr("Some mandatory fields are missing. Please fill the required fields (marked in red).", context_name="cm")
@@ -708,7 +708,7 @@ class AddNewLot:
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.remove_selection(True, layers=self.rel_layers)
-        tools_gw.disconnect_signal('lot')
+        tools_gw.disconnect_signal("lot")
         tools_qgis.force_refresh_map_canvas()
 
     def _refresh_relations_table(self):
@@ -717,7 +717,7 @@ class AddNewLot:
             # Check if this was the first insert by checking if table was empty before
             current_tab = self.dlg_lot.tab_feature.currentWidget()
             if current_tab:
-                feature_type = current_tab.objectName().replace('tab_', '')
+                feature_type = current_tab.objectName().replace("tab_", "")
                 table_widget_name = f"tbl_campaign_lot_x_{feature_type}"
                 table_view = getattr(self.dlg_lot, table_widget_name, None)
 
@@ -733,7 +733,7 @@ class AddNewLot:
     def _apply_table_config_for_feature(self, table_view, feature_type):
         """Apply table configuration for a specific feature type."""
         table_name = f"om_campaign_lot_x_{feature_type}"
-        dialog_ref = self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot
+        dialog_ref = self.dlg_lot_man if hasattr(self, "dlg_lot_man") else self.dlg_lot
         tools_gw.set_tablemodel_config(dialog_ref, table_view, table_name, schema_name="cm")
 
     def _update_completer_and_relations(self):
@@ -780,7 +780,7 @@ class AddNewLot:
 
         for row_idx, row in enumerate(data):
             for col_idx, col_name in enumerate(columns):
-                value = str(row.get(col_name, ''))
+                value = str(row.get(col_name, ""))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
         qtable.setModel(model)
@@ -798,13 +798,13 @@ class AddNewLot:
             # Default fallback
             table_name = "v_ui_lot"
 
-        tools_gw.set_tablemodel_config(self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot, qtable, table_name, schema_name="cm")
+        tools_gw.set_tablemodel_config(self.dlg_lot_man if hasattr(self, "dlg_lot_man") else self.dlg_lot, qtable, table_name, schema_name="cm")
 
     def get_current_user(self) -> Optional[Dict[str, Any]]:
         """Gets the current user's complete data, including role and organization,
         from the CM schema.
         """
-        if not tools_db.check_schema('cm'):
+        if not tools_db.check_schema("cm"):
             return None
 
         username = tools_db.get_current_user()
@@ -830,10 +830,10 @@ class AddNewLot:
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
 
         # Fill combo values for lot date_filter_type combo
-        date_types = [['real_startdate', tools_qt.tr("Start date", context_name="cm")],
-                      ['real_enddate', tools_qt.tr("End date", context_name="cm")],
-                      ['startdate', tools_qt.tr("Planned start date", context_name="cm")],
-                      ['enddate', tools_qt.tr("Planned end date", context_name="cm")]]
+        date_types = [["real_startdate", tools_qt.tr("Start date", context_name="cm")],
+                      ["real_enddate", tools_qt.tr("End date", context_name="cm")],
+                      ["startdate", tools_qt.tr("Planned start date", context_name="cm")],
+                      ["enddate", tools_qt.tr("Planned end date", context_name="cm")]]
         tools_qt.fill_combo_values(self.dlg_lot_man.cmb_date_filter_type, date_types, 1, sort_combo=False)
 
         # Fill combo values for lot status (based on sys_typevalue table)
@@ -884,11 +884,11 @@ class AddNewLot:
         if user_info:
             role = user_info[0]
             org_id = user_info[1]
-            if role not in ('role_cm_admin'):
+            if role not in ("role_cm_admin"):
                 if org_id is not None:
                     where_clause = f" WHERE campaign_name IN (SELECT name FROM cm.om_campaign WHERE organization_id = {org_id})"
 
-        sql = f'SELECT MIN(startdate), MAX(startdate) FROM cm.v_ui_campaign_lot{where_clause}'
+        sql = f"SELECT MIN(startdate), MAX(startdate) FROM cm.v_ui_campaign_lot{where_clause}"
         row = tools_db.get_rows(sql)
 
         if row and row[0] and row[0][0] is not None:
@@ -919,7 +919,7 @@ class AddNewLot:
         if user_info:
             role = user_info[0]
             org_id = user_info[1]
-            if role not in ('role_cm_admin'):
+            if role not in ("role_cm_admin"):
                 if org_id is not None:
                     filters.append(f"campaign_name IN (SELECT name FROM cm.om_campaign WHERE organization_id = {org_id})")
 
@@ -1051,7 +1051,7 @@ class AddNewLot:
         if not tab_widget:
             return
 
-        feature = tab_widget.objectName().replace('tab_', '')
+        feature = tab_widget.objectName().replace("tab_", "")
         if not feature:
             return
 
@@ -1064,9 +1064,9 @@ class AddNewLot:
         feature_id_lineedit = dlg.findChild(QLineEdit, "feature_id")
         if feature_id_lineedit:
             # Reuse one model/completer
-            if not hasattr(self, '_lot_feature_model') or self._lot_feature_model is None:
+            if not hasattr(self, "_lot_feature_model") or self._lot_feature_model is None:
                 self._lot_feature_model = QStringListModel(dlg)
-            if not hasattr(self, '_lot_feature_completer') or self._lot_feature_completer is None:
+            if not hasattr(self, "_lot_feature_completer") or self._lot_feature_completer is None:
                 self._lot_feature_completer = QCompleter(self._lot_feature_model, dlg)
                 self._lot_feature_completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
                 self._lot_feature_completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
@@ -1078,14 +1078,14 @@ class AddNewLot:
                 pass
             feature_id_lineedit.textEdited.connect(partial(self._lot_feature_typeahead, dlg, feature, lot_id))
 
-    def _lot_feature_typeahead(self, dlg: QDialog, feature: str, lot_id: int, text: str = ''):
+    def _lot_feature_typeahead(self, dlg: QDialog, feature: str, lot_id: int, text: str = ""):
         """Typeahead for lot: search only among features attached to the selected campaign.
 
         SQL uses campaign_id derived from lot and filters by id prefix with LIMIT 100.
         """
         if not text or len(text) < 1:
             # Clear to avoid massive preload
-            if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+            if hasattr(self, "_lot_feature_model") and self._lot_feature_model is not None:
                 self._lot_feature_model.setStringList([])
             return
 
@@ -1093,7 +1093,7 @@ class AddNewLot:
         row = tools_db.get_row(f"SELECT campaign_id FROM cm.om_campaign_lot WHERE lot_id = {lot_id}")
         campaign_id = row[0] if row else None
         if not campaign_id:
-            if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+            if hasattr(self, "_lot_feature_model") and self._lot_feature_model is not None:
                 self._lot_feature_model.setStringList([])
             return
 
@@ -1107,8 +1107,8 @@ class AddNewLot:
             f"ORDER BY {id_col} LIMIT 100"
         )
         rows = tools_db.get_rows(sql)
-        values = [r.get('val') for r in (rows or []) if r.get('val')]
-        if hasattr(self, '_lot_feature_model') and self._lot_feature_model is not None:
+        values = [r.get("val") for r in (rows or []) if r.get("val")]
+        if hasattr(self, "_lot_feature_model") and self._lot_feature_model is not None:
             self._lot_feature_model.setStringList(values)
             try:
                 if self.dlg_lot and self.dlg_lot.feature_id and self.dlg_lot.feature_id.completer():
@@ -1118,7 +1118,7 @@ class AddNewLot:
 
     def get_allowed_features_for_lot(self, lot_id: int, feature_type: str) -> Optional[List[Any]]:
         """Return list of allowed feature IDs for the lot's campaign and feature tab."""
-        if not feature_type or feature_type not in ['arc', 'node', 'connec', 'gully', 'link']:
+        if not feature_type or feature_type not in ["arc", "node", "connec", "gully", "link"]:
             return None
 
         try:
@@ -1233,7 +1233,7 @@ class AddNewLot:
         self.dlg_resources_man.btn_team_update.clicked.connect(partial(self.open_create_team, True))
         self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_registers, "cat_team"))
         # Toggle active on teams
-        if hasattr(self.dlg_resources_man, 'btn_team_toggle_active'):
+        if hasattr(self.dlg_resources_man, "btn_team_toggle_active"):
             self.dlg_resources_man.btn_team_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_team"))
         self.dlg_resources_man.txt_teams.textChanged.connect(partial(self.filter_teams_by_name))
 
@@ -1242,7 +1242,7 @@ class AddNewLot:
         self.dlg_resources_man.btn_assign_team.clicked.connect(partial(self.assign_team_to_user))
         self.dlg_resources_man.btn_remove_team.clicked.connect(partial(self.remove_team_from_user))
         # Toggle active on users
-        if hasattr(self.dlg_resources_man, 'btn_user_toggle_active'):
+        if hasattr(self.dlg_resources_man, "btn_user_toggle_active"):
             self.dlg_resources_man.btn_user_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_user"))
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
@@ -1285,7 +1285,7 @@ class AddNewLot:
         team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
 
         # Build sql filtering by the selected team
-        if team_id and team_id != '' and team_id != -1:
+        if team_id and team_id != "" and team_id != -1:
             # When a team is selected, show users from that team AND users with no team
             # This allows assigning users without teams to the selected team
             sql_filter = f"WHERE (ct.team_id = {team_id} OR cu.team_id IS NULL)"
@@ -1394,10 +1394,10 @@ class AddNewLot:
         # Check sql filter
         if sql_filter is not None:
             query += f" {sql_filter}"
-        elif 'cmbParent' in self.dict_tables[table_name]:
+        elif "cmbParent" in self.dict_tables[table_name]:
             # Reset combo parent
             cmb_parent = self.dict_tables[table_name]["cmbParent"]
-            tools_qt.set_combo_value(cmb_parent, '', 1)
+            tools_qt.set_combo_value(cmb_parent, "", 1)
 
         # Get data from query
         data = tools_db.get_rows(f"{query} ORDER BY {self.dict_tables[table_name]['idname']}:: INTEGER")
@@ -1451,11 +1451,11 @@ class AddNewLot:
             return
         # Determine column indexes
         model = table.model()
-        active_col = tools_qt.get_col_index_by_col_name(table, 'active')
+        active_col = tools_qt.get_col_index_by_col_name(table, "active")
         if active_col is None or active_col == -1:
             # Fallback: try to find by header text
             for i in range(model.columnCount()):
-                if str(model.headerData(i, Qt.Orientation.Horizontal)).lower() == 'active':
+                if str(model.headerData(i, Qt.Orientation.Horizontal)).lower() == "active":
                     active_col = i
                     break
         id_col = 0  # id is first column in our population logic
@@ -1515,7 +1515,7 @@ class AddNewLot:
                 login_names_to_drop = [row[0] for row in login_names_rows if row and row[0]]
 
         # Create message for the question
-        msg = f'''{tools_qt.tr("Are you sure you want to delete these records:", context_name="cm")} ({ids})?'''
+        msg = f"""{tools_qt.tr("Are you sure you want to delete these records:", context_name="cm")} ({ids})?"""
         if tablename == "cat_user" and login_names_to_drop:
             msg += f"\\n{tools_qt.tr('This will also delete the database user(s):', context_name='cm')} {', '.join(login_names_to_drop)}"
         title = tools_qt.tr("Delete records", context_name="cm")
@@ -1556,9 +1556,9 @@ class AddNewLot:
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
         # Get dialog configuration from database
-        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name="cm")
+        json_result = tools_gw.execute_procedure("gw_fct_cm_get_dialog", body, schema_name="cm")
 
-        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+        if not json_result or "body" not in json_result or "data" not in json_result["body"]:
             msg = tools_qt.tr("Failed to load team creation dialog configuration. Please check database configuration.", context_name="cm")
             tools_qgis.show_warning(msg)
             return
@@ -1636,7 +1636,7 @@ class AddNewLot:
             return
 
         features = ["arc", "node", "connec", "link"]
-        if tools_gw.get_project_type() == 'ud':
+        if tools_gw.get_project_type() == "ud":
             features.append("gully")
 
         has_relations = False
@@ -1666,7 +1666,7 @@ def upsert_team(**kwargs: Any):
     active = tools_qt.get_widget_value(dlg, "tab_none_active")
 
     # Set default values automatically
-    org_id = this.user_data['org_id']  # Current user's organization
+    org_id = this.user_data["org_id"]  # Current user's organization
     role_id = "role_cm_field"  # Default role
 
     # Set default values if empty

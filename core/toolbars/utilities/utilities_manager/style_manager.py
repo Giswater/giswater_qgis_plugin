@@ -63,10 +63,10 @@ class GwStyleManager:
         self.style_mng_dlg.btn_update_style.clicked.connect(self._update_selected_style)
         self.style_mng_dlg.btn_refresh_all.clicked.connect(partial(self._refresh_all_styles_mng, self.style_mng_dlg))
 
-        self.style_mng_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.style_mng_dlg, True, 'core'))
+        self.style_mng_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.style_mng_dlg, True, "core"))
 
         # Open the style management dialog
-        tools_gw.open_dialog(self.style_mng_dlg, 'style_manager')
+        tools_gw.open_dialog(self.style_mng_dlg, "style_manager")
 
     def _show_context_menu(self, qtableview):
         """Show custom context menu"""
@@ -140,7 +140,7 @@ class GwStyleManager:
         dialog_create.feature_id.textChanged.connect(partial(self._check_style_exists, dialog_create))
         dialog_create.idval.textChanged.connect(partial(self._check_style_exists, dialog_create))
 
-        tools_gw.open_dialog(dialog_create, dlg_name='create_style_group')
+        tools_gw.open_dialog(dialog_create, dlg_name="create_style_group")
 
     def _handle_add_feature(self, dialog_create):
         """Handles the logic when the add button is clicked."""
@@ -293,7 +293,7 @@ class GwStyleManager:
         dialog_update.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dialog_update))
         dialog_update.category_rename_copy.textChanged.connect(partial(self._check_style_group_exists, dialog_update))
 
-        tools_gw.open_dialog(dialog_update, dlg_name='update_style_group')
+        tools_gw.open_dialog(dialog_update, dlg_name="update_style_group")
 
     def _check_style_group_exists(self, dialog_update, idval=""):
         sql = f"SELECT idval FROM config_style WHERE idval = '{idval}'"
@@ -437,13 +437,13 @@ class GwStyleManager:
         """Load layers with geometry for the Add Style button."""
         try:
             body = tools_gw.create_body()
-            json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
-            if not json_result or json_result['status'] != 'Accepted':
+            json_result = tools_gw.execute_procedure("gw_fct_getaddlayervalues", body)
+            if not json_result or json_result["status"] != "Accepted":
                 msg = "Failed to load layers."
                 tools_qgis.show_warning(msg, dialog=self.style_mng_dlg)
                 return None
 
-            return json_result['body']['data']['fields']
+            return json_result["body"]["data"]["fields"]
 
         except Exception as e:
             msg = "Failed to load layers"
@@ -458,38 +458,38 @@ class GwStyleManager:
             dict_menu = {}
             for layer in layers:
                 # Filter only layers that have a geometry field
-                if layer['geomField'] == "None" or not layer['geomField']:
+                if layer["geomField"] == "None" or not layer["geomField"]:
                     continue  # Skip layers without a geometry field
 
-                context = json.loads(layer['context']['layer_menu'])
+                context = json.loads(layer["context"]["layer_menu"])
 
                 # Level 1 of the context
-                if 'level_1' in context and context['level_1'] not in dict_menu:
+                if "level_1" in context and context["level_1"] not in dict_menu:
                     menu_level_1 = menu.addMenu(f"{context['level_1']}")
-                    dict_menu[context['level_1']] = menu_level_1
+                    dict_menu[context["level_1"]] = menu_level_1
 
                 # Level 2 of the context
-                if 'level_2' in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
-                    menu_level_2 = dict_menu[context['level_1']].addMenu(f"{context['level_2']}")
+                if "level_2" in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
+                    menu_level_2 = dict_menu[context["level_1"]].addMenu(f"{context['level_2']}")
                     dict_menu[f"{context['level_1']}_{context['level_2']}"] = menu_level_2
 
                 # Level 3 of the context
-                if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
+                if "level_3" in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
                     menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(
                         f"{context['level_3']}")
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
 
-                alias = layer['layerName'] if layer['layerName'] is not None else layer['tableName']
+                alias = layer["layerName"] if layer["layerName"] is not None else layer["tableName"]
                 alias = f"{alias}     "
 
                 # Add actions and submenus at the appropriate context level
-                if 'level_3' in context:
+                if "level_3" in context:
                     sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
                 else:
                     sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}"]
 
                 action = QAction(alias, self.style_mng_dlg.btn_add_style)
-                action.triggered.connect(partial(self._add_layer_style, layer['tableName'], layer['geomField']))
+                action.triggered.connect(partial(self._add_layer_style, layer["tableName"], layer["geomField"]))
                 sub_menu.addAction(action)
 
             # Assign the menu to the button
@@ -549,8 +549,8 @@ class GwStyleManager:
                 styletype, stylevalue, active = existing_style
                 stylevalue_clean = stylevalue.replace("'", "''")
             else:
-                styletype = 'qml'
-                stylevalue_clean = ''
+                styletype = "qml"
+                stylevalue_clean = ""
                 active = True
 
             sql_insert_style = (
@@ -607,10 +607,10 @@ class GwStyleManager:
                     tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, msg_params=msg_params)
                     continue
 
-                style_value = ''
+                style_value = ""
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".qml") as tmp_file:
                     layer.saveNamedStyle(tmp_file.name)
-                    with open(tmp_file.name, 'r', encoding='utf-8') as file:
+                    with open(tmp_file.name, "r", encoding="utf-8") as file:
                         style_value = file.read()
 
                 style_value = style_value.replace("'", "''")

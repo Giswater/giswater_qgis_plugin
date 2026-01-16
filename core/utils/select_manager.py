@@ -45,7 +45,7 @@ class GwSelectionBehavior(Enum):
 
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object: object, table_object: Optional[str] = None, dialog: Optional['QDialog'] = None,
+    def __init__(self, class_object: object, table_object: Optional[str] = None, dialog: Optional["QDialog"] = None,
                  selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                  save_rectangle: bool = False, selection_type: GwSelectionType = GwSelectionType.DEFAULT) -> None:
         """Unified selection manager supporting multiple selection types
@@ -58,10 +58,10 @@ class GwSelectManager(QgsMapTool):
             selection_type: Type of selection tool to use
         """
         self.class_object: object = class_object
-        self.iface: 'QgisInterface' = global_vars.iface
-        self.canvas: 'QgsMapCanvas' = global_vars.canvas
+        self.iface: "QgisInterface" = global_vars.iface
+        self.canvas: "QgsMapCanvas" = global_vars.canvas
         self.table_object: Optional[str] = table_object
-        self.dialog: Optional['QDialog'] = dialog
+        self.dialog: Optional["QDialog"] = dialog
         self.selection_mode: GwSelectionMode = selection_mode
         self.save_rectangle: bool = save_rectangle
         self.selection_type: GwSelectionType = selection_type
@@ -155,9 +155,9 @@ class GwSelectManager(QgsMapTool):
 
     def deactivate(self):
         self.rubber_band.hide()
-        if hasattr(self, 'center_marker'):
+        if hasattr(self, "center_marker"):
             self.center_marker.hide()
-        if hasattr(self.iface, 'statusBarIface'):
+        if hasattr(self.iface, "statusBarIface"):
             self.iface.statusBarIface().clearMessage()
         QgsMapTool.deactivate(self)
 
@@ -169,14 +169,14 @@ class GwSelectManager(QgsMapTool):
         if event.key() == Qt.Key.Key_Escape:
             self._clear_drawing()
         elif event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-            if self.selection_type == GwSelectionType.CIRCLE and hasattr(self, 'center_point') and self.center_point:
-                self._finish_circle_selection(self.center_point, getattr(self, 'current_radius', 0))
+            if self.selection_type == GwSelectionType.CIRCLE and hasattr(self, "center_point") and self.center_point:
+                self._finish_circle_selection(self.center_point, getattr(self, "current_radius", 0))
 
     # endregion
 
     # region private functions
 
-    def _get_cached_feature(self, layer: QgsVectorLayer, feature_id: int) -> Optional['QgsFeature']:
+    def _get_cached_feature(self, layer: QgsVectorLayer, feature_id: int) -> Optional["QgsFeature"]:
         """Get a feature from the cache or fetch it from the layer
         Args:
             layer: The QgsVectorLayer containing the feature
@@ -203,7 +203,7 @@ class GwSelectManager(QgsMapTool):
             
         return None
 
-    def _cache_feature(self, layer: QgsVectorLayer, feature: 'QgsFeature') -> None:
+    def _cache_feature(self, layer: QgsVectorLayer, feature: "QgsFeature") -> None:
         """Add a feature to the cache
         Args:
             layer: The QgsVectorLayer containing the feature
@@ -242,7 +242,7 @@ class GwSelectManager(QgsMapTool):
     def _clear_drawing(self):
         """Clear all drawing elements"""
         self.rubber_band.hide()
-        if hasattr(self, 'center_marker'):
+        if hasattr(self, "center_marker"):
             self.center_marker.hide()
         self._reset_selection()
 
@@ -332,7 +332,7 @@ class GwSelectManager(QgsMapTool):
     # Circle selection handlers
     def _handle_circle_press(self, point):
         self.center_point = point
-        if hasattr(self, 'center_marker'):
+        if hasattr(self, "center_marker"):
             self.center_marker.reset()
             self.center_marker.addPoint(self.center_point)
             self.center_marker.show()
@@ -345,7 +345,7 @@ class GwSelectManager(QgsMapTool):
             )
             self._draw_circle(self.center_point, self.current_radius)
 
-            if hasattr(self.iface, 'statusBarIface'):
+            if hasattr(self.iface, "statusBarIface"):
                 radius_text = f"Circle radius: {self.current_radius:.2f} map units - Click to confirm"
                 self.iface.statusBarIface().showMessage(radius_text, 0)
 
@@ -389,7 +389,7 @@ class GwSelectManager(QgsMapTool):
         circle_geom = QgsGeometry.fromPointXY(center).buffer(radius, 64)
         self._perform_geometry_selection(circle_geom)
 
-        if hasattr(self.iface, 'statusBarIface'):
+        if hasattr(self.iface, "statusBarIface"):
             result_text = f"Circle selection completed (radius: {radius:.2f})"
             self.iface.statusBarIface().showMessage(result_text, 3000)
 
@@ -520,8 +520,8 @@ class GwSelectManager(QgsMapTool):
             # Rectangle selection
             selected_rectangle = None
             # Support multi-type selection when rel_feature_type == 'all'
-            if getattr(self.class_object, 'rel_feature_type', None) == 'all':
-                types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+            if getattr(self.class_object, "rel_feature_type", None) == "all":
+                types_to_select = getattr(self.class_object, "multi_enabled_types", None)
                 if not types_to_select or len(types_to_select) <= 1:
                     types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
                 layer_groups = []
@@ -595,8 +595,8 @@ class GwSelectManager(QgsMapTool):
         wkt = geometry.asWkt()
 
         # Support multi-type selection when rel_feature_type == 'all'
-        if getattr(self.class_object, 'rel_feature_type', None) == 'all':
-            types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+        if getattr(self.class_object, "rel_feature_type", None) == "all":
+            types_to_select = getattr(self.class_object, "multi_enabled_types", None)
             if not types_to_select or len(types_to_select) <= 1:
                 types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
             layer_groups = []
@@ -645,8 +645,8 @@ class GwSelectManager(QgsMapTool):
             # Get the snapped layer to verify it exists in our layer list
             snapped_layer = self.snapper_manager.get_snapped_layer(result)
             # Validate snapped layer against current selection scope (single or multi-type)
-            if getattr(self.class_object, 'rel_feature_type', None) == 'all':
-                types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+            if getattr(self.class_object, "rel_feature_type", None) == "all":
+                types_to_select = getattr(self.class_object, "multi_enabled_types", None)
                 if not types_to_select or len(types_to_select) <= 1:
                     types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
                 valid_layers = []
@@ -687,8 +687,8 @@ class GwSelectManager(QgsMapTool):
             
             wkt = QgsGeometry.fromPointXY(point).asWkt()
             # Apply selection in scope
-            if getattr(self.class_object, 'rel_feature_type', None) == 'all':
-                types_to_select = getattr(self.class_object, 'multi_enabled_types', None)
+            if getattr(self.class_object, "rel_feature_type", None) == "all":
+                types_to_select = getattr(self.class_object, "multi_enabled_types", None)
                 if not types_to_select or len(types_to_select) <= 1:
                     types_to_select = [ft for ft, layers in self.class_object.rel_layers.items() if layers]
                 layer_groups = []
@@ -710,7 +710,7 @@ class GwSelectManager(QgsMapTool):
 
     def _check_keep_drawing(self):
         """Check if we should keep the drawing tool active"""
-        keep_drawing = tools_gw.get_config_parser('dialogs_actions', 'keep_drawing', "user", "init", prefix=False)
+        keep_drawing = tools_gw.get_config_parser("dialogs_actions", "keep_drawing", "user", "init", prefix=False)
         keep_drawing = tools_os.set_boolean(keep_drawing, False)
 
         if keep_drawing:

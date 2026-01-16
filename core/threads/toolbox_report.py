@@ -25,7 +25,7 @@ class GwReportTask(GwTask):
         self.body = None
         self.json_result = None
         self.exception = None
-        self.function_name = 'gw_fct_getreport'
+        self.function_name = "gw_fct_getreport"
         self.queryAdd = queryAdd
         self.timer = timer
 
@@ -37,15 +37,15 @@ class GwReportTask(GwTask):
         if self.queryAdd:
             extras += f', "queryAdd": "{self.queryAdd}"'
         self.body = tools_gw.create_body(extras=extras)
-        self.json_result = tools_gw.execute_procedure('gw_fct_getreport', self.body, is_thread=True, aux_conn=self.aux_conn)
-        if not self.json_result or self.json_result['status'] == 'Failed':
+        self.json_result = tools_gw.execute_procedure("gw_fct_getreport", self.body, is_thread=True, aux_conn=self.aux_conn)
+        if not self.json_result or self.json_result["status"] == "Failed":
             self.finished_execute.emit(False, self.json_result)
             return False
         self.finished_execute.emit(True, self.json_result)
 
         if self.isCanceled():
             return False
-        if self.json_result['status'] == 'Failed':
+        if self.json_result["status"] == "Failed":
             return False
         if not self.json_result or self.json_result is None:
             return False
@@ -65,8 +65,8 @@ class GwReportTask(GwTask):
         tools_log.log_info(msg, msg_params=msg_params)
         tools_gw.manage_json_response(self.json_result, sql, None)
 
-        tools_qt.set_widget_enabled(self.dialog, 'btn_export', True)
-        tools_qt.set_widget_enabled(self.dialog, 'btn_close', True)
+        tools_qt.set_widget_enabled(self.dialog, "btn_export", True)
+        tools_qt.set_widget_enabled(self.dialog, "btn_close", True)
         self.dialog.progressBar.setVisible(False)
         if self.timer:
             self.timer.stop()
@@ -74,15 +74,15 @@ class GwReportTask(GwTask):
             return
 
         if result is False and self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
         # If database fail
-        elif result is False and lib_vars.session_vars['last_error_msg'] is not None:
-            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+        elif result is False and lib_vars.session_vars["last_error_msg"] is not None:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars["last_error_msg"])
         # If sql function return null
         elif result is False:
             msg = "Database returned null. Check postgres function '{0}'"

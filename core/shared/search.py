@@ -45,7 +45,7 @@ class GwSearch:
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
             self.dlg_search = dlg_search
-            self.dlg_search.setProperty('class', self)
+            self.dlg_search.setProperty("class", self)
 
         # If dlg_mincut is None we are not opening from mincut
         form = ""
@@ -56,19 +56,19 @@ class GwSearch:
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-        qgis_project_add_schema = lib_vars.project_vars['add_schema']
+        qgis_project_add_schema = lib_vars.project_vars["add_schema"]
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)
         else:
             extras = f'"addSchema":"{qgis_project_add_schema}"'
             body = tools_gw.create_body(form=form, extras=extras)
-        complet_list = tools_gw.execute_procedure('gw_fct_getsearch', body)
-        if not complet_list or complet_list['status'] == 'Failed':
+        complet_list = tools_gw.execute_procedure("gw_fct_getsearch", body)
+        if not complet_list or complet_list["status"] == "Failed":
             return False
 
-        main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        main_tab = self.dlg_search.findChild(QTabWidget, "main_tab")
         if dlg_mincut and len(complet_list["form"]) == 1:
-            main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+            main_tab = self.dlg_search.findChild(QTabWidget, "main_tab")
             main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
                                    "border: 1px solid transparent;}"
                                    "QTabWidget::pane { background-color: #fcfcfc; border: 1 solid #dadada;}")
@@ -77,36 +77,36 @@ class GwSearch:
         self.lineedit_list = []
         for tab in complet_list["form"]:
             if first_tab is None:
-                first_tab = tab['tabName']
+                first_tab = tab["tabName"]
             tab_widget = QWidget(main_tab)
-            tab_widget.setObjectName(tab['tabName'])
-            main_tab.addTab(tab_widget, tab['tabLabel'])
+            tab_widget.setObjectName(tab["tabName"])
+            main_tab.addTab(tab_widget, tab["tabLabel"])
             gridlayout = QGridLayout()
             tab_widget.setLayout(gridlayout)
             x = 0
 
-            for field in tab['fields']:
+            for field in tab["fields"]:
                 try:
                     label = QLabel()
-                    label.setObjectName('lbl_' + field['label'])
-                    label.setText(field['label'].capitalize())
+                    label.setObjectName("lbl_" + field["label"])
+                    label.setText(field["label"].capitalize())
 
-                    tooltip = field.get('tooltip')
+                    tooltip = field.get("tooltip")
                     if tooltip:
-                        label.setToolTip(field['tooltip'])
+                        label.setToolTip(field["tooltip"])
                     else:
-                        label.setToolTip(field['label'].capitalize())
+                        label.setToolTip(field["label"].capitalize())
 
                     widget = None
-                    if field['widgettype'] == 'typeahead':
+                    if field["widgettype"] == "typeahead":
                         completer = QCompleter()
                         widget = tools_gw.add_lineedit(field)
                         widget = self._set_typeahead_completer(widget, completer)
                         self.lineedit_list.append(widget)
-                    elif field['widgettype'] == 'combo':
+                    elif field["widgettype"] == "combo":
                         widget = tools_gw.add_combo(field)
                         widget.currentIndexChanged.connect(partial(self._clear_lineedits))
-                    elif field['widgettype'] == 'check':
+                    elif field["widgettype"] == "check":
                         kwargs = {"dialog": self.dlg_search, "field": field}
                         widget = tools_gw.add_checkbox(**kwargs)
                     gridlayout.addWidget(label, x, 0)
@@ -115,26 +115,26 @@ class GwSearch:
                 except Exception:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
                           "widgetname='{1}' AND widgettype='{2}'"
-                    msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
+                    msg_params = (field["columnname"], field["widgetname"], field["widgettype"],)
                     tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
-            tools_qt._translate_form('search', self.dlg_search)
+            tools_qt._translate_form("search", self.dlg_search)
             self._init_dialog()
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
         folder_path = tools_qt.get_text(dialog, path)
-        if folder_path is None or folder_path == 'null':
+        if folder_path is None or folder_path == "null":
             path.setStyleSheet("border: 1px solid red")
             return
 
         path.setStyleSheet(None)
-        if folder_path.find('.csv') == -1:
-            folder_path += '.csv'
+        if folder_path.find(".csv") == -1:
+            folder_path += ".csv"
         if qtable_1:
             model_1 = qtable_1.model()
         else:
@@ -187,27 +187,27 @@ class GwSearch:
         if tab_name:
             form = f'"singleTab":"{tab_name}"'
         else:
-            form = ''
+            form = ""
 
-        qgis_project_add_schema = lib_vars.project_vars['add_schema']
+        qgis_project_add_schema = lib_vars.project_vars["add_schema"]
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)
         else:
             extras = f'"addSchema":"{qgis_project_add_schema}"'
             body = tools_gw.create_body(form=form, extras=extras)
-        complet_list = tools_gw.execute_procedure('gw_fct_getsearch', body)
+        complet_list = tools_gw.execute_procedure("gw_fct_getsearch", body)
 
-        main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        main_tab = self.dlg_search.findChild(QTabWidget, "main_tab")
         for tab in complet_list["form"]:
-            for field in tab['fields']:
+            for field in tab["fields"]:
                 try:
-                    if field['widgettype'] == 'combo':
-                        widget = main_tab.findChild(QComboBox, field['widgetname'])
+                    if field["widgettype"] == "combo":
+                        widget = main_tab.findChild(QComboBox, field["widgetname"])
                         tools_gw.fill_combo(widget, field)
                 except Exception:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND " \
                           "widgetname='{1}' AND widgettype='{2}'"
-                    msg_params = (field['columnname'], field['widgetname'], field['widgettype'],)
+                    msg_params = (field["columnname"], field["widgetname"], field["widgettype"],)
                     tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
 
     # region private functions
@@ -261,14 +261,14 @@ class GwSearch:
         _key = completer.completionModel().index(row, 0).data()
         # Search text into self.result_data: this variable contains all matching objects in the function "make_list()"
         item = None
-        for data in self.result_data['data']:
-            if _key == data['display_name']:
+        for data in self.result_data["data"]:
+            if _key == data["display_name"]:
                 item = data
                 break
 
         for line_edit in line_list:
-            if 'id' in item:
-                line_edit.setProperty('id_', item['id'])
+            if "id" in item:
+                line_edit.setProperty("id_", item["id"])
 
         # Show info in docker?
         if self.is_mincut is False:
@@ -278,14 +278,14 @@ class GwSearch:
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()
 
         # check for addschema
-        if tab_selected == 'add_network':
+        if tab_selected == "add_network":
             is_add_schema = True
 
         # Tab 'network or add_network'
-        if tab_selected == 'network' or tab_selected == 'add_network':
-            self.customForm = GwInfo(tab_type='data')
+        if tab_selected == "network" or tab_selected == "add_network":
+            self.customForm = GwInfo(tab_type="data")
             complet_result, dialog = self.customForm.get_info_from_id(
-                item['sys_table_id'], tab_type='data', feature_id=item['sys_id'], is_add_schema=is_add_schema)
+                item["sys_table_id"], tab_type="data", feature_id=item["sys_id"], is_add_schema=is_add_schema)
 
             if not complet_result:
                 return
@@ -295,7 +295,7 @@ class GwSearch:
             # two ruberbands (the one from self.open_custom_form (...) and this one) we delete these
 
             try:
-                margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+                margin = float(complet_result["body"]["feature"]["zoomCanvasMargin"]["mts"])
             except ValueError:
                 margin = 50
 
@@ -303,68 +303,68 @@ class GwSearch:
             self._reset_rubber_band()
 
         # Tab 'address' (streets)
-        elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
-            polygon = item['st_astext']
+        elif tab_selected == "address" and "id" in item and "sys_id" not in item:
+            polygon = item["st_astext"]
             if polygon:
                 polygon = polygon[9:len(polygon) - 2]
-                polygon = polygon.split(',')
-                x1, y1 = polygon[0].split(' ')
-                x2, y2 = polygon[2].split(' ')
+                polygon = polygon.split(",")
+                x1, y1 = polygon[0].split(" ")
+                x2, y2 = polygon[2].split(" ")
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
             else:
                 msg = "Zoom unavailable. Doesn't exist the geometry for the street"
-                tools_qgis.show_info(msg, parameter=item['display_name'])
+                tools_qgis.show_info(msg, parameter=item["display_name"])
 
         # Tab 'address'
-        elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
-            x1 = item['sys_x']
-            y1 = item['sys_y']
+        elif tab_selected == "address" and "sys_x" in item and "sys_y" in item:
+            x1 = item["sys_x"]
+            y1 = item["sys_y"]
             point = QgsPointXY(float(x1), float(y1))
             tools_qgis.draw_point(point, self.rubber_band, duration_time=5000)
             tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
         # Tab 'hydro'
-        elif tab_selected == 'hydro':
+        elif tab_selected == "hydro":
             # Get basic_search_hydrometer_show_connec param
-            row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table='config_param_system')
-            basic_search_hydrometer = tools_os.set_boolean(row['value'])
+            row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table="config_param_system")
+            basic_search_hydrometer = tools_os.set_boolean(row["value"])
             if not basic_search_hydrometer:
-                x1 = item['sys_x']
-                y1 = item['sys_y']
+                x1 = item["sys_x"]
+                y1 = item["sys_y"]
                 point = QgsPointXY(float(x1), float(y1))
                 tools_qgis.draw_point(point, self.rubber_band)
                 tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'],
-                                         sys_feature_type_id=item['sys_feature_type_id'],
+            self._open_hydrometer_dialog(table_name=item["sys_table_id"], feature_id=item["sys_id"],
+                                         sys_feature_type_id=item["sys_feature_type_id"],
                                          basic_search_hydrometer=basic_search_hydrometer,
-                                         feature_type=item['sys_feature'])
+                                         feature_type=item["sys_feature"])
 
         # Tab 'workcat'
-        elif tab_selected == 'workcat':
+        elif tab_selected == "workcat":
             workcat_instance = GwWorkcat(global_vars.iface, global_vars.canvas)
             workcat_instance.workcat_open_table_items(item)
             return
 
         # Tab 'psector'
-        elif tab_selected == 'psector':
-            list_coord = re.search(r'\(\((.*)\)\)', str(item['sys_geometry']))
-            self.manage_new_psector.get_psector(item['sys_id'], list_coord)
+        elif tab_selected == "psector":
+            list_coord = re.search(r"\(\((.*)\)\)", str(item["sys_geometry"]))
+            self.manage_new_psector.get_psector(item["sys_id"], list_coord)
 
         # Tab 'visit'
-        elif tab_selected == 'visit':
-            list_coord = re.search(r'\((.*)\)', str(item['sys_geometry']))
+        elif tab_selected == "visit":
+            list_coord = re.search(r"\((.*)\)", str(item["sys_geometry"]))
             if not list_coord:
                 msg = "Empty coordinate list"
                 tools_qgis.show_info(msg)
-                self.manage_visit.get_visit(visit_id=item['sys_id'])
+                self.manage_visit.get_visit(visit_id=item["sys_id"])
                 return
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             self._reset_rubber_band()
             point = QgsPointXY(float(max_x), float(max_y))
             tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
-            self.manage_visit.get_visit(visit_id=item['sys_id'])
+            self.manage_visit.get_visit(visit_id=item["sys_id"])
             self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
             return
 
@@ -374,10 +374,10 @@ class GwSearch:
     def _make_list(self, completer, model, widget):
         """Create a list of ids and populate widget (QLineEdit)"""
         # Create 2 json, one for first QLineEdit and other for second QLineEdit
-        form_search = ''
-        extras_search = ''
-        form_search_add = ''
-        extras_search_add = ''
+        form_search = ""
+        extras_search = ""
+        form_search_add = ""
+        extras_search_add = ""
         result = None
         line_edit = None
         index = self.dlg_search.main_tab.currentIndex()
@@ -406,10 +406,10 @@ class GwSearch:
                 line_edit.textChanged.connect(partial(self._clear_line_edit_add, line_list))
 
             value = tools_qt.get_text(self.dlg_search, line_edit, return_string_null=False)
-            if str(value) == '':
+            if str(value) == "":
                 return
 
-            qgis_project_add_schema = lib_vars.project_vars['add_schema']
+            qgis_project_add_schema = lib_vars.project_vars["add_schema"]
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             if chk_list:
@@ -417,8 +417,8 @@ class GwSearch:
                 extras_search += f', "{chk_list.property("columnname")}":"{chk_list.isChecked()}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = tools_gw.create_body(form=form_search, extras=extras_search)
-            result = tools_gw.execute_procedure('gw_fct_setsearch', body, rubber_band=self.rubber_band)
-            if not result or result['status'] == 'Failed':
+            result = tools_gw.execute_procedure("gw_fct_setsearch", body, rubber_band=self.rubber_band)
+            if not result or result["status"] == "Failed":
                 return False
 
             if result:
@@ -427,7 +427,7 @@ class GwSearch:
         # Set label visible
         display_list = []
         if result:
-            if self.result_data['data'] == {} and self.lbl_visible:
+            if self.result_data["data"] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
                     widget_add = line_list[1]
@@ -438,8 +438,8 @@ class GwSearch:
                 self.dlg_search.lbl_msg.setVisible(False)
 
             # Get list of items from returned json from database and make a list for completer
-            for data in self.result_data['data']:
-                display_list.append(data['display_name'])
+            for data in self.result_data["data"]:
+                display_list.append(data["display_name"])
             tools_qt.set_completer_object(completer, model, widget, sorted(display_list))
 
         if len(line_list) == 2:
@@ -449,43 +449,43 @@ class GwSearch:
                 if line_edit:
                     line_edit.setText(value)
                 return
-            if str(value) == 'null':
+            if str(value) == "null":
                 return
 
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = tools_gw.create_body(form=form_search_add, extras=extras_search_add)
-            result = tools_gw.execute_procedure('gw_fct_setsearchadd', body, rubber_band=self.rubber_band)
-            if not result or result['status'] == 'Failed':
+            result = tools_gw.execute_procedure("gw_fct_setsearchadd", body, rubber_band=self.rubber_band)
+            if not result or result["status"] == "Failed":
                 return False
 
             self.result_data = result
             if result is not None:
                 display_list = []
-                for data in self.result_data['data']:
-                    display_list.append(data['display_name'])
+                for data in self.result_data["data"]:
+                    display_list.append(data["display_name"])
                 tools_qt.set_completer_object(completer, model, line_edit_add, sorted(display_list))
 
     def _clear_line_edit_add(self, line_list):
         """Clear second line edit if exist"""
         line_edit_add = line_list[1]
         line_edit_add.blockSignals(True)
-        line_edit_add.setText('')
+        line_edit_add.setText("")
         line_edit_add.blockSignals(False)
 
     def _clear_lineedits(self):
 
         # Clear all lineedit widgets from search tabs
         for widget in self.lineedit_list:
-            tools_qt.set_widget_text(self.dlg_search, widget, '')
+            tools_qt.set_widget_text(self.dlg_search, widget, "")
 
     def _open_hydrometer_dialog(self, table_name=None, feature_id=None, sys_feature_type_id=None,
                                 basic_search_hydrometer=False, feature_type=None):
 
         if basic_search_hydrometer:
-            self.customForm = GwInfo(tab_type='data')
+            self.customForm = GwInfo(tab_type="data")
             # feature_type (ve_connec or ve_node) is the exact view to see the details of the feature
             complet_result, dialog = self.customForm.get_info_from_id(
-                feature_type, tab_type='data', feature_id=sys_feature_type_id, is_add_schema=False)
+                feature_type, tab_type="data", feature_id=sys_feature_type_id, is_add_schema=False)
 
             if not complet_result:
                 return
@@ -493,14 +493,14 @@ class GwSearch:
             tab_main.setCurrentIndex(3)
             self._select_row_by_feature_id(tab_main, feature_id)
         else:
-            qgis_project_infotype = lib_vars.project_vars['info_type']
+            qgis_project_infotype = lib_vars.project_vars["info_type"]
 
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             extras = f'"infoType":"{qgis_project_infotype}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+            json_result = tools_gw.execute_procedure("gw_fct_getinfofromid", body)
 
-            if json_result is None or json_result['status'] == 'Failed':
+            if json_result is None or json_result["status"] == "Failed":
                 return
             result = json_result
 
@@ -511,7 +511,7 @@ class GwSearch:
             self.hydro_info_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
             self.hydro_info_dlg.dlg_closed.connect(self._reset_rubber_band)
             tools_gw.build_dialog_info(self.hydro_info_dlg, result)
-            tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
+            tools_gw.open_dialog(self.hydro_info_dlg, dlg_name="info_generic")
 
     def _select_row_by_feature_id(self, tab_main, feature_id, column_index=0):
         # Get the index of the current tab

@@ -44,7 +44,7 @@ class GwPsectorDuplicate(QObject):
         self.dlg_duplicate_psector.btn_accept.clicked.connect(partial(self._duplicate_psector))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_duplicate_psector, dlg_name='psector_duplicate')
+        tools_gw.open_dialog(self.dlg_duplicate_psector, dlg_name="psector_duplicate")
 
     # region private functions
 
@@ -62,22 +62,22 @@ class GwPsectorDuplicate(QObject):
         feature = '"type":"PSECTOR"'
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        body = body.replace('""', 'null')
-        complet_result = tools_gw.execute_procedure('gw_fct_psector_duplicate', body)
+        body = body.replace('""', "null")
+        complet_result = tools_gw.execute_procedure("gw_fct_psector_duplicate", body)
 
         sql = ("UPDATE config_param_user "
                 "SET value = False "
                 "WHERE parameter = 'plan_psector_disable_checktopology_trigger' AND cur_user=current_user")
         tools_db.execute_sql(sql)
 
-        if not complet_result or complet_result['status'] == 'Failed':
-            msg = tools_qt.tr('Function gw_fct_psector_duplicate executed with no result')
+        if not complet_result or complet_result["status"] == "Failed":
+            msg = tools_qt.tr("Function gw_fct_psector_duplicate executed with no result")
             tools_qgis.show_message(msg, Qgis.MessageLevel.Success, dialog=self.dlg_duplicate_psector)
             return
 
         # Populate tab info
         change_tab = False
-        data = complet_result['body']['data']
+        data = complet_result["body"]["data"]
         for k, v in list(data.items()):
             if str(k) == "info":
                 text, change_tab = tools_gw.fill_tab_log(self.dlg_duplicate_psector, data)
@@ -87,7 +87,7 @@ class GwPsectorDuplicate(QObject):
             tools_gw.close_dialog(self.dlg_duplicate_psector)
         else:
             tools_qt.get_widget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
-            self.dlg_duplicate_psector.setWindowTitle('SUCCESS IN DUPLICATING PSECTOR')
+            self.dlg_duplicate_psector.setWindowTitle("SUCCESS IN DUPLICATING PSECTOR")
 
         self.is_duplicated.emit()
 

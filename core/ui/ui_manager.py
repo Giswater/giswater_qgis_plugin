@@ -19,11 +19,11 @@ from .main_window import GwMainWindow
 # region private functions
 
 
-def _get_ui_class(ui_file_name, subfolder='shared'):
+def _get_ui_class(ui_file_name, subfolder="shared"):
     """Get UI Python class from @ui_file_name"""
     # Folder that contains UI files
-    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'am', 'cm'):
-        ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder
+    if subfolder in ("basic", "edit", "epa", "om", "plan", "utilities", "toc", "am", "cm"):
+        ui_folder_path = os.path.dirname(__file__) + os.sep + "toolbars" + os.sep + subfolder
     else:
         ui_folder_path = os.path.dirname(__file__) + os.sep + subfolder
 
@@ -42,7 +42,7 @@ def _get_ui_class(ui_file_name, subfolder='shared'):
 CONTEXT = "basic"
 
 UINAME = "info_crossect"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInfoCrossectUi(GwDialog, FORM_CLASS):
@@ -51,7 +51,7 @@ class GwInfoCrossectUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "info_feature"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInfoFeatureUi(GwMainWindow, FORM_CLASS):
@@ -63,7 +63,7 @@ class GwInfoFeatureUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "info_epa"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInfoEpaUi(GwDialog, FORM_CLASS):
@@ -72,7 +72,7 @@ class GwInfoEpaUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "search"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSearchUi(GwDocker, FORM_CLASS):
@@ -81,7 +81,7 @@ class GwSearchUi(GwDocker, FORM_CLASS):
 
 
 UINAME = "search_workcat"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSearchWorkcatUi(GwDialog, FORM_CLASS):
@@ -94,7 +94,7 @@ class GwSearchWorkcatUi(GwDialog, FORM_CLASS):
 CONTEXT = "om"
 
 UINAME = "mincut"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMincutUi(GwMainWindow, FORM_CLASS):
@@ -108,7 +108,7 @@ class GwMincutUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "mincut_connec"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMincutConnecUi(GwDialog, FORM_CLASS):
@@ -117,7 +117,7 @@ class GwMincutConnecUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "mincut_hydrometer"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMincutHydrometerUi(GwDialog, FORM_CLASS):
@@ -126,7 +126,7 @@ class GwMincutHydrometerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "mincut_composer"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMincutComposerUi(GwDialog, FORM_CLASS):
@@ -135,7 +135,7 @@ class GwMincutComposerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "mincut_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMincutManagerUi(GwDialog, FORM_CLASS):
@@ -144,7 +144,7 @@ class GwMincutManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "mincut_end"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMincutEndUi(GwDialog, FORM_CLASS):
@@ -153,7 +153,7 @@ class GwMincutEndUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "profile"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwProfileUi(GwMainWindow, FORM_CLASS):
@@ -162,7 +162,7 @@ class GwProfileUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "profile_list"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwProfilesListUi(GwDialog, FORM_CLASS):
@@ -171,7 +171,7 @@ class GwProfilesListUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "selector_date"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSelectorDateUi(GwDialog, FORM_CLASS):
@@ -184,7 +184,7 @@ class GwSelectorDateUi(GwDialog, FORM_CLASS):
 CONTEXT = "edit"
 
 UINAME = "arc_fusion"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwArcFusionUi(GwDialog, FORM_CLASS):
@@ -193,7 +193,7 @@ class GwArcFusionUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "auxcircle"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAuxCircleUi(GwDialog, FORM_CLASS):
@@ -202,7 +202,7 @@ class GwAuxCircleUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "auxpoint"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAuxPointUi(GwDialog, FORM_CLASS):
@@ -211,7 +211,7 @@ class GwAuxPointUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "dimensioning"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwDimensioningUi(GwMainWindow, FORM_CLASS):
@@ -220,7 +220,7 @@ class GwDimensioningUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "doc"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwDocUi(GwDialog, FORM_CLASS):
@@ -229,7 +229,7 @@ class GwDocUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "doc_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwDocManagerUi(GwDialog, FORM_CLASS):
@@ -238,7 +238,7 @@ class GwDocManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "element_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwElementManagerUi(GwDialog, FORM_CLASS):
@@ -247,7 +247,7 @@ class GwElementManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "feature_delete"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwFeatureDeleteUi(GwDialog, FORM_CLASS):
@@ -256,7 +256,7 @@ class GwFeatureDeleteUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "feature_end"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwFeatureEndUi(GwDialog, FORM_CLASS):
@@ -265,7 +265,7 @@ class GwFeatureEndUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "feature_end_connec"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwFeatureEndConnecUi(GwDialog, FORM_CLASS):
@@ -274,7 +274,7 @@ class GwFeatureEndConnecUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "feature_replace"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
@@ -283,7 +283,7 @@ class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "featuretype_change"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
@@ -292,7 +292,7 @@ class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "connect_link"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwConnectLinkUi(GwDialog, FORM_CLASS):
@@ -306,7 +306,7 @@ class GwConnectLinkUi(GwDialog, FORM_CLASS):
 CONTEXT = "epa"
 
 UINAME = "go2epa"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwGo2EpaUI(GwDialog, FORM_CLASS):
@@ -315,7 +315,7 @@ class GwGo2EpaUI(GwDialog, FORM_CLASS):
 
 
 UINAME = "go2epa_selector"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwGo2EpaSelectorUi(GwDialog, FORM_CLASS):
@@ -324,7 +324,7 @@ class GwGo2EpaSelectorUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "go2epa_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwEpaManagerUi(GwDialog, FORM_CLASS):
@@ -333,7 +333,7 @@ class GwEpaManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "go2epa_options"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwGo2EpaOptionsUi(GwDialog, FORM_CLASS):
@@ -342,7 +342,7 @@ class GwGo2EpaOptionsUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "dscenario_manager"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwDscenarioManagerUi(GwDialog, FROM_CLASS):
@@ -351,7 +351,7 @@ class GwDscenarioManagerUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_curve"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualCurveUi(GwDialog, FROM_CLASS):
@@ -360,7 +360,7 @@ class GwNonVisualCurveUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_controls"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualControlsUi(GwDialog, FROM_CLASS):
@@ -369,7 +369,7 @@ class GwNonVisualControlsUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_manager"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualManagerUi(GwDialog, FROM_CLASS):
@@ -378,7 +378,7 @@ class GwNonVisualManagerUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_pattern_ud"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualPatternUDUi(GwDialog, FROM_CLASS):
@@ -387,7 +387,7 @@ class GwNonVisualPatternUDUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_pattern_ws"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualPatternWSUi(GwDialog, FROM_CLASS):
@@ -396,7 +396,7 @@ class GwNonVisualPatternWSUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_print"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualPrint(GwDialog, FROM_CLASS):
@@ -405,7 +405,7 @@ class GwNonVisualPrint(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_roughness"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualRoughnessUi(GwDialog, FROM_CLASS):
@@ -414,7 +414,7 @@ class GwNonVisualRoughnessUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_rules"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualRulesUi(GwDialog, FROM_CLASS):
@@ -423,7 +423,7 @@ class GwNonVisualRulesUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_timeseries"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualTimeseriesUi(GwDialog, FROM_CLASS):
@@ -432,7 +432,7 @@ class GwNonVisualTimeseriesUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "nonvisual_lids"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
@@ -441,7 +441,7 @@ class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "inp_parsing"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInpParsingUi(GwDialog, FORM_CLASS):
@@ -450,7 +450,7 @@ class GwInpParsingUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "inp_config_import"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInpConfigImportUi(GwDialog, FORM_CLASS):
@@ -458,7 +458,7 @@ class GwInpConfigImportUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-FORM_CLASS = _get_ui_class('epatools_add_demand_check.ui', 'epa')
+FORM_CLASS = _get_ui_class("epatools_add_demand_check.ui", "epa")
 
 
 class AddDemandCheckUi(GwDialog, FORM_CLASS):
@@ -467,7 +467,7 @@ class AddDemandCheckUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "epatools_recursive_go2epa"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class RecursiveEpaUi(GwDialog, FORM_CLASS):
@@ -476,7 +476,7 @@ class RecursiveEpaUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "epatools_emitter_calibration"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class EmitterCalibrationUi(GwDialog, FORM_CLASS):
@@ -485,7 +485,7 @@ class EmitterCalibrationUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "epatools_quantized_demands"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class QuantizedDemandsUi(GwDialog, FORM_CLASS):
@@ -494,7 +494,7 @@ class QuantizedDemandsUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "epatools_static_calibration"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class StaticCalibrationUi(GwDialog, FORM_CLASS):
@@ -503,7 +503,7 @@ class StaticCalibrationUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "epatools_valve_operation_check"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class ValveOperationCheckUi(GwDialog, FORM_CLASS):
@@ -512,7 +512,7 @@ class ValveOperationCheckUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "go2iber"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwGo2IberUi(GwDialog, FORM_CLASS):
@@ -526,7 +526,7 @@ class GwGo2IberUi(GwDialog, FORM_CLASS):
 CONTEXT = "plan"
 
 UINAME = "psector"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPsectorUi(GwDialog, FORM_CLASS):
@@ -535,7 +535,7 @@ class GwPsectorUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "psector_duplicate"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPsectorDuplicateUi(GwDialog, FORM_CLASS):
@@ -544,7 +544,7 @@ class GwPsectorDuplicateUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "psector_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPsectorManagerUi(GwDialog, FORM_CLASS):
@@ -553,7 +553,7 @@ class GwPsectorManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "psector_rapport"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPsectorRapportUi(GwDialog, FORM_CLASS):
@@ -562,7 +562,7 @@ class GwPsectorRapportUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "psector_repair"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPsectorRepairUi(GwDialog, FORM_CLASS):
@@ -571,7 +571,7 @@ class GwPsectorRepairUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "netscenario_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNetscenarioManagerUi(GwDialog, FORM_CLASS):
@@ -580,7 +580,7 @@ class GwNetscenarioManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "netscenario"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwNetscenarioUi(GwDialog, FORM_CLASS):
@@ -594,7 +594,7 @@ class GwNetscenarioUi(GwDialog, FORM_CLASS):
 CONTEXT = "utilities"
 
 UINAME = "config"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwConfigUi(GwMainWindow, FORM_CLASS):
@@ -603,7 +603,7 @@ class GwConfigUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "csv"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwCsvUi(GwDialog, FORM_CLASS):
@@ -612,7 +612,7 @@ class GwCsvUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "epa_export"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class EpaExportUi(GwDialog, FORM_CLASS):
@@ -621,7 +621,7 @@ class EpaExportUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "print"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPrintUi(GwDialog, FORM_CLASS):
@@ -630,7 +630,7 @@ class GwPrintUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "toolbox_reports"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwToolboxReportsUi(GwDialog, FORM_CLASS):
@@ -639,7 +639,7 @@ class GwToolboxReportsUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "check_project"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwProjectCheckUi(GwDialog, FORM_CLASS):
@@ -648,7 +648,7 @@ class GwProjectCheckUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "workspace_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwWorkspaceManagerUi(GwDialog, FORM_CLASS):
@@ -657,7 +657,7 @@ class GwWorkspaceManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "workspace_create"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
@@ -666,7 +666,7 @@ class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "mapzone_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMapzoneManagerUi(GwDialog, FORM_CLASS):
@@ -675,7 +675,7 @@ class GwMapzoneManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "style_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwStyleManagerUi(GwDialog, FORM_CLASS):
@@ -684,7 +684,7 @@ class GwStyleManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "style"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwStyleUi(GwDialog, FORM_CLASS):
@@ -693,7 +693,7 @@ class GwStyleUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "style_update_category"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwUpdateStyleGroupUi(GwDialog, FORM_CLASS):
@@ -702,7 +702,7 @@ class GwUpdateStyleGroupUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "toolbox"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwToolboxUi(GwDialog, FORM_CLASS):
@@ -711,7 +711,7 @@ class GwToolboxUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "toolbox_tool"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwToolboxManagerUi(GwDialog, FORM_CLASS):
@@ -720,7 +720,7 @@ class GwToolboxManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "mapzone_config"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
@@ -729,7 +729,7 @@ class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "massive_composer"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwCompPagesUi(GwDialog, FORM_CLASS):
@@ -738,7 +738,7 @@ class GwCompPagesUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "workcat_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
@@ -747,7 +747,7 @@ class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "snapshot_view"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSnapshotViewUi(GwDialog, FORM_CLASS):
@@ -761,7 +761,7 @@ class GwSnapshotViewUi(GwDialog, FORM_CLASS):
 CONTEXT = "cm"
 
 UINAME = "add_lot"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class AddLotUi(GwDialog, FORM_CLASS):
@@ -770,7 +770,7 @@ class AddLotUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "lot_management"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class LotManagementUi(GwDialog, FORM_CLASS):
@@ -779,7 +779,7 @@ class LotManagementUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "resources_management"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class ResourcesManagementUi(GwDialog, FORM_CLASS):
@@ -788,7 +788,7 @@ class ResourcesManagementUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "team_create"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class TeamCreateUi(GwDialog, FORM_CLASS):
@@ -797,7 +797,7 @@ class TeamCreateUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "add_campaign_review"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class AddCampaignReviewUi(GwDialog, FORM_CLASS):
@@ -806,7 +806,7 @@ class AddCampaignReviewUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "add_campaign_visit"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class AddCampaignVisitUi(GwDialog, FORM_CLASS):
@@ -815,7 +815,7 @@ class AddCampaignVisitUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "add_campaign_inventory"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class AddCampaignInventoryUi(GwDialog, FORM_CLASS):
@@ -824,7 +824,7 @@ class AddCampaignInventoryUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "campaign_management"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class CampaignManagementUi(GwDialog, FORM_CLASS):
@@ -833,7 +833,7 @@ class CampaignManagementUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "workorder_management"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class WorkorderManagementUi(GwDialog, FORM_CLASS):
@@ -842,7 +842,7 @@ class WorkorderManagementUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "add_workorder"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class WorkorderAddUi(GwDialog, FORM_CLASS):
@@ -851,7 +851,7 @@ class WorkorderAddUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "check_project_cm"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class CheckProjectCmUi(GwDialog, FORM_CLASS):
@@ -868,7 +868,7 @@ class CheckProjectCmUi(GwDialog, FORM_CLASS):
 CONTEXT = "admin"
 
 UINAME = "admin_addfields"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminFieldsUi(GwDialog, FORM_CLASS):
@@ -877,7 +877,7 @@ class GwAdminFieldsUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_credentials"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwCredentialsUi(GwDialog, FORM_CLASS):
@@ -888,7 +888,7 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
 
         super().__init__(class_obj, subtag)
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+        icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -902,12 +902,12 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
             icon_path = os.path.dirname(
-                __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+                __file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
             icon_path = os.path.dirname(
-                __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
+                __file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "141.png"
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -916,7 +916,7 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_dbproject"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
@@ -925,7 +925,7 @@ class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "admin_translation"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminTranslationUi(GwDialog, FORM_CLASS):
@@ -936,7 +936,7 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
 
         super().__init__(class_obj, subtag)
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+        icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -950,11 +950,11 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
         text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+            icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
+            icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "141.png"
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -963,7 +963,7 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_markdown_generator"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminMarkdownGeneratorUi(GwDialog, FORM_CLASS):
@@ -972,7 +972,7 @@ class GwAdminMarkdownGeneratorUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_update_translation"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
@@ -982,7 +982,7 @@ class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
     def __init__(self, class_obj=None, subtag=None):
         super().__init__(class_obj, subtag)
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+        icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -995,11 +995,11 @@ class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
         text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+            icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
+            icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "141.png"
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -1008,7 +1008,7 @@ class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_i18n_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSchemaI18NManagerUi(GwDialog, FORM_CLASS):
@@ -1018,7 +1018,7 @@ class GwSchemaI18NManagerUi(GwDialog, FORM_CLASS):
     def __init__(self, class_obj=None, subtag=None):
         super().__init__(class_obj, subtag)
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+        icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -1031,11 +1031,11 @@ class GwSchemaI18NManagerUi(GwDialog, FORM_CLASS):
         text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+            icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "142.png"
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.EchoMode.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
+            icon_path = os.path.dirname(__file__) + os.sep + ".." + os.sep + ".." + os.sep + "icons" + os.sep + "dialogs" + os.sep + "141.png"
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -1044,7 +1044,7 @@ class GwSchemaI18NManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_import_osm"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminImportOsmUi(GwDialog, FORM_CLASS):
@@ -1053,7 +1053,7 @@ class GwAdminImportOsmUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_gisproject"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminGisProjectUi(GwMainWindow, FORM_CLASS):
@@ -1062,7 +1062,7 @@ class GwAdminGisProjectUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "admin_projectinfo"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminProjectInfoUi(GwMainWindow, FORM_CLASS):
@@ -1071,7 +1071,7 @@ class GwAdminProjectInfoUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "admin_renameproj"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminRenameProjUi(GwMainWindow, FORM_CLASS):
@@ -1080,7 +1080,7 @@ class GwAdminRenameProjUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "admin"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminUi(GwMainWindow, FORM_CLASS):
@@ -1090,7 +1090,7 @@ class GwAdminUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "admin_visitclass"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminVisitClassUi(GwDialog, FORM_CLASS):
@@ -1099,7 +1099,7 @@ class GwAdminVisitClassUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_visitparam"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminVisitParamUi(GwDialog, FORM_CLASS):
@@ -1108,7 +1108,7 @@ class GwAdminVisitParamUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "admin_cm_create"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAdminCmCreateUi(GwMainWindow, FORM_CLASS):
@@ -1122,7 +1122,7 @@ class GwAdminCmCreateUi(GwMainWindow, FORM_CLASS):
 CONTEXT = "menu"
 
 UINAME = "load_menu"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwLoadMenuUi(GwDialog, FORM_CLASS):
@@ -1135,7 +1135,7 @@ class GwLoadMenuUi(GwDialog, FORM_CLASS):
 CONTEXT = "shared"
 
 UINAME = "dscenario"
-FROM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FROM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwDscenarioUi(GwDialog, FROM_CLASS):
@@ -1144,7 +1144,7 @@ class GwDscenarioUi(GwDialog, FROM_CLASS):
 
 
 UINAME = "visit_event_full"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwVisitEventFullUi(GwDialog, FORM_CLASS):
@@ -1153,7 +1153,7 @@ class GwVisitEventFullUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit_gallery"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwGalleryUi(GwDialog, FORM_CLASS):
@@ -1162,7 +1162,7 @@ class GwGalleryUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit_gallery_zoom"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwGalleryZoomUi(GwDialog, FORM_CLASS):
@@ -1179,7 +1179,7 @@ class GwDialogShowInfoUi(DialogTextUi):
 
 
 UINAME = "info_catalog"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInfoCatalogUi(GwMainWindow, FORM_CLASS):
@@ -1188,7 +1188,7 @@ class GwInfoCatalogUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "audit_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAuditManagerUi(GwMainWindow, FORM_CLASS):
@@ -1197,7 +1197,7 @@ class GwAuditManagerUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "audit"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAuditUi(GwMainWindow, FORM_CLASS):
@@ -1206,7 +1206,7 @@ class GwAuditUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "info_generic"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInfoGenericUi(GwMainWindow, FORM_CLASS):
@@ -1215,7 +1215,7 @@ class GwInfoGenericUi(GwMainWindow, FORM_CLASS):
 
 
 UINAME = "info_workcat"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInfoWorkcatUi(GwDialog, FORM_CLASS):
@@ -1224,7 +1224,7 @@ class GwInfoWorkcatUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "selector"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwSelectorUi(GwDialog, FORM_CLASS):
@@ -1233,7 +1233,7 @@ class GwSelectorUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwVisitUi(GwDialog, FORM_CLASS):
@@ -1242,7 +1242,7 @@ class GwVisitUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit_document"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwVisitDocumentUi(GwDialog, FORM_CLASS):
@@ -1251,7 +1251,7 @@ class GwVisitDocumentUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit_event_rehab"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwVisitEventRehabUi(GwDialog, FORM_CLASS):
@@ -1260,7 +1260,7 @@ class GwVisitEventRehabUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit_event"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwVisitEventUi(GwDialog, FORM_CLASS):
@@ -1269,7 +1269,7 @@ class GwVisitEventUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "visit_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwVisitManagerUi(GwDialog, FORM_CLASS):
@@ -1278,7 +1278,7 @@ class GwVisitManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "interpolate"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwInterpolate(GwDialog, FORM_CLASS):
@@ -1287,7 +1287,7 @@ class GwInterpolate(GwDialog, FORM_CLASS):
 
 
 UINAME = "replace_in_file"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwReplaceInFileUi(GwDialog, FORM_CLASS):
@@ -1301,7 +1301,7 @@ class GwReplaceInFileUi(GwDialog, FORM_CLASS):
 CONTEXT = "am"
 
 UINAME = "result_selector"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwResultSelectorUi(GwDialog, FORM_CLASS):
@@ -1310,7 +1310,7 @@ class GwResultSelectorUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "assignation"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwAssignationUi(GwDialog, FORM_CLASS):
@@ -1319,7 +1319,7 @@ class GwAssignationUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "priority"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPriorityUi(GwDialog, FORM_CLASS):
@@ -1333,7 +1333,7 @@ class GwPriorityUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "priority_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwPriorityManagerUi(GwDialog, FORM_CLASS):
@@ -1342,7 +1342,7 @@ class GwPriorityManagerUi(GwDialog, FORM_CLASS):
 
 
 UINAME = "status_selector"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+FORM_CLASS = _get_ui_class(f"{UINAME}.ui", f"{CONTEXT}")
 
 
 class GwStatusSelectorUi(GwDialog, FORM_CLASS):

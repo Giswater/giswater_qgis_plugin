@@ -31,7 +31,7 @@ class GwParseInpTask(GwTask):
         try:
             self.log.append("Reading INP file...")
             self.network = read_inp_file(self.inp_file_path)
-            flow_units: str = self.network[OPTIONS].get('FLOW_UNITS')
+            flow_units: str = self.network[OPTIONS].get("FLOW_UNITS")
 
             if flow_units not in ("LPS", "LPM", "CMS"):
                 message: str = (
@@ -105,7 +105,7 @@ class Catalogs:
         db_arc_catalog: dict[str, tuple[str, Optional[float], Optional[float | str], Optional[float], Optional[float]]] = {}
         if rows:
             unsorted_dict = {
-                _id: (str(shape), tofloat(geom1), tofloat(geom2) if shape != 'CUSTOM' else str(geom2), tofloat(geom3), tofloat(geom4)) for _id, shape, geom1, geom2, geom3, geom4 in rows
+                _id: (str(shape), tofloat(geom1), tofloat(geom2) if shape != "CUSTOM" else str(geom2), tofloat(geom3), tofloat(geom4)) for _id, shape, geom1, geom2, geom3, geom4 in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
@@ -220,7 +220,7 @@ class Catalogs:
             # culvert = xs.culvert
             # transect = xs.transect
             curve_name = xs.curve_name
-            if shape == 'CUSTOM':
+            if shape == "CUSTOM":
                 geom2 = curve_name
 
             conduit_types.add((shape, geom1, geom2, geom3, geom4))

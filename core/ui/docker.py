@@ -19,16 +19,16 @@ class GwDocker(QDockWidget):
         super().__init__()
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly
-        context = getattr(self, 'CONTEXT', None)
-        uiname = getattr(self, 'UINAME', None)
+        context = getattr(self, "CONTEXT", None)
+        uiname = getattr(self, "UINAME", None)
 
         if context and uiname:
             # Use provided CONTEXT and UINAME
-            self.setProperty('context', context)
-            self.setProperty('uiname', uiname)
+            self.setProperty("context", context)
+            self.setProperty("uiname", uiname)
 
         # Always set class_obj and subtag
-        self.setProperty('class_obj', class_obj)
+        self.setProperty("class_obj", class_obj)
         self.subtag = subtag
 
         # TODO: Check try/catch. Strange error: "GwDocker object has no attribute 'setupUi"
@@ -47,8 +47,8 @@ class GwDocker(QDockWidget):
         if (event.type() == QtCore.QEvent.Type.WindowActivate or event.type() == QtCore.QEvent.Type.Show) \
                 and self.isActiveWindow():
             if hasattr(self, "subtag") and self.subtag is not None:
-                tag = f'{self.widget().objectName()}_{self.subtag}'
+                tag = f"{self.widget().objectName()}_{self.subtag}"
             else:
                 tag = str(self.widget().objectName())
-            lib_vars.session_vars['last_focus'] = tag
+            lib_vars.session_vars["last_focus"] = tag
         return super().event(event)

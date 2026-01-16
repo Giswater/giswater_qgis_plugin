@@ -32,19 +32,19 @@ gw_dev_mode = False
 iface = None                            # Instance of class QGisInterface. Provides the hook to manipulate QGIS application at runtime
 canvas = None                           # Instance of class QgsMapCanvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
 list_configs = [                        # List of configuration files
-    'init',
-    'session',
-    'dev',
-    'giswater',
-    'user_params']
+    "init",
+    "session",
+    "dev",
+    "giswater",
+    "user_params"]
 project_loaded = False                  # True when selected project has been loaded
 configs = {}                            # Dictionary of configuration files. Value is an array of 2 columns:
                                         # [0]-> Filepath. [1]-> Instance of class ConfigParser
-configs['init'] = [None, None]          # User configuration file: init.config (located in user config folder)
-configs['session'] = [None, None]       # Session configuration file: session.config (located in user config folder)
-configs['dev'] = [None, None]           # Developer configuration file: dev.config (located in plugin config folder)
-configs['giswater'] = [None, None]      # Plugin configuration file: giswater.config (located in plugin config folder)
-configs['user_params'] = [None, None]   # Settings configuration file: user_params.config (plugin config folder)
+configs["init"] = [None, None]          # User configuration file: init.config (located in user config folder)
+configs["session"] = [None, None]       # Session configuration file: session.config (located in user config folder)
+configs["dev"] = [None, None]           # Developer configuration file: dev.config (located in plugin config folder)
+configs["giswater"] = [None, None]      # Plugin configuration file: giswater.config (located in plugin config folder)
+configs["user_params"] = [None, None]   # Settings configuration file: user_params.config (plugin config folder)
 project_type = None                     # Project type get from table "sys_version"
 signal_manager = None                   # Instance of class GwSignalManager. Found in "/core/utils/signal_manager.py"
 giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
@@ -52,10 +52,10 @@ exec_procedure_max_retries = None       # Maximum number of execution retries of
 load_project_menu = None
 load_project = None                     # Instance of class GwLoadProject. Contains all toolbar buttons and project configuration
 psignals = {                            # A dictionary of all the psector status information
-    'widgets': [],
-    'psector_active': False,
-    'psector_id': None,
-    'last_styles': {},
+    "widgets": [],
+    "psector_active": False,
+    "psector_id": None,
+    "last_styles": {},
 }
 # endregion
 

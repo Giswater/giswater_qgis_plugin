@@ -36,11 +36,11 @@ class GwMassiveComposer:
         self.populate_cmb_composers(dlg_comp.cmb_composers)
 
         # Load user values
-        last_path = tools_gw.get_config_parser('composer_pages', 'folder_path', 'user', 'session')
+        last_path = tools_gw.get_config_parser("composer_pages", "folder_path", "user", "session")
         tools_qt.set_widget_text(dlg_comp, dlg_comp.txt_path, last_path)
-        last_prefix = tools_gw.get_config_parser('composer_pages', 'prefix', 'user', 'session')
+        last_prefix = tools_gw.get_config_parser("composer_pages", "prefix", "user", "session")
         tools_qt.set_widget_text(dlg_comp, dlg_comp.txt_prefix, last_prefix)
-        single = tools_os.set_boolean(tools_gw.get_config_parser('composer_pages', 'single', 'user', 'session'))
+        single = tools_os.set_boolean(tools_gw.get_config_parser("composer_pages", "single", "user", "session"))
         tools_qt.set_checked(dlg_comp, dlg_comp.chk_single, single)
 
         # Set signals
@@ -52,18 +52,18 @@ class GwMassiveComposer:
 
         self.dlg_comp = dlg_comp
 
-        tools_gw.open_dialog(dlg_comp, dlg_name='comp_x_pages')
+        tools_gw.open_dialog(dlg_comp, dlg_name="comp_x_pages")
 
     def save_user_values(self, dialog):
         """Save last user values"""
         folder_path = tools_qt.get_text(dialog, dialog.txt_path)
-        tools_gw.set_config_parser('composer_pages', 'folder_path', f"{folder_path}")
+        tools_gw.set_config_parser("composer_pages", "folder_path", f"{folder_path}")
         last_composer = tools_qt.get_combo_value(dialog, dialog.cmb_composers, 0)
-        tools_gw.set_config_parser('composer_pages', 'last_composer', f"{last_composer}")
+        tools_gw.set_config_parser("composer_pages", "last_composer", f"{last_composer}")
         prefix = tools_qt.get_text(dialog, dialog.txt_prefix, False, False)
-        tools_gw.set_config_parser('composer_pages', 'prefix', f"{prefix}")
+        tools_gw.set_config_parser("composer_pages", "prefix", f"{prefix}")
         single = tools_qt.is_checked(dialog, dialog.chk_single)
-        tools_gw.set_config_parser('composer_pages', 'single', f"{single}")
+        tools_gw.set_config_parser("composer_pages", "single", f"{single}")
 
     def get_folder_dialog(self, dialog, widget):
         """Get folder dialog"""
@@ -85,8 +85,8 @@ class GwMassiveComposer:
             records.append(elem)
             index = index + 1
         tools_qt.fill_combo_values(combo, records, 1, add_empty=True)
-        last_composer = tools_gw.get_config_parser('composer_pages', 'last_composer', 'user', 'session')
-        tools_qt.set_combo_value(combo, f'{last_composer}', 0, add_new=False)
+        last_composer = tools_gw.get_config_parser("composer_pages", "last_composer", "user", "session")
+        tools_qt.set_combo_value(combo, f"{last_composer}", 0, add_new=False)
 
     def generate_pdfs(self, dialog):
         folder_path = self.manage_folder_path(dialog)
@@ -95,7 +95,7 @@ class GwMassiveComposer:
     def manage_folder_path(self, dialog):
 
         folder_path = tools_qt.get_text(dialog, dialog.txt_path)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+        if folder_path is None or folder_path == "null" or not os.path.exists(folder_path):
             self.get_folder_dialog(dialog, dialog.txt_path)
             folder_path = tools_qt.get_text(dialog, dialog.txt_path)
 
@@ -125,7 +125,7 @@ class GwMassiveComposer:
         form = '"currentTab":"tab_psector"'
         extras = '"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)
-        current_selectors = tools_gw.execute_procedure('gw_fct_getselectors', body)
+        current_selectors = tools_gw.execute_procedure("gw_fct_getselectors", body)
 
         # Remove all psectors from selectors and getting first time json with all psectors
         extras = '"selectorType":"selector_basic", "tabName":"tab_psector", "checkAll":"False", "disableParent":"False", "addSchema":"NULL", "useAtlas":true'
@@ -144,7 +144,7 @@ class GwMassiveComposer:
         atlas = layout.atlas()
 
         prefix = tools_qt.get_text(dialog, dialog.txt_prefix, False, False)
-        if prefix not in (None, ''):
+        if prefix not in (None, ""):
             prefix += " "
 
         is_single = tools_qt.is_checked(dialog, dialog.chk_single)
@@ -174,18 +174,18 @@ class GwMassiveComposer:
 
     def restore_user_selectors(self, current_selectors):
         """Restore user selectors"""
-        qgis_project_add_schema = tools_qgis.get_project_variable('gwAddSchema')
+        qgis_project_add_schema = tools_qgis.get_project_variable("gwAddSchema")
 
-        for form_tab in current_selectors['body']['form']['formTabs']:
-            if form_tab['tableName'] != "selector_psector":
+        for form_tab in current_selectors["body"]["form"]["formTabs"]:
+            if form_tab["tableName"] != "selector_psector":
                 continue
-            for field in form_tab['fields']:
-                _id = field['psector_id']
+            for field in form_tab["fields"]:
+                _id = field["psector_id"]
                 extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", '
                           f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
                           f'"addSchema":"{qgis_project_add_schema}"')
                 body = tools_gw.create_body(extras=extras)
-                tools_gw.execute_procedure('gw_fct_setselectors', body)
+                tools_gw.execute_procedure("gw_fct_setselectors", body)
 
     def _enable_cancel_btn(self, enable):
         if enable:
@@ -200,5 +200,5 @@ class GwMassiveComposer:
             self.dlg_comp.btn_accept.clicked.connect(partial(self.generate_pdfs, self.dlg_comp))
 
     def _set_remaining_time(self, time):
-        lbl_time = self.dlg_comp.findChild(QLabel, 'lbl_time')
+        lbl_time = self.dlg_comp.findChild(QLabel, "lbl_time")
         lbl_time.setText(time)

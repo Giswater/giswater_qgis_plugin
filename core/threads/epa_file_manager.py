@@ -52,14 +52,14 @@ class GwEpaFileManager(GwTask):
 
     def set_variables_from_go2epa(self):
         """Set variables from object Go2Epa"""
-        self.dlg_go2epa = getattr(self.go2epa, 'dlg_go2epa', None)
-        self.result_name = getattr(self.go2epa, 'result_name', None)
-        self.file_inp = getattr(self.go2epa, 'file_inp', None)
-        self.file_rpt = getattr(self.go2epa, 'file_rpt', None)
-        self.go2epa_export_inp = getattr(self.go2epa, 'export_inp', None)
-        self.go2epa_execute_epa = getattr(self.go2epa, 'exec_epa', None)
-        self.go2epa_import_result = getattr(self.go2epa, 'import_result', None)
-        self.export_subcatch = getattr(self.go2epa, 'export_subcatch', True)
+        self.dlg_go2epa = getattr(self.go2epa, "dlg_go2epa", None)
+        self.result_name = getattr(self.go2epa, "result_name", None)
+        self.file_inp = getattr(self.go2epa, "file_inp", None)
+        self.file_rpt = getattr(self.go2epa, "file_rpt", None)
+        self.go2epa_export_inp = getattr(self.go2epa, "export_inp", None)
+        self.go2epa_execute_epa = getattr(self.go2epa, "exec_epa", None)
+        self.go2epa_import_result = getattr(self.go2epa, "import_result", None)
+        self.export_subcatch = getattr(self.go2epa, "export_subcatch", True)
 
     def run(self):
 
@@ -82,7 +82,7 @@ class GwEpaFileManager(GwTask):
             tools_log.log_info(msg, msg_params=msg_params)
             status = self._exec_function_pg2epa()
             if not status:
-                self.function_name = 'gw_fct_pg2epa_main'
+                self.function_name = "gw_fct_pg2epa_main"
                 return False
 
         if self.go2epa_export_inp:
@@ -98,7 +98,7 @@ class GwEpaFileManager(GwTask):
         if status and self.go2epa_import_result:
             msg_params = ("_import_rpt",)
             tools_log.log_info(msg, msg_params=msg_params)
-            self.function_name = 'gw_fct_rpt2pg_main'
+            self.function_name = "gw_fct_rpt2pg_main"
             status = self._import_rpt()
 
         return status
@@ -135,7 +135,7 @@ class GwEpaFileManager(GwTask):
 
                 # Get EPA group from layer tree
                 root = project.layerTreeRoot()
-                epa_group = root.findGroup('EPA')
+                epa_group = root.findGroup("EPA")
 
                 # Make EPA group and all child layers visible if group exists
                 if epa_group:
@@ -145,26 +145,26 @@ class GwEpaFileManager(GwTask):
 
             msg = "Task 'Go2Epa' execute function '{0}' from '{1}'"
             if self.go2epa_export_inp and self.complet_result:
-                if self.complet_result.get('status') == "Accepted":
-                    if 'body' in self.complet_result:
-                        if 'data' in self.complet_result['body']:
+                if self.complet_result.get("status") == "Accepted":
+                    if "body" in self.complet_result:
+                        if "data" in self.complet_result["body"]:
                             msg_params = ("add_layer_temp", "tools_gw.py",)
                             tools_log.log_info(msg, msg_params=msg_params)
-                            tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
+                            tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result["body"]["data"],
                                                     None, True, True, 1, True, close=False,
                                                     call_set_tabs_enabled=False)
 
             if self.go2epa_import_result and self.rpt_result:
-                if self.rpt_result.get('status') == "Accepted":
-                    if 'body' in self.rpt_result:
-                        if 'data' in self.rpt_result['body']:
+                if self.rpt_result.get("status") == "Accepted":
+                    if "body" in self.rpt_result:
+                        if "data" in self.rpt_result["body"]:
                             msg_params = ("add_layer_temp", "tools_gw.py",)
                             tools_log.log_info(msg, msg_params=msg_params)
 
-                            tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
+                            tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result["body"]["data"],
                                                     None, True, True, 1, True, close=False,
                                                     call_set_tabs_enabled=False)
-                    self.message = self.rpt_result['message']['text']
+                    self.message = self.rpt_result["message"]["text"]
             sql = f"SELECT {self.function_name}("
             if self.body:
                 sql += f"{self.body}"
@@ -173,7 +173,7 @@ class GwEpaFileManager(GwTask):
             tools_log.log_info(msg)
             tools_gw.manage_json_response(self.complet_result, sql, None)
 
-            replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
+            replace = tools_gw.get_config_parser("btn_go2epa", "force_import_velocity_higher_50ms", "user", "init",
                                                  prefix=False)
             if tools_os.set_boolean(replace, default=False) and self.replaced_velocities:
                 msg = ("There were velocities >50 in the rpt file. You have activated the option to force the import "
@@ -192,10 +192,10 @@ class GwEpaFileManager(GwTask):
                 msg = "Function failed finished"
                 tools_log.log_warning(msg)
             if self.complet_result:
-                if self.complet_result.get('status') == "Failed":
+                if self.complet_result.get("status") == "Failed":
                     tools_gw.manage_json_exception(self.complet_result)
             if self.rpt_result:
-                if "Failed" in self.rpt_result.get('status'):
+                if "Failed" in self.rpt_result.get("status"):
                     tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
@@ -211,8 +211,8 @@ class GwEpaFileManager(GwTask):
             raise self.exception
 
         # If Database exception, show dialog after task has finished
-        if lib_vars.session_vars['last_error']:
-            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+        if lib_vars.session_vars["last_error"]:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars["last_error_msg"])
 
     def cancel(self):
         msg = "Task canceled - {0}"
@@ -242,7 +242,7 @@ class GwEpaFileManager(GwTask):
         self.setProgress(0)
 
         extras = f'"resultId":"{self.result_name}"'
-        if global_vars.project_type == 'ud':
+        if global_vars.project_type == "ud":
             extras += f', "dumpSubcatch":"{self.export_subcatch}"'
 
         # 7 steps
@@ -252,14 +252,14 @@ class GwEpaFileManager(GwTask):
             msg = "Task 'Go2Epa' execute procedure '{0}' step {1}"
             msg_params = ("gw_fct_pg2epa_main", step,)
             tools_log.log_info(msg, msg_params=msg_params)
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
+            json_result = tools_gw.execute_procedure("gw_fct_pg2epa_main", self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if step == 6:
                 main_json_result = json_result
             if self.isCanceled() or json_result is None:
                 return False
             self.step_completed.emit(json_result, "\n")
-            if json_result.get('status') == 'Failed':
+            if json_result.get("status") == "Failed":
                 tools_log.log_warning(json_result)
                 self.function_failed = True
                 self.step_completed.emit({"message": {"level": 1, "text": "EXECUTION FAILED! Check logs for more information"}}, "\n")
@@ -270,8 +270,8 @@ class GwEpaFileManager(GwTask):
         self.complet_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True
-        elif 'status' in json_result:
-            if json_result['status'] == 'Failed':
+        elif "status" in json_result:
+            if json_result["status"] == "Failed":
                 tools_log.log_warning(json_result)
                 self.function_failed = True
             else:
@@ -290,14 +290,14 @@ class GwEpaFileManager(GwTask):
         tools_log.log_info(msg)
 
         # Get values from complet_result['body']['file'] and insert into INP file
-        if 'file' not in self.complet_result['body']:
+        if "file" not in self.complet_result["body"]:
             return False
 
         msg = "Task 'Go2Epa' execute function '{0}'"
         msg_params = ("_fill_inp_file",)
         tools_log.log_info(msg, msg_params=msg_params)
-        self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
-        self.message = self.complet_result['message']['text']
+        self._fill_inp_file(self.file_inp, self.complet_result["body"]["file"])
+        self.message = self.complet_result["message"]["text"]
         self.common_msg += "Export INP finished. "
 
         return True
@@ -309,18 +309,18 @@ class GwEpaFileManager(GwTask):
         tools_log.log_info(msg, msg_params=msg_params)
 
         # Generate generic INP file
-        file_inp = open(folder_path, "w", errors='replace')
+        file_inp = open(folder_path, "w", errors="replace")
         read = True
         for row in all_rows:
             # Use regexp to check which targets to read (everyone except GULLY)
-            if bool(re.match(r'\[(.*?)\]', row['text'])) and \
-                    ('GULLY' in row['text'] or 'LINK' in row['text'] or
-                     'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+            if bool(re.match(r"\[(.*?)\]", row["text"])) and \
+                    ("GULLY" in row["text"] or "LINK" in row["text"] or
+                     "GRATE" in row["text"] or "LXSECTIONS" in row["text"]):
                 read = False
-            elif bool(re.match(r'\[(.*?)\]', row['text'])):
+            elif bool(re.match(r"\[(.*?)\]", row["text"])):
                 read = True
-            if row.get('text') is not None and read:
-                line = row['text'].rstrip() + "\n"
+            if row.get("text") is not None and read:
+                line = row["text"].rstrip() + "\n"
                 file_inp.write(line)
 
         self._close_file(file_inp)
@@ -333,33 +333,33 @@ class GwEpaFileManager(GwTask):
         tools_db.execute_sql(sql, log_sql=True)
 
         networkmode = self.network_mode
-        if global_vars.project_type == 'ud' and networkmode and networkmode == 2:
+        if global_vars.project_type == "ud" and networkmode and networkmode == 2:
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', '_inlet_info.dat')
-            aditional_file = open(aditional_path, "w", errors='replace')
+            aditional_path = folder_path.replace(".inp", "_inlet_info.dat")
+            aditional_file = open(aditional_path, "w", errors="replace")
             read = True
             save_file = False
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
-                if bool(re.match(r'\[(.*?)\]', row['text'])) and \
-                        ('GULLY' in row['text'] or 'LINK' in row['text'] or
-                         'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+                if bool(re.match(r"\[(.*?)\]", row["text"])) and \
+                        ("GULLY" in row["text"] or "LINK" in row["text"] or
+                         "GRATE" in row["text"] or "LXSECTIONS" in row["text"]):
 
                     read = True
-                    if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
-                       'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
+                    if "GULLY" in row["text"] or "LINK" in row["text"] or \
+                       "GRATE" in row["text"] or "LXSECTIONS" in row["text"]:
                         save_file = True
-                elif bool(re.match(r'\[(.*?)\]', row['text'])):
+                elif bool(re.match(r"\[(.*?)\]", row["text"])):
                     read = False
 
-                if row.get('text') is not None and read:
+                if row.get("text") is not None and read:
 
-                    line = row['text'].rstrip() + "\n"
+                    line = row["text"].rstrip() + "\n"
 
-                    if not bool(re.match(r';;-(.*?)', row['text'])) and not bool(re.match(r'\[(.*?)', row['text'])):
-                        line = re.sub(';;', '', line)
-                        line = re.sub(' +', ' ', line)
+                    if not bool(re.match(r";;-(.*?)", row["text"])) and not bool(re.match(r"\[(.*?)", row["text"])):
+                        line = re.sub(";;", "", line)
+                        line = re.sub(" +", " ", line)
                         aditional_file.write(line)
 
             self._close_file(aditional_file)
@@ -389,9 +389,9 @@ class GwEpaFileManager(GwTask):
 
         # Set file to execute
         opener = None
-        if global_vars.project_type in 'ws':
+        if global_vars.project_type in "ws":
             opener = f"{lib_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
-        elif global_vars.project_type in 'ud':
+        elif global_vars.project_type in "ud":
             opener = f"{lib_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
 
         if opener is None:
@@ -412,8 +412,8 @@ class GwEpaFileManager(GwTask):
         """Load EPA layers if they are not already loaded"""
         # Get EPA layers from database
         body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getaddlayervalues", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         # Get current loaded layers
@@ -422,10 +422,10 @@ class GwEpaFileManager(GwTask):
             layer_list.append(tools_qgis.get_layer_source_table_name(layer))
 
         # Load EPA layers that are not already loaded
-        for field in json_result['body']['data']['fields']:
-            if field['context'] is not None:
-                context = json.loads(field['context'])
-                levels = context.get(tools_qt.tr('levels')) or context.get('levels')
+        for field in json_result["body"]["data"]["fields"]:
+            if field["context"] is not None:
+                context = json.loads(field["context"])
+                levels = context.get(tools_qt.tr("levels")) or context.get("levels")
 
                 # Check if this is an EPA RESULTS layer
 
@@ -436,24 +436,24 @@ class GwEpaFileManager(GwTask):
                     return False
                 context = json.loads(context[0])
                 if len(levels) > 1 and levels[0] == context[0] and levels[1] == context[1]:
-                    tablename = field['tableName']
+                    tablename = field["tableName"]
 
                     # Check if layer is not already loaded
                     if tablename not in layer_list:
                         layer_name = tablename
-                        the_geom = field['geomField'] if field['geomField'] != "None" else None
-                        geom_field = field['tableId']
+                        the_geom = field["geomField"] if field["geomField"] != "None" else None
+                        geom_field = field["tableId"]
 
                         if geom_field:
                             geom_field = geom_field.replace(" ", "")
                             group = levels[0]
                             sub_group = levels[1]
-                            alias = field['layerName'] if field['layerName'] is not None else field['tableName']
+                            alias = field["layerName"] if field["layerName"] is not None else field["tableName"]
 
                             # Add layer to TOC
                             style_id = "-1"
-                            if lib_vars.project_vars['current_style'] is not None:
-                                style_id = lib_vars.project_vars['current_style']
+                            if lib_vars.project_vars["current_style"] is not None:
+                                style_id = lib_vars.project_vars["current_style"]
 
                             tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group,
                                                       style_id=style_id, alias=alias, force_create_group=True)
@@ -514,11 +514,11 @@ class GwEpaFileManager(GwTask):
 
         """
         # Read normalization flag: optionally coerce literal ">50" velocities to numeric "50"
-        replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
+        replace = tools_gw.get_config_parser("btn_go2epa", "force_import_velocity_higher_50ms", "user", "init", prefix=False)
         replace = tools_os.set_boolean(replace, default=False)
 
         # Open file and load all lines (we keep the file handle to close it later)
-        self.file_rpt = open(file_path, "r+", errors='replace')
+        self.file_rpt = open(file_path, "r+", errors="replace")
         full_file = self.file_rpt.readlines()
         progress = 0
 
@@ -528,8 +528,8 @@ class GwEpaFileManager(GwTask):
         rows = tools_db.get_rows(sql)
         sources = {}
         for row in rows:
-            json_elem = row[1].replace('{', '').replace('}', '')
-            item = json_elem.split(',')
+            json_elem = row[1].replace("{", "").replace("}", "")
+            item = json_elem.split(",")
             for i in item:
                 sources[i.strip()] = row[0].strip()
 
@@ -550,26 +550,26 @@ class GwEpaFileManager(GwTask):
 
             progress += 1
             # Skip comments/separators commonly used in EPANET/SWMM reports
-            if '**' in row or '--' in row:
+            if "**" in row or "--" in row:
                 continue
 
             # Normalize velocity literal if allowed by config; otherwise it will be treated as an error later
-            if replace and '>50' in row:
-                row = row.replace('>50', '50')
+            if replace and ">50" in row:
+                row = row.replace(">50", "50")
 
             row = row.rstrip()
-            dirty_list = row.split(' ')
+            dirty_list = row.split(" ")
 
             # Compact multiple spaces into a clean list of tokens
             for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '':
+                if dirty_list[x] == "":
                     dirty_list.pop(x)
 
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
                     # Split tokens that look like numbers glued with minus signs (e.g., "123-45...")
-                    if bool(re.search(r'[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
+                    if bool(re.search(r"[0-9][-]\d{1,2}[.]]*", str(dirty_list[x]))):
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -582,8 +582,8 @@ class GwEpaFileManager(GwTask):
                         sp_n.append(json_elem)
 
                     # Detect overlapped numeric columns (two dots in the same token), which indicates broken alignment
-                    elif bool(re.search(r'(\d\..*\.\d)', str(dirty_list[x]))):
-                        if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
+                    elif bool(re.search(r"(\d\..*\.\d)", str(dirty_list[x]))):
+                        if not any(item in dirty_list for item in ["Version", "VERSION", "Input", "INPUT"]):
                             msg = "Error near line {0} -> {1}"
                             msg_params = (line_number + 1, dirty_list,)
                             tools_log.log_info(msg, msg_params=msg_params)
@@ -598,7 +598,7 @@ class GwEpaFileManager(GwTask):
                             del full_file
                             return False
                     # Velocity reported as ">50" is invalid unless normalization is enabled above
-                    elif bool(re.search('>50', str(dirty_list[x]))):
+                    elif bool(re.search(">50", str(dirty_list[x]))):
                         msg = "Error near line {0} -> {1}"
                         msg_params = (line_number + 1, dirty_list,)
                         tools_log.log_info(msg, msg_params=msg_params)
@@ -619,9 +619,9 @@ class GwEpaFileManager(GwTask):
             # Try to resolve the `target` table from the first tokens of the line
             for k, v in sources.items():
                 try:
-                    if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
+                    if k in (f"{sp_n[0]} {sp_n[1]}", f"{sp_n[0]}"):
                         target = "'" + v + "'"
-                        _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
+                        _time = re.compile("^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")
                         if len(sp_n) > 3 and _time.search(sp_n[3]):
                             col40 = "'" + sp_n[3] + "'"
                 except IndexError:
@@ -638,10 +638,10 @@ class GwEpaFileManager(GwTask):
                         value = '"' + sp_n[x].strip().replace("\n", "") + '", '
                         value = value.replace("''", "null")
                     else:
-                        value = 'null, '
+                        value = "null, "
                     json_elem += value
 
-                json_elem = '{' + str(json_elem[:-2]) + '}, '
+                json_elem = "{" + str(json_elem[:-2]) + "}, "
                 json_rpt += json_elem
 
             # Update progress bar every ~1000 lines
@@ -650,7 +650,7 @@ class GwEpaFileManager(GwTask):
 
         # Manage JSON
         # Finalize the JSON array string (strip the trailing comma+space added during the loop)
-        json_rpt = '[' + str(json_rpt[:-2]) + ']'
+        json_rpt = "[" + str(json_rpt[:-2]) + "]"
         self.json_rpt = json_rpt
 
         self._close_file()
@@ -665,14 +665,14 @@ class GwEpaFileManager(GwTask):
             if step == 1 and self.json_rpt:
                 extras += f', "file": {self.json_rpt}'
             self.body = tools_gw.create_body(extras=extras)
-            self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body,
+            self.json_result = tools_gw.execute_procedure("gw_fct_rpt2pg_main", self.body,
                                                           aux_conn=self.aux_conn, is_thread=True)
             self.rpt_result = self.json_result
             if self.json_result is None or not self.json_result:
                 self.function_failed = True
                 return False
 
-            if self.json_result.get('status') == 'Failed':
+            if self.json_result.get("status") == "Failed":
                 tools_log.log_warning(self.json_result)
                 self.function_failed = True
                 return False

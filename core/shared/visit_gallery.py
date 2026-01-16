@@ -105,9 +105,9 @@ class GwVisitGallery:
                 self.list_widget.append(widget_extended)
                 self.list_labels.append(widget)
 
-        txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
+        txt_visit_id = self.dlg_gallery.findChild(QLineEdit, "visit_id")
         txt_visit_id.setText(str(visit_id))
-        txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
+        txt_event_id = self.dlg_gallery.findChild(QLineEdit, "event_id")
         txt_event_id.setText(str(event_id))
 
         self.start_indx = 0
@@ -125,7 +125,7 @@ class GwVisitGallery:
             self.btn_next.setDisabled(True)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery')
+        tools_gw.open_dialog(self.dlg_gallery, dlg_name="visit_gallery")
 
     # region private functions
 
@@ -248,7 +248,7 @@ class GwVisitGallery:
         self.btn_slideNext.clicked.connect(self._slide_next)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom')
+        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name="visit_gallery_zoom")
 
         # Controling start index
         if handeler_index != i:

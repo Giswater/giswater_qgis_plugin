@@ -37,7 +37,7 @@ class GwMincutTools:
 
     def set_dialog(self, dialog):
         self.dlg_mincut_man = dialog
-        function_name = 'gw_fct_getmincut_manager'
+        function_name = "gw_fct_getmincut_manager"
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
 
@@ -45,14 +45,14 @@ class GwMincutTools:
             return False, None
 
         # Manage status failed
-        if json_result['status'] == 'Failed' or ('results' in json_result and json_result['results'] <= 0):
+        if json_result["status"] == "Failed" or ("results" in json_result and json_result["results"] <= 0):
             level = 1
-            if 'level' in json_result['message']:
-                level = int(json_result['message']['level'])
+            if "level" in json_result["message"]:
+                level = int(json_result["message"]["level"])
             msg = "Execution of {0} failed."
             msg_params = (function_name,)
-            if 'text' in json_result['message']:
-                msg = json_result['message']['text']
+            if "text" in json_result["message"]:
+                msg = json_result["message"]["text"]
                 msg_params = None
             level = Qgis.MessageLevel(level)
             tools_qgis.show_message(msg, level, msg_params=msg_params)
@@ -65,23 +65,23 @@ class GwMincutTools:
         self.load_tableviews(self.complet_result)
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tab_none_tbl_mincut_edit")
-        tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
+        tools_gw.open_dialog(self.dlg_mincut_man, dlg_name="mincut_manager")
 
         # Populate custom context menu
         self.tbl_mincut_edit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tbl_mincut_edit.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, self.tbl_mincut_edit, self.dlg_mincut_man))
 
-    def load_tableviews(self, complet_result, filter_fields=''):
+    def load_tableviews(self, complet_result, filter_fields=""):
         list_tables = self.dlg_mincut_man.findChildren(QTableView)
         complet_list = []
         for table in list_tables:
             widgetname = table.objectName()
-            columnname = table.property('columnname')
+            columnname = table.property("columnname")
             if columnname is None:
                 msg = f"widget {widgetname} in tab {self.dlg_mincut_man.objectName()} has not columnname and cant be configured"
                 tools_qgis.show_info(msg, 3)
                 continue
-            linkedobject = table.property('linkedobject')
+            linkedobject = table.property("linkedobject")
             complet_list, widget_list = tools_gw.fill_tbl(complet_result, self.dlg_mincut_man, columnname, linkedobject,
                                                       filter_fields)
             if complet_list is False:
@@ -95,46 +95,46 @@ class GwMincutTools:
         layout_list = []
         widget_offset = 0
         prev_layout = ""
-        for field in complet_result['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
+        for field in complet_result["body"]["data"]["fields"]:
+            if "hidden" in field and field["hidden"]:
                 continue
-            self.tablename = 'mincut_manager'
+            self.tablename = "mincut_manager"
             label, widget = tools_gw.set_widgets(self.dlg_mincut_man, complet_result, field, self.tablename, self)
             if widget is None:
                 continue
 
-            layout = self.dlg_mincut_man.findChild(QGridLayout, field['layoutname'])
+            layout = self.dlg_mincut_man.findChild(QGridLayout, field["layoutname"])
             if layout is not None:
                 if layout.objectName() != prev_layout:
                     widget_offset = 0
                     prev_layout = layout.objectName()
 
-                if field['layoutorder'] is None:
+                if field["layoutorder"] is None:
                     msg = "The field layoutorder is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
                     tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_mincut_man)
                     continue
 
                 # Manage widget and label positions
-                label_pos = field['widgetcontrols']['labelPosition'] if (
-                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
-                             'widgetcontrols']) else None
-                widget_pos = field['layoutorder'] + widget_offset
+                label_pos = field["widgetcontrols"]["labelPosition"] if (
+                            "widgetcontrols" in field and field["widgetcontrols"] and "labelPosition" in field[
+                             "widgetcontrols"]) else None
+                widget_pos = field["layoutorder"] + widget_offset
 
                 # The data tab is somewhat special (it has 2 columns)
-                if 'lyt_data' in layout.objectName():
+                if "lyt_data" in layout.objectName():
                     tools_gw.add_widget(self.dlg_mincut_man, field, label, widget)
                 # If the widget has a label
                 elif label:
                     # If it has a labelPosition configured
                     if label_pos is not None:
-                        if label_pos == 'top':
+                        if label_pos == "top":
                             layout.addWidget(label, 0, widget_pos)
                             if type(widget) is QSpacerItem:
                                 layout.addItem(widget, 1, widget_pos)
                             else:
                                 layout.addWidget(widget, 1, widget_pos)
-                        elif label_pos == 'left':
+                        elif label_pos == "left":
                             layout.addWidget(label, 0, widget_pos)
                             if type(widget) is QSpacerItem:
                                 layout.addItem(widget, 0, widget_pos + 1)
@@ -157,12 +157,12 @@ class GwMincutTools:
                 else:
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 0, widget_pos)
-                    elif field['layoutname'] == 'lyt_mincut_mng_1':
+                    elif field["layoutname"] == "lyt_mincut_mng_1":
                         layout.addWidget(widget, 1, widget_pos)
                     else:
                         layout.addWidget(widget, 0, widget_pos)
 
-            elif field['layoutname'] != 'lyt_none':
+            elif field["layoutname"] != "lyt_none":
                 msg = "The field layoutname is not configured for"
                 param = f"formname:{self.tablename}, columnname:{field['columnname']}"
                 tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_mincut_man)
@@ -176,14 +176,14 @@ def close_mincut_manager(**kwargs):
     """Function called in class tools_gw.add_button(...) -->
     widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
     """
-    dialog = kwargs['dialog']
+    dialog = kwargs["dialog"]
     tools_gw.close_dialog(dialog)
 
 
 def mincut_selector(**kwargs):
     """Manage mincut selector"""
-    dialog = kwargs['dialog']
-    class_obj = kwargs['class']
+    dialog = kwargs["dialog"]
+    class_obj = kwargs["class"]
     qtable = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     field_id = "id"
     model = qtable.model()
@@ -205,24 +205,24 @@ def mincut_selector(**kwargs):
 
     dlg_selector = GwSelectorUi(class_obj)
     tools_gw.load_settings(dlg_selector)
-    current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
+    current_tab = tools_gw.get_config_parser("dialogs_tab", "dlg_selector_mincut", "user", "session")
     dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
     dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
     dlg_selector.rejected.connect(
-        partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'mincut'))
+        partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, "mincut"))
 
     min_selector.get_selector(dlg_selector, selector_values, current_tab=current_tab, aux_params=aux_params)
 
-    tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+    tools_gw.open_dialog(dlg_selector, dlg_name="selector")
 
 
 def delete_mincut(**kwargs):
     """Delete selected elements of the table (by id)"""
-    dialog = kwargs['dialog']
+    dialog = kwargs["dialog"]
     widget = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     table_name = "om_mincut"
     column_id = "id"
-    complet_result = kwargs['complet_result']
+    complet_result = kwargs["complet_result"]
     # Get selected rows
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
@@ -242,11 +242,11 @@ def delete_mincut(**kwargs):
     title = "Delete mincut"
 
     # Check for mincuts not allowed to be deleted
-    row = tools_gw.get_config_value('om_mincut_settings', table='config_param_system')
+    row = tools_gw.get_config_value("om_mincut_settings", table="config_param_system")
     om_mincut_settings = row[0] if row else None
     if om_mincut_settings:
         om_mincut_settings = json.loads(om_mincut_settings)
-    if (om_mincut_settings is None or not om_mincut_settings.get('deleteUsers') or om_mincut_settings['deleteUsers'] == 'creator'):
+    if (om_mincut_settings is None or not om_mincut_settings.get("deleteUsers") or om_mincut_settings["deleteUsers"] == "creator"):
         sql = (f"SELECT * FROM {table_name}"
             f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
         rows = tools_db.execute_returning(sql, show_exception=False)
@@ -262,29 +262,29 @@ def delete_mincut(**kwargs):
                f" WHERE {column_id} IN ({list_id})")
         tools_db.execute_sql(sql)
         _reload_table(dialog, complet_result)
-        layer = tools_qgis.get_layer_by_tablename('v_om_mincut_node')
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_node")
         if layer is not None:
             layer.triggerRepaint()
-        layer = tools_qgis.get_layer_by_tablename('v_om_mincut_connec')
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_connec")
         if layer is not None:
             layer.triggerRepaint()
-        layer = tools_qgis.get_layer_by_tablename('v_om_mincut_arc')
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_arc")
         if layer is not None:
             layer.triggerRepaint()
-        layer = tools_qgis.get_layer_by_tablename('v_om_mincut_valve')
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
         if layer is not None:
             layer.triggerRepaint()
-        layer = tools_qgis.get_layer_by_tablename('v_om_mincut')
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut")
         if layer is not None:
             layer.triggerRepaint()
-        layer = tools_qgis.get_layer_by_tablename('v_om_mincut_hydrometer')
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_hydrometer")
         if layer is not None:
             layer.triggerRepaint()
 
 
 def _reload_table(dialog, complet_result):
     """Get inserted element_id and add it to current feature"""
-    tab_name = 'main'
+    tab_name = "main"
     list_tables = dialog.findChildren(QTableView)
 
     widget_list = []
@@ -293,14 +293,14 @@ def _reload_table(dialog, complet_result):
     widget_list.extend(dialog.findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
     for table in list_tables:
         widgetname = table.objectName()
-        columnname = table.property('columnname')
+        columnname = table.property("columnname")
         if columnname is None:
             msg = f"widget {widgetname} has not columnname and cant be configured"
             tools_qgis.show_info(msg, 1)
             continue
         # Get value from filter widgets
         filter_fields = tools_backend_calls.get_filter_qtableview_mincut(dialog, widget_list, complet_result)
-        linkedobject = table.property('linkedobject')
+        linkedobject = table.property("linkedobject")
         complet_list, widget_list = tools_backend_calls.fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:
             return False
@@ -308,7 +308,7 @@ def _reload_table(dialog, complet_result):
 
 def cancel_mincut(**kwargs):
 
-    dialog = kwargs['dialog']
+    dialog = kwargs["dialog"]
     table = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     selected_list = table.selectionModel().selectedRows()
     if len(selected_list) == 0:
@@ -331,11 +331,11 @@ def cancel_mincut(**kwargs):
         sql = (f"UPDATE om_mincut SET mincut_state = 3 "
                f" WHERE id::text IN ({list_id})")
         tools_db.execute_sql(sql, log_sql=False)
-        _reload_table(dialog, kwargs['complet_result'])
+        _reload_table(dialog, kwargs["complet_result"])
 
 
 def check_filter_days(**kwargs):
-    dialog = kwargs['dialog']
+    dialog = kwargs["dialog"]
     spinbox = dialog.findChild(QSpinBox, "tab_none_spm_next_days")
     if spinbox.isEnabled():
         spinbox.setEnabled(False)
@@ -346,9 +346,9 @@ def check_filter_days(**kwargs):
 
 
 def filter_by_days(dialog, widget):
-    widgetcontrols = widget.property('widgetcontrols')
-    filter_sign = widgetcontrols.get('filterSign')
-    filter_type = widgetcontrols.get('filterType')
+    widgetcontrols = widget.property("widgetcontrols")
+    filter_sign = widgetcontrols.get("filterSign")
+    filter_type = widgetcontrols.get("filterType")
 
     spinbox = dialog.findChild(QSpinBox, "tab_none_spm_next_days")
 
@@ -363,9 +363,9 @@ def filter_by_days(dialog, widget):
         date_from = date_to
         date_to = aux
 
-    format_low = '%Y-%m-%d 00:00:00.000'
-    format_high = '%Y-%m-%d 23:59:59.999'
-    interval = f"{date_from.strftime(format_low)}\'::timestamp AND \'{date_to.strftime(format_high)}"
+    format_low = "%Y-%m-%d 00:00:00.000"
+    format_high = "%Y-%m-%d 23:59:59.999"
+    interval = f"{date_from.strftime(format_low)}'::timestamp AND '{date_to.strftime(format_high)}"
 
     filter_fields = f'"forecast_start":{{"value":"{interval}","filterSign":"{filter_sign}","filterType":"{filter_type}"}}, '
     return filter_fields
@@ -373,13 +373,13 @@ def filter_by_days(dialog, widget):
 
 def open_mincut(**kwargs):
     """Open mincut form with selected record of the table"""
-    dialog = kwargs['dialog']
-    class_obj = kwargs['class']
-    mincut = kwargs['class'].mincut
-    table = kwargs['qtable']
+    dialog = kwargs["dialog"]
+    class_obj = kwargs["class"]
+    mincut = kwargs["class"].mincut
+    table = kwargs["qtable"]
 
     dlg_mincut = GwMincutUi(class_obj)
-    tools_gw.load_missing_layers('v_om_mincut%', "OM", "Mincut")
+    tools_gw.load_missing_layers("v_om_mincut%", "OM", "Mincut")
     selected_list = table.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
@@ -394,7 +394,7 @@ def open_mincut(**kwargs):
     result_mincut_id = selected_list[0].sibling(row, column).data()
 
     # Close this dialog and open selected mincut
-    keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'mincut_manager_keep_open', "user", "init",
+    keep_open_form = tools_gw.get_config_parser("dialogs_actions", "mincut_manager_keep_open", "user", "init",
                                                 prefix=True)
     if tools_os.set_boolean(keep_open_form, False) is not True:
         tools_gw.close_dialog(dialog)
@@ -402,7 +402,7 @@ def open_mincut(**kwargs):
     mincut.set_dialog(dlg_mincut)
     mincut.init_mincut_form()
     mincut.load_mincut(result_mincut_id)
-    tools_qt._translate_form('mincut', dlg_mincut)
+    tools_qt._translate_form("mincut", dlg_mincut)
     mincut.manage_docker()
     mincut.set_visible_mincut_layers(True)
 
@@ -410,8 +410,8 @@ def open_mincut(**kwargs):
 def filter_by_dates(dialog, widget):
 
     widgetname = widget.objectName()
-    widgetcontrols = widget.property('widgetcontrols')
-    filter_sign = widgetcontrols.get('filterSign')
+    widgetcontrols = widget.property("widgetcontrols")
+    filter_sign = widgetcontrols.get("filterSign")
     state_combo = dialog.findChild(QComboBox, "tab_none_state")
     date_from = dialog.findChild(QgsDateTimeEdit, "tab_none_date_from")
     date_to = dialog.findChild(QgsDateTimeEdit, "tab_none_date_to")
@@ -428,32 +428,32 @@ def filter_by_dates(dialog, widget):
     # Get selected dates
     visit_start = date_from.date()
     visit_end = date_to.date()
-    date_from = visit_start.toString('yyyyMMdd 00:00:00')
-    date_to = visit_end.toString('yyyyMMdd 23:59:59')
+    date_from = visit_start.toString("yyyyMMdd 00:00:00")
+    date_to = visit_end.toString("yyyyMMdd 23:59:59")
     if date_from > date_to:
         message = "Selected date interval is not valid"
         tools_qgis.show_warning(message, dialog=dialog)
-        return ''
+        return ""
 
     # Create interval dates
-    value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
+    value = tools_qt.get_calendar_date(dialog, widget, date_format="yyyy-MM-dd")
     if int(state_id) in (0, 1, 2, 3):
-        if options[int(state_id)]['column_to'] is not None:
-            if widgetname == 'tab_none_date_from':
+        if options[int(state_id)]["column_to"] is not None:
+            if widgetname == "tab_none_date_from":
                 filter_fields = f'"{options[int(state_id)]["column_from"]}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
             else:
                 filter_fields = f'"{options[int(state_id)]["column_to"]}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
         else:
             filter_fields = f'"{options[int(state_id)]["column_from"]}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
     else:
-        filter_fields = ''
+        filter_fields = ""
 
     return filter_fields
 
 
 def combo_tweaks(**kwargs):
-    state_combo = kwargs['widget']
-    dialog = kwargs['dialog']
+    state_combo = kwargs["widget"]
+    dialog = kwargs["dialog"]
     date_from = dialog.findChild(QgsDateTimeEdit, "tab_none_date_from")
     date_to = dialog.findChild(QgsDateTimeEdit, "tab_none_date_to")
     lbl_date_from = dialog.findChild(QLabel, "lbl_tab_none_date_from")
@@ -471,7 +471,7 @@ def combo_tweaks(**kwargs):
     }
 
     state_id = tools_qt.get_combo_value(dialog, state_combo, 0)
-    if state_id == '':
+    if state_id == "":
         date_from.setEnabled(False)
         date_to.setEnabled(False)
         msg = "Date from:"
@@ -483,8 +483,8 @@ def combo_tweaks(**kwargs):
         date_to.setEnabled(True)
 
         if int(state_id) in (0, 1, 2, 3):
-            tools_qt.set_widget_text(dialog, lbl_date_from, options[int(state_id)]['widget_text_from'])
-            tools_qt.set_widget_text(dialog, lbl_date_to, options[int(state_id)]['widget_text_to'])
+            tools_qt.set_widget_text(dialog, lbl_date_from, options[int(state_id)]["widget_text_from"])
+            tools_qt.set_widget_text(dialog, lbl_date_to, options[int(state_id)]["widget_text_to"])
         else:
             msg = "Date from:"
             tools_qt.set_widget_text(dialog, lbl_date_from, msg)

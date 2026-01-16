@@ -39,10 +39,10 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.feature_id = None
         self.actions = actions
         if not self.actions:
-            self.actions = [['ARC', tools_qt.tr('ARC')], ['NODE', tools_qt.tr('NODE')], ['CONNEC', tools_qt.tr('CONNEC')]]
+            self.actions = [["ARC", tools_qt.tr("ARC")], ["NODE", tools_qt.tr("NODE")], ["CONNEC", tools_qt.tr("CONNEC")]]
         self.list_tables = list_tables
         if not self.list_tables:
-            self.list_tables = ['ve_arc', 've_node', 've_connec', 've_gully']
+            self.list_tables = ["ve_arc", "ve_node", "ve_connec", "ve_gully"]
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -104,7 +104,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 've' in tablename:
+            if tablename and "ve" in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def canvasReleaseEvent(self, event):
@@ -125,8 +125,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        if global_vars.project_type.lower() == 'ud':
-            self.actions.append(['GULLY', tools_qt.tr('GULLY')])
+        if global_vars.project_type.lower() == "ud":
+            self.actions.append(["GULLY", tools_qt.tr("GULLY")])
 
         for action_id, action_name in self.actions:
             obj_action = QAction(f"{action_name}", ag)
@@ -149,10 +149,10 @@ class GwFeatureTypeChangeButton(GwMaptool):
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
         if features[0]:
-            self.customForm = GwInfo('data')
+            self.customForm = GwInfo("data")
             self.customForm.user_current_layer = self.current_layer
             feature_id = features[0][f"{self.feature_type}_id"]
-            complet_result, dialog = self.customForm.get_info_from_id(self.tablename, feature_id, 'data')
+            complet_result, dialog = self.customForm.get_info_from_id(self.tablename, feature_id, "data")
             if not complet_result:
                 return
 
@@ -162,11 +162,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
         """Open Feature Change Dialog dynamic"""
         feature = f'"tableName":"{self.tablename}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(feature=feature)
-        json_result = tools_gw.execute_procedure('gw_fct_getchangefeaturetype', body)
+        json_result = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
         self.dlg_change = GwFeatureTypeChangeUi(self)
         tools_gw.load_settings(self.dlg_change)
         self._manage_dlg_widgets(self.dlg_change, json_result)
-        tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
+        tools_gw.open_dialog(self.dlg_change, "featuretype_change")
 
     def _manage_dlg_widgets(self, dialog, complet_result):
         """Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment"""
@@ -176,15 +176,15 @@ class GwFeatureTypeChangeButton(GwMaptool):
         label_fixed_width = 100
 
         # Retrieve layout orientations from the JSON response if provided
-        for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
-            orientation = layout_info.get('lytOrientation')
+        for layout_name, layout_info in complet_result["body"]["form"]["layouts"].items():
+            orientation = layout_info.get("lytOrientation")
             if orientation:
                 layout_orientations[layout_name] = orientation
 
         # Loop through fields to add them to the appropriate layout
-        for field in complet_result['body']['data']['fields']:
+        for field in complet_result["body"]["data"]["fields"]:
             # Skip hidden fields based on conditions
-            if field.get('hidden'):
+            if field.get("hidden"):
                 continue
 
             # Create label and widget
@@ -197,19 +197,19 @@ class GwFeatureTypeChangeButton(GwMaptool):
                 label.setFixedWidth(label_fixed_width)
 
             # Find the layout for the current field based on layoutname
-            layout = dialog.findChild(QGridLayout, field['layoutname'])
+            layout = dialog.findChild(QGridLayout, field["layoutname"])
             if layout is None:
                 continue
 
             # Apply layout orientation if specified in JSON
             orientation = layout_orientations.get(layout.objectName(), "vertical")
-            layout.setProperty('lytOrientation', orientation)
+            layout.setProperty("lytOrientation", orientation)
 
             # Adjust alignment for the Catalog id label
-            if field['columnname'] == "featurecat_id":
+            if field["columnname"] == "featurecat_id":
                 # Add the label and combo box (Catalog ID) with the button
-                layout.addWidget(label, field['layoutorder'] - 1, 0)
-                layout.addWidget(widget, field['layoutorder'] - 1, 1)
+                layout.addWidget(label, field["layoutorder"] - 1, 0)
+                layout.addWidget(widget, field["layoutorder"] - 1, 1)
             else:
                 # Use add_widget_combined for other fields
                 old_widget_pos = tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
@@ -236,21 +236,21 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         layer = self.snapper_manager.get_snapped_layer(result)
         tablename = tools_qgis.get_layer_source_table_name(layer)
-        if tablename and 've' in tablename:
-            if tablename == 've_node':
-                self.feature_type = 'node'
-            elif tablename == 've_connec':
-                self.feature_type = 'connec'
-            elif tablename == 've_gully':
-                self.feature_type = 'gully'
-            elif tablename == 've_arc':
-                self.feature_type = 'arc'
+        if tablename and "ve" in tablename:
+            if tablename == "ve_node":
+                self.feature_type = "node"
+            elif tablename == "ve_connec":
+                self.feature_type = "connec"
+            elif tablename == "ve_gully":
+                self.feature_type = "gully"
+            elif tablename == "ve_arc":
+                self.feature_type = "arc"
 
         self.tablename = tablename
-        self.cat_table = f'cat_{self.feature_type}'
-        self.feature_edit_type = f'{self.feature_type}_type'
-        self.feature_type_cat = f'{self.feature_type}type_id'
-        self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
+        self.cat_table = f"cat_{self.feature_type}"
+        self.feature_edit_type = f"{self.feature_type}_type"
+        self.feature_type_cat = f"{self.feature_type}type_id"
+        self.feature_id = snapped_feat.attribute(f"{self.feature_type}_id")
         self._open_dialog()
     # endregion
 
@@ -270,27 +270,27 @@ def btn_accept_featuretype_change(**kwargs):
     feature_type_new = tools_qt.get_combo_value(dialog, "tab_none_feature_type_new", 1)
     featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
-    if featurecat_id.startswith('(') and featurecat_id.endswith(')'):
+    if featurecat_id.startswith("(") and featurecat_id.endswith(")"):
         msg = "Error replacing feature. Chose a valid catalog."
         tools_qgis.show_warning(msg)
         return
-    fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
+    fluid_type = tools_qt.get_combo_value(dialog, "tab_none_fluid_type", 1)
     if fluid_type is None:
-        fluid_type = 'null'
-    location_type = tools_qt.get_combo_value(dialog, 'tab_none_location_type', 1)
+        fluid_type = "null"
+    location_type = tools_qt.get_combo_value(dialog, "tab_none_location_type", 1)
     if location_type is None:
-        location_type = 'null'
-    category_type = tools_qt.get_combo_value(dialog, 'tab_none_category_type', 1)
+        location_type = "null"
+    category_type = tools_qt.get_combo_value(dialog, "tab_none_category_type", 1)
     if category_type is None:
-        category_type = 'null'
-    function_type = tools_qt.get_combo_value(dialog, 'tab_none_function_type', 1)
+        category_type = "null"
+    function_type = tools_qt.get_combo_value(dialog, "tab_none_function_type", 1)
     if function_type is None:
-        function_type = 'null'
+        function_type = "null"
 
     if feature_type_new != "null":
 
-        if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
-                project_type == 'ud'):
+        if (featurecat_id != "null" and featurecat_id is not None and project_type == "ws") or (
+                project_type == "ud"):
 
             # Get function input parameters
             feature = f'"type":"{class_obj.feature_type}"'
@@ -305,7 +305,7 @@ def btn_accept_featuretype_change(**kwargs):
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
-            complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body)
+            complet_result = tools_gw.execute_procedure("gw_fct_setchangefeaturetype", body)
             if not complet_result:
                 msg = "Error replacing feature"
                 tools_qgis.show_warning(msg)
@@ -314,12 +314,12 @@ def btn_accept_featuretype_change(**kwargs):
                 tools_gw.close_dialog(dialog)
                 return
 
-            if "Accepted" in complet_result['status']:
-                msg = complet_result['message']['text']
+            if "Accepted" in complet_result["status"]:
+                msg = complet_result["message"]["text"]
                 if msg is None:
-                    msg = tools_qt.tr('Replace feature done successfully')
+                    msg = tools_qt.tr("Replace feature done successfully")
                 tools_qgis.show_info(msg)
-            elif "Failed" in complet_result['status']:
+            elif "Failed" in complet_result["status"]:
                 return
 
             tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
@@ -357,13 +357,13 @@ def btn_catalog_featuretype_change(**kwargs):
 
     # Get feature_type
     child_type = tools_qt.get_text(dialog, "tab_none_feature_type_new")
-    if child_type == 'null':
+    if child_type == "null":
         msg = "New feature type is null. Please, select a valid value"
         tools_qt.show_info_box(msg, "Info")
         return
 
     class_obj.catalog = GwCatalog()
-    class_obj.catalog.open_catalog(dialog, 'tab_none_featurecat_id', class_obj.feature_type, child_type)
+    class_obj.catalog.open_catalog(dialog, "tab_none_featurecat_id", class_obj.feature_type, child_type)
 
 
 def cmb_new_featuretype_selection_changed(**kwargs):
@@ -384,29 +384,29 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     # Execute function to get additional data for fluid, location, category, and function types
     json_result = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
 
-    for field in json_result['body']['data']['fields']:
-        widgetcontrols = field.get('widgetcontrols')
+    for field in json_result["body"]["data"]["fields"]:
+        widgetcontrols = field.get("widgetcontrols")
         if widgetcontrols:
-            reload_fields = widgetcontrols.get('reloadFields', [])
+            reload_fields = widgetcontrols.get("reloadFields", [])
 
-        if field.get('hidden') or (
-            widgetcontrols and widgetcontrols.get('hiddenWhenNull') and field.get('value') in (None, '')
-        ) or field['columnname'] not in reload_fields:
+        if field.get("hidden") or (
+            widgetcontrols and widgetcontrols.get("hiddenWhenNull") and field.get("value") in (None, "")
+        ) or field["columnname"] not in reload_fields:
             continue
 
-        if field['widgettype'] == 'combo':
-            tools_gw.fill_combo(tools_qt.get_widget(dialog, field['widgetname']), field)
-        if field['widgettype'] == 'typeahead':
+        if field["widgettype"] == "combo":
+            tools_gw.fill_combo(tools_qt.get_widget(dialog, field["widgetname"]), field)
+        if field["widgettype"] == "typeahead":
             # Retrieve widget and selected value
-            widget = tools_qt.get_widget(dialog, field['widgetname'])
+            widget = tools_qt.get_widget(dialog, field["widgetname"])
 
             # Populate rows from comboIds and comboNames
-            rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
+            rows = list(zip(field.get("comboIds", []), field.get("comboNames", [])))
             tools_qt.set_completer_rows(widget, rows)
 
             for row in rows:
-                if row[0] == field['value']:
-                    tools_qt.set_widget_text(dialog, widget, field['value'])
+                if row[0] == field["value"]:
+                    tools_qt.set_widget_text(dialog, widget, field["value"])
                     continue
             tools_qt.set_widget_text(dialog, widget, f"({field['value']})")
 

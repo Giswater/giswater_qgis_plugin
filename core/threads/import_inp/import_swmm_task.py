@@ -178,7 +178,7 @@ class GwImportInpTask(GwTask):
             self._enable_triggers(True)
 
             execute_sql("select 1", commit=True)
-            report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
+            report_message = "\n".join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
             self.progress_changed.emit("REPORT", self.PROGRESS_END, report_message, True)
             self.progress_changed.emit("REPORT", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
             return True
@@ -286,15 +286,15 @@ class GwImportInpTask(GwTask):
     def _enable_triggers(self, enable: bool, plan_trigger: bool = False, geometry_trigger: bool = False) -> None:
         op = "ENABLE" if enable else "DISABLE"
         queries = [
-            f'ALTER TABLE arc {op} TRIGGER ALL;',
-            f'ALTER TABLE node {op} TRIGGER ALL;',
-            f'ALTER TABLE element {op} TRIGGER ALL;',
+            f"ALTER TABLE arc {op} TRIGGER ALL;",
+            f"ALTER TABLE node {op} TRIGGER ALL;",
+            f"ALTER TABLE element {op} TRIGGER ALL;",
         ]
         if plan_trigger:
-            queries.append('ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;')
-            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;')
+            queries.append("ALTER TABLE arc ENABLE TRIGGER gw_trg_plan_psector_after_arc;")
+            queries.append("ALTER TABLE node ENABLE TRIGGER gw_trg_plan_psector_after_node;")
         if geometry_trigger:
-            queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
+            queries.append("ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;")
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)
             if not result:
@@ -306,45 +306,45 @@ class GwImportInpTask(GwTask):
 
         extras = ""
         if self.manage_flwreg["pumps"]:
-            extras += f'''"pump": {{
+            extras += f""""pump": {{
                 "featureClass": "{self.catalogs['features']['pumps']}",
                 "catalog": "{self.catalogs['pumps']}",
                 "ids": {json.dumps(self.flwreg_ids["pumps"])}
-            }},'''
+            }},"""
         if self.manage_flwreg["orifices"]:
-            extras += f'''"orifice": {{
+            extras += f""""orifice": {{
                 "featureClass": "{self.catalogs['features']['orifices']}",
                 "catalog": "{self.catalogs['orifices']}",
                 "ids": {json.dumps(self.flwreg_ids["orifices"])}
-            }},'''
+            }},"""
         if self.manage_flwreg["weirs"]:
-            extras += f'''"weir": {{
+            extras += f""""weir": {{
                 "featureClass": "{self.catalogs['features']['weirs']}",
                 "catalog": "{self.catalogs['weirs']}",
                 "ids": {json.dumps(self.flwreg_ids["weirs"])}
-            }},'''
+            }},"""
         if self.manage_flwreg["outlets"]:
-            extras += f'''"outlet": {{
+            extras += f""""outlet": {{
                 "featureClass": "{self.catalogs['features']['outlets']}",
                 "catalog": "{self.catalogs['outlets']}",
                 "ids": {json.dumps(self.flwreg_ids["outlets"])}
-            }},'''
-        extras += f'''"state": {self.state},'''
+            }},"""
+        extras += f""""state": {self.state},"""
 
         if extras:
             extras = extras[:-1]
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_import_swmm_flwreg', body, commit=self.force_commit,
+            json_result = tools_gw.execute_procedure("gw_fct_import_swmm_flwreg", body, commit=self.force_commit,
                                                     is_thread=True)
-            if not json_result or json_result.get('status') != 'Accepted':
+            if not json_result or json_result.get("status") != "Accepted":
                 message = f"Error executing gw_fct_import_swmm_flwreg - {json_result.get('NOSQLERR')}"
                 raise ValueError(message)
             try:
-                if json_result['body']['data']['info']:
-                    info = json_result['body']['data']['info']
+                if json_result["body"]["data"]["info"]:
+                    info = json_result["body"]["data"]["info"]
                     if isinstance(info, list):
-                        logs = [x.get('message') for x in info]
-                        logs_str = '\n'.join(logs)
+                        logs = [x.get("message") for x in info]
+                        logs_str = "\n".join(logs)
                         return logs_str
             except KeyError:
                 pass
@@ -428,7 +428,7 @@ class GwImportInpTask(GwTask):
             WHERE parameter = 'admin_schema_info';
         """
 
-        title = title.replace('\n', '\\n')
+        title = title.replace("\n", "\\n")
         params = (f'''"{title}"''',)
 
         execute_sql(sql, params)
@@ -438,7 +438,7 @@ class GwImportInpTask(GwTask):
         """
         params = []
         for k, v in self.network[FILES].items():
-            actio_type, file_type = k.split(' ')[0], k.split(' ')[1]
+            actio_type, file_type = k.split(" ")[0], k.split(" ")[1]
             fname = v
             params.append((actio_type, file_type, fname))
 
@@ -567,7 +567,7 @@ class GwImportInpTask(GwTask):
                 """
                 params = (catalog, arctype_id, shape, geom1, geom2, geom3, geom4)
 
-                if shape == 'CUSTOM':
+                if shape == "CUSTOM":
                     sql = """
                         INSERT INTO cat_arc (id, arc_type, shape, geom1, curve_id)
                         VALUES (%s, %s, %s, %s, %s);
@@ -820,17 +820,17 @@ class GwImportInpTask(GwTask):
             template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
             params = []
             for k, v in lid.layer_dict.items():
-                if k == 'SURFACE':
+                if k == "SURFACE":
                     lid_values = (lid_name, k, v.StorHt, v.VegFrac, v.Rough, v.Slope, v.Xslope, None, None)
-                elif k == 'SOIL':
+                elif k == "SOIL":
                     lid_values = (lid_name, k, v.Thick, v.Por, v.FC, v.WP, v.Ksat, v.Kcoeff, v.Suct)
-                elif k == 'PAVEMENT':
+                elif k == "PAVEMENT":
                     lid_values = (lid_name, k, v.Thick, v.Vratio, v.FracImp, v.Perm, v.Vclog, v.regeneration_interval, v.regeneration_fraction)
-                elif k == 'STORAGE':
+                elif k == "STORAGE":
                     lid_values = (lid_name, k, v.Height, v.Vratio, v.Seepage, v.Vclog, v.Covrd, None, None)
-                elif k == 'DRAIN':
+                elif k == "DRAIN":
                     lid_values = (lid_name, k, v.Coeff, v.Expon, v.Offset, v.Delay, v.open_level, v.close_level, v.Qcurve)
-                elif k == 'DRAINMAT':
+                elif k == "DRAINMAT":
                     lid_values = (lid_name, k, v.Thick, v.Vratio, v.Rough, None, None, None, None)
                 else:
                     continue
@@ -839,7 +839,7 @@ class GwImportInpTask(GwTask):
             self.results["lids"] += 1
 
     def _save_junctions(self) -> None:
-        feature_class = self.catalogs['features']['junctions']
+        feature_class = self.catalogs["features"]["junctions"]
 
         node_sql = """ 
             INSERT INTO node (
@@ -949,7 +949,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_outfalls(self) -> None:
-        feature_class = self.catalogs['features']['outfalls']
+        feature_class = self.catalogs["features"]["outfalls"]
 
         node_sql = """ 
             INSERT INTO node (
@@ -1014,9 +1014,9 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[o_name] = {
                 "outfall_type": o.kind,
-                "stage": o.data if o.kind == 'FIXED' else None,
-                "curve_id": o.data if o.kind == 'TIDAL' else None,
-                "timser_id": o.data if o.kind == 'TIMESERIES' else None,
+                "stage": o.data if o.kind == "FIXED" else None,
+                "curve_id": o.data if o.kind == "TIDAL" else None,
+                "timser_id": o.data if o.kind == "TIMESERIES" else None,
                 "gate": to_yesno(o.has_flap_gate),
                 "route_to": nan_to_none(o.route_to)
             }
@@ -1060,7 +1060,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_dividers(self) -> None:
-        feature_class = self.catalogs['features']['dividers']
+        feature_class = self.catalogs["features"]["dividers"]
 
         node_sql = """ 
             INSERT INTO node (
@@ -1175,7 +1175,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_storage(self) -> None:
-        feature_class = self.catalogs['features']['storage']
+        feature_class = self.catalogs["features"]["storage"]
 
         node_sql = """ 
             INSERT INTO node (
@@ -1293,7 +1293,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pumps(self) -> None:
-        feature_class = self.catalogs['features']['pumps']
+        feature_class = self.catalogs["features"]["pumps"]
         arccat_id = self.catalogs["pumps"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["pumps"]:
@@ -1410,7 +1410,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_orifices(self) -> None:
-        feature_class = self.catalogs['features']['orifices']
+        feature_class = self.catalogs["features"]["orifices"]
         arccat_id = self.catalogs["orifices"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["orifices"]:
@@ -1536,7 +1536,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_weirs(self) -> None:
-        feature_class = self.catalogs['features']['weirs']
+        feature_class = self.catalogs["features"]["weirs"]
         arccat_id = self.catalogs["weirs"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["weirs"]:
@@ -1667,7 +1667,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_outlets(self) -> None:
-        feature_class = self.catalogs['features']['outlets']
+        feature_class = self.catalogs["features"]["outlets"]
         arccat_id = self.catalogs["outlets"]
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["outlets"]:
@@ -1740,7 +1740,7 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[o_name] = {
                 "outlet_type": o.curve_type,
-                "offsetval": o.offset if o.offset != '*' else self.network[JUNCTIONS][o.from_node].elevation,
+                "offsetval": o.offset if o.offset != "*" else self.network[JUNCTIONS][o.from_node].elevation,
                 "curve_id": o.curve_description if o.curve_type in ("TABULAR/DEPTH", "TABULAR/HEAD") else None,  # TODO: use enum
                 "cd1": o.curve_description[0] if o.curve_type in ("FUNCTIONAL/DEPTH", "FUNCTIONAL/HEAD") else None,
                 "cd2": o.curve_description[1] if o.curve_type in ("FUNCTIONAL/DEPTH", "FUNCTIONAL/HEAD") else None,
@@ -1788,7 +1788,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_conduits(self) -> None:
-        feature_class = self.catalogs['features']['conduits']
+        feature_class = self.catalogs["features"]["conduits"]
         # TODO: get rid of dma_id
         arc_sql = """ 
             INSERT INTO arc (
@@ -1989,7 +1989,7 @@ class GwImportInpTask(GwTask):
                 node_id = self.node_ids[i.node]
             except KeyError:
                 continue
-            timser_id = i.time_series if i.time_series not in ('""', '') else None
+            timser_id = i.time_series if i.time_series not in ('""', "") else None
             sfactor = i.scale_factor
             base = i.base_value
             pattern_id = nan_to_none(i.pattern)
@@ -2067,7 +2067,7 @@ class GwImportInpTask(GwTask):
             # [SUBCATCHMENTS]
             subc_id = subc_name
             outlet_id = self.node_ids[subc.outlet] if subc.outlet in self.node_ids else None  # TODO: show warning if outlet is * or not found in nodes
-            rg_id = self.default_raingage if subc.rain_gage == '*' else subc.rain_gage  # TODO: show warning if raingage is *
+            rg_id = self.default_raingage if subc.rain_gage == "*" else subc.rain_gage  # TODO: show warning if raingage is *
             area = subc.area
             imperv = subc.imperviousness
             width = subc.width

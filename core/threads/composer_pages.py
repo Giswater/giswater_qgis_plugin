@@ -47,7 +47,7 @@ class GwComposerPages(GwTask):
     def sort_list(self, json_):
 
         try:
-            return json_['atlas_id']
+            return json_["atlas_id"]
         except KeyError:
             return 0
 
@@ -57,14 +57,14 @@ class GwComposerPages(GwTask):
             psectors_list = []
             self.time_changed.emit("")
             self.change_btn_accept.emit(True)
-            for formtabs in self.result['body']['form']['formTabs']:
-                if formtabs['tableName'] != 'selector_psector':
+            for formtabs in self.result["body"]["form"]["formTabs"]:
+                if formtabs["tableName"] != "selector_psector":
                     continue
-                if self.atlas.count() != len(formtabs['fields']):
+                if self.atlas.count() != len(formtabs["fields"]):
                     msg = f"The number of pages in your composition does not match the number of psectors. ({self.atlas.count()} != {len(formtabs['fields'])})"
                     tools_qgis.show_warning(msg)
                     return False
-                psectors_list = formtabs['fields']
+                psectors_list = formtabs["fields"]
 
             # psectors_list.sort(key=self.sort_list)
             for i, psector in enumerate(psectors_list):
@@ -72,7 +72,7 @@ class GwComposerPages(GwTask):
                 if i < self.skip_psectors:
                     _index += 1
                     self._calculate_remaining_time(t0)
-                    action = self.designer_window.findChild(QAction, 'mActionAtlasNext')
+                    action = self.designer_window.findChild(QAction, "mActionAtlasNext")
                     action.trigger()
                     continue
                 # Get the number of maps in the page
@@ -90,7 +90,7 @@ class GwComposerPages(GwTask):
                         return False
 
                 name = f"\\tomerge {self.prefix}{_index}" if self.is_single else f"\\{self.prefix}{psector['name']}"
-                _id = psector['psector_id']
+                _id = psector["psector_id"]
                 extras = f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{_id}, "value":true, '
                 extras += '"isAlone":true, "addSchema":"NULL"'
                 body = tools_gw.create_body(extras=extras)
@@ -111,7 +111,7 @@ class GwComposerPages(GwTask):
 
                 self.export_to_pdf(self.layout, self.path + f"{name}.pdf")
                 self._calculate_remaining_time(t0)
-                action = self.designer_window.findChild(QAction, 'mActionAtlasNext')
+                action = self.designer_window.findChild(QAction, "mActionAtlasNext")
                 action.trigger()
                 self.map_refreshed = 0
                 self.refreshed = False
@@ -174,7 +174,7 @@ class GwComposerPages(GwTask):
         for (dirpath, dirnames, filenames) in os.walk(self.path):
             files.extend(filenames)
             break
-        files = [f for f in files if f'tomerge {self.prefix}' in f]
+        files = [f for f in files if f"tomerge {self.prefix}" in f]
 
         # Merge the file to one pdf
         for file in files:

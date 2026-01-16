@@ -41,7 +41,7 @@ class GwImportOsm:
         # Check project type
         sql = f"SELECT project_type FROM {self.schema_name}.sys_version"
         self.projetc_type = tools_db.get_row(sql)
-        if self.projetc_type[0] != 'WS':
+        if self.projetc_type[0] != "WS":
             msg = "Import OSM Streetaxis its only for WS projects"
             tools_qgis.show_warning(msg)
             return
@@ -56,7 +56,7 @@ class GwImportOsm:
         self.dlg_import_osm = GwAdminImportOsmUi(self)
         tools_gw.load_settings(self.dlg_import_osm)
 
-        self.dlg_import_osm.setWindowTitle(f'Import OSM Streetaxis - {self.schema_name}')
+        self.dlg_import_osm.setWindowTitle(f"Import OSM Streetaxis - {self.schema_name}")
 
         # Disable the "Log" tab initially
         tools_gw.disable_tab_log(self.dlg_import_osm)
@@ -66,7 +66,7 @@ class GwImportOsm:
         self.dlg_import_osm.btn_accept.clicked.connect(partial(self.run))
         self.dlg_import_osm.btn_close.clicked.connect(partial(self.close_dialog))
 
-        tools_gw.open_dialog(self.dlg_import_osm, dlg_name='admin_import_osm')
+        tools_gw.open_dialog(self.dlg_import_osm, dlg_name="admin_import_osm")
 
     def load_municipalities(self):
         """Get municipalities and add a checkbox widget for each of them"""
@@ -79,7 +79,7 @@ class GwImportOsm:
 
         for chk_muni in chk_municipalities:
             widget = QCheckBox()
-            widget.setObjectName(f'chk_{chk_muni[0]}')
+            widget.setObjectName(f"chk_{chk_muni[0]}")
             widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
             widget.setText(chk_muni[1])
             layout.addWidget(widget)
@@ -87,7 +87,7 @@ class GwImportOsm:
     def run(self):
         """Start import process"""
         # Enable the "Log" tab after pressing execute and disable execute button
-        qtabwidget = self.dlg_import_osm.findChild(QTabWidget, 'mainTab')
+        qtabwidget = self.dlg_import_osm.findChild(QTabWidget, "mainTab")
         if qtabwidget:
             tools_qt.enable_tab_by_tab_name(qtabwidget, "tab_log", True)  # Enable Log tab
 
@@ -155,40 +155,40 @@ class GwImportOsm:
                 edges = ox.graph_to_gdfs(graph, nodes=False)
 
                 # Add necessary columns
-                edges['muni_id'] = muni_id
-                edges['code'] = edges['osmid'].apply(lambda x: x[0] if isinstance(x, list) else x)
-                edges['name'] = edges['name'].fillna('Unnamed Road')
+                edges["muni_id"] = muni_id
+                edges["code"] = edges["osmid"].apply(lambda x: x[0] if isinstance(x, list) else x)
+                edges["name"] = edges["name"].fillna("Unnamed Road")
 
-                edges['maxspeed'] = edges['maxspeed'].apply(
+                edges["maxspeed"] = edges["maxspeed"].apply(
                     lambda x: int(x[0]) if isinstance(x, list) and x and str(x[0]).isdigit() else (
                         int(x) if pd.notna(x) and str(x).isdigit() else None))
-                edges['maxspeed'] = np.where(edges['maxspeed'].isnull(), None, edges['maxspeed'])
+                edges["maxspeed"] = np.where(edges["maxspeed"].isnull(), None, edges["maxspeed"])
 
-                edges['lanes'] = edges['lanes'].apply(
+                edges["lanes"] = edges["lanes"].apply(
                     lambda x: int(x[0]) if isinstance(x, list) and x and str(x[0]).isdigit() else (
                         int(x) if pd.notna(x) and str(x).isdigit() else 1))
-                edges['oneway'] = edges['oneway'].fillna(False).astype(bool)
+                edges["oneway"] = edges["oneway"].fillna(False).astype(bool)
 
                 # Convert NaN into None
-                if 'access' not in edges:
-                    edges['access'] = None
+                if "access" not in edges:
+                    edges["access"] = None
                 else:
-                    edges['access'] = edges['access'].replace(np.nan, None)
+                    edges["access"] = edges["access"].replace(np.nan, None)
 
                 # Set pedestrian attribute
-                edges['pedestrian'] = edges['highway'].apply(lambda h: h in ['footway', 'path', 'pedestrian'])
+                edges["pedestrian"] = edges["highway"].apply(lambda h: h in ["footway", "path", "pedestrian"])
 
                 # Handle road type and surface attributes
-                edges['road_type'] = edges['highway']
-                edges['surface'] = edges['surface'].fillna('unknown') if 'surface' in edges.columns else 'unknown'
+                edges["road_type"] = edges["highway"]
+                edges["surface"] = edges["surface"].fillna("unknown") if "surface" in edges.columns else "unknown"
 
                 # Transform geometries to EPSG:25831
                 transformer = Transformer.from_crs("EPSG:4326", "EPSG:25831", always_xy=True)
-                edges['the_geom'] = edges['geometry'].apply(lambda geom: transform(transformer.transform, geom).wkt)
+                edges["the_geom"] = edges["geometry"].apply(lambda geom: transform(transformer.transform, geom).wkt)
 
                 # Select required columns
-                edges = edges[['code', 'name', 'the_geom', 'maxspeed', 'lanes', 'oneway',
-                            'pedestrian', 'road_type', 'surface', 'muni_id', 'access']]
+                edges = edges[["code", "name", "the_geom", "maxspeed", "lanes", "oneway",
+                            "pedestrian", "road_type", "surface", "muni_id", "access"]]
 
                 # Append to the global DataFrame
                 all_edges = pd.concat([all_edges, edges], ignore_index=True)
@@ -197,15 +197,15 @@ class GwImportOsm:
                 msg = "Error processing muni_id {0}: {1}"
                 msg_params = (muni_id, e,)
                 tools_qgis.show_warning(msg, msg_params=msg_params, dialog=self.dlg_import_osm)
-                self.logs_list.append('{"id":8,"message":"ERROR: Processing muni_id ' + str(muni_id) + ': ' + e + '"}')
+                self.logs_list.append('{"id":8,"message":"ERROR: Processing muni_id ' + str(muni_id) + ": " + e + '"}')
                 continue
 
         # Debug: Show summary
         if len(all_edges) > 0:
             msg = "Total municipalities processed: {0}"
-            msg_params = (len(all_edges['muni_id'].unique()),)
+            msg_params = (len(all_edges["muni_id"].unique()),)
             tools_qgis.show_info(msg, msg_params=msg_params)
-            self.logs_list.append('{"id":9,"message":"Total municipalities processed: ' + str(len(all_edges['muni_id'].unique())) + '"}')
+            self.logs_list.append('{"id":9,"message":"Total municipalities processed: ' + str(len(all_edges["muni_id"].unique())) + '"}')
 
         # Insert data into the database
         errors = 0
@@ -216,8 +216,8 @@ class GwImportOsm:
                 cur.execute(f"""
                     INSERT INTO {self.schema_name}.{TABLE_NAME} (code, name, the_geom, maxspeed, lanes, oneway, pedestrian, road_type, surface, muni_id, access_info, expl_id)
                     VALUES (%s, %s, ST_GeomFromText(%s, 25831), %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (row['code'], row['name'], row['the_geom'], row['maxspeed'], row['lanes'], row['oneway'], row['pedestrian'],
-                    row['road_type'], row['surface'], row['muni_id'], row['access'], 0))
+                """, (row["code"], row["name"], row["the_geom"], row["maxspeed"], row["lanes"], row["oneway"], row["pedestrian"],
+                    row["road_type"], row["surface"], row["muni_id"], row["access"], 0))
 
                 tools_db.dao.commit()
                 success += 1
@@ -264,11 +264,11 @@ class GwImportOsm:
         msg_params = (success, errors,)
         tools_qgis.show_info(msg, msg_params=msg_params)
         # tools_qt.show_details(f"Data insertion completed: {success} successful, {errors} errors.")
-        self.logs_list.append('{"id":13,"message":"Data insertion completed: ' + str(success) + ' successful, ' + str(errors) + ' errors."}')
+        self.logs_list.append('{"id":13,"message":"Data insertion completed: ' + str(success) + " successful, " + str(errors) + ' errors."}')
 
         for msg in self.logs_list:
-            logs += msg + ', '
-        logs = logs[:-2] + ']}}'
+            logs += msg + ", "
+        logs = logs[:-2] + "]}}"
         tools_gw.fill_tab_log(self.dlg_import_osm, json.loads(logs), reset_text=True)
 
     def get_checked_municipalities(self):

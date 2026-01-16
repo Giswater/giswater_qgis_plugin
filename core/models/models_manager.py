@@ -4,13 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-__author__ = 'Luigi Pirelli'
-__date__ = 'January 2018'
-__copyright__ = '(C) 2018, Luigi Pirelli'
+__author__ = "Luigi Pirelli"
+__date__ = "January 2018"
+__copyright__ = "(C) 2018, Luigi Pirelli"
 
 # This will get replaced with a git SHA1 when you do a git archive
 
-__revision__ = '$Format:%H$'
+__revision__ = "$Format:%H$"
 
 from weakref import WeakKeyDictionary
 from ...libs import lib_vars, tools_db, tools_log, tools_qt, tools_qgis
@@ -97,8 +97,8 @@ class GwTable(object):
 
         # Set '' for void values
         for index, value in enumerate(values):
-            if value in (None, '', 'null', 'NULL'):
-                values[index] = ''
+            if value in (None, "", "null", "NULL"):
+                values[index] = ""
 
         values = [str(x) for x in values]
         current_pk = getattr(self, self.pk())
@@ -161,7 +161,7 @@ class GwTable(object):
         rows = tools_db.get_rows(sql, commit=commit)
         return rows
 
-    def delete(self, pks=[], all_records=False, where_clause='', commit=True):
+    def delete(self, pks=[], all_records=False, where_clause="", commit=True):
         """Delete all listed records with specified pks.
         If not ids are specified and not remove all => del current record.
         """
@@ -173,7 +173,7 @@ class GwTable(object):
                     pks = [getattr(self, self.pk())]
                 # add records to delete
                 pks = [str(x) for x in pks]
-                sql += " WHERE {0} IN ({1})".format(self.pk(), ','.join(pks))
+                sql += " WHERE {0} IN ({1})".format(self.pk(), ",".join(pks))
             else:
                 sql += " WHERE {}".format(where_clause)
 
@@ -191,14 +191,14 @@ class GwTable(object):
         sql += sql_fields[:-2] + ") VALUES ("
 
         # Manage value 'current_user'
-        if unique_value != 'current_user':
+        if unique_value != "current_user":
             unique_value = "$$" + unique_value + "$$"
 
         # Iterate over values
         sql_values = ""
         for value in values:
-            if value != 'current_user':
-                if value != '':
+            if value != "current_user":
+                if value != "":
                     sql_values += "$$" + value + "$$, "
                 else:
                     sql_values += "NULL, "
@@ -214,10 +214,10 @@ class GwTable(object):
         # Execute UPSERT
         tools_log.log_info(sql, stack_level_increase=1)
         result = tools_db.dao.execute_sql(sql, commit)
-        lib_vars.session_vars['last_error'] = tools_db.dao.last_error
+        lib_vars.session_vars["last_error"] = tools_db.dao.last_error
         if not result:
             # Check if any error has been raised
-            if lib_vars.session_vars['last_error']:
-                tools_qt.manage_exception_db(lib_vars.session_vars['last_error'], sql, schema_name=lib_vars.schema_name)
+            if lib_vars.session_vars["last_error"]:
+                tools_qt.manage_exception_db(lib_vars.session_vars["last_error"], sql, schema_name=lib_vars.schema_name)
 
         return result

@@ -54,8 +54,8 @@ class GwCreateSchemaTask(GwTask):
     def run(self) -> bool:
 
         super().run()
-        self.is_test = self.params['is_test']
-        self.finish_execution = {'import_data': False}
+        self.is_test = self.params["is_test"]
+        self.finish_execution = {"import_data": False}
         self.dict_folders_process = {}
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
@@ -108,9 +108,9 @@ class GwCreateSchemaTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
             msg += f"<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
@@ -118,7 +118,7 @@ class GwCreateSchemaTask(GwTask):
         if self.timer:
             self.timer.stop()
 
-        self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
+        self.admin.manage_process_result(self.params["project_name_schema"], self.params["project_type"],
                                              is_test=self.is_test)
         self.setProgress(100)
 
@@ -136,11 +136,11 @@ class GwCreateSchemaTask(GwTask):
         
         :return bool: True if the main execution finished successfully, False otherwise.
         """
-        project_type = self.params['project_type']
-        exec_last_process = self.params['exec_last_process']
-        project_name_schema = self.params['project_name_schema']
-        project_locale = self.params['project_locale']
-        project_srid = self.params['project_srid']
+        project_type = self.params["project_type"]
+        exec_last_process = self.params["exec_last_process"]
+        project_name_schema = self.params["project_name_schema"]
+        project_locale = self.params["project_locale"]
+        project_srid = self.params["project_srid"]
 
         self.admin.progress_ratio = 0.8
         msg = "Task '{0}' execute function '{1}'"
@@ -151,7 +151,7 @@ class GwCreateSchemaTask(GwTask):
         msg_params = (self.admin.total_sql_files,)
         tools_log.log_info(msg, msg_params=msg_params)
 
-        status = self.admin.load_base(self.dict_folders_process['load_base'])
+        status = self.admin.load_base(self.dict_folders_process["load_base"])
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
@@ -173,7 +173,7 @@ class GwCreateSchemaTask(GwTask):
             tools_log.log_info(msg, msg_params=msg_params)
             json_result = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                      project_locale, project_srid)
-        if (not json_result or json_result['status'] == 'Failed' and tools_os.set_boolean(self.admin.dev_commit, False) is False) or self.isCanceled():
+        if (not json_result or json_result["status"] == "Failed" and tools_os.set_boolean(self.admin.dev_commit, False) is False) or self.isCanceled():
             return False
 
         return True
@@ -184,8 +184,8 @@ class GwCreateSchemaTask(GwTask):
         
         :return None:
         """
-        project_type = self.params['project_type']
-        example_data = self.params['example_data']
+        project_type = self.params["project_type"]
+        example_data = self.params["example_data"]
 
         msg = "Execute '{0}'"
         msg_params = ("custom_execution",)
@@ -195,14 +195,14 @@ class GwCreateSchemaTask(GwTask):
         self.admin.progress_ratio = 1.0
 
         if self.admin.rdb_sample_inv.isChecked() and example_data:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_full', prefix=False)
+            tools_gw.set_config_parser("btn_admin", "create_schema_type", "rdb_sample_full", prefix=False)
             self.admin.load_sample_data(project_type=project_type)
             self.admin.load_inv_data(project_type=project_type)
         elif self.admin.rdb_sample_full.isChecked() and example_data:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_full', prefix=False)
+            tools_gw.set_config_parser("btn_admin", "create_schema_type", "rdb_sample_full", prefix=False)
             self.admin.load_sample_data(project_type=project_type)
         elif self.admin.rdb_empty.isChecked():
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_empty', prefix=False)
+            tools_gw.set_config_parser("btn_admin", "create_schema_type", "rdb_empty", prefix=False)
 
     def final_pass_execution(self, project_type) -> None:
         status = self.admin.load_final_pass(project_type)
@@ -220,7 +220,7 @@ class GwCreateSchemaTask(GwTask):
         """
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_final_pass', 'updates']
+        list_process = ["load_base", "load_final_pass", "updates"]
 
         for process_name in list_process:
             # tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
@@ -241,10 +241,10 @@ class GwCreateSchemaTask(GwTask):
 
         :return int: The number of files.
         """
-        project_type = self.params['project_type']
-        files_project_type = list(glob.iglob(folder_update_minor + f'**/**/{project_type}/*.sql', recursive=True))
-        files_utils = list(glob.iglob(folder_update_minor + '**/**/utils/*.sql', recursive=True))
-        files_i18n = list(glob.iglob(folder_update_minor + '**/**/i18n/**/*.sql', recursive=True))
+        project_type = self.params["project_type"]
+        files_project_type = list(glob.iglob(folder_update_minor + f"**/**/{project_type}/*.sql", recursive=True))
+        files_utils = list(glob.iglob(folder_update_minor + "**/**/utils/*.sql", recursive=True))
+        files_i18n = list(glob.iglob(folder_update_minor + "**/**/i18n/**/*.sql", recursive=True))
         total = len(files_project_type) + len(files_utils) + len(files_i18n)
 
         return total
@@ -279,7 +279,7 @@ class GwCreateSchemaTask(GwTask):
         :return dict: A dictionary with the folders and the number of files in each folder.
         """
         dict_folders = {}
-        if process_name == 'load_base':
+        if process_name == "load_base":
             dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ddl)] = 0
             dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_fct)] = 0
             dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ftrg)] = 0
@@ -287,10 +287,10 @@ class GwCreateSchemaTask(GwTask):
             dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_ftrg)] = 0
             dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_schema_model)] = 0
 
-        elif process_name == 'load_final_pass':
+        elif process_name == "load_final_pass":
             dict_folders[self.admin.folder_final_pass] = 0
 
-        elif process_name == 'updates':
+        elif process_name == "updates":
             dict_folders[os.path.join(self.admin.folder_updates)] = 0
 
         return dict_folders

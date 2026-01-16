@@ -27,9 +27,9 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete = None
         self.list_feature_type = list_feature_type
         if not self.list_feature_type:
-            self.list_feature_type = tuple(['ARC', 'NODE', 'CONNEC'])
-            if global_vars.project_type == 'ud':
-                self.list_feature_type += ('GULLY',)
+            self.list_feature_type = tuple(["ARC", "NODE", "CONNEC"])
+            if global_vars.project_type == "ud":
+                self.list_feature_type += ("GULLY",)
         else:
             self.list_feature_type = tuple(self.list_feature_type)
         if len(self.list_feature_type) == 1:
@@ -47,7 +47,7 @@ class GwFeatureDeleteButton(GwAction):
         tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows)
 
         # Set active layer
-        layer_name = 've_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = "ve_" + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
@@ -77,7 +77,7 @@ class GwFeatureDeleteButton(GwAction):
 
         # Set listeners
         self.dlg_feature_delete.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_feature_delete))
-        self.dlg_feature_delete.rejected.connect(partial(tools_gw.disconnect_signal, 'feature_delete'))
+        self.dlg_feature_delete.rejected.connect(partial(tools_gw.disconnect_signal, "feature_delete"))
         self.dlg_feature_delete.finished.connect(partial(self._selection_end))
         self.dlg_feature_delete.rejected.connect(partial(tools_gw.save_settings, self.dlg_feature_delete))
         self.dlg_feature_delete.btn_delete_another.clicked.connect(partial(self._delete_another_feature))
@@ -87,7 +87,7 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete.feature_type.currentIndexChanged.connect(partial(self._set_active_layer))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
+        tools_gw.open_dialog(self.dlg_feature_delete, dlg_name="feature_delete")
 
     def _delete_another_feature(self):
 
@@ -124,7 +124,7 @@ class GwFeatureDeleteButton(GwAction):
         rows_typeahead = rows_typeahead[0][0]
 
         if rows_typeahead is None:
-            model.setStringList([''])
+            model.setStringList([""])
             return
 
         rows_typeahead = [str(item) for item in rows_typeahead]
@@ -134,7 +134,7 @@ class GwFeatureDeleteButton(GwAction):
     def connect_signal_selection_changed(self):
         """Connect signal selectionChanged"""
         tools_gw.connect_signal(self.canvas.selectionChanged, partial(self._manage_selection),
-                                'feature_delete', 'connect_signal_selection_changed_selectionChanged_manage_selection')
+                                "feature_delete", "connect_signal_selection_changed_selectionChanged_manage_selection")
 
     # region private functions
 
@@ -150,19 +150,19 @@ class GwFeatureDeleteButton(GwAction):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_getfeaturerelation', body)
-        if not result or result.get('status') == 'Failed':
+        result = tools_gw.execute_procedure("gw_fct_getfeaturerelation", body)
+        if not result or result.get("status") == "Failed":
             return False
 
         # Construct message result
-        result_msg = ''
-        for value in result['body']['data']['info']['values']:
-            result_msg += value['message'] + '\n\n'
+        result_msg = ""
+        for value in result["body"]["data"]["info"]["values"]:
+            result_msg += value["message"] + "\n\n"
 
         tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
 
         # Enable button delete feature
-        if result_msg != '':
+        if result_msg != "":
             self.dlg_feature_delete.btn_delete.setEnabled(True)
 
         if feature_type:
@@ -173,7 +173,7 @@ class GwFeatureDeleteButton(GwAction):
             is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
             # Get layer from feature
-            layer = tools_qgis.get_layer_by_tablename(f've_{feature_type}')
+            layer = tools_qgis.get_layer_by_tablename(f"ve_{feature_type}")
 
             # Check if layer exists and expression is valid
             if layer and is_valid:
@@ -193,19 +193,19 @@ class GwFeatureDeleteButton(GwAction):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_setfeaturedelete', body)
+        complet_result = tools_gw.execute_procedure("gw_fct_setfeaturedelete", body)
 
         if not complet_result:
             msg = "Function gw_fct_setfeaturedelete executed with no result "
             tools_qgis.show_message(msg, Qgis.MessageLevel.Success)
             return
 
-        if complet_result.get('status') == 'Failed':
+        if complet_result.get("status") == "Failed":
             return False
 
         # Populate tab info
         change_tab = False
-        data = complet_result['body']['data']
+        data = complet_result["body"]["data"]
         for k, v in list(data.items()):
             if str(k) == "info":
                 change_tab = tools_gw.fill_tab_log(self.dlg_feature_delete, data)
@@ -214,7 +214,7 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete.btn_delete_another.setVisible(True)
 
         # Refresh psector's relations tables
-        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
+        tools_gw.execute_class_function(GwPsectorUi, "_refresh_tables_relations")
 
         # Close dialog
         if not change_tab:
@@ -225,13 +225,13 @@ class GwFeatureDeleteButton(GwAction):
 
     def _selection_init(self):
         """Set canvas map tool to an instance of class 'GwSelectManager'"""
-        tools_gw.disconnect_signal('feature_delete')
+        tools_gw.disconnect_signal("feature_delete")
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 
     def _selection_end(self):
         """Set canvas map tool to an instance of class 'GwSelectManager'"""
-        tools_gw.disconnect_signal('feature_delete')
+        tools_gw.disconnect_signal("feature_delete")
 
         for layer in global_vars.canvas.layers():
             if type(layer) is QgsVectorLayer:
@@ -244,7 +244,7 @@ class GwFeatureDeleteButton(GwAction):
         """Slot function for signal 'canvas.selectionChanged'"""
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
-        layer_name = 've_' + feature_type
+        layer_name = "ve_" + feature_type
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
 
@@ -272,13 +272,13 @@ class GwFeatureDeleteButton(GwAction):
         current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 've_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = "ve_" + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
 
         # Clear feature id field
-        tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
+        tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, "")
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
     # endregion

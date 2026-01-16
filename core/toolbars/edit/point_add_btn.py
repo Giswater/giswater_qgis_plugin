@@ -27,7 +27,7 @@ class GwPointAddButton(GwAction):
         if toolbar is not None:
             toolbar.removeAction(self.action)
 
-        self.info_feature = GwInfo('data')
+        self.info_feature = GwInfo("data")
 
         self.menu = QMenu()
         self.menu.setObjectName("GW_point_menu")
@@ -44,8 +44,8 @@ class GwPointAddButton(GwAction):
         # Refresh cat feature list
         self._fill_point_menu()
 
-        if self.menu.property('last_selection') is not None:
-            self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
+        if self.menu.property("last_selection") is not None:
+            self.info_feature.add_feature(self.menu.property("last_selection"), action=self)
 
     # region private functions
 
@@ -57,7 +57,7 @@ class GwPointAddButton(GwAction):
             action.disconnect()
             self.menu.removeAction(action)
             del action
-        action_group = self.action.property('action_group')        
+        action_group = self.action.property("action_group")        
 
         # Get list of different connec, gully and node types
         features_cat = tools_gw.manage_feature_cat()
@@ -65,7 +65,7 @@ class GwPointAddButton(GwAction):
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'NODE':
+                if feature_cat.feature_type.upper() == "NODE":
                     obj_action = QAction(str(feature_cat.id), action_group)
                     if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
@@ -80,7 +80,7 @@ class GwPointAddButton(GwAction):
             self.menu.addSeparator()
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'CONNEC':
+                if feature_cat.feature_type.upper() == "CONNEC":
                     obj_action = QAction(str(feature_cat.id), action_group)
                     if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
@@ -94,7 +94,7 @@ class GwPointAddButton(GwAction):
             self.menu.addSeparator()
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'GULLY' and project_type == 'ud':
+                if feature_cat.feature_type.upper() == "GULLY" and project_type == "ud":
                     obj_action = QAction(str(feature_cat.id), action_group)
                     if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))

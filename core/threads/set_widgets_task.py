@@ -26,25 +26,25 @@ class GWSetWidgetsTask(GwTask):
     def run(self):
         """Automatic mincut: Execute function 'gw_fct_mincut'"""
         super().run()
-        new_feature = self.params['new_feature']
-        complet_result = self.params['complet_result']
-        self.dlg_cf = self.params['dlg_cf']
+        new_feature = self.params["new_feature"]
+        complet_result = self.params["complet_result"]
+        self.dlg_cf = self.params["dlg_cf"]
         layout_list = []
-        for field in complet_result['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
+        for field in complet_result["body"]["data"]["fields"]:
+            if "hidden" in field and field["hidden"]:
                 continue
             label, widget = self.info._set_widgets(self.dlg_cf, complet_result, field, new_feature)
             if widget is None:
                 continue
-            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            layout = self.dlg_cf.findChild(QGridLayout, field["layoutname"])
             if layout is not None:
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                if layout not in layout_list and layout.objectName() not in ("lyt_top_1", "lyt_bot_1", "lyt_bot_2"):
                     layout_list.append(layout)
 
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                    layout.addWidget(label, 0, field['layoutorder'])
-                    layout.addWidget(widget, 1, field['layoutorder'])
+                if field["layoutname"] in ("lyt_top_1", "lyt_bot_1", "lyt_bot_2"):
+                    layout.addWidget(label, 0, field["layoutorder"])
+                    layout.addWidget(widget, 1, field["layoutorder"])
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
@@ -55,6 +55,6 @@ class GWSetWidgetsTask(GwTask):
 
     def finished(self, result):
         super().finished(result)
-        tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
+        tools_gw.open_dialog(self.dlg_cf, dlg_name="info_feature")
 
 

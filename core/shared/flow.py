@@ -65,7 +65,7 @@ class GwFlow(GwMaptool):
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            layer = tools_qgis.get_layer_by_tablename('ve_node')
+            layer = tools_qgis.get_layer_by_tablename("ve_node")
             if layer:
                 self.iface.setActiveLayer(layer)
 
@@ -78,7 +78,7 @@ class GwFlow(GwMaptool):
 
         if event.button() == Qt.MouseButton.LeftButton and self.current_layer:
             if self.snapped_feat is None:
-                elem_id = 'null'
+                elem_id = "null"
             else:
                 elem_id = f"""{self.snapped_feat.attribute('node_id')}"""
             feature_id = f'"id":[{elem_id}]'
@@ -87,11 +87,11 @@ class GwFlow(GwMaptool):
             extras = f' "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             result = tools_gw.execute_procedure(procedure_name, body)
-            if not result or result['status'] == 'Failed':
+            if not result or result["status"] == "Failed":
                 return
             
             # Zoom layer flowtrace_arc if exists
-            flowtrace_arc = tools_qgis.get_layer_by_layername(result['body']['data']['line']['layerName'])
+            flowtrace_arc = tools_qgis.get_layer_by_layername(result["body"]["data"]["line"]["layerName"])
             if flowtrace_arc:
                 tools_qgis.zoom_to_layer(flowtrace_arc)
 

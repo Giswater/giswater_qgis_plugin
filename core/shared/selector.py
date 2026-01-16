@@ -35,12 +35,12 @@ class GwSelector:
             self._selector_type = selector_type
             aux_params = None
             if selector_type == "selector_mincut":
-                current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
+                current_tab = tools_gw.get_config_parser("dialogs_tab", "dlg_selector_mincut", "user", "session")
                 aux_params = tools_gw.get_config_parser("selector_mincut", "aux_params", "user", "session")
             elif selector_type == "selector_campaign":
                 current_tab = reload_dlg.main_tab.widget(reload_dlg.main_tab.currentIndex()).objectName()
             else:
-                current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+                current_tab = tools_gw.get_config_parser("dialogs_tab", "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
             self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params, show_lot_tab=show_lot_tab)
             if self.scrolled_amount:
@@ -51,25 +51,25 @@ class GwSelector:
         self._selector_dialog = dlg_selector
         self._selector_type = selector_type
         tools_gw.load_settings(dlg_selector)
-        dlg_selector.setProperty('GwSelector', self)
+        dlg_selector.setProperty("GwSelector", self)
 
         # Get the name of the last tab used by the user
-        if selector_type == 'selector_campaign':
-            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_campaign", "user", "session")
+        if selector_type == "selector_campaign":
+            current_tab = tools_gw.get_config_parser("dialogs_tab", "dlg_selector_campaign", "user", "session")
         else:
-            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+            current_tab = tools_gw.get_config_parser("dialogs_tab", "dlg_selector_basic", "user", "session")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab, show_lot_tab=show_lot_tab)
-        tools_qt._translate_form('selector', dlg_selector)
-        if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(dlg_selector, dlg_name='selector', title='selector')
-            dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
+        tools_qt._translate_form("selector", dlg_selector)
+        if lib_vars.session_vars["dialog_docker"]:
+            tools_gw.docker_dialog(dlg_selector, dlg_name="selector", title="selector")
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name="position"))
 
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_docker))
 
         else:
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
-            tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+            tools_gw.open_dialog(dlg_selector, dlg_name="selector")
 
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
@@ -77,27 +77,27 @@ class GwSelector:
         dlg_selector.btn_close.clicked.connect(partial(self._selector_close, dlg_selector))
 
         # Manage tab focus
-        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
+        dlg_selector.findChild(QTabWidget, "main_tab").currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
-        if selector_type == 'selector_campaign':
-            dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'campaign'))
+        if selector_type == "selector_campaign":
+            dlg_selector.findChild(QTabWidget, "main_tab").currentChanged.connect(partial(
+                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, "campaign"))
         else:
-            dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+            dlg_selector.findChild(QTabWidget, "main_tab").currentChanged.connect(partial(
+                tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, "basic"))
 
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
 
     def _selector_close(self, dialog):
 
-        if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['dialog_docker'].isFloating():
-            widget = lib_vars.session_vars['dialog_docker'].widget()
+        if lib_vars.session_vars["dialog_docker"] and lib_vars.session_vars["dialog_docker"].isFloating():
+            widget = lib_vars.session_vars["dialog_docker"].widget()
             if widget:
                 widget.close()
                 del widget
-                global_vars.iface.removeDockWidget(lib_vars.session_vars['dialog_docker'])
-                lib_vars.session_vars['docker_type'] = None
+                global_vars.iface.removeDockWidget(lib_vars.session_vars["dialog_docker"])
+                lib_vars.session_vars["docker_type"] = None
         else:
             tools_gw.close_dialog(dialog)
 
@@ -105,7 +105,7 @@ class GwSelector:
         """Sets the focus to the typeahead filter if it's configured in DB"""
         index = dialog.main_tab.currentIndex()
         tab = dialog.main_tab.widget(index)
-        if tab and tools_os.set_boolean(tab.property('typeahead_forced'), False):
+        if tab and tools_os.set_boolean(tab.property("typeahead_forced"), False):
             tab_name = dialog.main_tab.widget(index).objectName()
             widget = dialog.main_tab.widget(index).findChild(QLineEdit, f"txt_filter_{str(tab_name)}")
             if widget:
@@ -121,14 +121,14 @@ class GwSelector:
         self._selector_type = selector_type
 
         index = 0
-        main_tab = dialog.findChild(QTabWidget, 'main_tab')
+        main_tab = dialog.findChild(QTabWidget, "main_tab")
 
         # Set filter
         if filter is not False:
-            main_tab = dialog.findChild(QTabWidget, 'main_tab')
+            main_tab = dialog.findChild(QTabWidget, "main_tab")
             text_filter = tools_qt.get_text(dialog, widget)
-            if text_filter in ('null', None):
-                text_filter = ''
+            if text_filter in ("null", None):
+                text_filter = ""
 
             # Set current_tab
             index = dialog.main_tab.currentIndex()
@@ -136,18 +136,18 @@ class GwSelector:
 
         # Profilactic control of nones
         if text_filter is None:
-            text_filter = ''
+            text_filter = ""
         if '"' in selector_type:
             selector_type = selector_type.strip('"')
 
         # Determine which function to call based on the campaign flag
-        if selector_type == 'selector_campaign':
+        if selector_type == "selector_campaign":
             # For campaign, use the gw_fct_cm_getselectors function
             body = tools_gw.create_body(
                 form=f'"currentTab":"{current_tab}"',
                 extras=f'"selectorType":"{selector_type}", "filterText":"{text_filter}", "addSchema":"{lib_vars.project_vars["add_schema"]}"'
             )
-            json_result = tools_gw.execute_procedure('gw_fct_cm_getselectors', body, schema_name='cm')
+            json_result = tools_gw.execute_procedure("gw_fct_cm_getselectors", body, schema_name="cm")
         else:
             # For non-campaign, use the gw_fct_getselectors function
             form = f'"currentTab":"{current_tab}"'
@@ -157,51 +157,51 @@ class GwSelector:
                 extras = f"{extras}, {aux_params}"
             extras += f', "addSchema":"{lib_vars.project_vars["add_schema"]}"'
             body = tools_gw.create_body(form=form, extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
+            json_result = tools_gw.execute_procedure("gw_fct_getselectors", body)
 
-        if not json_result or json_result['status'] == 'Failed':
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         # Get styles
-        stylesheet = json_result['body']['form'].get('style')
+        stylesheet = json_result["body"]["form"].get("style")
         color_rows = False
         if stylesheet:
             # Color selectors zebra-styled
-            color_rows = tools_os.set_boolean(stylesheet.get('rowsColor'), False)
+            color_rows = tools_os.set_boolean(stylesheet.get("rowsColor"), False)
 
         selection_modes = {}
-        for form_tab in json_result['body']['form']['formTabs']:
+        for form_tab in json_result["body"]["form"]["formTabs"]:
 
-            tab_name = form_tab['tabName']
+            tab_name = form_tab["tabName"]
             if filter and tab_name != str(current_tab):
                 continue
 
             # Hide tab_lot for role_cm_edit
-            if selector_type == 'selector_campaign' and tab_name == 'tab_lot' and not show_lot_tab:
+            if selector_type == "selector_campaign" and tab_name == "tab_lot" and not show_lot_tab:
                 continue
 
-            selection_mode = form_tab['selectionMode']
+            selection_mode = form_tab["selectionMode"]
             selection_modes[tab_name] = selection_mode
 
             # Create one tab for each form_tab and add to QTabWidget
             scroll_area = QScrollArea(main_tab)
             scroll_area.setObjectName(tab_name)
-            scroll_area.setProperty('selector_type', form_tab['selectorType'])
+            scroll_area.setProperty("selector_type", form_tab["selectorType"])
             scroll_area.viewport().setStyleSheet("background-color: white;")
             tab_widget = QWidget()
             tab_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
             if filter:
                 main_tab.removeTab(index)
-                main_tab.insertTab(index, scroll_area, form_tab['tabLabel'])
+                main_tab.insertTab(index, scroll_area, form_tab["tabLabel"])
             else:
-                main_tab.addTab(scroll_area, form_tab['tabLabel'])
+                main_tab.addTab(scroll_area, form_tab["tabLabel"])
 
             scroll_area.setWidgetResizable(True)  # Allow scroll area to resize its widget
             scroll_area.setWidget(tab_widget)
 
-            typeaheadForced = form_tab.get('typeaheadForced')
+            typeaheadForced = form_tab.get("typeaheadForced")
             if typeaheadForced is not None:
-                tab_widget.setProperty('typeahead_forced', typeaheadForced)
+                tab_widget.setProperty("typeahead_forced", typeaheadForced)
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
@@ -210,35 +210,35 @@ class GwSelector:
             field = {}
             i = 0
 
-            if 'typeaheadFilter' in form_tab:
+            if "typeaheadFilter" in form_tab:
                 label = QLabel()
-                label.setObjectName('lbl_filter')
-                label.setText(tools_qt.tr('lbl_filter', 'selector', default='Filter:'))
-                if tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name)) is None:
+                label.setObjectName("lbl_filter")
+                label.setText(tools_qt.tr("lbl_filter", "selector", default="Filter:"))
+                if tools_qt.get_widget(dialog, "txt_filter_" + str(tab_name)) is None:
                     widget = QLineEdit()
-                    widget.setObjectName('txt_filter_' + str(tab_name))
+                    widget.setObjectName("txt_filter_" + str(tab_name))
                     widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                     widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
                                                        widget=widget, current_tab=current_tab))
                     widget.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
                 else:
-                    widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name))
+                    widget = tools_qt.get_widget(dialog, "txt_filter_" + str(tab_name))
 
-                field['layoutname'] = gridlayout.objectName()
-                field['layoutorder'] = i
+                field["layoutname"] = gridlayout.objectName()
+                field["layoutorder"] = i
                 i = i + 1
-                gridlayout.addWidget(label, int(field['layoutorder']), 0)
-                gridlayout.addWidget(widget, int(field['layoutorder']), 2)
+                gridlayout.addWidget(label, int(field["layoutorder"]), 0)
+                gridlayout.addWidget(widget, int(field["layoutorder"]), 2)
                 
                 # Add checkbox filter move selections (if configured in DB)
-                show_move_selections = tools_os.set_boolean(form_tab.get('hasCustomOrderBy'), False)
+                show_move_selections = tools_os.set_boolean(form_tab.get("hasCustomOrderBy"), False)
                 if show_move_selections:
-                    chk_filter_name = f'chk_filter_{tab_name}'
+                    chk_filter_name = f"chk_filter_{tab_name}"
                     if tools_qt.get_widget(dialog, chk_filter_name) is None:
                         chk_filter = QCheckBox()
                         chk_filter.setObjectName(chk_filter_name)
-                        chk_filter.setText(tools_qt.tr('chk_filter', 'selector', default='Custom order by'))
+                        chk_filter.setText(tools_qt.tr("chk_filter", "selector", default="Custom order by"))
                     else:
                         chk_filter = tools_qt.get_widget(dialog, chk_filter_name)
                     sql = ("SELECT COALESCE((value::jsonb #>> ARRAY[%s,'is_checked'])::boolean, false) "
@@ -252,53 +252,53 @@ class GwSelector:
                     chk_filter.blockSignals(True)
                     chk_filter.setChecked(chk_filter_value)
                     chk_filter.blockSignals(False)
-                    if not tools_os.set_boolean(chk_filter.property('gw_custom_order_by_connected'), False):
+                    if not tools_os.set_boolean(chk_filter.property("gw_custom_order_by_connected"), False):
                         chk_filter.toggled.connect(
                             partial(self._set_selector_tab_custom_order_by_value, tab_name)
                         )
-                        chk_filter.setProperty('gw_custom_order_by_connected', True)
-                    gridlayout.addWidget(chk_filter, int(field['layoutorder']), 3)
+                        chk_filter.setProperty("gw_custom_order_by_connected", True)
+                    gridlayout.addWidget(chk_filter, int(field["layoutorder"]), 3)
                 
                 widget.setFocus()
 
-            if 'manageAll' in form_tab and (form_tab['manageAll']).lower() == 'true':
+            if "manageAll" in form_tab and (form_tab["manageAll"]).lower() == "true":
                 # Check check_all if all selectors are checked
                 self.checkall = True
-                for field in form_tab['fields']:
-                    if not tools_os.set_boolean(field.get('value'), default=False):
+                for field in form_tab["fields"]:
+                    if not tools_os.set_boolean(field.get("value"), default=False):
                         self.checkall = False
 
                 if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
                     widget = QCheckBox()
-                    widget.setObjectName('chk_all_' + str(tab_name))
+                    widget.setObjectName("chk_all_" + str(tab_name))
                     widget.toggled.connect(partial(self._manage_all, dialog, widget))
                     widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
                     chk_all_tooltip = tools_qt.tr("Shift+Click to uncheck all")
                     widget.setToolTip(chk_all_tooltip)
                 else:
                     widget = tools_qt.get_widget(dialog, f"chk_all_{tab_name}")
-                widget.setText(tools_qt.tr('chk_all_', 'selector', default='Check all'))
+                widget.setText(tools_qt.tr("chk_all_", "selector", default="Check all"))
                 if self.checkall is not None:
                     widget.blockSignals(True)
                     widget.setChecked(self.checkall)
                     widget.blockSignals(False)
-                field['layoutname'] = gridlayout.objectName()
-                field['layoutorder'] = i
+                field["layoutname"] = gridlayout.objectName()
+                field["layoutorder"] = i
                 i = i + 1
-                gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
+                gridlayout.addWidget(widget, int(field["layoutorder"]), 0, 1, -1)
 
-            for order, field in enumerate(form_tab['fields']):
+            for order, field in enumerate(form_tab["fields"]):
                 try:
                     # Create checkbox
-                    kwargs = {'field': field, 'connectsignal': False}
+                    kwargs = {"field": field, "connectsignal": False}
                     widget = tools_gw.add_checkbox(**kwargs)
-                    widget.setText(field['label'])
+                    widget.setText(field["label"])
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
                     widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
                     style = ""
-                    if field.get('stylesheet') is not None:
-                        style += field.get('stylesheet')
+                    if field.get("stylesheet") is not None:
+                        style += field.get("stylesheet")
                     # Set background color every other item (if enabled)
                     if color_rows and order % 2 == 0:
                         style += "background-color: #E9E7E3"
@@ -306,12 +306,12 @@ class GwSelector:
                         widget.setStyleSheet(style)
 
                     # Add widget to layout
-                    field['layoutname'] = gridlayout.objectName()
-                    field['layoutorder'] = order + i + 1
-                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
+                    field["layoutname"] = gridlayout.objectName()
+                    field["layoutorder"] = order + i + 1
+                    gridlayout.addWidget(widget, int(field["layoutorder"]), 0, 1, -1)
                 except Exception:
                     msg = "key 'comboIds' or/and comboNames not found WHERE columname='{0}' AND widgetname='{1}'"
-                    msg_params = (field['columnname'], field['widgetname'],)
+                    msg_params = (field["columnname"], field["widgetname"],)
                     tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, msg_params=msg_params)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
@@ -322,7 +322,7 @@ class GwSelector:
             self.help_button = QToolButton(None)
             style = "border: none;"
             tools_qt.set_stylesheet(self.help_button, style)
-            help_icon = tools_gw.add_icon(self.help_button, '130')
+            help_icon = tools_gw.add_icon(self.help_button, "130")
             action = QAction(help_icon, "Help")
             action.triggered.connect(partial(self._show_help, dialog, selection_modes))
             self.help_button.setDefaultAction(action)
@@ -331,7 +331,7 @@ class GwSelector:
             main_tab.cornerWidget().setHidden(False)
 
         # Set last tab used by user as current tab
-        tabname = json_result['body']['form']['currentTab']
+        tabname = json_result["body"]["form"]["currentTab"]
         tab = main_tab.findChild(QWidget, tabname)
 
         if tab:
@@ -339,9 +339,9 @@ class GwSelector:
 
         # Refresh psector mode
         current_psector = None
-        for user_value in json_result['body']['data']['userValues']:
-            if user_value['parameter'] == 'plan_psector_current':
-                current_psector = user_value['value']
+        for user_value in json_result["body"]["data"]["userValues"]:
+            if user_value["parameter"] == "plan_psector_current":
+                current_psector = user_value["value"]
                 break
         if current_psector is not None:
             tools_gw.set_psector_mode_enabled(enable=True, psector_id=current_psector, do_call_fct=False, force_change=True)
@@ -358,14 +358,14 @@ class GwSelector:
         tab_name = dialog.main_tab.widget(index).objectName()
         selection_mode = selection_modes[tab_name]
 
-        msg = f'''{tools_qt.tr('Clicking an item will check/uncheck it.')}'''
-        if selection_mode == 'keepPrevious':
-            msg += f'''{tools_qt.tr('Checking any item will not uncheck any other item.')}\n'''
-        elif selection_mode == 'keepPreviousUsingShift':
-            msg += f'''{tools_qt.tr('Checking any item will uncheck all other items unless Shift is pressed.')}\n'''
-        elif selection_mode == 'removePrevious':
-            msg += f'''{tools_qt.tr('Checking any item will uncheck all other items.')}\n'''
-        msg += f'''{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}').'''
+        msg = f"""{tools_qt.tr('Clicking an item will check/uncheck it.')}"""
+        if selection_mode == "keepPrevious":
+            msg += f"""{tools_qt.tr('Checking any item will not uncheck any other item.')}\n"""
+        elif selection_mode == "keepPreviousUsingShift":
+            msg += f"""{tools_qt.tr('Checking any item will uncheck all other items unless Shift is pressed.')}\n"""
+        elif selection_mode == "removePrevious":
+            msg += f"""{tools_qt.tr('Checking any item will uncheck all other items.')}\n"""
+        msg += f"""{tools_qt.tr("This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector")}_{tab_name}')."""
         title = "Selector help"
         tools_qt.show_info_box(msg, title)
 
@@ -379,7 +379,7 @@ class GwSelector:
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         tab_name = dialog.main_tab.widget(index).objectName()
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+        widget_all = dialog.findChild(QCheckBox, f"chk_all_{tab_name}")
 
         is_alone = False
         disable_parent = False
@@ -388,8 +388,8 @@ class GwSelector:
         if key_modifier == Qt.KeyboardModifier.ShiftModifier:
             disable_parent = True
 
-        if selection_mode == 'removePrevious' or \
-                (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.KeyboardModifier.ShiftModifier):
+        if selection_mode == "removePrevious" or \
+                (selection_mode == "keepPreviousUsingShift" and key_modifier != Qt.KeyboardModifier.ShiftModifier):
             is_alone = True
             if widget_all is not None:
                 widget_all.blockSignals(True)
@@ -444,8 +444,8 @@ class GwSelector:
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         selector_type = dialog.main_tab.widget(index).property("selector_type")
-        qgis_project_add_schema = lib_vars.project_vars['add_schema']
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+        qgis_project_add_schema = lib_vars.project_vars["add_schema"]
+        widget_all = dialog.findChild(QCheckBox, f"chk_all_{tab_name}")
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
@@ -460,47 +460,47 @@ class GwSelector:
                       f'"addSchema":"{qgis_project_add_schema}"')
 
         # Determine which function to call based on the campaign flag
-        if selector_type == 'selector_campaign':
+        if selector_type == "selector_campaign":
             # If it's a campaign, use the gw_fct_setselectocm procedure
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_cm_setselectors', body, schema_name='cm')
+            json_result = tools_gw.execute_procedure("gw_fct_cm_setselectors", body, schema_name="cm")
         else:
             # If not campaign, use the original gw_fct_setselectors procedure
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+            json_result = tools_gw.execute_procedure("gw_fct_setselectors", body)
 
-        if json_result is None or json_result['status'] == 'Failed':
+        if json_result is None or json_result["status"] == "Failed":
             return
-        level = json_result['body']['message']['level']
+        level = json_result["body"]["message"]["level"]
         if level == 0:
-            message = json_result['body']['message']['text']
+            message = json_result["body"]["message"]["text"]
             level = Qgis.MessageLevel(level)
             tools_qgis.show_message(message, level)
 
         # Apply zoom only to the selected tabs
-        if tab_name in ('tab_exploitation', 'tab_exploitation_add', 'tab_municipality', 'tab_macroexploitation', 'tab_macrosector', 'tab_sector'):
+        if tab_name in ("tab_exploitation", "tab_exploitation_add", "tab_municipality", "tab_macroexploitation", "tab_macrosector", "tab_sector"):
             try:
                 # Zoom to feature
-                x1 = json_result['body']['data']['geometry']['x1']
-                y1 = json_result['body']['data']['geometry']['y1']
-                x2 = json_result['body']['data']['geometry']['x2']
-                y2 = json_result['body']['data']['geometry']['y2']
+                x1 = json_result["body"]["data"]["geometry"]["x1"]
+                y1 = json_result["body"]["data"]["geometry"]["y1"]
+                x2 = json_result["body"]["data"]["geometry"]["x2"]
+                y2 = json_result["body"]["data"]["geometry"]["y2"]
                 if x1 is not None:
                     tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             except KeyError:
                 pass
 
         # Refresh canvas
-        tools_qgis.set_layer_index('ve_arc')
-        tools_qgis.set_layer_index('ve_node')
-        tools_qgis.set_layer_index('ve_connec')
-        tools_qgis.set_layer_index('ve_gully')
-        tools_qgis.set_layer_index('ve_link')
-        tools_qgis.set_layer_index('ve_plan_psector')
+        tools_qgis.set_layer_index("ve_arc")
+        tools_qgis.set_layer_index("ve_node")
+        tools_qgis.set_layer_index("ve_connec")
+        tools_qgis.set_layer_index("ve_gully")
+        tools_qgis.set_layer_index("ve_link")
+        tools_qgis.set_layer_index("ve_plan_psector")
         tools_qgis.refresh_map_canvas()
 
         # Refresh raster layer
-        layer = tools_qgis.get_layer_by_tablename('v_ext_raster_dem', schema_name='')
+        layer = tools_qgis.get_layer_by_tablename("v_ext_raster_dem", schema_name="")
         if layer:
             layer.dataProvider().reloadData()
             layer.triggerRepaint()
@@ -512,17 +512,17 @@ class GwSelector:
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
 
-        if tab_name == 'tab_exploitation':
-            docker_search = global_vars.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        if tab_name == "tab_exploitation":
+            docker_search = global_vars.iface.mainWindow().findChild(QDockWidget, "dlg_search")
             if docker_search:
-                search_class = docker_search.property('class')
+                search_class = docker_search.property("class")
                 search_class.refresh_tab()
-        elif tab_name == 'tab_sector':
+        elif tab_name == "tab_sector":
             """# TODO: Reload epa world filters if sector changed"""
             # tools_gw.set_epa_world(selector_change=True)
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
-        if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):
+        if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ""):
             widget_filter.textChanged.emit(widget_filter.text())
 
     def _remove_previuos(self, dialog, widget, widget_all, widget_list):

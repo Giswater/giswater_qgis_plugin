@@ -5,13 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-__author__ = 'Luigi Pirelli'
-__date__ = 'January 2018'
-__copyright__ = '(C) 2018, Luigi Pirelli'
+__author__ = "Luigi Pirelli"
+__date__ = "January 2018"
+__copyright__ = "(C) 2018, Luigi Pirelli"
 
 # This will get replaced with a git SHA1 when you do a git archive
 
-__revision__ = '$Format:%H$'
+__revision__ = "$Format:%H$"
 
 from .models_manager import GwTable, GwGenericDescriptor
 
@@ -33,5 +33,5 @@ class GwOmVisit(GwTable):
 
     def __init__(self):
 
-        GwTable.__init__(self, 'om_visit', 'id')
+        GwTable.__init__(self, "om_visit", "id")
 

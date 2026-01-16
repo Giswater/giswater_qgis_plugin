@@ -12,7 +12,7 @@ try:
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
     from matplotlib.figure import Figure
 
-    matplotlib.use('Qt5Agg')
+    matplotlib.use("Qt5Agg")
 
 except ImportError:
     matplotlib = None
@@ -21,7 +21,7 @@ except ImportError:
     msg = "Matplotlib Python package not found. Do you want to install Matplotlib?"
     if tools_qt.show_question(msg):
         subprocess.run(["python", "-m", "ensurepip"])
-        install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
+        install_matplotlib = subprocess.run(["python", "-m", "pip", "install", "-U", "matplotlib"])
         if install_matplotlib.returncode:
             msg = "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
             tools_qt.show_info_box(msg)

@@ -45,12 +45,12 @@ class GwFileTransferButton(GwAction):
 
     def clicked_event(self):
 
-        if self.menu.property('last_selection') is not None:
-            getattr(self, self.menu.property('last_selection'))()
+        if self.menu.property("last_selection") is not None:
+            getattr(self, self.menu.property("last_selection"))()
             return
-        if hasattr(self.action, 'associatedObjects'):
+        if hasattr(self.action, "associatedObjects"):
             button = QWidget(self.action.associatedObjects()[1])
-        elif hasattr(self.action, 'associatedWidgets'):
+        elif hasattr(self.action, "associatedWidgets"):
             button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
@@ -73,9 +73,9 @@ class GwFileTransferButton(GwAction):
         # Define menu actions
         menu_actions = [
             # Import section
-            (import_menu, ('ud', 'ws'), tools_qt.tr('Import CSV'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}66_1.png")),
-            (import_menu, ('ud', 'ws'), tools_qt.tr('Import INP file'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png")),
-            (export_menu, ('ws'), tools_qt.tr('Export EPA result families'), None)
+            (import_menu, ("ud", "ws"), tools_qt.tr("Import CSV"), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}66_1.png")),
+            (import_menu, ("ud", "ws"), tools_qt.tr("Import INP file"), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png")),
+            (export_menu, ("ws"), tools_qt.tr("Export EPA result families"), None)
         ]
         # Add actions to menu
         for menu, types, action, icon in menu_actions:
@@ -94,18 +94,18 @@ class GwFileTransferButton(GwAction):
 
     def _get_selected_action(self, name):
         """Gets selected action"""
-        if name == tools_qt.tr('Import CSV'):
+        if name == tools_qt.tr("Import CSV"):
             self._open_csv()
-        elif name == tools_qt.tr('Import INP file'):
-            if global_vars.project_type == 'ws':
+        elif name == tools_qt.tr("Import INP file"):
+            if global_vars.project_type == "ws":
                 import_inp = GwImportEpanet()
                 import_inp.clicked_event()
                 return
-            if global_vars.project_type == 'ud':
+            if global_vars.project_type == "ud":
                 import_inp = GwImportSwmm()
                 import_inp.clicked_event()
                 return
-        elif name == tools_qt.tr('Export EPA result families'):
+        elif name == tools_qt.tr("Export EPA result families"):
             self._export_epa_result_families()
 
     def _save_last_selection(self, menu, button_function):
@@ -113,16 +113,16 @@ class GwFileTransferButton(GwAction):
 
     def save_settings_values(self):
         """Save QGIS settings related with csv options"""
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type',
+        tools_gw.set_config_parser("btn_csv2pg", "cmb_import_type",
                                    f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
-        tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
-        tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
-        tools_gw.set_config_parser('btn_csv2pg', 'chk_ignore_header', f"{self.dlg_csv.chk_ignore_header.isChecked()}")
-        tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
-        tools_gw.set_config_parser('btn_csv2pg', 'rb_space', f"{self.dlg_csv.rb_space.isChecked()}")
-        tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_comma', f"{self.dlg_csv.rb_dec_comma.isChecked()}")
-        tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_period', f"{self.dlg_csv.rb_dec_period.isChecked()}")
+        tools_gw.set_config_parser("btn_csv2pg", "txt_import", tools_qt.get_text(self.dlg_csv, "txt_import"))
+        tools_gw.set_config_parser("btn_csv2pg", "txt_file_csv", tools_qt.get_text(self.dlg_csv, "txt_file_csv"))
+        tools_gw.set_config_parser("btn_csv2pg", "cmb_unicode_list", tools_qt.get_text(self.dlg_csv, "cmb_unicode_list"))
+        tools_gw.set_config_parser("btn_csv2pg", "chk_ignore_header", f"{self.dlg_csv.chk_ignore_header.isChecked()}")
+        tools_gw.set_config_parser("btn_csv2pg", "rb_semicolon", f"{self.dlg_csv.rb_semicolon.isChecked()}")
+        tools_gw.set_config_parser("btn_csv2pg", "rb_space", f"{self.dlg_csv.rb_space.isChecked()}")
+        tools_gw.set_config_parser("btn_csv2pg", "rb_dec_comma", f"{self.dlg_csv.rb_dec_comma.isChecked()}")
+        tools_gw.set_config_parser("btn_csv2pg", "rb_dec_period", f"{self.dlg_csv.rb_dec_period.isChecked()}")
 
     # region private functions
 
@@ -146,7 +146,7 @@ class GwFileTransferButton(GwAction):
             tools_gw.close_dialog(dlg_epa)
             return
 
-        json_format = tools_gw.get_config_parser('btn_export_epa_families', 'json_format', 'user', 'session', False)
+        json_format = tools_gw.get_config_parser("btn_export_epa_families", "json_format", "user", "session", False)
         if json_format:
             dlg_epa.chk_format_json.setChecked(bool(json_format))
 
@@ -159,7 +159,7 @@ class GwFileTransferButton(GwAction):
         dlg_epa.rejected.connect(lambda: tools_gw.close_dialog(dlg_epa))
         dlg_epa.btn_accept.clicked.connect(partial(self._do_export_epa_families, dlg_epa))
 
-        tools_gw.open_dialog(dlg_epa, dlg_name='epa_result_export')
+        tools_gw.open_dialog(dlg_epa, dlg_name="epa_result_export")
 
     def _browse_export_path_epa(self, dlg):
         file_path, _ = QFileDialog.getSaveFileName(
@@ -169,7 +169,7 @@ class GwFileTransferButton(GwAction):
             tools_qt.tr("JSON Files (*.json);;All Files (*)")
         )
         if file_path:
-            if not file_path.lower().endswith('.json'):
+            if not file_path.lower().endswith(".json"):
                 file_path += ".json"
             dlg.edit_path.setText(file_path)
 
@@ -202,9 +202,9 @@ class GwFileTransferButton(GwAction):
         
         # Extract only the features array from body.data.features
         if isinstance(json_result, dict):
-            body = json_result.get('body', {})
+            body = json_result.get("body", {})
             if isinstance(body, dict):
-                data = body.get('data', {})
+                data = body.get("data", {})
         # Write only the features array to the file
         try:
             indent = 2 if dlg.chk_format_json.isChecked() else None
@@ -212,7 +212,7 @@ class GwFileTransferButton(GwAction):
                 json.dump(data, f, ensure_ascii=False, indent=indent)
             msg = f"EPA Result Families exported successfully:\n{file_path}"
             tools_qgis.show_info(msg)
-            tools_gw.set_config_parser('btn_export_epa_families', 'json_format', f'{dlg.chk_format_json.isChecked()}', prefix=False)
+            tools_gw.set_config_parser("btn_export_epa_families", "json_format", f"{dlg.chk_format_json.isChecked()}", prefix=False)
         except Exception as e:
             msg = f"Failed to write export file:\n{str(e)}"
             tools_qgis.show_warning(msg)
@@ -223,13 +223,13 @@ class GwFileTransferButton(GwAction):
         self.dlg_csv = GwCsvUi(self)
         tools_gw.load_settings(self.dlg_csv)
 
-        temp_tablename = 'temp_csv'
+        temp_tablename = "temp_csv"
         tools_qt.fill_combo_unicodes(self.dlg_csv.cmb_unicode_list)
-        self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
-                             'alias, config_csv.descript, functionname, orderby', 'config_csv')
+        self._populate_combos(self.dlg_csv.cmb_import_type, "fid",
+                             "alias, config_csv.descript, functionname, orderby", "config_csv")
 
         self.dlg_csv.lbl_info.setWordWrap(True)
-        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
+        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, "utf8")
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
         self.dlg_csv.rb_space.setChecked(False)
@@ -249,7 +249,7 @@ class GwFileTransferButton(GwAction):
         self._get_function_name()
         self._load_settings_values()
 
-        if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
+        if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != "null":
             self._preview_csv(self.dlg_csv)
         self.dlg_csv.line.setVisible(False)
         self.dlg_csv.progressBar.setVisible(False)
@@ -258,7 +258,7 @@ class GwFileTransferButton(GwAction):
         tools_gw.disable_tab_log(self.dlg_csv)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
+        tools_gw.open_dialog(self.dlg_csv, dlg_name="csv")
 
         # Finally set label info
         self._update_info(self.dlg_csv)
@@ -314,7 +314,7 @@ class GwFileTransferButton(GwAction):
         _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
 
         try:
-            with open(path, 'r', encoding=_unicode) as csvfile:
+            with open(path, "r", encoding=_unicode) as csvfile:
                 insert_status = self._insert_into_db(dialog, csvfile, delimiter, _unicode)
                 csvfile.close()
                 del csvfile
@@ -334,12 +334,12 @@ class GwFileTransferButton(GwAction):
         if not result:
             return
         else:
-            if result['status'] == "Accepted":
-                tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
+            if result["status"] == "Accepted":
+                tools_gw.fill_tab_log(dialog, result["body"]["data"], close=False)
                 self.dlg_csv.btn_cancel.setText(tools_qt.tr("Close"))
-            message = result.get('message')
+            message = result.get("message")
             if message:
-                msg = message.get('text')
+                msg = message.get("text")
                 tools_qt.show_info_box(msg)
 
     def _update_info(self, dialog):
@@ -359,7 +359,7 @@ class GwFileTransferButton(GwAction):
 
     def _select_file_csv(self):
         """Select CSV file"""
-        tools_qt.get_open_file_path(self.dlg_csv, 'txt_file_csv', '*.csv', "Select CSV file")
+        tools_qt.get_open_file_path(self.dlg_csv, "txt_file_csv", "*.csv", "Select CSV file")
         self.save_settings_values()
         self._preview_csv(self.dlg_csv)
 
@@ -384,40 +384,40 @@ class GwFileTransferButton(GwAction):
 
     def _load_settings_values(self):
         """Load QGIS settings related with csv options"""
-        value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "session")
+        value = tools_gw.get_config_parser("btn_csv2pg", "cmb_import_type", "user", "session")
         tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0, add_new=False)
 
-        value = tools_gw.get_config_parser('btn_csv2pg', 'txt_import', "user", "session")
+        value = tools_gw.get_config_parser("btn_csv2pg", "txt_import", "user", "session")
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_import, value)
 
-        value = tools_gw.get_config_parser('btn_csv2pg', 'txt_file_csv', "user", "session")
+        value = tools_gw.get_config_parser("btn_csv2pg", "txt_file_csv", "user", "session")
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
 
-        unicode = tools_gw.get_config_parser('btn_csv2pg', 'cmb_unicode_list', "user", "session")
+        unicode = tools_gw.get_config_parser("btn_csv2pg", "cmb_unicode_list", "user", "session")
         if not unicode:
-            unicode = 'latin1'
+            unicode = "latin1"
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
-        if tools_gw.get_config_parser('btn_csv2pg', 'chk_ignore_header', "user", "session") == 'True':
+        if tools_gw.get_config_parser("btn_csv2pg", "chk_ignore_header", "user", "session") == "True":
             self.dlg_csv.chk_ignore_header.setChecked(True)
 
-        if tools_gw.get_config_parser('btn_csv2pg', 'rb_semicolon', "user", "session") == 'True':
+        if tools_gw.get_config_parser("btn_csv2pg", "rb_semicolon", "user", "session") == "True":
             self.dlg_csv.rb_semicolon.setChecked(True)
-        elif tools_gw.get_config_parser('btn_csv2pg', 'rb_space', "user", "session") == 'True':
+        elif tools_gw.get_config_parser("btn_csv2pg", "rb_space", "user", "session") == "True":
             self.dlg_csv.rb_space.setChecked(True)
         else:
             self.dlg_csv.rb_comma.setChecked(True)
 
-        if tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_comma', "user", "session") == 'True':
+        if tools_gw.get_config_parser("btn_csv2pg", "rb_dec_comma", "user", "session") == "True":
             self.dlg_csv.rb_dec_comma.setChecked(True)
-        elif tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_period', "user", "session") == 'True':
+        elif tools_gw.get_config_parser("btn_csv2pg", "rb_dec_period", "user", "session") == "True":
             self.dlg_csv.rb_dec_period.setChecked(True)
 
     def _validate_params(self, dialog):
         """Validate if params are valids"""
         path = self._get_path(dialog)
         self._preview_csv(dialog)
-        if path is None or path == 'null':
+        if path is None or path == "null":
             return False
         return True
 
@@ -429,13 +429,13 @@ class GwFileTransferButton(GwAction):
 
     def _get_delimiter(self, dialog):
 
-        delimiter = ';'
+        delimiter = ";"
         if dialog.rb_semicolon.isChecked():
-            delimiter = ';'
+            delimiter = ";"
         elif dialog.rb_comma.isChecked():
-            delimiter = ','
+            delimiter = ","
         elif dialog.rb_space.isChecked():
-            delimiter = ' '
+            delimiter = " "
         return delimiter
 
     def _insert_into_db(self, dialog, csvfile, delimiter, _unicode):
@@ -457,7 +457,7 @@ class GwFileTransferButton(GwAction):
         fields = []
         cont = 1
         for row in reader:
-            field = {'fid': fid_aux}
+            field = {"fid": fid_aux}
             if tools_os.set_boolean(ignoreheader) is True:
                 ignoreheader = False
                 continue
@@ -481,9 +481,9 @@ class GwFileTransferButton(GwAction):
 
         values = f'"separator": {decimal_sep}, "values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)
-        result = tools_gw.execute_procedure('gw_fct_setcsv', body)
+        result = tools_gw.execute_procedure("gw_fct_setcsv", body)
 
-        if result and result.get('status') == 'Accepted':
+        if result and result.get("status") == "Accepted":
             return True
 
         return False
@@ -491,11 +491,11 @@ class GwFileTransferButton(GwAction):
     def _get_path(self, dialog):
         """Take the file path if exist. AND if not exit ask it"""
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
-        if path is None or path == 'null' or not os.path.exists(path):
+        if path is None or path == "null" or not os.path.exists(path):
             msg = "Please choose a valid path"
             tools_qgis.show_message(msg, message_level=Qgis.MessageLevel.Info, dialog=dialog)
             return None
-        if path.find('.csv') == -1:
+        if path.find(".csv") == -1:
             msg = "Please choose a csv file"
             tools_qgis.show_message(msg, message_level=Qgis.MessageLevel.Info, dialog=dialog)
             return None

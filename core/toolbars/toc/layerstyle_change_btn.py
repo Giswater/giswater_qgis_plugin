@@ -115,8 +115,8 @@ class GwLayerStyleChangeButton(GwAction):
     def _apply_context(self, styleconfig_id: int, style_name: str) -> None:
         """Apply styles for the selected context."""
         apply_styles_to_layers(styleconfig_id, style_name)
-        lib_vars.project_vars['current_style'] = f"{styleconfig_id}"
-        tools_qgis.set_project_variable('gwCurrentStyle', f"{styleconfig_id}")
+        lib_vars.project_vars["current_style"] = f"{styleconfig_id}"
+        tools_qgis.set_project_variable("gwCurrentStyle", f"{styleconfig_id}")
         msg = "Applied styles for context"
         param = style_name
         tools_qgis.show_info(msg, parameter=param)

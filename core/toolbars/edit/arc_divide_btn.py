@@ -41,7 +41,7 @@ class GwArcDivideButton(GwMaptool):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-        value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init",
+        value = tools_gw.get_config_parser("user_edit_tricks", "keep_maptool_active", "user", "init",
                                            prefix=True)
         self.keep_maptool_active = tools_os.set_boolean(value, False)
 
@@ -121,7 +121,7 @@ class GwArcDivideButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = [tools_qt.tr('DRAG-DROP'), tools_qt.tr('SELECT')]
+        actions = [tools_qt.tr("DRAG-DROP"), tools_qt.tr("SELECT")]
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -130,7 +130,7 @@ class GwArcDivideButton(GwMaptool):
 
     def _get_selected_action(self, name):
         """Gets selected action"""
-        if name == tools_qt.tr('DRAG-DROP'):
+        if name == tools_qt.tr("DRAG-DROP"):
             self.selected_action = 1
         else:
             self.selected_action = 2
@@ -208,15 +208,15 @@ class GwArcDivideButton(GwMaptool):
         if status:
             feature_id = f'"id":["{node_id}"]'
             body = tools_gw.create_body(feature=feature_id)
-            result = tools_gw.execute_procedure('gw_fct_setarcdivide', body)
-            if result and result['status'] == 'Accepted':
-                log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
+            result = tools_gw.execute_procedure("gw_fct_setarcdivide", body)
+            if result and result["status"] == "Accepted":
+                log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", "user", "init")
                 if not tools_os.set_boolean(log, False):
-                    self.dlg_info = GwDialogShowInfoUi(self, 'arc_divide')
+                    self.dlg_info = GwDialogShowInfoUi(self, "arc_divide")
                     tools_gw.load_settings(self.dlg_info)
-                    tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False, True, 1)
+                    tools_gw.fill_tab_log(self.dlg_info, result["body"]["data"], False, True, 1)
                     self.dlg_info.finished.connect(partial(tools_gw.save_settings, self.dlg_info))
-                    tools_gw.open_dialog(self.dlg_info, dlg_name='arc_divide')
+                    tools_gw.open_dialog(self.dlg_info, dlg_name="arc_divide")
         else:
             msg = "Move node: Error updating geometry"
             tools_qgis.show_warning(msg)
@@ -285,11 +285,11 @@ class GwArcDivideButton(GwMaptool):
         point = self.toLayerCoordinates(layer, point)
 
         # Get selected feature (at this moment it will have one and only one)
-        node_id = self.snapped_feat.attribute('node_id')
+        node_id = self.snapped_feat.attribute("node_id")
 
         # Move selected node to the released point
         answer = True
-        ask = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_prev_warning", 'user', 'init')
+        ask = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_prev_warning", "user", "init")
         if not tools_os.set_boolean(ask, False):
             # Show message before executing
             msg = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
@@ -299,14 +299,14 @@ class GwArcDivideButton(GwMaptool):
             answer = tools_qt.show_question(msg, title)
         if answer:
             self._move_node(node_id, point)
-            tools_qgis.set_layer_index('ve_arc')
-            tools_qgis.set_layer_index('ve_connec')
-            tools_qgis.set_layer_index('ve_gully')
-            tools_qgis.set_layer_index('ve_node')
+            tools_qgis.set_layer_index("ve_arc")
+            tools_qgis.set_layer_index("ve_connec")
+            tools_qgis.set_layer_index("ve_gully")
+            tools_qgis.set_layer_index("ve_node")
             self.iface.mapCanvas().refresh()
 
             # Refresh psector's relations tables
-            tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
+            tools_gw.execute_class_function(GwPsectorUi, "_refresh_tables_relations")
 
         return True, answer
 

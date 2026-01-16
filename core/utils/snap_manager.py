@@ -41,10 +41,10 @@ class GwSnapManager(object):
 
     def set_snapping_layers(self):
         """Set main snapping layers"""
-        self.layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
-        self.layer_connec = tools_qgis.get_layer_by_tablename('ve_connec')
-        self.layer_gully = tools_qgis.get_layer_by_tablename('ve_gully')
-        self.layer_node = tools_qgis.get_layer_by_tablename('ve_node')
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
+        self.layer_connec = tools_qgis.get_layer_by_tablename("ve_connec")
+        self.layer_gully = tools_qgis.get_layer_by_tablename("ve_gully")
+        self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
 
     def get_snapping_options(self):
         """Function that collects all the snapping options"""
@@ -181,17 +181,17 @@ class GwSnapManager(object):
         """Create the appropriate map tool and connect to the corresponding signal"""
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
-            active_layer = tools_qgis.get_layer_by_tablename('sys_version')
+            active_layer = tools_qgis.get_layer_by_tablename("sys_version")
             global_vars.iface.setActiveLayer(active_layer)
 
         # Snapper
-        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
+        tools_gw.disconnect_signal("snap_managers", f"{hash(self)}_ep_canvasClicked_get_xy")
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
         tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._get_mouse_move, vertex_marker),
-                                'snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
+                                "snap_managers", f"{hash(self)}_xyCoordinates_get_mouse_move")
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_xy, vertex_marker, emit_point),
-                                'snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
+                                "snap_managers", f"{hash(self)}_ep_canvasClicked_get_xy")
 
     def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
 
@@ -230,13 +230,13 @@ class GwSnapManager(object):
             point = self.get_snapped_point(result)
 
         # Setting x, y coordinates from point
-        self.point_xy['x'] = point.x()
-        self.point_xy['y'] = point.y()
+        self.point_xy["x"] = point.x()
+        self.point_xy["y"] = point.y()
 
         msg = "Geometry has been added!"
         tools_qgis.show_info(msg)
-        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
-        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
+        tools_gw.disconnect_signal("snap_managers", f"{hash(self)}_ep_canvasClicked_get_xy")
+        tools_gw.disconnect_signal("snap_managers", f"{hash(self)}_xyCoordinates_get_mouse_move")
         global_vars.iface.mapCanvas().refreshAllLayers()
         vertex_marker.hide()
 

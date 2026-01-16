@@ -21,8 +21,8 @@ class GwGisFileCreate:
         self.layer_source = None
         self.srid = None
 
-    def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin', layer_source=None, layer_project_type=None, is_cm=False):
+    def gis_project_database(self, folder_path=None, filename=None, project_type="ws", schema="ws_sample",
+                             export_passwd=False, roletype="admin", layer_source=None, layer_project_type=None, is_cm=False):
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
@@ -68,27 +68,27 @@ class GwGisFileCreate:
         QgsProject.instance().clear()
 
         root = project.layerTreeRoot()
-        auth_id = self._replace_spatial_parameters(self.layer_source['srid'])
+        auth_id = self._replace_spatial_parameters(self.layer_source["srid"])
 
         # Set lib_vars.project_vars['store_credentials'] BEFORE creating layers
-        lib_vars.project_vars['store_credentials'] = f"{export_passwd}"
+        lib_vars.project_vars["store_credentials"] = f"{export_passwd}"
 
         # Get project layers
         extras = f'"project_type":"{layer_project_type}", "is_cm":{str(is_cm).lower()}'
         body = tools_gw.create_body(extras=extras)
-        layers = tools_gw.execute_procedure('gw_fct_get_project_layers', body, schema_name=schema)
+        layers = tools_gw.execute_procedure("gw_fct_get_project_layers", body, schema_name=schema)
         if layers:
-            for layer in layers['body']['data']['layers']:
-                template = layer.get('project_template')
-                addparam = layer.get('addparam')
-                properties = addparam.get('layerProp', None) if addparam is not None else None
+            for layer in layers["body"]["data"]["layers"]:
+                template = layer.get("project_template")
+                addparam = layer.get("addparam")
+                properties = addparam.get("layerProp", None) if addparam is not None else None
                 if not template:
                     continue
 
-                depth = template.get('levels_to_read')
-                if layer.get('context') is not None:
-                    context = json.loads(layer['context'])
-                    levels = context.get(tools_qt.tr('levels')) or context.get('levels')
+                depth = template.get("levels_to_read")
+                if layer.get("context") is not None:
+                    context = json.loads(layer["context"])
+                    levels = context.get(tools_qt.tr("levels")) or context.get("levels")
                     if levels is not None:
                         level = root
                         for i in range(0, depth):
@@ -99,14 +99,14 @@ class GwGisFileCreate:
                                 level = old_level
                     rectangle = tools_gw._get_extent_parameters(schema)
                     # Add project layer
-                    tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
-                                                 sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
-                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd else None, create_project=True, force_create_group=False,
+                    tools_gw.add_layer_database(layer["tableName"], layer["geomField"], layer["tableId"], levels[0], levels[1] if len(levels) > 1 else None, style_id="-1", alias=layer["layerName"],
+                                                 sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer["tableSchema"], visibility=template.get("visibility"), auth_id=auth_id,
+                                                 extent=rectangle, passwd=self.layer_source["password"] if export_passwd else None, create_project=True, force_create_group=False,
                                                  properties=properties)
 
         # Hide hidden group
-        tools_gw.hide_group_from_toc('HIDDEN')
-        root.findGroup('HIDDEN').setItemVisibilityChecked(False)
+        tools_gw.hide_group_from_toc("HIDDEN")
+        root.findGroup("HIDDEN").setItemVisibilityChecked(False)
         
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
@@ -147,13 +147,13 @@ class GwGisFileCreate:
 
     def _get_database_parameters(self, schema):
         """Get database parameters from layer source"""
-        layer_source, not_version = tools_db.get_layer_source_from_credentials('prefer')
+        layer_source, not_version = tools_db.get_layer_source_from_credentials("prefer")
         if layer_source is None:
             msg = "Error getting database parameters"
             tools_qgis.show_warning(msg)
             return False, None
         else:
-            layer_source['srid'] = tools_db.get_srid('ve_node', schema)
+            layer_source["srid"] = tools_db.get_srid("ve_node", schema)
             return True, layer_source
 
     def _replace_spatial_parameters(self, srid):
@@ -171,8 +171,8 @@ class GwGisFileCreate:
     def _set_project_vars(self, project, export_passwd):
 
         project_type = tools_gw.get_project_type()
-        project.setCustomVariables({'gwAddSchema': '', 'gwInfoType': 'full', 'gwMainSchema': '', 'gwProjectRole': 'role_admin', 'gwProjectType': project_type,
-                                     'gwStoreCredentials': f"{export_passwd}", 'svg_path': 'C:/Users/usuario/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/svg'})
+        project.setCustomVariables({"gwAddSchema": "", "gwInfoType": "full", "gwMainSchema": "", "gwProjectRole": "role_admin", "gwProjectType": project_type,
+                                     "gwStoreCredentials": f"{export_passwd}", "svg_path": "C:/Users/usuario/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/svg"})
 
         return project
 

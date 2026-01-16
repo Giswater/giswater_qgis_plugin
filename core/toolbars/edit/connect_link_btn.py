@@ -50,7 +50,7 @@ class GwConnectLinkButton(GwMaptool):
         self.user_click_marker.setPenWidth(3)
 
         # Check project type
-        if self.project_type != 'ws':
+        if self.project_type != "ws":
             # Create a dropdown menu
             self.menu = QMenu()
 
@@ -67,23 +67,23 @@ class GwConnectLinkButton(GwMaptool):
     def clicked_event(self):
         """Event when button is clicked"""
         # If a last selection exists (persisted in config), open that dialog directly
-        last_ft = tools_gw.get_config_parser('btn_connect_link', 'last_feature_type', "user", "session")
-        if last_ft not in (None, 'None', ''):
+        last_ft = tools_gw.get_config_parser("btn_connect_link", "last_feature_type", "user", "session")
+        if last_ft not in (None, "None", ""):
             self.feature_type = str(last_ft)
             self.open_dlg()
             return
 
         # Otherwise pop the menu below the button (like utilities/element)
         try:
-            if hasattr(self.action, 'associatedObjects'):
+            if hasattr(self.action, "associatedObjects"):
                 button = QWidget(self.action.associatedObjects()[1])
-            elif hasattr(self.action, 'associatedWidgets'):
+            elif hasattr(self.action, "associatedWidgets"):
                 button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.popup(menu_point)
         except Exception:
-            if self.project_type == 'ws':
-                self.feature_type = 'connec'
+            if self.project_type == "ws":
+                self.feature_type = "connec"
                 self.open_dlg()
 
     def open_dlg(self):
@@ -93,7 +93,7 @@ class GwConnectLinkButton(GwMaptool):
         body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
         # Execute procedure
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+        json_result = tools_gw.execute_procedure("gw_fct_get_dialog", body)
 
         # Create dialog
         self.dlg_connect_link = GwConnectLinkUi(self)
@@ -106,29 +106,29 @@ class GwConnectLinkButton(GwMaptool):
         self.max_distance = self.dlg_connect_link.findChild(QWidget, "tab_none_max_distance")
         self.tbl_ids = self.dlg_connect_link.findChild(QWidget, "tab_none_tbl_ids")
 
-        pipe_diameter_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'pipe_diameter', "user", "session")
-        max_distance_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'max_distance', "user", "session")
-        linkcat_id_value = tools_gw.get_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', "user", "session")
+        pipe_diameter_value = tools_gw.get_config_parser(f"btn_connect_link_to_{self.feature_type}", "pipe_diameter", "user", "session")
+        max_distance_value = tools_gw.get_config_parser(f"btn_connect_link_to_{self.feature_type}", "max_distance", "user", "session")
+        linkcat_id_value = tools_gw.get_config_parser(f"btn_connect_link_to_{self.feature_type}", "linkcat_id", "user", "session")
 
-        if pipe_diameter_value not in (None, 'None', ''):
+        if pipe_diameter_value not in (None, "None", ""):
             tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_pipe_diameter", pipe_diameter_value)
-        if max_distance_value not in (None, 'None', ''):
+        if max_distance_value not in (None, "None", ""):
             tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_max_distance", max_distance_value)
-        if linkcat_id_value not in (None, 'None', ''):
+        if linkcat_id_value not in (None, "None", ""):
             tools_qt.set_widget_text(self.dlg_connect_link, "tab_none_linkcat", linkcat_id_value)
 
         # Add headers to table
-        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{'header': f'{self.feature_type}_id'}])
+        tools_gw.add_tableview_header(self.tbl_ids, json_headers=[{"header": f"{self.feature_type}_id"}])
 
         # Connect cleanup signals when dialog is rejected (same pattern as psector)
         self.dlg_connect_link.rejected.connect(self._cleanup_and_close)
-        self.dlg_connect_link.rejected.connect(lambda: close(**{'class': self, 'dialog': self.dlg_connect_link}))
+        self.dlg_connect_link.rejected.connect(lambda: close(**{"class": self, "dialog": self.dlg_connect_link}))
 
         # Set window title from dialog depending of the current feature
         self.dlg_connect_link.setWindowTitle(tools_qt.tr(f"{self.feature_type.capitalize()} to link"))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_connect_link, 'connect_link')
+        tools_gw.open_dialog(self.dlg_connect_link, "connect_link")
 
         # Setup "Set to arc" button dropdown menu immediately (same as psector)
         self._setup_set_to_arc_button()
@@ -170,7 +170,7 @@ class GwConnectLinkButton(GwMaptool):
     def _btn_set_to_arc_clicked(self, btn):
         # Always open the dropdown menu; do not reuse last selection
         try:
-            if hasattr(btn, 'showMenu'):
+            if hasattr(btn, "showMenu"):
                 btn.showMenu()
         except Exception:
             pass
@@ -178,7 +178,7 @@ class GwConnectLinkButton(GwMaptool):
     def _make_arc_field_readonly(self):
         """Make arc field read-only (fallback if database config doesn't work)"""
         txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
-        if txt_arc_id and hasattr(txt_arc_id, 'setReadOnly'):
+        if txt_arc_id and hasattr(txt_arc_id, "setReadOnly"):
             txt_arc_id.setReadOnly(True)
 
     def _update_set_to_arc_button_state(self):
@@ -186,7 +186,7 @@ class GwConnectLinkButton(GwMaptool):
         btn_set_to_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_set_to_arc")
         btn_expr_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_expr_arc")
 
-        if hasattr(self, 'tbl_ids') and self.tbl_ids:
+        if hasattr(self, "tbl_ids") and self.tbl_ids:
             model = self.tbl_ids.model()
             has_connecs = model and model.rowCount() > 0
 
@@ -198,28 +198,28 @@ class GwConnectLinkButton(GwMaptool):
     def _cleanup_and_close(self):
         """Cleanup all visual elements when dialog is closed (same pattern as psector)"""
         # Reset rubber bands (clear red highlighting)
-        if hasattr(self, 'rubber_band_line') and self.rubber_band_line:
+        if hasattr(self, "rubber_band_line") and self.rubber_band_line:
             tools_gw.reset_rubberband(self.rubber_band_line)
 
         # Clear vertex markers
-        if hasattr(self, 'vertex_marker') and self.vertex_marker and hasattr(self.vertex_marker, 'hide'):
+        if hasattr(self, "vertex_marker") and self.vertex_marker and hasattr(self.vertex_marker, "hide"):
             self.vertex_marker.hide()
 
         # Clear user click marker
-        if hasattr(self, 'user_click_marker') and self.user_click_marker:
+        if hasattr(self, "user_click_marker") and self.user_click_marker:
             self.user_click_marker.hide()
 
         # Clear any user click point
-        if hasattr(self, 'user_click_point'):
+        if hasattr(self, "user_click_point"):
             self.user_click_point = None
 
         # Clear temp_table entries
         tools_db.execute_sql("DELETE FROM temp_table WHERE fid = 485 AND cur_user = current_user;")
 
         # Reset snapping if needed
-        if (hasattr(self, 'snapper_manager') and self.snapper_manager and
-            hasattr(self, 'emit_point') and self.emit_point and
-            hasattr(self, 'vertex_marker')):
+        if (hasattr(self, "snapper_manager") and self.snapper_manager and
+            hasattr(self, "emit_point") and self.emit_point and
+            hasattr(self, "vertex_marker")):
             tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
 
     def fill_tbl_ids(self, layer):
@@ -256,8 +256,8 @@ class GwConnectLinkButton(GwMaptool):
             self.menu.removeAction(action)
 
         ag = QActionGroup(self.iface.mainWindow())
-        entries = ((tools_qt.tr('Connec to network'), 'connec'),
-                   (tools_qt.tr('Gully to network'), 'gully'))
+        entries = ((tools_qt.tr("Connec to network"), "connec"),
+                   (tools_qt.tr("Gully to network"), "gully"))
         for label, feature_type in entries:
             act = QAction(label, ag)
             self.menu.addAction(act)
@@ -266,7 +266,7 @@ class GwConnectLinkButton(GwMaptool):
 
     def _save_last_main_selection(self, feature_type):
         # Persist last selected feature type using config (like select_manager)
-        tools_gw.set_config_parser('btn_connect_link', 'last_feature_type', feature_type)
+        tools_gw.set_config_parser("btn_connect_link", "last_feature_type", feature_type)
 
     def _open_connect_dialog(self, feature_type):
         self.feature_type = feature_type
@@ -282,7 +282,7 @@ class GwConnectLinkButton(GwMaptool):
         tools_gw.reset_rubberband(self.rubber_band)
 
         # Initialize snapper manager if not already done
-        if not hasattr(self, 'snapper_manager') or self.snapper_manager is None:
+        if not hasattr(self, "snapper_manager") or self.snapper_manager is None:
             self.snapper_manager = GwSnapManager(self.iface)
 
         # Store user snapping configuration
@@ -317,7 +317,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasReleaseEvent(self, event):
         """With left click the digitizing is finished"""
         # Manage if task is already running
-        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
+        if hasattr(self, "connect_link_task") and self.connect_link_task is not None:
             try:
                 if self.connect_link_task.isActive():
                     msg = "Connect link task is already active!"
@@ -343,16 +343,16 @@ class GwConnectLinkButton(GwMaptool):
             tools_gw.reset_rubberband(self.rubber_band)
 
             # Force reload dataProvider of layer
-            tools_qgis.set_layer_index('ve_link')
-            tools_qgis.set_layer_index('ve_vnode')
+            tools_qgis.set_layer_index("ve_link")
+            tools_qgis.set_layer_index("ve_vnode")
 
     def manage_result(self, result):
 
-        if result and result['status'] != 'Failed':
-            tools_gw.fill_tab_log(self.dlg_connect_link, result['body']['data'])
+        if result and result["status"] != "Failed":
+            tools_gw.fill_tab_log(self.dlg_connect_link, result["body"]["data"])
         else:
             msg = "gw_fct_setlinktonetwork (Check log messages)"
-            tools_qgis.show_warning(msg, title='Function error')
+            tools_qgis.show_warning(msg, title="Function error")
 
         # Recover dialog values
         self._save_dlg_values()
@@ -366,8 +366,8 @@ class GwConnectLinkButton(GwMaptool):
         self.iface.actionPan().trigger()
 
         # Force reload dataProvider of layer
-        tools_qgis.set_layer_index('ve_link')
-        tools_qgis.set_layer_index('ve_vnode')
+        tools_qgis.set_layer_index("ve_link")
+        tools_qgis.set_layer_index("ve_vnode")
 
     # endregion
 
@@ -405,7 +405,7 @@ class GwConnectLinkButton(GwMaptool):
         behaviour = QgsVectorLayer.SelectBehavior.RemoveFromSelection if key == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier) else QgsVectorLayer.SelectBehavior.AddToSelection
 
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f"ve_{self.feature_type}")
 
         # Check if layer exists
         if layer:
@@ -423,7 +423,7 @@ class GwConnectLinkButton(GwMaptool):
     def _selection_end(self):
         """Process selected features"""
         # Get current feature layer (connec/gully)
-        layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f"ve_{self.feature_type}")
 
         # Refresh table
         self.fill_tbl_ids(layer)
@@ -440,12 +440,12 @@ class GwConnectLinkButton(GwMaptool):
             return
 
         # Extract arc IDs from selected features
-        selected_arc_ids = [str(feature.attribute('arc_id')) for feature in selected_features]
+        selected_arc_ids = [str(feature.attribute("arc_id")) for feature in selected_features]
 
         # Update arc line edit field directly (same as mapzone forceClosed)
         txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
-        if txt_arc_id and hasattr(txt_arc_id, 'setText'):
-            arc_text = ', '.join(selected_arc_ids)
+        if txt_arc_id and hasattr(txt_arc_id, "setText"):
+            arc_text = ", ".join(selected_arc_ids)
             txt_arc_id.setText(arc_text)
 
         # Clean up
@@ -457,14 +457,14 @@ class GwConnectLinkButton(GwMaptool):
         tools_gw.reset_rubberband(self.rubber_band_line)
 
         # If no arcs selected, just clear and return
-        if not hasattr(self, 'selected_arcs') or not self.selected_arcs:
+        if not hasattr(self, "selected_arcs") or not self.selected_arcs:
             return
 
         # Get arc layer and highlight all selected arcs
-        layer = tools_qgis.get_layer_by_tablename('ve_arc')
+        layer = tools_qgis.get_layer_by_tablename("ve_arc")
         if layer:
             for arc_id in self.selected_arcs:
-                feature = tools_qt.get_feature_by_id(layer, arc_id, 'arc_id')
+                feature = tools_qt.get_feature_by_id(layer, arc_id, "arc_id")
                 if feature:
                     try:
                         geometry = feature.geometry()
@@ -483,15 +483,15 @@ class GwConnectLinkButton(GwMaptool):
         max_distance_value = self.max_distance.text()
         linkcat_id_value = tools_qt.get_combo_value(self.dlg_connect_link, "tab_none_linkcat")
 
-        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'pipe_diameter', pipe_diameter_value)
-        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'max_distance', max_distance_value)
-        tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', linkcat_id_value)
+        tools_gw.set_config_parser(f"btn_connect_link_to_{self.feature_type}", "pipe_diameter", pipe_diameter_value)
+        tools_gw.set_config_parser(f"btn_connect_link_to_{self.feature_type}", "max_distance", max_distance_value)
+        tools_gw.set_config_parser(f"btn_connect_link_to_{self.feature_type}", "linkcat_id", linkcat_id_value)
 
     def _set_to_arc(self, idx):
         """Handle 'Set to arc' button clicks - allows user to set exact connection point on arc"""
-        if hasattr(self, 'emit_point') and self.emit_point is not None:
-            tools_gw.disconnect_signal('connect_link', 'set_to_arc_ep_canvasClicked_set_arc_id')
-            tools_gw.disconnect_signal('connect_link', 'set_to_arc_xyCoordinates_mouse_move_arc')
+        if hasattr(self, "emit_point") and self.emit_point is not None:
+            tools_gw.disconnect_signal("connect_link", "set_to_arc_ep_canvasClicked_set_arc_id")
+            tools_gw.disconnect_signal("connect_link", "set_to_arc_xyCoordinates_mouse_move_arc")
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -508,13 +508,13 @@ class GwConnectLinkButton(GwMaptool):
         # Show instruction message for multiple selection mode
         if idx == 0:  # "Set closest point (multiple)"
             message = "Click on arcs to select them. Use Alt+click to unselect selected arcs."
-            tools_qgis.show_info(message, title='Connect to network')
+            tools_qgis.show_info(message, title="Connect to network")
 
         # Set signals
-        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'connect_link',
-                                'set_to_arc_xyCoordinates_mouse_move_arc')
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, "connect_link",
+                                "set_to_arc_xyCoordinates_mouse_move_arc")
         tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id, idx),
-                                'connect_link', 'set_to_arc_ep_canvasClicked_set_arc_id')
+                                "connect_link", "set_to_arc_ep_canvasClicked_set_arc_id")
 
     # endregion
 
@@ -557,13 +557,13 @@ class GwConnectLinkButton(GwMaptool):
             if layer == self.layer_arc:
                 # Get the point
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
-                self.arc_id = snapped_feat.attribute('arc_id')
+                self.arc_id = snapped_feat.attribute("arc_id")
 
                 # Set highlight like in psector (without zoom)
-                feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
+                feature = tools_qt.get_feature_by_id(layer, self.arc_id, "arc_id")
                 try:
                     geometry = feature.geometry()
-                    if hasattr(self, 'rubber_band_line'):
+                    if hasattr(self, "rubber_band_line"):
                         # Reset first, then add geometry (avoids zoom that setToGeometry causes)
                         tools_gw.reset_rubberband(self.rubber_band_line)
                         self.rubber_band_line.addGeometry(geometry, None)
@@ -601,12 +601,12 @@ class GwConnectLinkButton(GwMaptool):
 
             # Update display with all selected arcs
             txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
-            if txt_arc_id and hasattr(txt_arc_id, 'setText'):
+            if txt_arc_id and hasattr(txt_arc_id, "setText"):
                 if self.selected_arcs:
-                    arc_text = ', '.join(map(str, self.selected_arcs))
+                    arc_text = ", ".join(map(str, self.selected_arcs))
                     txt_arc_id.setText(arc_text)
                 else:
-                    txt_arc_id.setText('')
+                    txt_arc_id.setText("")
 
             # Highlight all selected arcs
             self._highlight_all_selected_arcs()
@@ -624,18 +624,18 @@ class GwConnectLinkButton(GwMaptool):
             self.user_click_point = snapped_point
 
             # Add a cross marker at the snapped point (same location as pink vertex marker)
-            if hasattr(self, 'user_click_marker') and self.user_click_marker:
+            if hasattr(self, "user_click_marker") and self.user_click_marker:
                 self.user_click_marker.setCenter(snapped_point)
                 self.user_click_marker.show()
 
             # Set single arc id in field
             txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
-            if txt_arc_id and hasattr(txt_arc_id, 'setText'):
+            if txt_arc_id and hasattr(txt_arc_id, "setText"):
                 txt_arc_id.setText(str(self.arc_id))
 
         # Disconnect and restore snapping (only for single mode, without panning)
-        tools_gw.disconnect_signal('connect_link', 'set_to_arc_ep_canvasClicked_set_arc_id')
-        tools_gw.disconnect_signal('connect_link', 'set_to_arc_xyCoordinates_mouse_move_arc')
+        tools_gw.disconnect_signal("connect_link", "set_to_arc_ep_canvasClicked_set_arc_id")
+        tools_gw.disconnect_signal("connect_link", "set_to_arc_xyCoordinates_mouse_move_arc")
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
     # endregion
@@ -644,15 +644,15 @@ class GwConnectLinkButton(GwMaptool):
 def add(**kwargs):
     """Add button clicked event"""
     # Get class
-    this = kwargs['class']
+    this = kwargs["class"]
 
     # Get selected id
     selected_id = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_id")
 
     # Check if selected id is not empty
-    if selected_id is None or selected_id == '':
+    if selected_id is None or selected_id == "":
         message = "Please select a feature to add"
-        tools_qgis.show_warning(message, title='Connect to network')
+        tools_qgis.show_warning(message, title="Connect to network")
         return
 
     # Create expression filter
@@ -660,7 +660,7 @@ def add(**kwargs):
     is_valid, expr = tools_qt.check_expression_filter(expr_filter)
 
     # Get layer from feature
-    layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
+    layer = tools_qgis.get_layer_by_tablename(f"ve_{this.feature_type}")
 
     # Check if layer exists and expression is valid
     if layer and is_valid:
@@ -679,7 +679,7 @@ def add(**kwargs):
 def remove(**kwargs):
     """Remove button clicked event - Remove selected rows from table"""
     # Get class
-    this = kwargs['class']
+    this = kwargs["class"]
 
     try:
         # Get the table model and selection model
@@ -694,7 +694,7 @@ def remove(**kwargs):
 
         if not selected_rows:
             message = "Please select rows to remove from the table"
-            tools_qgis.show_warning(message, title='Connect to network')
+            tools_qgis.show_warning(message, title="Connect to network")
             return
 
         # Get IDs from selected rows
@@ -720,7 +720,7 @@ def remove(**kwargs):
         this._update_set_to_arc_button_state()
 
         # Update canvas selection to show only remaining items in the table
-        layer = tools_qgis.get_layer_by_tablename(f've_{this.feature_type}')
+        layer = tools_qgis.get_layer_by_tablename(f"ve_{this.feature_type}")
         if layer:
             # Get remaining IDs from the table
             remaining_ids = []
@@ -753,7 +753,7 @@ def remove(**kwargs):
 def accept(**kwargs):
     """Accept button clicked event"""
     # Get class
-    this = kwargs['class']
+    this = kwargs["class"]
 
     # Clear any previous temp_table entries for fid 485 (user click points)
     sql_clear = "DELETE FROM temp_table WHERE fid = 485;"
@@ -763,28 +763,28 @@ def accept(**kwargs):
     this.linkcat = tools_qt.get_combo_value(this.dlg_connect_link, "tab_none_linkcat")
 
     # Check input values
-    if this.linkcat == '':
+    if this.linkcat == "":
         message = "Please fill link catalog field in the dialog"
-        tools_qgis.show_warning(message, title='Connect to network', dialog=this.dlg_connect_link)
+        tools_qgis.show_warning(message, title="Connect to network", dialog=this.dlg_connect_link)
         return
 
     # Get arc layer
-    layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
+    layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
     # Get selected arcs from the class variable or field
     selected_arcs = []
 
     # First, check if we have multiple arcs selected via "Set closest point (multiple)"
-    if hasattr(this, 'selected_arcs') and this.selected_arcs:
+    if hasattr(this, "selected_arcs") and this.selected_arcs:
         selected_arcs = this.selected_arcs
     else:
         # Fallback: try to get arc from the arc selection field
         txt_arc_id = this.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
-        arc_id_from_field = txt_arc_id.text() if txt_arc_id and hasattr(txt_arc_id, 'text') else None
+        arc_id_from_field = txt_arc_id.text() if txt_arc_id and hasattr(txt_arc_id, "text") else None
 
         if arc_id_from_field:
             # Handle comma-separated arc IDs
-            arc_ids = [arc.strip() for arc in arc_id_from_field.split(',') if arc.strip()]
+            arc_ids = [arc.strip() for arc in arc_id_from_field.split(",") if arc.strip()]
             selected_arcs = arc_ids
         else:
             # Final fallback: check if there are arcs selected on the map
@@ -799,7 +799,7 @@ def accept(**kwargs):
     # Check if table is empty
     if model.rowCount() == 0:
         message = "Please select a feature to add"
-        tools_qgis.show_warning(message, title='Connect to network', dialog=this.dlg_connect_link)
+        tools_qgis.show_warning(message, title="Connect to network", dialog=this.dlg_connect_link)
         return
 
     # Loop throught table rows
@@ -809,7 +809,7 @@ def accept(**kwargs):
             this.ids.append(int(item.text()))
 
     # Insert temp_table point if user click was used
-    if hasattr(this, 'user_click_point') and this.user_click_point:
+    if hasattr(this, "user_click_point") and this.user_click_point:
         point = this.user_click_point
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {lib_vars.data_epsg})"
         sql_insert = f"INSERT INTO temp_table (fid, geom_point, cur_user) VALUES (485, {the_geom}, current_user);"
@@ -831,13 +831,13 @@ def accept(**kwargs):
 
 def snapping(**kwargs):
     """Accept button clicked event"""
-    GwMaptool.clicked_event(kwargs['class'])
+    GwMaptool.clicked_event(kwargs["class"])
 
 
 def close(**kwargs):
     """Close button clicked event"""
     # Get class
-    this = kwargs['class']
+    this = kwargs["class"]
 
     # Remove selection from layers before canceling map tool
     tools_gw.remove_selection()
@@ -846,16 +846,16 @@ def close(**kwargs):
     this.cancel_map_tool()
 
     # Close dialog
-    tools_gw.close_dialog(kwargs['dialog'])
+    tools_gw.close_dialog(kwargs["dialog"])
 
 
 def filter_expression(**kwargs):
     """Select features by expression for connec table"""
     # Get class
-    this = kwargs['class']
+    this = kwargs["class"]
 
     # Get current layer and feature type
-    layer_name = f've_{this.feature_type}'
+    layer_name = f"ve_{this.feature_type}"
 
     layer = tools_qgis.get_layer_by_tablename(layer_name)
     if not layer:
@@ -879,10 +879,10 @@ def filter_expression(**kwargs):
 def filter_expression_arc(**kwargs):
     """Select arc features by expression for arc field"""
     # Get class
-    this = kwargs['class']
+    this = kwargs["class"]
 
     # Get arc layer
-    layer_name = 've_arc'
+    layer_name = "ve_arc"
     layer = tools_qgis.get_layer_by_tablename(layer_name)
     if not layer:
         return
@@ -893,7 +893,7 @@ def filter_expression_arc(**kwargs):
 
     # Temporarily change feature_type to 'arc' for correct dialog title and layer
     original_feature_type = this.feature_type
-    this.feature_type = 'arc'
+    this.feature_type = "arc"
 
     # Show expression dialog for arc field
     tools_gw.select_with_expression_dialog_custom(

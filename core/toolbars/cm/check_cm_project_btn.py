@@ -33,12 +33,12 @@ class GwCheckCMProjectButton(GwAction):
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
 
         # Fetch dialog configuration from the database
-        json_result = tools_gw.execute_procedure('gw_fct_cm_get_dialog', body, schema_name='cm')
+        json_result = tools_gw.execute_procedure("gw_fct_cm_get_dialog", body, schema_name="cm")
 
         # Check for a valid result
         if not json_result or json_result.get("status") != "Accepted":
             msg = tools_qt.tr("Failed to fetch dialog configuration", context_name="cm")
-            tools_qgis.show_warning(msg, dialog=self.dialog if hasattr(self, 'dialog') else None)
+            tools_qgis.show_warning(msg, dialog=self.dialog if hasattr(self, "dialog") else None)
             return
 
         # Store the dialog as an instance variable to prevent garbage collection
@@ -52,12 +52,12 @@ class GwCheckCMProjectButton(GwAction):
         self.campaign_combo = self.dialog.findChild(QComboBox, "tab_data_campaign")
         self.lot_combo = self.dialog.findChild(QComboBox, "tab_data_lot")
 
-        campagin_combo_value = tools_gw.get_config_parser('check_project_cm', 'campaign_combo', "user", "session")
-        lot_combo_value = tools_gw.get_config_parser('check_project_cm', 'lot_combo', "user", "session")
+        campagin_combo_value = tools_gw.get_config_parser("check_project_cm", "campaign_combo", "user", "session")
+        lot_combo_value = tools_gw.get_config_parser("check_project_cm", "lot_combo", "user", "session")
 
-        if campagin_combo_value not in (None, 'None', ''):
+        if campagin_combo_value not in (None, "None", ""):
             tools_qt.set_combo_value(self.campaign_combo, campagin_combo_value, 0)
-        if lot_combo_value not in (None, 'None', ''):
+        if lot_combo_value not in (None, "None", ""):
             tools_qt.set_combo_value(self.lot_combo, lot_combo_value, 0)
 
         # Set listeners
@@ -108,7 +108,7 @@ class GwCheckCMProjectButton(GwAction):
             # Populate the lot combo box with results
             if result:
                 for row in result:
-                    self.lot_combo.addItem(str(row['idval']), row['id'])
+                    self.lot_combo.addItem(str(row["idval"]), row["id"])
         finally:
             # Always unblock signals when we are done
             self.lot_combo.blockSignals(False)
@@ -139,7 +139,7 @@ class GwCheckCMProjectButton(GwAction):
         # Save dialog values
         self._save_dlg_values()
 
-        self.project_check_task = GwProjectCheckCMTask('check_project_cm', params)
+        self.project_check_task = GwProjectCheckCMTask("check_project_cm", params)
 
         # Connect task signals to UI updates
         self.project_check_task.task_started.connect(self._on_task_started)
@@ -173,8 +173,8 @@ class GwCheckCMProjectButton(GwAction):
         campaign_combo = tools_qt.get_combo_value(self.dialog, "tab_data_campaign", index=0)
         lot_combo = tools_qt.get_combo_value(self.dialog, "tab_data_lot", index=-1)
 
-        tools_gw.set_config_parser('check_project_cm', 'campaign_combo', campaign_combo)
-        tools_gw.set_config_parser('check_project_cm', 'lot_combo', lot_combo)
+        tools_gw.set_config_parser("check_project_cm", "campaign_combo", campaign_combo)
+        tools_gw.set_config_parser("check_project_cm", "lot_combo", lot_combo)
 
     # endregion
 

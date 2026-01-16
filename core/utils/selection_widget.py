@@ -199,7 +199,7 @@ class GwSelectionWidget(QWidget):
             for tool_type in used_tools:
                 icon_path = os.path.join(lib_vars.plugin_dir, "icons", "dialogs", tools[tool_type])
                 action = QAction(QIcon(icon_path), tool_type.capitalize(), dialog)
-                action.setProperty('has_icon', True)
+                action.setProperty("has_icon", True)
                 action.triggered.connect(partial(handle_action, tool_type))
                 ag.addAction(action)
 
@@ -546,7 +546,7 @@ class GwSelectionWidget(QWidget):
 
         model = widget_table.model()
         id_column_index = -1
-        id_col_name = f'{feature_type}_id'
+        id_col_name = f"{feature_type}_id"
 
         for i in range(model.columnCount()):
             if model.headerData(i, Qt.Orientation.Horizontal) == id_col_name:
@@ -627,7 +627,7 @@ class GwSelectionWidget(QWidget):
             return
             
         # Initialize default model on first call
-        if not hasattr(self, 'default_model') or self.default_model is None:
+        if not hasattr(self, "default_model") or self.default_model is None:
             # Create a deep copy of the current model as the default
             self.default_model = QStandardItemModel()
             self.default_model.setHorizontalHeaderLabels([

@@ -21,7 +21,7 @@ class GwProjectCheckTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, description='', params=None, timer=None):
+    def __init__(self, description="", params=None, timer=None):
 
         super().__init__(description)
         self.params = params if params else {}
@@ -33,9 +33,9 @@ class GwProjectCheckTask(GwTask):
 
         super().run()
 
-        layers = self.params['layers']
-        init_project = self.params['init_project']
-        self.dlg_audit_project = self.params['dialog']
+        layers = self.params["layers"]
+        init_project = self.params["init_project"]
+        self.dlg_audit_project = self.params["dialog"]
         msg = "Task 'Check project' execute function '{0}'"
         msg_params = ("fill_check_project_table",)
         tools_log.log_info(msg, msg_params=msg_params)
@@ -61,10 +61,10 @@ class GwProjectCheckTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
             return
@@ -82,29 +82,29 @@ class GwProjectCheckTask(GwTask):
                 continue
             if not tools_qgis.check_query_layer(layer):
                 continue
-            if layer.providerType() != 'postgres':
+            if layer.providerType() != "postgres":
                 continue
             layer_source = tools_qgis.get_layer_source(layer)
-            if layer_source['schema'] is None:
+            if layer_source["schema"] is None:
                 continue
-            layer_source['schema'] = layer_source['schema'].replace('"', '')
-            if layer_source.get('schema') != lib_vars.schema_name:
+            layer_source["schema"] = layer_source["schema"].replace('"', "")
+            if layer_source.get("schema") != lib_vars.schema_name:
                 continue
 
-            schema_name = layer_source['schema']
+            schema_name = layer_source["schema"]
             if schema_name is not None:
-                schema_name = schema_name.replace('"', '')
-                table_name = layer_source['table']
-                db_name = layer_source['db']
-                host_name = layer_source['host']
-                table_user = layer_source['user']
+                schema_name = schema_name.replace('"', "")
+                table_name = layer_source["table"]
+                db_name = layer_source["db"]
+                host_name = layer_source["host"]
+                table_user = layer_source["user"]
                 fields += f'{{"table_schema":"{schema_name}", '
                 fields += f'"table_id":"{table_name}", '
                 fields += f'"table_dbname":"{db_name}", '
                 fields += f'"table_host":"{host_name}", '
                 fields += '"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
-        fields = fields[:-2] + ']'
+        fields = fields[:-2] + "]"
 
         # Execute function 'gw_fct_setcheckproject'
         result = self._execute_check_project_function(init_project, fields)
@@ -120,11 +120,11 @@ class GwProjectCheckTask(GwTask):
         show_qgis_project = self.params.get("show_qgis_project", False)
 
         # Get project variables
-        add_schema = lib_vars.project_vars['add_schema']
-        main_schema = lib_vars.project_vars['main_schema']
-        project_role = lib_vars.project_vars['project_role']
-        info_type = lib_vars.project_vars['info_type']
-        project_type = lib_vars.project_vars['project_type']
+        add_schema = lib_vars.project_vars["add_schema"]
+        main_schema = lib_vars.project_vars["main_schema"]
+        project_role = lib_vars.project_vars["project_role"]
+        info_type = lib_vars.project_vars["info_type"]
+        project_type = lib_vars.project_vars["project_type"]
 
         plugin_version, message = tools_qgis.get_plugin_version()
         if plugin_version is None:
@@ -149,15 +149,15 @@ class GwProjectCheckTask(GwTask):
         extras += f', "projectType":"{project_type}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
-        extras += f', {fields_to_insert}'
+        extras += f", {fields_to_insert}"
         if show_versions or show_qgis_project:
             extras += f', "parameters": {{"showVersions": {str(show_versions).lower()}, "showQgisProject": {str(show_qgis_project).lower()}}}'
 
         # Execute procedure
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
+        result = tools_gw.execute_procedure("gw_fct_setcheckproject", body, is_thread=True, aux_conn=self.aux_conn)
         try:
-            if not result or result['body']['variables'].get('hideForm'):
+            if not result or result["body"]["variables"].get("hideForm"):
                 return result
         except KeyError as e:
             msg = "EXCEPTION: {0}, {1}"
@@ -170,12 +170,12 @@ class GwProjectCheckTask(GwTask):
     def _show_check_project_result(self, result):
         """Show dialog with audit check project results"""
         # Handle failed results
-        if result.get('status') == 'Failed':
+        if result.get("status") == "Failed":
             tools_gw.manage_json_exception(result)
             return False
 
         # Call `fill_tab_log()` directly, no need to store variables
-        tools_gw.fill_tab_log(self.dlg_audit_project, result['body']['data'], reset_text=False)
+        tools_gw.fill_tab_log(self.dlg_audit_project, result["body"]["data"], reset_text=False)
 
     def _add_selected_layers(self, dialog, m_layers):
         """Receive a list of layers, look for the checks associated with each layer and if they are checked,
@@ -188,27 +188,27 @@ class GwProjectCheckTask(GwTask):
             if layer_info == {}:
                 continue
 
-            check = dialog.findChild(QCheckBox, layer_info['layer'])
+            check = dialog.findChild(QCheckBox, layer_info["layer"])
             if check.isChecked():
-                geom_field = layer_info['geom_field']
-                pkey_field = layer_info['pkey_field']
-                group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
-                style_id = layer_info['style_id']
+                geom_field = layer_info["geom_field"]
+                pkey_field = layer_info["pkey_field"]
+                group = layer_info["group_layer"] if layer_info["group_layer"] is not None else "GW Layers"
+                style_id = layer_info["style_id"]
 
-                tools_gw.add_layer_database(layer_info['layer'], geom_field, pkey_field, group=group)
+                tools_gw.add_layer_database(layer_info["layer"], geom_field, pkey_field, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:
-                    layer = tools_qgis.get_layer_by_tablename(layer_info['layer'])
+                    layer = tools_qgis.get_layer_by_tablename(layer_info["layer"])
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
-                        style = tools_gw.execute_procedure('gw_fct_getstyle', body)
-                        if not style or style['status'] == 'Failed':
+                        style = tools_gw.execute_procedure("gw_fct_getstyle", body)
+                        if not style or style["status"] == "Failed":
                             return
-                        if 'styles' in style['body']:
-                            if 'style' in style['body']['styles']:
-                                qml = style['body']['styles']['style']
+                        if "styles" in style["body"]:
+                            if "style" in style["body"]["styles"]:
+                                qml = style["body"]["styles"]["style"]
                             tools_qgis.create_qml(layer, qml)
                 tools_qgis.set_layer_visible(layer)
 

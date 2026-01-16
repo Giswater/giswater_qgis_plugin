@@ -38,12 +38,12 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager = GwWorkspaceManagerUi(self)
         tools_gw.load_settings(self.dlg_workspace_manager)
 
-        self.filter_name = self.dlg_workspace_manager.findChild(QLineEdit, 'txt_name')
+        self.filter_name = self.dlg_workspace_manager.findChild(QLineEdit, "txt_name")
         reg_exp = QRegularExpression(r'([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegularExpressionValidator(reg_exp))
 
         # Fill table
-        self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, 'tbl_wrkspcm')
+        self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, "tbl_wrkspcm")
         self._fill_tbl()
         self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
@@ -64,15 +64,15 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_workspace_manager))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_workspace_manager, 'workspace_manager')
+        tools_gw.open_dialog(self.dlg_workspace_manager, "workspace_manager")
 
     def _open_update_workspace_dlg(self):
 
         # Create workspace dialog
         self.dlg_create_workspace = GwCreateWorkspaceUi(self)
-        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
-        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
-        self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
+        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, "txt_workspace_name")
+        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, "txt_workspace_descript")
+        self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, "chk_workspace_private")
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_create_workspace)
@@ -95,20 +95,20 @@ class GwWorkspaceManagerButton(GwAction):
         sql = (f"SELECT name, descript, private FROM cat_workspace WHERE id = {value}")
         row = tools_db.get_row(sql)
 
-        tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_name, row['name'])
-        tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_descript, row['descript'])
-        tools_qt.set_checked(self.dlg_create_workspace, self.new_workspace_chk, row['private'])
+        tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_name, row["name"])
+        tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_descript, row["descript"])
+        tools_qt.set_checked(self.dlg_create_workspace, self.new_workspace_chk, row["private"])
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
+        tools_gw.open_dialog(self.dlg_create_workspace, "workspace_create")
 
     def _open_create_workspace_dlg(self):
 
         # Create workspace dialog
         self.dlg_create_workspace = GwCreateWorkspaceUi(self)
-        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
-        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
-        self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
+        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, "txt_workspace_name")
+        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, "txt_workspace_descript")
+        self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, "chk_workspace_private")
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_create_workspace)
@@ -119,15 +119,15 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_create_workspace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_workspace))
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
+        tools_gw.open_dialog(self.dlg_create_workspace, "workspace_create")
 
-    def _get_list(self, table_name='v_ui_workspace', filter_name=""):
+    def _get_list(self, table_name="v_ui_workspace", filter_name=""):
         """Mount and execute the query for gw_fct_getlist"""
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
-        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
-        if json_result is None or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getlist", body)
+        if json_result is None or json_result["status"] == "Failed":
             return False
         complet_list = json_result
         if not complet_list:
@@ -141,8 +141,8 @@ class GwWorkspaceManagerButton(GwAction):
 
         if complet_list is False:
             return False, False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
+        for field in complet_list["body"]["data"]["fields"]:
+            if field.get("hidden"):
                 continue
             model = self.tbl_wrkspcm.model()
             if model is None:
@@ -150,7 +150,7 @@ class GwWorkspaceManagerButton(GwAction):
                 self.tbl_wrkspcm.setModel(model)
             model.removeRows(0, model.rowCount())
 
-            if field['value']:
+            if field["value"]:
                 self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, field)
                 self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
             # TODO: config_form_tableview
@@ -170,26 +170,26 @@ class GwWorkspaceManagerButton(GwAction):
             if deselected.indexes():
                 self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.SelectionFlag.Select)
                 return
-            tools_qt.set_widget_text(self.dlg_workspace_manager, 'tab_log_txt_infolog', "")
+            tools_qt.set_widget_text(self.dlg_workspace_manager, "tab_log_txt_infolog", "")
             return
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, 'id')
+        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, "id")
         workspace_id = json.loads(cols[col_ind].data())
 
         action = "INFO"
         extras = f'"action":"{action}", "id":"{workspace_id}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+        result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
-        if result and result['status'] == "Accepted":
-            tools_gw.fill_tab_log(self.dlg_workspace_manager, result['body']['data'],
+        if result and result["status"] == "Accepted":
+            tools_gw.fill_tab_log(self.dlg_workspace_manager, result["body"]["data"],
                                   force_tab=False, call_set_tabs_enabled=False, close=False)
 
     def _create_workspace(self):
         """Create a workspace"""
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
-        if descript == '':
-            descript = 'null'
+        if descript == "":
+            descript = "null"
         else:
             descript = f'"{descript}"'
             descript = descript.replace("\n", "\\n")
@@ -201,10 +201,10 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+        result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
-        if result and result['status'] == "Accepted":
-            tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
+        if result and result["status"] == "Accepted":
+            tools_gw.fill_tab_log(self.dlg_create_workspace, result["body"]["data"])
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
@@ -224,7 +224,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         try:
             name_value = result["body"]["data"]["name"]
-            tools_qt.set_widget_text(dialog, 'lbl_vdefault_workspace', name_value)
+            tools_qt.set_widget_text(dialog, "lbl_vdefault_workspace", name_value)
         except KeyError:
             print("Error: 'name' field is missing in the result")
 
@@ -245,13 +245,13 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "id": "{value}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+        result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
-        if result and result.get('message') and result['message'].get('text'):
-            msg = result["message"].get('text')
-            tools_qgis.show_message(msg, Qgis.MessageLevel(result["message"].get('level')), dialog=self.dlg_workspace_manager)
+        if result and result.get("message") and result["message"].get("text"):
+            msg = result["message"].get("text")
+            tools_qgis.show_message(msg, Qgis.MessageLevel(result["message"].get("level")), dialog=self.dlg_workspace_manager)
 
-        if result and result['status'] == "Accepted":
+        if result and result["status"] == "Accepted":
             # Set labels
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
@@ -261,9 +261,9 @@ class GwWorkspaceManagerButton(GwAction):
             global_vars.iface.mapCanvas().refresh()
 
             # Zoom to layer
-            layer = tools_qgis.get_layer_by_tablename('ve_inp_junction')
+            layer = tools_qgis.get_layer_by_tablename("ve_inp_junction")
             if not layer:
-                layer = tools_qgis.get_layer_by_tablename('ve_node')
+                layer = tools_qgis.get_layer_by_tablename("ve_node")
             tools_qgis.zoom_to_layer(layer)
 
             # Refresh selector docker if open
@@ -280,7 +280,7 @@ class GwWorkspaceManagerButton(GwAction):
         if windows:
             try:
                 dialog = windows[0]
-                go2epa = dialog.property('GwGo2EpaButton')
+                go2epa = dialog.property("GwGo2EpaButton")
                 go2epa._refresh_go2epa_options(go2epa.dlg_go2epa_options)
             except Exception:
                 pass
@@ -302,13 +302,13 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "id": "{value}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+        result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
-        if result and result['status'] == "Accepted":
-            message = result.get('message')
+        if result and result["status"] == "Accepted":
+            message = result.get("message")
             if message:
-                msg = message['text']
-                tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
+                msg = message["text"]
+                tools_qgis.show_message(msg, Qgis.MessageLevel(message["level"]), dialog=self.dlg_workspace_manager)
             self._fill_tbl(self.filter_name.text())
 
     def _update_workspace(self):
@@ -328,8 +328,8 @@ class GwWorkspaceManagerButton(GwAction):
 
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
-        if descript == '':
-            descript = 'null'
+        if descript == "":
+            descript = "null"
         else:
             descript = f'"{descript}"'
             descript = descript.replace("\n", "\\n")
@@ -344,15 +344,15 @@ class GwWorkspaceManagerButton(GwAction):
         if answer:
             extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+            result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
-            if result and result['status'] == "Accepted":
-                message = result.get('message')
+            if result and result["status"] == "Accepted":
+                message = result.get("message")
                 if message:
-                    msg = message['text']
-                    tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
+                    msg = message["text"]
+                    tools_qgis.show_message(msg, Qgis.MessageLevel(message["level"]), dialog=self.dlg_workspace_manager)
 
-                tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
+                tools_gw.fill_tab_log(self.dlg_create_workspace, result["body"]["data"])
                 self._fill_tbl(self.filter_name.text())
                 self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
@@ -375,7 +375,7 @@ class GwWorkspaceManagerButton(GwAction):
         sql = "SELECT value FROM config_param_user WHERE parameter='utils_workspace_current' AND cur_user = current_user"
         row = tools_db.get_row(sql)
         if row and row[0]:
-            if row[0] == f'{value}':
+            if row[0] == f"{value}":
                 msg = ("WARNING: This will remove the 'utils_workspace_current' variable for your user!\n"
                         "Are you sure you want to delete these records?")
 
@@ -384,13 +384,13 @@ class GwWorkspaceManagerButton(GwAction):
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+            result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
-            if result and result['status'] == "Accepted":
-                message = result.get('message')
+            if result and result["status"] == "Accepted":
+                message = result.get("message")
                 if message:
-                    msg = message['text']
-                    tools_qgis.show_message(msg, Qgis.MessageLevel(message['level']), dialog=self.dlg_workspace_manager)
+                    msg = message["text"]
+                    tools_qgis.show_message(msg, Qgis.MessageLevel(message["level"]), dialog=self.dlg_workspace_manager)
 
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)

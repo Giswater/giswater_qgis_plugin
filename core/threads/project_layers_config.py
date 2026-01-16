@@ -23,10 +23,10 @@ class GwProjectLayersConfig(GwTask):
         self.exception = None
         self.message = None
         self.available_layers = None
-        self.project_type = params['project_type']
-        self.schema_name = params['schema_name']
-        self.qgis_project_infotype = params['qgis_project_infotype']
-        self.db_layers = params['db_layers']
+        self.project_type = params["project_type"]
+        self.schema_name = params["schema_name"]
+        self.qgis_project_infotype = params["qgis_project_infotype"]
+        self.db_layers = params["db_layers"]
         self.body = None
         self.json_result = None
         self.vr_errors = None
@@ -89,8 +89,8 @@ class GwProjectLayersConfig(GwTask):
         for layer in all_layers_toc:
             layer_source = tools_qgis.get_layer_source(layer)
             # Filter to take only the layers of the current schema
-            schema = layer_source.get('schema')
-            if schema and schema.replace('"', '') == self.schema_name:
+            schema = layer_source.get("schema")
+            if schema and schema.replace('"', "") == self.schema_name:
                 table_name = f"{tools_qgis.get_layer_source_table_name(layer)}"
                 if table_name not in self.available_layers:
                     self.available_layers.append(table_name)
@@ -114,8 +114,8 @@ class GwProjectLayersConfig(GwTask):
             Column names as alias, combos as ValueMap, typeahead as textedit
         """
         # Check only once if function 'gw_fct_getinfofromid' exists
-        row = tools_db.check_function('gw_fct_getinfofromid', aux_conn=self.aux_conn, is_thread=True)
-        if row in (None, ''):
+        row = tools_db.check_function("gw_fct_getinfofromid", aux_conn=self.aux_conn, is_thread=True)
+        if row in (None, ""):
             msg = "Function not found in database: {0}"
             msg_params = ("gw_fct_getinfofromid",)
             tools_log.log_warning(msg, msg_params=msg_params)
@@ -139,20 +139,20 @@ class GwProjectLayersConfig(GwTask):
 
             feature = f'"tableName":"{layer_name}", "isLayer":true'
             self.body = tools_gw.create_body(feature=feature)
-            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn,
+            self.json_result = tools_gw.execute_procedure("gw_fct_getinfofromid", self.body, aux_conn=self.aux_conn,
                                                           is_thread=True, check_function=False)
             if not self.json_result:
                 continue
-            if 'status' not in self.json_result:
+            if "status" not in self.json_result:
                 continue
-            if self.json_result['status'] == 'Failed':
+            if self.json_result["status"] == "Failed":
                 continue
-            if 'body' not in self.json_result:
+            if "body" not in self.json_result:
                 msg = "Not '{0}'"
                 msg_params = ("body")
                 tools_log.log_info(msg, msg_params=msg_params)
                 continue
-            if 'data' not in self.json_result['body']:
+            if "data" not in self.json_result["body"]:
                 msg = "Not '{0}'"
                 msg_params = ("body")
                 tools_log.log_info(msg, msg_params=msg_params)

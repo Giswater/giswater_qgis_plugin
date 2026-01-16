@@ -49,14 +49,14 @@ class GwDimensioningButton(GwMaptool):
 
             # Connect to QGIS Editing Stopped signal to fully reset Dimensioning
             tools_gw.connect_signal(self.layer.editingStopped, self._reset_dimensioning,
-                                    'dimensioning', 'activate_layer_editingStopped_reset_dimensioning')
+                                    "dimensioning", "activate_layer_editingStopped_reset_dimensioning")
 
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
 
             # Manage new tool
             tools_gw.connect_signal(self.layer.featureAdded, self._open_new_dimensioning,
-                                    'dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
+                                    "dimensioning", "activate_layer_featureAdded_open_new_dimensioning")
 
     # endregion
 
@@ -79,13 +79,13 @@ class GwDimensioningButton(GwMaptool):
         self.dimensioning = GwDimensioning()
         self.dimensioning.points = list_points
         self.dimensioning.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
-        tools_gw.disconnect_signal('dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
+        tools_gw.disconnect_signal("dimensioning", "activate_layer_featureAdded_open_new_dimensioning")
         super().deactivate()
 
     def _reset_dimensioning(self):
         """Fully disables Dimensioning when editing is turned off."""
         # Disconnect the signal to prevent recursion
-        tools_gw.disconnect_signal('dimensioning', 'activate_layer_editingStopped_reset_dimensioning')
+        tools_gw.disconnect_signal("dimensioning", "activate_layer_editingStopped_reset_dimensioning")
 
         # If editing is already disabled, skip execution
         if not self.layer.isEditable():

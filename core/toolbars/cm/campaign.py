@@ -29,7 +29,7 @@ class Campaign:
     CAMPAIGN_TYPE_INVENTORY = 3
 
     # Valid feature types for campaigns
-    VALID_FEATURE_TYPES = ['arc', 'node', 'connec', 'gully', 'link']
+    VALID_FEATURE_TYPES = ["arc", "node", "connec", "gully", "link"]
 
     # Maximum results for typeahead
     MAX_TYPEAHEAD_RESULTS = 100
@@ -38,7 +38,7 @@ class Campaign:
         self.visitclass_combo: Optional[QComboBox] = None
         self.reviewclass_combo: Optional[QComboBox] = None
         self.iface = global_vars.iface
-        self.campaign_date_format = 'yyyy-MM-dd'
+        self.campaign_date_format = "yyyy-MM-dd"
         self.schema_parent = lib_vars.schema_name
         self.project_type = tools_gw.get_project_type()
         self.dialog: Optional[QDialog] = None
@@ -59,7 +59,7 @@ class Campaign:
 
         # Privilege guard: quietly exit if user has no CM access
         try:
-            if not tools_db.check_schema('cm'):
+            if not tools_db.check_schema("cm"):
                 return
             has_usage = tools_db.get_row(
                 "SELECT has_schema_privilege(current_user, 'cm', 'USAGE')",
@@ -76,10 +76,10 @@ class Campaign:
 
         # Populate combo date type (planned dates first, then real dates)
         rows = [
-            ['startdate', tools_qt.tr('Start date', 'cm')],
-            ['enddate', tools_qt.tr('End date', 'cm')],
-            ['real_startdate', tools_qt.tr('Real start date', 'cm')],
-            ['real_enddate', tools_qt.tr('Real end date', 'cm')]
+            ["startdate", tools_qt.tr("Start date", "cm")],
+            ["enddate", tools_qt.tr("End date", "cm")],
+            ["real_startdate", tools_qt.tr("Real start date", "cm")],
+            ["real_enddate", tools_qt.tr("Real end date", "cm")]
         ]
         tools_qt.fill_combo_values(self.manager_dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
         # Default to planned Start date
@@ -115,10 +115,10 @@ class Campaign:
 
         # Check user role
         cm_roles = tools_gw.get_cm_user_role()
-        show_lot = not (cm_roles and 'role_cm_edit' in list(cm_roles))
+        show_lot = not (cm_roles and "role_cm_edit" in list(cm_roles))
 
         # Show form in docker
-        tools_gw.init_docker('qgis_form_docker')
+        tools_gw.init_docker("qgis_form_docker")
         selector = GwSelector()
         selector.open_selector(selector_type, show_lot_tab=show_lot)
 
@@ -145,14 +145,14 @@ class Campaign:
         # Setting lists
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.ids = []
-        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
-        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
-        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        if self.project_type == 'ud':
-            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
-        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
+        self.rel_list_ids = {"arc": [], "node": [], "connec": [], "gully": [], "link": []}
+        self.rel_layers = {"arc": [], "node": [], "connec": [], "gully": [], "link": []}
+        self.rel_layers["arc"] = tools_gw.get_layers_from_feature_type("arc")
+        self.rel_layers["node"] = tools_gw.get_layers_from_feature_type("node")
+        self.rel_layers["connec"] = tools_gw.get_layers_from_feature_type("connec")
+        if self.project_type == "ud":
+            self.rel_layers["gully"] = tools_gw.get_layers_from_feature_type("gully")
+        self.rel_layers["link"] = tools_gw.get_layers_from_feature_type("link")
         self.excluded_layers = [
             "ve_arc", "ve_node", "ve_connec",
             "ve_gully", "ve_link"
@@ -216,7 +216,7 @@ class Campaign:
         tools_gw.load_settings(self.dialog)
 
         # Hide gully tab if project_type is 'ws'
-        if self.project_type == 'ws':
+        if self.project_type == "ws":
             index = self.dialog.tab_feature.indexOf(self.dialog.tab_gully)
             if index != -1:
                 self.dialog.tab_feature.removeTab(index)
@@ -266,8 +266,8 @@ class Campaign:
             self._load_campaign_relations(campaign_id)
             self._check_and_disable_class_combos()
 
-        tools_gw.add_icon(self.dialog.btn_insert, '111')
-        tools_gw.add_icon(self.dialog.btn_delete, '112')
+        tools_gw.add_icon(self.dialog.btn_insert, "111")
+        tools_gw.add_icon(self.dialog.btn_delete, "112")
 
         self.dialog.rejected.connect(self._on_dialog_rejected)
 
@@ -319,19 +319,19 @@ class Campaign:
 
         # Wire selectionChanged
         try:
-            if hasattr(self.dialog, 'tbl_campaign_x_arc') and self.dialog.tbl_campaign_x_arc.selectionModel():
+            if hasattr(self.dialog, "tbl_campaign_x_arc") and self.dialog.tbl_campaign_x_arc.selectionModel():
                 self.dialog.tbl_campaign_x_arc.selectionModel().selectionChanged.connect(partial(
                     tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
-            if hasattr(self.dialog, 'tbl_campaign_x_node') and self.dialog.tbl_campaign_x_node.selectionModel():
+            if hasattr(self.dialog, "tbl_campaign_x_node") and self.dialog.tbl_campaign_x_node.selectionModel():
                 self.dialog.tbl_campaign_x_node.selectionModel().selectionChanged.connect(partial(
                     tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_node, "ve_node", "node_id", self.rubber_band, 10))
-            if hasattr(self.dialog, 'tbl_campaign_x_connec') and self.dialog.tbl_campaign_x_connec.selectionModel():
+            if hasattr(self.dialog, "tbl_campaign_x_connec") and self.dialog.tbl_campaign_x_connec.selectionModel():
                 self.dialog.tbl_campaign_x_connec.selectionModel().selectionChanged.connect(partial(
                     tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
-            if hasattr(self.dialog, 'tbl_campaign_x_link') and self.dialog.tbl_campaign_x_link.selectionModel():
+            if hasattr(self.dialog, "tbl_campaign_x_link") and self.dialog.tbl_campaign_x_link.selectionModel():
                 self.dialog.tbl_campaign_x_link.selectionModel().selectionChanged.connect(partial(
                     tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_link, "ve_link", "link_id", self.rubber_band, 10))
-            if self.project_type == 'ud' and hasattr(self.dialog, 'tbl_campaign_x_gully') and self.dialog.tbl_campaign_x_gully.selectionModel():
+            if self.project_type == "ud" and hasattr(self.dialog, "tbl_campaign_x_gully") and self.dialog.tbl_campaign_x_gully.selectionModel():
                 self.dialog.tbl_campaign_x_gully.selectionModel().selectionChanged.connect(partial(
                     tools_qgis.highlight_features_by_id, self.dialog.tbl_campaign_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
         except Exception:
@@ -347,7 +347,7 @@ class Campaign:
         so table selections map directly to DB field names for actions like delete.
         """
         features = ["arc", "node", "connec", "link"]
-        if self.project_type == 'ud':
+        if self.project_type == "ud":
             features.append("gully")
 
         for feature in features:
@@ -477,8 +477,8 @@ class Campaign:
         # For inventory campaigns, inventoryclass_id is special.
         # It should not be saved in om_campaign table but passed as an extra param.
         inventory_class_id = None
-        if self.campaign_type == 3 and 'inventoryclass_id' in fields_dict:
-            inventory_class_id = fields_dict.pop('inventoryclass_id')
+        if self.campaign_type == 3 and "inventoryclass_id" in fields_dict:
+            inventory_class_id = fields_dict.pop("inventoryclass_id")
 
         fields_str = ", ".join([f'"{k}":{v}' for k, v in fields_dict.items()])
         extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
@@ -490,17 +490,17 @@ class Campaign:
         # Check mandatory fields
         list_mandatory = []
         for field in self.fields_form:
-            if field.get('hidden', False):
+            if field.get("hidden", False):
                 continue
 
-            if field.get('ismandatory', False):
-                widget = self.dialog.findChild(QWidget, field.get('widgetname'))
+            if field.get("ismandatory", False):
+                widget = self.dialog.findChild(QWidget, field.get("widgetname"))
                 if widget:
                     widget.setStyleSheet(None)  # Reset style first
                     value = tools_qt.get_text(self.dialog, widget)
-                    if value in ('null', None, ''):
+                    if value in ("null", None, ""):
                         widget.setStyleSheet("border: 1px solid red")
-                        list_mandatory.append(field['widgetname'])
+                        list_mandatory.append(field["widgetname"])
 
         if list_mandatory:
             msg = tools_qt.tr("Some mandatory values are missing. Please check the widgets marked in red.", context_name="cm")
@@ -531,7 +531,7 @@ class Campaign:
                     id_field.setText(str(campaign_id))
 
             # Reload manager table only if from manager
-            if hasattr(self, 'manager_dialog') and self.manager_dialog:
+            if hasattr(self, "manager_dialog") and self.manager_dialog:
                 self.filter_campaigns()
 
             if not from_tab_change:
@@ -556,7 +556,7 @@ class Campaign:
             if not current_tab:
                 return
 
-            feature_type = current_tab.objectName().replace('tab_', '')
+            feature_type = current_tab.objectName().replace("tab_", "")
             table_widget_name = f"tbl_campaign_x_{feature_type}"
             table_view = getattr(self.dialog, table_widget_name, None)
 
@@ -572,7 +572,7 @@ class Campaign:
     def _apply_table_config_for_feature(self, table_view, feature_type):
         """Apply table configuration for a specific feature type."""
         table_name = f"om_campaign_x_{feature_type}"
-        dialog_ref = self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog
+        dialog_ref = self.manager_dialog if hasattr(self, "manager_dialog") else self.dialog
         tools_gw.set_tablemodel_config(dialog_ref, table_view, table_name, schema_name="cm")
 
     def _get_checkbox_value_as_string(self, dialog: QDialog, widget: QCheckBox) -> str:
@@ -585,31 +585,31 @@ class Campaign:
 
         # Mappings from widget types to their value getters and properties
         widget_configs = {
-            QLineEdit: {'getter': tools_qt.get_text, 'quote': True},
-            QTextEdit: {'getter': tools_qt.get_text, 'quote': True},
-            QDateEdit: {'getter': tools_qt.get_calendar_date, 'quote': True},
-            QComboBox: {'getter': tools_qt.get_combo_value, 'quote': True, 'invalid': ['null', '', '-1']},
-            QCheckBox: {'getter': self._get_checkbox_value_as_string, 'quote': False, 'invalid': ['null', '""']}
+            QLineEdit: {"getter": tools_qt.get_text, "quote": True},
+            QTextEdit: {"getter": tools_qt.get_text, "quote": True},
+            QDateEdit: {"getter": tools_qt.get_calendar_date, "quote": True},
+            QComboBox: {"getter": tools_qt.get_combo_value, "quote": True, "invalid": ["null", "", "-1"]},
+            QCheckBox: {"getter": self._get_checkbox_value_as_string, "quote": False, "invalid": ["null", '""']}
         }
 
         for widget_class, config in widget_configs.items():
-            getter = config['getter']
+            getter = config["getter"]
             for widget in dialog.findChildren(widget_class):
-                colname = widget.property('columnname')
+                colname = widget.property("columnname")
                 if not colname:
                     continue
 
                 value = getter(dialog, widget)
 
-                if 'invalid' in config and value in config['invalid']:
+                if "invalid" in config and value in config["invalid"]:
                     continue
 
-                if value not in ('null', None, ''):
+                if value not in ("null", None, ""):
                     # For combo boxes, the value might be a list; we take the first element (the ID)
                     if isinstance(value, (list, tuple)) and value:
                         value = value[0]
 
-                    fields[colname] = f'"{value}"' if config['quote'] else str(value)
+                    fields[colname] = f'"{value}"' if config["quote"] else str(value)
 
         if as_dict:
             return fields
@@ -671,7 +671,7 @@ class Campaign:
 
         table_prefix = "om_campaign_inventory_x_" if self.campaign_type == 3 else "om_campaign_x_"
         features = ["arc", "node", "connec", "link"]
-        if self.project_type == 'ud':
+        if self.project_type == "ud":
             features.append("gully")
 
         has_relations = False
@@ -714,7 +714,7 @@ class Campaign:
         if not tab_widget:
             return
 
-        feature = tab_widget.objectName().replace('tab_', '')
+        feature = tab_widget.objectName().replace("tab_", "")
         if not feature:
             return
 
@@ -743,10 +743,10 @@ class Campaign:
 
     def _ensure_completer_infrastructure(self, dlg: QDialog):
         """Ensure completer model and completer are properly initialized."""
-        if not hasattr(self, '_feature_id_model') or self._feature_id_model is None:
+        if not hasattr(self, "_feature_id_model") or self._feature_id_model is None:
             self._feature_id_model = QStringListModel(dlg)
 
-        if not hasattr(self, '_feature_id_completer') or self._feature_id_completer is None:
+        if not hasattr(self, "_feature_id_completer") or self._feature_id_completer is None:
             self._feature_id_completer = QCompleter(self._feature_id_model, dlg)
             self._feature_id_completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
             self._feature_id_completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
@@ -760,7 +760,7 @@ class Campaign:
             pass
         dlg.feature_id.textEdited.connect(partial(self._feature_id_typeahead, dlg, feature, allowed_types))
 
-    def _feature_id_typeahead(self, dlg: QDialog, feature: str, allowed_types: List[str], text: str = ''):
+    def _feature_id_typeahead(self, dlg: QDialog, feature: str, allowed_types: List[str], text: str = ""):
         """Query server on each keystroke and feed the completer with up to 100 items."""
         value_list = []
         if text and len(text) >= 1:
@@ -777,7 +777,7 @@ class Campaign:
                 value_list = self._get_unrestricted_features(feature, text)
 
         # Force our completer to be the one that works
-        if hasattr(self, '_feature_id_model') and self._feature_id_model is not None:
+        if hasattr(self, "_feature_id_model") and self._feature_id_model is not None:
             self._update_completer_model(dlg, value_list, text)
 
     def _get_unrestricted_features(self, feature: str, text: str) -> List[str]:
@@ -788,7 +788,7 @@ class Campaign:
         where_sql = f" WHERE p.{id_column}::text ILIKE '{safe}%'"
         sql = base_sql + where_sql + f" ORDER BY p.{id_column} LIMIT {self.MAX_TYPEAHEAD_RESULTS}"
         rows = tools_db.get_rows(sql)
-        return [r.get('val') for r in (rows or []) if r.get('val')]
+        return [r.get("val") for r in (rows or []) if r.get("val")]
 
     def _update_completer_model(self, dlg: QDialog, value_list: List[str], text: str):
         """Update the completer model with filtered data and trigger completion."""
@@ -944,7 +944,7 @@ class Campaign:
             # If 'ALL' is found, get all distinct feature types from the catalog.
             all_features_sql = f"SELECT DISTINCT feature_type FROM {self.schema_parent}.cat_feature WHERE feature_type IS NOT NULL"
             rows = tools_db.get_rows(all_features_sql)
-            return [r['feature_type'] for r in rows or []]
+            return [r["feature_type"] for r in rows or []]
 
         # For a specific (non-ALL) review class, get only the linked feature types.
         sql = f"""
@@ -1020,7 +1020,7 @@ class Campaign:
 
         for row_idx, row in enumerate(data):
             for col_idx, col_name in enumerate(columns):
-                value = str(row.get(col_name, ''))
+                value = str(row.get(col_name, ""))
                 model.setItem(row_idx, col_idx, QStandardItem(value))
 
         qtable.setModel(model)
@@ -1035,7 +1035,7 @@ class Campaign:
             # Default for campaign manager table
             table_name = "v_ui_campaign"
 
-        tools_gw.set_tablemodel_config(self.manager_dialog if hasattr(self, 'manager_dialog') else self.dialog, qtable, table_name, schema_name="cm")
+        tools_gw.set_tablemodel_config(self.manager_dialog if hasattr(self, "manager_dialog") else self.dialog, qtable, table_name, schema_name="cm")
 
     # Campaign manager
     def load_campaigns_into_manager(self):
@@ -1062,8 +1062,8 @@ class Campaign:
 
         if result:
             # psycopg2 DictRow supports key access; fallback for tuple
-            min_date = result.get("min_date") if hasattr(result, 'get') else result[0]
-            max_date = result.get("max_date") if hasattr(result, 'get') else result[1]
+            min_date = result.get("min_date") if hasattr(result, "get") else result[0]
+            max_date = result.get("max_date") if hasattr(result, "get") else result[1]
 
             if min_date:
                 self.manager_dialog.date_event_from.setDate(min_date)
@@ -1092,7 +1092,7 @@ class Campaign:
         if user_info:
             role = user_info[0]
             org_id = user_info[1]
-            if role not in ('role_cm_admin'):
+            if role not in ("role_cm_admin"):
                 if org_id is not None:
                     filters.append(f"organization_id = {org_id}")
 
@@ -1114,8 +1114,8 @@ class Campaign:
                 date_to = date_from  # Update variable too
 
             # Ensure forward-compatible format and inclusive range
-            date_format_low = 'yyyy-MM-dd 00:00:00'
-            date_format_high = 'yyyy-MM-dd 23:59:59'
+            date_format_low = "yyyy-MM-dd 00:00:00"
+            date_format_high = "yyyy-MM-dd 23:59:59"
 
             interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
             date_filter = f"({date_type} BETWEEN {interval}"
@@ -1207,13 +1207,13 @@ def update_expl_sector_combos(**kwargs: Any):
     """Update exploitation and sector combos based on organization.
     This function is designed to be called from a widgetfunction.
     """
-    dialog = kwargs.get('dialog')
-    parent_widget = kwargs.get('widget')
-    saved_values = kwargs.get('saved_values', {})
+    dialog = kwargs.get("dialog")
+    parent_widget = kwargs.get("widget")
+    saved_values = kwargs.get("saved_values", {})
 
     try:
         # Find child widgets by their object name
-        expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
+        expl_widget = dialog.findChild(QComboBox, "tab_data_expl_id")
 
         # Get data from the currently selected item in the parent combo
         current_index = parent_widget.currentIndex()
@@ -1230,7 +1230,7 @@ def update_expl_sector_combos(**kwargs: Any):
             org_data_sql = f"SELECT expl_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
             org_data_row = tools_db.get_row(org_data_sql)
             if org_data_row:
-                expl_ids = org_data_row.get('expl_id')
+                expl_ids = org_data_row.get("expl_id")
 
         schema = lib_vars.schema_name
 
@@ -1249,7 +1249,7 @@ def update_expl_sector_combos(**kwargs: Any):
             tools_qt.fill_combo_values(expl_widget, rows_expl, add_empty=True)
 
             # Manually set the value from saved_values after populating
-            saved_expl_id = saved_values.get('expl_id')
+            saved_expl_id = saved_values.get("expl_id")
             if saved_expl_id is not None:
                 # Create a temporary Campaign object to access the robust set_widget_value
                 temp_campaign_instance = Campaign(None, None, None, None, None)
@@ -1282,11 +1282,11 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         WHERE u.username = '{username}'
     """
     user_info = tools_db.get_row(sql_user)
-    is_admin = user_info and user_info.get('role_id') == 'role_cm_admin'
+    is_admin = user_info and user_info.get("role_id") == "role_cm_admin"
 
-    expl_widget = dialog.findChild(QComboBox, 'tab_data_expl_id')
-    sector_widget = dialog.findChild(QComboBox, 'tab_data_sector_id')
-    organization_widget = dialog.findChild(QComboBox, 'tab_data_organization_id')
+    expl_widget = dialog.findChild(QComboBox, "tab_data_expl_id")
+    sector_widget = dialog.findChild(QComboBox, "tab_data_sector_id")
+    organization_widget = dialog.findChild(QComboBox, "tab_data_organization_id")
 
     if not sector_widget:
         return
@@ -1303,7 +1303,7 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
         org_data_sql = f"SELECT sector_id FROM cm.cat_organization WHERE organization_id = {organization_id}"
         org_data_row = tools_db.get_row(org_data_sql)
         if org_data_row:
-            sector_ids = org_data_row.get('sector_id')
+            sector_ids = org_data_row.get("sector_id")
 
     # Get exploitation filter
     expl_id = None
@@ -1344,7 +1344,7 @@ def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
     rows_sector = tools_db.get_rows(sql_sector)
     tools_qt.fill_combo_values(sector_widget, rows_sector, add_empty=True)
 
-    saved_sector_id = saved_values.get('sector_id')
+    saved_sector_id = saved_values.get("sector_id")
     if saved_sector_id is not None:
         temp_campaign_instance = Campaign(None, None, None, None, None)
         temp_campaign_instance.set_widget_value(sector_widget, saved_sector_id)

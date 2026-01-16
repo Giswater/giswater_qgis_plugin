@@ -65,32 +65,32 @@ class GwDocument(QObject):
 
         # Setting lists
         self.rel_ids = []
-        self.rel_list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
-        self.rel_layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
-        self.rel_layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.rel_layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.rel_layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        self.rel_layers['link'] = tools_gw.get_layers_from_feature_type('link')
-        self.rel_layers['element'] = tools_gw.get_layers_from_feature_type('element')
+        self.rel_list_ids = {"arc": [], "node": [], "connec": [], "link": [], "gully": [], "element": []}
+        self.rel_layers = {"arc": [], "node": [], "connec": [], "link": [], "gully": [], "element": []}
+        self.rel_layers["arc"] = tools_gw.get_layers_from_feature_type("arc")
+        self.rel_layers["node"] = tools_gw.get_layers_from_feature_type("node")
+        self.rel_layers["connec"] = tools_gw.get_layers_from_feature_type("connec")
+        self.rel_layers["link"] = tools_gw.get_layers_from_feature_type("link")
+        self.rel_layers["element"] = tools_gw.get_layers_from_feature_type("element")
 
         # Add manager element layers (ve_man_frelem, ve_man_genelem) if they exist
-        for layer_name in ['ve_man_frelem', 've_man_genelem']:
+        for layer_name in ["ve_man_frelem", "ve_man_genelem"]:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
-            if layer and layer not in self.rel_layers['element']:
-                self.rel_layers['element'].append(layer)
+            if layer and layer not in self.rel_layers["element"]:
+                self.rel_layers["element"].append(layer)
 
-        if self.project_type == 'ud':
-            self.rel_layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        if self.project_type == "ud":
+            self.rel_layers["gully"] = tools_gw.get_layers_from_feature_type("gully")
 
-        params = ['arc', 'node', 'connec', 'gully', 'link', 'element']
+        params = ["arc", "node", "connec", "gully", "link", "element"]
         if list_tabs:
             for i in params:
                 if i not in list_tabs:
-                    tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
+                    tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f"tab_{i}")
 
         # Remove 'gully' if not 'UD'
-        if self.project_type != 'ud':
-            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
+        if self.project_type != "ud":
+            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, "tab_gully")
 
         if doc_tables:
             self.doc_tables = doc_tables
@@ -137,7 +137,7 @@ class GwDocument(QObject):
             for n in range(1, 5):
                 self.dlg_add_doc.tabWidget.setTabEnabled(n, False)
 
-            tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
+            tools_qt.set_calendar(self.dlg_add_doc, "date", None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
@@ -182,14 +182,14 @@ class GwDocument(QObject):
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.rejected.connect(
-            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
+            lambda: setattr(self, "layers", tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
         )
         # Widgets
         self.dlg_add_doc.doc_name.textChanged.connect(partial(self._check_doc_exists))
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self._activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_path_doc.clicked.connect(
-            lambda: setattr(self, 'files_path', self._get_file_dialog(self.dlg_add_doc, "path"))
+            lambda: setattr(self, "files_path", self._get_file_dialog(self.dlg_add_doc, "path"))
         )
         self.dlg_add_doc.btn_add_geom.clicked.connect(self._get_point_xy)
         # Dialog buttons
@@ -197,7 +197,7 @@ class GwDocument(QObject):
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, True)
         )
         self.dlg_add_doc.btn_cancel.clicked.connect(
-            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
+            lambda: setattr(self, "layers", tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
         )
         self.dlg_add_doc.btn_apply.clicked.connect(
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, False)
@@ -236,7 +236,7 @@ class GwDocument(QObject):
         tools_gw.get_signal_change_tab(self.dlg_add_doc, self.excluded_layers)
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
+        tools_gw.open_dialog(self.dlg_add_doc, dlg_name="doc")
 
         return self.dlg_add_doc
 
@@ -255,7 +255,7 @@ class GwDocument(QObject):
         """Associate an existing workcat with the current document, ensuring no duplicates and clearing the input field"""
         workcat_id = tools_qt.get_text(dialog, "feature_id_workcat")
 
-        if workcat_id == 'null':
+        if workcat_id == "null":
             msg = "You need to enter a workcat id"
             tools_qgis.show_warning(msg, dialog=dialog)
             return
@@ -312,7 +312,7 @@ class GwDocument(QObject):
         """Associate an existing psector with the current document, ensuring no duplicates and clearing the input field"""
         psector_name = tools_qt.get_text(dialog, "feature_id_psector")
 
-        if psector_name == 'null' or not psector_name:
+        if psector_name == "null" or not psector_name:
             msg = "You need to enter a psector name"
             tools_qgis.show_warning(msg, dialog=dialog)
             return
@@ -390,7 +390,7 @@ class GwDocument(QObject):
         """Associate an existing visit with the current document, ensuring no duplicates and clearing the input field"""
         visit_id = tools_qt.get_text(dialog, "feature_id_visit")
 
-        if visit_id == 'null' or not visit_id:
+        if visit_id == "null" or not visit_id:
             msg = "You need to enter a visit ID"
             tools_qgis.show_warning(msg, dialog=dialog)
             return
@@ -442,13 +442,13 @@ class GwDocument(QObject):
         """List of existing names"""
         sql = "SELECT name FROM doc ORDER BY name;"
         rows = tools_db.get_rows(sql)
-        return [row['name'] for row in rows if 'name' in row]
+        return [row["name"] for row in rows if "name" in row]
 
     def manage_documents(self):
         """Button 32: Edit document"""
         # Create the dialog
         self.dlg_man = GwDocManagerUi(self)
-        self.dlg_man.setProperty('class_obj', self)
+        self.dlg_man.setProperty("class_obj", self)
         tools_gw.load_settings(self.dlg_man)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document)
@@ -475,7 +475,7 @@ class GwDocument(QObject):
         self.dlg_man.btn_create.clicked.connect(partial(self.open_document_dialog))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
+        tools_gw.open_dialog(self.dlg_man, dlg_name="doc_manager")
 
     def _show_context_menu(self, qtableview, pos):
         """Show custom context menu"""
@@ -503,8 +503,8 @@ class GwDocument(QObject):
         complet_list = tools_gw.get_list(view, filter_name=filter_text, id_field="name")
         if complet_list is False:
             return False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
+        for field in complet_list["body"]["data"]["fields"]:
+            if field.get("hidden"):
                 continue
             model = self.dlg_man.tbl_document.model()
             if model is None:
@@ -512,10 +512,10 @@ class GwDocument(QObject):
                 self.dlg_man.tbl_document.setModel(model)
             model.removeRows(0, model.rowCount())
 
-            if field['value']:
+            if field["value"]:
                 self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
                 self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', Qt.SortOrder.AscendingOrder)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, "v_ui_doc", Qt.SortOrder.AscendingOrder)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
 
         return True
@@ -528,7 +528,7 @@ class GwDocument(QObject):
     def _refresh_manager_table(self):
         """Refresh the manager table"""
         try:
-            if getattr(self, 'dlg_man', None):
+            if getattr(self, "dlg_man", None):
                 # Use the existing _fill_table method to refresh the table
                 self._fill_table()
         except Exception as e:
@@ -542,7 +542,7 @@ class GwDocument(QObject):
                " ORDER BY id;")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(widget, rows, add_empty=True)
-        doctype_vdefault = tools_gw.get_config_value('edit_doctype_vdefault')
+        doctype_vdefault = tools_gw.get_config_value("edit_doctype_vdefault")
         if doctype_vdefault:
             tools_qt.set_combo_value(widget, doctype_vdefault[0], 0)
             self._activate_relations()
@@ -551,7 +551,7 @@ class GwDocument(QObject):
         """Force user to set doc_id and doc_type"""
         doc_type = tools_qt.get_combo_value(self.dlg_add_doc, self.dlg_add_doc.doc_type)
 
-        if doc_type in (None, '', 'null'):
+        if doc_type in (None, "", "null"):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         else:
             self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
@@ -614,7 +614,7 @@ class GwDocument(QObject):
                         temp_name = f"{name}_{n}"
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, temp_name)
         else:
-            doc_id = row['id']
+            doc_id = row["id"]
             if len(self.files_path) <= 1:
                 sql = self._update_doc_sql(doc_type, observ, date, doc_id, path, the_geom, name)
             else:
@@ -634,7 +634,7 @@ class GwDocument(QObject):
         self.point_xy = {"x": None, "y": None}
 
         # Refresh manager table
-        tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
+        tools_gw.execute_class_function(GwDocManagerUi, "_refresh_manager_table")
 
     def _insert_doc_sql(self, doc_type, observ, date, path, the_geom, name):
         fields = "doc_type, path, observ, date, name"
@@ -664,42 +664,42 @@ class GwDocument(QObject):
         if sql is not None and sql != "":
             tools_db.execute_sql(sql)
 
-        arc_ids = self.rel_list_ids.get('arc')
-        node_ids = self.rel_list_ids.get('node')
-        connec_ids = self.rel_list_ids.get('connec')
-        link_ids = self.rel_list_ids.get('link')
+        arc_ids = self.rel_list_ids.get("arc")
+        node_ids = self.rel_list_ids.get("node")
+        connec_ids = self.rel_list_ids.get("connec")
+        link_ids = self.rel_list_ids.get("link")
         workcat_ids = self._get_associated_workcat_ids()
         psector_ids = self._get_associated_psector_ids()
         visit_ids = self._get_associated_visit_ids()
-        gully_ids = self.rel_list_ids.get('gully')
-        element_ids = self.rel_list_ids.get('element')
+        gully_ids = self.rel_list_ids.get("gully")
+        element_ids = self.rel_list_ids.get("element")
 
         data = {
-            'arc': arc_ids,
-            'node': node_ids,
-            'connec': connec_ids,
-            'link': link_ids,
-            'workcat': workcat_ids,
-            'psector': psector_ids,
-            'visit': visit_ids,
-            'element': element_ids
+            "arc": arc_ids,
+            "node": node_ids,
+            "connec": connec_ids,
+            "link": link_ids,
+            "workcat": workcat_ids,
+            "psector": psector_ids,
+            "visit": visit_ids,
+            "element": element_ids
         }
-        if self.project_type == 'ud':
-            data['gully'] = gully_ids
+        if self.project_type == "ud":
+            data["gully"] = gully_ids
         parameters = {
-            'project_type': self.project_type,
-            'object_id': doc_id,
-            'table_name': 'doc',
-            'data': data
+            "project_type": self.project_type,
+            "object_id": doc_id,
+            "table_name": "doc",
+            "data": data
         }
 
         # Create request body with parameters
         extras = f'"parameters":{json.dumps(parameters)}'
         body = tools_gw.create_body(extras=extras)
         # Execute function
-        json_result = tools_gw.execute_procedure('gw_fct_manage_relations', body, self.schema_name, log_sql=True)
+        json_result = tools_gw.execute_procedure("gw_fct_manage_relations", body, self.schema_name, log_sql=True)
 
-        if json_result['status'] == 'Accepted':
+        if json_result["status"] == "Accepted":
             self.doc_id = doc_id
             self.doc_name = doc_name
             self.is_new = False
@@ -716,7 +716,7 @@ class GwDocument(QObject):
                    f" VALUES('{doc_id}', '{item_id}')")
             tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
-            if tablename == 'psector':
+            if tablename == "psector":
                 expr = f"""psector_name = (SELECT name FROM "{lib_vars.schema_name}".plan_psector WHERE psector_id = '{item_id}')"""
             message = tools_qt.fill_table(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
@@ -730,7 +730,7 @@ class GwDocument(QObject):
         rows = tools_db.get_rows(sql)
         if not rows:
             return []
-        return [row['workcat_id'] for row in rows if 'workcat_id' in row]
+        return [row["workcat_id"] for row in rows if "workcat_id" in row]
 
     def _get_associated_psector_ids(self, doc_id=None):
         """Get psector_ids linked to documento"""
@@ -740,7 +740,7 @@ class GwDocument(QObject):
         rows = tools_db.get_rows(sql)
         if not rows:
             return []
-        return [row['psector_id'] for row in rows if 'psector_id' in row]
+        return [row["psector_id"] for row in rows if "psector_id" in row]
 
     def _get_associated_visit_ids(self, doc_id=None):
         """Get visit_ids linked to the document"""
@@ -750,7 +750,7 @@ class GwDocument(QObject):
         rows = tools_db.get_rows(sql)
         if not rows:
             return []
-        return [row['visit_id'] for row in rows if 'visit_id' in row]
+        return [row["visit_id"] for row in rows if "visit_id" in row]
 
     def _check_doc_exists(self, name=""):
         sql = f"SELECT name FROM doc WHERE name = '{name}'"
@@ -767,7 +767,7 @@ class GwDocument(QObject):
     def _open_selected_object_document(self, dialog, widget, table_object):
 
         # Check if there is a dlg_doc already open
-        if hasattr(self, 'dlg_add_doc') and not isdeleted(self.dlg_add_doc) and self.dlg_add_doc.isVisible():
+        if hasattr(self, "dlg_add_doc") and not isdeleted(self.dlg_add_doc) and self.dlg_add_doc.isVisible():
             return
 
         selected_list = widget.selectionModel().selectedRows()
@@ -784,7 +784,7 @@ class GwDocument(QObject):
         selected_object_id = widget.model().item(row, id_col_idx).text()
 
         # Close this dialog and open selected object
-        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'doc_manager_keep_open', "user", "init",
+        keep_open_form = tools_gw.get_config_parser("dialogs_actions", "doc_manager_keep_open", "user", "init",
                                                     prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
@@ -796,10 +796,10 @@ class GwDocument(QObject):
         """Display url using the default browser"""
         if widget is not None:
             url = tools_qt.get_text(dialog, widget)
-            if url == 'null':
-                url = 'http://www.giswater.org'
+            if url == "null":
+                url = "http://www.giswater.org"
         else:
-            url = 'http://www.giswater.org'
+            url = "http://www.giswater.org"
 
         webbrowser.open(url)
 
@@ -823,7 +823,7 @@ class GwDocument(QObject):
             self.files_path = files_path
             self.point_xy = {"x": None, "y": None}
             for file in files_path:
-                if file.lower().endswith(('.tif', '.tiff', '.jpg', '.jpeg', '.png')):
+                if file.lower().endswith((".tif", ".tiff", ".jpg", ".jpeg", ".png")):
                     gps_coordinates = self.get_geolocation_gdal(files_path[0])
                     if gps_coordinates:
                         self.point_xy = {"x": gps_coordinates[0], "y": gps_coordinates[1]}
@@ -836,9 +836,9 @@ class GwDocument(QObject):
         # Reset list of selected records
         self.rel_ids, self.rel_list_ids = tools_gw.reset_feature_list()
 
-        list_feature_type = ['arc', 'node', 'connec', 'element', 'link']
-        if global_vars.project_type == 'ud':
-            list_feature_type.append('gully')
+        list_feature_type = ["arc", "node", "connec", "element", "link"]
+        if global_vars.project_type == "ud":
+            list_feature_type.append("gully")
 
         object_name = tools_qt.get_text(dialog, table_object + "_name")
         filter_str = f"name = '{object_name}'"

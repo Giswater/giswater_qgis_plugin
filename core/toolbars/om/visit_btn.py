@@ -16,5 +16,5 @@ class GwVisitButton(GwAction):
         self.visit_manager = GwVisit()
 
     def clicked_event(self):
-        self.visit_manager.get_visit(tag='add')
+        self.visit_manager.get_visit(tag="add")
 

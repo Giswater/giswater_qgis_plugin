@@ -24,7 +24,7 @@ class GwRenameSchemaTask(GwTask):
         self.status = False
         self.timer = timer
 
-        if hasattr(self.admin, 'dlg_readsql_rename') and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
+        if hasattr(self.admin, "dlg_readsql_rename") and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
             # Manage buttons & other dlg-related widgets
             self.admin.dlg_readsql_rename.schema_rename_copy.setEnabled(False)                        
             # Disable dlg_readsql_rename buttons
@@ -42,10 +42,10 @@ class GwRenameSchemaTask(GwTask):
     def run(self):
         super().run()        
         
-        schema = self.params.get('schema')
-        self.new_schema_name = self.params.get('new_schema_name')
+        schema = self.params.get("schema")
+        self.new_schema_name = self.params.get("new_schema_name")
 
-        sql = f'ALTER SCHEMA {schema} RENAME TO {self.new_schema_name}'
+        sql = f"ALTER SCHEMA {schema} RENAME TO {self.new_schema_name}"
         status = tools_db.execute_sql(sql, commit=False)        
         if status:
             # Reload fcts
@@ -53,7 +53,7 @@ class GwRenameSchemaTask(GwTask):
             if self.isCanceled():
                 return True
             # Call fct gw_fct_admin_rename_fixviews
-            sql = ('SELECT ' + str(self.new_schema_name) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
+            sql = ("SELECT " + str(self.new_schema_name) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.new_schema_name + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             tools_db.execute_sql(sql, commit=False)
             # Execute last_process
@@ -77,7 +77,7 @@ class GwRenameSchemaTask(GwTask):
         if self.isCanceled():
             self.task_finished.emit()
 
-        if hasattr(self.admin, 'dlg_readsql_rename') and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
+        if hasattr(self.admin, "dlg_readsql_rename") and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
             # Enable dlg_readsql_show_info buttons
             self.admin.dlg_readsql_rename.btn_cancel.setEnabled(True)
             # Enable red 'X' from dlg_readsql_show_info
@@ -90,7 +90,7 @@ class GwRenameSchemaTask(GwTask):
 
             # Set info project
             self.admin._set_info_project()
-            if hasattr(self.admin, 'dlg_readsql_rename') and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
+            if hasattr(self.admin, "dlg_readsql_rename") and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
                 self.admin._close_dialog_admin(self.admin.dlg_readsql_rename)
 
         self.task_finished.emit()

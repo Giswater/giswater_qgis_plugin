@@ -55,17 +55,17 @@ class GwLoadProject(QObject):
             return
 
         # Get SRID from table node
-        lib_vars.data_epsg = tools_db.get_srid('ve_node', lib_vars.schema_name)
+        lib_vars.data_epsg = tools_db.get_srid("ve_node", lib_vars.schema_name)
 
         # Manage schema name
         tools_db.get_current_user()
         layer_source = tools_qgis.get_layer_source(self.layer_node)
-        schema_name = layer_source['schema']
+        schema_name = layer_source["schema"]
         if schema_name:
-            lib_vars.schema_name = schema_name.replace('"', '')
+            lib_vars.schema_name = schema_name.replace('"', "")
 
         # Set PostgreSQL parameter 'search_path'
-        tools_db.set_search_path(layer_source['schema'])
+        tools_db.set_search_path(layer_source["schema"])
 
         # Get water software from table 'sys_version'
         global_vars.project_type = tools_gw.get_project_type()
@@ -79,20 +79,20 @@ class GwLoadProject(QObject):
         # Removes all deprecated variables defined at giswater.config
         tools_gw.remove_deprecated_config_vars()
 
-        project_role = lib_vars.project_vars.get('project_role')
-        lib_vars.project_vars['project_role'] = tools_gw.get_role_permissions(project_role)
+        project_role = lib_vars.project_vars.get("project_role")
+        lib_vars.project_vars["project_role"] = tools_gw.get_role_permissions(project_role)
 
         # Check if user has config files 'init' and 'session' and its parameters
         tools_gw.user_params_to_userconfig()
 
         # Check for developers options
-        value = tools_gw.get_config_parser('log', 'log_sql', "user", "init", False)
-        tools_qgis.user_parameters['log_sql'] = value
-        value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
-        tools_qgis.user_parameters['show_message_durations'] = value
+        value = tools_gw.get_config_parser("log", "log_sql", "user", "init", False)
+        tools_qgis.user_parameters["log_sql"] = value
+        value = tools_gw.get_config_parser("system", "show_message_durations", "user", "init", False)
+        tools_qgis.user_parameters["show_message_durations"] = value
 
         # Manage locale and corresponding 'i18n' file
-        lib_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', lib_vars.plugin_dir)
+        lib_vars.plugin_name = tools_qgis.get_plugin_metadata("name", "giswater", lib_vars.plugin_dir)
         tools_qt._add_translator(True)
 
         # Check if schema exists
@@ -116,9 +116,9 @@ class GwLoadProject(QObject):
         # Connect project save / new project
         try:
             tools_gw.connect_signal(self.iface.newProjectCreated, main._project_new,
-                                    'main', 'newProjectCreated')
+                                    "main", "newProjectCreated")
             tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
-                                    'main', 'actionSaveProject_save_toolbars_position')
+                                    "main", "actionSaveProject_save_toolbars_position")
         except AttributeError:
             pass
 
@@ -141,14 +141,14 @@ class GwLoadProject(QObject):
         self._create_psector_status_bar()
 
         # Check parameter 'force_tab_expl'
-        force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
+        force_tab_expl = tools_gw.get_config_parser("system", "force_tab_expl", "user", "init", prefix=False)
         if tools_os.set_boolean(force_tab_expl, False):
             self._force_tab_exploitation()
 
         # Set lib_vars.project_epsg
         lib_vars.project_epsg = tools_qgis.get_epsg()
         tools_gw.connect_signal(QgsProject.instance().crsChanged, tools_gw.set_epsg,
-                                'load_project', 'project_read_crsChanged_set_epsg')
+                                "load_project", "project_read_crsChanged_set_epsg")
         global_vars.project_loaded = True
 
         # Set indexing strategy for snapping so that it uses less memory if possible
@@ -158,15 +158,15 @@ class GwLoadProject(QObject):
         tools_qgis.set_project_snapping_settings(enabled=True)
 
         # Manage versions of Giswater and PostgreSQL
-        plugin_version = tools_qgis.get_plugin_metadata('version', 0, lib_vars.plugin_dir)
+        plugin_version = tools_qgis.get_plugin_metadata("version", 0, lib_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
 
         # Compare major.minor versions
         try:
-            plugin_version_l = str(plugin_version).split('.')
-            project_version_l = str(project_version).split('.')
-            plugin_major_minor = f'{plugin_version_l[0]}.{plugin_version_l[1]}'
-            project_major_minor = f'{project_version_l[0]}.{project_version_l[1]}'
+            plugin_version_l = str(plugin_version).split(".")
+            project_version_l = str(project_version).split(".")
+            plugin_major_minor = f"{plugin_version_l[0]}.{plugin_version_l[1]}"
+            project_major_minor = f"{project_version_l[0]}.{project_version_l[1]}"
 
             if plugin_major_minor == project_major_minor:
                 msg = "Project read finished"
@@ -202,19 +202,19 @@ class GwLoadProject(QObject):
 
         # Get list with own QToolBars
         for w in widget_list:
-            if w.property('gw_name'):
+            if w.property("gw_name"):
                 own_toolbars.append(w)
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
-        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
+        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property("gw_name") == "toc") or \
                 global_vars.project_type is None:
             return
 
         # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
-        sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
+        sorted_toolbar_ids = [tb.property("gw_name") for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
-        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+        tools_gw.set_config_parser("toolbars_position", "toolbars_order", str(sorted_toolbar_ids), "user", "init")
 
     def _check_version_compatibility(self):
 
@@ -223,9 +223,9 @@ class GwLoadProject(QObject):
         pgrouting_version = tools_db.get_pgrouting_version()
 
         # Get version compatiblity from metadata.txt
-        minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir).replace('.', '')
-        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', lib_vars.plugin_dir).replace('.', '')
-        minorPgrVersion = tools_qgis.get_plugin_metadata('minorPgrVersion', '3.8.0', lib_vars.plugin_dir).replace('.', '')
+        minorPgVersion = tools_qgis.get_plugin_metadata("minorPgVersion", "9.5", lib_vars.plugin_dir).replace(".", "")
+        majorPgVersion = tools_qgis.get_plugin_metadata("majorPgVersion", "11.99", lib_vars.plugin_dir).replace(".", "")
+        minorPgrVersion = tools_qgis.get_plugin_metadata("minorPgrVersion", "3.8.0", lib_vars.plugin_dir).replace(".", "")
 
         url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
@@ -233,30 +233,30 @@ class GwLoadProject(QObject):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
         if pgrouting_version is not None and minorPgrVersion is not None:
-            if int(str(pgrouting_version).replace('.', '')) < int(minorPgrVersion):
+            if int(str(pgrouting_version).replace(".", "")) < int(minorPgrVersion):
                 msg = "pgRouting version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
 
     def _get_project_variables(self):
         """Manage QGIS project variables"""
         lib_vars.project_vars = {}
-        lib_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
-        lib_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
-        lib_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
-        lib_vars.project_vars['cm_schema'] = tools_qgis.get_project_variable('gwCmSchema')
-        lib_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
-        lib_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
-        lib_vars.project_vars['store_credentials'] = tools_qgis.get_project_variable('gwStoreCredentials')
-        lib_vars.project_vars['current_style'] = tools_qgis.get_project_variable('gwCurrentStyle')
+        lib_vars.project_vars["info_type"] = tools_qgis.get_project_variable("gwInfoType")
+        lib_vars.project_vars["add_schema"] = tools_qgis.get_project_variable("gwAddSchema")
+        lib_vars.project_vars["main_schema"] = tools_qgis.get_project_variable("gwMainSchema")
+        lib_vars.project_vars["cm_schema"] = tools_qgis.get_project_variable("gwCmSchema")
+        lib_vars.project_vars["project_role"] = tools_qgis.get_project_variable("gwProjectRole")
+        lib_vars.project_vars["project_type"] = tools_qgis.get_project_variable("gwProjectType")
+        lib_vars.project_vars["store_credentials"] = tools_qgis.get_project_variable("gwStoreCredentials")
+        lib_vars.project_vars["current_style"] = tools_qgis.get_project_variable("gwCurrentStyle")
 
     def _get_user_variables(self):
         """Get config related with user variables"""
-        lib_vars.user_level['level'] = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
-        lib_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
-        lib_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
-        lib_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
-        lib_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
-        lib_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
+        lib_vars.user_level["level"] = tools_gw.get_config_parser("user_level", "level", "user", "init", False)
+        lib_vars.user_level["showquestion"] = tools_gw.get_config_parser("user_level", "showquestion", "user", "init", False)
+        lib_vars.user_level["showsnapmessage"] = tools_gw.get_config_parser("user_level", "showsnapmessage", "user", "init", False)
+        lib_vars.user_level["showselectmessage"] = tools_gw.get_config_parser("user_level", "showselectmessage", "user", "init", False)
+        lib_vars.user_level["showadminadvanced"] = tools_gw.get_config_parser("user_level", "showadminadvanced", "user", "init", False)
+        lib_vars.date_format = tools_gw.get_config_parser("system", "date_format", "user", "init", False)
 
     def _check_project(self, show_warning):
         """Check if loaded project is valid for Giswater"""
@@ -269,9 +269,9 @@ class GwLoadProject(QObject):
         # Check missing layers
         missing_layers = {}
         if self.layer_node is None:
-            missing_layers['ve_node'] = True
+            missing_layers["ve_node"] = True
         if layer_arc is None:
-            missing_layers['ve_arc'] = True
+            missing_layers["ve_arc"] = True
 
         # Show message if layers are missing
         if missing_layers:
@@ -287,7 +287,7 @@ class GwLoadProject(QObject):
     def _check_project_type(self):
         """Check if loaded project is valid for Giswater"""
         # Check if table 've_node' is loaded
-        if global_vars.project_type not in ('ws', 'ud'):
+        if global_vars.project_type not in ("ws", "ud"):
             return False
 
         addparam = tools_gw.get_sysversion_addparam()
@@ -311,7 +311,7 @@ class GwLoadProject(QObject):
         finally:
             self.connection_status, not_version, layer_source = tools_db.set_database_connection()
             if not self.connection_status or not_version:
-                message = lib_vars.session_vars['last_error']
+                message = lib_vars.session_vars["last_error"]
                 if show_warning:
                     if message:
                         tools_qgis.show_warning(message, 15)
@@ -330,13 +330,13 @@ class GwLoadProject(QObject):
         repeated_layers = {}
         for layer in layers:
             layer_toc_name = tools_qgis.get_layer_source_table_name(layer)
-            if layer_toc_name == 've_node':
+            if layer_toc_name == "ve_node":
                 layer_source = tools_qgis.get_layer_source(layer)
-                repeated_layers[layer_source['schema'].replace('"', '')] = 've_node'
+                repeated_layers[layer_source["schema"].replace('"', "")] = "ve_node"
 
         if len(repeated_layers) > 1:
-            if lib_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
-                    or lib_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
+            if lib_vars.project_vars["main_schema"] in (None, "", "null", "NULL") \
+                    or lib_vars.project_vars["add_schema"] in (None, "", "null", "NULL"):
                 msg = ("QGIS project has more than one {0} layer coming from different schemas. "
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and "
                       "which isn't. To do this, you need to configure the QGIS project setting this project's "
@@ -347,8 +347,8 @@ class GwLoadProject(QObject):
 
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
-            if lib_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
-                lib_vars.schema_name = lib_vars.project_vars['main_schema']
+            if lib_vars.project_vars["main_schema"] not in (None, "NULL", ""):
+                lib_vars.schema_name = lib_vars.project_vars["main_schema"]
 
         return True
 
@@ -356,11 +356,11 @@ class GwLoadProject(QObject):
         """Get all buttons to hide"""
         buttons_to_hide = None
         try:
-            row = tools_gw.get_config_parser('toolbars_hidebuttons', 'buttons_to_hide', "user", "init")
-            if not row or row in (None, 'None'):
+            row = tools_gw.get_config_parser("toolbars_hidebuttons", "buttons_to_hide", "user", "init")
+            if not row or row in (None, "None"):
                 return None
 
-            buttons_to_hide = [int(x) for x in row.split(',')]
+            buttons_to_hide = [int(x) for x in row.split(",")]
 
         except Exception as e:
             msg = "{0}: {1}"
@@ -372,30 +372,30 @@ class GwLoadProject(QObject):
     def _manage_toolbars(self):
         """Manage actions of the custom plugin toolbars"""
         # Dynamically get list of toolbars from config file
-        toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
-        if toolbar_names in (None, 'None'):
+        toolbar_names = tools_gw.get_config_parser("toolbars", "list_toolbars", "project", "giswater")
+        if toolbar_names in (None, "None"):
             msg = "Parameter '{0}' is None"
             msg_params = ("toolbar_names",)
             tools_log.log_info(msg, msg_params=msg_params)
             return
 
-        toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
-        if toolbars_order in (None, 'None'):
-            toolbars_order = tools_gw.get_config_parser('toolbars_position', '_toolbars_order', 'user', 'init')
+        toolbars_order = tools_gw.get_config_parser("toolbars_position", "toolbars_order", "user", "init")
+        if toolbars_order in (None, "None"):
+            toolbars_order = tools_gw.get_config_parser("toolbars_position", "_toolbars_order", "user", "init")
 
-        if toolbars_order in (None, 'None'):
+        if toolbars_order in (None, "None"):
             msg = "Parameter '{0}' is None"
             msg_params = ("toolbars_order",)
             tools_log.log_info(msg, msg_params=msg_params)
             return
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
-        toolbars_order_list = toolbars_order.replace(' ', '').split(',')
+        toolbars_order_list = toolbars_order.replace(" ", "").split(",")
         config_was_updated = False
 
         # Check for optional toolbars
-        for toolbar_id in ('am', 'cm'):
-            is_active = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
+        for toolbar_id in ("am", "cm"):
+            is_active = tools_gw.get_config_parser("toolbars_add", f"{toolbar_id}_active", "user", "init", False)
             if tools_os.set_boolean(is_active, False):
                 if toolbar_id not in toolbars_order_list:
                     toolbars_order_list.append(toolbar_id)
@@ -403,7 +403,7 @@ class GwLoadProject(QObject):
 
         if config_was_updated:
             new_toolbars_order = ",".join(toolbars_order_list)
-            tools_gw.set_config_parser('toolbars_position', 'toolbars_order', new_toolbars_order, "user", "init")
+            tools_gw.set_config_parser("toolbars_position", "toolbars_order", new_toolbars_order, "user", "init")
 
         for tb in toolbars_order_list:
             self._create_toolbar(tb)
@@ -413,16 +413,16 @@ class GwLoadProject(QObject):
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
-            ag.setProperty('gw_name', 'gw_QActionGroup')
+            ag.setProperty("gw_name", "gw_QActionGroup")
             for index_action in plugin_toolbar.list_actions:
                 successful = False
                 attempt = 0
                 while not successful and attempt < 10:
-                    button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
-                    if button_def not in (None, 'None'):
+                    button_def = tools_gw.get_config_parser("buttons_def", str(index_action), "project", "giswater")
+                    if button_def not in (None, "None"):
                         # Check if the class associated to the button definition exists
                         if hasattr(buttons, button_def):
-                            text = tools_qt.tr(f'{button_def}')
+                            text = tools_qt.tr(f"{button_def}")
                             icon_path = f"{icon_folder}{os.sep}{plugin_toolbar.toolbar_id}{os.sep}{index_action}.png"
                             button_class = getattr(buttons, button_def)
                             button = button_class(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
@@ -435,13 +435,13 @@ class GwLoadProject(QObject):
         successful = False
         attempt = 0
         while not successful and attempt < 10:
-            project_exclude = tools_gw.get_config_parser('project_exclude', global_vars.project_type, "project", "giswater")
+            project_exclude = tools_gw.get_config_parser("project_exclude", global_vars.project_type, "project", "giswater")
             if project_exclude not in (None, "None"):
                 successful = True
             attempt = attempt + 1
 
-        if project_exclude not in (None, 'None'):
-            project_exclude = project_exclude.replace(' ', '').split(',')
+        if project_exclude not in (None, "None"):
+            project_exclude = project_exclude.replace(" ", "").split(",")
             for index in project_exclude:
                 self._hide_button(index)
 
@@ -466,7 +466,7 @@ class GwLoadProject(QObject):
         rows = tools_db.get_rows(sql, commit=False)
 
         # Check if schema is actived
-        schema_actived = tools_gw.get_config_parser('toolbars_add', 'audit_active', 'user', 'init', False)
+        schema_actived = tools_gw.get_config_parser("toolbars_add", "audit_active", "user", "init", False)
         schema_actived = tools_os.set_boolean(schema_actived, False)
 
         if rows is None or schema_actived is False:
@@ -476,17 +476,17 @@ class GwLoadProject(QObject):
         """Create and register a toolbar, with special CM/AM schema checks."""
         # Load toolbar actions from your config
         list_actions = tools_gw.get_config_parser(
-            'toolbars', str(toolbar_id), "project", "giswater"
+            "toolbars", str(toolbar_id), "project", "giswater"
         )
-        if list_actions in (None, 'None'):
+        if list_actions in (None, "None"):
             return
 
-        list_actions = list_actions.replace(' ', '').split(',')
+        list_actions = list_actions.replace(" ", "").split(",")
         if not isinstance(list_actions, list):
             list_actions = [list_actions]
 
         # Prepare toolbar object
-        toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')
+        toolbar_name = tools_qt.tr(f"toolbar_{toolbar_id}_name")
         plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
         # Special case: ToC lives in the Layers panel
@@ -494,7 +494,7 @@ class GwLoadProject(QObject):
             plugin_toolbar.toolbar = (
                 self.iface
                 .mainWindow()
-                .findChild(QDockWidget, 'Layers')
+                .findChild(QDockWidget, "Layers")
                 .findChildren(QToolBar)[0]
             )
 
@@ -521,10 +521,10 @@ class GwLoadProject(QObject):
                     f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{schema_to_check}'")
 
                 flag = tools_gw.get_config_parser(
-                    'toolbars_add',
-                    f'{toolbar_id}_active',
-                    'user',
-                    'init',
+                    "toolbars_add",
+                    f"{toolbar_id}_active",
+                    "user",
+                    "init",
                     False
                 )
                 active = tools_os.set_boolean(flag, False)
@@ -537,9 +537,9 @@ class GwLoadProject(QObject):
             plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
 
         # Finalize: register and optionally hide/disable immediately
-        if getattr(plugin_toolbar, 'toolbar', None):
+        if getattr(plugin_toolbar, "toolbar", None):
             plugin_toolbar.toolbar.setObjectName(toolbar_name)
-            plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
+            plugin_toolbar.toolbar.setProperty("gw_name", toolbar_id)
             plugin_toolbar.list_actions = list_actions
             self.plugin_toolbars[toolbar_id] = plugin_toolbar
             self._enable_toolbar(toolbar_id)
@@ -547,7 +547,7 @@ class GwLoadProject(QObject):
     def _create_psector_status_bar(self):
         """Create Psector status bar with play/pause button and psector combobox."""
         # Check if Masterplan (plan) toolbar is loaded
-        plan_toolbar = self.plugin_toolbars.get('plan')
+        plan_toolbar = self.plugin_toolbars.get("plan")
         if not plan_toolbar or not plan_toolbar.toolbar:
             return
 
@@ -559,7 +559,7 @@ class GwLoadProject(QObject):
         # Play/pause button
         self.playpause_button = QPushButton()
         tools_gw.add_icon(self.playpause_button, "73", f"toolbars{os.sep}status")
-        self.playpause_button.setProperty('psector_active', False)
+        self.playpause_button.setProperty("psector_active", False)
         self.playpause_button.clicked.connect(self._playpause_btn_clicked)
         statusbar.insertPermanentWidget(0, self.playpause_button)
 
@@ -602,11 +602,11 @@ class GwLoadProject(QObject):
         self.cmb_psector.view().viewport().installEventFilter(self)
 
         # Register these widgets globally if needed
-        global_vars.psignals['widgets'] = [self.playpause_button, self.cmb_psector]
+        global_vars.psignals["widgets"] = [self.playpause_button, self.cmb_psector]
 
     def eventFilter(self, obj, event):
         """Filter events to handle right-click on combo box popup."""
-        if not hasattr(self, 'cmb_psector') or self.cmb_psector is None:
+        if not hasattr(self, "cmb_psector") or self.cmb_psector is None:
             return super().eventFilter(obj, event)
 
         try:
@@ -666,10 +666,10 @@ class GwLoadProject(QObject):
 
     def _manage_snapping_layers(self):
         """Manage snapping of layers"""
-        tools_qgis.manage_snapping_layer('ve_arc', snapping_type=2)
-        tools_qgis.manage_snapping_layer('ve_connec', snapping_type=0)
-        tools_qgis.manage_snapping_layer('ve_node', snapping_type=0)
-        tools_qgis.manage_snapping_layer('ve_gully', snapping_type=0)
+        tools_qgis.manage_snapping_layer("ve_arc", snapping_type=2)
+        tools_qgis.manage_snapping_layer("ve_connec", snapping_type=0)
+        tools_qgis.manage_snapping_layer("ve_node", snapping_type=0)
+        tools_qgis.manage_snapping_layer("ve_gully", snapping_type=0)
 
     def _check_user_roles(self):
         """Check user roles and show/hide toolbars"""
@@ -677,32 +677,32 @@ class GwLoadProject(QObject):
 
         # Check cm role and adjust CM toolbar if necessary
         cm_role = tools_gw.get_cm_user_role()
-        if cm_role and 'role_cm_edit' in list(cm_role):
+        if cm_role and "role_cm_edit" in list(cm_role):
             self.is_role_cm_edit = True
             # Hide buttons not wanted for role_cm_edit
-            self._hide_button('86', True)  # GwAddLotButton
-            self._hide_button('87', True)  # GwLotResourceManagementButton
+            self._hide_button("86", True)  # GwAddLotButton
+            self._hide_button("87", True)  # GwLotResourceManagementButton
 
         # Let the standard project role logic run for everyone
-        project_role = lib_vars.project_vars.get('project_role')
+        project_role = lib_vars.project_vars.get("project_role")
 
-        if project_role == 'role_basic':
+        if project_role == "role_basic":
             return
 
-        elif project_role == 'role_om':
+        elif project_role == "role_om":
             self._enable_toolbar("om")
             return
 
-        elif project_role == 'role_edit':
+        elif project_role == "role_edit":
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
 
-        elif project_role == 'role_epa':
+        elif project_role == "role_epa":
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
 
-        elif project_role == 'role_plan' or project_role == 'role_admin' or project_role == 'role_system':
+        elif project_role == "role_plan" or project_role == "role_admin" or project_role == "role_system":
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("epa")
@@ -714,15 +714,15 @@ class GwLoadProject(QObject):
         if not status:
             return False
         if result:
-            variables = result['body'].get('variables')
+            variables = result["body"].get("variables")
             if variables:
-                setQgisLayers = variables.get('setQgisLayers')
-                if setQgisLayers in (False, 'False', 'false'):
+                setQgisLayers = variables.get("setQgisLayers")
+                if setQgisLayers in (False, "False", "false"):
                     return
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         # Manage if task is already running
-        if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
+        if hasattr(self, "task_get_layers") and self.task_get_layers is not None:
             try:
                 if self.task_get_layers.isActive():
                     msg = "{0} task is already active!"
@@ -732,7 +732,7 @@ class GwLoadProject(QObject):
             except RuntimeError:
                 pass
         # Set background task 'ConfigLayerFields'
-        schema_name = lib_vars.schema_name.replace('"', '')
+        schema_name = lib_vars.schema_name.replace('"', "")
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
                f"UNION "
                f"SELECT DISTINCT(child_layer) FROM cat_feature "
@@ -742,7 +742,7 @@ class GwLoadProject(QObject):
         rows = tools_db.get_rows(sql)
         description = "ConfigLayerFields"
         params = {"project_type": global_vars.project_type, "schema_name": lib_vars.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": lib_vars.project_vars['info_type']}
+                  "qgis_project_infotype": lib_vars.project_vars["info_type"]}
         self.task_get_layers = GwProjectLayersConfig(description, params)
         QgsApplication.taskManager().addTask(self.task_get_layers)
         QgsApplication.taskManager().triggerTask(self.task_get_layers)
@@ -756,16 +756,16 @@ class GwLoadProject(QObject):
         if len(layers) == 0:
             return False
 
-        if global_vars.project_type in ('ws', 'ud'):
+        if global_vars.project_type in ("ws", "ud"):
             QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor)
             self.check_project = GwProjectCheckTask()
 
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
-                variables = result['body'].get('variables')
+                variables = result["body"].get("variables")
                 if variables:
-                    guided_map = variables.get('useGuideMap')
+                    guided_map = variables.get("useGuideMap")
                     if guided_map:
                         msg = "{0}"
                         msg_params = ("manage_guided_map",)
@@ -781,7 +781,7 @@ class GwLoadProject(QObject):
 
     def _manage_guided_map(self):
         """Guide map works using ext_municipality"""
-        self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
+        self.layer_muni = tools_qgis.get_layer_by_tablename("ext_municipality")
         if self.layer_muni is None:
             return
 
@@ -791,7 +791,7 @@ class GwLoadProject(QObject):
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
         tools_gw.connect_signal(self.iface.mapCanvas().selectionChanged, self._selection_changed,
-                                'load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
+                                "load_project", "manage_guided_map_mapCanvas_selectionChanged_selection_changed")
         cursor = tools_gw.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
@@ -807,7 +807,7 @@ class GwLoadProject(QObject):
             tools_log.log_info(msg, parameter=muni_id, msg_params=msg_params)
             break
 
-        tools_gw.disconnect_signal('load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
+        tools_gw.disconnect_signal("load_project", "manage_guided_map_mapCanvas_selectionChanged_selection_changed")
         self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
 
@@ -817,17 +817,17 @@ class GwLoadProject(QObject):
         extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
         extras += f'"addSchema":"{lib_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        complet_result = tools_gw.execute_procedure("gw_fct_setselectors", body)
         if complet_result:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
             # Zoom to feature
             try:
-                x1 = complet_result['body']['data']['geometry']['x1']
-                y1 = complet_result['body']['data']['geometry']['y1']
-                x2 = complet_result['body']['data']['geometry']['x2']
-                y2 = complet_result['body']['data']['geometry']['y2']
+                x1 = complet_result["body"]["data"]["geometry"]["x1"]
+                y1 = complet_result["body"]["data"]["geometry"]["y1"]
+                x2 = complet_result["body"]["data"]["geometry"]["x2"]
+                y2 = complet_result["body"]["data"]["geometry"]["y2"]
                 if x1 is not None:
                     tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             except KeyError:
@@ -876,29 +876,29 @@ class GwLoadProject(QObject):
 
     def _manage_attribute_table(self):
         """If configured, disable button "Update all" from attribute table"""
-        disable = tools_gw.get_config_parser('system', 'disable_updateall_attributetable', "user", "init", prefix=False)
+        disable = tools_gw.get_config_parser("system", "disable_updateall_attributetable", "user", "init", prefix=False)
         if tools_os.set_boolean(disable, False):
             tools_gw.connect_signal(QApplication.instance().focusChanged, self._manage_focus_changed,
-                                    'load_project', 'manage_attribute_table_focusChanged')
+                                    "load_project", "manage_attribute_table_focusChanged")
 
     def _manage_focus_changed(self, old, new):
         """Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself."""
-        if new is None or not hasattr(new, 'window'):
+        if new is None or not hasattr(new, "window"):
             return
 
         table_dialog = new.window()
         # Check if focused widget's window is a QgsAttributeTableDialog
-        if isinstance(table_dialog, QDialog) and table_dialog.objectName().startswith('QgsAttributeTableDialog'):
+        if isinstance(table_dialog, QDialog) and table_dialog.objectName().startswith("QgsAttributeTableDialog"):
             try:
                 # Look for the button "Update all"
                 for widget in table_dialog.children():
-                    if widget.objectName() == 'mUpdateExpressionBox':
+                    if widget.objectName() == "mUpdateExpressionBox":
                         widget_btn_updateall = None
                         for subwidget in widget.children():
-                            if subwidget.objectName() == 'mRunFieldCalc':  # This is for the button itself
+                            if subwidget.objectName() == "mRunFieldCalc":  # This is for the button itself
                                 widget_btn_updateall = subwidget
                                 tools_qt.set_widget_enabled(None, widget_btn_updateall, False)
-                            if subwidget.objectName() == 'mUpdateExpressionText':  # This is the expression text field
+                            if subwidget.objectName() == "mUpdateExpressionText":  # This is the expression text field
                                 try:
                                     subwidget.fieldChanged.disconnect()
                                 except Exception:
@@ -916,7 +916,7 @@ class GwLoadProject(QObject):
     def _apply_campaign_form_config(self):
         """Applies custom form configurations from the cm_form_config table to project layers.
         """
-        if not tools_db.check_schema('cm'):
+        if not tools_db.check_schema("cm"):
             return
 
         # Require USAGE on cm; avoid error popups

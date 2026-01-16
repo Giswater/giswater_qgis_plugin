@@ -27,7 +27,7 @@ class GwCreateSchemaAssetTask(GwTask):
     def run(self):
 
         super().run()
-        self.finish_execution = {'import_data': False}
+        self.finish_execution = {"import_data": False}
         self.dict_folders_process = {}
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
@@ -57,10 +57,10 @@ class GwCreateSchemaAssetTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 
@@ -78,7 +78,7 @@ class GwCreateSchemaAssetTask(GwTask):
         """Main common execution"""
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
-        for process in ['load_base', 'load_updates']:
+        for process in ["load_base", "load_updates"]:
             status = self.admin.load_sql_folder(self.dict_folders_process[process])
             if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                     or self.isCanceled():
@@ -89,7 +89,7 @@ class GwCreateSchemaAssetTask(GwTask):
         """Calculate total number of SQL to execute"""
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_updates', 'load_i18n']
+        list_process = ["load_base", "load_updates", "load_i18n"]
 
         for process_name in list_process:
             dict_folders, total = self.get_number_of_files_process(process_name)
@@ -116,13 +116,13 @@ class GwCreateSchemaAssetTask(GwTask):
     def get_folders_process(self, process_name):
         """Get list of folders related with this @process_name"""
         dict_folders = {}
-        if process_name == 'load_base':
+        if process_name == "load_base":
             dict_folders[self.admin.folder_base] = 0
 
-        elif process_name == 'load_i18n':
+        elif process_name == "load_i18n":
             dict_folders[self.admin.folder_i18n] = 0
 
-        elif process_name == 'load_updates':
+        elif process_name == "load_updates":
             # Automatically process all update folders
             updates_folder = self.admin.folder_asset_updates
             if os.path.exists(updates_folder):

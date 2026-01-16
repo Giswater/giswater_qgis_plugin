@@ -196,7 +196,7 @@ def _load_last_config(self_cls):
 
 def _load_config_from_file(self_cls):
     """Load configuration from a file"""
-    config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+    config_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp"
     config_path: Optional[Path] = tools_qt.get_file("Select a configuration file", config_folder, "JSON files (*.json)")
 
     if config_path:
@@ -219,7 +219,7 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
 
     try:
         if _config_path is None:
-            config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+            config_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp"
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)
             file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS.value else "import_swmm_config.json"
@@ -242,7 +242,7 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
 def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwInpConfig]:
 
     if config is None:
-        config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+        config_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp"
         file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS.value else "import_swmm_config.json"
         path_temp_file = f"{config_folder}{os.sep}{file_name}"
         config_path: Path = Path(path_temp_file)
@@ -262,11 +262,11 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
             return
 
     # Fill 'Basic' tab widgets
-    tools_qt.set_widget_text(self_cls.dlg_config, 'txt_workcat', config.workcat)
+    tools_qt.set_widget_text(self_cls.dlg_config, "txt_workcat", config.workcat)
     if global_vars.project_type == ProjectType.WS.value:
-        tools_qt.set_widget_text(self_cls.dlg_config, 'txt_dscenario', config.dscenario)
+        tools_qt.set_widget_text(self_cls.dlg_config, "txt_dscenario", config.dscenario)
     elif global_vars.project_type == ProjectType.UD.value:
-        tools_qt.set_widget_text(self_cls.dlg_config, 'txt_raingage', config.raingage)
+        tools_qt.set_widget_text(self_cls.dlg_config, "txt_raingage", config.raingage)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_expl, config.exploitation, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_sector, config.sector, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_muni, config.municipality, 0)
@@ -287,27 +287,27 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 def fill_txt_info(self_cls, dialog):
     """Fill the text information in the dialog"""
     epa_software = "EPANET" if global_vars.project_type == ProjectType.WS.value else "SWMM"
-    info_str = f'''<h3>{tools_qt.tr('IMPORT INP')} ({epa_software})</h3>'''
+    info_str = f"""<h3>{tools_qt.tr('IMPORT INP')} ({epa_software})</h3>"""
     info_str += "<p>"
-    info_str += f'''{tools_qt.tr('This wizard will help with the process of importing a network from a {0} INP file into the Giswater database.', list_params=(epa_software,))}<br><br>'''
-    info_str += f'''{tools_qt.tr('There are multple tabs in order to configure all the necessary catalogs.')}<br><br>'''
-    info_str += f'''{tools_qt.tr("The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.")}<br><br>'''
-    info_str += f'''{tools_qt.tr("The second tab is the 'Features' tab, where you can select the corresponding feature classes for each type of feature on the network.")}<br>'''
+    info_str += f"""{tools_qt.tr('This wizard will help with the process of importing a network from a {0} INP file into the Giswater database.', list_params=(epa_software,))}<br><br>"""
+    info_str += f"""{tools_qt.tr('There are multple tabs in order to configure all the necessary catalogs.')}<br><br>"""
+    info_str += f"""{tools_qt.tr("The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.")}<br><br>"""
+    info_str += f"""{tools_qt.tr("The second tab is the 'Features' tab, where you can select the corresponding feature classes for each type of feature on the network.")}<br>"""
     if epa_software == "EPANET":
-        info_str += f'''{tools_qt.tr('Here you can choose how the pumps and valves will be imported, either left as arcs (virual arcs) or converted to nodes.')}<br><br>'''
-        info_str += f'''{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.")}<br><br>'''
+        info_str += f"""{tools_qt.tr('Here you can choose how the pumps and valves will be imported, either left as arcs (virual arcs) or converted to nodes.')}<br><br>"""
+        info_str += f"""{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.")}<br><br>"""
     elif epa_software == "SWMM":
-        info_str += f'''{tools_qt.tr('Here you can choose how the pumps, weirs, orifices, and outlets will be imported, either left as arcs (virual arcs) or converted to flwreg.')}<br><br>'''
-        info_str += f'''{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding roughness value for each material.")}<br><br>'''
-    info_str += f'''{tools_qt.tr("The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.")}<br><br>'''
-    info_str += f'''{tools_qt.tr("The fifth tab is the 'Arcs' tab, where you can select the catalog for each type of arc on the network.")}<br><br>'''
+        info_str += f"""{tools_qt.tr('Here you can choose how the pumps, weirs, orifices, and outlets will be imported, either left as arcs (virual arcs) or converted to flwreg.')}<br><br>"""
+        info_str += f"""{tools_qt.tr("The third tab is the 'Materials' tab, where you can select the corresponding roughness value for each material.")}<br><br>"""
+    info_str += f"""{tools_qt.tr("The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.")}<br><br>"""
+    info_str += f"""{tools_qt.tr("The fifth tab is the 'Arcs' tab, where you can select the catalog for each type of arc on the network.")}<br><br>"""
     if epa_software == "SWMM":
-        info_str += f'''{tools_qt.tr('If you chose to import the flow regulators as flwreg objects, the sixth tab is where you can select the catalog for each flow regulator (pumps, weirs, orifices, outlets) on the network.')}<br>{tools_qt.tr('If not, you can ignore the tab.')}<br><br>'''
-    info_str += f'''{tools_qt.tr("Once you have configured all the necessary catalogs, you can click on the 'Accept' button to start the import process.")}<br>{tools_qt.tr('It will then show the log of the process in the last tab.')}<br><br>'''
-    info_str += f'''{tools_qt.tr('You can save the current configuration to a file and load it later, or load the last saved configuration.')}<br><br>'''
-    info_str += f'''{tools_qt.tr('If you have any questions, please contact the Giswater team via')}<a href='https://github.com/Giswater/giswater_qgis_plugin/issues'>{tools_qt.tr('GitHub Issues')}</a> {tools_qt.tr('or')}<a href='https://giswater.org/contact/'>{tools_qt.tr('our website')}</a>.<br>'''
+        info_str += f"""{tools_qt.tr('If you chose to import the flow regulators as flwreg objects, the sixth tab is where you can select the catalog for each flow regulator (pumps, weirs, orifices, outlets) on the network.')}<br>{tools_qt.tr('If not, you can ignore the tab.')}<br><br>"""
+    info_str += f"""{tools_qt.tr("Once you have configured all the necessary catalogs, you can click on the 'Accept' button to start the import process.")}<br>{tools_qt.tr('It will then show the log of the process in the last tab.')}<br><br>"""
+    info_str += f"""{tools_qt.tr('You can save the current configuration to a file and load it later, or load the last saved configuration.')}<br><br>"""
+    info_str += f"""{tools_qt.tr('If you have any questions, please contact the Giswater team via')}<a href='https://github.com/Giswater/giswater_qgis_plugin/issues'>{tools_qt.tr('GitHub Issues')}</a> {tools_qt.tr('or')}<a href='https://giswater.org/contact/'>{tools_qt.tr('our website')}</a>.<br>"""
     info_str += "</p>"
-    tools_qt.set_widget_text(dialog, 'txt_info', info_str)
+    tools_qt.set_widget_text(dialog, "txt_info", info_str)
 
 
 def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
@@ -348,7 +348,7 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
         combo: QComboBox = self_cls.tbl_elements[element_type][0]
         if element_catalog:
             if combo.findText(element_catalog) == -1:
-                combo.setCurrentText('Create new')
+                combo.setCurrentText("Create new")
                 self_cls.tbl_elements[element_type][1].setText(element_catalog)
                 continue
             combo.setCurrentText(element_catalog)
@@ -362,7 +362,7 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
             combo: QComboBox = self_cls.tbl_elements["pipes"][dint_rough_tuple][0]
             if pipe_catalog:
                 if combo.findText(pipe_catalog) == -1:
-                    combo.setCurrentText('Create new')
+                    combo.setCurrentText("Create new")
                     self_cls.tbl_elements["pipes"][dint_rough_tuple][1].setText(pipe_catalog)
                     continue
                 combo.setCurrentText(pipe_catalog)
@@ -404,7 +404,7 @@ def _set_combo_values_from_swmm_catalogs(self_cls, catalogs):
         combo: QComboBox = self_cls.tbl_elements[element_type][0]
         if element_catalog:
             if combo.findText(element_catalog) == -1:
-                combo.setCurrentText('Create new')
+                combo.setCurrentText("Create new")
                 self_cls.tbl_elements[element_type][1].setText(element_catalog)
                 continue
             combo.setCurrentText(element_catalog)
@@ -419,7 +419,7 @@ def _set_combo_values_from_swmm_catalogs(self_cls, catalogs):
             combo: QComboBox = self_cls.tbl_elements["conduits"][catalog_tuple][0]
             if conduits_catalog:
                 if combo.findText(conduits_catalog) == -1:
-                    combo.setCurrentText('Create new')
+                    combo.setCurrentText("Create new")
                     self_cls.tbl_elements["conduits"][catalog_tuple][1].setText(conduits_catalog)
                     continue
                 combo.setCurrentText(conduits_catalog)

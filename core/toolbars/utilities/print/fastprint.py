@@ -53,12 +53,12 @@ class GwFastprint:
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getprint', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getprint", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
-        if json_result['formTabs']:
-            fields = json_result['formTabs'][0]
+        if json_result["formTabs"]:
+            fields = json_result["formTabs"][0]
             # This dialog is created from config_form_fieds
             # where formname == 'print' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
@@ -79,8 +79,8 @@ class GwFastprint:
             reg_exp = QRegularExpression(r"\d{0,8}[\r]?")
             w_scale.setValidator(QRegularExpressionValidator(reg_exp))
             tools_qt.set_widget_text(self.dlg_composer, w_scale, scale)
-        self.my_json['rotation'] = rotation
-        self.my_json['scale'] = scale
+        self.my_json["rotation"] = rotation
+        self.my_json["scale"] = scale
 
         # Signals
         self.dlg_composer.btn_print.clicked.connect(partial(self.__print, self.dlg_composer))
@@ -94,20 +94,20 @@ class GwFastprint:
         self._check_whidget_exist(self.dlg_composer)
         self._load_composer_values(self.dlg_composer)
 
-        tools_gw.open_dialog(self.dlg_composer, dlg_name='fastprint')
+        tools_gw.open_dialog(self.dlg_composer, dlg_name="fastprint")
 
         # Control if no have composers
         if composers_list != '"{}"':
             self._accept(self.dlg_composer, self.my_json)
             tools_gw.connect_signal(self.canvas.extentsChanged, partial(self._accept, self.dlg_composer, self.my_json),
-                                    'print', 'open_print_extentsChanged_accept')
+                                    "print", "open_print_extentsChanged_accept")
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
 
     def _create_dialog(self, dialog, fields):
 
-        for field in fields['fields']:
+        for field in fields["fields"]:
             label, widget = self._set_widgets_into_composer(dialog, field, self.my_json)
             tools_gw.add_widget(dialog, field, label, widget)
             tools_gw.get_values(dialog, widget, self.my_json)
@@ -138,7 +138,7 @@ class GwFastprint:
         # success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
         # but python2 produces an error in the word 'print' at actual_printer.print(...),
         # then we need to create a fake to cheat python2
-        print_ = getattr(actual_printer, 'print')
+        print_ = actual_printer.print
         print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
     def _preview(self, dialog, show):
@@ -149,7 +149,7 @@ class GwFastprint:
         widget_list = dialog.findChildren(QLineEdit)
 
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('columnname'))
+            item = selected_com.itemById(widget.property("columnname"))
             if type(item) is QgsLayoutItemLabel:
                 item.setText(str(widget.text()))
                 item.refresh()
@@ -158,7 +158,7 @@ class GwFastprint:
 
     def _destructor(self):
         self.canvas.setRotation(self.initial_rotation)
-        tools_gw.disconnect_signal('print')
+        tools_gw.disconnect_signal("print")
         self.destroyed = True
         if self.rubber_band:
             self.canvas.scene().removeItem(self.rubber_band)
@@ -169,7 +169,7 @@ class GwFastprint:
         selected_com = self._get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('columnname'))
+            item = selected_com.itemById(widget.property("columnname"))
             if type(item) is not QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
@@ -184,7 +184,7 @@ class GwFastprint:
 
         if selected_com is not None:
             for widget in widget_list:
-                item = selected_com.itemById(widget.property('columnname'))
+                item = selected_com.itemById(widget.property("columnname"))
                 if type(item) is QgsLayoutItemLabel:
                     widget.setText(str(item.text()))
 
@@ -193,7 +193,7 @@ class GwFastprint:
         if self.destroyed:
             return
 
-        if my_json == '' or str(my_json) == '{}':
+        if my_json == "" or str(my_json) == "{}":
             tools_gw.close_dialog(dialog)
             return False
 
@@ -203,30 +203,30 @@ class GwFastprint:
             if not isinstance(composer, QgsPrintLayout):
                 continue
             composer_map = []
-            composer_template = {'ComposerTemplate': composer.name()}
+            composer_template = {"ComposerTemplate": composer.name()}
             index = 0
             for item in composer.items():
                 cur_map = {}
                 if isinstance(item, QgsLayoutItemMap):
-                    cur_map['width'] = item.rect().width()
-                    cur_map['height'] = item.rect().height()
-                    cur_map['name'] = item.displayName()
-                    cur_map['index'] = index
+                    cur_map["width"] = item.rect().width()
+                    cur_map["height"] = item.rect().height()
+                    cur_map["name"] = item.displayName()
+                    cur_map["index"] = index
                     composer_map.append(cur_map)
-                    composer_template['ComposerMap'] = composer_map
+                    composer_template["ComposerMap"] = composer_map
                     index += 1
             composer_templates.append(composer_template)
-            my_json['ComposerTemplates'] = composer_templates
+            my_json["ComposerTemplates"] = composer_templates
 
-        composer_name = my_json['composer']
-        rotation = my_json['rotation']
-        scale = my_json['scale']
+        composer_name = my_json["composer"]
+        rotation = my_json["rotation"]
+        scale = my_json["scale"]
         extent = self.canvas.extent()
 
-        p1 = {'xcoord': extent.xMinimum(), 'ycoord': extent.yMinimum()}
-        p2 = {'xcoord': extent.xMaximum(), 'ycoord': extent.yMaximum()}
-        ext = {'p1': p1, 'p2': p2}
-        my_json['extent'] = ext
+        p1 = {"xcoord": extent.xMinimum(), "ycoord": extent.yMinimum()}
+        p2 = {"xcoord": extent.xMaximum(), "ycoord": extent.yMaximum()}
+        ext = {"p1": p1, "p2": p2}
+        my_json["extent"] = ext
 
         my_json = json.dumps(my_json)
         client = '"client":{"device":4, "infoType":1, "lang":"ES"}, '
@@ -234,13 +234,13 @@ class GwFastprint:
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "$${" + client + form + feature + data + "}$$"
-        json_result = tools_gw.execute_procedure('gw_fct_setprint', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_setprint", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
-        result = json_result['data']
+        result = json_result["data"]
         self._draw_rectangle(result, self.rubber_band)
-        map_index = json_result['data']['mapIndex']
+        map_index = json_result["data"]["mapIndex"]
 
         maps = []
         active_composers = tools_qgis.get_composers_list()
@@ -270,29 +270,29 @@ class GwFastprint:
         """
         widget = None
         label = None
-        if field['label']:
+        if field["label"]:
             label = QLabel()
-            label.setObjectName('lbl_' + field['widgetname'])
-            label.setText(field['label'].capitalize())
-            if field.get('stylesheet') is not None and 'label' in field['stylesheet']:
+            label.setObjectName("lbl_" + field["widgetname"])
+            label.setText(field["label"].capitalize())
+            if field.get("stylesheet") is not None and "label" in field["stylesheet"]:
                 label = tools_gw.set_stylesheet(field, label)
-            if 'tooltip' in field:
-                label.setToolTip(field['tooltip'])
+            if "tooltip" in field:
+                label.setToolTip(field["tooltip"])
             else:
-                label.setToolTip(field['label'].capitalize())
-        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+                label.setToolTip(field["label"].capitalize())
+        if field["widgettype"] == "text" or field["widgettype"] == "typeahead":
             widget = tools_gw.add_lineedit(field)
             widget = tools_gw.set_widget_size(widget, field)
             widget = tools_gw.set_data_type(field, widget)
             widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, my_json))
             widget.returnPressed.connect(partial(tools_gw.get_values, dialog, widget, my_json))
-        elif field['widgettype'] == 'combo':
+        elif field["widgettype"] == "combo":
             widget = tools_gw.add_combo(field, ignore_function=True)
             widget = tools_gw.set_widget_size(widget, field)
             widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, my_json))
-            if 'widgetfunction' in field:
-                if field['widgetfunction'].get('functionName') is not None:
-                    function_name = field['widgetfunction']['functionName']
+            if "widgetfunction" in field:
+                if field["widgetfunction"].get("functionName") is not None:
+                    function_name = field["widgetfunction"]["functionName"]
                     widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
 
         return label, widget
@@ -302,7 +302,7 @@ class GwFastprint:
         selected_com = None
         active_composers = tools_qgis.get_composers_list()
         for composer in active_composers:
-            if composer.name() == self.my_json['composer']:
+            if composer.name() == self.my_json["composer"]:
                 selected_com = composer
                 break
 
@@ -320,17 +320,17 @@ class GwFastprint:
         """Function called in def _set_widgets_into_composer(...) -->
         widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
         """
-        if my_json['composer'] != '-1':
+        if my_json["composer"] != "-1":
             self._check_whidget_exist(self.dlg_composer)
             self._load_composer_values(dialog)
             self._accept(dialog, my_json)
 
     def _draw_rectangle(self, result, rubber_band):
         """Draw lines based on geometry"""
-        if result['geometry'] is None:
+        if result["geometry"] is None:
             return
 
-        list_coord = re.search(r'\((.*)\)', str(result['geometry']['st_astext']))
+        list_coord = re.search(r"\((.*)\)", str(result["geometry"]["st_astext"]))
         points = tools_qgis.get_geometry_vertex(list_coord)
         tools_qgis.draw_polyline(points, rubber_band)
 

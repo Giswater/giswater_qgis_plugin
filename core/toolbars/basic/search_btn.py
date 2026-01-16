@@ -21,7 +21,7 @@ class GwSearchButton(GwAction):
 
     def clicked_event(self):
         # Get 'Search' docker form from qgis iface and remove it if exists
-        dockers_search = self.iface.mainWindow().findChildren(QDockWidget, 'dlg_search')
+        dockers_search = self.iface.mainWindow().findChildren(QDockWidget, "dlg_search")
         if dockers_search:
             for docker_search in dockers_search:
                 self.iface.removeDockWidget(docker_search)

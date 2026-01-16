@@ -34,7 +34,7 @@ class GwWorkcat:
     def manage_workcats(self):
         """Manager to display and manage workcats"""
         self.dlg_man = GwWorkcatManagerUi(self)
-        self.dlg_man.setProperty('class_obj', self)
+        self.dlg_man.setProperty("class_obj", self)
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_workcat.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat)
@@ -62,7 +62,7 @@ class GwWorkcat:
         self.dlg_man.btn_create.clicked.connect(partial(self.create_workcat))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_man, dlg_name='workcat_manager')
+        tools_gw.open_dialog(self.dlg_man, dlg_name="workcat_manager")
 
     def _handle_delete(self):
         tools_gw.delete_selected_rows(self.dlg_man.tbl_workcat, "cat_work")
@@ -75,18 +75,18 @@ class GwWorkcat:
         complet_list = tools_gw.get_list(view, filter_name=filter_text, id_field="id")
         if complet_list is False:
             return False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
+        for field in complet_list["body"]["data"]["fields"]:
+            if field.get("hidden"):
                 continue
             model = self.dlg_man.tbl_workcat.model()
             if model is None:
                 model = QStandardItemModel()
                 self.dlg_man.tbl_workcat.setModel(model)
             model.removeRows(0, model.rowCount())
-            if field['value']:
+            if field["value"]:
                 self.dlg_man.tbl_workcat = tools_gw.add_tableview_header(self.dlg_man.tbl_workcat, field)
                 self.dlg_man.tbl_workcat = tools_gw.fill_tableview_rows(self.dlg_man.tbl_workcat, field)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, 'cat_work', Qt.SortOrder.AscendingOrder)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, "cat_work", Qt.SortOrder.AscendingOrder)
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
         return True
 
@@ -101,7 +101,7 @@ class GwWorkcat:
         id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
         selected_object_id = widget.model().item(row, id_col_idx).text()
 
-        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'workcat_manager_keep_open', "user", "init",
+        keep_open_form = tools_gw.get_config_parser("dialogs_actions", "workcat_manager_keep_open", "user", "init",
                                                     prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
@@ -109,12 +109,12 @@ class GwWorkcat:
         self.open_workcat(selected_object_id)
 
     def open_workcat(self, workcat_id):
-        item = {'sys_id': workcat_id, 'filter_text': '', 'display_name': 'Workcat Details'}
+        item = {"sys_id": workcat_id, "filter_text": "", "display_name": "Workcat Details"}
         self.workcat_open_table_items(item)
 
     def _refresh_manager_table(self):
         try:
-            if getattr(self, 'dlg_man', None):
+            if getattr(self, "dlg_man", None):
                 self._fill_workcat_table()
         except Exception as e:
             print(f"Error refreshing manager table: {e}")
@@ -133,7 +133,7 @@ class GwWorkcat:
 
         dialog.messageBar().hide()
 
-        tools_gw.open_dialog(dialog, dlg_name='info_workcat')
+        tools_gw.open_dialog(dialog, dlg_name="info_workcat")
 
     def _save_new_workcat(self, dialog):
         workid = dialog.cat_work_id.text()
@@ -171,13 +171,13 @@ class GwWorkcat:
 
     def workcat_open_table_items(self, item):
         """Create the view and open the dialog with his content"""
-        workcat_id = item['sys_id']
-        field_id = item['filter_text']
-        display_name = item['display_name']
+        workcat_id = item["sys_id"]
+        field_id = item["filter_text"]
+        display_name = item["display_name"]
         self.current_workcat_id = workcat_id
         if workcat_id is None:
             return False
-        if 'sys_geometry' not in item:
+        if "sys_geometry" not in item:
             sql = f"""
                 SELECT row_to_json(row) FROM (SELECT 
                     CASE
@@ -205,13 +205,13 @@ class GwWorkcat:
             """
             row = tools_db.get_row(sql)
             try:
-                item['sys_geometry'] = row[0]['st_astext']
+                item["sys_geometry"] = row[0]["st_astext"]
             except Exception:
                 pass
 
-        if 'sys_geometry' in item:
+        if "sys_geometry" in item:
             # Zoom to result
-            list_coord = re.search(r'\(\((.*)\)\)', str(item['sys_geometry']))
+            list_coord = re.search(r"\(\((.*)\)\)", str(item["sys_geometry"]))
             if not list_coord:
                 msg = "Empty coordinate list"
                 tools_qgis.show_warning(msg)
@@ -236,7 +236,7 @@ class GwWorkcat:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = tools_gw.get_config_parser('btn_search', 'search_csv_path', "user", "session")
+        search_csv_path = tools_gw.get_config_parser("btn_search", "search_csv_path", "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -259,13 +259,13 @@ class GwWorkcat:
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
         self.items_dialog.btn_doc_insert.clicked.connect(
-            partial(self._document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
-        self.items_dialog.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.items_dialog.tbl_document, 'doc_x_workcat'))
+            partial(self._document_insert, self.items_dialog, "doc_x_workcat", "workcat_id", item["sys_id"]))
+        self.items_dialog.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.items_dialog.tbl_document, "doc_x_workcat"))
         self.items_dialog.btn_doc_new.clicked.connect(
-            partial(self._manage_document, self.items_dialog.tbl_document, item['sys_id']))
-        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
+            partial(self._manage_document, self.items_dialog.tbl_document, item["sys_id"]))
+        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, "path"))
         self.items_dialog.tbl_document.doubleClicked.connect(
-            partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
+            partial(tools_qt.document_open, self.items_dialog.tbl_document, "path"))
 
         self.items_dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
@@ -303,20 +303,20 @@ class GwWorkcat:
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
         # Select workcat features (installed by default - state=1)
-        self._select_workcat_features(workcat_id, 'workcat_id', state=1)
+        self._select_workcat_features(workcat_id, "workcat_id", state=1)
 
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
-        extension = '_end'
+        extension = "_end"
         self._fill_label_data(workcat_id, table_name)
         self._fill_label_data(workcat_id, table_name_end, extension)
 
         # Connect tab change signal to maintain selection
-        if hasattr(self.items_dialog, 'tabWidget') and self.items_dialog.tabWidget is not None:
+        if hasattr(self.items_dialog, "tabWidget") and self.items_dialog.tabWidget is not None:
             self.items_dialog.tabWidget.currentChanged.connect(self._on_tab_changed)
 
-        tools_gw.open_dialog(self.items_dialog, dlg_name='search_workcat')
+        tools_gw.open_dialog(self.items_dialog, dlg_name="search_workcat")
         title = self.items_dialog.windowTitle()
         self.items_dialog.setWindowTitle(f"{title} - {display_name}")
         text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_init, False, False)
@@ -327,39 +327,39 @@ class GwWorkcat:
     def _manage_document(self, qtable, item_id):
         """Access GUI to manage documents e.g Execute action of button 34"""
         manage_document = GwDocument(single_tool=False)
-        dlg_docman = manage_document.get_document(tablename='workcat', qtable=qtable, item_id=item_id)
-        dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
-        tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
+        dlg_docman = manage_document.get_document(tablename="workcat", qtable=qtable, item_id=item_id)
+        dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, "doc"))
+        tools_qt.remove_tab(dlg_docman.tabWidget, "tab_rel")
 
     def _get_current_selectors(self):
         """Take the current selector_expl and selector_state to restore them at the end of the operation"""
-        current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "session")
+        current_tab = tools_gw.get_config_parser("dialogs_tab", "selector_basic", "user", "session")
         form = f'"currentTab":"{current_tab}"'
         extras = '"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
+        json_result = tools_gw.execute_procedure("gw_fct_getselectors", body)
         return json_result
 
     def _restore_selectors(self, current_selectors):
         """Restore selector_expl and selector_state to how the user had it"""
-        qgis_project_add_schema = lib_vars.project_vars['add_schema']
-        for form_tab in current_selectors['body']['form']['formTabs']:
-            if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
+        qgis_project_add_schema = lib_vars.project_vars["add_schema"]
+        for form_tab in current_selectors["body"]["form"]["formTabs"]:
+            if form_tab["tableName"] not in ("selector_expl", "selector_state"):
                 continue
-            selector_type = form_tab['selectorType']
-            tab_name = form_tab['tabName']
+            selector_type = form_tab["selectorType"]
+            tab_name = form_tab["tabName"]
             field_id = None
-            if form_tab['tableName'] == 'selector_expl':
-                field_id = 'expl_id'
-            elif form_tab['tableName'] == 'selector_state':
-                field_id = 'id'
-            for field in form_tab['fields']:
+            if form_tab["tableName"] == "selector_expl":
+                field_id = "expl_id"
+            elif form_tab["tableName"] == "selector_state":
+                field_id = "id"
+            for field in form_tab["fields"]:
                 _id = field[field_id]
                 extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
                           f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
                           f'"addSchema":"{qgis_project_add_schema}"')
                 body = tools_gw.create_body(extras=extras)
-                tools_gw.execute_procedure('gw_fct_setselectors', body)
+                tools_gw.execute_procedure("gw_fct_setselectors", body)
         tools_qgis.refresh_map_canvas()
 
     def _force_expl(self, workcat_id):
@@ -406,7 +406,7 @@ class GwWorkcat:
 
     def _get_folder_dialog(self, dialog, widget):
         """Get folder dialog"""
-        tools_qt.get_save_file_path(dialog, widget, '*.csv', 'Save as', os.path.expanduser("~/Documents" if os.name == 'nt' else "~"))
+        tools_qt.get_save_file_path(dialog, widget, "*.csv", "Save as", os.path.expanduser("~/Documents" if os.name == "nt" else "~"))
 
     def _force_state(self, qbutton, state, qtable):
         """Force selected state and set qtable enabled = True"""
@@ -426,28 +426,28 @@ class GwWorkcat:
         qtable.model().select()
         
         # Trigger selection after state is activated
-        if hasattr(self, 'current_workcat_id'):
+        if hasattr(self, "current_workcat_id"):
             if state == 1:
-                self._select_workcat_features(self.current_workcat_id, 'workcat_id', state=1)
+                self._select_workcat_features(self.current_workcat_id, "workcat_id", state=1)
             elif state == 0:
-                self._select_workcat_features(self.current_workcat_id, 'workcat_id_end', state=0)
+                self._select_workcat_features(self.current_workcat_id, "workcat_id_end", state=0)
 
     def _write_to_csv(self, dialog, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
-            writer = csv.writer(output, lineterminator='\n')
+            writer = csv.writer(output, lineterminator="\n")
             writer.writerows(all_rows)
-        tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
+        tools_gw.set_config_parser("btn_search", "search_csv_path", f"{tools_qt.get_text(dialog, 'txt_path')}")
         msg = "The csv file has been successfully exported"
         tools_qgis.show_info(msg, dialog=dialog)
 
     def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """Filter list of workcats by workcat_id and field_id"""
         # Use workcat_id_end for the _end table
-        workcat_field = 'workcat_id_end' if 'feature_end' in table_name else 'workcat_id'
+        workcat_field = "workcat_id_end" if "feature_end" in table_name else "workcat_id"
         
         result_select = tools_qt.get_text(dialog, widget_txt)
-        if result_select != 'null':
+        if result_select != "null":
             expr = (f"{workcat_field} = '{workcat_id}'"
                     f" and {field_id} ILIKE '%{result_select}%'")
         else:
@@ -477,7 +477,7 @@ class GwWorkcat:
         widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
-            if 'Unable to find table' in model.lastError().text():
+            if "Unable to find table" in model.lastError().text():
                 tools_db.reset_qsqldatabase_connection(self.items_dialog)
             else:
                 tools_qgis.show_warning(model.lastError().text(), dialog=self.items_dialog)
@@ -517,17 +517,17 @@ class GwWorkcat:
 
         row = element[0].row()
 
-        feature_type = qtable.model().record(row).value('feature_type').lower()
+        feature_type = qtable.model().record(row).value("feature_type").lower()
         table_name = "ve_" + feature_type
 
-        feature_id = qtable.model().record(row).value('feature_id')
+        feature_id = qtable.model().record(row).value("feature_id")
 
-        self.customForm = GwInfo(tab_type='data')
-        complet_result, dialog = self.customForm.get_info_from_id(table_name, feature_id, 'data')
+        self.customForm = GwInfo(tab_type="data")
+        complet_result, dialog = self.customForm.get_info_from_id(table_name, feature_id, "data")
 
         # Get list of all coords in field geometry
         try:
-            list_coord = re.search(r'\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+            list_coord = re.search(r"\((.*)\)", str(complet_result["body"]["feature"]["geometry"]["st_astext"]))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
         except Exception:
@@ -539,9 +539,9 @@ class GwWorkcat:
             return
 
         # Use workcat_id_end for the _end table
-        workcat_field = 'workcat_id_end' if 'feature_end' in table_name else 'workcat_id'
+        workcat_field = "workcat_id_end" if "feature_end" in table_name else "workcat_id"
         
-        features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
+        features = ["NODE", "CONNEC", "GULLY", "ELEMENT", "ARC"]
         for feature in features:
             sql = (f"SELECT feature_id "
                    f" FROM {table_name}")
@@ -560,14 +560,14 @@ class GwWorkcat:
 
             # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
-            if self.project_type == 'ws' and feature == 'GULLY':
+            if self.project_type == "ws" and feature == "GULLY":
                 widget.setVisible(False)
 
             if not rows:
                 continue
 
             length = 0
-            if feature == 'ARC':
+            if feature == "ARC":
                 for row in rows:
                     arc_id = str(row[0])
                     sql = (f"SELECT st_length2d(the_geom)::numeric(12,2) "
@@ -630,9 +630,9 @@ class GwWorkcat:
 
         tools_gw.reset_rubberband(self.aux_rubber_band)
         row = index.row()
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_type')
+        column_index = tools_qt.get_col_index_by_col_name(qtable, "feature_type")
         feature_type = index.sibling(row, column_index).data().lower()
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_id')
+        column_index = tools_qt.get_col_index_by_col_name(qtable, "feature_id")
         feature_id = index.sibling(row, column_index).data()
         layer = tools_qgis.get_layer_by_tablename(f"ve_{feature_type}")
         if not layer:
@@ -653,7 +653,7 @@ class GwWorkcat:
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.reset_rubberband(self.aux_rubber_band)
 
-    def _select_workcat_features(self, workcat_id, field_name='workcat_id', state=None):
+    def _select_workcat_features(self, workcat_id, field_name="workcat_id", state=None):
         """Select features on map for the given workcat_id"""
         expr = f"{field_name} ILIKE '%{workcat_id}%'"
         if state is not None:
@@ -676,25 +676,25 @@ class GwWorkcat:
 
     def _on_tab_changed(self, index):
         """Re-select features when switching tabs"""
-        if not hasattr(self, 'current_workcat_id'):
+        if not hasattr(self, "current_workcat_id"):
             return
         # Installed tab (index 0) - select by workcat_id and state=1
         if index == 0:
-            self._select_workcat_features(self.current_workcat_id, 'workcat_id', state=1)
+            self._select_workcat_features(self.current_workcat_id, "workcat_id", state=1)
         # Removed tab (index 1) - select by workcat_id_end and state=0
         elif index == 1:
-            self._select_workcat_features(self.current_workcat_id, 'workcat_id_end', state=0)
+            self._select_workcat_features(self.current_workcat_id, "workcat_id_end", state=0)
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
         folder_path = tools_qt.get_text(dialog, path)
-        if folder_path is None or folder_path == 'null':
+        if folder_path is None or folder_path == "null":
             path.setStyleSheet("border: 1px solid red")
             return
 
         path.setStyleSheet(None)
-        if folder_path.find('.csv') == -1:
-            folder_path += '.csv'
+        if folder_path.find(".csv") == -1:
+            folder_path += ".csv"
         if qtable_1:
             model_1 = qtable_1.model()
         else:

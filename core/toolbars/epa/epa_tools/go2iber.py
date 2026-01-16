@@ -34,8 +34,8 @@ class Go2Iber:
 
     def __init__(self) -> None:
         self.ibergis_folder = tools_qgis.get_plugin_folder("IberGIS")
-        self.ig_options_class = importlib.import_module('.options', package=f'{self.ibergis_folder}.core.shared') if self.ibergis_folder else None
-        self.ig_tools_db = importlib.import_module('.tools_db', package=f'{self.ibergis_folder}.lib') if self.ibergis_folder else None
+        self.ig_options_class = importlib.import_module(".options", package=f"{self.ibergis_folder}.core.shared") if self.ibergis_folder else None
+        self.ig_tools_db = importlib.import_module(".tools_db", package=f"{self.ibergis_folder}.lib") if self.ibergis_folder else None
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
@@ -64,7 +64,7 @@ class Go2Iber:
         # Open dialog
         msg = "This tool is still in developement, it might not work as intended."
         tools_qgis.show_warning(msg, dialog=self.dlg_go2iber)  # TODO: remove this
-        tools_gw.open_dialog(self.dlg_go2iber, dlg_name='go2iber')
+        tools_gw.open_dialog(self.dlg_go2iber, dlg_name="go2iber")
 
     def _btn_swmm_options_clicked(self):
         # tools_gw.execute_class_function(GwGo2EpaUI, '_go2epa_options')
@@ -87,10 +87,10 @@ class Go2Iber:
         my_json = '[{"widget": "inp_options_networkmode", "value": "2"}]'
         extras = f'"fields":{my_json}'
         body = tools_gw.create_body(form=form, extras=extras)
-        tools_gw.execute_procedure('gw_fct_setconfig', body)
+        tools_gw.execute_procedure("gw_fct_setconfig", body)
 
         # Manage if task is already running
-        if hasattr(self, 'go2iber_task') and self.go2iber_task is not None:
+        if hasattr(self, "go2iber_task") and self.go2iber_task is not None:
             try:
                 if self.go2iber_task.isActive():
                     msg = "Go2Iber task is already active!"
@@ -99,7 +99,7 @@ class Go2Iber:
             except RuntimeError:
                 pass
 
-        mesh = tools_qt.get_combo_value(self.dlg_go2iber, 'cmb_mesh', 1)
+        mesh = tools_qt.get_combo_value(self.dlg_go2iber, "cmb_mesh", 1)
         if mesh is None or mesh == "" or mesh == -1:
             msg = "You need to have a mesh"
             tools_qt.show_warning(msg)
@@ -154,18 +154,18 @@ class Go2Iber:
     def _save_user_values(self):
         """Save dialog widgets' values"""
         txt_result_name = f"{tools_qt.get_text(self.dlg_go2iber, 'txt_result_name', return_string_null=False)}"
-        tools_gw.set_config_parser('btn_go2iber', 'go2iber_result_name', f"{txt_result_name}")
+        tools_gw.set_config_parser("btn_go2iber", "go2iber_result_name", f"{txt_result_name}")
         txt_path = f"{tools_qt.get_text(self.dlg_go2iber, 'txt_path', return_string_null=False)}"
-        tools_gw.set_config_parser('btn_go2iber', 'go2iber_path', f"{txt_path}")
+        tools_gw.set_config_parser("btn_go2iber", "go2iber_path", f"{txt_path}")
 
     def _fill_user_values(self):
         """Fill dialog widgets' values"""
-        txt_result_name = tools_gw.get_config_parser('btn_go2iber', 'go2iber_result_name', 'user', 'session')
+        txt_result_name = tools_gw.get_config_parser("btn_go2iber", "go2iber_result_name", "user", "session")
         if txt_result_name:
-            tools_qt.set_widget_text(self.dlg_go2iber, 'txt_result_name', txt_result_name)
-        txt_path = tools_gw.get_config_parser('btn_go2iber', 'go2iber_path', 'user', 'session')
+            tools_qt.set_widget_text(self.dlg_go2iber, "txt_result_name", txt_result_name)
+        txt_path = tools_gw.get_config_parser("btn_go2iber", "go2iber_path", "user", "session")
         if txt_path:
-            tools_qt.set_widget_text(self.dlg_go2iber, 'txt_path', txt_path)
+            tools_qt.set_widget_text(self.dlg_go2iber, "txt_path", txt_path)
 
     def _check_fields(self):
 
@@ -183,7 +183,7 @@ class Go2Iber:
         #     return False
 
         # Control result name
-        if result_name == '':
+        if result_name == "":
             self.dlg_go2iber.txt_result_name.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
             title = "Result name"
@@ -191,7 +191,7 @@ class Go2Iber:
             return False
 
         # Control folder path
-        if folder_path == '':
+        if folder_path == "":
             self.dlg_go2iber.txt_path.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
             title = "Folder path"
@@ -224,11 +224,11 @@ class Go2Iber:
             self.timer.stop()
             return
 
-        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time = dialog.findChild(QLabel, "lbl_time")
         lbl_time.setText(text)
 
     def check_ibergis_project(self) -> bool:
-        gpkg_path = tools_qgis.get_project_variable('project_gpkg_path')
+        gpkg_path = tools_qgis.get_project_variable("project_gpkg_path")
         if not gpkg_path or not os.path.exists(f"{QgsProject.instance().absolutePath()}{os.sep}{gpkg_path}"):
             return False
         return True
@@ -236,30 +236,30 @@ class Go2Iber:
     def load_project(self, file_path: Path) -> bool:
         """Load IberGIS project"""
         import_layers = {
-            'MESH': ['ground', 'roof', 'mesh_anchor_lines', 'mesh_anchor_points'],
-            'IBER': ['culvert', 'bridge', 'boundary_conditions', 'hyetograph']
+            "MESH": ["ground", "roof", "mesh_anchor_lines", "mesh_anchor_points"],
+            "IBER": ["culvert", "bridge", "boundary_conditions", "hyetograph"]
         }
 
         plugin_folder = tools_qgis.find_plugin_path("ibergis")
         for group_name, layers in import_layers.items():
             for layer_name in layers:
                 layer = QgsVectorLayer(f"{file_path}|layername={layer_name}", layer_name.capitalize().replace("_", " "), "ogr")
-                qml_name = layer_name + '.qml'
+                qml_name = layer_name + ".qml"
                 qml_path = f"{plugin_folder}{os.sep}resources{os.sep}templates{os.sep}{qml_name}"
                 if not os.path.exists(qml_path):
                     msg = f"QML file {qml_path} not found"
                     tools_qgis.show_warning(msg)
                 else:
                     layer.loadNamedStyle(qml_path)
-                tools_qgis.add_layer_to_toc(layer, group=f'IBERGIS - {os.path.basename(file_path)}', sub_group=group_name, create_groups=True)
+                tools_qgis.add_layer_to_toc(layer, group=f"IBERGIS - {os.path.basename(file_path)}", sub_group=group_name, create_groups=True)
 
         # Save project path
         relative_path = os.path.relpath(file_path, QgsProject.instance().absolutePath())
-        tools_qgis.set_project_variable('project_gpkg_path', relative_path)
+        tools_qgis.set_project_variable("project_gpkg_path", relative_path)
 
         # Reload plugin
         import qgis.utils
-        plugin_name = tools_qgis.get_plugin_folder('IberGIS')
+        plugin_name = tools_qgis.get_plugin_folder("IberGIS")
         if plugin_name not in qgis.utils.plugins:
             qgis.utils.loadPlugin(plugin_name)
         else:

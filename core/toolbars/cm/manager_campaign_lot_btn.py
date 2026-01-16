@@ -23,12 +23,12 @@ class GwManageCampaignLotButton(GwAction):
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
         self.workorder_manager = Workorder(icon_path, action_name, text, toolbar, action_group)
 
-        self.actions = [tools_qt.tr('Manage Campaign'), tools_qt.tr('Manage Lot'), tools_qt.tr('Manage Workorder')]
+        self.actions = [tools_qt.tr("Manage Campaign"), tools_qt.tr("Manage Lot"), tools_qt.tr("Manage Workorder")]
 
         # Conditionally remove 'Lot management' for role_cm_edit
         cm_roles = tools_gw.get_cm_user_role()
-        if cm_roles and 'role_cm_edit' in list(cm_roles):
-            self.actions.remove(tools_qt.tr('Manage Lot'))
+        if cm_roles and "role_cm_edit" in list(cm_roles):
+            self.actions.remove(tools_qt.tr("Manage Lot"))
 
         # Create a menu and add all the actions
         self.menu = QMenu()
@@ -56,10 +56,10 @@ class GwManageCampaignLotButton(GwAction):
 
     def clicked_event(self, selected_action):
         """Open the correct campaign dialog based on user selection"""
-        if selected_action == tools_qt.tr('Manage Campaign'):
+        if selected_action == tools_qt.tr("Manage Campaign"):
             self.campaign_manager.campaign_manager()
-        elif selected_action == tools_qt.tr('Manage Lot'):
+        elif selected_action == tools_qt.tr("Manage Lot"):
             self.new_lot.lot_manager()
-        elif selected_action == tools_qt.tr('Manage Workorder'):
+        elif selected_action == tools_qt.tr("Manage Workorder"):
             self.workorder_manager.workorder_manager()
 

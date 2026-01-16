@@ -36,13 +36,13 @@ class GwToolBoxTask(GwTask):
     def run(self):
 
         super().run()
-        extras = ''
-        feature_field = ''
+        extras = ""
+        feature_field = ""
 
         self.function_name = self.result.get("functionname")
         try:
-            if self.result.get('source') == 'cm':
-                self.schema_name = 'cm'
+            if self.result.get("source") == "cm":
+                self.schema_name = "cm"
             else:
                 self.schema_name = None
         except Exception:
@@ -54,7 +54,7 @@ class GwToolBoxTask(GwTask):
         else:
             return False
 
-        if self.result['functionparams'].get('featureType'):
+        if self.result["functionparams"].get("featureType"):
             layer = None
 
             layer_name = tools_qt.get_combo_value(self.dialog, self.combo, 1)
@@ -63,21 +63,21 @@ class GwToolBoxTask(GwTask):
                 if not layer:
                     return False
 
-            selection_mode = self.toolbox.rbt_checked['widget']
+            selection_mode = self.toolbox.rbt_checked["widget"]
             extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
-            open_char = '['
-            close_char = ']'
+            open_char = "["
+            close_char = "]"
             pks = tools_qgis.get_primary_key(layer)
             if pks:
                 pks = pks.split(",")
                 if len(pks) > 1:
-                    open_char = '{'
-                    close_char = '}'
+                    open_char = "{"
+                    close_char = "}"
             feature_id_list = f'"id":{open_char}'
-            if (selection_mode == 'wholeSelection') or (selection_mode == 'previousSelection' and layer is None):
+            if (selection_mode == "wholeSelection") or (selection_mode == "previousSelection" and layer is None):
                 feature_id_list += close_char
-            elif selection_mode == 'previousSelection' and layer is not None:
+            elif selection_mode == "previousSelection" and layer is not None:
                 features = layer.selectedFeatures()
                 if len(pks) > 1:
                     for pk in pks:
@@ -86,7 +86,7 @@ class GwToolBoxTask(GwTask):
                             feature_id = feature.attribute(pk)
                             feature_id_list += f'"{feature_id}", '
                         if len(features) > 0:
-                            feature_id_list = feature_id_list[:-2] + '], '
+                            feature_id_list = feature_id_list[:-2] + "], "
                 else:
                     for feature in features:
                         feature_id = feature.attribute(pks[0])
@@ -105,25 +105,25 @@ class GwToolBoxTask(GwTask):
         widget_is_void = False
         extras += '"parameters":{'
 
-        if self.result.get('fields') is not None:
-            for field in self.result.get('fields'):
-                widget = self.dialog.findChild(QWidget, field['widgetname'])
+        if self.result.get("fields") is not None:
+            for field in self.result.get("fields"):
+                widget = self.dialog.findChild(QWidget, field["widgetname"])
                 param_name = widget.objectName()
                 if type(widget) in (QLineEdit,):
                     widget.setStyleSheet(None)
                     value = tools_qt.get_text(self.dialog, widget, False, False)
-                    extras += f'"{param_name}":"{value}", '.replace('""', 'null')
-                    if value == '' and widget.property('ismandatory'):
+                    extras += f'"{param_name}":"{value}", '.replace('""', "null")
+                    if value == "" and widget.property("ismandatory"):
                         widget_is_void = True
                         widget.setStyleSheet("border: 1px solid red")
                 elif type(widget) in (QSpinBox, QDoubleSpinBox):
                     value = tools_qt.get_text(self.dialog, widget, False, False)
-                    if value == '':
+                    if value == "":
                         value = 0
                     extras += f'"{param_name}":"{value}", '
                 elif isinstance(widget, QComboBox):
                     value = tools_qt.get_combo_value(self.dialog, widget, 0)
-                    if value not in (None, ''):
+                    if value not in (None, ""):
                         extras += f'"{param_name}":"{value}", '
                 elif type(widget) in (QCheckBox,):
                     value = tools_qt.is_checked(self.dialog, widget)
@@ -137,12 +137,12 @@ class GwToolBoxTask(GwTask):
 
         if widget_is_void:
             msg = "This param is mandatory. Please, set a value"
-            tools_log.log_info(msg, parameter='')
+            tools_log.log_info(msg, parameter="")
             return False
 
         if len(widget_list) > 0:
             extras = extras[:-2]
-        extras += '}'
+        extras += "}"
         if self.aux_params is False:
             self.aux_params = "null"
         extras += f', "aux_params":{self.aux_params}'
@@ -158,7 +158,7 @@ class GwToolBoxTask(GwTask):
             return False
         if not self.json_result or self.json_result is None:
             return False
-        if self.json_result['status'] == 'Failed':
+        if self.json_result["status"] == "Failed":
             return False
 
         return True
@@ -185,17 +185,17 @@ class GwToolBoxTask(GwTask):
             return
 
         if result is False and self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
         # If database fail
-        elif result is False and lib_vars.session_vars['last_error_msg'] is not None:
-            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+        elif result is False and lib_vars.session_vars["last_error_msg"] is not None:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars["last_error_msg"])
         elif result:
-            tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, False, False)
+            tools_gw.fill_tab_log(self.dialog, self.json_result["body"]["data"], True, True, 1, False, False)
             self.dialog.btn_run.setEnabled(False)
         elif self.json_result:
             tools_gw.manage_json_exception(self.json_result)

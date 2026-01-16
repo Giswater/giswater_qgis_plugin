@@ -31,7 +31,7 @@ class GwAudit:
         body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+        json_result = tools_gw.execute_procedure("gw_fct_get_dialog", body)
 
         # Create and open dialog
         self.dlg_audit_manager = GwAuditManagerUi(self)
@@ -41,7 +41,7 @@ class GwAudit:
         # Get logs from db
         complet_list = self._get_list()
 
-        if not complet_list or complet_list['body']['data']['fields'][0]['value'] is None:
+        if not complet_list or complet_list["body"]["data"]["fields"][0]["value"] is None:
             # Show warning
             msg = "This feature has no log changes, please update this feature before."
             tools_qgis.show_warning(msg)
@@ -90,7 +90,7 @@ class GwAudit:
             widget.setAllowNull(False)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
+        tools_gw.open_dialog(self.dlg_audit_manager, "audit_manager")
 
     def get_first_log_date(self):
         """Get first snapshot date"""
@@ -134,7 +134,7 @@ class GwAudit:
             body = {"client": {"cur_user": tools_db.current_user}, "form": log_id, "schema": {"parent_schema": lib_vars.schema_name}}
 
             # Execute procedure
-            result = tools_gw.execute_procedure('gw_fct_getauditlogdata', body, schema_name='audit')
+            result = tools_gw.execute_procedure("gw_fct_getauditlogdata", body, schema_name="audit")
             results.append(result)
 
         # Create dialog
@@ -143,7 +143,7 @@ class GwAudit:
         body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+        json_result = tools_gw.execute_procedure("gw_fct_get_dialog", body)
 
         # Create dialog
         self.dlg_audit = GwAuditUi(self)
@@ -153,7 +153,7 @@ class GwAudit:
         tools_gw.manage_dlg_widgets(self, self.dlg_audit, json_result)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_audit, 'audit')
+        tools_gw.open_dialog(self.dlg_audit, "audit")
 
         # Get layout to add widgets
         layout = self.dlg_audit.centralwidget.findChild(QScrollArea).findChild(QWidget).findChild(QGridLayout)
@@ -170,8 +170,8 @@ class GwAudit:
         # Add widgets in form for each value
         done_values = []
         for result in results:
-            old_data = result['olddata']
-            new_data = result['newdata']
+            old_data = result["olddata"]
+            new_data = result["newdata"]
 
             # Check results
             if not old_data or not new_data:
@@ -216,8 +216,8 @@ class GwAudit:
         if complet_list is False:
             return False
 
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
+        for field in complet_list["body"]["data"]["fields"]:
+            if field.get("hidden"):
                 continue
             model = self.dlg_audit_manager.tbl_audit.model()
             if model is None:
@@ -226,11 +226,11 @@ class GwAudit:
             model.removeRows(0, model.rowCount())
 
             # Check if has data
-            if field['value']:
+            if field["value"]:
                 self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, field)
                 self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, field)
 
-        tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, 'audit_results')
+        tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, "audit_results")
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
 
         self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
@@ -248,8 +248,8 @@ class GwAudit:
 
         # Create json body
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields, extras=page_info)
-        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
-        if json_result is None or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getlist", body)
+        if json_result is None or json_result["status"] == "Failed":
             return False
 
         return json_result

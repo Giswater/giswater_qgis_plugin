@@ -29,12 +29,12 @@ class GwGo2EpaSelectorButton(GwAction):
         form = {"formName": "generic", "formType": "epa_selector"}
         body = {"client": {"cur_user": user}, "form": form}
 
-        json_result = tools_gw.execute_procedure('gw_fct_get_epa_selector', body)
+        json_result = tools_gw.execute_procedure("gw_fct_get_epa_selector", body)
 
-        self.dlg_go2epa_result = GwGo2EpaSelectorUi(self, 'go2epa')
+        self.dlg_go2epa_result = GwGo2EpaSelectorUi(self, "go2epa")
         tools_gw.load_settings(self.dlg_go2epa_result)
         tools_gw.manage_dlg_widgets(self, self.dlg_go2epa_result, json_result)
-        tools_gw.open_dialog(self.dlg_go2epa_result, 'go2epa_result')
+        tools_gw.open_dialog(self.dlg_go2epa_result, "go2epa_result")
 
 
 def set_combo_values(**kwargs):
@@ -49,7 +49,7 @@ def set_combo_values(**kwargs):
     body = {"client": {"cur_user": user}, "form": form, "feature": feature}
 
     # db fct
-    combo_list = tools_gw.execute_procedure('gw_fct_get_epa_selector', body)["body"]
+    combo_list = tools_gw.execute_procedure("gw_fct_get_epa_selector", body)["body"]
 
     for combo_name, combo in combo_list.items():
         combo_widget = tools_qt.get_widget(dialog, f"tab_time_{combo_name}")
@@ -69,12 +69,12 @@ def accept(**kwargs):
     body = {"client": {"cur_user": user}, "form": form}
 
     # db fct
-    tools_gw.execute_procedure('gw_fct_set_epa_selector', body)
+    tools_gw.execute_procedure("gw_fct_set_epa_selector", body)
 
     tools_qgis.set_cursor_wait()
     try:
         _load_result_layers()
-        if form.get('tab_result_result_name_compare') and form.get('tab_result_result_name_compare') != '':
+        if form.get("tab_result_result_name_compare") and form.get("tab_result_result_name_compare") != "":
             _load_compare_layers()
     except Exception:
         pass
@@ -120,24 +120,24 @@ def _get_form_with_combos(dialog):
 def _load_result_layers():
     """Adds any missing Compare layers to TOC"""
     # Manage user variable
-    if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init"), default=False):
+    if not tools_os.set_boolean(tools_gw.get_config_parser("btn_go2epa_selector", "load_result_layers", "user", "init"), default=False):
         return
 
     filtre = "(id LIKE 'v_rpt_arc%' OR id LIKE 'v_rpt_node%')"
-    if global_vars.project_type == 'ud':
+    if global_vars.project_type == "ud":
         filtre = "id LIKE 'v_rpt_%_sum'"
     sql = f"SELECT id, alias FROM sys_table WHERE {filtre} AND alias IS NOT NULL"
     rows = tools_db.get_rows(sql)
     if rows:
         body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
+        json_result = tools_gw.execute_procedure("gw_fct_getaddlayervalues", body)
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
                 pk = "id"
-                for field in json_result['body']['data']['fields']:
-                    if field['tableName'] == tablename:
-                        pk = field['tableId']
+                for field in json_result["body"]["data"]["fields"]:
+                    if field["tableName"] == tablename:
+                        pk = field["tableId"]
                         break
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
 
@@ -147,24 +147,24 @@ def _load_compare_layers():
     """ This function is no longer used after reversing the change to load compare layers. """
 
     # Manage user variable
-    if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init"), default=False):
+    if not tools_os.set_boolean(tools_gw.get_config_parser("btn_go2epa_selector", "load_compare_layers", "user", "init"), default=False):
         return
 
-    filtre = 'v_rpt_comp_%'
-    if global_vars.project_type == 'ud':
-        filtre = 'v_rpt_comp_%_sum'
+    filtre = "v_rpt_comp_%"
+    if global_vars.project_type == "ud":
+        filtre = "v_rpt_comp_%_sum"
     sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filtre}' AND alias IS NOT NULL"
     rows = tools_db.get_rows(sql)
     if rows:
         body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
+        json_result = tools_gw.execute_procedure("gw_fct_getaddlayervalues", body)
         for tablename, alias in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
                 pk = "id"
-                for field in json_result['body']['data']['fields']:
-                    if field['tableName'] == tablename:
-                        pk = field['tableId']
+                for field in json_result["body"]["data"]["fields"]:
+                    if field["tableName"] == tablename:
+                        pk = field["tableId"]
                         break
                 tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
 

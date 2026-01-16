@@ -30,7 +30,7 @@ class GwCreateSchemaAuditTask(GwTask):
     def run(self):
 
         super().run()
-        self.finish_execution = {'import_data': False}
+        self.finish_execution = {"import_data": False}
         self.dict_folders_process = {}
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
@@ -59,10 +59,10 @@ class GwCreateSchemaAuditTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 
@@ -117,10 +117,10 @@ class GwCreateSchemaAuditTask(GwTask):
     def get_folders_process(self, process_name):
         """Get list of folders related with this @process_name"""
         dict_folders = {}
-        if process_name == 'load_audit_structure':
+        if process_name == "load_audit_structure":
             dict_folders[self.admin.folder_audit_structure] = 0
 
-        elif process_name == 'load_audit_activation':
+        elif process_name == "load_audit_activation":
             dict_folders[self.admin.folder_audit_activate] = 0
 
         return dict_folders

@@ -68,9 +68,9 @@ class GwAmBreakageButton(GwAction):
 
     def clicked_event(self):
         if self.action:
-            if hasattr(self.action, 'associatedObjects'):
+            if hasattr(self.action, "associatedObjects"):
                 button = QWidget(self.action.associatedObjects()[1])
-            elif hasattr(self.action, 'associatedWidgets'):
+            elif hasattr(self.action, "associatedWidgets"):
                 button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.exec(menu_point)

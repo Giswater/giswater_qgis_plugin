@@ -31,7 +31,7 @@ class GwUtilsManagerButton(GwAction):
         if toolbar is not None:
             toolbar.removeAction(self.action)
 
-        self.info_feature = GwInfo('data')
+        self.info_feature = GwInfo("data")
 
         self.menu = QMenu()
         self.menu.setObjectName("GW_utils_menu")
@@ -45,12 +45,12 @@ class GwUtilsManagerButton(GwAction):
 
     def clicked_event(self):
 
-        if self.menu.property('last_selection') is not None:
-            getattr(self, self.menu.property('last_selection'))()
+        if self.menu.property("last_selection") is not None:
+            getattr(self, self.menu.property("last_selection"))()
             return
-        if hasattr(self.action, 'associatedObjects'):
+        if hasattr(self.action, "associatedObjects"):
             button = QWidget(self.action.associatedObjects()[1])
-        elif hasattr(self.action, 'associatedWidgets'):
+        elif hasattr(self.action, "associatedWidgets"):
             button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
@@ -68,19 +68,19 @@ class GwUtilsManagerButton(GwAction):
             action.disconnect()
             self.menu.removeAction(action)
             del action
-        action_group = self.action.property('action_group')
+        action_group = self.action.property("action_group")
 
-        buttons = [[tools_qt.tr('Mapzones manager'), '_mapzones_manager'],
-                    [tools_qt.tr('Workcat manager'), '_workcat_manager']]
-        role = tools_gw.get_role_permissions(lib_vars.project_vars.get('project_role'))
-        if role in ('role_plan', 'role_admin', 'role_system'):
-            buttons.append(['Style manager', '_style_manager'])
+        buttons = [[tools_qt.tr("Mapzones manager"), "_mapzones_manager"],
+                    [tools_qt.tr("Workcat manager"), "_workcat_manager"]]
+        role = tools_gw.get_role_permissions(lib_vars.project_vars.get("project_role"))
+        if role in ("role_plan", "role_admin", "role_system"):
+            buttons.append(["Style manager", "_style_manager"])
         for button in buttons:
             button_name = button[0]
             button_function = button[1]
             obj_action = QAction(str(tools_qt.tr(button_name)), action_group)
             obj_action.setObjectName(button_name)
-            obj_action.setProperty('action_group', action_group)
+            obj_action.setProperty("action_group", action_group)
             # if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
             #     obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
             # try:

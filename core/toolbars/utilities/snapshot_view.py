@@ -52,7 +52,7 @@ class GwSnapshotViewButton(GwAction):
         body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
         # Execute procedure
-        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+        json_result = tools_gw.execute_procedure("gw_fct_get_dialog", body)
 
         # Create dialog
         self.dlg_snapshot_view = GwSnapshotViewUi(self)
@@ -79,12 +79,12 @@ class GwSnapshotViewButton(GwAction):
         self._handle_coordinates_actions()
 
         # Hide gully checkbox if project type is not UD
-        if self.project_type != 'ud':
+        if self.project_type != "ud":
             self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
             self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
 
         # Open form
-        tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
+        tools_gw.open_dialog(self.dlg_snapshot_view, "snapshot_view")
 
     def _get_first_snapshot_date(self):
         """Get first snapshot date"""
@@ -208,17 +208,17 @@ def run(**kwargs):
     # Create json input data
     form = {
         "date": class_obj.date.dateTime().toString("yyyy-MM-dd"),
-        "polygon": f'{polygon.asWkt()}',
-        "features": [feature.objectName().split('_')[-1] for feature in class_obj.features if feature.isChecked()]
+        "polygon": f"{polygon.asWkt()}",
+        "features": [feature.objectName().split("_")[-1] for feature in class_obj.features if feature.isChecked()]
     }
 
     body = {"client": {"cur_user": tools_db.current_user}, "form": form, "schema": {"parent_schema": lib_vars.schema_name}}
 
     # Execute procedure
-    result = tools_gw.execute_procedure('gw_fct_getsnapshot', body, schema_name='audit')
+    result = tools_gw.execute_procedure("gw_fct_getsnapshot", body, schema_name="audit")
 
     if result.get("status") == "Accepted" and result.get("body").get("data"):
-        layers = result['body']['data']
+        layers = result["body"]["data"]
         add_layers_temp(layers, f"Snapshot - {form['date']}")
         tools_gw.close_dialog(class_obj.dlg_snapshot_view)
     else:
@@ -229,27 +229,27 @@ def run(**kwargs):
 def add_layers_temp(layers, group):
     """Creates temporary layers from a given list of layers and adds them to specified subgroups under a main group in QGIS."""
     for i, layer in enumerate(layers):
-        if not layer['features']:
+        if not layer["features"]:
             continue
 
-        geometry_type = layer['geometryType']
-        aux_layer_name = layer['layerName']
-        layer_group = layer.get('group', '')  # Get the subgroup name from the layer
+        geometry_type = layer["geometryType"]
+        aux_layer_name = layer["layerName"]
+        layer_group = layer.get("group", "")  # Get the subgroup name from the layer
 
         # Remove existing layer with the same name from the group
         tools_qgis.remove_layer_from_toc(aux_layer_name, group)
 
         # Create a new memory layer
-        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{lib_vars.data_epsg}", aux_layer_name, 'memory')
+        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{lib_vars.data_epsg}", aux_layer_name, "memory")
         prov = v_layer.dataProvider()
 
         v_layer.startEditing()
 
         # Get unique attributes before adding features
         unique_attributes = set()
-        for feature in layer['features']:
-            for key in feature['properties'].keys():
-                if key != 'the_geom':
+        for feature in layer["features"]:
+            for key in feature["properties"].keys():
+                if key != "the_geom":
                     unique_attributes.add(key)
         unique_attributes.add("color")  # Add color attribute
 
@@ -258,7 +258,7 @@ def add_layers_temp(layers, group):
         v_layer.updateFields()
 
         # Add features with their attributes and colors
-        for feature in layer['features']:
+        for feature in layer["features"]:
             geometry = tools_qgis.get_geometry_from_json(feature)
             if not geometry:
                 continue
@@ -268,9 +268,9 @@ def add_layers_temp(layers, group):
 
             attributes = []
             for key in unique_attributes:
-                value = feature['properties'].get(key, "")  # Get the value or an empty string if not exists
+                value = feature["properties"].get(key, "")  # Get the value or an empty string if not exists
                 if key == "color":
-                    value = feature.get('color', 'blue')  # If no color, use blue by default
+                    value = feature.get("color", "blue")  # If no color, use blue by default
                 attributes.append(value)
 
             fet.setAttributes(attributes)
@@ -307,9 +307,9 @@ def apply_layer_style(layer, layer_group, layer_origin):
                 break
 
     # Check which colors are present in the layer features
-    has_colors = {'red': False, 'yellow': False}
+    has_colors = {"red": False, "yellow": False}
     for feature in layer.getFeatures():
-        color = feature['color']
+        color = feature["color"]
         if color in has_colors:
             has_colors[color] = True
 
@@ -330,13 +330,13 @@ def apply_layer_style(layer, layer_group, layer_origin):
     root_rule = QgsRuleBasedRenderer.Rule(None)
 
     # Add rules based on available feature colors
-    if has_colors['red']:
-        root_rule.appendChild(create_colored_rule('red', 'Deleted'))
-    if has_colors['yellow']:
-        root_rule.appendChild(create_colored_rule('yellow', 'Updated'))
+    if has_colors["red"]:
+        root_rule.appendChild(create_colored_rule("red", "Deleted"))
+    if has_colors["yellow"]:
+        root_rule.appendChild(create_colored_rule("yellow", "Updated"))
 
     # Blue features always present
-    root_rule.appendChild(create_colored_rule('blue', 'Existent'))
+    root_rule.appendChild(create_colored_rule("blue", "Existent"))
 
     # Apply the rule-based renderer
     renderer = QgsRuleBasedRenderer(root_rule)

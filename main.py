@@ -54,13 +54,13 @@ class Giswater(QObject):
         """
         try:
             # Reset values for lib_vars.project_vars
-            lib_vars.project_vars['info_type'] = None
-            lib_vars.project_vars['add_schema'] = None
-            lib_vars.project_vars['main_schema'] = None
-            lib_vars.project_vars['project_role'] = None
-            lib_vars.project_vars['project_type'] = None
-            lib_vars.project_vars['store_credentials'] = None
-            lib_vars.project_vars['current_style'] = None
+            lib_vars.project_vars["info_type"] = None
+            lib_vars.project_vars["add_schema"] = None
+            lib_vars.project_vars["main_schema"] = None
+            lib_vars.project_vars["project_role"] = None
+            lib_vars.project_vars["project_type"] = None
+            lib_vars.project_vars["store_credentials"] = None
+            lib_vars.project_vars["current_style"] = None
         except Exception as e:
             msg = "Exception in unload when reset values for {0}"
             msg_params = ("lib_vars.project_vars",)
@@ -100,13 +100,13 @@ class Giswater(QObject):
         message = "Exception in unload when disconnecting {0} signal"
         try:
             # Disconnect QgsProject.instance().crsChanged signal
-            tools_gw.disconnect_signal('load_project', 'project_read_crsChanged_set_epsg')
+            tools_gw.disconnect_signal("load_project", "project_read_crsChanged_set_epsg")
         except Exception as e:
             msg_params = ("QgsProject.instance().crsChanged",)
             tools_log.log_info(message, parameter=str(e), msg_params=msg_params)
 
         try:
-            tools_gw.disconnect_signal('load_project', 'manage_attribute_table_focusChanged')
+            tools_gw.disconnect_signal("load_project", "manage_attribute_table_focusChanged")
         except Exception as e:
             msg_params = ("focusChanged",)
             tools_log.log_info(message, parameter=str(e), msg_params=msg_params)
@@ -164,7 +164,7 @@ class Giswater(QObject):
             if self.load_project:
                 if self.load_project.plugin_toolbars:
                     for plugin_toolbar in list(self.load_project.plugin_toolbars.values()):
-                        if plugin_toolbar.enabled and plugin_toolbar.toolbar.objectName() != 'toolbar_toc_name':
+                        if plugin_toolbar.enabled and plugin_toolbar.toolbar.objectName() != "toolbar_toc_name":
                             plugin_toolbar.toolbar.setVisible(False)
                             del plugin_toolbar.toolbar
         except Exception as e:
@@ -192,14 +192,14 @@ class Giswater(QObject):
         plugin_dir = os.path.dirname(__file__)
         lib_vars.plugin_dir = plugin_dir
         global_vars.iface = self.iface
-        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', plugin_dir)
+        self.plugin_name = tools_qgis.get_plugin_metadata("name", "giswater", plugin_dir)
         self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}"
         major_version = tools_qgis.get_major_version(plugin_dir=plugin_dir)
-        user_folder_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}'
+        user_folder_dir = f"{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}"
         global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
 
         # Get gw_dev_mode variable
-        gw_dev_mode = QgsSettings().value('variables/GwDevMode')
+        gw_dev_mode = QgsSettings().value("variables/GwDevMode")
         gw_dev_mode = tools_os.set_boolean(gw_dev_mode, False)
         global_vars.gw_dev_mode = gw_dev_mode
 
@@ -210,7 +210,7 @@ class Giswater(QObject):
         tools_log.log_info(msg)
 
         # Check if config file exists
-        setting_file = os.path.join(plugin_dir, 'config', 'giswater.config')
+        setting_file = os.path.join(plugin_dir, "config", "giswater.config")
         if not os.path.exists(setting_file):
             msg = "Config file not found at"
             tools_qgis.show_warning(msg, parameter=setting_file)
@@ -242,22 +242,22 @@ class Giswater(QObject):
             tools_gw.user_params_to_userconfig()
 
         # Set logger parameters min_log_level and log_limit_characters
-        min_log_level = tools_gw.get_config_parser('log', 'log_level', 'user', 'init', False)
-        log_limit_characters = tools_gw.get_config_parser('log', 'log_limit_characters', 'user', 'init', False)
-        log_db_limit_characters = tools_gw.get_config_parser('log', 'log_db_limit_characters', 'user', 'init', False)
+        min_log_level = tools_gw.get_config_parser("log", "log_level", "user", "init", False)
+        log_limit_characters = tools_gw.get_config_parser("log", "log_limit_characters", "user", "init", False)
+        log_db_limit_characters = tools_gw.get_config_parser("log", "log_db_limit_characters", "user", "init", False)
         lib_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, log_db_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
-        if python_enable_console == 'TRUE':
+        python_enable_console = tools_gw.get_config_parser("system", "enable_python_console", "project", "giswater")
+        if python_enable_console == "TRUE":
             tools_qgis.enable_python_console()
 
         # Set init parameter 'exec_procedure_max_retries'
         try:
-            global_vars.exec_procedure_max_retries = int(tools_gw.get_config_parser('system', 'exec_procedure_max_retries', 'user', 'init', False))
+            global_vars.exec_procedure_max_retries = int(tools_gw.get_config_parser("system", "exec_procedure_max_retries", "user", "init", False))
         except (ValueError, TypeError):
             global_vars.exec_procedure_max_retries = 3
-            tools_gw.set_config_parser('system', 'exec_procedure_max_retries', global_vars.exec_procedure_max_retries, 'user', 'init', prefix=False)
+            tools_gw.set_config_parser("system", "exec_procedure_max_retries", global_vars.exec_procedure_max_retries, "user", "init", prefix=False)
 
         # Create the GwSignalManager
         self._create_signal_manager()
@@ -288,10 +288,10 @@ class Giswater(QObject):
             # Check if config files exists. If not create them empty
             filepath = f"{config_folder}{os.sep}init.config"
             if not os.path.exists(filepath):
-                open(filepath, 'a').close()
+                open(filepath, "a").close()
             filepath = f"{config_folder}{os.sep}session.config"
             if not os.path.exists(filepath):
-                open(filepath, 'a').close()
+                open(filepath, "a").close()
 
             if not global_vars.gw_dev_mode:
                 # Copy user_params file to user config folder
@@ -308,12 +308,12 @@ class Giswater(QObject):
         """Define iface event signals on Project Read / New Project / Save Project"""
         try:
             tools_gw.connect_signal(self.iface.projectRead, self._project_read,
-                                    'main', 'projectRead')
+                                    "main", "projectRead")
         except AttributeError:
             pass
         try:
             tools_gw.connect_signal(QgsProject.instance().readProject, tools_qgis.restore_hidden_nodes,
-                                    'main', 'projectRead_restore_hidden_nodes')
+                                    "main", "projectRead_restore_hidden_nodes")
         except AttributeError:
             pass
 
@@ -321,19 +321,19 @@ class Giswater(QObject):
         """Disconnect iface event signals on Project Read / New Project / Save Project"""
         if hide_gw_button is None:
             try:
-                tools_gw.disconnect_signal('main', 'projectRead')
+                tools_gw.disconnect_signal("main", "projectRead")
             except TypeError:
                 pass
             try:
-                tools_gw.disconnect_signal('main', 'projectRead_restore_hidden_nodes')
+                tools_gw.disconnect_signal("main", "projectRead_restore_hidden_nodes")
             except TypeError:
                 pass
         try:
-            tools_gw.disconnect_signal('main', 'newProjectCreated')
+            tools_gw.disconnect_signal("main", "newProjectCreated")
         except TypeError:
             pass
         try:
-            tools_gw.disconnect_signal('main', 'actionSaveProject_save_toolbars_position')
+            tools_gw.disconnect_signal("main", "actionSaveProject_save_toolbars_position")
         except TypeError:
             pass
 
@@ -343,12 +343,12 @@ class Giswater(QObject):
         Else open admin form with which can manage database and qgis projects
         """
         # Create instance class and add button into QGIS toolbar
-        if not hasattr(self, 'action_info') or self.action_info is None:
+        if not hasattr(self, "action_info") or self.action_info is None:
             main_toolbutton = QToolButton()
             self.action_info = self.iface.addToolBarWidget(main_toolbutton)
 
             # Set icon button if exists
-            icon_path = self.icon_folder + '118.png'
+            icon_path = self.icon_folder + "118.png"
             if os.path.exists(icon_path):
                 icon = QIcon(icon_path)
                 self.action = QAction(icon, "Show info", self.iface.mainWindow())
@@ -378,9 +378,9 @@ class Giswater(QObject):
 
     def _unset_toc_buttons(self):
         """Unset Add Child Layer and Toggle EPA World buttons (when plugin is disabled or reloaded)"""
-        toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[-1]
+        toolbar = self.iface.mainWindow().findChild(QDockWidget, "Layers").findChildren(QToolBar)[-1]
         for action in toolbar.actions():
-            if action.objectName() not in ('GwAddChildLayerButton', 'GwLayerStyleChangeButton'):
+            if action.objectName() not in ("GwAddChildLayerButton", "GwLayerStyleChangeButton"):
                 continue
             toolbar.removeAction(action)  # Remove from toolbar
             action.deleteLater()  # Schedule for deletion
@@ -388,10 +388,10 @@ class Giswater(QObject):
     def _unset_psignals(self):
         """Unset PSIGNALS (when plugin is disabled or reloaded)"""
         statusbar = self.iface.mainWindow().statusBar()
-        for widget in global_vars.psignals['widgets']:
+        for widget in global_vars.psignals["widgets"]:
             statusbar.removeWidget(widget)
             widget.deleteLater()
-        global_vars.psignals['widgets'].clear()
+        global_vars.psignals["widgets"].clear()
 
     def _project_new(self):
         """Function executed when a user creates a new QGIS project"""
@@ -423,7 +423,7 @@ class Giswater(QObject):
     def _remove_dockers(self):
         """Remove Giswater dockers"""
         # Get 'Search' docker form from qgis iface and remove it if exists
-        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, "dlg_search")
         if docker_search:
             self.iface.removeDockWidget(docker_search)
             # TODO: manage this better, deleteLater() is not fast enough and deletes the docker after opening the search
@@ -431,7 +431,7 @@ class Giswater(QObject):
             docker_search.deleteLater()
 
         # Get 'Docker' docker form from qgis iface and remove it if exists
-        docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
+        docker_info = self.iface.mainWindow().findChild(QDockWidget, "docker")
         if docker_info:
             self.iface.removeDockWidget(docker_info)
 
@@ -440,7 +440,7 @@ class Giswater(QObject):
 
         # Get 'Layers' docker form and his actions from qgis iface and remove it if exists
         if self.btn_add_layers:
-            dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
+            dockwidget = self.iface.mainWindow().findChild(QDockWidget, "Layers")
             toolbar = dockwidget.findChildren(QToolBar)[0]
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])

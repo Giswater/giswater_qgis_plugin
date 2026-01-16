@@ -34,7 +34,7 @@ class GwAutoMincutTask(GwTask):
         super().run()
 
         try:
-            real_mincut_id = tools_qt.get_text(self.mincut_class.dlg_mincut, 'result_mincut_id')
+            real_mincut_id = tools_qt.get_text(self.mincut_class.dlg_mincut, "result_mincut_id")
             if self.mincut_class.is_new:
                 self.mincut_class.set_id_val()
                 self.mincut_class.is_new = False
@@ -49,20 +49,20 @@ class GwAutoMincutTask(GwTask):
                 else:
                     real_mincut_id = new_mincut_id[0]
 
-            tools_qt.set_widget_text(self.mincut_class.dlg_mincut, 'result_mincut_id', real_mincut_id)
-            use_planified = tools_qt.is_checked(self.mincut_class.dlg_mincut, 'chk_use_planified')
+            tools_qt.set_widget_text(self.mincut_class.dlg_mincut, "result_mincut_id", real_mincut_id)
+            use_planified = tools_qt.is_checked(self.mincut_class.dlg_mincut, "chk_use_planified")
 
             mincut_result_type = tools_qt.get_combo_value(self.mincut_class.dlg_mincut, self.mincut_class.dlg_mincut.type, 0)
 
             date_start_predict = self.mincut_class.dlg_mincut.cbx_date_start_predict.date()
             time_start_predict = self.mincut_class.dlg_mincut.cbx_hours_start_predict.time()
             forecast_start_predict = date_start_predict.toString(
-                'yyyy-MM-dd') + " " + time_start_predict.toString('HH:mm:ss')
+                "yyyy-MM-dd") + " " + time_start_predict.toString("HH:mm:ss")
 
             # Get prediction date - end
             date_end_predict = self.mincut_class.dlg_mincut.cbx_date_end_predict.date()
             time_end_predict = self.mincut_class.dlg_mincut.cbx_hours_end_predict.time()
-            forecast_end_predict = date_end_predict.toString('yyyy-MM-dd') + " " + time_end_predict.toString('HH:mm:ss')
+            forecast_end_predict = date_end_predict.toString("yyyy-MM-dd") + " " + time_end_predict.toString("HH:mm:ss")
 
             extras = (f'"action":"{self.mincut_action}", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}", "mincutType":"{mincut_result_type}", '
@@ -76,7 +76,7 @@ class GwAutoMincutTask(GwTask):
             self.complet_result = self.mincut_class._execute_setmincut_with_cursor(self.body, commit=True)
             if self.isCanceled():
                 return False
-            if not self.complet_result or self.complet_result['status'] == 'Failed':
+            if not self.complet_result or self.complet_result["status"] == "Failed":
                 return False
 
             self.mincut_class._reset_form_has_changes()
@@ -90,13 +90,13 @@ class GwAutoMincutTask(GwTask):
     def cancel(self):
         """Cancel task - use mincut cursor connection instead of aux_conn"""
         # Use mincut cursor connection if available
-        if hasattr(self.mincut_class, 'mincut_aux_conn') and self.mincut_class.mincut_aux_conn:
+        if hasattr(self.mincut_class, "mincut_aux_conn") and self.mincut_class.mincut_aux_conn:
             try:
                 pid = self.mincut_class.mincut_aux_conn.get_backend_pid()
                 if isinstance(pid, int):
                     result = tools_db.cancel_pid(pid)
-                    if result['last_error'] is not None:
-                        tools_log.log_warning(result['last_error'])
+                    if result["last_error"] is not None:
+                        tools_log.log_warning(result["last_error"])
                     tools_db.dao.rollback(self.mincut_class.mincut_aux_conn)
             except Exception as e:
                 tools_log.log_warning(f"Error canceling mincut task: {e}")
@@ -111,7 +111,7 @@ class GwAutoMincutTask(GwTask):
         # Call parent finished but skip aux_conn cleanup since we use mincut cursor
         # We need to manually do the cleanup that parent does, except aux_conn deletion
         try:
-            lib_vars.session_vars['threads'].remove(self)
+            lib_vars.session_vars["threads"].remove(self)
         except ValueError:
             pass
         # Don't delete aux_conn - we're using mincut cursor instead
@@ -157,19 +157,19 @@ class GwAutoMincutTask(GwTask):
 
         # Handle python exception
         elif self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
             self.task_finished.emit([False, self.complet_result])
 
         # Task finished but postgres function failed
-        elif self.complet_result.get('status') == 'Failed':
+        elif self.complet_result.get("status") == "Failed":
             self.task_finished.emit([False, self.complet_result])
             tools_gw.manage_json_exception(self.complet_result)
 
         # Task finished with Accepted result
-        elif 'mincutOverlap' in self.complet_result or self.complet_result.get('status') == 'Accepted':
+        elif "mincutOverlap" in self.complet_result or self.complet_result.get("status") == "Accepted":
             self.task_finished.emit([True, self.complet_result])

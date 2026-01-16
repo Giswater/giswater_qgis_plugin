@@ -39,7 +39,7 @@ class GwGo2EpaButton(GwAction):
         self.epa_options_list = []
         self.iface = global_vars.iface
 
-        if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
+        if self.project_type == "ud" and tools_qgis.is_plugin_active("IberGIS"):
             # Create a menu and add all the actions
             self.menu = QMenu()
             self.menu.setObjectName("GW_epa_tools")
@@ -50,10 +50,10 @@ class GwGo2EpaButton(GwAction):
                 toolbar.addAction(self.action)
 
     def clicked_event(self):
-        if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
-            if hasattr(self.action, 'associatedObjects'):
+        if self.project_type == "ud" and tools_qgis.is_plugin_active("IberGIS"):
+            if hasattr(self.action, "associatedObjects"):
                 button = QWidget(self.action.associatedObjects()[1])
-            elif hasattr(self.action, 'associatedWidgets'):
+            elif hasattr(self.action, "associatedWidgets"):
                 button = self.action.associatedWidgets()[1]
             menu_point = button.mapToGlobal(QPoint(0, button.height()))
             self.menu.exec(menu_point)
@@ -71,12 +71,12 @@ class GwGo2EpaButton(GwAction):
         ag = QActionGroup(self.iface.mainWindow())
 
         new_actions = [
-            (self.menu, ('ud'), tools_qt.tr('Go2EPA'), None),
+            (self.menu, ("ud"), tools_qt.tr("Go2EPA"), None),
         ]
 
         # Add Go2Iber action if ibergis plugin is available
-        if tools_qgis.is_plugin_active('IberGIS'):
-            new_actions.append((self.menu, ('ud'), tools_qt.tr('Go2IBER'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png")))
+        if tools_qgis.is_plugin_active("IberGIS"):
+            new_actions.append((self.menu, ("ud"), tools_qt.tr("Go2IBER"), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png")))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
@@ -94,10 +94,10 @@ class GwGo2EpaButton(GwAction):
 
     def _get_selected_action(self, name):
         """Gets selected action"""
-        if name == tools_qt.tr('Go2EPA'):
+        if name == tools_qt.tr("Go2EPA"):
             self._open_go2epa()
 
-        elif name == tools_qt.tr('Go2IBER'):
+        elif name == tools_qt.tr("Go2IBER"):
             go2iber = Go2Iber()
             if go2iber.check_ibergis_project():
                 go2iber.clicked_event()
@@ -118,13 +118,13 @@ class GwGo2EpaButton(GwAction):
     def _go2epa(self):
         """Button 42: Open form to set INP, RPT and project"""
         # Show form in docker?
-        tools_gw.init_docker('qgis_form_docker')
+        tools_gw.init_docker("qgis_form_docker")
 
         # Create dialog
         self.dlg_go2epa = GwGo2EpaUI(self)
         tools_gw.load_settings(self.dlg_go2epa)
         self._load_user_values()
-        if self.project_type in 'ws':
+        if self.project_type in "ws":
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
 
         # Set signals
@@ -144,16 +144,16 @@ class GwGo2EpaButton(GwAction):
         if sys.platform != "win32":
             tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
             self.dlg_go2epa.chk_exec.setEnabled(False)
-            self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
+            self.dlg_go2epa.chk_exec.setText("Execute EPA software (Runs only on Windows)")
 
-        self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
+        self._set_completer_result(self.dlg_go2epa.txt_result_name, "v_ui_rpt_cat_result", "result_id")
         self.check_result_id()
-        if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_go2epa, dlg_name='go2epa', title='go2epa')
+        if lib_vars.session_vars["dialog_docker"]:
+            tools_gw.docker_dialog(self.dlg_go2epa, dlg_name="go2epa", title="go2epa")
             self.dlg_go2epa.btn_close.clicked.disconnect()
-            self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
+            self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name="position"))
         else:
-            tools_gw.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
+            tools_gw.open_dialog(self.dlg_go2epa, dlg_name="go2epa")
 
     def _set_signals(self):
 
@@ -172,18 +172,18 @@ class GwGo2EpaButton(GwAction):
         :param index: tab index (passed by signal)
         """
         # Set network mode to 1
-        if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
+        if self.project_type == "ud" and tools_qgis.is_plugin_active("IberGIS"):
             form = '"formName":"epaoptions"'
             my_json = '[{"widget": "inp_options_networkmode", "value": "1"}]'
             extras = f'"fields":{my_json}'
             body = tools_gw.create_body(form=form, extras=extras)
-            tools_gw.execute_procedure('gw_fct_setconfig', body)
+            tools_gw.execute_procedure("gw_fct_setconfig", body)
 
         if index == 1:
             self.dlg_go2epa.btn_accept.setEnabled(False)
         else:
             # Disable if task is active, enabled otherwise
-            if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
+            if hasattr(self, "go2epa_task") and self.go2epa_task is not None:
                 try:
                     if self.go2epa_task.isActive():
                         self.dlg_go2epa.btn_accept.setEnabled(False)
@@ -266,7 +266,7 @@ class GwGo2EpaButton(GwAction):
                     return False
 
         # Control result name
-        if result_name == '':
+        if result_name == "":
             self.dlg_go2epa.txt_result_name.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
             title = "Rpt fail"
@@ -297,38 +297,38 @@ class GwGo2EpaButton(GwAction):
     def _load_user_values(self):
         """Load QGIS settings related with file_manager"""
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
-        self.result_name = tools_gw.get_config_parser('btn_go2epa', 'go2epa_RESULT_NAME', "user", "session")
+        self.result_name = tools_gw.get_config_parser("btn_go2epa", "go2epa_RESULT_NAME", "user", "session")
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.file_inp = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_INP', "user", "session")
+        self.file_inp = tools_gw.get_config_parser("btn_go2epa", "go2epa_FILE_INP", "user", "session")
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.file_rpt = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_RPT', "user", "session")
+        self.file_rpt = tools_gw.get_config_parser("btn_go2epa", "go2epa_FILE_RPT", "user", "session")
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_INP', "user", "session")
+        value = tools_gw.get_config_parser("btn_go2epa", "go2epa_chk_INP", "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_UD', "user", "session")
+        value = tools_gw.get_config_parser("btn_go2epa", "go2epa_chk_UD", "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_EPA', "user", "session")
+        value = tools_gw.get_config_parser("btn_go2epa", "go2epa_chk_EPA", "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_RPT', "user", "session")
+        value = tools_gw.get_config_parser("btn_go2epa", "go2epa_chk_RPT", "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
     def _save_user_values(self):
         """Save QGIS settings related with file_manager"""
         txt_result_name = f"{tools_qt.get_text(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_RESULT_NAME', f"{txt_result_name}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_RESULT_NAME", f"{txt_result_name}")
         txt_file_inp = f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_INP', f"{txt_file_inp}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_FILE_INP", f"{txt_file_inp}")
         txt_file_rpt = f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_RPT', f"{txt_file_rpt}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_FILE_RPT", f"{txt_file_rpt}")
         chk_export = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_INP', f"{chk_export}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_chk_INP", f"{chk_export}")
         chk_export_subcatch = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_UD', f"{chk_export_subcatch}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_chk_UD", f"{chk_export_subcatch}")
         chk_exec = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_EPA', f"{chk_exec}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_chk_EPA", f"{chk_exec}")
         chk_import_result = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT', f"{chk_import_result}")
+        tools_gw.set_config_parser("btn_go2epa", "go2epa_chk_RPT", f"{chk_import_result}")
 
     def _sector_selection(self):
         """Load the tables in the selection form"""
@@ -340,30 +340,30 @@ class GwGo2EpaButton(GwAction):
         tools_gw.load_settings(dlg_selector)
 
         # Create the common signals
-        go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab='tab_dscenario')
-        tools_gw.save_current_tab(dlg_selector, dlg_selector.main_tab, 'basic')
+        go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab="tab_dscenario")
+        tools_gw.save_current_tab(dlg_selector, dlg_selector.main_tab, "basic")
 
-        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-            tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+        dlg_selector.findChild(QTabWidget, "main_tab").currentChanged.connect(partial(
+            tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, "basic"))
 
         # Open form
-        if lib_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars["dialog_docker"]:
             # Set signals when have docker form
-            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa, dlg_name='selector', title='selector'))
-            dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa, dlg_name="selector", title="selector"))
+            dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, "restore"))
             # Save widgets settings from go2epa form
-            self._manage_form_settings('save')
+            self._manage_form_settings("save")
             # Open form
-            tools_gw.docker_dialog(dlg_selector, dlg_name='selector', title='selector')
+            tools_gw.docker_dialog(dlg_selector, dlg_name="selector", title="selector")
         else:
             # Set signals when have not docker form
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             # Open form
-            tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+            tools_gw.open_dialog(dlg_selector, dlg_name="selector")
 
     def _manage_form_settings(self, action):
 
-        if action == 'save':
+        if action == "save":
             # Get widgets form values
             self.txt_result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
             self.chk_export = self.dlg_go2epa.chk_export.isChecked()
@@ -372,43 +372,43 @@ class GwGo2EpaButton(GwAction):
             self.chk_exec = self.dlg_go2epa.chk_exec.isChecked()
             self.txt_file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
             self.chk_import_result = self.dlg_go2epa.chk_import_result.isChecked()
-        elif action == 'restore':
+        elif action == "restore":
             # Set widgets form values
-            if self.txt_result_name is not 'null':
+            if self.txt_result_name != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, self.txt_result_name)
-            if self.chk_export is not 'null':
+            if self.chk_export != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export, self.chk_export)
-            if self.chk_export_subcatch is not 'null':
+            if self.chk_export_subcatch != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, self.chk_export_subcatch)
-            if self.txt_file_inp is not 'null':
+            if self.txt_file_inp != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.txt_file_inp)
-            if self.chk_exec is not 'null':
+            if self.chk_exec != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_exec, self.chk_exec)
-            if self.txt_file_rpt is not 'null':
+            if self.txt_file_rpt != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.txt_file_rpt)
-            if self.chk_import_result is not 'null':
+            if self.chk_import_result != "null":
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
 
     def _go2epa_select_file_inp(self):
         """Select INP file"""
         message = "Select INP file"
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
-            tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
+            tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, "*.inp", message)
         else:
-            tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
+            tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, "*.inp", message)
 
     def _go2epa_select_file_rpt(self):
         """Select RPT file"""
         message = "Select RPT file"
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
-            tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
+            tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, "*.rpt", message)
         else:
-            tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
+            tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, "*.rpt", message)
 
     def _go2epa_accept(self):
         """Save INP, RPT and result name"""
         # Manage if task is already running
-        if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
+        if hasattr(self, "go2epa_task") and self.go2epa_task is not None:
             try:
                 if self.go2epa_task.isActive():
                     message = "Go2Epa task is already active!"
@@ -420,7 +420,7 @@ class GwGo2EpaButton(GwAction):
         # Check if import result is enabled and RPT file exists
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result) or tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
             file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
-            if not file_rpt or file_rpt == 'null':
+            if not file_rpt or file_rpt == "null":
                 message = tools_qt.tr("RPT file path is required when importing results or executing EPA")
                 tools_qgis.show_warning(message)
                 return
@@ -481,14 +481,14 @@ class GwGo2EpaButton(GwAction):
 
     def _cancel_task(self):
 
-        if hasattr(self, 'go2epa_task'):
+        if hasattr(self, "go2epa_task"):
             self.go2epa_task.cancel()
 
     def step_completed(self, json_result, end="\n"):
 
-        message = json_result.get('message')
+        message = json_result.get("message")
         if message:
-            data = {"info": {"values": [{"message": message.get('text')}]}}
+            data = {"info": {"values": [{"message": message.get("text")}]}}
             tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False, end=end, call_set_tabs_enabled=False)
 
     def _set_completer_result(self, widget, viewname, field_name):
@@ -515,7 +515,7 @@ class GwGo2EpaButton(GwAction):
     def _refresh_go2epa_options(self, dialog):
         """Refresh widgets into layouts on go2epa_options form"""
         if dialog:
-            for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_')):
+            for lyt in dialog.findChildren(QGridLayout, QRegularExpression("lyt_")):
                 i = 0
                 while i < lyt.count():
                     item = lyt.itemAt(i)
@@ -528,12 +528,12 @@ class GwGo2EpaButton(GwAction):
 
             form = '"formName":"epaoptions"'
             body = tools_gw.create_body(form=form)
-            json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
-            if not json_result or json_result['status'] == 'Failed':
+            json_result = tools_gw.execute_procedure("gw_fct_getconfig", body)
+            if not json_result or json_result["status"] == "Failed":
                 return False
 
             tools_gw.build_dialog_options(
-                dialog, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
+                dialog, json_result["body"]["form"]["formTabs"], 0, self.epa_options_list)
             grbox_list = dialog.findChildren(QGroupBox)
             for grbox in grbox_list:
                 widget_list = grbox.findChildren(QWidget)
@@ -553,16 +553,16 @@ class GwGo2EpaButton(GwAction):
         # Create dialog
         self.dlg_go2epa_options = GwGo2EpaOptionsUi(self)
         tools_gw.load_settings(self.dlg_go2epa_options)
-        self.dlg_go2epa_options.setProperty('GwGo2EpaButton', self)
+        self.dlg_go2epa_options.setProperty("GwGo2EpaButton", self)
 
         form = '"formName":"epaoptions"'
         body = tools_gw.create_body(form=form)
-        json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getconfig", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         tools_gw.build_dialog_options(
-            self.dlg_go2epa_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
+            self.dlg_go2epa_options, json_result["body"]["form"]["formTabs"], 0, self.epa_options_list)
         grbox_list = self.dlg_go2epa_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
@@ -579,14 +579,14 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa_options.btn_accept.clicked.connect(partial(self._update_values, self.epa_options_list))
         self.dlg_go2epa_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
         self.dlg_go2epa_options.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
-        self.dlg_go2epa_options.findChild(QTabWidget, 'tabWidget').currentChanged.connect(partial(
-            tools_gw.save_current_tab, self.dlg_go2epa_options, self.dlg_go2epa_options.tabWidget, 'main'))
+        self.dlg_go2epa_options.findChild(QTabWidget, "tabWidget").currentChanged.connect(partial(
+            tools_gw.save_current_tab, self.dlg_go2epa_options, self.dlg_go2epa_options.tabWidget, "main"))
 
-        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_go2epa_options_main", "user", "session")
+        current_tab = tools_gw.get_config_parser("dialogs_tab", "dlg_go2epa_options_main", "user", "session")
         if current_tab:
             tab = self.dlg_go2epa_options.tabWidget.findChild(QWidget, current_tab)
             self.dlg_go2epa_options.tabWidget.setCurrentWidget(tab)
-        tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name='go2epa_options')
+        tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name="go2epa_options")
 
     def _update_values(self, _json):
 
@@ -594,12 +594,12 @@ class GwGo2EpaButton(GwAction):
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
         body = tools_gw.create_body(form=form, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setconfig', body)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_setconfig", body)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         # Refresh epa world view if is active and it has changed
-        if any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
+        if any(widget["widget"] == "inp_options_networkmode" for widget in _json):
             tools_qgis.force_refresh_map_canvas()
 
         msg = "Values has been updated"
@@ -609,9 +609,9 @@ class GwGo2EpaButton(GwAction):
 
     def _get_event_combo_parent(self, complet_result):
 
-        for field in complet_result['body']['form']['formTabs'][0]["fields"]:
-            if field['isparent']:
-                widget = self.dlg_go2epa_options.findChild(QComboBox, field['widgetname'])
+        for field in complet_result["body"]["form"]["formTabs"][0]["fields"]:
+            if field["isparent"]:
+                widget = self.dlg_go2epa_options.findChild(QComboBox, field["widgetname"])
                 if widget:
                     widget.currentIndexChanged.connect(partial(self._fill_child, self.dlg_go2epa_options, widget))
 
@@ -620,11 +620,11 @@ class GwGo2EpaButton(GwAction):
         combo_parent = widget.objectName()
         combo_id = tools_qt.get_combo_value(dialog, widget)
         # TODO cambiar por gw_fct_getchilds then unified with tools_gw.get_child if posible
-        json_result = tools_gw.execute_procedure('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getcombochilds", f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
+        if not json_result or json_result["status"] == "Failed":
             return False
 
-        for combo_child in json_result['fields']:
+        for combo_child in json_result["fields"]:
             if combo_child is not None:
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
 
@@ -640,7 +640,7 @@ class GwGo2EpaButton(GwAction):
             self.timer.stop()
             return
 
-        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time = dialog.findChild(QLabel, "lbl_time")
         lbl_time.setText(text)
 
     # endregion

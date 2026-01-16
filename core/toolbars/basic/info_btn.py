@@ -65,14 +65,14 @@ class GwInfoButton(GwMaptool):
         self.cursor.setShape(Qt.CursorShape.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
         self.rubberband_list = []
-        self.tab_type = 'data'
+        self.tab_type = "data"
 
     def deactivate(self):
 
-        if hasattr(self, 'rubberband_list'):
+        if hasattr(self, "rubberband_list"):
             for rb in self.rubberband_list:
                 tools_gw.reset_rubberband(rb)
-        if hasattr(self, 'dlg_info_feature'):
+        if hasattr(self, "dlg_info_feature"):
             tools_gw.reset_rubberband(self.rubber_band)
 
         super().deactivate()
@@ -108,59 +108,59 @@ class GwInfoButton(GwMaptool):
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
-        if not json_result or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getlayersfromcoordinates", body, rubber_band=self.rubber_band)
+        if not json_result or json_result["status"] == "Failed":
             return False
 
         # hide QMenu identify if no feature under mouse
-        len_layers = len(json_result['body']['data']['layersNames'])
+        len_layers = len(json_result["body"]["data"]["layersNames"])
         if len_layers == 0:
             return False
 
-        self.icon_folder = self.plugin_dir + '/icons/dialogs/'
+        self.icon_folder = self.plugin_dir + "/icons/dialogs/"
 
         # Right click main QMenu
         main_menu = QMenu()
 
         # Create one menu for each layer
-        for layer in json_result['body']['data']['layersNames']:
-            layer_name = tools_qgis.get_layer_by_tablename(layer['layerName'])
-            icon_path = self.icon_folder + layer['icon'] + '.png'
+        for layer in json_result["body"]["data"]["layersNames"]:
+            layer_name = tools_qgis.get_layer_by_tablename(layer["layerName"])
+            icon_path = self.icon_folder + layer["icon"] + ".png"
             if os.path.exists(str(icon_path)):
                 icon = QIcon(icon_path)
                 sub_menu = main_menu.addMenu(icon, layer_name.name())
             else:
                 sub_menu = main_menu.addMenu(layer_name.name())
             # Create one QAction for each id
-            for feature in layer['ids']:
-                if 'label' in feature:
-                    label = str(feature['label'])
+            for feature in layer["ids"]:
+                if "label" in feature:
+                    label = str(feature["label"])
                 else:
-                    label = str(feature['id'])
+                    label = str(feature["id"])
 
                 # If plan_psector_data exists, create a submenu for this feature
-                if 'plan_psector_data' in feature and feature['plan_psector_data'] is not None:
+                if "plan_psector_data" in feature and feature["plan_psector_data"] is not None:
                     psector_menu = sub_menu.addMenu(label)
                     # Add main feature action in submenu
                     main_action = QAction(label, None)
-                    main_action.setProperty('feature_id', str(feature['id']))
-                    main_action.setProperty('layer_name', layer_name.name())
+                    main_action.setProperty("feature_id", str(feature["id"]))
+                    main_action.setProperty("layer_name", layer_name.name())
                     psector_menu.addAction(main_action)
                     main_action.triggered.connect(partial(self._get_info_from_selected_id, main_action, tab_type))
                     main_action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
                     # Store reference to main action in menu property for restoration
-                    psector_menu.setProperty('main_action', main_action)
-                    psector_menu.setProperty('main_action_label', label)
-                    psector_menu.setProperty('feature_id', str(feature['id']))
-                    psector_menu.setProperty('layer_name', layer_name.name())
-                    psector_menu.setProperty('tab_type', tab_type)
+                    psector_menu.setProperty("main_action", main_action)
+                    psector_menu.setProperty("main_action_label", label)
+                    psector_menu.setProperty("feature_id", str(feature["id"]))
+                    psector_menu.setProperty("layer_name", layer_name.name())
+                    psector_menu.setProperty("tab_type", tab_type)
 
                     # Add separator
                     psector_menu.addSeparator()
 
                     # Add psector info actions (informational only)
                     # Handle both single object and array of psector_data
-                    psector_data = feature['plan_psector_data']
+                    psector_data = feature["plan_psector_data"]
                     psector_list = psector_data if isinstance(psector_data, list) else [psector_data]
 
                     for idx, psector_item in enumerate(psector_list):
@@ -168,27 +168,27 @@ class GwInfoButton(GwMaptool):
                         if idx > 0:
                             psector_menu.addSeparator()
 
-                        if 'name' in psector_item:
-                            if 'psector_id' in psector_item:
+                        if "name" in psector_item:
+                            if "psector_id" in psector_item:
                                 # Check if psector exists in selector_psector
                                 sql = "SELECT psector_id FROM selector_psector WHERE psector_id = %s AND cur_user = current_user"
-                                row = tools_db.get_row(sql, params=(psector_item['psector_id'],), log_info=False)
+                                row = tools_db.get_row(sql, params=(psector_item["psector_id"],), log_info=False)
                                 is_in_selector = row is not None
                                 # Create QCheckBox widget for psector
                                 label = f"{psector_item['psector_id']} - {psector_item['name']}"
                                 checkbox = QCheckBox(label)
-                                if psector_item['active'] is False:
+                                if psector_item["active"] is False:
                                     checkbox.setStyleSheet("QCheckBox {color: #E9E7E3;}")
                                 container = QWidget(psector_menu)
                                 layout = QHBoxLayout(container)
                                 layout.setContentsMargins(10, 4, 10, 4)
                                 layout.addWidget(checkbox)
                                 checkbox.setChecked(is_in_selector)
-                                checkbox.setProperty('psector_id', psector_item['psector_id'])
+                                checkbox.setProperty("psector_id", psector_item["psector_id"])
                                 # Store reference to menu in checkbox property
-                                checkbox.setProperty('psector_menu', psector_menu)
+                                checkbox.setProperty("psector_menu", psector_menu)
                                 # Connect checkbox stateChanged to function that updates selector_psector
-                                checkbox.stateChanged.connect(partial(self._toggle_psector_selector, psector_item['psector_id']))
+                                checkbox.stateChanged.connect(partial(self._toggle_psector_selector, psector_item["psector_id"]))
                                 # Create QWidgetAction to embed checkbox in menu
                                 widget_action = QWidgetAction(psector_menu)
                                 widget_action.setDefaultWidget(container)
@@ -201,8 +201,8 @@ class GwInfoButton(GwMaptool):
                 else:
                     # No plan_psector_data, add action directly
                     action = QAction(label, None)
-                    action.setProperty('feature_id', str(feature['id']))
-                    action.setProperty('layer_name', layer_name.name())
+                    action.setProperty("feature_id", str(feature["id"]))
+                    action.setProperty("layer_name", layer_name.name())
                     sub_menu.addAction(action)
                     action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
                     action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
@@ -210,20 +210,20 @@ class GwInfoButton(GwMaptool):
         main_menu.addSeparator()
         # Identify all
         cont = 0
-        for layer in json_result['body']['data']['layersNames']:
-            cont += len(layer['ids'])
+        for layer in json_result["body"]["data"]["layersNames"]:
+            cont += len(layer["ids"])
         action = QAction(f"{tools_qt.tr('Identify all')} ({cont})", None)
         action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
 
         # Open/close valve
-        valve = json_result['body']['data'].get('valve')
+        valve = json_result["body"]["data"].get("valve")
         if valve:
-            valve_id = valve['id']
-            valve_text = valve['text']
-            valve_table = valve['tableName']
-            valve_value = valve['value']
+            valve_id = valve["id"]
+            valve_text = valve["text"]
+            valve_table = valve["tableName"]
+            valve_value = valve["value"]
             action_valve = QAction(f"{valve_text}", None)
             action_valve.triggered.connect(partial(self._toggle_valve_state, valve_id, valve_table, valve_value))
             action_valve.hovered.connect(partial(self._reset_rubber_bands))
@@ -231,13 +231,13 @@ class GwInfoButton(GwMaptool):
             main_menu.addSeparator()
 
         # Open/close valve in netscenario
-        valve_netscenario = json_result['body']['data'].get('valve_netscenario')
+        valve_netscenario = json_result["body"]["data"].get("valve_netscenario")
         if valve_netscenario:
-            valve_netscenario_id = valve_netscenario['id']
-            netscenario_id = valve_netscenario['netscenario_id']
-            valve_netscenario_text = valve_netscenario['text']
-            valve_netscenario_table = valve_netscenario['tableName']
-            valve_netscenario_value = valve_netscenario['value']
+            valve_netscenario_id = valve_netscenario["id"]
+            netscenario_id = valve_netscenario["netscenario_id"]
+            valve_netscenario_text = valve_netscenario["text"]
+            valve_netscenario_table = valve_netscenario["tableName"]
+            valve_netscenario_value = valve_netscenario["value"]
             action_valve_netscenario = QAction(f"{valve_netscenario_text}", None)
             if valve_netscenario_id:
                 action_valve_netscenario.triggered.connect(partial(self._toggle_valve_state_netscenario, netscenario_id, valve_netscenario_id, valve_netscenario_table, valve_netscenario_value))
@@ -253,14 +253,14 @@ class GwInfoButton(GwMaptool):
         tools_gw.reset_rubberband(self.rubber_band)
         for rb in rb_list:
             tools_gw.reset_rubberband(rb)
-        for layer in complet_list['body']['data']['layersNames']:
-            for feature in layer['ids']:
+        for layer in complet_list["body"]["data"]["layersNames"]:
+            for feature in layer["ids"]:
                 points = []
-                list_coord = re.search(r'\(+([^)]+)\)+', str(feature['geometry']))
+                list_coord = re.search(r"\(+([^)]+)\)+", str(feature["geometry"]))
                 coords = list_coord.group(1)
-                polygon = coords.split(',')
+                polygon = coords.split(",")
                 for i in range(0, len(polygon)):
-                    x, y = polygon[i].split(' ')
+                    x, y = polygon[i].split(" ")
                     point = QgsPointXY(float(x), float(y))
                     points.append(point)
                 rb = tools_gw.create_rubberband(self.canvas)
@@ -283,21 +283,21 @@ class GwInfoButton(GwMaptool):
         body = tools_gw.create_body(feature=feature, extras=extras)
 
         # Get utils_graphanalytics_automatic_trigger param
-        row = tools_gw.get_config_value("utils_graphanalytics_automatic_trigger", table='config_param_system')
+        row = tools_gw.get_config_value("utils_graphanalytics_automatic_trigger", table="config_param_system")
         thread = row[0] if row else None
         if thread:
             thread = json.loads(thread)
-            thread = tools_os.set_boolean(thread['status'], default=False)
+            thread = tools_os.set_boolean(thread["status"], default=False)
 
         # If param is false don't create thread
         if not thread:
-            tools_gw.execute_procedure('gw_fct_setfields', body)
+            tools_gw.execute_procedure("gw_fct_setfields", body)
             tools_qgis.refresh_map_canvas()
             return
 
         # If param is true show question and create thread
         msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-        if lib_vars.user_level['level'] in ('1', '2'):
+        if lib_vars.user_level["level"] in ("1", "2"):
             msg = ("You closed a valve, this will modify the current mapzones and it may take a little bit of time."
                     " Would you like to continue?")
             answer = tools_qt.show_question(msg)
@@ -320,25 +320,25 @@ class GwInfoButton(GwMaptool):
         extras = f'"fields":{{"netscenario_id": "{netscenario_id}", "node_id": "{valve_id}","closed": "{value}"}}'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
-        tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        tools_gw.execute_procedure("gw_fct_upsertfields", body)
         tools_qgis.refresh_map_canvas()
 
     def _draw_by_action(self, feature, rb_list, reset_rb=True):
         """Draw lines based on geometry"""
         for rb in rb_list:
             tools_gw.reset_rubberband(rb)
-        if feature['geometry'] is None:
+        if feature["geometry"] is None:
             return
 
         if reset_rb:
             tools_gw.reset_rubberband(self.rubber_band)
-        tools_gw.draw_wkt_geometry(str(feature['geometry']), self.rubber_band, QColor(255, 0, 0, 100), 3)
+        tools_gw.draw_wkt_geometry(str(feature["geometry"]), self.rubber_band, QColor(255, 0, 0, 100), 3)
 
     def _get_info_from_selected_id(self, action, tab_type):
         """Set active selected layer"""
         tools_gw.reset_rubberband(self.rubber_band)
         # Get layer name from action property (for nested menus) or from parent menu title
-        layer_name_str = action.property('layer_name')
+        layer_name_str = action.property("layer_name")
         if layer_name_str:
             layer = tools_qgis.get_layer_by_layername(layer_name_str)
         else:
@@ -350,9 +350,9 @@ class GwInfoButton(GwMaptool):
             tools_gw.init_docker()
             info_feature = GwInfo(self.tab_type)
             info_feature.signal_activate.connect(self._reactivate_map_tool)
-            info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.property('feature_id'), tab_type=tab_type)
+            info_feature.get_info_from_id(table_name=layer_source["table"], feature_id=action.property("feature_id"), tab_type=tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars['dialog_docker'] is not None:
+            if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars["dialog_docker"] is not None:
                 tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 
@@ -375,7 +375,7 @@ class GwInfoButton(GwMaptool):
             info_feature.signal_activate.connect(self._reactivate_map_tool)
             info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars['dialog_docker'] is not None:
+            if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars["dialog_docker"] is not None:
                 tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 
@@ -399,12 +399,12 @@ class GwInfoButton(GwMaptool):
         is_checked = checkbox.isChecked()
 
         # Get menu reference from checkbox property
-        psector_menu = checkbox.property('psector_menu')
+        psector_menu = checkbox.property("psector_menu")
         if psector_menu is None:
             return
 
         # Store reference to main action before executing procedure
-        main_action = psector_menu.property('main_action')
+        main_action = psector_menu.property("main_action")
         main_action_index = -1
         if main_action:
             actions = psector_menu.actions()
@@ -418,11 +418,11 @@ class GwInfoButton(GwMaptool):
         extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":"{psector_id}", '
                   f'"isAlone":"False", "value":"{value_str}", "addSchema":"{lib_vars.project_vars["add_schema"]}"')
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        json_result = tools_gw.execute_procedure("gw_fct_setselectors", body)
 
-        level = json_result['body']['message']['level']
+        level = json_result["body"]["message"]["level"]
         if level == 0:
-            message = json_result['body']['message']['text']
+            message = json_result["body"]["message"]["text"]
             tools_qgis.show_message(message, level)
             QTimer.singleShot(0, partial(self.restore_state, checkbox, is_checked))
             return

@@ -58,11 +58,11 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.btn_edit.clicked.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_show_inp_data.clicked.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_archive.clicked.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
-                                                              'result_id'))
+                                                              "result_id"))
         self.dlg_manager.btn_toggle_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
-                                                              'result_id'))
+                                                              "result_id"))
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
-                                                            'v_ui_rpt_cat_result', 'result_id'))
+                                                            "v_ui_rpt_cat_result", "result_id"))
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         selection_model.selectionChanged.connect(partial(self._enable_buttons))
@@ -71,7 +71,7 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
+        tools_gw.open_dialog(self.dlg_manager, dlg_name="go2epa_manager")
 
     def _show_context_menu(self, qtableview):
         """Show custom context menu"""
@@ -107,8 +107,8 @@ class GwGo2EpaManagerButton(GwAction):
 
         if complet_list is False:
             return False, False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
+        for field in complet_list["body"]["data"]["fields"]:
+            if field.get("hidden"):
                 continue
             model = self.dlg_manager.tbl_rpt_cat_result.model()
             if model is None:
@@ -116,24 +116,24 @@ class GwGo2EpaManagerButton(GwAction):
                 self.dlg_manager.tbl_rpt_cat_result.setModel(model)
             model.removeRows(0, model.rowCount())
 
-            if field['value']:
+            if field["value"]:
                 self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, field)
                 self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, field)
 
-        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, "v_ui_rpt_cat_result")
         tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
 
         return complet_list
 
-    def _get_list(self, table_name='v_ui_rpt_cat_result', filter_id=None):
+    def _get_list(self, table_name="v_ui_rpt_cat_result", filter_id=None):
         """Mount and execute the query for gw_fct_getlist"""
         feature = f'"tableName":"{table_name}"'
         filter_fields = '"limit": -1'
         if filter_id:
             filter_fields += f', "result_id": {{"filterSign":"ILIKE", "value":"{filter_id}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
-        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
-        if json_result is None or json_result['status'] == 'Failed':
+        json_result = tools_gw.execute_procedure("gw_fct_getlist", body)
+        if json_result is None or json_result["status"] == "Failed":
             return False
         complet_list = json_result
         if not complet_list:
@@ -146,7 +146,7 @@ class GwGo2EpaManagerButton(GwAction):
         sql = f"""UPDATE v_ui_rpt_cat_result SET "{columnname}" = $${value}$$ WHERE result_id = '{result_id}';"""
         result = tools_db.execute_sql(sql, log_sql=True)
         if result:
-            self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
+            self._fill_manager_table(tools_qt.get_text(self.dlg_manager, "txt_result_id"))
 
     def _fill_txt_infolog(self, selected):
         """Fill txt_infolog from epa_result_manager form with current data selected for columns:
@@ -157,25 +157,25 @@ class GwGo2EpaManagerButton(GwAction):
         # Get id of selected row
         row = selected.indexes()
         if not row:
-            tools_qt.set_widget_text(self.dlg_manager, 'tab_log_txt_infolog', '')
+            tools_qt.set_widget_text(self.dlg_manager, "tab_log_txt_infolog", "")
             return
 
         msg = ""
 
         try:
             # Get column index for column addparam
-            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'addparam')
-            addparam = json.loads(f'{row[col_ind].data()}')
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "addparam")
+            addparam = json.loads(f"{row[col_ind].data()}")
 
             # Construct custom message with addparam keys
             if not addparam:
                 raise
 
             msg += "<b>Properties: </b> <br>"
-            corporate_last_dates = addparam['corporateLastDates']
+            corporate_last_dates = addparam["corporateLastDates"]
             if corporate_last_dates:
-                corporate_start = corporate_last_dates.get('start')
-                corporate_end = corporate_last_dates.get('end')
+                corporate_start = corporate_last_dates.get("start")
+                corporate_end = corporate_last_dates.get("end")
                 if corporate_start and corporate_end:
                     msg += f"Corporate from {corporate_start} to {corporate_end}"
                 elif corporate_start and not corporate_end:
@@ -188,8 +188,8 @@ class GwGo2EpaManagerButton(GwAction):
 
         try:
             # Get column index for column export_options
-            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
-            export_options = json.loads(f'{row[col_ind].data()}')
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "export_options")
+            export_options = json.loads(f"{row[col_ind].data()}")
 
             # Construct message with all data rows
             if msg:
@@ -202,8 +202,8 @@ class GwGo2EpaManagerButton(GwAction):
 
         try:
             # Get column index for column network_stats
-            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
-            network_stats = json.loads(f'{row[col_ind].data()}')
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "network_stats")
+            network_stats = json.loads(f"{row[col_ind].data()}")
             if msg:
                 msg += " <br> "
             msg += "<b>Network Status: </b> <br>"
@@ -214,8 +214,8 @@ class GwGo2EpaManagerButton(GwAction):
 
         try:
             # Get column index for column inp_options
-            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
-            inp_options = json.loads(f'{row[col_ind].data()}')
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "inp_options")
+            inp_options = json.loads(f"{row[col_ind].data()}")
             if msg:
                 msg += " <br> "
             msg += f"<b>{tools_qt.tr('Inp Options')}: </b> <br>"
@@ -225,7 +225,7 @@ class GwGo2EpaManagerButton(GwAction):
             pass
 
         # Set message text into widget
-        tools_qt.set_widget_text(self.dlg_manager, 'tab_log_txt_infolog', msg)
+        tools_qt.set_widget_text(self.dlg_manager, "tab_log_txt_infolog", msg)
 
     def _enable_buttons(self, selected):
         set_corporate_enabled, archive_enabled = True, True
@@ -234,31 +234,31 @@ class GwGo2EpaManagerButton(GwAction):
         for idx, index in enumerate(selected_rows):
             is_corporate = None
             # set corporate
-            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'rpt_stats')
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "rpt_stats")
             row = index.row()
             status = index.sibling(row, col_idx).data()
             if not status:
                 set_corporate_enabled = False
 
-            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'iscorporate')
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "iscorporate")
             if col_idx is None:
                 row = index.row()
                 is_corporate = index.sibling(row, col_idx).data()
 
             # toggle archive
-            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'status')
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "status")
             status = index.sibling(row, col_idx).data()
             if last_status is None:
                 last_status = status
             if is_corporate is None:
-                if status == 'PARTIAL' or status != last_status or tools_os.set_boolean(is_corporate, False):
+                if status == "PARTIAL" or status != last_status or tools_os.set_boolean(is_corporate, False):
                     archive_enabled = False
             last_status = status
 
             # check network type
-            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_type')
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "network_type")
             network_type = index.sibling(row, col_idx).data()
-        if not selected_rows or network_type == 'NETWORK DMA' or len(selected_rows) > 1:
+        if not selected_rows or network_type == "NETWORK DMA" or len(selected_rows) > 1:
             set_corporate_enabled, archive_enabled = False, False
         self.dlg_manager.btn_toggle_corporate.setEnabled(set_corporate_enabled)
         self.dlg_manager.btn_archive.setEnabled(archive_enabled)
@@ -273,9 +273,9 @@ class GwGo2EpaManagerButton(GwAction):
 
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id
-        tablename = 'v_ui_rpt_cat_result'
+        tablename = "v_ui_rpt_cat_result"
         result_id = tools_qt.get_text(self.dlg_manager, widget_txt)
-        if result_id != 'null':
+        if result_id != "null":
             expr = f" result_id ILIKE '%{result_id}%'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
@@ -315,7 +315,7 @@ class GwGo2EpaManagerButton(GwAction):
             sql = f"DELETE FROM {table_name}"
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
-            self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
+            self._fill_manager_table(tools_qt.get_text(self.dlg_manager, "txt_result_id"))
 
     def _toggle_rpt_archived(self, widget, column_id):
         """Call gw_fct_set_rpt_archived with selected result_id
@@ -337,12 +337,12 @@ class GwGo2EpaManagerButton(GwAction):
         status = widget.model().index(row, col).data()
 
         # check corporate
-        action = 'RESTORE' if status == 'ARCHIVED' else 'ARCHIVE'
+        action = "RESTORE" if status == "ARCHIVED" else "ARCHIVE"
         extras = f'"result_id":"{result_id}", "action": "{action}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_set_rpt_archived', body)
+        result = tools_gw.execute_procedure("gw_fct_set_rpt_archived", body)
 
-        if not result or result.get('status') != 'Accepted':
+        if not result or result.get("status") != "Accepted":
             msg = "gw_fct_set_rpt_archived execution failed. See logs for more details..."
             tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
@@ -382,17 +382,17 @@ class GwGo2EpaManagerButton(GwAction):
             set_corporate = widget.model().index(row, col).data()
         set_corporate = not tools_os.set_boolean(set_corporate, False)
         parameter = {"data": {"resultId": result_id, "isCorporate": str(set_corporate).lower()}}
-        result = tools_gw.execute_procedure('gw_fct_epa2data', parameter)
+        result = tools_gw.execute_procedure("gw_fct_epa2data", parameter)
 
-        if not result or result.get('status') != 'Accepted':
+        if not result or result.get("status") != "Accepted":
             msg = "Epa2data execution failed. See logs for more details..."
             tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
-        elif result['message'].get('level') == 2:
-            tools_qgis.show_warning(result['message']['text'], dialog=self.dlg_manager)
+        elif result["message"].get("level") == 2:
+            tools_qgis.show_warning(result["message"]["text"], dialog=self.dlg_manager)
             return
 
-        tools_qgis.show_info(result['message']['text'], dialog=self.dlg_manager)
+        tools_qgis.show_info(result["message"]["text"], dialog=self.dlg_manager)
 
         # Refresh table
         self._fill_manager_table()
@@ -448,7 +448,7 @@ class GwGo2EpaManagerButton(GwAction):
             commit=False
         )
 
-        if not json_result or 'status' not in json_result or json_result['status'] == 'Failed':
+        if not json_result or "status" not in json_result or json_result["status"] == "Failed":
             msg = "Failed to retrieve GeoJSON data."
             tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return

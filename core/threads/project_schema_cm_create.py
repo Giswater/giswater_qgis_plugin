@@ -23,12 +23,12 @@ class GwCreateSchemaCmTask(GwTask):
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
         self.timer = timer
-        self.list_process = list_process or ['load_base_schema', 'load_parent_schema', 'load_example', 'load_locale']
+        self.list_process = list_process or ["load_base_schema", "load_parent_schema", "load_example", "load_locale"]
         self.process_name = process_name
 
     def run(self):
         super().run()
-        self.finish_execution = {'import_data': False}
+        self.finish_execution = {"import_data": False}
         self.dict_folders_process = {}
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
@@ -63,10 +63,10 @@ class GwCreateSchemaCmTask(GwTask):
 
         # Handle exception
         if self.exception is not None:
-            msg = f'''<b>{tools_qt.tr('key')}: </b>{self.exception}<br>'''
-            msg += f'''<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>'''
-            msg += f'''<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>'''
-            msg += f'''<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>'''
+            msg = f"""<b>{tools_qt.tr('key')}: </b>{self.exception}<br>"""
+            msg += f"""<b>{tools_qt.tr('key container')}: </b>'body/data/ <br>"""
+            msg += f"""<b>{tools_qt.tr('Python file')}: </b>{__name__} <br>"""
+            msg += f"""<b>{tools_qt.tr('Python function')}:</b> {self.__class__.__name__} <br>"""
             title = "Key on returned json from ddbb is missed."
             tools_qt.show_exception_message(title, msg)
 
@@ -123,28 +123,28 @@ class GwCreateSchemaCmTask(GwTask):
         """Get list of folders related with this @process_name"""
         dict_folders = {}
 
-        if process_name == 'load_base_schema':
+        if process_name == "load_base_schema":
             dict_folders[os.path.join(self.admin.folder_cm_utils, self.admin.file_pattern_ddl)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_utils, self.admin.file_pattern_fct)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_utils, self.admin.file_pattern_ftrg)] = 0
             dict_folders[self.admin.folder_cm_base] = 0
 
-        elif process_name == 'load_parent_schema':
-            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type, 'ddl.sql')] = 0
+        elif process_name == "load_parent_schema":
+            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type, "ddl.sql")] = 0
             dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.file_pattern_fct)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.file_pattern_ftrg)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.file_pattern_utils)] = 0
-            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type, 'trg.sql')] = 0
+            dict_folders[os.path.join(self.admin.folder_cm_parent_schema, self.admin.project_type, "trg.sql")] = 0
 
-        elif process_name == 'load_example':
+        elif process_name == "load_example":
             dict_folders[os.path.join(self.admin.folder_cm_example, self.admin.file_pattern_utils)] = 0
             dict_folders[os.path.join(self.admin.folder_cm_example, self.admin.project_type)] = 0
 
-        elif process_name == 'load_locale':
+        elif process_name == "load_locale":
             dict_folders[self.admin.folder_cm_locale] = 0
 
-        elif process_name == 'load_updates':
-            dict_folders[os.path.join(self.admin.folder_cm_updates, '40')] = 0
+        elif process_name == "load_updates":
+            dict_folders[os.path.join(self.admin.folder_cm_updates, "40")] = 0
 
         return dict_folders
 

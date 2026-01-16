@@ -38,12 +38,12 @@ class GwPrintButton(GwAction):
 
     def clicked_event(self):
 
-        if self.menu.property('last_selection') is not None:
-            getattr(self, self.menu.property('last_selection'))()
+        if self.menu.property("last_selection") is not None:
+            getattr(self, self.menu.property("last_selection"))()
             return
-        if hasattr(self.action, 'associatedObjects'):
+        if hasattr(self.action, "associatedObjects"):
             button = QWidget(self.action.associatedObjects()[1])
-        elif hasattr(self.action, 'associatedWidgets'):
+        elif hasattr(self.action, "associatedWidgets"):
             button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
@@ -58,16 +58,16 @@ class GwPrintButton(GwAction):
             action.disconnect()
             self.menu.removeAction(action)
             del action
-        action_group = self.action.property('action_group')
+        action_group = self.action.property("action_group")
 
-        buttons = [[tools_qt.tr('Fast print'), '_fastprint'], [tools_qt.tr('Multi psector print'), '_massive_composer']]
+        buttons = [[tools_qt.tr("Fast print"), "_fastprint"], [tools_qt.tr("Multi psector print"), "_massive_composer"]]
 
         for button in buttons:
             button_name = button[0]
             button_function = button[1]
             obj_action = QAction(str(tools_qt.tr(button_name)), action_group)
             obj_action.setObjectName(button_name)
-            obj_action.setProperty('action_group', action_group)
+            obj_action.setProperty("action_group", action_group)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(getattr(self, button_function)))
             obj_action.triggered.connect(partial(self._save_last_selection, self.menu, button_function))

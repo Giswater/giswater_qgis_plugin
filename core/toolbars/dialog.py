@@ -25,7 +25,7 @@ class GwAction:
         self.project_type = global_vars.project_type
         self.gw_name = None
         if toolbar is not None:
-            self.gw_name = toolbar.property('gw_name')
+            self.gw_name = toolbar.property("gw_name")
 
         icon = None
         if os.path.exists(icon_path):
@@ -38,7 +38,7 @@ class GwAction:
             self.action = QAction(icon, text, action_group)
 
         self.action.setObjectName(action_name)
-        self.action.setProperty('action_group', action_group)
+        self.action.setProperty("action_group", action_group)
         self.action.setCheckable(False)
         self.action.triggered.connect(self.clicked_event)
 

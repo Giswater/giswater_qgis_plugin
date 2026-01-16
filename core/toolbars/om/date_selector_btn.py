@@ -49,8 +49,8 @@ class GwDateSelectorButton(GwAction):
         # Set project user
         self.current_user = tools_db.current_user
 
-        from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
-        to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
+        from_date = self.widget_date_from.date().toString("yyyy-MM-dd")
+        to_date = self.widget_date_to.date().toString("yyyy-MM-dd")
         sql = (f"SELECT * FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")
         row = tools_db.get_row(sql)
@@ -69,19 +69,19 @@ class GwDateSelectorButton(GwAction):
 
     def _update_date_to(self):
         """If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from'"""
-        from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
-        to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
+        from_date = self.widget_date_from.date().toString("yyyy-MM-dd")
+        to_date = self.widget_date_to.date().toString("yyyy-MM-dd")
         if from_date >= to_date:
-            to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
+            to_date = self.widget_date_from.date().addDays(1).toString("yyyy-MM-dd")
+            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, "%Y-%m-%d"))
 
     def _update_date_from(self):
         """If 'date to' is lower than 'date from' set 'date from' 1 day less than 'date to'"""
-        from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
-        to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
+        from_date = self.widget_date_from.date().toString("yyyy-MM-dd")
+        to_date = self.widget_date_to.date().toString("yyyy-MM-dd")
         if to_date <= from_date:
-            from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
+            from_date = self.widget_date_to.date().addDays(-1).toString("yyyy-MM-dd")
+            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, "%Y-%m-%d"))
 
     def _get_default_dates(self):
         """Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date)"""

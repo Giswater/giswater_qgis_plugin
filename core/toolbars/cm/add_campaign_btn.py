@@ -23,7 +23,7 @@ class GwAddCampaignButton(GwAction):
 
         # Check user role
         roles = tools_gw.get_cm_user_role()
-        is_cm_edit_role = roles and 'role_cm_edit' in list(roles)
+        is_cm_edit_role = roles and "role_cm_edit" in list(roles)
 
         if is_cm_edit_role:
             # For 'role_cm_edit', the button directly creates an 'inventory' campaign
@@ -39,11 +39,11 @@ class GwAddCampaignButton(GwAction):
         show_review = True
         show_visit = True
 
-        if config_result and config_result['value']:
+        if config_result and config_result["value"]:
             try:
-                config = json.loads(config_result['value'])
-                show_review = config.get('campaignReview', 'true').lower() == 'true'
-                show_visit = config.get('campaignVisit', 'true').lower() == 'true'
+                config = json.loads(config_result["value"])
+                show_review = config.get("campaignReview", "true").lower() == "true"
+                show_visit = config.get("campaignVisit", "true").lower() == "true"
             except (json.JSONDecodeError, KeyError):
                 # Fallback to default if JSON is malformed
                 pass
@@ -55,7 +55,7 @@ class GwAddCampaignButton(GwAction):
         # Conditional logic for button creation
         if show_review and show_visit:
             # Both are true: create a dropdown menu
-            self.actions = [tools_qt.tr('Review'), tools_qt.tr('Visit')]
+            self.actions = [tools_qt.tr("Review"), tools_qt.tr("Visit")]
             self.menu = QMenu()
             self.menu.setObjectName("GW_create_campaign")
             self._fill_action_menu()
@@ -110,13 +110,13 @@ class GwAddCampaignButton(GwAction):
 
         # Handle button click when menu is present
         if self.menu is not None:
-            last_selection = self.menu.property('last_selection')
+            last_selection = self.menu.property("last_selection")
             if last_selection is not None:
                 self.new_campaign.create_campaign(dialog_type=last_selection)
             else:
-                if hasattr(self.action, 'associatedObjects'):
+                if hasattr(self.action, "associatedObjects"):
                     button = QWidget(self.action.associatedObjects()[1])
-                elif hasattr(self.action, 'associatedWidgets'):
+                elif hasattr(self.action, "associatedWidgets"):
                     button = self.action.associatedWidgets()[1]
                 menu_point = button.mapToGlobal(QPoint(0, button.height()))
                 self.menu.popup(menu_point)

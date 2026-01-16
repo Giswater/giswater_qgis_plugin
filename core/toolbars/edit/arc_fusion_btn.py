@@ -59,7 +59,7 @@ class GwArcFusionButton(GwMaptool):
     def _fusion_arc(self):
 
         catalog = tools_qt.get_text(self.dlg_fusion, self.dlg_fusion.cmb_new_cat)
-        if catalog in (None, 'null'):
+        if catalog in (None, "null"):
             msg = "Mandatory field is missing. Please, set a value for field"
             tools_qgis.show_warning(msg, parameter="'Catalog id'", dialog=self.dlg_fusion)
             return
@@ -95,7 +95,7 @@ class GwArcFusionButton(GwMaptool):
                 "You are about to merge them using the selected values.\n\n"
                 "{0}\n\nDo you want to continue?"
             )
-            msg_params = ('\n\n'.join(diff_fields),)
+            msg_params = ("\n\n".join(diff_fields),)
             answer = tools_qt.show_question(msg, title="Arc Fusion", msg_params=msg_params)
             if not answer:
                 return
@@ -103,15 +103,15 @@ class GwArcFusionButton(GwMaptool):
         # Build SQL function input parameters
         state_type = tools_qt.get_combo_value(self.dlg_fusion, "cmb_statetype")
         action_mode = self.dlg_fusion.cmb_nodeaction.currentIndex()
-        plan_mode = global_vars.psignals['psector_active']
+        plan_mode = global_vars.psignals["psector_active"]
         if plan_mode:
             action_mode = 1
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         enddate = self.dlg_fusion.enddate.date()
-        enddate_str = enddate.toString('yyyy-MM-dd')
+        enddate_str = enddate.toString("yyyy-MM-dd")
         feature_id = f'"id":["{self.node_id}"]'
         extras = f'"enddate":"{enddate_str}"'
-        if workcat_id_end not in (None, 'null', ''):
+        if workcat_id_end not in (None, "null", ""):
             extras += f', "workcatId":"{workcat_id_end}"'
         if self.psector_id:
             extras += f', "psectorId": "{self.psector_id}"'
@@ -123,22 +123,22 @@ class GwArcFusionButton(GwMaptool):
                     extras += f', "state_type": {state_type}'
                 else:
                     extras += ', "state_type": null'
-        if catalog not in (None, 'null', ''):
+        if catalog not in (None, "null", ""):
             extras += f', "arccat_id":"{catalog}"'
-        if asset_id not in (None, 'null', ''):
+        if asset_id not in (None, "null", ""):
             extras += f', "asset_id":"{asset_id}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
-        complet_result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
-        if not complet_result or complet_result['status'] == "Failed":
+        complet_result = tools_gw.execute_procedure("gw_fct_setarcfusion", body)
+        if not complet_result or complet_result["status"] == "Failed":
             msg = "Error fusing arcs"
             tools_qgis.show_warning(msg)
             return
 
         text_result = None
-        log = tools_gw.get_config_parser("user_edit_tricks", "arc_fusion_disable_showlog", 'user', 'init')
+        log = tools_gw.get_config_parser("user_edit_tricks", "arc_fusion_disable_showlog", "user", "init")
         if not tools_os.set_boolean(log, False):
-            text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, complet_result['body']['data'], True, True, 1)
+            text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, complet_result["body"]["data"], True, True, 1)
 
         self._save_dlg_values()
 
@@ -149,7 +149,7 @@ class GwArcFusionButton(GwMaptool):
         self.iface.mapCanvas().refresh()
 
         # Refresh psector's relations tables
-        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
+        tools_gw.execute_class_function(GwPsectorUi, "_refresh_tables_relations")
 
         # Check in init config file if user wants to keep map tool active or not
         self.manage_active_maptool()
@@ -171,8 +171,8 @@ class GwArcFusionButton(GwMaptool):
 
         if snapped_feat:
 
-            self.node_id = snapped_feat.attribute('node_id')
-            self.node_state = snapped_feat.attribute('state')
+            self.node_id = snapped_feat.attribute("node_id")
+            self.node_state = snapped_feat.attribute("state")
             self.psector_id = None
             # If the node has state 0 (obsolete) don't open arc fusion dlg
             if self.node_state is not None and self.node_state == 0:
@@ -188,10 +188,10 @@ class GwArcFusionButton(GwMaptool):
         tools_gw.load_settings(self.dlg_fusion)
 
         # Fill ComboBox cmb_nodeaction
-        rows = [[0, tools_qt.tr('KEEP OPERATIVE')], [1, tools_qt.tr('DOWNGRADE NODE')], [2, tools_qt.tr('REMOVE NODE')]]
+        rows = [[0, tools_qt.tr("KEEP OPERATIVE")], [1, tools_qt.tr("DOWNGRADE NODE")], [2, tools_qt.tr("REMOVE NODE")]]
         tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, sort_by=0)
         node_action = tools_gw.get_config_parser("btn_arc_fusion", "cmb_nodeaction", "user", "session")
-        if node_action not in (None, 'None', ''):
+        if node_action not in (None, "None", ""):
             tools_qt.set_widget_text(self.dlg_fusion, "cmb_nodeaction", node_action)
 
         # Fill ComboBox workcat_id_end
@@ -204,7 +204,7 @@ class GwArcFusionButton(GwMaptool):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows)
         state_type = tools_gw.get_config_parser("btn_arc_fusion", "cmb_statetype", "user", "session")
-        if state_type not in (None, 'None', ''):
+        if state_type not in (None, "None", ""):
             tools_qt.set_widget_text(self.dlg_fusion, "cmb_statetype", state_type)
 
         # Set QDateEdit to current date
@@ -213,11 +213,11 @@ class GwArcFusionButton(GwMaptool):
 
         valid_states = [0]
         # If the node has state 2 (planified) only allow remove node
-        if global_vars.psignals['psector_active']:
-            self.psector_id = global_vars.psignals['psector_id']
+        if global_vars.psignals["psector_active"]:
+            self.psector_id = global_vars.psignals["psector_id"]
             if self.node_state is not None and self.node_state == 2:
-                node_psector_id = int(self._get_feature_psector_id(self.node_id, 'node'))
-                current_psector_id = int(global_vars.psignals['psector_id'])
+                node_psector_id = int(self._get_feature_psector_id(self.node_id, "node"))
+                current_psector_id = int(global_vars.psignals["psector_id"])
                 node_psector_name = None
                 current_psector_name = None
                 row = tools_db.get_row(f"SELECT name FROM v_plan_psector WHERE psector_id = {node_psector_id}")
@@ -241,7 +241,7 @@ class GwArcFusionButton(GwMaptool):
             msg_params = None
             if self.node_state == 0:
                 msg = "Current feature has state '{0}'. Therefore it is not fusionable"
-                state = 'OBSOLETE'
+                state = "OBSOLETE"
                 msg_params = (state,)
             elif self.node_state == 2:
                 msg = "Current feature is planified. You should activate plan mode to work with it."
@@ -274,7 +274,7 @@ class GwArcFusionButton(GwMaptool):
         self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
         self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
-        tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
+        tools_gw.open_dialog(self.dlg_fusion, dlg_name="arc_fusion")
 
     def _build_catalog_asset_widgets(self):
         """Build catalog and asset widgets"""
@@ -325,7 +325,7 @@ class GwArcFusionButton(GwMaptool):
 
     def _manage_plan_widgets(self):
         """Manage plan widgets"""
-        if global_vars.psignals and global_vars.psignals['psector_active']:
+        if global_vars.psignals and global_vars.psignals["psector_active"]:
             self.dlg_fusion.lbl_nodeaction.setVisible(False)
             self.dlg_fusion.cmb_nodeaction.setVisible(False)
             self.dlg_fusion.lbl_enddate.setVisible(False)
