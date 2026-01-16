@@ -93,7 +93,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             msg = "Click on the object to change its class"
             tools_qgis.show_info(msg)
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
@@ -107,7 +107,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             if tablename and "ve" in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         self._featuretype_change(event)
 

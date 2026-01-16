@@ -37,7 +37,7 @@ class GwDocker(QDockWidget):
         except Exception:
             pass
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # noqa: N802
 
         self.dlg_closed.emit()
         return super().closeEvent(event)

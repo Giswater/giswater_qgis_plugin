@@ -84,7 +84,7 @@ class GwMainWindow(QMainWindow):
         # Enable event filter
         self.installEventFilter(self)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # noqa: N802
 
         try:
             self.dlg_closed.emit()
@@ -94,7 +94,7 @@ class GwMainWindow(QMainWindow):
             # RuntimeError: wrapped C/C++ object of type Mincut has been deleted
             pass
 
-    def eventFilter(self, object, event):
+    def eventFilter(self, object, event):  # noqa: N802
 
         if hasattr(self, "subtag") and self.subtag is not None:
             tag = f"{self.objectName()}_{self.subtag}"
@@ -107,7 +107,7 @@ class GwMainWindow(QMainWindow):
 
         return False
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
 
         try:
             if event.key() == QtCore.Qt.Key.Key_Escape:
@@ -120,5 +120,5 @@ class GwMainWindow(QMainWindow):
             # Multiples signals are emited when we use key_scape in order to close dialog
             pass
 
-    def messageBar(self):
+    def messageBar(self):  # noqa: N802
         return self._messageBar

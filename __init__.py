@@ -37,7 +37,7 @@ if sys.version_info >= (3, 10):
 
 
 # noinspection PyPep8Naming
-def classFactory(iface):  # pylint: disable=invalid-name
+def classFactory(iface):  # noqa: N802  # pylint: disable=invalid-name
     """Load Giswater class from file giswater.
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface

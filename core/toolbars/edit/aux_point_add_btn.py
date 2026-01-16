@@ -68,14 +68,14 @@ class GwAuxPointAddButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
 
         if event.key() == Qt.Key.Key_Escape:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
 
         # Hide highlight and get coordinates
         self.vertex_marker.hide()
@@ -91,7 +91,7 @@ class GwAuxPointAddButton(GwMaptool):
             # Get the point and add marker on it
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         self._add_aux_point(event)
 

@@ -14,5 +14,5 @@ class GwFlowTraceButton(GwFlow):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.help_message = "Click on node to compute its upstream network"
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
         self._set_flow(event, "gw_fct_graphanalytics_upstream")

@@ -7387,7 +7387,7 @@ def _manage_spinbox(**kwargs):
     return widget
 
 
-def _manage_doubleSpinbox(**kwargs):
+def _manage_doubleSpinbox(**kwargs):  # noqa: N802
     """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
     widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
@@ -7500,7 +7500,7 @@ class CustomQComboBox(QComboBox):
         super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
-    def wheelEvent(self, *args, **kwargs):
+    def wheelEvent(self, *args, **kwargs):  # noqa: N802
         if self.hasFocus():
             return QComboBox.wheelEvent(self, *args, **kwargs)
         else:
@@ -7512,7 +7512,7 @@ class CustomQgsDateTimeEdit(QgsDateTimeEdit):
         super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
-    def wheelEvent(self, *args, **kwargs):
+    def wheelEvent(self, *args, **kwargs):  # noqa: N802
         if self.hasFocus():
             return QgsDateTimeEdit.wheelEvent(self, *args, **kwargs)
         else:

@@ -99,7 +99,7 @@ class GwFeatureReplaceButton(GwMaptool):
             msg = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
             tools_qgis.show_info(msg)
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
@@ -113,7 +113,7 @@ class GwFeatureReplaceButton(GwMaptool):
             if tablename and "ve" in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()

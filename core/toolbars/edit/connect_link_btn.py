@@ -298,7 +298,7 @@ class GwConnectLinkButton(GwMaptool):
                       "CTRL + SHIFT over selection to remove it")
             tools_qgis.show_info(msg, duration=9)
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
         """With left click the digitizing is finished"""
         if event.buttons() == Qt.MouseButton.LeftButton:
 
@@ -309,12 +309,12 @@ class GwConnectLinkButton(GwMaptool):
             self.select_rect.setBottomRight(event.pos())
             self._set_rubber_band()
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):  # noqa: N802
 
         self.select_rect.setRect(0, 0, 0, 0)
         tools_gw.reset_rubberband(self.rubber_band, "polygon")
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
         """With left click the digitizing is finished"""
         # Manage if task is already running
         if hasattr(self, "connect_link_task") and self.connect_link_task is not None:

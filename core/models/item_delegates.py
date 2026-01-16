@@ -12,21 +12,21 @@ from qgis.PyQt.QtWidgets import QStyledItemDelegate, QLineEdit
 class ReadOnlyDelegate(QStyledItemDelegate):
     """Item delegate for read-only fields"""
 
-    def editorEvent(self, *args, **kwargs):
+    def editorEvent(self, *args, **kwargs):  # noqa: N802
         return False
 
-    def createEditor(self, *args, **kwargs):
+    def createEditor(self, *args, **kwargs):  # noqa: N802
         return None
 
 
 class EditableDelegate(QStyledItemDelegate):
     """Item delegate for editable fields (can set null values)"""
 
-    def createEditor(self, parent, options, index):
+    def createEditor(self, parent, options, index):  # noqa: N802
         le = QLineEdit(parent)
         return le
 
-    def setModelData(self, editor, model, index):
+    def setModelData(self, editor, model, index):  # noqa: N802
         value = editor.text()
         if not value:
             model.setData(index, None, QtCore.Qt.ItemDataRole.EditRole)

@@ -3256,7 +3256,7 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
     tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
 
 
-def epa_tbl_doubleClicked(tbl, dlg):
+def epa_tbl_doubleClicked(tbl, dlg):  # noqa: N802
 
     if "tab_epa" in tbl.objectName():
         dlg.findChild(QPushButton, "tab_epa_edit_dscenario").click()

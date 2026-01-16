@@ -38,7 +38,7 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
 
-    def initGui(self):
+    def initGui(self):  # noqa: N802
         """Create the menu entries and toolbar icons inside the QGIS GUI"""
         # Initialize plugin
         if self._init_plugin():

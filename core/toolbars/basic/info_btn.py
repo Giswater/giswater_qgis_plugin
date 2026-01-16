@@ -39,7 +39,7 @@ class GwInfoButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
 
         if event.key() == Qt.Key.Key_Escape:
             for rb in self.rubberband_list:
@@ -48,10 +48,10 @@ class GwInfoButton(GwMaptool):
             self.action.trigger()
             return
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
         pass
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         self._get_info(event)
 

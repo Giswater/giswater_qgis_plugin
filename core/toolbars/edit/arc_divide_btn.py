@@ -99,11 +99,11 @@ class GwArcDivideButton(GwMaptool):
 
         self.reset()
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
         """Mouse movement event"""
         self._move_event(event)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         self._release_event(event)
 

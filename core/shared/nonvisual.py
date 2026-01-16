@@ -2903,7 +2903,7 @@ class GwNonVisual:
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
-    def _onCellChanged(self, table, row, column):
+    def _onCellChanged(self, table, row, column):  # noqa: N802
         """Note: row & column parameters are passed by the signal"""
         # Add a new row if the edited row is the last one
         if row >= (table.rowCount() - 1):

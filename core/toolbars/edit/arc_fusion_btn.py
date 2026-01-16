@@ -48,7 +48,7 @@ class GwArcFusionButton(GwMaptool):
             msg = "Click on node, that joins two pipes, in order to remove it and merge pipes"
             tools_qgis.show_info(msg)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         self._get_arc_fusion(event)
 

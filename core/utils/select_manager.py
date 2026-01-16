@@ -107,7 +107,7 @@ class GwSelectManager(QgsMapTool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):  # noqa: N802
         if event.button() == Qt.MouseButton.LeftButton:
             point = self.toMapCoordinates(event.pos())
 
@@ -125,7 +125,7 @@ class GwSelectManager(QgsMapTool):
         elif event.button() == Qt.MouseButton.RightButton:
             self._handle_right_click(event)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
         if event.button() == Qt.MouseButton.LeftButton:
             if self.selection_type == GwSelectionType.POINT:
                 # Point selection is handled in canvasPressEvent
@@ -139,7 +139,7 @@ class GwSelectManager(QgsMapTool):
         else:
             self.rubber_band.hide()
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
         point = self.toMapCoordinates(event.pos())
 
         if self.selection_type in [GwSelectionType.RECTANGLE, GwSelectionType.DEFAULT]:
@@ -164,7 +164,7 @@ class GwSelectManager(QgsMapTool):
     def activate(self):
         pass
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
         """Handle keyboard input"""
         if event.key() == Qt.Key.Key_Escape:
             self._clear_drawing()

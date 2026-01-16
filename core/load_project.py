@@ -604,7 +604,7 @@ class GwLoadProject(QObject):
         # Register these widgets globally if needed
         global_vars.psignals["widgets"] = [self.playpause_button, self.cmb_psector]
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, obj, event):  # noqa: N802
         """Filter events to handle right-click on combo box popup."""
         if not hasattr(self, "cmb_psector") or self.cmb_psector is None:
             return super().eventFilter(obj, event)

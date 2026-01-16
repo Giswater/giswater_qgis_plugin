@@ -26,7 +26,7 @@ class GwFlow(GwMaptool):
             return self.cancel_map_tool()
         super().clicked_event()
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
         # Hide marker and get coordinates
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)

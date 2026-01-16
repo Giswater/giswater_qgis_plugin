@@ -49,7 +49,7 @@ class GwAuxCircleAddButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
 
         if event.key() == Qt.Key.Key_Escape:
             self._reset_rubberbands()
@@ -57,7 +57,7 @@ class GwAuxCircleAddButton(GwMaptool):
             self.iface.setActiveLayer(self.current_layer)
             return
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
@@ -72,7 +72,7 @@ class GwAuxCircleAddButton(GwMaptool):
         # Add marker
         self.snapper_manager.add_marker(result, self.vertex_marker)
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         self._add_aux_circle(event)
 

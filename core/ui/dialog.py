@@ -83,7 +83,7 @@ class GwDialog(QDialog):
         # Enable event filter
         self.installEventFilter(self)
 
-    def eventFilter(self, object, event):
+    def eventFilter(self, object, event):  # noqa: N802
         if hasattr(self, "subtag") and self.subtag is not None:
             tag = f"{self.objectName()}_{self.subtag}"
         else:
@@ -94,7 +94,7 @@ class GwDialog(QDialog):
             return True
         return False
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
 
         try:
             if event.key() == QtCore.Qt.Key.Key_Escape:
@@ -104,5 +104,5 @@ class GwDialog(QDialog):
             # Multiples signals are emited when we use key_scape in order to close dialog
             pass
 
-    def messageBar(self):
+    def messageBar(self):  # noqa: N802
         return self._messageBar

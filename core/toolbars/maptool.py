@@ -101,7 +101,7 @@ class GwMaptool(QgsMapTool):
         if hasattr(self, "vertex_marker") and self.vertex_marker and hasattr(self.vertex_marker, "hide"):
             self.vertex_marker.hide()
 
-    def canvasMoveEvent(self, event):
+    def canvasMoveEvent(self, event):  # noqa: N802
 
         # Make sure active layer is always 've_node'
         cur_layer = self.iface.activeLayer()
@@ -118,13 +118,13 @@ class GwMaptool(QgsMapTool):
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # noqa: N802
 
         if event.key() == Qt.Key.Key_Escape:
             self.cancel_map_tool()
             return
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event):  # noqa: N802
 
         if event.button() == Qt.MouseButton.RightButton:
             self.cancel_map_tool()
