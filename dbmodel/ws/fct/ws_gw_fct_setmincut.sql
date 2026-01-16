@@ -383,12 +383,12 @@ BEGIN
 				'ARC',
 				v_arc_id
 			);
-			IF p_data->'data' ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
-			IF p_data->'data' ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
-			IF p_data->'data' ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
-			IF p_data->'data' ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
-			IF p_data->'data' ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
-			IF p_data->'data' ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
+			IF (p_data->'data')::jsonb ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
+			IF (p_data->'data')::jsonb ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
+			IF (p_data->'data')::jsonb ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
+			IF (p_data->'data')::jsonb ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
+			IF (p_data->'data')::jsonb ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
+			IF (p_data->'data')::jsonb ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
 			v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 			EXECUTE v_query_text;
 		END IF;
@@ -469,12 +469,12 @@ BEGIN
 			END IF;
 			-- Update planning fields if passed
 			v_query_text := 'UPDATE om_mincut SET id = id';
-			IF p_data->'data' ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
-			IF p_data->'data' ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
-			IF p_data->'data' ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
-			IF p_data->'data' ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
-			IF p_data->'data' ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
-			IF p_data->'data' ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
+			IF (p_data->'data')::jsonb ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
+			IF (p_data->'data')::jsonb ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
+			IF (p_data->'data')::jsonb ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
+			IF (p_data->'data')::jsonb ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
+			IF (p_data->'data')::jsonb ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
+			IF (p_data->'data')::jsonb ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
 			v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 			EXECUTE v_query_text;
 		END IF;
@@ -517,25 +517,25 @@ BEGIN
 				-- Update planning fields if mincutAccept and state = 0 (plannified)
 				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_plannified_state THEN
 					v_query_text := 'UPDATE om_mincut SET id = id';
-					IF p_data->'data' ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
-					IF p_data->'data' ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
-					IF p_data->'data' ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
-					IF p_data->'data' ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
-					IF p_data->'data' ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
-					IF p_data->'data' ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
+					IF (p_data->'data')::jsonb ? 'mincutType' THEN v_query_text := concat(v_query_text, ', mincut_type = ', quote_nullable(v_mincut_type)); END IF;
+					IF (p_data->'data')::jsonb ? 'anlCause' THEN v_query_text := concat(v_query_text, ', anl_cause = ', quote_nullable(v_anl_cause)); END IF;
+					IF (p_data->'data')::jsonb ? 'anlDescript' THEN v_query_text := concat(v_query_text, ', anl_descript = ', quote_nullable(v_anl_descript)); END IF;
+					IF (p_data->'data')::jsonb ? 'forecastStart' THEN v_query_text := concat(v_query_text, ', forecast_start = ', quote_nullable(v_forecast_start)); END IF;
+					IF (p_data->'data')::jsonb ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
+					IF (p_data->'data')::jsonb ? 'receivedDate' THEN v_query_text := concat(v_query_text, ', received_date = ', quote_nullable(v_received_date)); END IF;
 					v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 					EXECUTE v_query_text;
 				-- Update execution fields if mincutAccept and state = 1 (in progress)
 				ELSIF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_in_progress_state THEN
 					v_query_text := 'UPDATE om_mincut SET id = id';
-					IF p_data->'data' ? 'execStart' THEN v_query_text := concat(v_query_text, ', exec_start = ', quote_nullable(v_exec_start)); END IF;
-					IF p_data->'data' ? 'execEnd' THEN v_query_text := concat(v_query_text, ', exec_end = ', quote_nullable(v_exec_end)); END IF;
-					IF p_data->'data' ? 'execDescript' THEN v_query_text := concat(v_query_text, ', exec_descript = ', quote_nullable(v_exec_descript)); END IF;
-					IF p_data->'data' ? 'execUser' THEN v_query_text := concat(v_query_text, ', exec_user = ', quote_nullable(v_exec_user)); END IF;
-					IF p_data->'data' ? 'execFromPlot' THEN v_query_text := concat(v_query_text, ', exec_from_plot = ', quote_nullable(v_exec_from_plot)); END IF;
-					IF p_data->'data' ? 'execDepth' THEN v_query_text := concat(v_query_text, ', exec_depth = ', quote_nullable(v_exec_depth)); END IF;
-					IF p_data->'data' ? 'execAppropiate' THEN v_query_text := concat(v_query_text, ', exec_appropiate = ', quote_nullable(v_exec_appropiate)); END IF;
-					IF p_data->'data' ? 'execTheGeom' THEN v_query_text := concat(v_query_text, ', exec_the_geom = ', quote_nullable(v_exec_the_geom)); END IF;
+					IF (p_data->'data')::jsonb ? 'execStart' THEN v_query_text := concat(v_query_text, ', exec_start = ', quote_nullable(v_exec_start)); END IF;
+					IF (p_data->'data')::jsonb ? 'execEnd' THEN v_query_text := concat(v_query_text, ', exec_end = ', quote_nullable(v_exec_end)); END IF;
+					IF (p_data->'data')::jsonb ? 'execDescript' THEN v_query_text := concat(v_query_text, ', exec_descript = ', quote_nullable(v_exec_descript)); END IF;
+					IF (p_data->'data')::jsonb ? 'execUser' THEN v_query_text := concat(v_query_text, ', exec_user = ', quote_nullable(v_exec_user)); END IF;
+					IF (p_data->'data')::jsonb ? 'execFromPlot' THEN v_query_text := concat(v_query_text, ', exec_from_plot = ', quote_nullable(v_exec_from_plot)); END IF;
+					IF (p_data->'data')::jsonb ? 'execDepth' THEN v_query_text := concat(v_query_text, ', exec_depth = ', quote_nullable(v_exec_depth)); END IF;
+					IF (p_data->'data')::jsonb ? 'execAppropiate' THEN v_query_text := concat(v_query_text, ', exec_appropiate = ', quote_nullable(v_exec_appropiate)); END IF;
+					IF (p_data->'data')::jsonb ? 'execTheGeom' THEN v_query_text := concat(v_query_text, ', exec_the_geom = ', quote_nullable(v_exec_the_geom)); END IF;
 					v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 					EXECUTE v_query_text;
 				END IF;
@@ -546,14 +546,14 @@ BEGIN
 				-- Update execution fields for mincutEnd
 				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) = v_mincut_in_progress_state THEN
 					v_query_text := 'UPDATE om_mincut SET id = id';
-					IF p_data->'data' ? 'execStart' THEN v_query_text := concat(v_query_text, ', exec_start = ', quote_nullable(v_exec_start)); END IF;
-					IF p_data->'data' ? 'execEnd' THEN v_query_text := concat(v_query_text, ', exec_end = ', quote_nullable(v_exec_end)); END IF;
-					IF p_data->'data' ? 'execDescript' THEN v_query_text := concat(v_query_text, ', exec_descript = ', quote_nullable(v_exec_descript)); END IF;
-					IF p_data->'data' ? 'execUser' THEN v_query_text := concat(v_query_text, ', exec_user = ', quote_nullable(v_exec_user)); END IF;
-					IF p_data->'data' ? 'execFromPlot' THEN v_query_text := concat(v_query_text, ', exec_from_plot = ', quote_nullable(v_exec_from_plot)); END IF;
-					IF p_data->'data' ? 'execDepth' THEN v_query_text := concat(v_query_text, ', exec_depth = ', quote_nullable(v_exec_depth)); END IF;
-					IF p_data->'data' ? 'execAppropiate' THEN v_query_text := concat(v_query_text, ', exec_appropiate = ', quote_nullable(v_exec_appropiate)); END IF;
-					IF p_data->'data' ? 'execTheGeom' THEN v_query_text := concat(v_query_text, ', exec_the_geom = ', quote_nullable(v_exec_the_geom)); END IF;
+					IF (p_data->'data')::jsonb ? 'execStart' THEN v_query_text := concat(v_query_text, ', exec_start = ', quote_nullable(v_exec_start)); END IF;
+					IF (p_data->'data')::jsonb ? 'execEnd' THEN v_query_text := concat(v_query_text, ', exec_end = ', quote_nullable(v_exec_end)); END IF;
+					IF (p_data->'data')::jsonb ? 'execDescript' THEN v_query_text := concat(v_query_text, ', exec_descript = ', quote_nullable(v_exec_descript)); END IF;
+					IF (p_data->'data')::jsonb ? 'execUser' THEN v_query_text := concat(v_query_text, ', exec_user = ', quote_nullable(v_exec_user)); END IF;
+					IF (p_data->'data')::jsonb ? 'execFromPlot' THEN v_query_text := concat(v_query_text, ', exec_from_plot = ', quote_nullable(v_exec_from_plot)); END IF;
+					IF (p_data->'data')::jsonb ? 'execDepth' THEN v_query_text := concat(v_query_text, ', exec_depth = ', quote_nullable(v_exec_depth)); END IF;
+					IF (p_data->'data')::jsonb ? 'execAppropiate' THEN v_query_text := concat(v_query_text, ', exec_appropiate = ', quote_nullable(v_exec_appropiate)); END IF;
+					IF (p_data->'data')::jsonb ? 'execTheGeom' THEN v_query_text := concat(v_query_text, ', exec_the_geom = ', quote_nullable(v_exec_the_geom)); END IF;
 					v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 					EXECUTE v_query_text;
 					UPDATE om_mincut SET mincut_state = v_mincut_finished_state WHERE id = v_mincut_id;
