@@ -2217,7 +2217,7 @@ class GwMincut:
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
                    f"{snapped_point.y()}), {lib_vars.data_epsg}),"
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
-                   f" anl_feature_id = '{element_id}'"
+                   f" anl_feature_id = {element_id}"
                    f" WHERE id = '{real_mincut_id}'")
             status = tools_db.execute_sql(sql)
             if not status:
