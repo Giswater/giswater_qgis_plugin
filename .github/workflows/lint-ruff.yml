@@ -1,24 +1,12 @@
-name: 🐍 Flake8 Linting
+name: 🐍 Ruff Linting
 
 on:
   push:
-    branches:
-      - 'main'
-      - 'release/**'
-      - 'feature/**'
-      - 'fix/**'
-      - 'refactor/**'
   pull_request:
-    branches:
-      - 'main'
-      - 'release/**'
-      - 'feature/**'
-      - 'fix/**'
-      - 'refactor/**'
 
 jobs:
-  # Run flake8 linting
-  lint-flake8:
+  # Run ruff linting
+  lint-ruff:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,7 +28,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: pip install flake8
+        run: pip install ruff
 
-      - name: Lint with flake8
-        run: flake8 .
+      - name: Lint with ruff
+        run: ruff check . --config ruff.toml
