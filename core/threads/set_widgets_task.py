@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -14,7 +13,7 @@ from ..utils import tools_gw
 
 
 class GWSetWidgetsTask(GwTask):
-    """ This shows how to subclass QgsTask """
+    """This shows how to subclass QgsTask"""
 
     task_finished = pyqtSignal(list)
 
@@ -25,7 +24,7 @@ class GWSetWidgetsTask(GwTask):
         self.params = params
 
     def run(self):
-        """ Automatic mincut: Execute function 'gw_fct_mincut' """
+        """Automatic mincut: Execute function 'gw_fct_mincut'"""
         super().run()
         new_feature = self.params['new_feature']
         complet_result = self.params['complet_result']

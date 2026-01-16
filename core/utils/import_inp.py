@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -29,7 +28,7 @@ class ProjectType(Enum):
 
 
 class GwInpConfig:
-    """ Class to store the configuration of the import INP process, as well as serializing/deserializing it """
+    """Class to store the configuration of the import INP process, as well as serializing/deserializing it"""
 
     def __init__(self, file_path: Optional[Path] = None, workcat: Optional[str] = None, exploitation: Optional[int] = None,
                  sector: Optional[int] = None, municipality: Optional[int] = None, dscenario: Optional[str] = None,
@@ -91,7 +90,7 @@ class GwInpConfig:
         self.deserialize(data)
 
     def convert_keys(self, obj):
-        """ Recursively converts keys to strings in a dictionary. """
+        """Recursively converts keys to strings in a dictionary."""
         if isinstance(obj, dict):
             return {str(k): self.convert_keys(v) for k, v in obj.items()}
         return obj
@@ -179,7 +178,6 @@ def toolsdb_execute_values(
 
 def create_load_menu(self_cls):
     """Create a drop-down menu for the load button"""
-
     menu = QMenu(self_cls.dlg_config)
     action_load_last = menu.addAction("Load from last import")
     action_load_from_file = menu.addAction("Load from file...")
@@ -193,13 +191,11 @@ def create_load_menu(self_cls):
 
 def _load_last_config(self_cls):
     """Load the last saved configuration"""
-
     load_config(self_cls)
 
 
 def _load_config_from_file(self_cls):
     """Load configuration from a file"""
-
     config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
     config_path: Optional[Path] = tools_qt.get_file("Select a configuration file", config_folder, "JSON files (*.json)")
 
@@ -211,7 +207,6 @@ def _load_config_from_file(self_cls):
 
 def save_config_to_file(self_cls):
     """Save configuration to a file"""
-
     config_path: Optional[Path] = tools_qt.get_file("Select a configuration file", "", "JSON files (*.json)")
 
     if config_path:
@@ -291,7 +286,6 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
 def fill_txt_info(self_cls, dialog):
     """Fill the text information in the dialog"""
-
     epa_software = "EPANET" if global_vars.project_type == ProjectType.WS.value else "SWMM"
     info_str = f'''<h3>{tools_qt.tr('IMPORT INP')} ({epa_software})</h3>'''
     info_str += "<p>"

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -19,7 +18,7 @@ from .....libs import tools_qgis, tools_qt, tools_os, tools_db
 
 
 class GwMassiveComposer:
-    """ Action 65b: Massive composer """
+    """Action 65b: Massive composer"""
 
     def __init__(self):
         self.iface = global_vars.iface
@@ -56,7 +55,7 @@ class GwMassiveComposer:
         tools_gw.open_dialog(dlg_comp, dlg_name='comp_x_pages')
 
     def save_user_values(self, dialog):
-        """ Save last user values """
+        """Save last user values"""
         folder_path = tools_qt.get_text(dialog, dialog.txt_path)
         tools_gw.set_config_parser('composer_pages', 'folder_path', f"{folder_path}")
         last_composer = tools_qt.get_combo_value(dialog, dialog.cmb_composers, 0)
@@ -67,17 +66,14 @@ class GwMassiveComposer:
         tools_gw.set_config_parser('composer_pages', 'single', f"{single}")
 
     def get_folder_dialog(self, dialog, widget):
-        """ Get folder dialog """
-
+        """Get folder dialog"""
         # Check if selected folder exists. Set default value if necessary
         tools_qt.get_folder_path(dialog, widget)
 
     def populate_cmb_composers(self, combo):
-        """
-        :param combo: QComboBox to populate with composers and set with last composer if exist
+        """:param combo: QComboBox to populate with composers and set with last composer if exist
         :return:
         """
-
         index = 0
         records = []
         layout_manager = QgsProject.instance().layoutManager()
@@ -177,7 +173,7 @@ class GwMassiveComposer:
         self.composer_task.task_finished.connect(partial(self.restore_user_selectors, current_selectors))
 
     def restore_user_selectors(self, current_selectors):
-        """ Restore user selectors """
+        """Restore user selectors"""
         qgis_project_add_schema = tools_qgis.get_project_variable('gwAddSchema')
 
         for form_tab in current_selectors['body']['form']['formTabs']:

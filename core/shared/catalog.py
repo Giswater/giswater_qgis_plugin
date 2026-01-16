@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -19,11 +18,10 @@ from ...libs import tools_qt, tools_log, tools_db, tools_qgis
 class GwCatalog:
 
     def __init__(self):
-        """ Class to control toolbar 'om_ws' """
+        """Class to control toolbar 'om_ws'"""
 
     def open_catalog(self, previous_dialog, widget_name, feature_type, child_type):
-        """ Main function of catalog """
-
+        """Main function of catalog"""
         form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{child_type}"'
@@ -91,8 +89,7 @@ class GwCatalog:
     # region private functions
 
     def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type, child_type):
-        """ Execute gw_fct_getcatalog """
-
+        """Execute gw_fct_getcatalog"""
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
         pn_value = tools_qt.get_combo_value(self.dlg_catalog, pnom)
         dn_value = tools_qt.get_combo_value(self.dlg_catalog, dnom)
@@ -126,8 +123,7 @@ class GwCatalog:
                     self._fill_combo(id, field)
 
     def _populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, child_type):
-        """ Execute gw_fct_getcatalog and fill combos """
-
+        """Execute gw_fct_getcatalog and fill combos"""
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
 
         form_name = 'upsert_catalog_' + feature_type + ''
@@ -146,8 +142,7 @@ class GwCatalog:
                 self._fill_combo(dnom, field)
 
     def _populate_catalog_id(self, feature_type):
-        """ Execute gw_api_get_catalog_id and fill combo id """
-
+        """Execute gw_api_get_catalog_id and fill combo id"""
         # Get widgets
         widget_metcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
         widget_pn = self.dlg_catalog.findChild(QComboBox, 'pnom')
@@ -166,8 +161,7 @@ class GwCatalog:
             self._fill_combo(widget_id, row[0]['catalog_id'][0])
 
     def _add_combobox(self, field):
-        """ Add QComboBox to dialog """
-
+        """Add QComboBox to dialog"""
         widget = QComboBox()
         widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -177,12 +171,10 @@ class GwCatalog:
         return widget
 
     def _fill_combo(self, widget, field):
+        """Fill QComboBox
+        :param widget: combobox destination (QComboBox)
+        :param field: json where find values (Json)
         """
-        Fill QComboBox
-            :param widget: combobox destination (QComboBox)
-            :param field: json where find values (Json)
-        """
-
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -203,8 +195,7 @@ class GwCatalog:
                 widget.addItem(str(record[1]), record)
 
     def _fill_geomcat_id(self, previous_dialog, widget_name):
-        """ Fill the widget of the previous dialogue """
-
+        """Fill the widget of the previous dialogue"""
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
         catalog_id = tools_qt.get_text(self.dlg_catalog, widget_id)
         widget = previous_dialog.findChild(QWidget, widget_name)

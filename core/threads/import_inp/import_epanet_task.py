@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -260,14 +259,13 @@ class GwImportInpTask(GwTask):
             self.update_municipality = True
 
     def _save_options(self):
-        """
-            Import options to table 'config_param_user'.
-            "hydraulic" -> inp_options_%
-            "energy" -> inp_energy_%
-            "reaction" -> inp_reactions_%
-            "report" -> inp_report_%
-            "time" -> inp_times_%
-            "quality" -> inp_options_quality_mode??
+        """Import options to table 'config_param_user'.
+        "hydraulic" -> inp_options_%
+        "energy" -> inp_energy_%
+        "reaction" -> inp_reactions_%
+        "report" -> inp_report_%
+        "time" -> inp_times_%
+        "quality" -> inp_options_quality_mode??
         """
         # Define prefixes for each category
         prefix_map = {
@@ -599,7 +597,6 @@ class GwImportInpTask(GwTask):
 
     def _replace_codes_with_ids(self, text: str, req: tuple) -> str:
         """Replace INP codes (node/arc names) with database IDs in control/rule text."""
-
         result = text
         for obj in req:
             code = obj.name
@@ -1507,8 +1504,7 @@ class GwImportInpTask(GwTask):
             execute_sql(sql, params, commit=self.force_commit)
 
     def _manage_nodarcs(self) -> str:
-        """ Transform pumps and valves into nodes """
-
+        """Transform pumps and valves into nodes"""
         extras = ""
         extras += f'"workcatId": "{self.workcat}",'
         for k, v in self.manage_nodarcs.items():
@@ -1537,8 +1533,7 @@ class GwImportInpTask(GwTask):
         return "No nodarcs to manage"
 
     def _update_municipality(self):
-        """ Update the muni_id of all features getting the spatial intersection with the municipality """
-
+        """Update the muni_id of all features getting the spatial intersection with the municipality"""
         sql = f"""
             UPDATE node n 
             SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) 

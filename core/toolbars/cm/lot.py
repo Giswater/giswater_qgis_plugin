@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -29,8 +28,7 @@ from ...utils.selection_widget import GwSelectionWidget
 class AddNewLot:
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QToolBar, action_group: QActionGroup):
-        """ Class to control 'Add basic visit' of toolbar 'edit' """
-
+        """Class to control 'Add basic visit' of toolbar 'edit'"""
         self.ids: List[Any] = []
         self.canvas = global_vars.canvas
         self.rb_red = tools_gw.create_rubberband(self.canvas)
@@ -55,7 +53,6 @@ class AddNewLot:
 
     def manage_lot(self, lot_id: Optional[int] = None, is_new: bool = True):
         """Open the AddLot dialog and load dynamic fields from gw_fct_cm_getlot."""
-
         self.lot_id = lot_id
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.is_new_lot = is_new
@@ -200,8 +197,7 @@ class AddNewLot:
         return (self, self.dlg_lot, "lot")
 
     def _on_campaign_changed(self):
-        """
-        Handles all UI updates when the campaign selection changes.
+        """Handles all UI updates when the campaign selection changes.
         - Populates and updates exploitation and sector combo boxes based on the campaign's organization.
         - Updates the team combo box with valid teams for the campaign.
         """
@@ -319,7 +315,6 @@ class AddNewLot:
 
     def load_lot_dialog(self, lot_id: Optional[int]):
         """Dynamically load and populate lot dialog using gw_fct_cm_getlot"""
-
         p_data: Dict[str, Any] = {
             "feature": {"tableName": "om_campaign_lot", "idName": "lot_id"},
             "data": {}
@@ -443,8 +438,7 @@ class AddNewLot:
                 self.dlg_lot.tab_feature.setTabEnabled(idx, count > 0)
 
     def _load_lot_relations(self, lot_id: int):
-        """
-        Load related elements into lot relation tabs for the given ID.
+        """Load related elements into lot relation tabs for the given ID.
         Includes 'gully' only if project type is UD.
         """
         features = ["arc", "node", "connec", "link"]
@@ -560,8 +554,7 @@ class AddNewLot:
                 pass
 
     def populate_cmb_team(self) -> None:
-        """ Fill ComboBox cmb_assigned_to """
-
+        """Fill ComboBox cmb_assigned_to"""
         sql = ("SELECT DISTINCT(cat_team.team_id), teamname "
                "FROM cm.cat_team WHERE active is True ORDER BY teamname")
         rows = tools_db.get_rows(sql, commit=True)
@@ -575,7 +568,6 @@ class AddNewLot:
 
     def update_workorder_fields(self) -> None:
         """Fetch workorder info from DB and populate dynamic form fields."""
-
         cmb_ot = self.dlg_lot.findChild(QComboBox, "tab_data_wo")
         if not cmb_ot:
             return
@@ -608,8 +600,7 @@ class AddNewLot:
                 self.set_widget_value(widget, val)
 
     def fill_workorder_fields(self) -> None:
-        """ Fill combo boxes of the form """
-
+        """Fill combo boxes of the form"""
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
         # OT Combo is now filled
@@ -620,7 +611,6 @@ class AddNewLot:
 
     def save_lot(self, from_change_tab: bool = False) -> Optional[bool]:
         """Save lot using gw_fct_cm_setlot (dynamic form logic) with mandatory field validation."""
-
         fields = {}
         list_mandatory = []
 
@@ -692,7 +682,8 @@ class AddNewLot:
 
     def reset_rb_list(self, rb_list: Optional[List[Any]] = None):
         """Resets the main rubber band and clears all rubber band selections in the provided list,
-        effectively removing any current feature highlights from the canvas."""
+        effectively removing any current feature highlights from the canvas.
+        """
         # Use self.rb_list if no list is provided, for direct calls
         rb_list_to_reset = rb_list if rb_list is not None else self.rb_list
         self.rb_red.reset()
@@ -701,7 +692,8 @@ class AddNewLot:
 
     def manage_rejected(self):
         """Handles the cancellation or rejection of changes by disconnecting selection signals,
-        clearing any active feature selections, saving user settings, switching the tool to pan mode, and closing the current dialog."""
+        clearing any active feature selections, saving user settings, switching the tool to pan mode, and closing the current dialog.
+        """
         self._cleanup_map_selection()
         tools_gw.save_settings(self.dlg_lot)
         self.iface.actionPan().trigger()
@@ -774,7 +766,6 @@ class AddNewLot:
 
     def populate_tableview(self, qtable: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
-
         data = tools_db.get_rows(query)
         if not data:
             qtable.setModel(QStandardItemModel())  # Clear view
@@ -810,8 +801,7 @@ class AddNewLot:
         tools_gw.set_tablemodel_config(self.dlg_lot_man if hasattr(self, 'dlg_lot_man') else self.dlg_lot, qtable, table_name, schema_name="cm")
 
     def get_current_user(self) -> Optional[Dict[str, Any]]:
-        """
-        Gets the current user's complete data, including role and organization,
+        """Gets the current user's complete data, including role and organization,
         from the CM schema.
         """
         if not tools_db.check_schema('cm'):
@@ -833,7 +823,6 @@ class AddNewLot:
 
     def lot_manager(self):
         """Entry point for opening the Lot Manager dialog (Button 75)."""
-
         self.dlg_lot_man = LotManagementUi(self)
         tools_gw.load_settings(self.dlg_lot_man)
 
@@ -977,7 +966,6 @@ class AddNewLot:
 
     def open_lot(self, index: Optional[QModelIndex] = None):
         """Open selected lot in edit mode, from button or double click."""
-
         if index and index.isValid():
             model = index.model()
             row = index.row()
@@ -1002,7 +990,6 @@ class AddNewLot:
 
     def delete_lot(self):
         """Delete selected lot(s) with confirmation."""
-
         selected = self.dlg_lot_man.tbl_lots.selectionModel().selectedRows()
         if not selected:
             msg = tools_qt.tr("Select a lot to delete.", context_name="cm")
@@ -1158,8 +1145,8 @@ class AddNewLot:
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
-        (such as teams and vehicles) within the application's UI."""
-
+        (such as teams and vehicles) within the application's UI.
+        """
         # Get user information
         user_data = self.get_current_user()
 
@@ -1264,15 +1251,13 @@ class AddNewLot:
         tools_gw.open_dialog(self.dlg_resources_man, "resources_management")
 
     def txt_org_name_changed(self):
-        """ Filter table by organization id """
-
+        """Filter table by organization id"""
         org_name = tools_qt.get_text(self.dlg_resources_man, "txt_orgname")
         sql_filter = f"WHERE orgname ILIKE '%{org_name}%'" if org_name and org_name.strip() else None
         self._populate_resource_tableview("cat_organization", sql_filter)
 
     def filter_teams_by_name(self):
-        """ Filter teams table by team name """
-
+        """Filter teams table by team name"""
         team_name = tools_qt.get_text(self.dlg_resources_man, "txt_teams")
 
         # Build sql filtering by team name and organization
@@ -1295,8 +1280,7 @@ class AddNewLot:
         self._populate_resource_tableview("cat_team", sql_filter)
 
     def filter_users_table(self):
-        """ Filter table by user name """
-
+        """Filter table by user name"""
         # Get selected team id from combo
         team_id = tools_qt.get_combo_value(self.dlg_resources_man, "cmb_team")
 
@@ -1318,8 +1302,7 @@ class AddNewLot:
         self._populate_resource_tableview("cat_user", sql_filter)
 
     def assign_team_to_user(self):
-        """ Assign a team to selected user(s) """
-
+        """Assign a team to selected user(s)"""
         # Get selected user IDs
         selected_ids = self.get_selected_ids("cat_user")
         if not selected_ids:
@@ -1367,8 +1350,7 @@ class AddNewLot:
             tools_qgis.show_warning(msg, msg_params=msg_params)
 
     def remove_team_from_user(self):
-        """ Remove team assignment from selected user(s) """
-
+        """Remove team assignment from selected user(s)"""
         # Get selected user IDs
         selected_ids = self.get_selected_ids("cat_user")
         if not selected_ids:
@@ -1403,7 +1385,6 @@ class AddNewLot:
 
     def _populate_resource_tableview(self, table_name: str, sql_filter: Optional[str] = None):
         """Populate a QTableView with the results of a SQL query."""
-
         # Get QTableView
         table = self.dict_tables[table_name]["widget"]
 
@@ -1450,8 +1431,7 @@ class AddNewLot:
         tools_gw.set_tablemodel_config(self.dlg_resources_man, table, table_name, schema_name="cm")
 
     def selected_row(self, tablename: str):
-        """ Handle double click selected row """
-
+        """Handle double click selected row"""
         # Call open_create function depending of the table name
         if tablename == "cat_team":
             self.open_create_team(True)
@@ -1515,8 +1495,7 @@ class AddNewLot:
                 self.filter_users_table()
 
     def delete_registers(self, tablename: str):
-        """ Delete selected registers from the table."""
-
+        """Delete selected registers from the table."""
         # Get idname
         idname = self.dict_tables[tablename]["idname"]
 
@@ -1571,8 +1550,7 @@ class AddNewLot:
                     self._populate_resource_tableview(tablename, sql_filter)
 
     def open_create_team(self, is_update: Optional[bool] = False):
-        """ Open dialog to create or update team """
-
+        """Open dialog to create or update team"""
         # Define the form type and create the body
         form_type = "team_create"
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
@@ -1633,7 +1611,6 @@ class AddNewLot:
 
     def get_selected_ids(self, tablename: str) -> List[str]:
         """Get selected ids from QTableView."""
-
         qtable = self.dict_tables[tablename]["widget"]
 
         model = qtable.model()
@@ -1677,8 +1654,7 @@ class AddNewLot:
 
 
 def upsert_team(**kwargs: Any):
-    """ Create or update team """
-
+    """Create or update team"""
     dlg = kwargs["dialog"]
     this = kwargs["class_obj"]
     team_id = this.team_id
@@ -1744,5 +1720,5 @@ def upsert_team(**kwargs: Any):
 
 
 def close(**kwargs: Any):
-    """ Close dialog """
+    """Close dialog"""
     tools_gw.close_dialog(kwargs["dialog"])

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -13,8 +12,7 @@ class GwSignalManager(QObject):
     refresh_selectors = pyqtSignal(str)
 
     def __init__(self):
-        """
-        This class has signals that are needed to bypass the limitation of threads working with Qt objects.
+        """This class has signals that are needed to bypass the limitation of threads working with Qt objects.
         An instance of this class always exists in global_vars
                                 (signal_manager, created in main.py -> global_vars.signal_manager = GwSignalManager())
 
@@ -25,5 +23,4 @@ class GwSignalManager(QObject):
                       you assign the arguments when you emit the signal
                 3- Emit the signal when you want to execute the connected function like: signal_name.emit(arg1, ...)
         """
-
         QObject.__init__(self)

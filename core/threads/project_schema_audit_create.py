@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -78,8 +77,7 @@ class GwCreateSchemaAuditTask(GwTask):
         self.setProgress(value)
 
     def main_execution(self):
-        """ Main common execution """
-
+        """Main common execution"""
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
         for process in self.list_process:
@@ -90,8 +88,7 @@ class GwCreateSchemaAuditTask(GwTask):
         return True
 
     def calculate_number_of_files(self):
-        """ Calculate total number of SQL to execute """
-
+        """Calculate total number of SQL to execute"""
         total_sql_files = 0
         dict_process = {}
 
@@ -104,8 +101,7 @@ class GwCreateSchemaAuditTask(GwTask):
         return total_sql_files
 
     def get_number_of_files_process(self, process_name: str):
-        """ Calculate number of files of all folders of selected @process_name """
-
+        """Calculate number of files of all folders of selected @process_name"""
         dict_folders = self.get_folders_process(process_name)
         if dict_folders is None:
             return dict_folders, 0
@@ -119,8 +115,7 @@ class GwCreateSchemaAuditTask(GwTask):
         return dict_folders, number_of_files
 
     def get_folders_process(self, process_name):
-        """ Get list of folders related with this @process_name """
-
+        """Get list of folders related with this @process_name"""
         dict_folders = {}
         if process_name == 'load_audit_structure':
             dict_folders[self.admin.folder_audit_structure] = 0

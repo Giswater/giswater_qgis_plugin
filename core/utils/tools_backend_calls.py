@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -30,10 +29,9 @@ from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
 
 def add_object(**kwargs):
-    """
-    Open form of selected element of the @qtable??
-        function called in module tools_gw: def add_button(module=sys.modules[__name__], **kwargs):
-        at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Open form of selected element of the @qtable??
+    function called in module tools_gw: def add_button(module=sys.modules[__name__], **kwargs):
+    at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     dialog = kwargs['dialog']
     button = kwargs['widget']
@@ -124,9 +122,9 @@ def add_object(**kwargs):
 
 
 def delete_object(**kwargs):
-    """ Delete selected objects (elements or documents) of the @widget
-         function called in module tools_gw: def add_button(module=sys.modules[__name__], **kwargs):
-        at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Delete selected objects (elements or documents) of the @widget
+     function called in module tools_gw: def add_button(module=sys.modules[__name__], **kwargs):
+    at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     dialog = kwargs['dialog']
 
@@ -232,9 +230,10 @@ def open_visit(**kwargs):
 
 
 def manage_document(doc_id, **kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-        widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
-        Function called by: columnname ='btn_doc_new' """
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    Function called by: columnname ='btn_doc_new'
+    """
     feature = None
     complet_result = kwargs['complet_result']
     feature_type = complet_result['body']['feature']['featureType']
@@ -340,9 +339,9 @@ def manage_visit_class(**kwargs):
 
 
 def open_selected_path(**kwargs):
-    """ Open selected path of the @widget
-        function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
-        at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Open selected path of the @widget
+    function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
+    at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
@@ -383,18 +382,16 @@ def open_selected_path(**kwargs):
 
 
 def filter_table(**kwargs):
+    """Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+    at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+               widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+
+    Might be called in tools_gw also: def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None)
+    at lines:  widget.textChanged.connect(partial(getattr(module, function_name), **kwargs))
+               widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
+               widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
+               widget.valueChanged.connect(partial(getattr(module, function_name), **kwargs))
     """
-         Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
-         at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-                    widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-
-         Might be called in tools_gw also: def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None)
-         at lines:  widget.textChanged.connect(partial(getattr(module, function_name), **kwargs))
-                    widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
-                    widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
-                    widget.valueChanged.connect(partial(getattr(module, function_name), **kwargs))
-     """
-
     complet_result = kwargs['complet_result']
     model = kwargs['model']
     dialog = kwargs['dialog']
@@ -440,12 +437,10 @@ def filter_table(**kwargs):
 
 
 def filter_table_mincut(**kwargs):
+    """Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+    at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+               widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
     """
-         Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
-         at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-                    widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-     """
-
     complet_result = kwargs['complet_result']
     model = kwargs['model']
     dialog = kwargs['dialog']
@@ -480,12 +475,10 @@ def filter_table_mincut(**kwargs):
 
 
 def open_rpt_result(**kwargs):
+    """Open form of selected element of the @qtable??
+    function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
+    at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
-    Open form of selected element of the @qtable??
-        function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
-        at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-    """
-
     qtable = kwargs['qtable']
     complet_list = kwargs['complet_result']
     func_params = kwargs['func_params']
@@ -512,7 +505,7 @@ def open_rpt_result(**kwargs):
 
 
 def set_layer_index(**kwargs):
-    """ Force reload dataProvider of layer """
+    """Force reload dataProvider of layer"""
     """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
 
     # Get list of layer names
@@ -527,9 +520,9 @@ def set_layer_index(**kwargs):
 
 
 def get_info_node(**kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    """
     dialog = kwargs['dialog']
     widget = kwargs['widget']
 
@@ -547,14 +540,14 @@ def get_info_node(**kwargs):
 
 
 def set_style_mapzones(**kwargs):
-    """ A bridge function to call tools_gw->set_style_mapzones """
+    """A bridge function to call tools_gw->set_style_mapzones"""
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     tools_gw.set_style_mapzones()
 
 
 def get_graph_config(**kwargs):
-    """ A function to call gw_fct_getgraphconfig """
+    """A function to call gw_fct_getgraphconfig"""
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     json_result = kwargs.get('json_result')
@@ -587,7 +580,7 @@ def get_graph_config(**kwargs):
 
 
 def add_query_layer(**kwargs):
-    """ Create and add a QueryLayer to ToC """
+    """Create and add a QueryLayer to ToC"""
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     query = kwargs.get('query')
@@ -607,9 +600,10 @@ def add_query_layer(**kwargs):
 
 
 def refresh_attribute_table(**kwargs):
-    """ Set layer fields configured according to client configuration.
-        At the moment manage:
-            Column names as alias, combos and typeahead as ValueMap"""
+    """Set layer fields configured according to client configuration.
+    At the moment manage:
+        Column names as alias, combos and typeahead as ValueMap
+    """
     """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
 
     # Get list of layer names
@@ -687,8 +681,7 @@ def refresh_attribute_table(**kwargs):
 
 
 def refresh_canvas(**kwargs):
-    """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-
+    """Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)"""
     # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
     # self.canvas.refreshAllLayers()
     # Get list of layer names
@@ -709,8 +702,7 @@ def refresh_canvas(**kwargs):
 
 
 def set_column_visibility(**kwargs):
-    """ Hide selected fields according table config_form_fields.hidden """
-
+    """Hide selected fields according table config_form_fields.hidden"""
     try:
         layer = kwargs["layer"]
         if type(layer) is str:
@@ -734,8 +726,7 @@ def set_column_visibility(**kwargs):
 
 
 def set_column_multiline(**kwargs):
-    """ Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline'] """
-
+    """Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline']"""
     try:
         field = kwargs["field"]
         layer = kwargs["layer"]
@@ -756,8 +747,7 @@ def set_column_multiline(**kwargs):
 
 
 def set_read_only(**kwargs):
-    """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable') """
-
+    """Set field readOnly according to client configuration into config_form_fields (field 'iseditable')"""
     try:
         field = kwargs["field"]
         layer = kwargs["layer"]
@@ -783,11 +773,10 @@ def set_read_only(**kwargs):
 
 
 def load_qml(**kwargs):
-    """ Apply QML style located in @qml_path in @layer
+    """Apply QML style located in @qml_path in @layer
     :param kwargs:{"layerName": "ve_arc", "qmlPath": "C:\\xxxx\\xxxx\\xxxx\\qml_file.qml"}
     :return: Boolean value
     """
-
     # Get layer
     layer = tools_qgis.get_layer_by_tablename(kwargs['layerName']) if 'layerName' in kwargs else None
     if layer is None:
@@ -813,16 +802,16 @@ def load_qml(**kwargs):
 
 
 def open_url(widget):
-    """ Function called in def add_hyperlink(field): -->
-        widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget)) """
-
+    """Function called in def add_hyperlink(field): -->
+    widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
+    """
     status, message = tools_os.open_file(widget.text())
     if status is False and message is not None:
         tools_qgis.show_warning(message, parameter=widget.text())
 
 
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
-    """ Put filter widgets into layout and set headers into QTableView """
+    """Put filter widgets into layout and set headers into QTableView"""
     no_tabs = False
     try:
         index_tab = dialog.tab_main.currentIndex()
@@ -957,10 +946,9 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
 
 
 def open_selected_manager_item(**kwargs):
-    """
-    Open form of selected element of the @qtable??
-        function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
-        at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Open form of selected element of the @qtable??
+    function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
+    at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
@@ -1005,9 +993,9 @@ def open_selected_manager_item(**kwargs):
 
 
 def manage_element_menu(**kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    """
     # Get widget from kwargs
     button = kwargs['widget']
     func_params = kwargs['func_params']
@@ -1064,9 +1052,9 @@ def manage_element_menu(**kwargs):
 
 
 def delete_manager_item(**kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    """
     dialog = kwargs['dialog']
     params = kwargs['func_params']
     table_widget = params['targetwidget']
@@ -1080,7 +1068,7 @@ def delete_manager_item(**kwargs):
 
 
 def reload_table_manager(**kwargs):
-    """ Reload table data """
+    """Reload table data"""
     complet_result = kwargs['complet_result']
     dialog = kwargs['dialog']
     list_tables = dialog.findChildren(QTableView)
@@ -1111,8 +1099,9 @@ def reload_table_manager(**kwargs):
 
 
 def close_manager(**kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    """
     dialog = kwargs['dialog']
     tools_gw.close_dialog(dialog)
 
@@ -1137,8 +1126,7 @@ def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widge
 
 
 def _manage_document_new(doc, **kwargs):
-    """ Get inserted doc_id and add it to current feature """
-
+    """Get inserted doc_id and add it to current feature"""
     if doc.doc_name is None:
         return
     dialog = kwargs['dialog']
@@ -1149,7 +1137,7 @@ def _manage_document_new(doc, **kwargs):
 
 
 def _reload_table(**kwargs):
-    """ Get inserted element_id and add it to current feature """
+    """Get inserted element_id and add it to current feature"""
     dialog = kwargs['dialog']
     no_tabs = False
     try:
@@ -1206,23 +1194,19 @@ def _reload_table(**kwargs):
 
 
 def get_selector(**kwargs):
-    """
-    Refreshes the selectors if the selector dialog is open
+    """Refreshes the selectors if the selector dialog is open
 
     Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
     """
-
     tab_name = kwargs.get('tab')
     global_vars.signal_manager.refresh_selectors.emit(tab_name)
 
 
 def show_message(**kwargs):
-    """
-    Shows a message in the message bar.
+    """Shows a message in the message bar.
 
     Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
     """
-
     text = kwargs.get('text', default='No message found')
     level = kwargs.get('level', default=1)
     duration = kwargs.get('duration', default=10)
@@ -1231,8 +1215,7 @@ def show_message(**kwargs):
 
 
 def manage_duplicate_dscenario_copyfrom(dialog):
-    """ Function called in def build_dialog_options(...) -->  getattr(module, signal)(dialog) """
-
+    """Function called in def build_dialog_options(...) -->  getattr(module, signal)(dialog)"""
     dscenario_id = tools_qt.get_combo_value(dialog, 'copyFrom')
     sql = f"SELECT descript, parent_id, dscenario_type, active, expl_id FROM ve_cat_dscenario WHERE dscenario_id = {dscenario_id}"
     row = tools_db.get_row(sql)
@@ -1247,15 +1230,13 @@ def manage_duplicate_dscenario_copyfrom(dialog):
 
 
 def selection_init(**kwargs):
-    """
-    Initialize the selection.
+    """Initialize the selection.
     """
     tools_gw.selection_init(kwargs.get('class'), kwargs.get('dialog'), kwargs.get('class').feature_type, GwSelectionMode.ELEMENT)
 
 
 def insert_feature(**kwargs):
-    """
-    Insert the selected records.
+    """Insert the selected records.
     """
     func_params = kwargs.get('func_params')
     target_widget = func_params.get('targetwidget')

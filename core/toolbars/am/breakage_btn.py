@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -37,7 +36,8 @@ from ...ui.ui_manager import GwAssignationUi
 
 class GwAmBreakageButton(GwAction):
     """Button 73: Breakage button
-    Dropdown with two options: 'Incremental load' and 'Assigning'"""
+    Dropdown with two options: 'Incremental load' and 'Assigning'
+    """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -77,7 +77,6 @@ class GwAmBreakageButton(GwAction):
 
     def _fill_action_menu(self):
         """Fill action menu"""
-
         # Remove all previous actions from the menu
         for action in self.menu.actions():
             self.menu.removeAction(action)
@@ -101,7 +100,6 @@ class GwAmBreakageButton(GwAction):
 
     def _get_selected_action(self, name):
         """Gets selected action"""
-
         if name == self.txt_assignation:
             self.assignation()
         elif name == self.txt_priority:

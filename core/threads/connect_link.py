@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -48,7 +47,7 @@ class GwConnectLink(GwTask):
         tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
     def _link_selected_features(self, feature_type, selected_arcs=None):
-        """ Link selected @feature_type to the pipe """
+        """Link selected @feature_type to the pipe"""
         # Use individual processing for multiple connecs in "Set user click" mode
         user_click_with_multiple = (
             self._check_user_click_mode() and
@@ -61,7 +60,7 @@ class GwConnectLink(GwTask):
             return self._link_features_batch(feature_type, selected_arcs)
 
     def _check_user_click_mode(self):
-        """ Check if user click mode is active by looking for temp_table entry """
+        """Check if user click mode is active by looking for temp_table entry"""
         sql = "SELECT COUNT(*) FROM temp_table WHERE fid = 485 AND cur_user = current_user;"
         result = tools_db.get_row(sql)
         return result and result[0] > 0

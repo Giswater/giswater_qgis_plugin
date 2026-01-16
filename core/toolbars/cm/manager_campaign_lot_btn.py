@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -16,7 +15,7 @@ from ...utils import tools_gw
 
 
 class GwManageCampaignLotButton(GwAction):
-    """ Button 87: Campaign Management """
+    """Button 87: Campaign Management"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -41,7 +40,7 @@ class GwManageCampaignLotButton(GwAction):
             toolbar.addAction(self.action)
 
     def _fill_action_menu(self):
-        """ Fill action menu """
+        """Fill action menu"""
         actions = self.menu.actions()
         for action in actions:
             action.disconnect()
@@ -56,7 +55,7 @@ class GwManageCampaignLotButton(GwAction):
             obj_action.triggered.connect(partial(self.clicked_event, action))
 
     def clicked_event(self, selected_action):
-        """ Open the correct campaign dialog based on user selection """
+        """Open the correct campaign dialog based on user selection"""
         if selected_action == tools_qt.tr('Manage Campaign'):
             self.campaign_manager.campaign_manager()
         elif selected_action == tools_qt.tr('Manage Lot'):

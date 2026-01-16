@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -18,8 +17,9 @@ from ...libs import lib_vars, tools_db, tools_log, tools_qt, tools_qgis
 
 
 class GwGenericDescriptor(object):
-    """ A descriptor that set getter and setter. class example from:
-    http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""
+    """A descriptor that set getter and setter. class example from:
+    http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb
+    """
 
     def __init__(self, default):
         self.default = default
@@ -39,7 +39,7 @@ class GwGenericDescriptor(object):
 
 
 class GwTable(object):
-    """ Base class representing a table. Assume it have to be used as a pure virtual. """
+    """Base class representing a table. Assume it have to be used as a pure virtual."""
 
     def __init__(self, table_name, pk):
         self.__table_name = table_name
@@ -52,17 +52,16 @@ class GwTable(object):
         return self.__pk
 
     def field_names(self):
-        """ Return the list of field names composing the table.
-        Names are that exposed in the class not derived from the db table."""
-
+        """Return the list of field names composing the table.
+        Names are that exposed in the class not derived from the db table.
+        """
         fields = list(vars(self.__class__).keys())
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
         fields = [x for x in fields if "__" not in x]
         return fields
 
     def fetch(self, commit=True):
-        """ Retrieve a record with a specified primary key id."""
-
+        """Retrieve a record with a specified primary key id."""
         if not getattr(self, self.pk()):
             msg = "No primary key value set"
             tools_qgis.show_info(msg, parameter=self.pk)
@@ -88,9 +87,9 @@ class GwTable(object):
         return True
 
     def upsert(self, commit=True):
-        """ Save current event state in the DB as new record.
-        Eventually add the record if it is not available """
-
+        """Save current event state in the DB as new record.
+        Eventually add the record if it is not available
+        """
         fields = list(vars(self.__class__).keys())
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
         fields = [x for x in fields if (("__" not in x) and (x != self.pk()))]
@@ -119,9 +118,9 @@ class GwTable(object):
         return True
 
     def nextval(self, commit=True):
-        """ Get the next id for the __pk. that will be used for the next insert.
-        BEWARE that this call increment the sequence at each call. """
-
+        """Get the next id for the __pk. that will be used for the next insert.
+        BEWARE that this call increment the sequence at each call.
+        """
         sql = "SELECT nextval(pg_get_serial_sequence('{}', '{}'))".format(
             self.table_name(), self.pk())
         row = tools_db.get_row(sql, commit=commit)
@@ -131,8 +130,7 @@ class GwTable(object):
             return None
 
     def currval(self, commit=True):
-        """ Get the current id for the __pk. that is the id of the last insert. """
-
+        """Get the current id for the __pk. that is the id of the last insert."""
         # get latest updated sequence ASSUMED a sequence is available!
         # using lastval can generate problems in case of parallel inserts
         # sql = ("SELECT lastval()")
@@ -146,8 +144,7 @@ class GwTable(object):
             return None
 
     def max_pk(self, commit=True):
-        """ Retrive max value of the primary key (if numeric). """
-
+        """Retrive max value of the primary key (if numeric)."""
         # doe not use DB nextval function becouse each call it is incremented
         sql = "SELECT MAX({1}) FROM {0}".format(
             self.table_name(), self.pk())
@@ -158,17 +155,16 @@ class GwTable(object):
             return row[0]
 
     def pks(self, commit=True):
-        """ Fetch all pk values. """
-
+        """Fetch all pk values."""
         sql = "SELECT {1} FROM {0} ORDER BY {1}".format(
             self.table_name(), self.pk())
         rows = tools_db.get_rows(sql, commit=commit)
         return rows
 
     def delete(self, pks=[], all_records=False, where_clause='', commit=True):
-        """ Delete all listed records with specified pks.
-        If not ids are specified and not remove all => del current record. """
-
+        """Delete all listed records with specified pks.
+        If not ids are specified and not remove all => del current record.
+        """
         sql = "DELETE FROM {0}".format(self.table_name())
         if not all_records:
             if not where_clause:
@@ -184,8 +180,7 @@ class GwTable(object):
         return tools_db.execute_sql(sql, commit=commit)
 
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
-        """ Execute UPSERT sentence """
-
+        """Execute UPSERT sentence"""
         # Set SQL for INSERT
         sql = "INSERT INTO " + tablename + "(" + unique_field + ", "
 

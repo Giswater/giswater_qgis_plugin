@@ -56,7 +56,6 @@ class Workorder:
 
     def filter_workorder(self):
         """Filter cm.workorder based on optional name, class, and type"""
-
         filters = []
 
         # Name filter
@@ -95,7 +94,6 @@ class Workorder:
 
     def populate_tableview(self, qtable: QTableView, query: str, columns: list[str] = None):
         """Populate a QTableView with the results of a SQL query."""
-
         data = tools_db.get_rows(query)
         if not data:
             qtable.setModel(QStandardItemModel())  # Clear view
@@ -182,8 +180,7 @@ class Workorder:
         tools_gw.open_dialog(self.dialog, dlg_name='workorder_edit')
 
     def save_workorder(self, from_manager=True):
-        """
-        Read back all widgets, convert empty strings to None,
+        """Read back all widgets, convert empty strings to None,
         then call cm.gw_fct_cm_setworkorder.
         """
         fields = {}
@@ -294,7 +291,6 @@ class Workorder:
 
     def create_widget_from_field(self, field):
         """Create a Qt widget based on field metadata"""
-
         wtype = field.get("widgettype", "text")
         iseditable = field.get("iseditable", True)
         widget = None
@@ -337,7 +333,6 @@ class Workorder:
 
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
-
         if isinstance(widget, QLineEdit):
             widget.setText(str(value))
         elif isinstance(widget, QTextEdit):

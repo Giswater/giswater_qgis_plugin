@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -458,8 +457,7 @@ class GwRecursiveEpa(GwTask):
             self._import_rpt(result_name, file_rpt)
 
     def _import_rpt(self, result_name, file_rpt):
-        """ Import result file """
-
+        """Import result file"""
         msg = "Import rpt file........: {0}"
         msg_params = (file_rpt,)
         tools_log.log_info(msg, msg_params=msg_params)
@@ -615,8 +613,7 @@ class GwRecursiveEpa(GwTask):
         return True
 
     def _exec_import_function(self, result_name):
-        """ Call function gw_fct_rpt2pg_main """
-
+        """Call function gw_fct_rpt2pg_main"""
         extras = f'"resultId":"{result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'

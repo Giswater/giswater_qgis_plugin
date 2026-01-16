@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -28,7 +27,7 @@ from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwDscenarioManagerButton(GwAction):
-    """ Button 45: Dscenario manager """
+    """Button 45: Dscenario manager"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -90,8 +89,7 @@ class GwDscenarioManagerButton(GwAction):
     # region dscenario manager
 
     def _fill_dscenario_menu(self):
-        """ Fill add arc menu """
-
+        """Fill add arc menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
@@ -257,8 +255,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager.setWindowTitle(tools_qt.tr('DWF scenario manager'))
 
     def _open_dscenario_manager(self):
-        """ Open dscenario manager """
-
+        """Open dscenario manager"""
         # Main dialog
         self.dlg_dscenario_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_dscenario_manager)
@@ -319,7 +316,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.setWindowTitle(tools_qt.tr('Dscenario manager'))
 
     def _show_context_menu(self, qtableview, pos):
-        """ Show custom context menu """
+        """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", self.tbl_dscenario)
@@ -354,8 +351,7 @@ class GwDscenarioManagerButton(GwAction):
         menu.exec(QCursor.pos())
 
     def _manage_toggle_active(self, dialog, tableview, view, parameter=None, scenario_type=None):
-        """ Toggle the active state of selected items in the current table. """
-
+        """Toggle the active state of selected items in the current table."""
         # Get selected row
         if tableview is None and view is None:
             tableview = dialog.main_tab.currentWidget()
@@ -392,8 +388,7 @@ class GwDscenarioManagerButton(GwAction):
         pass
 
     def update_current_scenario(self, dialog, qtbl, scenario_type, col_id_name, view_name):
-        """ Sets the selected scenario as current if it is active, based on scenario type """
-
+        """Sets the selected scenario as current if it is active, based on scenario type"""
         # Get selected rows in the table
         selected_list = qtbl.selectionModel().selectedRows()
 
@@ -441,8 +436,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(dialog, dlg_name='dscenario_manager')
 
     def _set_label_current_dscenario_type(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
-        """
-        Sets the label for the current scenario by retrieving its name.
+        """Sets the label for the current scenario by retrieving its name.
 
         If `from_open_dialog` is True, the function calls `gw_fct_set_toggle_current`
         to retrieve the name based on `scenario_type` only. Otherwise, it
@@ -468,8 +462,7 @@ class GwDscenarioManagerButton(GwAction):
             print("Error: 'name' field is missing in the result.")
 
     def _get_list(self, table_name='ve_cat_dscenario', filter_name="", filter_id=None, filter_active=None):
-        """ Mount and execute the query for gw_fct_getlist """
-
+        """Mount and execute the query for gw_fct_getlist"""
         id_field = self.dict_ids.get(table_name)
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
@@ -488,8 +481,7 @@ class GwDscenarioManagerButton(GwAction):
         return complet_list
 
     def _fill_manager_table(self, view, filter_active=None, filter_name="", dialog=None, scenario_type=None):
-        """ Fill dscenario manager table and optionally update current label. """
-
+        """Fill dscenario manager table and optionally update current label."""
         filter_active = 'true' if filter_active == 2 else self.chk_active.isChecked()
         if filter_name == "":
             filter_name = self.filter_name.text()
@@ -519,8 +511,7 @@ class GwDscenarioManagerButton(GwAction):
         return complet_list
 
     def _manage_btn_create(self, dialog, view, scenario_type=None):
-        """ Fill btn_create QMenu """
-
+        """Fill btn_create QMenu"""
         # Functions
         sql = "SELECT id, alias FROM config_toolbox WHERE "
 
@@ -547,11 +538,9 @@ class GwDscenarioManagerButton(GwAction):
         dialog.btn_create.setMenu(create_menu)
 
     def _open_toolbox_function(self, function, view, signal=None, connect=None, label=None, dialog=None, scenario_type=None):
-        """
-        Execute currently selected function from combobox and dynamically append additional logic
+        """Execute currently selected function from combobox and dynamically append additional logic
         for specific scenarios without removing defaults.
         """
-
         dscenario_functions = [3134, 3110, 3112, 3108, 3158, 3118]
 
         if function == 3290 and label == 'Create hydrology scenario values':
@@ -598,8 +587,7 @@ class GwDscenarioManagerButton(GwAction):
         return dlg_functions
 
     def _duplicate_selected_dscenario(self, dialog, view, fct_id):
-        """ Duplicates the selected dscenario """
-
+        """Duplicates the selected dscenario"""
         # Get selected row
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -618,8 +606,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
     def _delete_selected_dscenario(self, dialog, view, scenario_type=None):
-        """ Deletes the selected dscenario """
-
+        """Deletes the selected dscenario"""
         # Get selected row
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -650,8 +637,7 @@ class GwDscenarioManagerButton(GwAction):
     # region dscenario
 
     def _open_dscenario(self, index):
-        """ Create custom dialog for selected dscenario and fill initial table """
-
+        """Create custom dialog for selected dscenario and fill initial table"""
         # Check if there are selected rows
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -754,8 +740,7 @@ class GwDscenarioManagerButton(GwAction):
         tableview.update()
 
     def _manage_paste_dscenario_demand_values(self, feature_id, values):
-        """ Insert feature to dscenario via copy paste """
-
+        """Insert feature to dscenario via copy paste"""
         if feature_id == '':
             msg = "Feature_id is mandatory."
             tools_qgis.show_warning(msg, dialog=self.dlg_dscenario)
@@ -782,8 +767,7 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_dscenario_table()
 
     def _fill_dscenario_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
-        """ Fill dscenario table with data from its corresponding table """
-
+        """Fill dscenario table with data from its corresponding table"""
         # Manage exception if dialog is closed
         if not hasattr(self, 'dlg_dscenario') or isdeleted(self.dlg_dscenario):
             return
@@ -844,8 +828,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.txt_feature_id.setText('')
 
     def _manage_current_changed(self):
-        """ Manages tab changes """
-
+        """Manages tab changes"""
         if not hasattr(self, 'dlg_dscenario') or isdeleted(self.dlg_dscenario):
             return
 
@@ -919,8 +902,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_expr_select', False)
 
     def _manage_feature_type(self):
-        """ Manages current tableview feature type (node, arc, nodarc, etc.) """
-
+        """Manages current tableview feature type (node, arc, nodarc, etc.)"""
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         self.feature_type = 'node'
         feature_type = 'feature_id'
@@ -935,8 +917,7 @@ class GwDscenarioManagerButton(GwAction):
             self.feature_type = feature_type.split('_')[0]
 
     def _manage_highlight(self, qtableview, view, index):
-        """ Creates rubberband to indicate which feature is selected """
-
+        """Creates rubberband to indicate which feature is selected"""
         table = view.replace("_dscenario", "")
         feature_type = 'feature_id'
 
@@ -1079,8 +1060,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic', title=title)
 
     def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
-        """ Accept the properties dialog """
-
+        """Accept the properties dialog"""
         if not my_json:
             return
 
@@ -1111,8 +1091,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
 
     def _manage_add_layers(self, table_name, sub_group):
-        """ Opens menu to add/remove layers to ToC """
-
+        """Opens menu to add/remove layers to ToC"""
         # Create main menu and get cursor click position
         main_menu = QMenu()
         cursor = QCursor()
@@ -1179,13 +1158,12 @@ class GwDscenarioManagerButton(GwAction):
         main_menu.exec(click_point)
 
     def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, sub_group, state):
-        """ Control if user check or uncheck action menu, then add or remove layer from toc
+        """Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param pk: Field id of the table (String)
         :param style_id: Id of the style we want to load (integer or String)
         :param state: This parameter is sent by the action itself with the trigger (Bool)
         """
-
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
@@ -1206,8 +1184,7 @@ class GwDscenarioManagerButton(GwAction):
                     child.defaultWidget().setChecked(True)
 
     def _manage_insert(self):
-        """ Insert feature to dscenario via the button """
-
+        """Insert feature to dscenario via the button"""
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
         if view == "inp_dscenario_controls":
@@ -1272,8 +1249,7 @@ class GwDscenarioManagerButton(GwAction):
         nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
 
     def _manage_delete(self):
-        """ Delete features from dscenario via the button """
-
+        """Delete features from dscenario via the button"""
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         # Get selected row
         selected_list = tableview.selectionModel().selectedRows()
@@ -1316,8 +1292,7 @@ class GwDscenarioManagerButton(GwAction):
             self._selection_end()
 
     def _manage_select(self):
-        """ Button snapping """
-
+        """Button snapping"""
         self._manage_feature_type()
 
         # Get current layer and remove selection
@@ -1347,21 +1322,18 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.btn_snapping.setChecked(True)
 
     def _selection_init(self):
-        """ Set canvas map tool to selection """
-
+        """Set canvas map tool to selection"""
         tools_gw.disconnect_signal('dscenario_snapping')
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 
     def connect_signal_selection_changed(self):
-        """ Connect signal selectionChanged """
-
+        """Connect signal selectionChanged"""
         tools_gw.connect_signal(global_vars.canvas.selectionChanged, partial(self._manage_selection),
                                 'dscenario_snapping', 'connect_signal_selection_changed_selectionChanged_manage_selection')
 
     def _manage_selection(self):
-        """ Slot function for signal 'canvas.selectionChanged' """
-
+        """Slot function for signal 'canvas.selectionChanged'"""
         # Get feature_type and feature_id
         layer = self.iface.activeLayer()
         feature_type = self.feature_type
@@ -1404,8 +1376,7 @@ class GwDscenarioManagerButton(GwAction):
                 tools_gw.get_expression_filter(feature_type, inserted, {f"{feature_type}": [layer]})
 
     def _selection_end(self):
-        """ Stop selection mode """
-
+        """Stop selection mode"""
         tools_gw.disconnect_signal('dscenario_snapping')
         tools_gw.remove_selection()
         tools_gw.reset_rubberband(self.rubber_band)
@@ -1413,7 +1384,6 @@ class GwDscenarioManagerButton(GwAction):
 
     def _select_with_expression_dialog(self):
         """Select features by expression for dscenario"""
-
         # Get current layer and feature type
         self._manage_feature_type()
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()

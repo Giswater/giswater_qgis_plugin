@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -302,8 +301,7 @@ class GwImportInpTask(GwTask):
                 return
 
     def _manage_flwreg(self) -> str:
-        """ Execute database function 'gw_fct_import_swmm_flwreg' """
-
+        """Execute database function 'gw_fct_import_swmm_flwreg'"""
         import json
 
         extras = ""
@@ -374,8 +372,7 @@ class GwImportInpTask(GwTask):
             self.update_municipality = True
 
     def _save_options(self):
-        """
-            Import options to table 'config_param_user'.
+        """Import options to table 'config_param_user'.
         """
         params_map = {
 
@@ -437,10 +434,8 @@ class GwImportInpTask(GwTask):
         execute_sql(sql, params)
 
     def _save_files(self):
+        """Import options to table 'config_param_user'.
         """
-            Import options to table 'config_param_user'.
-        """
-
         params = []
         for k, v in self.network[FILES].items():
             actio_type, file_type = k.split(' ')[0], k.split(' ')[1]
@@ -2121,8 +2116,7 @@ class GwImportInpTask(GwTask):
         self.results["subcatchments"] = len(subcatchments) if subcatchments else 0
 
     def _update_municipality(self):
-        """ Update the muni_id of all features getting the spatial intersection with the municipality """
-
+        """Update the muni_id of all features getting the spatial intersection with the municipality"""
         sql = f"""
             UPDATE node n 
             SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) 

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -20,8 +19,9 @@ from .... import global_vars
 
 
 class GwFeatureReplaceButton(GwMaptool):
-    """ Button 26: Replace feature
-    User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
+    """Button 26: Replace feature
+    User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace'
+    """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1, actions=None, list_tables=None):
 
@@ -154,8 +154,7 @@ class GwFeatureReplaceButton(GwMaptool):
     # region private functions
 
     def _fill_action_menu(self):
-        """ Fill action menu """
-
+        """Fill action menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
@@ -177,8 +176,7 @@ class GwFeatureReplaceButton(GwMaptool):
                                                  parameter="last_feature_type", value=action_id, comment=None))
 
     def _set_active_layer(self, name):
-        """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
-
+        """Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY)"""
         tablename = f"ve_{name.lower()}"
         layer = tools_qgis.get_layer_by_tablename(tablename)
         if layer:
@@ -186,8 +184,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.current_layer = layer
 
     def _manage_dates(self, date_value):
-        """ Manage dates """
-
+        """Manage dates"""
         date_result = None
         try:
             date_result = str(date_value)
@@ -356,8 +353,7 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
     def _manage_new_workcat_accept(self, table_object):
-        """ Insert table 'cat_work'. Add cat_work """
-
+        """Insert table 'cat_work'. Add cat_work"""
         # Get values from dialog
         values = ""
         fields = ""
@@ -494,8 +490,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.manage_active_maptool()
 
     def _edit_change_elem_type_get_value(self, index):
-        """ Just select item to 'real' combo 'new_featurecat_id' (that is hidden) """
-
+        """Just select item to 'real' combo 'new_featurecat_id' (that is hidden)"""
         if index == -1:
             return
 

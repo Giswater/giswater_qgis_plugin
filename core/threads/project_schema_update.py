@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -111,8 +110,7 @@ class GwUpdateSchemaTask(GwTask):
         self.setProgress(100)
 
     def main_execution(self):
-        """ Main common execution """
-
+        """Main common execution"""
         schema_name = self.admin._get_schema_name()
         sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
         tools_db.execute_sql(sql, commit=False)

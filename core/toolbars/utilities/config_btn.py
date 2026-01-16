@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -23,7 +22,7 @@ from ....libs import lib_vars, tools_qt, tools_db, tools_qgis
 
 
 class GwConfigButton(GwAction):
-    """ Button 62: Config """
+    """Button 62: Config"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -94,8 +93,7 @@ class GwConfigButton(GwAction):
         tools_gw.open_dialog(self.dlg_config, dlg_name='config')
 
     def _get_widget_controls(self):
-        """ Control the current tab, to load widgets """
-
+        """Control the current tab, to load widgets"""
         self.tab_main = self.dlg_config.findChild(QTabWidget, "tab_main")
 
         self._hide_void_tab(self.json_result['body']['form']['formTabs'][0], 'tab_addfields', 'lyt_addfields')
@@ -103,8 +101,7 @@ class GwConfigButton(GwAction):
         self.tab_main.currentChanged.connect(partial(self._tab_activation))
 
     def _tab_activation(self):
-        """ Call functions depend on tab selection """
-
+        """Call functions depend on tab selection"""
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         grbox_list = self.tab_main.widget(index_tab).findChildren(QGroupBox)
@@ -140,11 +137,10 @@ class GwConfigButton(GwAction):
             self.tab_admin_loaded = True
 
     def _hide_void_tab_groupbox(self, grbox_list):
-        """ Recives a list, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
+        """Recives a list, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
          (if it is empty), hides the QGroupBox
         :param grbox_list: list of QGroupBox
         """
-
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
@@ -158,8 +154,7 @@ class GwConfigButton(GwAction):
             tools_qt.remove_tab(self.tab_main, tab_name)
 
     def _get_layers_name(self):
-        """ Returns the name of all the layers visible in the TOC, then populate the cad_combo_layers """
-
+        """Returns the name of all the layers visible in the TOC, then populate the cad_combo_layers"""
         layers = self.iface.mapCanvas().layers()
         if not layers:
             return

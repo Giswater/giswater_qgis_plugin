@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -18,7 +17,7 @@ from ....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwDateSelectorButton(GwAction):
-    """ Button 18: Date selector """
+    """Button 18: Date selector"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -46,8 +45,7 @@ class GwDateSelectorButton(GwAction):
         tools_gw.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
     def _update_dates_into_db(self):
-        """ Insert or update dates into database """
-
+        """Insert or update dates into database"""
         # Set project user
         self.current_user = tools_db.current_user
 
@@ -70,8 +68,7 @@ class GwDateSelectorButton(GwAction):
         tools_qgis.refresh_map_canvas()
 
     def _update_date_to(self):
-        """ If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from' """
-
+        """If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from'"""
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
@@ -79,8 +76,7 @@ class GwDateSelectorButton(GwAction):
             tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
     def _update_date_from(self):
-        """ If 'date to' is lower than 'date from' set 'date from' 1 day less than 'date to' """
-
+        """If 'date to' is lower than 'date from' set 'date from' 1 day less than 'date to'"""
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
@@ -88,8 +84,7 @@ class GwDateSelectorButton(GwAction):
             tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
 
     def _get_default_dates(self):
-        """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
-
+        """Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date)"""
         # Set project user
         self.current_user = tools_db.current_user
 

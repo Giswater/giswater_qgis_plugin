@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -20,11 +19,10 @@ from ...libs import tools_qt, tools_db, tools_qgis, lib_vars
 class GwAudit:
 
     def __init__(self):
-        """ Class to control toolbar 'om_ws' """
+        """Class to control toolbar 'om_ws'"""
 
     def open_audit_manager(self, feature_id, table_name):
-        """ Open Audit Manager Dialog dynamic """
-
+        """Open Audit Manager Dialog dynamic"""
         self.feature_id = feature_id
         self.table_name = table_name
 
@@ -95,8 +93,7 @@ class GwAudit:
         tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
 
     def get_first_log_date(self):
-        """ Get first snapshot date """
-
+        """Get first snapshot date"""
         # Get the first snapshot date
         sql = f"SELECT min(tstamp)::date FROM audit.log WHERE table_name = '{self.table_name}' \
                 AND feature_id = '{self.feature_id}' AND \"schema\" = '{lib_vars.schema_name}';"
@@ -109,8 +106,7 @@ class GwAudit:
             return None
 
     def open_audit(self):
-        """ Open selected audit """
-
+        """Open selected audit"""
         # Get selected row from table
         selected_list = self.dlg_audit_manager.tbl_audit.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -130,8 +126,7 @@ class GwAudit:
         self.fill_dialog(form)
 
     def fill_dialog(self, form):
-        """ Create and open dialog """
-
+        """Create and open dialog"""
         results = []
         for log_id in form:
             # Create body
@@ -217,8 +212,7 @@ class GwAudit:
     # private region
 
     def _fill_manager_table(self, complet_list) -> bool:
-        """ Fill log manager table with data from audit.log """
-
+        """Fill log manager table with data from audit.log"""
         if complet_list is False:
             return False
 
@@ -244,8 +238,7 @@ class GwAudit:
         return True
 
     def _get_list(self):
-        """ Mount and execute the query for gw_fct_getlist """
-
+        """Mount and execute the query for gw_fct_getlist"""
         feature = '"tableName":"audit_results"'
         filter_fields = f""""limit": -1, 
                         "feature_id": {{"filterSign":"=", "value":"{self.feature_id}"}},
@@ -265,20 +258,17 @@ class GwAudit:
 
 
 def close_dlg(**kwargs):
-    """ Close dialog """
-
+    """Close dialog"""
     tools_gw.close_dialog(kwargs["dialog"])
 
 
 def open(**kwargs):
-    """ Open audit """
-
+    """Open audit"""
     kwargs["class"].open_audit()
 
 
 def open_date(**kwargs):
-    """ Open audit in selected date """
-
+    """Open audit in selected date"""
     class_obj = kwargs["class"]
     query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' AND \"schema\" = '{lib_vars.schema_name}' AND feature_id = '{class_obj.feature_id}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)

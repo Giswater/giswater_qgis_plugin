@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -30,7 +29,7 @@ from .epa_tools.go2iber import Go2Iber
 
 
 class GwGo2EpaButton(GwAction):
-    """ Button 42: Go2epa """
+    """Button 42: Go2epa"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -62,8 +61,7 @@ class GwGo2EpaButton(GwAction):
             self._open_go2epa()
 
     def _fill_action_menu(self):
-        """ Fill action menu """
-
+        """Fill action menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
@@ -95,8 +93,7 @@ class GwGo2EpaButton(GwAction):
                 menu.menuAction().setParent(None)
 
     def _get_selected_action(self, name):
-        """ Gets selected action """
-
+        """Gets selected action"""
         if name == tools_qt.tr('Go2EPA'):
             self._open_go2epa()
 
@@ -109,8 +106,7 @@ class GwGo2EpaButton(GwAction):
                 tools_qgis.show_warning(msg)
 
     def check_result_id(self):
-        """ Check if selected @result_id already exists """
-
+        """Check if selected @result_id already exists"""
         self.dlg_go2epa.txt_result_name.setStyleSheet(None)
 
     # region private functions
@@ -120,8 +116,7 @@ class GwGo2EpaButton(GwAction):
         self._go2epa()
 
     def _go2epa(self):
-        """ Button 42: Open form to set INP, RPT and project """
-
+        """Button 42: Open form to set INP, RPT and project"""
         # Show form in docker?
         tools_gw.init_docker('qgis_form_docker')
 
@@ -173,9 +168,8 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.mainTab.currentChanged.connect(partial(self._manage_btn_accept))
 
     def _manage_btn_accept(self, index):
-        """
-        Disable btn_accept when on tab info log and/or if go2epa_task is active
-            :param index: tab index (passed by signal)
+        """Disable btn_accept when on tab info log and/or if go2epa_task is active
+        :param index: tab index (passed by signal)
         """
         # Set network mode to 1
         if self.project_type == 'ud' and tools_qgis.is_plugin_active('IberGIS'):
@@ -301,8 +295,7 @@ class GwGo2EpaButton(GwAction):
         return True
 
     def _load_user_values(self):
-        """ Load QGIS settings related with file_manager """
-
+        """Load QGIS settings related with file_manager"""
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
         self.result_name = tools_gw.get_config_parser('btn_go2epa', 'go2epa_RESULT_NAME', "user", "session")
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
@@ -321,8 +314,7 @@ class GwGo2EpaButton(GwAction):
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
     def _save_user_values(self):
-        """ Save QGIS settings related with file_manager """
-
+        """Save QGIS settings related with file_manager"""
         txt_result_name = f"{tools_qt.get_text(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}"
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_RESULT_NAME', f"{txt_result_name}")
         txt_file_inp = f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}"
@@ -339,8 +331,7 @@ class GwGo2EpaButton(GwAction):
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT', f"{chk_import_result}")
 
     def _sector_selection(self):
-        """ Load the tables in the selection form """
-
+        """Load the tables in the selection form"""
         # Get class Selector from selector.py
         go2epa_selector = GwSelector()
 
@@ -399,8 +390,7 @@ class GwGo2EpaButton(GwAction):
                 tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
 
     def _go2epa_select_file_inp(self):
-        """ Select INP file """
-
+        """Select INP file"""
         message = "Select INP file"
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
@@ -408,8 +398,7 @@ class GwGo2EpaButton(GwAction):
             tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
 
     def _go2epa_select_file_rpt(self):
-        """ Select RPT file """
-
+        """Select RPT file"""
         message = "Select RPT file"
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
@@ -417,8 +406,7 @@ class GwGo2EpaButton(GwAction):
             tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
 
     def _go2epa_accept(self):
-        """ Save INP, RPT and result name"""
-
+        """Save INP, RPT and result name"""
         # Manage if task is already running
         if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
             try:
@@ -504,10 +492,9 @@ class GwGo2EpaButton(GwAction):
             tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False, end=end, call_set_tabs_enabled=False)
 
     def _set_completer_result(self, widget, viewname, field_name):
-        """ Set autocomplete of widget 'feature_id'
-            getting id's from selected @viewname
+        """Set autocomplete of widget 'feature_id'
+        getting id's from selected @viewname
         """
-
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
@@ -526,8 +513,7 @@ class GwGo2EpaButton(GwAction):
             self.completer.setModel(model)
 
     def _refresh_go2epa_options(self, dialog):
-        """ Refresh widgets into layouts on go2epa_options form """
-
+        """Refresh widgets into layouts on go2epa_options form"""
         if dialog:
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_')):
                 i = 0
@@ -560,8 +546,7 @@ class GwGo2EpaButton(GwAction):
                         lyt.addItem(spacer)
 
     def _go2epa_options(self):
-        """ Button 42: Open form to set INP, RPT and project """
-
+        """Button 42: Open form to set INP, RPT and project"""
         # Clear list
         self.epa_options_list = []
 

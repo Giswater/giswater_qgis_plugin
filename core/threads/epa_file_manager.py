@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,7 +20,7 @@ from .task import GwTask
 
 
 class GwEpaFileManager(GwTask):
-    """ This shows how to subclass QgsTask """
+    """This shows how to subclass QgsTask"""
 
     fake_progress = pyqtSignal()
     step_completed = pyqtSignal(dict, str)
@@ -52,8 +51,7 @@ class GwEpaFileManager(GwTask):
         self.replaced_velocities = False
 
     def set_variables_from_go2epa(self):
-        """ Set variables from object Go2Epa """
-
+        """Set variables from object Go2Epa"""
         self.dlg_go2epa = getattr(self.go2epa, 'dlg_go2epa', None)
         self.result_name = getattr(self.go2epa, 'result_name', None)
         self.file_inp = getattr(self.go2epa, 'file_inp', None)
@@ -411,8 +409,7 @@ class GwEpaFileManager(GwTask):
         return True
 
     def _load_epa_layers(self):
-        """ Load EPA layers if they are not already loaded """
-
+        """Load EPA layers if they are not already loaded"""
         # Get EPA layers from database
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
@@ -464,8 +461,7 @@ class GwEpaFileManager(GwTask):
         return True
 
     def _import_rpt(self):
-        """ Import result file """
-
+        """Import result file"""
         msg = "Import rpt file........: {0}"
         msg_params = (self.file_rpt,)
         tools_log.log_info(msg, msg_params=msg_params)
@@ -491,8 +487,7 @@ class GwEpaFileManager(GwTask):
             return status
 
     def _read_rpt_file(self, file_path: str = None):
-        """
-        Parse an EPANET/SWMM RPT text file and build a JSON-serializable row list string.
+        """Parse an EPANET/SWMM RPT text file and build a JSON-serializable row list string.
 
         Behavior overview:
         - Reads the RPT file line by line and tokenizes each line into columns `col1..colN`.
@@ -516,8 +511,8 @@ class GwEpaFileManager(GwTask):
 
         Returns:
         - True on success, False if parsing is cancelled or an unrecoverable format error is detected.
-        """
 
+        """
         # Read normalization flag: optionally coerce literal ">50" velocities to numeric "50"
         replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
         replace = tools_os.set_boolean(replace, default=False)
@@ -664,8 +659,7 @@ class GwEpaFileManager(GwTask):
         return True
 
     def _exec_import_function(self):
-        """ Call function gw_fct_rpt2pg_main """
-
+        """Call function gw_fct_rpt2pg_main"""
         for step in range(1, 3):
             extras = f'"step":"{step}", "resultId":"{self.result_name}"'
             if step == 1 and self.json_rpt:

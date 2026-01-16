@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -76,8 +75,7 @@ class ValveOperationCheck:
         QgsApplication.taskManager().addTask(self.thread)
 
     def _get_file_dialog(self, widget):
-        """ Check if selected file exists. Set default value if necessary """
-
+        """Check if selected file exists. Set default value if necessary"""
         tools_qt.get_open_file_path(self.dlg_voc, widget, "", "Selected file", str(Path.home()))
 
     def _get_scenarios_from_db(self):

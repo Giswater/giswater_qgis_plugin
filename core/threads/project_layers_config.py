@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -14,7 +13,7 @@ from ...libs import tools_log, tools_qgis, tools_qt, tools_db
 
 
 class GwProjectLayersConfig(GwTask):
-    """ This shows how to subclass QgsTask """
+    """This shows how to subclass QgsTask"""
 
     fake_progress = pyqtSignal()
 
@@ -82,8 +81,7 @@ class GwProjectLayersConfig(GwTask):
     # region private functions
 
     def _get_layers_to_config(self):
-        """ Get available layers to be configured """
-
+        """Get available layers to be configured"""
         self.available_layers = [layer[0] for layer in self.db_layers]
 
         self._set_form_suppress(self.available_layers)
@@ -98,8 +96,7 @@ class GwProjectLayersConfig(GwTask):
                     self.available_layers.append(table_name)
 
     def _set_form_suppress(self, layers_list):
-        """ Set form suppress on "Hide form on add feature (global settings) """
-
+        """Set form suppress on "Hide form on add feature (global settings)"""
         for layer_name in layers_list:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer is None:
@@ -112,10 +109,10 @@ class GwProjectLayersConfig(GwTask):
             layer.setEditFormConfig(config)
 
     def _set_layer_config(self, layers):
-        """ Set layer fields configured according to client configuration.
-            At the moment manage:
-                Column names as alias, combos as ValueMap, typeahead as textedit"""
-
+        """Set layer fields configured according to client configuration.
+        At the moment manage:
+            Column names as alias, combos as ValueMap, typeahead as textedit
+        """
         # Check only once if function 'gw_fct_getinfofromid' exists
         row = tools_db.check_function('gw_fct_getinfofromid', aux_conn=self.aux_conn, is_thread=True)
         if row in (None, ''):

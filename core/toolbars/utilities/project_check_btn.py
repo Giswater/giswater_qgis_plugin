@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -19,7 +18,7 @@ from ....libs import tools_qgis, tools_qt
 
 
 class GwProjectCheckButton(GwAction):
-    """ Button 67: Check project """
+    """Button 67: Check project"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -33,7 +32,6 @@ class GwProjectCheckButton(GwAction):
 
     def _open_check_project(self):
         """Fetches form configuration, dynamically populates widgets, and opens the dialog."""
-
         # Define the form type and create the body
         form_type = "check_project"
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
@@ -108,7 +106,6 @@ class GwProjectCheckButton(GwAction):
 
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""
-
         # Enable the "Log" tab after pressing Accept
         qtabwidget = self.dialog.findChild(QTabWidget, 'mainTab')
         if qtabwidget:
@@ -118,7 +115,6 @@ class GwProjectCheckButton(GwAction):
 
     def _start_project_check(self):
         """Re-executes the project check process after Accept is pressed."""
-
         # Show progress bar and timer when execution starts
         self.dialog.progressBar.setVisible(True)
         lbl_time = self.dialog.findChild(QLabel, "lbl_time")
@@ -148,7 +144,6 @@ class GwProjectCheckButton(GwAction):
 
     def _execute_checkdatabase(self):
         """Executes `gw_fct_setcheckdatabase` and updates the Log tab with results."""
-
         # Collect selected checkboxes
         check_parameters = self._get_selected_checks()
         if not any(check_parameters.values()):
@@ -199,8 +194,7 @@ class GwProjectCheckButton(GwAction):
             lbl_time.setVisible(False)
 
     def _save_dlg_values(self):
-        """ Save dialog values """
-
+        """Save dialog values"""
         versions_check = self.versions_check.isChecked() if self.versions_check else False
         qgisproj_check = self.qgisproj_check.isChecked() if self.qgisproj_check else False
         verified_exceptions = self.verified_exceptions.isChecked() if self.verified_exceptions else False

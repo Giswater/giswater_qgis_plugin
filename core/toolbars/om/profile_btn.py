@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -70,7 +69,7 @@ class GwNodeData:
 
 
 class GwProfileButton(GwAction):
-    """ Button 15: Profile """
+    """Button 15: Profile"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -227,8 +226,7 @@ class GwProfileButton(GwAction):
             tools_qt.show_info_box(msg, inf_text=self.none_values)
 
     def _save_profile(self):
-        """ Save profile """
-
+        """Save profile"""
         profile_id = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
         if profile_id in (None, 'null'):
             msg = "Profile name is mandatory."
@@ -261,8 +259,7 @@ class GwProfileButton(GwAction):
         tools_qgis.show_info(message)
 
     def _open_profile(self):
-        """ Open dialog profile_list.ui """
-
+        """Open dialog profile_list.ui"""
         self.dlg_load = GwProfilesListUi(self)
         tools_gw.load_settings(self.dlg_load)
 
@@ -285,8 +282,7 @@ class GwProfileButton(GwAction):
         tools_gw.open_dialog(self.dlg_load, dlg_name='profile_list')
 
     def _load_profile(self, parameters):
-        """ Open selected profile from dialog load_profiles.ui """
-
+        """Open selected profile from dialog load_profiles.ui"""
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -510,8 +506,7 @@ class GwProfileButton(GwAction):
             self.iface.actionPan().trigger()
 
     def _draw_profile(self, arcs, nodes, terrains):
-        """ Parent function - Draw profiles """
-
+        """Parent function - Draw profiles"""
         # Clear plot
         plt.gcf().clear()
 
@@ -575,8 +570,7 @@ class GwProfileButton(GwAction):
         plt.savefig(img_path, dpi=300)
 
     def _set_profile_layout(self):
-        """ Set properties of main window """
-
+        """Set properties of main window"""
         # Set window name
         self.win = plt.gcf()
         title = tools_qt.tr("Draw Profile")
@@ -594,8 +588,7 @@ class GwProfileButton(GwAction):
         self.rect.set_facecolor('white')
 
     def _set_profile_variables(self, arcs, nodes, terrains):
-        """ Get and calculate parameters and values for drawing """
-
+        """Get and calculate parameters and values for drawing"""
         # Declare list elements
         self.list_of_selected_arcs = arcs
         self.list_of_selected_nodes = []
@@ -631,8 +624,7 @@ class GwProfileButton(GwAction):
             i += 1
 
     def _fill_profile_variables(self, arcs, nodes, terrains):
-        """ Get parameters from database. Fill self.nodes with parameters postgres """
-
+        """Get parameters from database. Fill self.nodes with parameters postgres"""
         # Get parameters and fill the nodes
         n = 0
         for node in nodes:
@@ -680,8 +672,7 @@ class GwProfileButton(GwAction):
             n += 1
 
     def _draw_start_node(self, node):
-        """ Draw first node """
-
+        """Draw first node"""
         # Get superior points
         s1x = -node.geom / 2
         s1y = node.top_elev
@@ -744,8 +735,7 @@ class GwProfileButton(GwAction):
         self._draw_guitar_auxiliar_lines(0)
 
     def _draw_guitar_vertical_lines(self, start_point):
-        """ Draw fixed part of table """
-
+        """Draw fixed part of table"""
         # Get stylesheet
         line_color = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['color']
         line_style = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['style']
@@ -767,8 +757,7 @@ class GwProfileButton(GwAction):
         plt.plot(x, y, linestyle=line_style, color=line_color, linewidth=line_width, zorder=100)
 
     def _draw_guitar_auxiliar_lines(self, start_point, first_vl=True):
-        """ Draw marks for each node """
-
+        """Draw marks for each node"""
         # Get stylesheet
         auxline_color = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['color']
         auxline_style = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['style']
@@ -863,8 +852,7 @@ class GwProfileButton(GwAction):
                  date, fontsize=title_size * 0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
 
     def _draw_nodes(self, node, prev_node, index):
-        """ Draw nodes between first and last node """
-
+        """Draw nodes between first and last node"""
         z1 = prev_node.z2
         z2 = node.z1
 
@@ -1150,14 +1138,12 @@ class GwProfileButton(GwAction):
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
     def _draw_end_node(self, node, prev_node, index):
-        """
-        draws last arc and nodes of profile
+        """Draws last arc and nodes of profile
         :param node:
         :param prev_node:
         :param index:
         :return:
         """
-
         s1x = self.slast[0]
         s1y = self.slast[1]
 
@@ -1242,11 +1228,9 @@ class GwProfileButton(GwAction):
         self.lastnode_datatype = 'REAL'
 
     def _set_guitar_parameters(self):
-        """
-        Define parameters of table
+        """Define parameters of table
         :return:
         """
-
         # Search y coordinate min_top_elev ( top_elev- ymax)
         self.min_top_elev = Decimal(self.nodes[0].top_elev - self.nodes[0].ymax)
 
@@ -1274,8 +1258,7 @@ class GwProfileButton(GwAction):
         self.height_y = Decimal(self.z * 2)
 
     def _draw_guitar_horitzontal_lines(self):
-        """
-        Draw horitzontal lines of table
+        """Draw horitzontal lines of table
         :return:
         """
         line_color = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['color']
@@ -1415,8 +1398,7 @@ class GwProfileButton(GwAction):
         plt.plot(x, y, color=line_color, linewidth=line_width, linestyle=line_style)
 
     def _clear_profile(self):
-        """ Manage button clear profile and leave form empty """
-
+        """Manage button clear profile and leave form empty"""
         # Clear list of nodes and arcs
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
@@ -1436,8 +1418,7 @@ class GwProfileButton(GwAction):
         self._reset_profile_variables()
 
     def _delete_profile(self):
-        """ Delete profile """
-
+        """Delete profile"""
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1458,8 +1439,7 @@ class GwProfileButton(GwAction):
         self.dlg_load.tbl_profiles.takeItem(self.dlg_load.tbl_profiles.row(self.dlg_load.tbl_profiles.currentItem()))
 
     def _remove_selection(self, actionpan=False):
-        """ Remove selected features of all layers """
-
+        """Remove selected features of all layers"""
         for layer in self.canvas.layers():
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()

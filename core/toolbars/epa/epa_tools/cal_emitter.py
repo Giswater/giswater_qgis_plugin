@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -274,12 +273,10 @@ class EmitterCalibration:
 
     def _select_file_inp(self):
         """Select INP file"""
-
         tools_qt.get_open_file_path(self.dlg_vol_cal, "data_inp_input_file", "*.inp", "Select INP file")
 
     def _select_config_file(self):
         """Select config file"""
-
         tools_qt.get_open_file_path(self.dlg_vol_cal, "data_config_file", "*.in", "Select .in file")
 
     def _save_values(self):

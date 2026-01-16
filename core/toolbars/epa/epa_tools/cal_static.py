@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -165,7 +164,6 @@ class StaticCalibration:
 
     def _get_file_dialog(self, widget):
         """Get file dialog"""
-
         tools_qt.get_open_file_path(self.dlg_epa, widget, "", "Select file", str(os.path.expanduser("~")))
 
     def _load_user_values(self):

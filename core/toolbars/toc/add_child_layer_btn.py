@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -20,7 +19,7 @@ from ....libs import tools_qgis, tools_qt, lib_vars, tools_db
 
 
 class GwAddChildLayerButton(GwAction):
-    """ Button 71: Add child layer """
+    """Button 71: Add child layer"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -147,7 +146,7 @@ class GwAddChildLayerButton(GwAction):
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
                                 sub_group=None, sub_sub_group=None, alias=None, state=None):
-        """ Control if user check or uncheck action menu, then add or remove layer from toc
+        """Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
         :param field_id: Field id of the table (String)
@@ -155,7 +154,6 @@ class GwAddChildLayerButton(GwAction):
         :param group: Name of the group that will be created in the toc (String)
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
-
         style_id: str = "-1"
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)

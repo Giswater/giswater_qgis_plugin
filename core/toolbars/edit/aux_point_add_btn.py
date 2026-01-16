@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater 3
+"""This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -19,7 +18,7 @@ from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
 
 
 class GwAuxPointAddButton(GwMaptool):
-    """ Button 72: Add point aux """
+    """Button 72: Add point aux"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -166,8 +165,7 @@ class GwAuxPointAddButton(GwMaptool):
     # region private functions
 
     def _load_missing_layers(self):
-        """ Adds any missing Mincut layers to TOC """
-
+        """Adds any missing Mincut layers to TOC"""
         sql = "SELECT id, alias FROM sys_table WHERE id LIKE 've_cad_aux%' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:

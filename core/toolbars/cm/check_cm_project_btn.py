@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -17,7 +16,7 @@ from ...ui.ui_manager import CheckProjectCmUi
 
 
 class GwCheckCMProjectButton(GwAction):
-    """ Button 89: Check Project CM """
+    """Button 89: Check Project CM"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -29,7 +28,6 @@ class GwCheckCMProjectButton(GwAction):
 
     def _open_check_project(self):
         """Fetches form configuration, dynamically populates widgets, and opens the dialog."""
-
         # Define the form type and create the body
         form_type = "check_project_cm"
         body = tools_gw.create_body(form=f'"formName":"generic","formType":"{form_type}"')
@@ -121,7 +119,6 @@ class GwCheckCMProjectButton(GwAction):
 
     def _start_project_check(self):
         """Re-executes the project check process after Accept is pressed."""
-
         # Retrieve layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 
@@ -172,8 +169,7 @@ class GwCheckCMProjectButton(GwAction):
         self.dialog.lbl_time.setVisible(False)
 
     def _save_dlg_values(self):
-        """ Save dialog values """
-
+        """Save dialog values"""
         campaign_combo = tools_qt.get_combo_value(self.dialog, "tab_data_campaign", index=0)
         lot_combo = tools_qt.get_combo_value(self.dialog, "tab_data_lot", index=-1)
 

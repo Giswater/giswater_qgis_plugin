@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -20,7 +19,7 @@ from ...shared.psector import GwPsectorUi
 
 
 class GwFeatureDeleteButton(GwAction):
-    """ Button 29: Delete feature """
+    """Button 29: Delete feature"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_feature_type=None):
 
@@ -133,8 +132,7 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
     def connect_signal_selection_changed(self):
-        """ Connect signal selectionChanged """
-
+        """Connect signal selectionChanged"""
         tools_gw.connect_signal(self.canvas.selectionChanged, partial(self._manage_selection),
                                 'feature_delete', 'connect_signal_selection_changed_selectionChanged_manage_selection')
 
@@ -226,15 +224,13 @@ class GwFeatureDeleteButton(GwAction):
         tools_qgis.refresh_map_canvas()
 
     def _selection_init(self):
-        """ Set canvas map tool to an instance of class 'GwSelectManager' """
-
+        """Set canvas map tool to an instance of class 'GwSelectManager'"""
         tools_gw.disconnect_signal('feature_delete')
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 
     def _selection_end(self):
-        """ Set canvas map tool to an instance of class 'GwSelectManager' """
-
+        """Set canvas map tool to an instance of class 'GwSelectManager'"""
         tools_gw.disconnect_signal('feature_delete')
 
         for layer in global_vars.canvas.layers():
@@ -245,8 +241,7 @@ class GwFeatureDeleteButton(GwAction):
         global_vars.iface.actionPan().trigger()
 
     def _manage_selection(self):
-        """ Slot function for signal 'canvas.selectionChanged' """
-
+        """Slot function for signal 'canvas.selectionChanged'"""
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer_name = 've_' + feature_type

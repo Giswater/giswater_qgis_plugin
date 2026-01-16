@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -18,7 +17,7 @@ from ....libs import tools_os
 
 
 class GwPointAddButton(GwAction):
-    """ Button 21: Add point """
+    """Button 21: Add point"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -51,8 +50,7 @@ class GwPointAddButton(GwAction):
     # region private functions
 
     def _fill_point_menu(self):
-        """ Fill add point menu """
-
+        """Fill add point menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:

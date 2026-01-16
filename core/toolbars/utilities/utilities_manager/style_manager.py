@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -70,7 +69,7 @@ class GwStyleManager:
         tools_gw.open_dialog(self.style_mng_dlg, 'style_manager')
 
     def _show_context_menu(self, qtableview):
-        """ Show custom context menu """
+        """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_update = QAction("Update style", qtableview)
@@ -145,7 +144,6 @@ class GwStyleManager:
 
     def _handle_add_feature(self, dialog_create):
         """Handles the logic when the add button is clicked."""
-
         # Gather data from the dialog fields
         feature_id = dialog_create.feature_id.text()
         idval = dialog_create.idval.text()
@@ -311,7 +309,6 @@ class GwStyleManager:
 
     def _handle_update_feature(self, dialog_update, old_category_name):
         """Handles the logic when the add button is clicked."""
-
         # Gather data from the dialog fields
         new_category_name = dialog_update.category_rename_copy.text()
 
@@ -646,7 +643,7 @@ class GwStyleManager:
             tools_qgis.show_warning(msg, dialog=self.style_mng_dlg, parameter=param)
 
     def _refresh_all_styles_mng(self, dialog):
-        """ Refreshes all styles in the database and reloads the style table. """
+        """Refreshes all styles in the database and reloads the style table."""
         # Refresh all styles in the database
         tools_gw.refresh_all_styles(dialog)
 

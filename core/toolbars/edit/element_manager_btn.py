@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -18,15 +17,15 @@ from ..dialog import GwAction
 
 
 class GwElementManagerButton(GwAction):
-    """ Button 34: Element Manager """
+    """Button 34: Element Manager"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
     def clicked_event(self):
-        """ Button 34: Edit element   
-            Fetches form configuration, dynamically populates widgets, and opens the dialog."""
-
+        """Button 34: Edit element
+        Fetches form configuration, dynamically populates widgets, and opens the dialog.
+        """
         # Define the form type and create the body
         form_type = "form_element"
         body = tools_gw.create_body(form=f'"formName":"element_manager","formType":"{form_type}"')
@@ -54,7 +53,6 @@ class GwElementManagerButton(GwAction):
 
     def _populate_dynamic_widgets(self, dialog, complet_result):
         """Creates and populates all widgets dynamically into the dialog layout."""
-
         # Retrieve the tablename from the JSON response if available
         tablename = complet_result['body']['form'].get('tableName', 'default_table')
         old_widget_pos = 0

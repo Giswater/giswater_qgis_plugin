@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -26,6 +25,7 @@ from .selection_mode import GwSelectionMode
 
 class GwSelectionType(Enum):
     """Enum for different selection types"""
+
     RECTANGLE = "rectangle"
     POLYGON = "polygon"
     CIRCLE = "circle"
@@ -36,6 +36,7 @@ class GwSelectionType(Enum):
 
 class GwSelectionBehavior(Enum):
     """Enum for different selection behaviors"""
+
     REMOVE = "remove"  # Remove from current selection (Ctrl+Shift)
     ADD = "add"       # Add to current selection (Ctrl)
     REPLACE = "replace"  # Replace current selection (no modifiers)
@@ -47,8 +48,7 @@ class GwSelectManager(QgsMapTool):
     def __init__(self, class_object: object, table_object: Optional[str] = None, dialog: Optional['QDialog'] = None,
                  selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                  save_rectangle: bool = False, selection_type: GwSelectionType = GwSelectionType.DEFAULT) -> None:
-        """
-        Unified selection manager supporting multiple selection types
+        """Unified selection manager supporting multiple selection types
         Args:
             class_object: Class where we will look for @layers, @feature_type, @list_ids, etc
             table_object: Name of the table object
@@ -177,8 +177,7 @@ class GwSelectManager(QgsMapTool):
     # region private functions
 
     def _get_cached_feature(self, layer: QgsVectorLayer, feature_id: int) -> Optional['QgsFeature']:
-        """
-        Get a feature from the cache or fetch it from the layer
+        """Get a feature from the cache or fetch it from the layer
         Args:
             layer: The QgsVectorLayer containing the feature
             feature_id: The ID of the feature to retrieve
@@ -205,8 +204,7 @@ class GwSelectManager(QgsMapTool):
         return None
 
     def _cache_feature(self, layer: QgsVectorLayer, feature: 'QgsFeature') -> None:
-        """
-        Add a feature to the cache
+        """Add a feature to the cache
         Args:
             layer: The QgsVectorLayer containing the feature
             feature: The QgsFeature to cache
@@ -418,7 +416,7 @@ class GwSelectManager(QgsMapTool):
                 self._update_freehand_rubber_band()
     
     def _handle_point_move(self, event, point):
-        """ Mouse move event for point selection with snapping to valid layers """
+        """Mouse move event for point selection with snapping to valid layers"""
         if not self.snapper_manager:
             return
 
@@ -496,8 +494,7 @@ class GwSelectManager(QgsMapTool):
 
     # Common selection methods
     def _get_selection_behavior(self) -> GwSelectionBehavior:
-        """
-        Determine selection behavior based on keyboard modifiers
+        """Determine selection behavior based on keyboard modifiers
         Returns:
             GwSelectionBehavior: The selection behavior to use
         """
@@ -614,8 +611,7 @@ class GwSelectManager(QgsMapTool):
         self._check_keep_drawing()
 
     def _perform_point_selection(self, event: QEvent) -> bool:
-        """
-        Perform point-based selection on all relevant layers
+        """Perform point-based selection on all relevant layers
         Args:
             event: The mouse event containing position information
             selection_behavior: The type of selection behavior to use

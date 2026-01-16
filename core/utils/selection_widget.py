@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -22,8 +21,7 @@ from ... import global_vars
 
 
 class GwSelectionWidget(QWidget):
-    """
-    A widget that provides selection tools and functionality for GIS features.
+    """A widget that provides selection tools and functionality for GIS features.
     
     This widget creates a horizontal layout containing various selection-related buttons
     and handles different selection modes (rectangle, polygon, circle, freehand, point).
@@ -32,8 +30,7 @@ class GwSelectionWidget(QWidget):
 
     def __init__(self, self_varibles: dict, general_variables: dict, menu_variables: dict = None,
                  highlight_variables: dict = None, expression_selection: dict = None, selection_on_top_variables: dict = None):
-        """
-        Initialize the selection widget.
+        """Initialize the selection widget.
         
         Args:
             self_varibles: Dict of variables that are used in more than one button but separately
@@ -55,6 +52,7 @@ class GwSelectionWidget(QWidget):
                 "callback_later_values": The callback function to get the updated values for callback_later
             selection_on_top_variables: Dict for selection on top:
                 "callback_later": The callback function to execute after selection
+
         """
         super().__init__()
 
@@ -98,14 +96,14 @@ class GwSelectionWidget(QWidget):
     # region utility functions
 
     def find_parent_tab(self, widget: QWidget):
-        """
-        Find the parent QTabWidget of a given widget.
+        """Find the parent QTabWidget of a given widget.
         
         Args:
             widget: The widget to find the parent tab for
             
         Returns:
             The parent QTabWidget or None if not found
+
         """
         current = widget.parent()
         while current is not None:
@@ -115,8 +113,7 @@ class GwSelectionWidget(QWidget):
         return None
 
     def get_expected_table(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Get the expected table name based on selection mode.
+        """Get the expected table name based on selection mode.
         
         Args:
             class_object: The class object
@@ -125,6 +122,7 @@ class GwSelectionWidget(QWidget):
         Returns:
             The expected QTableView
             The feature type
+
         """
         if self.selection_mode in (GwSelectionMode.LOT, GwSelectionMode.EXPRESSION_LOT):
             expected_table_name = f"tbl_campaign_{table_object}_x_{class_object.rel_feature_type}"
@@ -142,23 +140,23 @@ class GwSelectionWidget(QWidget):
     # region menu btn_snapping
 
     def update_default_action(self, action: QAction):
-        """
-        Update the default action for the snapping button.
+        """Update the default action for the snapping button.
         
         Args:
             action: The action to set as default
+
         """
         self.btn_snapping.setDefaultAction(action)
 
     def activate_selection_mode(self, class_object: Any, dialog: QDialog, table_object: str, tool_type: str):
-        """
-        Activate selection snapping mode.
+        """Activate selection snapping mode.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table object name
             tool_type: The type of selection tool
+
         """
         # Disconnect any existing connections to avoid duplicates
         try:
@@ -171,8 +169,7 @@ class GwSelectionWidget(QWidget):
 
     def init_selection_btn(self, class_object: Any, dialog: QDialog, table_object: str, used_tools: list[str],
                         callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None):
-        """
-        Create snapping button with menu (split button behavior).
+        """Create snapping button with menu (split button behavior).
         
         Args:
             class_object: The class object
@@ -181,6 +178,7 @@ class GwSelectionWidget(QWidget):
             used_tools: List of tools to include
             callback: Optional callback function
             callback_later: Optional callback to execute after selection
+
         """
         def handle_action(tool_type):
             if callback and callback() is False:
@@ -234,13 +232,13 @@ class GwSelectionWidget(QWidget):
     # region activate highlight methods
 
     def highlight_features_method(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Route to appropriate highlight method based on method string.
+        """Route to appropriate highlight method based on method string.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+
         """
         if self.method == "all":
             self.highlight_features_in_table(class_object, dialog, table_object)
@@ -249,14 +247,14 @@ class GwSelectionWidget(QWidget):
 
     def highlight_in_tab_changed(self, class_object: Any, dialog: QDialog, table_object: str,
                                  parent_tab: QTabWidget):
-        """
-        Handle tab change events for highlighting features.
+        """Handle tab change events for highlighting features.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
             parent_tab: The parent tab widget
+
         """
         widget = parent_tab.widget(parent_tab.currentIndex())
         if widget.objectName() in ("tab_relations", "tab_features", "tab_rel", "RelationsTab"):
@@ -272,25 +270,25 @@ class GwSelectionWidget(QWidget):
                 tools_gw.reset_rubberband(class_object.rubber_band)
 
     def highlight_in_table_changed(self, callback_values: Callable[[], tuple]):
-        """
-        Handle table change events for highlighting features.
+        """Handle table change events for highlighting features.
         
         Args:
             callback_values: Callback function that returns (class_object, dialog, table_object)
+
         """
         class_object, dialog, table_object = callback_values()
         self.highlight_features_method(class_object, dialog, table_object)
 
     def init_highlight_features_methods(self, class_object: Any, dialog: QDialog, table_object: str,
                                             callback_values: Callable[[], tuple]):
-        """
-        Initialize highlight features methods with tab change event handlers.
+        """Initialize highlight features methods with tab change event handlers.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table object name
             callback_values: Optional callback function
+
         """
         # Setup tab change event handlers
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
@@ -309,14 +307,14 @@ class GwSelectionWidget(QWidget):
 
     def highlight_features_selected_in_table(self, class_object: Any, dialog: QDialog, table_object: str,
                                              connected_signal: bool = False):
-        """
-        Highlight features selected in table.
+        """Highlight features selected in table.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
             connected_signal: Whether this is called from a connected signal
+
         """
         # Refresh map canvas and reset rubberband
         self.highlight_method_active = True
@@ -363,13 +361,13 @@ class GwSelectionWidget(QWidget):
         tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
 
     def highlight_features_in_table(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Selects all features on the map that are currently listed in the given table widget.
+        """Selects all features on the map that are currently listed in the given table widget.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+
         """
         # Get main variables
         widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
@@ -412,13 +410,13 @@ class GwSelectionWidget(QWidget):
     # region invert selection
 
     def init_invert_selection(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Initialize invert selection functionality.
+        """Initialize invert selection functionality.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+
         """
         # Create invert selection button
         btn_invert = QPushButton(self)
@@ -429,13 +427,13 @@ class GwSelectionWidget(QWidget):
         self.number_buttons += 1
 
     def invert_table_selection(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Invert the current selection in the table using efficient QItemSelection.
+        """Invert the current selection in the table using efficient QItemSelection.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+
         """
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
         if not widget_table or not widget_table.model():
@@ -463,8 +461,7 @@ class GwSelectionWidget(QWidget):
     def init_expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
                                    callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None,
                                    callback_later_values: Callable = None):
-        """
-        Initialize expression selection functionality.
+        """Initialize expression selection functionality.
         
         Args:
             class_object: The class object
@@ -473,6 +470,7 @@ class GwSelectionWidget(QWidget):
             callback: Optional callback function
             callback_later: Optional callback to execute after selection
             callback_later_values: Optional callback to get the updated values for callback_later
+
         """
         # Create expression button
         self.btn_expression = QToolButton(self)
@@ -487,8 +485,7 @@ class GwSelectionWidget(QWidget):
     def expression_selection(self, class_object: Any, dialog: QDialog, table_object: str,
                              callback: Union[Callable[[], bool], None] = None, callback_later: Callable = None,
                              callback_later_values: Callable = None):
-        """
-        Select features by expression.
+        """Select features by expression.
         
         Args:
             class_object: The class object
@@ -497,6 +494,7 @@ class GwSelectionWidget(QWidget):
             callback: Optional callback function
             callback_later: Optional callback to execute after selection
             callback_later_values: Optional callback to get the updated values for callback_later
+
         """
         if callback and callback() is False:
             return
@@ -513,13 +511,13 @@ class GwSelectionWidget(QWidget):
     # region zoom to selection
 
     def init_zoom_to_selection(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Initialize zoom to selection functionality.
+        """Initialize zoom to selection functionality.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+
         """
         btn_zoom_to_selection = QPushButton(self)
         tools_gw.add_icon(btn_zoom_to_selection, "176")
@@ -529,13 +527,13 @@ class GwSelectionWidget(QWidget):
         self.number_buttons += 1
 
     def zoom_to_selection(self, class_object: Any, dialog: QDialog, table_object: str):
-        """
-        Zoom to selection.
+        """Zoom to selection.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
+
         """
         widget_table, feature_type = self.get_expected_table(class_object, dialog, table_object)
         if not widget_table or not feature_type:
@@ -573,14 +571,14 @@ class GwSelectionWidget(QWidget):
     # region selection on top
 
     def init_selection_on_top(self, class_object: Any, dialog: QDialog, table_object: str, callback_later: Callable = None):
-        """
-        Initialize selection on top functionality.
+        """Initialize selection on top functionality.
         
         Args:
             class_object: The class object
             dialog: The dialog
             table_object: The table name
             callback_later: Optional callback to execute after selection
+
         """
         # Create button
         btn_selection_on_top = QPushButton(self)
@@ -591,8 +589,7 @@ class GwSelectionWidget(QWidget):
         self.number_buttons += 1
 
     def show_selection_on_top_action(self, class_object: Any, dialog: QDialog, table_object: str, callback_later: Callable = None):
-        """
-        Move selected rows to top - simple action like other buttons
+        """Move selected rows to top - simple action like other buttons
         """
         widget_table, _ = self.get_expected_table(class_object, dialog, table_object)
         if not widget_table or not widget_table.model():
@@ -612,8 +609,7 @@ class GwSelectionWidget(QWidget):
             callback_later()
 
     def update_default_model(self, widget_table, class_object=None, dialog=None, table_object=None):
-        """
-        Update the default model with the current model data.
+        """Update the default model with the current model data.
         
         This function synchronizes the default model with any changes made to the current model,
         preserving the original row order while updating data for existing rows and adding new ones.
@@ -624,6 +620,7 @@ class GwSelectionWidget(QWidget):
             class_object: The class object (optional, used to determine feature type)
             dialog: The dialog (optional, used to determine feature type)
             table_object: The table object name (optional, used to determine feature type)
+
         """
         current_model = widget_table.model()
         if not current_model:
@@ -719,8 +716,7 @@ class GwSelectionWidget(QWidget):
         self.default_model = updated_model
 
     def get_selected_ids(self, widget_table, class_object=None, dialog=None, table_object=None):
-        """
-        Get IDs of selected rows using the correct {feature}_id column
+        """Get IDs of selected rows using the correct {feature}_id column
         
         Args:
             widget_table: The QTableView widget
@@ -730,6 +726,7 @@ class GwSelectionWidget(QWidget):
             
         Returns:
             List of selected row IDs
+
         """
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
@@ -758,8 +755,7 @@ class GwSelectionWidget(QWidget):
         return selected_ids
 
     def restore_selection(self, widget_table, selected_ids, class_object=None, dialog=None, table_object=None):
-        """
-        Restore selection based on IDs using the correct {feature}_id column
+        """Restore selection based on IDs using the correct {feature}_id column
         
         Args:
             widget_table: The QTableView widget
@@ -767,6 +763,7 @@ class GwSelectionWidget(QWidget):
             class_object: The class object (optional, used to determine feature type)
             dialog: The dialog (optional, used to determine feature type)
             table_object: The table object name (optional, used to determine feature type)
+
         """
         model = widget_table.model()
         selection_model = widget_table.selectionModel()
@@ -794,14 +791,14 @@ class GwSelectionWidget(QWidget):
                 selection_model.select(index, QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
 
     def show_selection_on_top(self, widget_table, class_object=None, dialog=None, table_object=None):
-        """
-        Moves the selected rows in a QTableView to the top while preserving all data roles and delegates
+        """Moves the selected rows in a QTableView to the top while preserving all data roles and delegates
         
         Args:
             widget_table: The QTableView widget
             class_object: The class object (optional, used to determine feature type)
             dialog: The dialog (optional, used to determine feature type)
             table_object: The table object name (optional, used to determine feature type)
+
         """
         if not widget_table or not widget_table.model() or not widget_table.selectionModel():
             return
@@ -881,8 +878,7 @@ class GwSelectionWidget(QWidget):
     # region reorder layout
 
     def reorder_lyt_selection(self) -> None:
-        """
-        Reorder the layout of the selection widget into a proper grid layout.
+        """Reorder the layout of the selection widget into a proper grid layout.
         
         Transforms the current horizontal layout into a grid layout with the specified
         number of rows, distributing widgets evenly across columns.

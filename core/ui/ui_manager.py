@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,8 +20,7 @@ from .main_window import GwMainWindow
 
 
 def _get_ui_class(ui_file_name, subfolder='shared'):
-    """ Get UI Python class from @ui_file_name """
-
+    """Get UI Python class from @ui_file_name"""
     # Folder that contains UI files
     if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'am', 'cm'):
         ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -22,7 +21,7 @@ from datetime import datetime
 
 
 class GwGo2IberTask(GwTask):
-    """ This shows how to subclass QgsTask """
+    """This shows how to subclass QgsTask"""
 
     fake_progress = pyqtSignal()
     step_completed = pyqtSignal(dict, str)
@@ -55,8 +54,7 @@ class GwGo2IberTask(GwTask):
         self.replaced_velocities = False
 
     def set_variables_from_go2iber(self):
-        """ Set variables from object Go2Iber """
-
+        """Set variables from object Go2Iber"""
         self.dlg_go2iber = self.go2iber.dlg_go2iber
         self.result_name = self.go2iber.result_name
         self.folder_path = self.go2iber.folder_path
@@ -204,8 +202,7 @@ class GwGo2IberTask(GwTask):
         super().cancel()
 
     def _get_tmax_from_options(self) -> int:
-        """ Update the tmax field based on SWMM options """
-
+        """Update the tmax field based on SWMM options"""
         # Get values
         sql = "SELECT value FROM config_param_user WHERE parameter in ('inp_options_start_time', 'inp_options_end_time', 'inp_options_start_date', 'inp_options_end_date') ORDER BY parameter"
         rows = tools_db.get_rows(sql)

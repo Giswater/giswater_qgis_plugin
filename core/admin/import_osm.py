@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -36,8 +35,7 @@ class GwImportOsm:
         self.projetc_type = None
 
     def init_dialog(self, schema_name):
-        """ Constructor """
-
+        """Constructor"""
         self.schema_name = schema_name
 
         # Check project type
@@ -71,7 +69,7 @@ class GwImportOsm:
         tools_gw.open_dialog(self.dlg_import_osm, dlg_name='admin_import_osm')
 
     def load_municipalities(self):
-        """ Get municipalities and add a checkbox widget for each of them """
+        """Get municipalities and add a checkbox widget for each of them"""
         sql = (f"""
             SELECT muni_id, name
             FROM {self.schema_name}.ext_municipality;
@@ -87,8 +85,7 @@ class GwImportOsm:
             layout.addWidget(widget)
 
     def run(self):
-        """ Start import process """
-
+        """Start import process"""
         # Enable the "Log" tab after pressing execute and disable execute button
         qtabwidget = self.dlg_import_osm.findChild(QTabWidget, 'mainTab')
         if qtabwidget:
@@ -275,8 +272,7 @@ class GwImportOsm:
         tools_gw.fill_tab_log(self.dlg_import_osm, json.loads(logs), reset_text=True)
 
     def get_checked_municipalities(self):
-        """ Get selected municipalities and checks if there are already imported """
-
+        """Get selected municipalities and checks if there are already imported"""
         all_munis = self.dlg_import_osm.mainTab.findChildren(QCheckBox)
         selected_munis = list()
 
@@ -332,6 +328,6 @@ class GwImportOsm:
         return checked_municipalities
 
     def close_dialog(self):
-        """ Close dialog """
+        """Close dialog"""
         tools_gw.close_dialog(self.dlg_import_osm, delete_dlg=True)
 

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -86,8 +85,7 @@ def _get_geom_type(geometry_type: QgsGeometryType = None):
 
 
 def normalize_label(label: str, add_colon: bool = False) -> str:
-    """
-    Normalize label: underscores to spaces, trim, capitalize first char, handle colon.
+    """Normalize label: underscores to spaces, trim, capitalize first char, handle colon.
     """
     if not isinstance(label, str):
         return ""
@@ -102,8 +100,7 @@ def normalize_label(label: str, add_colon: bool = False) -> str:
 
 
 def load_settings(dialog, plugin='core'):
-    """ Load user UI settings related with dialog position and size """
-
+    """Load user UI settings related with dialog position and size"""
     # Get user UI config file
     try:
         x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session", plugin=plugin)
@@ -129,8 +126,7 @@ def load_settings(dialog, plugin='core'):
 
 
 def save_settings(dialog, plugin='core'):
-    """ Save user UI related with dialog position and size """
-
+    """Save user UI related with dialog position and size"""
     # Ensure that 'plugin' parameter isn't being populated with int from signal
     try:
         plugin = int(plugin)
@@ -150,8 +146,7 @@ def save_settings(dialog, plugin='core'):
 
 
 def initialize_parsers():
-    """ Initialize parsers of configuration files: init, session, giswater, user_params """
-
+    """Initialize parsers of configuration files: init, session, giswater, user_params"""
     success = True
     for config in global_vars.list_configs:
         filepath, parser = _get_parser_from_filename(config)
@@ -164,8 +159,7 @@ def initialize_parsers():
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
                       chk_user_params=True, get_none=False, force_reload=False, plugin='core') -> str:
-    """ Load a simple parser value """
-
+    """Load a simple parser value"""
     if config_type not in ("user", "project"):
         msg = "{0}: Reference {1} = '{2}' it is not managed"
         msg_params = ("get_config_parser", "config_type", config_type)
@@ -234,8 +228,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
                       comment=None, prefix=True, chk_user_params=True, plugin='core'):
-    """ Save simple parser value """
-
+    """Save simple parser value"""
     if config_type not in ("user", "project"):
         msg = "{0}: Reference {1} = '{2}' it is not managed"
         msg_params = ("set_config_parser", "config_type", config_type)
@@ -292,13 +285,11 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
 
 
 def save_current_tab(dialog, tab_widget, selector_name):
+    """Save the name of current tab used by the user into QSettings()
+    :param dialog: QDialog
+    :param tab_widget: QTabWidget
+    :param selector_name: Name of the selector (String)
     """
-    Save the name of current tab used by the user into QSettings()
-        :param dialog: QDialog
-        :param tab_widget: QTabWidget
-        :param selector_name: Name of the selector (String)
-    """
-
     try:
         index = tab_widget.currentIndex()
         tab = tab_widget.widget(index)
@@ -311,7 +302,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
 
 
 def add_btn_help(dlg):
-    """ Create and add btn_help in all dialogs """
+    """Create and add btn_help in all dialogs"""
     if tools_qt.get_widget(dlg, 'btn_help') is not None:
         return
 
@@ -329,8 +320,7 @@ def add_btn_help(dlg):
 
 
 def open_help_link(context, uiname, dlg=None):
-    """ Opens the help link for the given dialog, or a default link if not found. """
-
+    """Opens the help link for the given dialog, or a default link if not found."""
     # Base URL for the documentation
     domain = get_config_value('help_domain', table='config_param_system')
     if domain is None:
@@ -378,7 +368,7 @@ def open_help_link(context, uiname, dlg=None):
 
 
 def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
-    """ Open dialog """
+    """Open dialog"""
     # Check database connection before opening dialog
     if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
         return
@@ -425,8 +415,7 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_w
 
 
 def close_dialog(dlg, delete_dlg=True, plugin='core'):
-    """ Close dialog """
-
+    """Close dialog"""
     if dlg is None or isdeleted(dlg):
         return
 
@@ -450,15 +439,13 @@ def close_dialog(dlg, delete_dlg=True, plugin='core'):
 
 
 def connect_signal(obj, pfunc, section, signal_name):
-    """
-    Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
+    """Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
     :param obj: the object to which the signal will be connected
     :param pfunc: the partial object containing the function to connect and the arguments if needed
     :param section: the name of the parent category
     :param signal_name: the name of the signal. Should be {functionname}_{obj}_{pfunc} like -> {replace_arc}_{xyCoordinates}_{mouse_move_arc}
     :return: the signal. If failed to connect it will return None
     """
-
     if section not in global_vars.active_signals:
         global_vars.active_signals[section] = {}
     # If the signal is already connected, don't reconnect it, just return it.
@@ -476,15 +463,13 @@ def connect_signal(obj, pfunc, section, signal_name):
 
 
 def disconnect_signal(section, signal_name=None, pop=True):
+    """Disconnects a signal
+    :param section: the name of the parent category
+    :param signal_name: the name of the signal
+    :param pop: should always be True, if False it won't remove the signal from the dict.
+    :return: 2 things -> (object which had the signal connected, partial function that was connected with the signal)
+             (None, None) if it couldn't find the signal
     """
-    Disconnects a signal
-        :param section: the name of the parent category
-        :param signal_name: the name of the signal
-        :param pop: should always be True, if False it won't remove the signal from the dict.
-        :return: 2 things -> (object which had the signal connected, partial function that was connected with the signal)
-                 (None, None) if it couldn't find the signal
-    """
-
     if section not in global_vars.active_signals:
         return None, None
 
@@ -510,13 +495,11 @@ def disconnect_signal(section, signal_name=None, pop=True):
 
 
 def reconnect_signal(section, signal_name):
+    """Disconnects and reconnects a signal
+    :param section: the name of the parent category
+    :param signal_name: the name of the signal
+    :return: True if successfully reconnected, False otherwise (bool)
     """
-    Disconnects and reconnects a signal
-        :param section: the name of the parent category
-        :param signal_name: the name of the signal
-        :return: True if successfully reconnected, False otherwise (bool)
-    """
-
     obj, pfunc = disconnect_signal(section, signal_name)  # Disconnect the signal
     if obj is not None and pfunc is not None:
         connect_signal(obj, pfunc, section, signal_name)  # Reconnect it
@@ -525,8 +508,7 @@ def reconnect_signal(section, signal_name):
 
 
 def create_body(form='', feature='', filter_fields='', extras=None, list_feature=None, body=None) -> str:
-    """ Create and return parameters as body to functions"""
-
+    """Create and return parameters as body to functions"""
     info_types = {'full': 1}
     plugin_version, message = tools_qgis.get_plugin_version()
     info_type = info_types.get(lib_vars.project_vars['info_type'])
@@ -571,10 +553,9 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
 
 
 def refresh_legend():
-    """ This function solves the bug generated by changing the type of feature.
+    """This function solves the bug generated by changing the type of feature.
     Mysteriously this bug is solved by checking and unchecking the categorization of the tables.
     """
-
     layers = [tools_qgis.get_layer_by_tablename('ve_node'),
               tools_qgis.get_layer_by_tablename('ve_connec'),
               tools_qgis.get_layer_by_tablename('ve_gully')]
@@ -592,8 +573,7 @@ def refresh_legend():
 
 
 def get_cursor_multiple_selection():
-    """ Set cursor for multiple selection """
-
+    """Set cursor for multiple selection"""
     path_cursor = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs", '153.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
@@ -604,8 +584,7 @@ def get_cursor_multiple_selection():
 
 
 def hide_parent_layers(excluded_layers=[]):
-    """ Hide generic layers """
-
+    """Hide generic layers"""
     layers_changed = {}
     list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link", "ve_element"]
     if global_vars.project_type == 'ud':
@@ -695,8 +674,7 @@ def enable_feature_type(dialog, widget_name='tbl_relation', ids=None, widget_tab
 
 
 def reset_feature_list():
-    """ Reset list of selected records """
-
+    """Reset list of selected records"""
     ids = []
     list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'link': []}
 
@@ -704,8 +682,7 @@ def reset_feature_list():
 
 
 def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Optional[str] = None):
-    """ Set feature_type and layer depending selected tab """
-
+    """Set feature_type and layer depending selected tab"""
     tab_idx = dialog.tab_feature.currentIndex()
     tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
                 'tab_elem': 'element', 'tab_link': 'link'}
@@ -732,10 +709,9 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
 
 
 def set_completer_feature_id(widget, feature_type, viewname):
-    """ Set autocomplete of widget 'feature_id'
-        getting id's from selected @viewname
+    """Set autocomplete of widget 'feature_id'
+    getting id's from selected @viewname
     """
-
     if feature_type == '':
         return
 
@@ -757,22 +733,20 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
 def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
                         visibility=None, auth_id=None, extent=None, passwd=None, create_project=True, force_create_group=False, properties=None):
+    """Put selected layer into TOC
+    :param tablename: Postgres table name (String)
+    :param the_geom: Geometry field of the table (String)
+    :param field_id: Field id of the table (String)
+    :param child_layers: List of layers (StringList)
+    :param group: Name of the group that will be created in the toc (String)
+    :param style_id: Id of the style we want to load (integer or String)
+    :param alias: Alias of the layer (String)
+    :param sub_sub_group: Sub-sub-group of the layer (String)
+    :param schema: Schema of the layer (String)
+    :param visibility: Visibility of the layer (Boolean)
+    :param auth_id: Auth ID of the layer (String)
+    :param extent: Extent of the layer (QgsRectangle)
     """
-    Put selected layer into TOC
-        :param tablename: Postgres table name (String)
-        :param the_geom: Geometry field of the table (String)
-        :param field_id: Field id of the table (String)
-        :param child_layers: List of layers (StringList)
-        :param group: Name of the group that will be created in the toc (String)
-        :param style_id: Id of the style we want to load (integer or String)
-        :param alias: Alias of the layer (String)
-        :param sub_sub_group: Sub-sub-group of the layer (String)
-        :param schema: Schema of the layer (String)
-        :param visibility: Visibility of the layer (Boolean)
-        :param auth_id: Auth ID of the layer (String)
-        :param extent: Extent of the layer (QgsRectangle)
-    """
-
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
 
@@ -866,12 +840,10 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
 
 def refresh_categorized_layer_symbology_classes(layer, addparam=None):
+    """Refresh categorized symbology classes of a layer
+    :param layer: Layer to refresh (QgsVectorLayer)
+    :param addparam: Addparams of the layer (dict)
     """
-    Refresh categorized symbology classes of a layer
-        :param layer: Layer to refresh (QgsVectorLayer)
-        :param addparam: Addparams of the layer (dict)
-    """
-
     field_name = addparam.get('symbolField')
 
     renderer = layer.renderer()
@@ -988,6 +960,7 @@ def hide_layer_from_toc(layer):
     
     Args:
         layer: Layer to hide
+
     """
     if layer is None:
         return
@@ -1005,8 +978,10 @@ def hide_layer_from_toc(layer):
 
 def hide_group_from_toc(group):
     """Hide group from the QGIS layer tree view.
+
     Args:
         group: Group to hide. Can be QgsMapLayer objects or .
+
     """
     if group is None:
         return
@@ -1060,21 +1035,19 @@ def set_layer_styles(tablename, layer, schema_name):
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
+    """Add QgsVectorLayer into TOC
+    :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
+    :param data: Json with information
+    :param layer_name: Name that will be given to the layer (String)
+    :param force_tab: Boolean that tells us if we want to show the tab or not (bool)
+    :param reset_text: It allows us to delete the text from the Qtexedit log, or add text below (bool)
+    :param tab_idx: Log tab index (int)
+    :param del_old_layers: Delete layers added in previous operations (bool)
+    :param group: Name of the group to which we want to add the layer (String)
+    :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (bool).
+    :param close: Manage buttons accept, cancel, close...  in function def fill_tab_log(...) (bool).
+    :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
-    Add QgsVectorLayer into TOC
-        :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
-        :param data: Json with information
-        :param layer_name: Name that will be given to the layer (String)
-        :param force_tab: Boolean that tells us if we want to show the tab or not (bool)
-        :param reset_text: It allows us to delete the text from the Qtexedit log, or add text below (bool)
-        :param tab_idx: Log tab index (int)
-        :param del_old_layers: Delete layers added in previous operations (bool)
-        :param group: Name of the group to which we want to add the layer (String)
-        :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (bool).
-        :param close: Manage buttons accept, cancel, close...  in function def fill_tab_log(...) (bool).
-        :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
-    """
-
     text_result = None
     temp_layers_added = []
     srid = lib_vars.data_epsg
@@ -1149,8 +1122,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
 
 
 def configure_layers_from_table_name(table_name):
-    """
-    Configure layers based on the provided table name, dynamically fetching the relevant tables
+    """Configure layers based on the provided table name, dynamically fetching the relevant tables
     and applying configurations.
 
     Args:
@@ -1158,6 +1130,7 @@ def configure_layers_from_table_name(table_name):
 
     Returns:
         bool: True if all layers configured successfully, False if any errors occurred.
+
     """
     # Define table groups dynamically
     table_groups = {
@@ -1435,8 +1408,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
 
 
 def load_missing_layers(filter, group="GW Layers", sub_group=None):
-    """ Adds any missing Mincut layers to TOC """
-
+    """Adds any missing Mincut layers to TOC"""
     sql = f"SELECT id, alias, addparam FROM sys_table " \
           f"WHERE id LIKE '{filter}' AND alias IS NOT NULL " \
           f"ORDER BY orderby DESC"
@@ -1452,7 +1424,7 @@ def load_missing_layers(filter, group="GW Layers", sub_group=None):
 
 
 def load_layer_in_hidden_group(layer_name):
-    """ Load a layer into the 'Hidden' group """
+    """Load a layer into the 'Hidden' group"""
     # Resolve schema and table name
     if '.' in layer_name:
         schema, table = layer_name.split('.', 1)
@@ -1477,18 +1449,16 @@ def load_layer_in_hidden_group(layer_name):
 
 
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True, end="\n"):
+    """Populate txt_infolog QTextEdit widget
+    :param dialog: QDialog
+    :param data: Json
+    :param force_tab: Force show tab (bool)
+    :param reset_text: Reset(or not) text for each iteration (bool)
+    :param tab_idx: index of tab to force (int)
+    :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (bool)
+    :param close: Manage buttons accept, cancel, close... (bool)
+    :return: Text received from data (String)
     """
-    Populate txt_infolog QTextEdit widget
-        :param dialog: QDialog
-        :param data: Json
-        :param force_tab: Force show tab (bool)
-        :param reset_text: Reset(or not) text for each iteration (bool)
-        :param tab_idx: index of tab to force (int)
-        :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (bool)
-        :param close: Manage buttons accept, cancel, close... (bool)
-        :return: Text received from data (String)
-    """
-
     change_tab = False
     text = tools_qt.get_text(dialog, 'tab_log_txt_infolog', return_string_null=False)
     if text is None:
@@ -1547,15 +1517,13 @@ def disable_tab_log(dialog):
 
 
 def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers', sort_val=None):
-    """
-    :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
+    """:param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
     :param data: Json
     :param layer_type: point, line, polygon...(String)
     :param counter: control if json have values (int)
     :param group: group to which we want to add the layer (string)
     :return:
     """
-
     attributes_map = {
         int: QVariant.Int,
         float: QVariant.Double,
@@ -1677,8 +1645,7 @@ def set_stylesheet(field, widget, wtype='label'):
 
 
 def delete_selected_rows(widget, table_object, field_object_id=None, col_idx=0):
-    """ Delete selected objects of the table (by object_id) """
-
+    """Delete selected objects of the table (by object_id)"""
     # Get selected rows
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
@@ -1713,11 +1680,10 @@ def delete_selected_rows(widget, table_object, field_object_id=None, col_idx=0):
 
 
 def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
-    """ Disable all tabs in the dialog except the log one and change the state of the buttons
+    """Disable all tabs in the dialog except the log one and change the state of the buttons
     :param dialog: Dialog where tabs are disabled (QDialog)
     :return:
     """
-
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     for x in range(0, qtabwidget.count() - 1):
         qtabwidget.widget(x).setEnabled(False)
@@ -1736,8 +1702,7 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
 
 
 def set_style_mapzones(schema_name: Union[str, None] = None) -> bool:
-    """ Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function """
-
+    """Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function"""
     extras = '"mapzones":""'
     body = create_body(extras=extras)
 
@@ -1820,8 +1785,7 @@ def set_style_mapzones(schema_name: Union[str, None] = None) -> bool:
 
 
 def manage_feature_cat():
-    """ Manage records from table 'cat_feature' """
-
+    """Manage records from table 'cat_feature'"""
     # Dictionary to keep every record of table 'cat_feature'
     # Key: field tablename
     # Value: Object of the class SysFeatureCat
@@ -1854,8 +1818,7 @@ def manage_feature_cat():
 
 
 def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_name=None, enable_actions=True, is_inserting=False):
-    """
-    Builds the dialog and configures fields and actions dynamically based on the provided result.
+    """Builds the dialog and configures fields and actions dynamically based on the provided result.
     Handles tab-specific action visibility and configurations.
     """
     fields = result['body']['data']
@@ -2131,8 +2094,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
 
 
 def check_parameters(field):
-    """ Check that all the parameters necessary to mount the form are correct """
-
+    """Check that all the parameters necessary to mount the form are correct"""
     msg = ""
     if 'widgettype' not in field:
         msg += tools_qt.tr("widgettype not found. ")
@@ -2152,7 +2114,7 @@ def check_parameters(field):
 
 
 def add_widget(dialog, field, lbl, widget):
-    """ Insert widget into layout """
+    """Insert widget into layout"""
     layout = dialog.findChild(QGridLayout, field['layoutname'])
     if layout in (None, 'null', 'NULL', 'Null'):
         return
@@ -2178,8 +2140,7 @@ def add_widget(dialog, field, lbl, widget):
 
 
 def add_widget_combined(dialog, field, label, widget, pos_offset):
-    """ Insert widget into layout based on orientation and label position """
-
+    """Insert widget into layout based on orientation and label position"""
     layout = dialog.findChild(QGridLayout, field['layoutname'])
     if layout in (None, 'null', 'NULL', 'Null'):
         return
@@ -2261,8 +2222,7 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
 
 def add_button(**kwargs):
-    """
-    :param dialog: (QDialog)
+    """:param dialog: (QDialog)
     :param field: Part of json where find info (Json)
     :param temp_layers_added: List of layers added to the toc
     :param module: Module where find 'function_name', if 'function_name' is not in this module
@@ -2275,7 +2235,6 @@ def add_button(**kwargs):
         module = tools_backend_calls -> def open_selected_element(**kwargs):
         module = featuretype_change_button -> def btn_accept_featuretype_change(**kwargs):
     """
-
     field = kwargs['field']
     module = tools_backend_calls
     widget = QPushButton()
@@ -2510,8 +2469,7 @@ def add_checkbox(**kwargs):
 
 
 def add_textarea(field):
-    """ Add widgets QTextEdit type """
-
+    """Add widgets QTextEdit type"""
     widget = QTextEdit()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -2531,12 +2489,10 @@ def add_textarea(field):
 
 
 def add_hyperlink(field):
-    """
-    functions called in -> widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
-        module = tools_backend_calls -> def open_url(self, widget)
+    """Functions called in -> widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
+    module = tools_backend_calls -> def open_url(self, widget)
 
     """
-
     is_editable = field.get('iseditable')
     if is_editable:
         widget = GwHyperLinkLineEdit()
@@ -2661,10 +2617,9 @@ def set_typeahead(field, dialog, widget, completer, feature_id=None):
 
 def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
     """ Set autocomplete of widget @table_object + "_id"
-        getting id's from selected @table_object.
-        WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
+    getting id's from selected @table_object.
+    WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
     """
-
     if not widget:
         return
 
@@ -2729,8 +2684,7 @@ def set_widget_size(widget, field):
 
 
 def add_lineedit(field):
-    """ Add widgets QLineEdit type """
-
+    """Add widgets QLineEdit type"""
     widget = QLineEdit()
     widget.setObjectName(field['widgetname'])
 
@@ -2775,11 +2729,10 @@ def toggle_visibility(widget, action, checked):
 
 
 def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], class_self=None):
-    """
-    Add widgets QTableView type.
-        Function called in -> widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-            module = tools_backend_calls open_selected_path(**kwargs):
-            module = tools_backend_calls open_selected_element(**kwargs):
+    """Add widgets QTableView type.
+    Function called in -> widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+        module = tools_backend_calls open_selected_path(**kwargs):
+        module = tools_backend_calls open_selected_element(**kwargs):
 
     """
     widget = QTableView()
@@ -2903,6 +2856,7 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
         
     Returns:
         QWidget: Container widget with search box and filtered list
+
     """
     # Create list widget to show selected values
     widget = QListWidget()
@@ -2960,11 +2914,9 @@ def add_multiple_option(field, dialog=None, complet_result=None, ignore_function
 
 
 def make_list_multiple_option(completer, model, widget, field, list_widget):
-    """
-    Populate completer suggestions for multiple_option fields.
+    """Populate completer suggestions for multiple_option fields.
     IMPORTANT: do not refresh model while the completer popup is visible, or the first click is eaten.
     """
-
     # If user is selecting from popup, do not rebuild suggestions
     if completer.popup().isVisible():
         return
@@ -3002,8 +2954,7 @@ def make_list_multiple_option(completer, model, widget, field, list_widget):
 
 
 def get_sequence_next_preview(seq_name: str, schema: str = None) -> int:
-    """
-    Returns a NON-reserving preview of the next sequence value.
+    """Returns a NON-reserving preview of the next sequence value.
     IMPORTANT: Not guaranteed under concurrency (other sessions may consume nextval()).
     """
     seq_ref = f'{schema}.{seq_name}' if schema else seq_name
@@ -3033,6 +2984,7 @@ def add_item_multiple_option(completer, widget, typeahead):
     Args:
         completer (QCompleter): The completer containing selected item
         widget (QListWidget): The list widget to add item to
+
     """
     # Get currently selected row in completer popup
     row = completer.popup().currentIndex().row()
@@ -3064,8 +3016,8 @@ def fill_multiple_option(widget, field, index_to_show=1, index_to_compare=0):
         
     Returns:
         QListWidget: The populated widget
-    """
 
+    """
     # Clear widget contents while blocking signals to prevent unwanted triggers
     widget.blockSignals(True)
     widget.clear()
@@ -3196,8 +3148,7 @@ def fill_multiple_checkbox(widget, field, index_to_show=1, index_to_compare=0):
 
 
 def set_multiple_option_value(listwidget, value):
-    """
-    Sets values in a filtered value relation list widget.
+    """Sets values in a filtered value relation list widget.
     
     Args:
         listwidget (QListWidget): The list widget to populate
@@ -3208,6 +3159,7 @@ def set_multiple_option_value(listwidget, value):
         
     The function takes a list widget and populates it with items from the value parameter.
     Each item shows the display value and stores the ID in the UserRole data.
+
     """
     # Return early if either widget or value is None
     if listwidget is None or value is None:
@@ -3224,8 +3176,7 @@ def set_multiple_option_value(listwidget, value):
 
 
 def delete_item_on_doubleclick(listwidget, item):
-    """
-    Deletes an item from a list widget when double-clicked.
+    """Deletes an item from a list widget when double-clicked.
     
     Args:
         listwidget (QListWidget): The list widget containing the item
@@ -3233,6 +3184,7 @@ def delete_item_on_doubleclick(listwidget, item):
         
     The function removes the specified item from the list widget if both parameters
     are valid and the item exists in the widget.
+
     """
     # Only proceed if we have valid widget and item
     if item is not None and listwidget is not None:
@@ -3244,14 +3196,12 @@ def delete_item_on_doubleclick(listwidget, item):
 
 
 def set_multiple_checkbox_value(listwidget, value, add_new=True):
+    """Set text to combobox populate with more than 1 item for row
+    :param combo: QComboBox widget to manage
+    :param value: element to show
+    :param index: index to compare
+    :param add_new: if True it will add the value even if it's not in the combo
     """
-    Set text to combobox populate with more than 1 item for row
-        :param combo: QComboBox widget to manage
-        :param value: element to show
-        :param index: index to compare
-        :param add_new: if True it will add the value even if it's not in the combo
-    """
-
     if listwidget is None:
         return False
     try:
@@ -3361,10 +3311,9 @@ def fill_child(dialog, widget, action, feature_type=''):
 
 
 def get_expression_filter(feature_type, list_ids=None, layers=None):
-    """ Set an expression filter with the contents of the list.
-        Set a model with selected filter. Attach that model to selected table
+    """Set an expression filter with the contents of the list.
+    Set a model with selected filter. Attach that model to selected table
     """
-
     list_ids = list_ids[feature_type]
     if len(list_ids) == 0:
         return None
@@ -3389,13 +3338,11 @@ def get_expression_filter(feature_type, list_ids=None, layers=None):
 
 
 def get_actions_from_json(json_result, sql):
-    """
-    Manage options for layers (active, visible, zoom and indexing)
+    """Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
     :param sql: query executed (String)
     :return: None
     """
-
     try:
         actions = json_result['body']['python_actions']
     except KeyError:
@@ -3424,10 +3371,9 @@ def get_actions_from_json(json_result, sql):
 
 def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None,
         aux_conn=None, is_thread=False, check_function=True):
-    """ Manage execution of database function @function_name
-        If execution failed, execute it again up to the value indicated in parameter 'exec_procedure_max_retries'
+    """Manage execution of database function @function_name
+    If execution failed, execute it again up to the value indicated in parameter 'exec_procedure_max_retries'
     """
-
     # Define dictionary with results
     dict_result = {}
     status = False
@@ -3468,7 +3414,7 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=True, rubber_band=None,
         aux_conn=None, is_thread=False, check_function=True):
-    """ Manage execution database function
+    """Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
     :param commit: Commit sql (bool)
@@ -3476,7 +3422,6 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     :param aux_conn: Auxiliar connection to database used by threads (psycopg2.connection)
     :return: Response of the function executed (json)
     """
-
     # Check if function exists
     if check_function:
         row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn, is_thread=is_thread)
@@ -3598,8 +3543,7 @@ def manage_json_response(complet_result, sql=None, rubber_band=None):
 
 
 def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_thread=False):
-    """ Manage exception in JSON database queries and show information to the user """
-
+    """Manage exception in JSON database queries and show information to the user"""
     try:
 
         if 'message' in json_result:
@@ -3664,13 +3608,11 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
 
 
 def manage_json_return(json_result, sql, rubber_band=None, i=None):
-    """
-    Manage options for layers (active, visible, zoom and indexing)
+    """Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
     :param sql: query executed (String)
     :return: None
     """
-
     try:
         return_manager = json_result['body']['returnManager']
     except KeyError:
@@ -3838,8 +3780,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None,
                              expr_filter=None, table_separator="_x_", columns_to_show=None):
-    """ Get records of @feature_type associated to selected @table_object """
-
+    """Get records of @feature_type associated to selected @table_object"""
     if feature_id is None:
         feature_id = tools_qt.get_text(dialog, table_object + "_id")
 
@@ -3874,8 +3815,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
 
 
 def load_tableview_feature_end(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None, expr_filter=None):
-    """ Reload QtableView """
-
+    """Reload QtableView"""
     if feature_id is None:
         feature_id = tools_qt.get_text(dialog, table_object + "_id")
 
@@ -3904,8 +3844,7 @@ def load_tableview_feature_end(class_object, dialog, table_object, feature_type,
 
 
 def get_project_type(schemaname=None):
-    """ Get project type from table 'sys_version' """
-
+    """Get project type from table 'sys_version'"""
     project_type = None
     if schemaname is None and lib_vars.schema_name is None:
         return None
@@ -3928,8 +3867,7 @@ def get_project_type(schemaname=None):
 
 
 def get_project_info(schemaname=None, order_direction="DESC"):
-    """ Get project information from table 'sys_version' """
-
+    """Get project information from table 'sys_version'"""
     project_info_dict = None
     if schemaname is None and lib_vars.schema_name is None:
         return None
@@ -3959,8 +3897,7 @@ def get_project_info(schemaname=None, order_direction="DESC"):
 
 
 def get_layers_from_feature_type(feature_type):
-    """ Get layers of the group @feature_type """
-
+    """Get layers of the group @feature_type"""
     list_items = []
     sql = (f"SELECT child_layer "
            f"FROM {lib_vars.schema_name}.cat_feature "
@@ -4043,8 +3980,7 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
 
 
 def parse_currency(value_str, currency_config=None):
-    """
-    Parse a formatted currency string back to a float.
+    """Parse a formatted currency string back to a float.
     
     Args:
         value_str: Formatted currency string like "€1.000.000,25" or "$1,000,000.25"
@@ -4052,8 +3988,8 @@ def parse_currency(value_str, currency_config=None):
     
     Returns:
         Float value
-    """
 
+    """
     if currency_config is None:
         try:
             row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -4082,8 +4018,7 @@ def parse_currency(value_str, currency_config=None):
 
 
 def format_currency(value, currency_config=None, with_symbol=True):
-    """
-    Format a number as currency using admin_currency configuration.
+    """Format a number as currency using admin_currency configuration.
     
     Args:
         value: The numeric value to format
@@ -4097,8 +4032,8 @@ def format_currency(value, currency_config=None, with_symbol=True):
         {"symbol":"$", "separator":",", "decimals":true} -> $1,000,000.25
         {"symbol":"€", "separator":".", "decimals":true} -> €1.000.000,25
         {"symbol":"₡", "separator":",", "decimals":false} -> ₡1,000,000
-    """
 
+    """
     if currency_config is None:
         try:
             row = get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -4147,13 +4082,11 @@ def format_currency(value, currency_config=None, with_symbol=True):
 
 
 def manage_layer_manager(json_result, sql=None):
-    """
-    Manage options for layers (active, visible, zoom and indexing)
+    """Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
     :param sql: query executed (String)
     :return: None
     """
-
     try:
         layermanager = json_result['body']['layerManager']
     except KeyError:
@@ -4210,8 +4143,7 @@ def manage_layer_manager(json_result, sql=None):
 
 
 def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
-    """ Zoom to feature by id or list of ids """
-
+    """Zoom to feature by id or list of ids"""
     layer = tools_qgis.get_layer_by_tablename(tablename)
     if not layer:
         return
@@ -4237,7 +4169,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
 
 def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                    tool_type="rectangle"):
-    """ Set canvas map tool to an instance of selection tool based on tool_type """
+    """Set canvas map tool to an instance of selection tool based on tool_type"""
     try:
         class_object.rel_feature_type = get_signal_change_tab(dialog, excluded_layers=class_object.excluded_layers)
     except AttributeError as e:
@@ -4290,7 +4222,6 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
 
 def select_with_expression_dialog(class_object, dialog, table_object, selection_mode=None):
     """Select features by expression"""
-
     if selection_mode is None:
         selection_mode = GwSelectionMode.EXPRESSION
 
@@ -4306,7 +4237,6 @@ def select_with_expression_dialog(class_object, dialog, table_object, selection_
 
 def select_with_expression_dialog_custom(class_object, dialog, table_object, layer_name, activation_function, deactivation_function):
     """Select features by expression with custom activation and deactivation functions"""
-
     # Execute activation function
     activation_function()
 
@@ -4408,7 +4338,6 @@ def _campaign_multi_tab_shortcut(class_object, dialog, table_object, selection_m
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
-
     if selection_mode != GwSelectionMode.EXPRESSION:
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -4938,8 +4867,7 @@ def set_model_signals(class_object):
 
 
 def show_expression_dialog(feature_type, dialog, table_object):
-    """ Show expression builder dialog """
-
+    """Show expression builder dialog"""
     # Open a dialog with a QgsExpressionBuilderWidget in it
     tablename = f"ve_{feature_type}"
     layer = tools_qgis.get_layer_by_tablename(tablename)
@@ -4950,10 +4878,9 @@ def show_expression_dialog(feature_type, dialog, table_object):
 
 def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                    remove_ids=True, lazy_widget=None, lazy_init_function=None, refresh_callback=None, target_widget=None):
-    """ Select feature with entered id. Set a model with selected filter.
-        Attach that model to selected table
+    """Select feature with entered id. Set a model with selected filter.
+    Attach that model to selected table
     """
-
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
 
@@ -5070,12 +4997,11 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
 
 
 def remove_selection(remove_groups=True, layers=None):
-    """ Removes selection from layers.
+    """Removes selection from layers.
     :param remove_groups: Remove groups of layers (bool)
     :param layers: Dictionary of layers to remove selection from (optional)
     :return: Dictionary of layers with removed selection
     """
-
     list_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("ve_gully")
@@ -5097,8 +5023,7 @@ def remove_selection(remove_groups=True, layers=None):
 
 
 def connect_signal_selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
-    """ Connect signal selectionChanged """
-
+    """Connect signal selectionChanged"""
     try:
         global_vars.canvas.selectionChanged.connect(
             partial(selection_changed, class_object, dialog, table_object, selection_mode))
@@ -5208,8 +5133,7 @@ def _check_mincut_state_4_replacement(docker):
 
 
 def init_docker(docker_param='qgis_info_docker'):
-    """ Get user config parameter @docker_param """
-
+    """Get user config parameter @docker_param"""
     lib_vars.session_vars['info_docker'] = True
     # Show info or form in docker?
     row = get_config_value(docker_param)
@@ -5250,10 +5174,9 @@ def init_docker(docker_param='qgis_info_docker'):
 
 
 def close_docker(option_name='position'):
-    """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
-        remove from iface and del class
+    """Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
+    remove from iface and del class
     """
-
     try:
         if lib_vars.session_vars['dialog_docker']:
             if not lib_vars.session_vars['dialog_docker'].isFloating():
@@ -5273,8 +5196,7 @@ def close_docker(option_name='position'):
 
 
 def manage_docker_options(option_name='position'):
-    """ Check if user want dock the dialog or not """
-
+    """Check if user want dock the dialog or not"""
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
@@ -5287,8 +5209,7 @@ def manage_docker_options(option_name='position'):
 
 
 def set_tablemodel_config(dialog, widget, table_name, sort_order=Qt.SortOrder.AscendingOrder, schema_name=None):
-    """ Configuration of tables. Set visibility and width of columns """
-
+    """Configuration of tables. Set visibility and width of columns"""
     widget = tools_qt.get_widget(dialog, widget)
     if not widget or isdeleted(widget):
         return widget
@@ -5361,8 +5282,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=Qt.SortOrder.As
 
 
 def add_icon(widget, icon, folder="dialogs"):
-    """ Set @icon to selected @widget """
-
+    """Set @icon to selected @widget"""
     # Get icons folder
     icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
@@ -5446,8 +5366,7 @@ def fill_tableview_rows(widget, field):
 
 
 def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
-    """ Executes query and set QDateEdit """
-
+    """Executes query and set QDateEdit"""
     sql = (f"SELECT {value} FROM {table_name}"
            f" WHERE parameter = '{parameter}' AND cur_user = current_user")
     row = tools_db.get_row(sql)
@@ -5459,8 +5378,7 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
 
 
 def load_tablename(dialog, table_object, feature_type, expr_filter):
-    """ Reload @widget with contents of @tablename applying selected @expr_filter """
-
+    """Reload @widget with contents of @tablename applying selected @expr_filter"""
     widget_name = None
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{feature_type}"
@@ -5488,8 +5406,7 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
 
 
 def load_tableview_psector(dialog, feature_type):
-    """ Reload QtableView """
-
+    """Reload QtableView"""
     value = tools_qt.get_text(dialog, "tab_general_psector_id")
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
@@ -5502,8 +5419,7 @@ def load_tableview_psector(dialog, feature_type):
 
 
 def load_tableview_element(dialog, feature_id, rel_feature_type):
-    """ Reload QtableView """
-
+    """Reload QtableView"""
     expr = f"element_id = '{feature_id}'"
     qtable = tools_qt.get_widget(dialog, f'tab_features_tbl_element_x_{rel_feature_type}')
     tablename = f'v_ui_element_x_{rel_feature_type}'
@@ -5516,8 +5432,7 @@ def load_tableview_element(dialog, feature_id, rel_feature_type):
 
 
 def load_tableview_visit(dialog, feature_id, rel_feature_type):
-    """ Reload QtableView """
-
+    """Reload QtableView"""
     expr = f"visit_id = '{feature_id}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_visit_x_{rel_feature_type}')
     tablename = f'om_visit_x_{rel_feature_type}'
@@ -5531,12 +5446,11 @@ def load_tableview_visit(dialog, feature_id, rel_feature_type):
 
 def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
-        getting id's from selected @table_object
+    getting id's from selected @table_object
 
-        TODO: Refactor. It should have this params: (dialog, widget, tablename, field_id="id")
-            The widget might not be called '@table_object + "_id"'
+    TODO: Refactor. It should have this params: (dialog, widget, tablename, field_id="id")
+        The widget might not be called '@table_object + "_id"'
     """
-
     widget_name = tablename + "_id"
     if tablename == "ve_element":  # TODO: remove this when refactored
         widget_name = "element_id"
@@ -5551,9 +5465,8 @@ def set_completer_object(dialog, tablename, field_id="id"):
 def set_completer_widget(tablename, widget, field_id, add_id=False,
                          filter_mode: tools_qt.QtMatchFlag = 'starts'):
     """ Set autocomplete of widget @table_object + "_id"
-        getting id's from selected @table_object
+    getting id's from selected @table_object
     """
-
     if not widget:
         return
     if type(tablename) is list and type(field_id) is list:
@@ -5570,9 +5483,8 @@ def set_completer_widget(tablename, widget, field_id, add_id=False,
 
 def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id=False):
     """ Set autocomplete of widget @table_object + "_id"
-        getting id's from selected @table_object
+    getting id's from selected @table_object
     """
-
     if not widget:
         return
 
@@ -5594,17 +5506,15 @@ def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id
 
 
 def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to, max_back_date=None, max_fwd_date=None):
+    """Builds query to populate @widget_from & @widget_to dates
+    :param widget_from:
+    :param widget_to:
+    :param table_name:
+    :param field_from:
+    :param field_to:
+    :param max_back_date: a PostgreSQL valid interval (eg. '1 year')
+    :param max_fwd_date: a PostgreSQL valid interval (eg. '1 year')
     """
-    Builds query to populate @widget_from & @widget_to dates
-        :param widget_from:
-        :param widget_to:
-        :param table_name:
-        :param field_from:
-        :param field_to:
-        :param max_back_date: a PostgreSQL valid interval (eg. '1 year')
-        :param max_fwd_date: a PostgreSQL valid interval (eg. '1 year')
-    """
-
     min_sql = f"MIN(LEAST({field_from}, {field_to}))"
     max_sql = f"MAX(GREATEST({field_from}, {field_to}))"
     if max_back_date:
@@ -5627,8 +5537,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to, 
 
 
 def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=None, layers=None):
-    """ Close dialog and disconnect snapping """
-
+    """Close dialog and disconnect snapping"""
     tools_qgis.disconnect_snapping()
     tools_qgis.disconnect_signal_selection_changed()
     if cur_active_layer:
@@ -5652,8 +5561,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
 
 def delete_records(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
                    lazy_widget=None, lazy_init_function=None, extra_field=None, refresh_callback=None):
-    """ Delete selected elements of the table """
-
+    """Delete selected elements of the table"""
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
     if type(table_object) is str:
@@ -5763,8 +5671,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
 
 
 def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
-    """
-    From a widget, get information about selected records.
+    """From a widget, get information about selected records.
     Returns a tuple of (list of ids to delete, display text of ids, string list of ids for query).
     """
     del_id = []
@@ -5890,11 +5797,10 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
 
 
 def get_parent_layers_visibility():
-    """ Get layer visibility to restore when dialog is closed
+    """Get layer visibility to restore when dialog is closed
     :return: example: {<QgsMapLayer: 'Arc' (postgres)>: True, <QgsMapLayer: 'Node' (postgres)>: False,
                        <QgsMapLayer: 'Connec' (postgres)>: True, <QgsMapLayer: 'Element' (postgres)>: False}
     """
-
     layers_visibility = {}
     for layer_name in ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully", "ve_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -5905,18 +5811,16 @@ def get_parent_layers_visibility():
 
 
 def restore_parent_layers_visibility(layers):
-    """ Receive a dictionary with the layer and if it has to be active or not
+    """Receive a dictionary with the layer and if it has to be active or not
     :param layers: example: {<QgsMapLayer: 'Arc' (postgres)>: True, <QgsMapLayer: 'Node' (postgres)>: False,
                              <QgsMapLayer: 'Connec' (postgres)>: True, <QgsMapLayer: 'Element' (postgres)>: False}
     """
-
     for layer, visibility in layers.items():
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
 def create_rubberband(canvas, geometry_type: QgsGeometryType = None):
-    """ Creates a rubberband and adds it to the global list """
-
+    """Creates a rubberband and adds it to the global list"""
     geom_type = _get_geom_type(geometry_type)
 
     rb = QgsRubberBand(canvas, geom_type)
@@ -5925,8 +5829,7 @@ def create_rubberband(canvas, geometry_type: QgsGeometryType = None):
 
 
 def reset_rubberband(rb, geometry_type=None):
-    """ Resets a rubberband and tries to remove it from the global list """
-
+    """Resets a rubberband and tries to remove it from the global list"""
     if geometry_type:
         geom_type = _get_geom_type(geometry_type)
         rb.reset(geom_type)
@@ -5950,7 +5853,6 @@ def refresh_selectors(is_cm: bool = False):
 
     If is_cm=True, refresh the specific selector of campaign manager.
     """
-
     # Get the selector UI if it's open
     windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
                and (issubclass(type(x), GwSelectorUi))]
@@ -5974,7 +5876,6 @@ def execute_class_function(dlg_class, func_name: str, kwargs: Optional[dict] = N
     If the argument is a string starting with '__self__', it will be replaced with the corresponding attribute of the class_obj.
     (e.g. '__self__.dlg_psector_mng' will be replaced with self.dlg_psector_mng (self is the class_obj))
     """
-
     # Get the dialog if it's open
     windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
                and (issubclass(type(x), dlg_class))]
@@ -5996,8 +5897,7 @@ def execute_class_function(dlg_class, func_name: str, kwargs: Optional[dict] = N
 
 
 def open_dlg_help():
-    """ Opens the help page for the last focused dialog """
-
+    """Opens the help page for the last focused dialog"""
     parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
     path = f"{lib_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
     if not os.path.exists(path):
@@ -6015,8 +5915,7 @@ def open_dlg_help():
 
 
 def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional[int] = None, do_call_fct: bool = True, force_change: bool = False):
-    """
-    Set psector mode enabled/disabled and update UI elements accordingly.
+    """Set psector mode enabled/disabled and update UI elements accordingly.
 
     Args:
         enable (Optional[bool]): If True, enables psector mode. If False, disables it.
@@ -6024,8 +5923,8 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
         psector_id (Optional[int]): ID of psector to set. If None, uses psector from cmb_psector_id.
         do_call_fct (bool): If True, calls gw_fct_set_toggle_current procedure. Should be False if it was already called.
         force_change (bool): If True, forces UI update. Useful when called from another function.
-    """
 
+    """
     # Check if psector widgets exist (plan toolbar must be loaded)
     psignals_widgets = global_vars.psignals['widgets']
     if not psignals_widgets or len(psignals_widgets) < 2:
@@ -6092,14 +5991,13 @@ def set_psector_mode_enabled(enable: Optional[bool] = None, psector_id: Optional
 
 
 def _manage_psector_layer_styles(enable: bool) -> None:
-    """
-    Manage layer styles when psector mode is toggled.
+    """Manage layer styles when psector mode is toggled.
     
     Args:
         enable (bool): If True, saves current styles and applies psector styles. 
             If False, restores previously saved styles.
-    """
 
+    """
     disable_forced_style = get_config_value('plan_psector_disable_forced_style')
     # Only do this if the config value is set and is not disabled
     if disable_forced_style is not None and not tools_os.set_boolean(disable_forced_style[0], False):
@@ -6128,8 +6026,7 @@ def _manage_psector_layer_styles(enable: bool) -> None:
 
 
 def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, cmb_changed=False):
-    """ Change plan mode buttons """
-
+    """Change plan mode buttons"""
     psignals_widgets = global_vars.psignals['widgets']
     btn_psector_playpause = psignals_widgets[0]
     cmb_psector_id = psignals_widgets[1]
@@ -6159,7 +6056,7 @@ def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, c
 
 
 def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
-    """ Fill cmb_psector_id """
+    """Fill cmb_psector_id"""
     sql = "SELECT psector_id as id, name as idval FROM v_ui_plan_psector WHERE archived = false ORDER BY id ASC"
     rows = tools_db.get_rows(sql)
     disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
@@ -6172,14 +6069,13 @@ def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
 
 
 def manage_psector_change(cmb_psector, index):
-    """ Manage psector change """
+    """Manage psector change"""
     psector_id = tools_qt.get_combo_value(None, cmb_psector)
     set_psector_mode_enabled(psector_id=psector_id)
 
 
 def create_sqlite_conn(file_name):
-    """ Creates an sqlite connection to a file """
-
+    """Creates an sqlite connection to a file"""
     status = False
     cursor = None
     try:
@@ -6199,8 +6095,7 @@ def create_sqlite_conn(file_name):
 
 
 def manage_user_config_folder(user_folder_dir):
-    """ Check if user config folder exists. If not create empty files init.config and session.config """
-
+    """Check if user config folder exists. If not create empty files init.config and session.config"""
     try:
         config_folder = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}"
         if not os.path.exists(config_folder):
@@ -6224,8 +6119,7 @@ def manage_user_config_folder(user_folder_dir):
 
 
 def check_old_userconfig(user_folder_dir):
-    """ Function to transfer user configuration from version 3.5.023 or older to new `.../core/` folder """
-
+    """Function to transfer user configuration from version 3.5.023 or older to new `.../core/` folder"""
     # Move all files in old config folder to new core config folder
     old_folder_path = f"{user_folder_dir}{os.sep}config"
     if os.path.exists(old_folder_path):
@@ -6247,8 +6141,7 @@ def check_old_userconfig(user_folder_dir):
 
 
 def user_params_to_userconfig():
-    """ Function to load all the variables from user_params.config to their respective user config files """
-
+    """Function to load all the variables from user_params.config to their respective user config files"""
     parser = global_vars.configs['user_params'][1]
     if parser is None:
         return
@@ -6326,8 +6219,7 @@ def recreate_config_files():
 
 
 def remove_deprecated_config_vars():
-    """ Removes all deprecated variables defined at giswater.config """
-
+    """Removes all deprecated variables defined at giswater.config"""
     if lib_vars.user_folder_dir is None:
         return
 
@@ -6457,8 +6349,7 @@ def hide_widgets_form(dialog, dlg_name):
 
 
 def get_project_version(schemaname=None):
-    """ Get project version from table 'sys_version' """
-
+    """Get project version from table 'sys_version'"""
     if schemaname in (None, 'null', ''):
         schemaname = lib_vars.schema_name
 
@@ -6479,8 +6370,7 @@ def get_project_version(schemaname=None):
 
 
 def export_layers_to_gpkg(layers, path):
-    """ This function is not used on Giswater Project at the moment. """
-
+    """This function is not used on Giswater Project at the moment."""
     uri = tools_db.get_uri()
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     is_first = True
@@ -6562,8 +6452,7 @@ def get_vertex_flag(default_value):
 
 
 def get_sysversion_addparam():
-    """ Gets addparam field from table sys_version """
-
+    """Gets addparam field from table sys_version"""
     if not tools_db.check_column('sys_version', 'addparam'):
         return None
 
@@ -6577,15 +6466,14 @@ def get_sysversion_addparam():
 
 
 def create_giswater_menu(project_loaded=False):
-    """ Create Giswater menu """
+    """Create Giswater menu"""
     if global_vars.load_project_menu is None:
         global_vars.load_project_menu = GwMenuLoad()
     global_vars.load_project_menu.read_menu(project_loaded)
 
 
 def unset_giswater_menu():
-    """ Unset Giswater menu (when plugin is disabled or reloaded) """
-
+    """Unset Giswater menu (when plugin is disabled or reloaded)"""
     menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
     if menu_giswater not in (None, "None"):
         menu_giswater.clear()  # I think it's good to clear the menu before deleting it, just in case
@@ -6594,8 +6482,7 @@ def unset_giswater_menu():
 
 
 def reset_position_dialog(show_message=False, plugin='core', file_name='session'):
-    """ Reset position dialog x/y """
-
+    """Reset position dialog x/y"""
     try:
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True, strict=False)
         config_folder = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config"
@@ -6626,7 +6513,7 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
 
 # region private functions
 def _insert_feature(dialog, relation_id, relation_type, feature_type, ids=None, extra_cols=None):
-    """ Universal function to insert features into any relation table using generalized function """
+    """Universal function to insert features into any relation table using generalized function"""
     if not ids:
         return
 
@@ -6695,8 +6582,7 @@ def _insert_feature(dialog, relation_id, relation_type, feature_type, ids=None, 
 
 
 def load_tableview_campaign(dialog, feature_type, campaign_id, layers):
-    """
-    Reload QTableView for campaign_x_<feature_type> safely, avoiding recursive selectionChanged loop.
+    """Reload QTableView for campaign_x_<feature_type> safely, avoiding recursive selectionChanged loop.
     """
     if not campaign_id:
         msg = "Campaign ID not found."
@@ -6739,7 +6625,6 @@ def get_cm_user_role():
     - Avoid UI error popups by using is_admin=True on low-level queries.
     - Prefer role-membership short-circuit to avoid touching CM tables when unnecessary.
     """
-
     # Check schema exists
     if not tools_db.check_schema('cm'):
         return None
@@ -6807,7 +6692,7 @@ def get_cm_user_role():
 
 
 def get_ids_from_qtable(qtable, id_column):
-    """ Get all IDs from a QTableView model for the given column """
+    """Get all IDs from a QTableView model for the given column"""
     ids = []
     model = qtable.model()
 
@@ -6824,7 +6709,7 @@ def get_ids_from_qtable(qtable, id_column):
 
 
 def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=None):
-    """ Delete features_id to table plan_@feature_type_x_psector"""
+    """Delete features_id to table plan_@feature_type_x_psector"""
     widget = tools_qt.get_widget(dialog, f"tbl_campaign_x_{feature_type}")
     tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
 
@@ -6838,7 +6723,6 @@ def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=N
 
 def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
     """Reload QTableView for campaign_lot_x_<feature_type> safely, avoiding recursive selectionChanged loop."""
-
     if not lot_id:
         tools_qgis.show_warning("Lot ID not found.")
         return
@@ -6875,7 +6759,7 @@ def load_tableview_lot(dialog, feature_type, lot_id, layers, ids=None):
 
 
 def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
-    """ Delete features_id to table plan_@feature_type_x_psector"""
+    """Delete features_id to table plan_@feature_type_x_psector"""
     widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
     tablename = widget.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
 
@@ -6888,7 +6772,7 @@ def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
 
 
 def delete_feature_visit(dialog, visit_id, rel_feature_type, list_id=None):
-    """ Delete features_id to table tbl_visit_x_@rel_feature_type """
+    """Delete features_id to table tbl_visit_x_@rel_feature_type"""
     sql = f"DELETE FROM om_visit_x_{rel_feature_type} WHERE visit_id = '{visit_id}'"
     if list_id is not None:
         sql += f" AND {rel_feature_type}_id in ({list_id})"
@@ -6896,8 +6780,7 @@ def delete_feature_visit(dialog, visit_id, rel_feature_type, list_id=None):
 
 
 def _delete_feature_psector(dialog, feature_type, list_id, state=None):
-    """ Delete features_id to table plan_@feature_type_x_psector"""
-
+    """Delete features_id to table plan_@feature_type_x_psector"""
     widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
     tablename = widget.property('tablename')
     value = tools_qt.get_text(dialog, "tab_general_psector_id")
@@ -6911,10 +6794,9 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
 
 
 def _check_user_params(section, parameter, file_name, prefix=False):
-    """ Check if a parameter exists in the config/user_params.config
-        If it doesn't exist, it creates it and assigns 'None' as a default value
+    """Check if a parameter exists in the config/user_params.config
+    If it doesn't exist, it creates it and assigns 'None' as a default value
     """
-
     if section == "i18n_generator" or parameter == "dev_commit":
         return
 
@@ -6945,8 +6827,7 @@ def _check_user_params(section, parameter, file_name, prefix=False):
 
 
 def _get_parser_from_filename(filename):
-    """ Get parser of file @filename.config """
-
+    """Get parser of file @filename.config"""
     if filename in ('init', 'session'):
         folder = f"{lib_vars.user_folder_dir}{os.sep}core"
     elif filename in ('dev', 'giswater'):
@@ -6976,8 +6857,7 @@ def _get_parser_from_filename(filename):
 
 
 def _get_extent_parameters(schema_name, table_name="node", geom_name="the_geom"):
-    """ Get extent parameters for a given schema """
-
+    """Get extent parameters for a given schema"""
     rectangle = None
     sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
             f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
@@ -6996,8 +6876,7 @@ def _get_extent_parameters(schema_name, table_name="node", geom_name="the_geom")
 
 
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
-    """ Put filter widgets into layout and set headers into QTableView """
-
+    """Put filter widgets into layout and set headers into QTableView"""
     complet_list = _get_list(complet_result, '', filter_fields, widgetname, 'form_feature', linkedobject)
     tab_name = 'tab_none'
     if complet_list is False:
@@ -7070,7 +6949,6 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
 
 def populate_dynamic_widgets(dialog, complet_result, class_info):
     """Creates and populates all widgets dynamically into the dialog layout."""
-
     # Retrieve the tablename from the JSON response if available
     tablename = complet_result['body']['form'].get('tableName', 'default_table')
     old_widget_pos = 0
@@ -7095,13 +6973,11 @@ def populate_dynamic_widgets(dialog, complet_result, class_info):
 
 # region Info buttons
 def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None):
+    """Functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                     -> widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+    module = tools_backend_calls -> def open_rpt_result(**kwargs)
+                                 -> def filter_table(self, **kwargs)
     """
-    functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-                        -> widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-       module = tools_backend_calls -> def open_rpt_result(**kwargs)
-                                    -> def filter_table(self, **kwargs)
-     """
-
     model = None
     for widget in widget_list:
         if type(widget) is QTableView:
@@ -7206,8 +7082,7 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
 
 
 def manage_dlg_widgets(class_object, dialog, complet_result):
-    """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
-
+    """Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment"""
     layout_orientations = {}
     pos_offset = 0
 
@@ -7251,22 +7126,21 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
 
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
+    """Functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+    def _manage_text(**kwargs)
+    def manage_typeahead(self, **kwargs)
+    def manage_combo(self, **kwargs)
+    def manage_check(self, **kwargs)
+    def manage_datetime(self, **kwargs)
+    def manage_button(self, **kwargs)
+    def manage_hyperlink(self, **kwargs)
+    def manage_hspacer(self, **kwargs)
+    def manage_vspacer(self, **kwargs)
+    def manage_textarea(self, **kwargs)
+    def manage_spinbox(self, **kwargs)
+    def manage_doubleSpinbox(self, **kwargs)
+    def manage_tableview(self, **kwargs)
     """
-    functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
-        def _manage_text(**kwargs)
-        def manage_typeahead(self, **kwargs)
-        def manage_combo(self, **kwargs)
-        def manage_check(self, **kwargs)
-        def manage_datetime(self, **kwargs)
-        def manage_button(self, **kwargs)
-        def manage_hyperlink(self, **kwargs)
-        def manage_hspacer(self, **kwargs)
-        def manage_vspacer(self, **kwargs)
-        def manage_textarea(self, **kwargs)
-        def manage_spinbox(self, **kwargs)
-        def manage_doubleSpinbox(self, **kwargs)
-        def manage_tableview(self, **kwargs)
-     """
     widget = None
     label = None
 
@@ -7331,10 +7205,9 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
 
 
 def _manage_text(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
     """
-
     field = kwargs['field']
 
     widget = add_lineedit(field)
@@ -7348,8 +7221,7 @@ def _manage_text(**kwargs):
 
 
 def _set_min_max_values(widget, field):
-    """ Set max and min values allowed """
-
+    """Set max and min values allowed"""
     if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
         if 'min' in field['widgetcontrols']['maxMinValues']:
             widget.setProperty('minValue', field['widgetcontrols']['maxMinValues']['min'])
@@ -7362,8 +7234,7 @@ def _set_min_max_values(widget, field):
 
 
 def _set_max_length(widget, field):
-    """ Set max and min values allowed """
-
+    """Set max and min values allowed"""
     if field['widgetcontrols'] and 'maxLength' in field['widgetcontrols']:
         if field['widgetcontrols']['maxLength'] is not None:
             widget.setProperty('maxLength', field['widgetcontrols']['maxLength'])
@@ -7372,8 +7243,7 @@ def _set_max_length(widget, field):
 
 
 def _set_reg_exp(widget, field):
-    """ Set regular expression """
-
+    """Set regular expression"""
     if 'widgetcontrols' in field and field['widgetcontrols']:
         if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
             if field['widgetcontrols']['regexpControl'] is not None:
@@ -7384,9 +7254,9 @@ def _set_reg_exp(widget, field):
 
 
 def _manage_typeahead(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
@@ -7401,9 +7271,9 @@ def _manage_typeahead(**kwargs):
 
 
 def _manage_combo(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
@@ -7415,8 +7285,8 @@ def _manage_combo(**kwargs):
 
 
 def _manage_multiple_checkbox(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
     dialog = kwargs['dialog']
     complet_result = kwargs['complet_result']
@@ -7427,8 +7297,8 @@ def _manage_multiple_checkbox(**kwargs):
 
 
 def _manage_multiple_option(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
     dialog = kwargs['dialog']
     complet_result = kwargs['complet_result']
@@ -7439,19 +7309,17 @@ def _manage_multiple_option(**kwargs):
 
 
 def _manage_check(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     widget = add_checkbox(**kwargs)
     return widget
 
 
 def _manage_datetime(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     dialog = kwargs['dialog']
     field = kwargs['field']
     widget = add_calendar(dialog, field, **kwargs)
@@ -7459,10 +7327,9 @@ def _manage_datetime(**kwargs):
 
 
 def _manage_button(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     field = kwargs['field']
     stylesheet = field.get('stylesheet') or {}
     info_class = kwargs['class']
@@ -7478,10 +7345,9 @@ def _manage_button(**kwargs):
 
 
 def _manage_hyperlink(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
     field = kwargs['field']
     widget = add_hyperlink(field)
     widget = set_widget_size(widget, field)
@@ -7489,47 +7355,42 @@ def _manage_hyperlink(**kwargs):
 
 
 def _manage_hspacer(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     widget = tools_qt.add_horizontal_spacer()
     return widget
 
 
 def _manage_vspacer(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     widget = tools_qt.add_verticalspacer()
     return widget
 
 
 def _manage_textarea(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
     field = kwargs['field']
     widget = add_textarea(field)
     return widget
 
 
 def _manage_spinbox(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
     widget = add_spinbox(**kwargs)
     return widget
 
 
 def _manage_doubleSpinbox(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     widget = add_spinbox(**kwargs)
     return widget
 
@@ -7539,8 +7400,8 @@ def _manage_list(self, **kwargs):
 
 
 def _manage_tableview(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
     complet_result = kwargs['complet_result']
     field = kwargs['field']
@@ -7555,16 +7416,14 @@ def _manage_tableview(**kwargs):
 
 
 def _manage_tablewidget(**kwargs):
-    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+    widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
-
     return _manage_tableview(**kwargs)
 
 
 def _update_toolbar_button_icon(button_id, toolbar_id, file_name):
-    """
-    Update the icon for a specific toolbar button
+    """Update the icon for a specific toolbar button
     """
     try:
 
@@ -7610,7 +7469,6 @@ def _force_button_click(dlg, obj, name, pos):
 
 def _show_context_menu(self, qtableview):
         """Show custom context menu"""
-
         menu = QMenu(qtableview)
 
         buttons = qtableview.window().findChildren(QPushButton)

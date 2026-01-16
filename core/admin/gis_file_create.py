@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -147,8 +146,7 @@ class GwGisFileCreate:
     # region private functions 
 
     def _get_database_parameters(self, schema):
-        """ Get database parameters from layer source """
-
+        """Get database parameters from layer source"""
         layer_source, not_version = tools_db.get_layer_source_from_credentials('prefer')
         if layer_source is None:
             msg = "Error getting database parameters"

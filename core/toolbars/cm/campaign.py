@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -50,13 +49,11 @@ class Campaign:
         self.is_new_campaign = True
 
     def create_campaign(self, campaign_id: Optional[int] = None, is_new: bool = True, dialog_type: str = "review"):
-        """ Entry point for campaign creation or editing """
-
+        """Entry point for campaign creation or editing"""
         self.load_campaign_dialog(campaign_id=campaign_id, mode=dialog_type)
 
     def campaign_manager(self):
-        """ Opens the campaign management interface """
-
+        """Opens the campaign management interface"""
         self.manager_dialog = CampaignManagementUi(self)
         tools_gw.load_settings(self.manager_dialog)
 
@@ -113,7 +110,7 @@ class Campaign:
         tools_gw.open_dialog(self.manager_dialog, dlg_name="campaign_management")
 
     def open_campaign_selector(self):
-        """ Open the campaign-specific selector when the button is clicked """
+        """Open the campaign-specific selector when the button is clicked"""
         selector_type = "selector_campaign"
 
         # Check user role
@@ -126,8 +123,7 @@ class Campaign:
         selector.open_selector(selector_type, show_lot_tab=show_lot)
 
     def load_campaign_dialog(self, campaign_id: Optional[int] = None, mode: str = "review", parent: Optional[QWidget] = None):
-        """
-        Load and initialize the campaign dialog.
+        """Load and initialize the campaign dialog.
 
         - Creates and sets up the form dynamically based on response from `gw_fct_cm_getcampaign`.
         - Initializes rubberbands and layer lists.
@@ -346,8 +342,7 @@ class Campaign:
         self._cleanup_map_selection()
 
     def _load_campaign_relations(self, campaign_id: int):
-        """
-        Load related elements into campaign relation tabs for the given ID.
+        """Load related elements into campaign relation tabs for the given ID.
         Uses the generic loader to bind a QSqlTableModel per feature table,
         so table selections map directly to DB field names for actions like delete.
         """
@@ -477,7 +472,6 @@ class Campaign:
 
     def save_campaign(self, from_tab_change: bool = False) -> Optional[bool]:
         """Save campaign data to the database. Updates ID and resets map on success."""
-
         fields_dict = self.extract_campaign_fields(self.dialog, as_dict=True)
 
         # For inventory campaigns, inventoryclass_id is special.
@@ -901,8 +895,7 @@ class Campaign:
         self._manage_tabs_enabled(feature_types)
 
     def get_allowed_feature_subtypes_visit(self, visitclass_id: int) -> List[str]:
-        """
-        Returns a list of feature_type strings from cm.om_visitclass
+        """Returns a list of feature_type strings from cm.om_visitclass
         for the given visitclass_id.
         """
         # guard: ensure we have a valid integer
@@ -923,8 +916,7 @@ class Campaign:
         return []
 
     def get_allowed_feature_subtypes(self, feature: str, reviewclass_id: int) -> List[str]:
-        """
-        Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id.
+        """Get allowed subtypes (e.g., TANK, PR_BREAK_VALVE) based on reviewclass_id.
         If the class is linked to 'ALL', it returns an empty list to enable all selections.
         """
         # First, check if this review class is linked to an 'ALL' object.
@@ -944,8 +936,7 @@ class Campaign:
         return result
 
     def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int) -> List[str]:
-        """
-        Query om_reviewclass_x_object to get allowed feature types.
+        """Query om_reviewclass_x_object to get allowed feature types.
         Has special handling for a class linked to an 'ALL' object_id.
         """
         # First, check if the linked object is 'ALL'.
@@ -990,8 +981,7 @@ class Campaign:
         return tools_db.get_row(sql) is not None
 
     def _manage_tabs_enabled(self, feature_types: List[str]):
-        """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
-
+        """Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc'])."""
         tab_widget = self.dialog.tab_feature
 
         # For inventory campaigns (type 3), enable all tabs
@@ -1016,7 +1006,6 @@ class Campaign:
 
     def populate_tableview(self, qtable: QTableView, query: str, columns: Optional[List[str]] = None):
         """Populate a QTableView with the results of a SQL query."""
-
         data = tools_db.get_rows(query)
         if not data:
             qtable.setModel(QStandardItemModel())  # Clear view
@@ -1057,7 +1046,6 @@ class Campaign:
 
     def manage_date_filter(self):
         """Update date filters based on selected field (e.g., real_startdate)"""
-
         field = tools_qt.get_combo_value(self.manager_dialog, self.manager_dialog.campaign_cmb_date_filter_type, 0)
 
         if not field:
@@ -1084,7 +1072,6 @@ class Campaign:
 
     def filter_campaigns(self):
         """Filter om_campaign based on status and date"""
-
         filters = []
 
         # Directly query the cm schema to get user's role and organization
@@ -1188,7 +1175,6 @@ class Campaign:
 
     def open_campaign(self, index: Optional[QModelIndex] = None):
         """Open campaign from the clicked index safely (double click handler or button handler)."""
-
         # If called by double click, index is passed
         if index and hasattr(index, "isValid") and index.isValid():
             model = index.model()
@@ -1218,8 +1204,7 @@ class Campaign:
 
 
 def update_expl_sector_combos(**kwargs: Any):
-    """
-    Update exploitation and sector combos based on organization.
+    """Update exploitation and sector combos based on organization.
     This function is designed to be called from a widgetfunction.
     """
     dialog = kwargs.get('dialog')
@@ -1283,8 +1268,7 @@ def update_expl_sector_combos(**kwargs: Any):
 
 
 def update_sector_combo(dialog: QDialog, saved_values: Optional[Dict] = None):
-    """
-    Update sector combo based on selected exploitation and organization.
+    """Update sector combo based on selected exploitation and organization.
     """
     if saved_values is None:
         saved_values = {}

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -76,8 +75,7 @@ class GwProjectCheckTask(GwTask):
         self.setProgress(100)
 
     def fill_check_project_table(self, layers, init_project):
-        """ Fill table 'audit_check_project' table with layers data """
-
+        """Fill table 'audit_check_project' table with layers data"""
         fields = '"fields":[  '
         for layer in layers:
             if layer is None:
@@ -116,7 +114,7 @@ class GwProjectCheckTask(GwTask):
     # region private functions
 
     def _execute_check_project_function(self, init_project, fields_to_insert):
-        """ Execute function 'gw_fct_setcheckproject' with checkbox selections passed from project_check_btn.py """
+        """Execute function 'gw_fct_setcheckproject' with checkbox selections passed from project_check_btn.py"""
         # Retrieve checkbox values from params
         show_versions = self.params.get("show_versions", False)
         show_qgis_project = self.params.get("show_qgis_project", False)
@@ -170,8 +168,7 @@ class GwProjectCheckTask(GwTask):
         return result
 
     def _show_check_project_result(self, result):
-        """ Show dialog with audit check project results """
-
+        """Show dialog with audit check project results"""
         # Handle failed results
         if result.get('status') == 'Failed':
             tools_gw.manage_json_exception(result)
@@ -181,13 +178,12 @@ class GwProjectCheckTask(GwTask):
         tools_gw.fill_tab_log(self.dlg_audit_project, result['body']['data'], reset_text=False)
 
     def _add_selected_layers(self, dialog, m_layers):
-        """ Receive a list of layers, look for the checks associated with each layer and if they are checked,
+        """Receive a list of layers, look for the checks associated with each layer and if they are checked,
             load the corresponding layer and put styles
         :param dialog: Dialog where to look for QCheckBox (QDialog)
         :param m_layers: List with the information of the missing layers (list)[{...}, {...}, {...}, ...]
         :return:
         """
-
         for layer_info in m_layers:
             if layer_info == {}:
                 continue

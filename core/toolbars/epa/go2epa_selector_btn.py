@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -13,7 +12,7 @@ from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwGo2EpaSelectorButton(GwAction):
-    """ Button 44: Go2epa selector """
+    """Button 44: Go2epa selector"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -21,13 +20,11 @@ class GwGo2EpaSelectorButton(GwAction):
         self.project_type = global_vars.project_type
 
     def clicked_event(self):
-        """ Button 44: Epa result selector """
-
+        """Button 44: Epa result selector"""
         self._open_dialog()
 
     def _open_dialog(self):
-        """ Open Epa Selector Dialog dynamic """
-
+        """Open Epa Selector Dialog dynamic"""
         user = tools_db.current_user
         form = {"formName": "generic", "formType": "epa_selector"}
         body = {"client": {"cur_user": user}, "form": form}
@@ -41,8 +38,7 @@ class GwGo2EpaSelectorButton(GwAction):
 
 
 def set_combo_values(**kwargs):
-    """ Update values of combo childs """
-
+    """Update values of combo childs"""
     dialog = kwargs["dialog"]
     combo_childs = kwargs["func_params"]["cmbListToChange"]
 
@@ -63,8 +59,7 @@ def set_combo_values(**kwargs):
 
 
 def accept(**kwargs):
-    """ Update current values to the table """
-
+    """Update current values to the table"""
     dialog = kwargs["dialog"]
 
     # Get form
@@ -95,8 +90,7 @@ def accept(**kwargs):
 
 
 def close_dlg(**kwargs):
-    """ Close form """
-
+    """Close form"""
     dialog = kwargs["dialog"]
     tools_gw.close_dialog(dialog)
 
@@ -104,8 +98,7 @@ def close_dlg(**kwargs):
 # region private functions
 
 def _get_form_with_combos(dialog):
-    """ Get combo values of tab result """
-
+    """Get combo values of tab result"""
     form = {}
     form["tab_result_result_name_show"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_show", 1)
     form["tab_result_result_name_compare"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_compare", 1)
@@ -125,8 +118,7 @@ def _get_form_with_combos(dialog):
 
 
 def _load_result_layers():
-    """ Adds any missing Compare layers to TOC """
-
+    """Adds any missing Compare layers to TOC"""
     # Manage user variable
     if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init"), default=False):
         return
@@ -151,7 +143,7 @@ def _load_result_layers():
 
 
 def _load_compare_layers():
-    """ Adds any missing Compare layers to TOC """
+    """Adds any missing Compare layers to TOC"""
     """ This function is no longer used after reversing the change to load compare layers. """
 
     # Manage user variable

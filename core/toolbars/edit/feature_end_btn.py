@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,7 +20,7 @@ from ....libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db
 
 
 class GwFeatureEndButton(GwAction):
-    """ Button 28: End feature """
+    """Button 28: End feature"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
 
@@ -177,8 +176,7 @@ class GwFeatureEndButton(GwAction):
             tools_db.execute_sql(sql)
 
     def _fill_fields(self):
-        """ Fill dates and combos cat_work/state type end """
-
+        """Fill dates and combos cat_work/state type end"""
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows)
@@ -203,8 +201,7 @@ class GwFeatureEndButton(GwAction):
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
     def _manage_dates(self, date_value):
-        """ Manage dates """
-
+        """Manage dates"""
         date_result = None
         try:
             date_result = str(date_value)
@@ -216,8 +213,7 @@ class GwFeatureEndButton(GwAction):
             return date_result
 
     def _fill_workids(self):
-        """ Auto fill workid """
-
+        """Auto fill workid"""
         workcat_id = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         if not workcat_id:
             return
@@ -244,8 +240,7 @@ class GwFeatureEndButton(GwAction):
             self.selected_list.append(id_)
 
     def _end_feature(self, force_downgrade=False):
-        """ Get elements from all the tables and update his data """
-
+        """Get elements from all the tables and update his data"""
         # Setting values
         self.workcat_id_end = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         self.statetype_id_end = tools_qt.get_combo_value(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
@@ -361,8 +356,7 @@ class GwFeatureEndButton(GwAction):
         return feature_body
 
     def _update_feature_type(self, feature, list_feature=True):
-        """ Get elements from @feature_type and update his corresponding table """
-
+        """Get elements from @feature_type and update his corresponding table"""
         extras = f'"state_type":"{self.statetype_id_end}", '
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}"'
         if self.workcat_id_end not in (None, 'null', ''):
@@ -374,8 +368,7 @@ class GwFeatureEndButton(GwAction):
             tools_gw.fill_tab_log(self.dlg_work_end, result['body']['data'], tab_idx=2)
 
     def _open_selected_object(self, widget):
-        """ Open object form with selected record of the table """
-
+        """Open object form with selected record of the table"""
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -388,8 +381,7 @@ class GwFeatureEndButton(GwAction):
         self._open_arc_form(feature_id)
 
     def _open_arc_form(self, arc_id):
-        """ Open form corresponding to start or end node of the current arc """
-
+        """Open form corresponding to start or end node of the current arc"""
         # Get sys_feature_cat.id from cat_feature.id
         sql = (f"SELECT sys_type"
                f" FROM ve_arc"
@@ -436,8 +428,7 @@ class GwFeatureEndButton(GwAction):
         self._end_feature(force_downgrade=True)
 
     def _set_completer(self):
-        """ Set autocompleters of the form """
-
+        """Set autocompleters of the form"""
         # Adding auto-completion to a QLineEdit - visit_id
         completer = QCompleter()
         self.dlg_work.arc_id.setCompleter(completer)
@@ -460,8 +451,7 @@ class GwFeatureEndButton(GwAction):
             self._fill_table_relations(table, self.schema_name + "." + tablename)
 
     def _fill_table_relations(self, widget, table_name):
-        """ Set a model with selected filter. Attach that model to selected table """
-
+        """Set a model with selected filter. Attach that model to selected table"""
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -490,14 +480,12 @@ class GwFeatureEndButton(GwAction):
         widget.show()
 
     def _close_dialog_workcat_list(self, dlg=None):
-        """ Close dialog """
-
+        """Close dialog"""
         tools_gw.close_dialog(dlg)
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
     def _manage_close(self, dialog, force_downgrade=False, show_warning=False):
-        """ Close dialog and disconnect snapping """
-
+        """Close dialog and disconnect snapping"""
         tools_gw.close_dialog(dialog)
         tools_qgis.disconnect_snapping()
         tools_qgis.disconnect_signal_selection_changed()
@@ -522,8 +510,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
     def _manage_new_workcat_accept(self, table_object):
-        """ Insert table 'cat_work'. Add cat_work """
-
+        """Insert table 'cat_work'. Add cat_work"""
         # Get values from dialog
         values = ""
         fields = ""

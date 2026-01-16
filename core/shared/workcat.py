@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -33,7 +32,7 @@ class GwWorkcat:
         self.items_dialog = None
 
     def manage_workcats(self):
-        """ Manager to display and manage workcats """
+        """Manager to display and manage workcats"""
         self.dlg_man = GwWorkcatManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
@@ -171,8 +170,7 @@ class GwWorkcat:
             dialog.cat_work_id.setToolTip("")
 
     def workcat_open_table_items(self, item):
-        """ Create the view and open the dialog with his content """
-
+        """Create the view and open the dialog with his content"""
         workcat_id = item['sys_id']
         field_id = item['filter_text']
         display_name = item['display_name']
@@ -327,16 +325,14 @@ class GwWorkcat:
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"{text} {field_id}")
 
     def _manage_document(self, qtable, item_id):
-        """ Access GUI to manage documents e.g Execute action of button 34 """
-
+        """Access GUI to manage documents e.g Execute action of button 34"""
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.get_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
     def _get_current_selectors(self):
-        """ Take the current selector_expl and selector_state to restore them at the end of the operation """
-
+        """Take the current selector_expl and selector_state to restore them at the end of the operation"""
         current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "session")
         form = f'"currentTab":"{current_tab}"'
         extras = '"selectorType":"selector_basic", "filterText":""'
@@ -345,8 +341,7 @@ class GwWorkcat:
         return json_result
 
     def _restore_selectors(self, current_selectors):
-        """ Restore selector_expl and selector_state to how the user had it """
-
+        """Restore selector_expl and selector_state to how the user had it"""
         qgis_project_add_schema = lib_vars.project_vars['add_schema']
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
@@ -368,9 +363,9 @@ class GwWorkcat:
         tools_qgis.refresh_map_canvas()
 
     def _force_expl(self, workcat_id):
-        """ Active exploitations are compared with workcat farms.
-            If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
-
+        """Active exploitations are compared with workcat farms.
+        If there is consistency nothing happens, if there is no consistency force this exploitations to selector.
+        """
         sql = (f"SELECT a.expl_id, a.expl_name FROM "
                f"  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
                f"   WHERE workcat_id='{workcat_id}' "
@@ -393,8 +388,7 @@ class GwWorkcat:
             tools_qgis.show_info(msg)
 
     def _update_selector_workcat(self, workcat_id):
-        """ Update table selector_workcat """
-
+        """Update table selector_workcat"""
         sql = ("DELETE FROM selector_workcat "
                " WHERE cur_user = current_user;\n")
         sql += (f"INSERT INTO selector_workcat(workcat_id, cur_user) "
@@ -411,13 +405,11 @@ class GwWorkcat:
             qbutton.setEnabled(True)
 
     def _get_folder_dialog(self, dialog, widget):
-        """ Get folder dialog """
-
+        """Get folder dialog"""
         tools_qt.get_save_file_path(dialog, widget, '*.csv', 'Save as', os.path.expanduser("~/Documents" if os.name == 'nt' else "~"))
 
     def _force_state(self, qbutton, state, qtable):
-        """ Force selected state and set qtable enabled = True """
-
+        """Force selected state and set qtable enabled = True"""
         sql = (f"SELECT state_id "
                f"FROM selector_state "
                f"WHERE cur_user = current_user AND state_id = '{state}'")
@@ -450,8 +442,7 @@ class GwWorkcat:
         tools_qgis.show_info(msg, dialog=dialog)
 
     def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
-        """ Filter list of workcats by workcat_id and field_id """
-
+        """Filter list of workcats by workcat_id and field_id"""
         # Use workcat_id_end for the _end table
         workcat_field = 'workcat_id_end' if 'feature_end' in table_name else 'workcat_id'
         
@@ -465,7 +456,7 @@ class GwWorkcat:
         tools_gw.set_tablemodel_config(dialog, qtable, table_name)
 
     def _workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
-        """ Fill table @widget filtering query by @workcat_id
+        """Fill table @widget filtering query by @workcat_id
         Set a model with selected filter.
         Attach that model to selected table
         @setEditStrategy:
@@ -473,7 +464,6 @@ class GwWorkcat:
             1: OnRowChange
             2: OnManualSubmit
         """
-
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -499,7 +489,7 @@ class GwWorkcat:
             widget.setModel(model)
 
     def _show_context_menu(self, qtableview, pos):
-        """ Show custom context menu """
+        """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
@@ -514,7 +504,7 @@ class GwWorkcat:
         menu.exec(QCursor.pos())
 
     def _open_feature_form(self, qtable):
-        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type' """
+        """Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type'"""
         from .info import GwInfo  # Avoid circular import
 
         tools_gw.reset_rubberband(self.aux_rubber_band)
@@ -599,12 +589,11 @@ class GwWorkcat:
                 widget.setText(f"Total arcs length: {length}")
 
     def _document_insert(self, dialog, tablename, field, field_value):
-        """
-        Insert a document related to the current visit
-            :param dialog: (QDialog )
-            :param tablename: Name of the table to make the queries (String)
-            :param field: Field of the table to make the where clause (String)
-            :param field_value: Value to compare in the clause where (String)
+        """Insert a document related to the current visit
+        :param dialog: (QDialog )
+        :param tablename: Name of the table to make the queries (String)
+        :param field: Field of the table to make the where clause (String)
+        :param field_value: Value to compare in the clause where (String)
         """
         doc_id = tools_qt.get_combo_value(dialog, dialog.doc_id)
 
@@ -665,7 +654,7 @@ class GwWorkcat:
         tools_gw.reset_rubberband(self.aux_rubber_band)
 
     def _select_workcat_features(self, workcat_id, field_name='workcat_id', state=None):
-        """ Select features on map for the given workcat_id """
+        """Select features on map for the given workcat_id"""
         expr = f"{field_name} ILIKE '%{workcat_id}%'"
         if state is not None:
             expr += f" AND state = {state}"
@@ -686,7 +675,7 @@ class GwWorkcat:
             tools_qgis.select_features_by_expr(lyr, expr_obj)
 
     def _on_tab_changed(self, index):
-        """ Re-select features when switching tabs """
+        """Re-select features when switching tabs"""
         if not hasattr(self, 'current_workcat_id'):
             return
         # Installed tab (index 0) - select by workcat_id and state=1

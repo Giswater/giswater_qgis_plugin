@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -85,7 +84,7 @@ class GwImportSwmm:
             tools_qgis.show_message(msg)
 
     def _get_file(self) -> Optional[Path]:
-        """ Get the INP file path from the user. """
+        """Get the INP file path from the user."""
         file_path = tools_qt.get_file(
             "Select INP file", "", "INP files (*.inp)"
         )
@@ -100,7 +99,6 @@ class GwImportSwmm:
 
     def parse_inp_file(self, file_path: Path) -> None:
         """Parse INP file, showing a log to the user"""
-
         # Create and show parsing dialog
         self.dlg_inp_parsing = GwInpParsingUi(self)
         tools_gw.load_settings(self.dlg_inp_parsing)
@@ -129,7 +127,6 @@ class GwImportSwmm:
 
     def open_config_dialog(self) -> None:
         """Open the config INP import dialog"""
-
         self.dlg_config = GwInpConfigImportUi(self)
         tools_gw.load_settings(self.dlg_config)
 
@@ -163,7 +160,7 @@ class GwImportSwmm:
         tools_gw.open_dialog(self.dlg_config, dlg_name="inp_config_import")
 
     def _manage_psector(self):
-        """ Manage the psector checkbox and the workcat and exploitation combo """
+        """Manage the psector checkbox and the workcat and exploitation combo"""
         checked = tools_qt.is_checked(self.dlg_config, "chk_psector")
         if checked:
             # Check if there is a current psector

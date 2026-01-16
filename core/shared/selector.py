@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -29,8 +28,7 @@ class GwSelector:
         self._selector_type = None
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None, show_lot_tab=True):
-        """
-        :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
+        """:param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
         if reload_dlg:
             self._selector_dialog = reload_dlg
@@ -104,8 +102,7 @@ class GwSelector:
             tools_gw.close_dialog(dialog)
 
     def _set_focus(self, dialog):
-        """ Sets the focus to the typeahead filter if it's configured in DB """
-
+        """Sets the focus to the typeahead filter if it's configured in DB"""
         index = dialog.main_tab.currentIndex()
         tab = dialog.main_tab.widget(index)
         if tab and tools_os.set_boolean(tab.property('typeahead_forced'), False):
@@ -116,10 +113,9 @@ class GwSelector:
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
                      aux_params=None, show_lot_tab=True):
-        """
-        Ask to DB for selectors and make dialog
-            :param dialog: Is a standard dialog, from file selector.ui, where put widgets
-            :param selector_type: List of selectors to ask DB ['exploitation', 'state', ...]
+        """Ask to DB for selectors and make dialog
+        :param dialog: Is a standard dialog, from file selector.ui, where put widgets
+        :param selector_type: List of selectors to ask DB ['exploitation', 'state', ...]
         """
         self._selector_dialog = dialog
         self._selector_type = selector_type
@@ -355,9 +351,8 @@ class GwSelector:
     # region private functions
 
     def _show_help(self, dialog, selection_modes):
-        """
-        Show help dialog depending on current tab's selection mode
-            :param dialog:
+        """Show help dialog depending on current tab's selection mode
+        :param dialog:
         """
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
@@ -375,13 +370,11 @@ class GwSelector:
         tools_qt.show_info_box(msg, title)
 
     def _set_selection_mode(self, dialog, widget, selection_mode):
+        """Manage selection mode
+        :param dialog: QDialog where search all checkbox
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
-        Manage selection mode
-            :param dialog: QDialog where search all checkbox
-            :param widget: QCheckBox that has changed status (QCheckBox)
-            :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
-        """
-
         # Get QCheckBox check all
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
@@ -442,13 +435,11 @@ class GwSelector:
             dialog.main_tab.currentWidget().verticalScrollBar().setValue(self.scrolled_amount)
 
     def _set_selector(self, dialog, widget, is_alone, disable_parent, check_all_override=None):
+        """Send values to DB and reload selectors
+        :param dialog: QDialog
+        :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+        :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
-        Send values to DB and reload selectors
-            :param dialog: QDialog
-            :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
-            :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
-        """
-
         # Get current tab name
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
@@ -535,14 +526,12 @@ class GwSelector:
             widget_filter.textChanged.emit(widget_filter.text())
 
     def _remove_previuos(self, dialog, widget, widget_all, widget_list):
+        """Remove checks of not selected QCheckBox
+        :param dialog: QDialog
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param widget_all: QCheckBox that handles global selection (QCheckBox)
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
         """
-        Remove checks of not selected QCheckBox
-            :param dialog: QDialog
-            :param widget: QCheckBox that has changed status (QCheckBox)
-            :param widget_all: QCheckBox that handles global selection (QCheckBox)
-            :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
-        """
-
         for checkbox in widget_list:
             # Some selectors.ui dont have widget_all
             if widget_all is not None:

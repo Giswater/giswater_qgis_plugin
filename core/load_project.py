@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -26,8 +25,7 @@ from ..libs import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
 class GwLoadProject(QObject):
 
     def __init__(self):
-        """ Class to manage layers. Refactor code from main.py """
-
+        """Class to manage layers. Refactor code from main.py"""
         super().__init__()
         self.iface = global_vars.iface
         self.plugin_toolbars = {}
@@ -38,8 +36,7 @@ class GwLoadProject(QObject):
         self.selected_psector_id: int | None = None
 
     def project_read(self, show_warning=True, main=None):
-        """ Function executed when a user opens a QGIS project (*.qgs) """
-
+        """Function executed when a user opens a QGIS project (*.qgs)"""
         global_vars.project_loaded = False
         if show_warning:
             msg = "Project read started"
@@ -241,8 +238,7 @@ class GwLoadProject(QObject):
                 tools_qgis.show_message_link(msg, url_wiki, message_level=Qgis.MessageLevel.Warning, btn_text="Open wiki")
 
     def _get_project_variables(self):
-        """ Manage QGIS project variables """
-
+        """Manage QGIS project variables"""
         lib_vars.project_vars = {}
         lib_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
         lib_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
@@ -254,8 +250,7 @@ class GwLoadProject(QObject):
         lib_vars.project_vars['current_style'] = tools_qgis.get_project_variable('gwCurrentStyle')
 
     def _get_user_variables(self):
-        """ Get config related with user variables """
-
+        """Get config related with user variables"""
         lib_vars.user_level['level'] = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
         lib_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
         lib_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
@@ -264,8 +259,7 @@ class GwLoadProject(QObject):
         lib_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
 
     def _check_project(self, show_warning):
-        """ Check if loaded project is valid for Giswater """
-
+        """Check if loaded project is valid for Giswater"""
         # Check if table 've_node' is loaded
         self.layer_node = tools_qgis.get_layer_by_tablename("ve_node")
         layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
@@ -291,7 +285,7 @@ class GwLoadProject(QObject):
         return True
 
     def _check_project_type(self):
-        """ Check if loaded project is valid for Giswater """
+        """Check if loaded project is valid for Giswater"""
         # Check if table 've_node' is loaded
         if global_vars.project_type not in ('ws', 'ud'):
             return False
@@ -306,8 +300,7 @@ class GwLoadProject(QObject):
         return True
 
     def _check_database_connection(self, show_warning, force_commit=False):
-        """ Set new database connection. If force_commit=True then force commit before opening project """
-
+        """Set new database connection. If force_commit=True then force commit before opening project"""
         try:
             if tools_db.dao and force_commit:
                 msg = "Force commit"
@@ -328,13 +321,11 @@ class GwLoadProject(QObject):
             return True
 
     def _check_layers_from_distinct_schema(self):
-        """
-            Checks if there are duplicate layers in any of the defined schemas from project_vars.
+        """Checks if there are duplicate layers in any of the defined schemas from project_vars.
 
-            :returns: False if there are duplicate layers and project_vars main_schema or add_schema
-            haven't been set.
+        :returns: False if there are duplicate layers and project_vars main_schema or add_schema
+        haven't been set.
         """
-
         layers = tools_qgis.get_project_layers()
         repeated_layers = {}
         for layer in layers:
@@ -362,8 +353,7 @@ class GwLoadProject(QObject):
         return True
 
     def _get_buttons_to_hide(self):
-        """ Get all buttons to hide """
-
+        """Get all buttons to hide"""
         buttons_to_hide = None
         try:
             row = tools_gw.get_config_parser('toolbars_hidebuttons', 'buttons_to_hide', "user", "init")
@@ -380,8 +370,7 @@ class GwLoadProject(QObject):
             return buttons_to_hide
 
     def _manage_toolbars(self):
-        """ Manage actions of the custom plugin toolbars """
-
+        """Manage actions of the custom plugin toolbars"""
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
         if toolbar_names in (None, 'None'):
@@ -485,7 +474,6 @@ class GwLoadProject(QObject):
 
     def _create_toolbar(self, toolbar_id):
         """Create and register a toolbar, with special CM/AM schema checks."""
-
         # Load toolbar actions from your config
         list_actions = tools_gw.get_config_parser(
             'toolbars', str(toolbar_id), "project", "giswater"
@@ -673,19 +661,18 @@ class GwLoadProject(QObject):
             self.manage_new_psector.get_psector(psector_id)
 
     def _playpause_btn_clicked(self):
-        """ Manage psector play/pause """
+        """Manage psector play/pause"""
         tools_gw.set_psector_mode_enabled()
 
     def _manage_snapping_layers(self):
-        """ Manage snapping of layers """
-
+        """Manage snapping of layers"""
         tools_qgis.manage_snapping_layer('ve_arc', snapping_type=2)
         tools_qgis.manage_snapping_layer('ve_connec', snapping_type=0)
         tools_qgis.manage_snapping_layer('ve_node', snapping_type=0)
         tools_qgis.manage_snapping_layer('ve_gully', snapping_type=0)
 
     def _check_user_roles(self):
-        """ Check user roles and show/hide toolbars """
+        """Check user roles and show/hide toolbars"""
         self.is_role_cm_edit = False
 
         # Check cm role and adjust CM toolbar if necessary
@@ -722,8 +709,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("plan")
 
     def _config_layers(self):
-        """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
-
+        """Call gw_fct_setcheckproject and create GwProjectLayersConfig thread"""
         status, result = self._manage_layers()
         if not status:
             return False
@@ -764,8 +750,7 @@ class GwLoadProject(QObject):
         return True
 
     def _manage_layers(self):
-        """ Get references to project main layers """
-
+        """Get references to project main layers"""
         # Check if we have any layer loaded
         layers = tools_qgis.get_project_layers()
         if len(layers) == 0:
@@ -795,8 +780,7 @@ class GwLoadProject(QObject):
         return True
 
     def _manage_guided_map(self):
-        """ Guide map works using ext_municipality """
-
+        """Guide map works using ext_municipality"""
         self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
         if self.layer_muni is None:
             return
@@ -813,8 +797,7 @@ class GwLoadProject(QObject):
             self.iface.mapCanvas().setCursor(cursor)
 
     def _selection_changed(self):
-        """ Get selected muni_id and execute function setselectors """
-
+        """Get selected muni_id and execute function setselectors"""
         muni_id = None
         features = self.layer_muni.getSelectedFeatures()
         for feature in features:
@@ -852,8 +835,7 @@ class GwLoadProject(QObject):
             tools_gw.set_style_mapzones()
 
     def _enable_toolbars(self, visible=True):
-        """ Enable/disable all plugin toolbars from QGIS GUI """
-
+        """Enable/disable all plugin toolbars from QGIS GUI"""
         # Enable/Disable actions
         self._enable_all_buttons(visible)
         try:
@@ -864,28 +846,24 @@ class GwLoadProject(QObject):
             tools_log.log_warning(str(e))
 
     def _enable_all_buttons(self, enable=True):
-        """ Utility to enable/disable all buttons """
-
+        """Utility to enable/disable all buttons"""
         for index in self.buttons.keys():
             self._enable_button(index, enable)
 
     def _enable_button(self, button_id, enable=True):
-        """ Enable/disable selected button """
-
+        """Enable/disable selected button"""
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setEnabled(enable)
 
     def _hide_button(self, button_id, hide=True):
-        """ Enable/disable selected action """
-
+        """Enable/disable selected action"""
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
 
     def _enable_toolbar(self, toolbar_id, enable=True):
-        """ Enable/Disable toolbar. Normally because user has no permission """
-
+        """Enable/Disable toolbar. Normally because user has no permission"""
         if toolbar_id in self.plugin_toolbars:
             plugin_toolbar = self.plugin_toolbars[toolbar_id]
             plugin_toolbar.toolbar.setVisible(enable)
@@ -893,21 +871,18 @@ class GwLoadProject(QObject):
                 self._enable_button(index_action, enable)
 
     def _force_tab_exploitation(self):
-        """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
-
+        """Select tab 'tab_exploitation' in dialog 'dlg_selector_basic'"""
         tools_gw.set_config_parser("dialogs_tab", "dlg_selector_basic", "tab_exploitation", "user", "session")
 
     def _manage_attribute_table(self):
-        """ If configured, disable button "Update all" from attribute table """
-
+        """If configured, disable button "Update all" from attribute table"""
         disable = tools_gw.get_config_parser('system', 'disable_updateall_attributetable', "user", "init", prefix=False)
         if tools_os.set_boolean(disable, False):
             tools_gw.connect_signal(QApplication.instance().focusChanged, self._manage_focus_changed,
                                     'load_project', 'manage_attribute_table_focusChanged')
 
     def _manage_focus_changed(self, old, new):
-        """ Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself. """
-
+        """Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself."""
         if new is None or not hasattr(new, 'window'):
             return
 
@@ -939,10 +914,8 @@ class GwLoadProject(QObject):
     # region Campaign form config
 
     def _apply_campaign_form_config(self):
+        """Applies custom form configurations from the cm_form_config table to project layers.
         """
-        Applies custom form configurations from the cm_form_config table to project layers.
-        """
-
         if not tools_db.check_schema('cm'):
             return
 
@@ -989,10 +962,8 @@ class GwLoadProject(QObject):
                 self._configure_layer_form(layer, cfg_fields)
 
     def _configure_layer_form(self, layer, cfg_fields):
+        """Applies a given form configuration to a single QgsVectorLayer.
         """
-        Applies a given form configuration to a single QgsVectorLayer.
-        """
-
         # Build order list: configured first, then the rest
         configured_map = {f["field"]: f for f in cfg_fields}
         configured_order = [f["field"] for f in cfg_fields]

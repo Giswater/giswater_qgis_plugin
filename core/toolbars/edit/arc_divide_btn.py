@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -19,8 +18,9 @@ from ....libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_os
 
 
 class GwArcDivideButton(GwMaptool):
-    """ Button 23: Divide arc
-    Execute SQL function: 'gw_fct_node2arc' """
+    """Button 23: Divide arc
+    Execute SQL function: 'gw_fct_node2arc'
+    """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -49,8 +49,7 @@ class GwArcDivideButton(GwMaptool):
     """ QgsMapTool inherited event functions """
 
     def activate(self):
-        """ Called when set as currently active map tool """
-
+        """Called when set as currently active map tool"""
         # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
         if hasattr(self.action, "setChecked"):
             self.action.setChecked(True)
@@ -84,8 +83,7 @@ class GwArcDivideButton(GwMaptool):
             tools_qgis.show_info(msg)
 
     def deactivate(self):
-        """ Called when map tool is being deactivated """
-
+        """Called when map tool is being deactivated"""
         super().deactivate()
 
         self.layer_arc.removeSelection()
@@ -102,8 +100,7 @@ class GwArcDivideButton(GwMaptool):
         self.reset()
 
     def canvasMoveEvent(self, event):
-        """ Mouse movement event """
-
+        """Mouse movement event"""
         self._move_event(event)
 
     def canvasReleaseEvent(self, event):
@@ -115,8 +112,7 @@ class GwArcDivideButton(GwMaptool):
     # region private functions
 
     def _fill_action_menu(self):
-        """ Fill action menu """
-
+        """Fill action menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
@@ -133,8 +129,7 @@ class GwArcDivideButton(GwMaptool):
             obj_action.triggered.connect(partial(self._get_selected_action, action))
 
     def _get_selected_action(self, name):
-        """ Gets selected action """
-
+        """Gets selected action"""
         if name == tools_qt.tr('DRAG-DROP'):
             self.selected_action = 1
         else:
@@ -160,8 +155,7 @@ class GwArcDivideButton(GwMaptool):
                 self._move_event_snap_to_arc(event_point, x, y)
 
     def _move_event_snap_to_node(self, event_point, x, y):
-        """ Snap to node. First step: Any node selected """
-
+        """Snap to node. First step: Any node selected"""
         # Make sure active layer is 've_node'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_node:
@@ -180,8 +174,7 @@ class GwArcDivideButton(GwMaptool):
             self.rubber_band.movePoint(point)
 
     def _move_event_snap_to_arc(self, event_point, x, y):
-        """ Snap to arc. Second step: After a node is selected """
-
+        """Snap to arc. Second step: After a node is selected"""
         # Make sure active layer is 've_arc'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_arc:
@@ -205,8 +198,7 @@ class GwArcDivideButton(GwMaptool):
         self.rubber_band.movePoint(point)
 
     def _move_node(self, node_id, point):
-        """ Move selected node to the current point """
-
+        """Move selected node to the current point"""
         # Update node geometry
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {lib_vars.data_epsg})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "

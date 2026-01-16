@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -24,7 +23,7 @@ from ..epa.epa_tools.import_swmm import GwImportSwmm
 
 
 class GwFileTransferButton(GwAction):
-    """ Button 66: File Transfer """
+    """Button 66: File Transfer"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -59,8 +58,7 @@ class GwFileTransferButton(GwAction):
     # region private functions
 
     def _fill_import_export_menu(self):
-        """ Fill import/export menu with CSV actions """
-
+        """Fill import/export menu with CSV actions"""
         # Clear existing menu items
         actions = self.menu.actions()
         for action in actions:
@@ -95,8 +93,7 @@ class GwFileTransferButton(GwAction):
         #         menu.menuAction().setParent(None)
 
     def _get_selected_action(self, name):
-        """ Gets selected action """
-
+        """Gets selected action"""
         if name == tools_qt.tr('Import CSV'):
             self._open_csv()
         elif name == tools_qt.tr('Import INP file'):
@@ -115,8 +112,7 @@ class GwFileTransferButton(GwAction):
         menu.setProperty("last_selection", button_function)
 
     def save_settings_values(self):
-        """ Save QGIS settings related with csv options """
-
+        """Save QGIS settings related with csv options"""
         tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type',
                                    f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
@@ -304,8 +300,7 @@ class GwFileTransferButton(GwAction):
             self._update_info(self.dlg_csv)
 
     def _write_csv(self, dialog, temp_tablename):
-        """ Write csv in postgres and call gw_fct_utils_csv2pg function """
-
+        """Write csv in postgres and call gw_fct_utils_csv2pg function"""
         self.save_settings_values()
         insert_status = True
         if not self._validate_params(dialog):
@@ -348,7 +343,7 @@ class GwFileTransferButton(GwAction):
                 tools_qt.show_info_box(msg)
 
     def _update_info(self, dialog):
-        """ Update the tag according to item selected from cmb_import_type """
+        """Update the tag according to item selected from cmb_import_type"""
         try:
             dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
         except Exception as e:
@@ -363,15 +358,13 @@ class GwFileTransferButton(GwAction):
             tools_log.log_warning(str(e))
 
     def _select_file_csv(self):
-        """ Select CSV file """
-
+        """Select CSV file"""
         tools_qt.get_open_file_path(self.dlg_csv, 'txt_file_csv', '*.csv', "Select CSV file")
         self.save_settings_values()
         self._preview_csv(self.dlg_csv)
 
     def _preview_csv(self, dialog):
-        """ Show current file in QTableView acorrding to selected delimiter and unicode """
-
+        """Show current file in QTableView acorrding to selected delimiter and unicode"""
         path = self._get_path(dialog)
         if path is None:
             return
@@ -390,8 +383,7 @@ class GwFileTransferButton(GwAction):
             tools_qgis.show_warning(str(e), dialog=dialog)
 
     def _load_settings_values(self):
-        """ Load QGIS settings related with csv options """
-
+        """Load QGIS settings related with csv options"""
         value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "session")
         tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0, add_new=False)
 
@@ -422,8 +414,7 @@ class GwFileTransferButton(GwAction):
             self.dlg_csv.rb_dec_period.setChecked(True)
 
     def _validate_params(self, dialog):
-        """ Validate if params are valids """
-
+        """Validate if params are valids"""
         path = self._get_path(dialog)
         self._preview_csv(dialog)
         if path is None or path == 'null':
@@ -431,8 +422,7 @@ class GwFileTransferButton(GwAction):
         return True
 
     def _delete_table_csv(self, temp_tablename, fid_aux):
-        """ Delete records from temp_csv for current user and selected cat """
-
+        """Delete records from temp_csv for current user and selected cat"""
         sql = (f"DELETE FROM {temp_tablename} "
                f"WHERE fid = '{fid_aux}' AND cur_user = current_user")
         tools_db.execute_sql(sql)
@@ -499,8 +489,7 @@ class GwFileTransferButton(GwAction):
         return False
 
     def _get_path(self, dialog):
-        """ Take the file path if exist. AND if not exit ask it """
-
+        """Take the file path if exist. AND if not exit ask it"""
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             msg = "Please choose a valid path"
@@ -525,8 +514,7 @@ class GwFileTransferButton(GwAction):
             model.appendRow(items)
 
     def _get_rolenames(self):
-        """ Get list of rolenames of current user """
-
+        """Get list of rolenames of current user"""
         sql = ("SELECT rolname FROM pg_roles "
                " WHERE pg_has_role(current_user, oid, 'member')")
         rows = tools_db.get_rows(sql)

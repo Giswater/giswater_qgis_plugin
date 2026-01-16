@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -264,6 +263,7 @@ class Consumption:
         Consumption flow in liters per second
     seconds : float
         Consumption time in seconds
+
     """
 
     def __init__(self, liters, flow):
@@ -293,17 +293,17 @@ class ConsumptionCreator:
     -------
     new_consumption(hour)
         Returns a new random Consumption
+
     """
 
     def __init__(self, hourly_distribution=False):
-        """
-        Parameters
+        """Parameters
         ----------
         hourly_distribution : bool
             Defines whether the volume table should contain a different
             probability distribution for each hour of the day.
-        """
 
+        """
         self._volumes = VolumeTable(hourly_distribution)
         self.flows = FlowTable()
 

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -24,7 +23,7 @@ from ....libs import lib_vars, tools_db, tools_qgis, tools_os, tools_qt
 
 
 class GwInfoButton(GwMaptool):
-    """ Button 01: Info """
+    """Button 01: Info"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -83,8 +82,7 @@ class GwInfoButton(GwMaptool):
     # region private functions
 
     def _reactivate_map_tool(self):
-        """ Reactivate tool """
-
+        """Reactivate tool"""
         self.block_signal = True
         info_action = self.iface.mainWindow().findChildren(QAction, self.action_name)[-1]
         info_action.trigger()
@@ -274,9 +272,9 @@ class GwInfoButton(GwMaptool):
                 rb_list.append(rb)
 
     def _toggle_valve_state(self, valve_id, table_name, value):
-        """ Open or closes a valve. If parameter 'utils_graphanalytics_automatic_trigger' is true,
-        also updates mapzones in a thread """
-
+        """Open or closes a valve. If parameter 'utils_graphanalytics_automatic_trigger' is true,
+        also updates mapzones in a thread
+        """
         # Build function body
         feature = f'"id":"{valve_id}", '
         feature += f'"tableName":"{table_name}", '
@@ -314,8 +312,7 @@ class GwInfoButton(GwMaptool):
             QgsApplication.taskManager().triggerTask(self.valve_thread)
 
     def _toggle_valve_state_netscenario(self, netscenario_id, valve_id, table_name, value):
-        """ Open or closes a valve in a netscenario """
-
+        """Open or closes a valve in a netscenario"""
         # Build function body
         feature = f'"id":"{netscenario_id}, {valve_id}", '
         feature += f'"tableName":"{table_name}" '
@@ -327,8 +324,7 @@ class GwInfoButton(GwMaptool):
         tools_qgis.refresh_map_canvas()
 
     def _draw_by_action(self, feature, rb_list, reset_rb=True):
-        """ Draw lines based on geometry """
-
+        """Draw lines based on geometry"""
         for rb in rb_list:
             tools_gw.reset_rubberband(rb)
         if feature['geometry'] is None:
@@ -339,8 +335,7 @@ class GwInfoButton(GwMaptool):
         tools_gw.draw_wkt_geometry(str(feature['geometry']), self.rubber_band, QColor(255, 0, 0, 100), 3)
 
     def _get_info_from_selected_id(self, action, tab_type):
-        """ Set active selected layer """
-
+        """Set active selected layer"""
         tools_gw.reset_rubberband(self.rubber_band)
         # Get layer name from action property (for nested menus) or from parent menu title
         layer_name_str = action.property('layer_name')
@@ -392,11 +387,9 @@ class GwInfoButton(GwMaptool):
             self._get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
 
     def _toggle_psector_selector(self, psector_id: int, state):
+        """Toggle psector in selector_psector when checkbox is toggled
+        :param psector_id: ID of the psector to toggle
         """
-        Toggle psector in selector_psector when checkbox is toggled
-            :param psector_id: ID of the psector to toggle
-        """
-
         # Get the checkbox that triggered this (sender)
         checkbox = self.sender()
         if checkbox is None:

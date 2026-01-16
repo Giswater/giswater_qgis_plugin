@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -214,8 +213,7 @@ class GwSearch:
     # region private functions
 
     def _init_dialog(self):
-        """ Initialize dialog. Make it dockable in left dock widget area """
-
+        """Initialize dialog. Make it dockable in left dock widget area"""
         tools_gw.add_btn_help(self.dlg_search)
         self.iface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
@@ -233,8 +231,7 @@ class GwSearch:
         self.dlg_search = None
 
     def _set_typeahead_completer(self, widget, completer=None):
-        """ Set completer and add listeners """
-
+        """Set completer and add listeners"""
         if completer:
             model = QStringListModel()
             completer.highlighted.connect(partial(self._check_tab, completer))
@@ -375,8 +372,7 @@ class GwSearch:
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
     def _make_list(self, completer, model, widget):
-        """ Create a list of ids and populate widget (QLineEdit) """
-
+        """Create a list of ids and populate widget (QLineEdit)"""
         # Create 2 json, one for first QLineEdit and other for second QLineEdit
         form_search = ''
         extras_search = ''
@@ -470,8 +466,7 @@ class GwSearch:
                 tools_qt.set_completer_object(completer, model, line_edit_add, sorted(display_list))
 
     def _clear_line_edit_add(self, line_list):
-        """ Clear second line edit if exist """
-
+        """Clear second line edit if exist"""
         line_edit_add = line_list[1]
         line_edit_add.blockSignals(True)
         line_edit_add.setText('')

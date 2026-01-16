@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -137,8 +136,7 @@ class GwMaptool(QgsMapTool):
             self.prev_maptool = None
 
     def set_action_pan(self):
-        """ Set action 'Pan' """
-
+        """Set action 'Pan'"""
         try:
             self.iface.actionPan().trigger()
         except Exception:
@@ -160,8 +158,7 @@ class GwMaptool(QgsMapTool):
         self.snapped_feat = None
 
     def cancel_map_tool(self):
-        """ Executed if user press right button or escape key """
-
+        """Executed if user press right button or escape key"""
         # Reset rubber band
         self.reset()
 
@@ -172,15 +169,13 @@ class GwMaptool(QgsMapTool):
         self.set_action_pan()
 
     def refresh_map_canvas(self):
-        """ Refresh all layers present in map canvas """
-
+        """Refresh all layers present in map canvas"""
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
 
     def manage_active_maptool(self):
-        """ Check in init config file if user wants to keep map tool active or not """
-
+        """Check in init config file if user wants to keep map tool active or not"""
         value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init", prefix=True)
         keep_maptool_active = tools_os.set_boolean(value, False)
         if not keep_maptool_active:

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,7 +20,7 @@ from .... import global_vars
 
 
 class GwSnapshotViewButton(GwAction):
-    """ Button 68: Snapshot View """
+    """Button 68: Snapshot View"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -34,8 +33,7 @@ class GwSnapshotViewButton(GwAction):
     # region private functions
 
     def _open_snapshot_view(self):
-        """ Get dialog """
-
+        """Get dialog"""
         # Get yesterday date
         yesterday = QDateTime.currentDateTime().addDays(-1)
 
@@ -89,8 +87,7 @@ class GwSnapshotViewButton(GwAction):
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
 
     def _get_first_snapshot_date(self):
-        """ Get first snapshot date """
-
+        """Get first snapshot date"""
         # Get the first snapshot date
         sql = f"SELECT min(date)::date FROM audit.snapshot WHERE schema = '{lib_vars.schema_name}';"
         result = tools_db.get_row(sql)
@@ -155,7 +152,7 @@ class GwSnapshotViewButton(GwAction):
             tools_qgis.show_warning(msg, dialog=self.dlg_snapshot_view, parameter=param)
 
     def _update_current_polygon(self, origin, id_name=None, id=None):
-        """ Update polygon """
+        """Update polygon"""
         xmin, xmax, ymin, ymax = None, None, None, None
         if origin == "map_canvas":
             extent = self.iface.mapCanvas().extent()
@@ -178,15 +175,13 @@ class GwSnapshotViewButton(GwAction):
 
 
 def close_dlg(**kwargs):
-    """ Close form """
-
+    """Close form"""
     dialog = kwargs["dialog"]
     tools_gw.close_dialog(dialog)
 
 
 def run(**kwargs):
-    """ Button run clicked """
-
+    """Button run clicked"""
     class_obj = kwargs["class"]
 
     # Get coordinates
@@ -233,7 +228,6 @@ def run(**kwargs):
 
 def add_layers_temp(layers, group):
     """Creates temporary layers from a given list of layers and adds them to specified subgroups under a main group in QGIS."""
-
     for i, layer in enumerate(layers):
         if not layer['features']:
             continue
@@ -301,7 +295,6 @@ def add_layers_temp(layers, group):
 
 def apply_layer_style(layer, layer_group, layer_origin):
     """Applies styling to a layer based on its geometry type and feature colors."""
-
     # Get reference symbol style from layer_group
     layer_node = QgsProject.instance().mapLayersByName(layer_group)[0]
     renderer = layer_node.renderer()

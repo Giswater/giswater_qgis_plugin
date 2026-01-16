@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -51,7 +50,6 @@ def get_contexts_params() -> List[Tuple[int, str]]:
 
 def get_styles_for_context(styleconfig_id: int) -> List[Tuple[str, str]]:
     """Fetch styles from the sys_style table for a given context."""
-
     sql = f"SELECT layername, stylevalue FROM sys_style WHERE styleconfig_id = {styleconfig_id}"
     rows = tools_db.get_rows(sql)
     return [(row[0], row[1]) for row in rows] if rows else []
@@ -59,7 +57,6 @@ def get_styles_for_context(styleconfig_id: int) -> List[Tuple[str, str]]:
 
 def apply_styles_to_layers(styleconfig_id: int, style_name: str, force_refresh: bool = False) -> None:
     """Apply styles to layers based on the selected context."""
-
     styles = get_styles_for_context(styleconfig_id)
     for layername, qml in styles:
         layer = tools_qgis.get_layer_by_tablename(layername)
@@ -91,7 +88,6 @@ class GwLayerStyleChangeButton(GwAction):
 
     def clicked_event(self) -> None:
         """Show the menu directly when the button is clicked."""
-
         self.menu: QMenu = QMenu()
         self._populate_menu()
         cursor = QCursor()
@@ -102,7 +98,6 @@ class GwLayerStyleChangeButton(GwAction):
 
     def _populate_menu(self) -> None:
         """Populate the menu with available contexts."""
-
         # contexts = get_available_contexts()
         contexts_params = get_contexts_params()
         for styleconfig_id, style_name in contexts_params:
@@ -119,7 +114,6 @@ class GwLayerStyleChangeButton(GwAction):
 
     def _apply_context(self, styleconfig_id: int, style_name: str) -> None:
         """Apply styles for the selected context."""
-
         apply_styles_to_layers(styleconfig_id, style_name)
         lib_vars.project_vars['current_style'] = f"{styleconfig_id}"
         tools_qgis.set_project_variable('gwCurrentStyle', f"{styleconfig_id}")

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,7 +20,7 @@ from ....libs.tools_qt import GwEditDialog
 
 
 class GwGo2EpaManagerButton(GwAction):
-    """ Button 43: Go2epa maanger """
+    """Button 43: Go2epa maanger"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -75,7 +74,7 @@ class GwGo2EpaManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
 
     def _show_context_menu(self, qtableview):
-        """ Show custom context menu """
+        """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_edit = QAction("Edit", qtableview)
@@ -103,8 +102,7 @@ class GwGo2EpaManagerButton(GwAction):
         menu.exec(QCursor.pos())
 
     def _fill_manager_table(self, filter_id=None):
-        """ Fill dscenario manager table with data from ve_cat_dscenario """
-
+        """Fill dscenario manager table with data from ve_cat_dscenario"""
         complet_list = self._get_list("v_ui_rpt_cat_result", filter_id)
 
         if complet_list is False:
@@ -128,8 +126,7 @@ class GwGo2EpaManagerButton(GwAction):
         return complet_list
 
     def _get_list(self, table_name='v_ui_rpt_cat_result', filter_id=None):
-        """ Mount and execute the query for gw_fct_getlist """
-
+        """Mount and execute the query for gw_fct_getlist"""
         feature = f'"tableName":"{table_name}"'
         filter_fields = '"limit": -1'
         if filter_id:
@@ -152,13 +149,11 @@ class GwGo2EpaManagerButton(GwAction):
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
     def _fill_txt_infolog(self, selected):
+        """Fill txt_infolog from epa_result_manager form with current data selected for columns:
+        'export_options'
+        'network_stats'
+        'inp_options'
         """
-        Fill txt_infolog from epa_result_manager form with current data selected for columns:
-            'export_options'
-            'network_stats'
-            'inp_options'
-        """
-
         # Get id of selected row
         row = selected.indexes()
         if not row:
@@ -291,12 +286,11 @@ class GwGo2EpaManagerButton(GwAction):
                 tools_qgis.show_warning(message)
 
     def _multi_rows_delete(self, widget, table_name, column_id):
-        """ Delete selected elements of the table
+        """Delete selected elements of the table
         :param QTableView widget: origin
         :param table_name: table origin
         :param column_id: Refers to the id of the source table
         """
-
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -324,12 +318,11 @@ class GwGo2EpaManagerButton(GwAction):
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
     def _toggle_rpt_archived(self, widget, column_id):
-        """ Call gw_fct_set_rpt_archived with selected result_id
-                :param QTableView widget: origin
-                :param table_name: table origin
-                :param column_id: Refers to the id of the source table
-                """
-
+        """Call gw_fct_set_rpt_archived with selected result_id
+        :param QTableView widget: origin
+        :param table_name: table origin
+        :param column_id: Refers to the id of the source table
+        """
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -360,12 +353,11 @@ class GwGo2EpaManagerButton(GwAction):
         self._fill_manager_table()
 
     def _epa2data(self, widget, column_id):
-        """ Delete selected elements of the table
-            :param QTableView widget: origin
-            :param table_name: table origin
-            :param column_id: Refers to the id of the source table
+        """Delete selected elements of the table
+        :param QTableView widget: origin
+        :param table_name: table origin
+        :param column_id: Refers to the id of the source table
         """
-
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:

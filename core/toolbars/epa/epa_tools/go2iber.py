@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -40,7 +39,6 @@ class Go2Iber:
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
-
         self.dlg_go2iber = GwGo2IberUi(self)
         tools_gw.load_settings(self.dlg_go2iber)
         if self.ig_options_class is None:
@@ -83,8 +81,7 @@ class Go2Iber:
         self.ig_options.open_options_dlg()
 
     def _btn_accept_clicked(self):
-        """ Save INP, RPT and result name"""
-
+        """Save INP, RPT and result name"""
         # Set network mode to 2
         form = '"formName":"epaoptions"'
         my_json = '[{"widget": "inp_options_networkmode", "value": "2"}]'
@@ -155,15 +152,14 @@ class Go2Iber:
         tools_gw.close_dialog(self.dlg_go2iber)
 
     def _save_user_values(self):
-        """ Save dialog widgets' values """
-
+        """Save dialog widgets' values"""
         txt_result_name = f"{tools_qt.get_text(self.dlg_go2iber, 'txt_result_name', return_string_null=False)}"
         tools_gw.set_config_parser('btn_go2iber', 'go2iber_result_name', f"{txt_result_name}")
         txt_path = f"{tools_qt.get_text(self.dlg_go2iber, 'txt_path', return_string_null=False)}"
         tools_gw.set_config_parser('btn_go2iber', 'go2iber_path', f"{txt_path}")
 
     def _fill_user_values(self):
-        """ Fill dialog widgets' values """
+        """Fill dialog widgets' values"""
         txt_result_name = tools_gw.get_config_parser('btn_go2iber', 'go2iber_result_name', 'user', 'session')
         if txt_result_name:
             tools_qt.set_widget_text(self.dlg_go2iber, 'txt_result_name', txt_result_name)
@@ -238,8 +234,7 @@ class Go2Iber:
         return True
 
     def load_project(self, file_path: Path) -> bool:
-        """ Load IberGIS project """
-
+        """Load IberGIS project"""
         import_layers = {
             'MESH': ['ground', 'roof', 'mesh_anchor_lines', 'mesh_anchor_points'],
             'IBER': ['culvert', 'bridge', 'boundary_conditions', 'hyetograph']

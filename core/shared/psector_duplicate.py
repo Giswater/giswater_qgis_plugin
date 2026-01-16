@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -20,8 +19,7 @@ class GwPsectorDuplicate(QObject):
     is_duplicated = pyqtSignal()
 
     def __init__(self):
-        """ Class to control 'Workcat end' of toolbar 'edit' """
-
+        """Class to control 'Workcat end' of toolbar 'edit'"""
         super().__init__()
 
     def manage_duplicate_psector(self, psector_id=None):

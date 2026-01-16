@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -51,7 +50,7 @@ class RecursiveEpa():
         tools_gw.open_dialog(self.dlg_epa, dlg_name='recursive_epa')
 
     def save_user_values(self, dialog):
-        """ Save last user values """
+        """Save last user values"""
         config_path = tools_qt.get_text(dialog, dialog.data_config_file)
         tools_gw.set_config_parser('recursive_epa', 'config_path', f"{config_path}")
         folder_path = tools_qt.get_text(dialog, dialog.data_output_folder)
@@ -104,13 +103,11 @@ class RecursiveEpa():
             QgsApplication.taskManager().triggerTask(self.recursive_epa)
 
     def _get_file_dialog(self, widget):
-        """ Check if selected file exists. Set default value if necessary """
-
+        """Check if selected file exists. Set default value if necessary"""
         tools_qt.get_open_file_path(self.dlg_epa, widget, "", "Selected file", str(Path.home()))
 
     def get_folder_dialog(self, widget):
-        """ Get folder dialog """
-
+        """Get folder dialog"""
         # Check if selected folder exists. Set default value if necessary
         tools_qt.get_folder_path(self.dlg_epa, widget)
 

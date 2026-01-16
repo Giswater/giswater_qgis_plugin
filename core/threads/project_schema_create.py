@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -137,7 +136,6 @@ class GwCreateSchemaTask(GwTask):
         
         :return bool: True if the main execution finished successfully, False otherwise.
         """
-
         project_type = self.params['project_type']
         exec_last_process = self.params['exec_last_process']
         project_name_schema = self.params['project_name_schema']
@@ -186,7 +184,6 @@ class GwCreateSchemaTask(GwTask):
         
         :return None:
         """
-
         project_type = self.params['project_type']
         example_data = self.params['example_data']
 
@@ -221,7 +218,6 @@ class GwCreateSchemaTask(GwTask):
         
         :return int: The total number of SQL files.
         """
-
         total_sql_files = 0
         dict_process = {}
         list_process = ['load_base', 'load_final_pass', 'updates']
@@ -239,14 +235,12 @@ class GwCreateSchemaTask(GwTask):
         return total_sql_files
 
     def get_number_of_files_folder_update_minor(self, folder_update_minor: str) -> int:
-        """
-        Calculate number of files of all folders of selected @folder_update_minor 
+        """Calculate number of files of all folders of selected @folder_update_minor
         
         :param folder_update_minor: The path to the folder to get the number of files from.
 
         :return int: The number of files.
         """
-
         project_type = self.params['project_type']
         files_project_type = list(glob.iglob(folder_update_minor + f'**/**/{project_type}/*.sql', recursive=True))
         files_utils = list(glob.iglob(folder_update_minor + '**/**/utils/*.sql', recursive=True))
@@ -263,7 +257,6 @@ class GwCreateSchemaTask(GwTask):
 
         :return tuple: A tuple with the dictionary of folders and the number of files.
         """
-
         # tools_log.log_info(f"Task 'Create schema' execute function 'def get_folders_process' with parameters: '{process_name}'")
         dict_folders = self.get_folders_process(process_name)
         if dict_folders is None:
@@ -285,7 +278,6 @@ class GwCreateSchemaTask(GwTask):
 
         :return dict: A dictionary with the folders and the number of files in each folder.
         """
-
         dict_folders = {}
         if process_name == 'load_base':
             dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ddl)] = 0

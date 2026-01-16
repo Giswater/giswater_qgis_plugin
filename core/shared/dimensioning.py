@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -440,8 +439,7 @@ class GwDimensioning:
         action.setChecked(False)
 
     def _create_map_tips(self):
-        """ Create MapTips on the map """
-
+        """Create MapTips on the map"""
         row = tools_gw.get_config_value('qgis_dim_tooltip')
         if not row or row[0].lower() != 'true':
             return
@@ -462,8 +460,7 @@ class GwDimensioning:
                                 'dimensioning', 'create_map_tips_timer_map_tips_clear_timeout_clear_map_tip')
 
     def _map_tip_changed(self, point):
-        """ SLOT. Initialize the Timer to show MapTips on the map """
-
+        """SLOT. Initialize the Timer to show MapTips on the map"""
         if self.canvas.underMouse():
             self.last_map_position = QgsPointXY(point.x(), point.y())
             self.map_tip_node.clear(self.canvas)
@@ -471,8 +468,7 @@ class GwDimensioning:
             self.timer_map_tips.start(100)
 
     def _show_map_tip(self):
-        """ Show MapTips on the map """
-
+        """Show MapTips on the map"""
         self.timer_map_tips.stop()
         if self.canvas.underMouse():
             point_qgs = self.last_map_position
@@ -488,8 +484,7 @@ class GwDimensioning:
             self.timer_map_tips_clear.start(1000)
 
     def _clear_map_tip(self):
-        """ Clear MapTips """
-
+        """Clear MapTips"""
         self.timer_map_tips_clear.stop()
         self.map_tip_node.clear(self.canvas)
         self.map_tip_connec.clear(self.canvas)

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -17,7 +16,7 @@ from ...shared.info import GwInfo
 
 
 class GwElementButton(GwAction):
-    """ Button 33: Element """
+    """Button 33: Element"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -41,8 +40,7 @@ class GwElementButton(GwAction):
             self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
 
     def _fill_element_menu(self):
-        """ Fill add point menu """
-
+        """Fill add point menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:

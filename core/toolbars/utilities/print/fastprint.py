@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -22,7 +21,7 @@ from .....libs import tools_qgis, tools_qt
 
 
 class GwFastprint:
-    """ Action 65a: Fast print """
+    """Action 65a: Fast print"""
 
     def __init__(self):
         self.iface = global_vars.iface
@@ -114,11 +113,11 @@ class GwFastprint:
             tools_gw.get_values(dialog, widget, self.my_json)
 
     def _set_rotation(self, widget):
-        """ Set rotation to mapCanvas """
+        """Set rotation to mapCanvas"""
         self.canvas.setRotation(float(widget.text()))
 
     def _set_scale(self, widget):
-        """ Set zoomScale to mapCanvas """
+        """Set zoomScale to mapCanvas"""
         self.canvas.zoomScale(float(widget.text()))
 
     def __print(self, dialog):
@@ -143,10 +142,9 @@ class GwFastprint:
         print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
     def _preview(self, dialog, show):
-        """ Export values from widgets(only QLineEdit) into dialog, to selected composer
-                if composer.widget.id == dialog.widget.property('columnname')
+        """Export values from widgets(only QLineEdit) into dialog, to selected composer
+        if composer.widget.id == dialog.widget.property('columnname')
         """
-
         selected_com = self._get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
 
@@ -167,8 +165,7 @@ class GwFastprint:
             self.rubber_band = None
 
     def _check_whidget_exist(self, dialog):
-        """ Check if widget exist in composer """
-
+        """Check if widget exist in composer"""
         selected_com = self._get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
@@ -181,8 +178,7 @@ class GwFastprint:
                 widget.setStyleSheet(None)
 
     def _load_composer_values(self, dialog):
-        """ Load values from composer into form dialog """
-
+        """Load values from composer into form dialog"""
         selected_com = self._get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
 
@@ -269,11 +265,9 @@ class GwFastprint:
         return True
 
     def _set_widgets_into_composer(self, dialog, field, my_json=None):
+        """Functions called in -> widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
+        def set_print(self, dialog, my_json)
         """
-        functions called in -> widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
-            def set_print(self, dialog, my_json)
-        """
-
         widget = None
         label = None
         if field['label']:
@@ -304,8 +298,7 @@ class GwFastprint:
         return label, widget
 
     def _get_current_composer(self):
-        """ Get composer selected in QComboBox """
-
+        """Get composer selected in QComboBox"""
         selected_com = None
         active_composers = tools_qgis.get_composers_list()
         for composer in active_composers:
@@ -316,8 +309,7 @@ class GwFastprint:
         return selected_com
 
     def _open_composer(self, dialog):
-        """ Open selected composer and load values from composer into form dialog """
-
+        """Open selected composer and load values from composer into form dialog"""
         selected_com = self._get_current_composer()
         if selected_com is not None:
             self.iface.openLayoutDesigner(layout=selected_com)
@@ -325,17 +317,16 @@ class GwFastprint:
         self._load_composer_values(dialog)
 
     def set_print(self, dialog, my_json):
-        """ Function called in def _set_widgets_into_composer(...) -->
-            widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json)) """
-
+        """Function called in def _set_widgets_into_composer(...) -->
+        widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
+        """
         if my_json['composer'] != '-1':
             self._check_whidget_exist(self.dlg_composer)
             self._load_composer_values(dialog)
             self._accept(dialog, my_json)
 
     def _draw_rectangle(self, result, rubber_band):
-        """ Draw lines based on geometry """
-
+        """Draw lines based on geometry"""
         if result['geometry'] is None:
             return
 

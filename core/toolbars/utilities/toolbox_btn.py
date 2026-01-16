@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -30,7 +29,7 @@ from .... import global_vars
 
 
 class GwToolBoxButton(GwAction):
-    """ Button 63: Toolbox """
+    """Button 63: Toolbox"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -133,8 +132,7 @@ class GwToolBoxButton(GwAction):
         return layer
 
     def save_parametric_values(self, dialog, function_name):
-        """ Save QGIS settings related with toolbox options """
-
+        """Save QGIS settings related with toolbox options"""
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
@@ -153,8 +151,7 @@ class GwToolBoxButton(GwAction):
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
 
     def save_settings_values(self, dialog, function_name):
-        """ Save QGIS settings related with toolbox options """
-
+        """Save QGIS settings related with toolbox options"""
         feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_feature_type, 0)
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", f"{feature_type}")
         layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
@@ -507,8 +504,7 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked['value'] = state
 
     def _load_parametric_values(self, dialog, function):
-        """ Load QGIS settings related with toolbox options """
-
+        """Load QGIS settings related with toolbox options"""
         function_name = function['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
@@ -536,8 +532,7 @@ class GwToolBoxButton(GwAction):
                 tools_qt.set_calendar(dialog, widget, date)
 
     def _load_settings_values(self, dialog, function):
-        """ Load QGIS settings related with toolbox options """
-
+        """Load QGIS settings related with toolbox options"""
         function_name = function['functionname']
         if dialog.cmb_feature_type.property('selectedId') in (None, '', 'NULL'):
             feature_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", "user",
@@ -604,11 +599,9 @@ class GwToolBoxButton(GwAction):
         lbl_time.setText(text)
 
     def _manage_btn_run(self, index):
+        """Disable btn_accept when on tab info log and/or if toolbox_task is active
+        :param index: tab index (passed by signal)
         """
-        Disable btn_accept when on tab info log and/or if toolbox_task is active
-            :param index: tab index (passed by signal)
-        """
-
         if index == 1:
             self.dlg_functions.btn_run.setEnabled(False)
         else:
@@ -827,8 +820,7 @@ class GwToolBoxButton(GwAction):
             self.toolbox_task.cancel()
 
     def _select_file_report(self):
-        """ Select CSV file """
-
+        """Select CSV file"""
         tools_qt.get_save_file_path(self.dlg_reports, 'txt_export_path', '*.csv', "Save report file")
 
     def _export_reports(self, dialog, table, path):

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,7 +20,7 @@ from .... import global_vars
 
 
 class GwFeatureTypeChangeButton(GwMaptool):
-    """ Button 25: Change feature type
+    """Button 25: Change feature type
     User select from drop-down button feature type: ARC, NODE, CONNEC.
     Snap to this feature type is activated.
     User selects a feature of that type from the map.
@@ -117,8 +116,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
     # region private functions
 
     def _fill_change_menu(self):
-        """ Fill change feature type menu """
-
+        """Fill change feature type menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
@@ -139,8 +137,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
                                                  parameter="last_feature_type", value=action_id, comment=None))
 
     def _set_active_layer(self, name):
-        """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
-
+        """Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY)"""
         layers = {"ARC": "ve_arc", "NODE": "ve_node",
                   "CONNEC": "ve_connec", "GULLY": "ve_gully"}
         tablename = layers.get(name.upper())
@@ -148,8 +145,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.iface.setActiveLayer(self.current_layer)
 
     def _open_custom_form(self, layer, expr):
-        """ Open custom from selected layer """
-
+        """Open custom from selected layer"""
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
         if features[0]:
@@ -163,8 +159,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.tablename))
 
     def _open_dialog(self):
-        """ Open Feature Change Dialog dynamic """
-
+        """Open Feature Change Dialog dynamic"""
         feature = f'"tableName":"{self.tablename}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getchangefeaturetype', body)
@@ -174,8 +169,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
 
     def _manage_dlg_widgets(self, dialog, complet_result):
-        """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
-
+        """Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment"""
         layout_orientations = {}
         old_widget_pos = 0
         # Define a fixed width for labels to ensure alignment
@@ -262,15 +256,13 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
 
 def btn_cancel_featuretype_change(**kwargs):
-    """ Close form """
-
+    """Close form"""
     dialog = kwargs["dialog"]
     tools_gw.close_dialog(dialog)
 
 
 def btn_accept_featuretype_change(**kwargs):
-    """ Update current type of feature and save changes in database """
-
+    """Update current type of feature and save changes in database"""
     class_obj = kwargs["class"]
     dialog = kwargs["dialog"]
 
@@ -359,8 +351,7 @@ def btn_accept_featuretype_change(**kwargs):
 
 
 def btn_catalog_featuretype_change(**kwargs):
-    """ Open Catalog form """
-
+    """Open Catalog form"""
     dialog = kwargs["dialog"]
     class_obj = kwargs["class"]
 
@@ -376,8 +367,7 @@ def btn_catalog_featuretype_change(**kwargs):
 
 
 def cmb_new_featuretype_selection_changed(**kwargs):
-    """ When new featuretype changes, catalog_id and related fields (fluid, location, etc.) update as well """
-
+    """When new featuretype changes, catalog_id and related fields (fluid, location, etc.) update as well"""
     dialog = kwargs["dialog"]
     cmb_new_feature_type = kwargs["widget"]
     class_obj = kwargs["class"]

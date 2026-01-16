@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -92,8 +91,7 @@ class GwMincutTools:
     # region private functions
 
     def _manage_dlg_widgets(self, complet_result):
-        """ Creates and populates all the widgets """
-
+        """Creates and populates all the widgets"""
         layout_list = []
         widget_offset = 0
         prev_layout = ""
@@ -175,14 +173,15 @@ class GwMincutTools:
 
 
 def close_mincut_manager(**kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    """
     dialog = kwargs['dialog']
     tools_gw.close_dialog(dialog)
 
 
 def mincut_selector(**kwargs):
-    """ Manage mincut selector """
+    """Manage mincut selector"""
     dialog = kwargs['dialog']
     class_obj = kwargs['class']
     qtable = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
@@ -218,7 +217,7 @@ def mincut_selector(**kwargs):
 
 
 def delete_mincut(**kwargs):
-    """ Delete selected elements of the table (by id) """
+    """Delete selected elements of the table (by id)"""
     dialog = kwargs['dialog']
     widget = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     table_name = "om_mincut"
@@ -284,8 +283,7 @@ def delete_mincut(**kwargs):
 
 
 def _reload_table(dialog, complet_result):
-    """ Get inserted element_id and add it to current feature """
-
+    """Get inserted element_id and add it to current feature"""
     tab_name = 'main'
     list_tables = dialog.findChildren(QTableView)
 
@@ -374,7 +372,7 @@ def filter_by_days(dialog, widget):
 
 
 def open_mincut(**kwargs):
-    """ Open mincut form with selected record of the table """
+    """Open mincut form with selected record of the table"""
     dialog = kwargs['dialog']
     class_obj = kwargs['class']
     mincut = kwargs['class'].mincut

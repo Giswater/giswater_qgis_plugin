@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -24,8 +23,7 @@ from .threads.project_layers_config import GwProjectLayersConfig
 class GwMenuLoad(QObject):
 
     def __init__(self):
-        """ Class to manage layers. Refactor code from main.py """
-
+        """Class to manage layers. Refactor code from main.py"""
         super().__init__()
         self.iface = global_vars.iface
 
@@ -120,31 +118,27 @@ class GwMenuLoad(QObject):
         action_function.clicked_event()
 
     def _translate(self, message):
-        """ Calls on tools_qt to translate parameter message """
-
+        """Calls on tools_qt to translate parameter message"""
         return tools_qt.tr(message)
 
     # region private functions
 
     def _open_config_path(self):
-        """ Opens the OS-specific Config directory """
-
+        """Opens the OS-specific Config directory"""
         path = os.path.realpath(lib_vars.user_folder_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
 
     def _open_plugin_path(self):
-        """ Opens the OS-specific Plugin directory """
-
+        """Opens the OS-specific Plugin directory"""
         path = os.path.realpath(lib_vars.plugin_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
 
     def _open_manage_file(self):
-        """ Manage files dialog:: """
-
+        """Manage files dialog::"""
         tools_qgis.set_cursor_wait()
         self.dlg_manage_menu = GwLoadMenuUi(self)
         tools_gw.load_settings(self.dlg_manage_menu)
@@ -177,12 +171,11 @@ class GwMenuLoad(QObject):
         tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
 
     def _reset_position_dialog(self):
-        """ Reset position dialog x/y """
+        """Reset position dialog x/y"""
         tools_gw.reset_position_dialog(True)
 
     def _fill_tbl_config_files(self):
-        """ Fills a UI table with the local list of values variable. """
-
+        """Fills a UI table with the local list of values variable."""
         self.tree_config_files.resize(500, 200)
         self.tree_config_files.setColumnCount(4)
         self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value", "Description"])
@@ -260,8 +253,7 @@ class GwMenuLoad(QObject):
         tools_qgis.show_info(msg)
 
     def _reset_plugin(self):
-        """ Called in reset plugin action """
-
+        """Called in reset plugin action"""
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
         tools_qgis.restore_cursor()  # Restore cursor in case it's stuck with an overridden one
@@ -269,8 +261,7 @@ class GwMenuLoad(QObject):
         self._reload_layers()  # Execute GwProjectLayersConfig thread
 
     def _reload_layers(self):
-        """ Reloads all the layers """
-
+        """Reloads all the layers"""
         # Manage if task is already running
         if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
             try:
@@ -298,14 +289,12 @@ class GwMenuLoad(QObject):
         QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
     def _reset_snapping_managers(self):
-        """ Deactivates all snapping managers """
-
+        """Deactivates all snapping managers"""
         for i in range(0, len(global_vars.snappers)):
             global_vars.snappers[i].vertex_marker.hide()
 
     def _reset_all_rubberbands(self):
-        """ Resets all active rubber bands """
-
+        """Resets all active rubber bands"""
         for i in range(0, len(global_vars.active_rubberbands)):
             global_vars.active_rubberbands[0].reset()
             global_vars.active_rubberbands.pop(0)

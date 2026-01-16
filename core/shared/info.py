@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -101,8 +100,7 @@ class GwInfo(QObject):
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, linked_feature=None,
                   layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False, connect_signal=None):
-        """
-        :param point: point where use clicked
+        """:param point: point where use clicked
         :param table_name: table where do sql query
         :param feature_id: id of feature to do info
         :return:
@@ -305,8 +303,7 @@ class GwInfo(QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
     def add_feature(self, feature_cat, action=None, connect_signal=None, linked_feature=None):
-        """ Button 21, 22: Add 'node', 'arc', 'connec' or 'element' """
-
+        """Button 21, 22: Add 'node', 'arc', 'connec' or 'element'"""
         global is_inserting  # noqa: F824
         if is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
@@ -365,8 +362,7 @@ class GwInfo(QObject):
     """ FUNCTIONS RELATED WITH TAB PLAN """
 
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
-        """ Snap feature and set a value into dialog """
-
+        """Snap feature and set a value into dialog"""
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:
             action.setChecked(False)
@@ -501,15 +497,14 @@ class GwInfo(QObject):
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None, connect_signal=None,
                           linked_feature=None):
-        """
-        Opens a custom form
-            :param feature_id: the id of the node that will populate the form (Integer)
-            :param complet_result: The JSON used to create/populate the form (JSON)
-            :param tab_type:
-            :param sub_tag:
-            :param is_docker: Whether the form is docker or not (Boolean)
-            :param new_feature: Whether the form will create a new feature or not (Boolean)
-            :return: self.complt_result, self.dlg_cf
+        """Opens a custom form
+        :param feature_id: the id of the node that will populate the form (Integer)
+        :param complet_result: The JSON used to create/populate the form (JSON)
+        :param tab_type:
+        :param sub_tag:
+        :param is_docker: Whether the form is docker or not (Boolean)
+        :param new_feature: Whether the form will create a new feature or not (Boolean)
+        :return: self.complt_result, self.dlg_cf
         """
         # Dialog
         self.dlg_cf = GwInfoFeatureUi(self, sub_tag)
@@ -690,8 +685,7 @@ class GwInfo(QObject):
         return self.complet_result, self.dlg_cf
 
     def _get_widget_controls(self, new_feature):
-        """ Sets class variables for most widgets """
-
+        """Sets class variables for most widgets"""
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf))
 
@@ -707,8 +701,7 @@ class GwInfo(QObject):
         self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
 
     def _get_actions(self):
-        """ Sets class variables for actions """
-
+        """Sets class variables for actions"""
         self.action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         self.action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
         self.action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
@@ -731,8 +724,7 @@ class GwInfo(QObject):
         self.action_set_geom = self.dlg_cf.findChild(QAction, "actionSetGeom")
 
     def _manage_icons(self):
-        """ Adds icons to actions and buttons """
-
+        """Adds icons to actions and buttons"""
         # Set actions icon
         tools_gw.add_icon(self.action_edit, "101")
         tools_gw.add_icon(self.action_copy_paste, "106")
@@ -756,8 +748,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_set_geom, "133")
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
-        """ Creates and populates all the widgets """
-
+        """Creates and populates all the widgets"""
         layout_orientations = {}
         old_widget_pos = 0
         layout_list = []
@@ -861,8 +852,7 @@ class GwInfo(QObject):
                             self.tablename, self.field_id))
 
     def _manage_actions_signals(self, complet_result, list_points, new_feature, tab_type, result):
-        """ Connects signals to the actions """
-
+        """Connects signals to the actions"""
         # Set variables
         id_name = complet_result['body']['feature']['idName']
         self.filter = str(id_name) + " = '" + str(self.feature_id) + "'"
@@ -986,8 +976,7 @@ class GwInfo(QObject):
         open_epa_dlg("DWF & INFLOWS", **kwargs)
 
     def action_open_link(self):
-        """ Manage def open_file from action 'Open Link' """
-
+        """Manage def open_file from action 'Open Link'"""
         try:
             widget_list = self.dlg_cf.findChildren(tools_qt.GwHyperLinkLabel)
             for widget in widget_list:
@@ -999,8 +988,7 @@ class GwInfo(QObject):
             pass
 
     def _get_feature_type(self, complet_result):
-        """ Get feature type as feature_type (node, arc, connec, gully) """
-
+        """Get feature type as feature_type (node, arc, connec, gully)"""
         self.feature_type = str(complet_result['body']['feature']['featureType'])
         if str(self.feature_type) in ('', '[]'):
             if 'feature_cat' in globals():
@@ -1015,8 +1003,7 @@ class GwInfo(QObject):
         return result
 
     def _open_help(self, feature_type):
-        """ Open help file with selected @project_type and @feature_type """
-
+        """Open help file with selected @project_type and @feature_type"""
         # Get locale of QGIS application
         locale = tools_qgis.get_locale_schema()
         project_type = tools_gw.get_project_type()
@@ -1186,8 +1173,7 @@ class GwInfo(QObject):
         self.iface.actionPan().trigger()
 
     def _change_rb_type(self, dialog, widget, complet_result, ep):
-        """ Function to manage radioButton interpolate/extrapolate"""
-
+        """Function to manage radioButton interpolate/extrapolate"""
         if widget.objectName() != self.last_rb:
             self.last_rb = widget.objectName()
             tools_gw.set_config_parser("btn_info", "rb_action_interpolate", f"{widget.objectName()}")
@@ -1195,8 +1181,7 @@ class GwInfo(QObject):
             self._activate_snapping(complet_result, ep, refresh_dialog=dialog)
 
     def _snapping_node(self, dlg_interpolate, point, button):
-        """ Get id of selected nodes (node1 and node2) """
-
+        """Get id of selected nodes (node1 and node2)"""
         if button == 2:
             self._dlg_destroyed(self.layer)
             return
@@ -1380,8 +1365,7 @@ class GwInfo(QObject):
         tools_gw.disconnect_signal('info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
 
     def _manage_action_copy_paste(self, dialog, feature_type, tab_type=None):
-        """ Copy some fields from snapped feature to current feature """
-
+        """Copy some fields from snapped feature to current feature"""
         # Set map tool emit point and signals
         tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
@@ -1404,10 +1388,9 @@ class GwInfo(QObject):
             self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
     def _manage_action_copy_paste_mouse_move(self, point):
-        """ Slot function when mouse is moved in the canvas.
-            Add marker if any feature is snapped
+        """Slot function when mouse is moved in the canvas.
+        Add marker if any feature is snapped
         """
-
         # Hide marker and get coordinates
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(point=point)
@@ -1421,8 +1404,7 @@ class GwInfo(QObject):
         self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def _manage_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
-        """ Slot function when canvas is clicked """
-
+        """Slot function when canvas is clicked"""
         if btn == Qt.MouseButton.RightButton:
             self._manage_disable_copy_paste(dialog, emit_point)
             return
@@ -1508,8 +1490,7 @@ class GwInfo(QObject):
         self._manage_disable_copy_paste(dialog, emit_point)
 
     def _manage_disable_copy_paste(self, dialog, emit_point):
-        """ Disable actionCopyPaste and set action 'Identify' """
-
+        """Disable actionCopyPaste and set action 'Identify'"""
         action_widget = dialog.findChild(QAction, "actionCopyPaste")
         if action_widget:
             action_widget.setChecked(False)
@@ -1545,15 +1526,13 @@ class GwInfo(QObject):
         tools_gw.close_dialog(dialog)
 
     def _get_feature(self, tab_type):
-        """ Get current QgsFeature """
-
+        """Get current QgsFeature"""
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
         self.feature = tools_qgis.get_feature_by_expr(self.layer, expr_filter)
         return self.feature
 
     def _manage_action_centered(self, canvas, layer):
-        """ Center map to current feature """
-
+        """Center map to current feature"""
         if not self.feature:
             self._get_feature(self.tab_type)
         layer.selectByIds([self.feature.id()])
@@ -1597,8 +1576,7 @@ class GwInfo(QObject):
                 pass
 
     def _apply_from_btn(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False, linked_feature=None):
-        """ Manage apply button from info dialog """
-
+        """Manage apply button from info dialog"""
         self._manage_edition(dialog, action_edit, fid, new_feature, generic, from_apply)
 
         if linked_feature:
@@ -1690,7 +1668,7 @@ class GwInfo(QObject):
             return save
 
     def _manage_linked_feature(self, linked_feature):
-        """ Manage linked feature after accept action """
+        """Manage linked feature after accept action"""
         if linked_feature.get('table_name'):
             sql = f"SELECT * FROM {linked_feature['table_name']} WHERE {linked_feature['columnname']} = '{linked_feature['element_id']}'"
             linked = tools_db.get_row(sql)
@@ -1727,7 +1705,7 @@ class GwInfo(QObject):
         return True
 
     def _roll_back(self):
-        """ Discard changes in current layer """
+        """Discard changes in current layer"""
         self._disconnect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
@@ -1786,8 +1764,7 @@ class GwInfo(QObject):
                 widget.setVisible(False)
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
-        """
-        :param dialog:
+        """:param dialog:
         :param complet_result:
         :param _json:
         :param p_widget:
@@ -1795,7 +1772,6 @@ class GwInfo(QObject):
         :param close_dlg:
         :return: (boolean)
         """
-
         # QgsProject.instance().blockSignals(True)
         # It's not necessary to block signals because the code isn't changing snapping configuration anymore.
 
@@ -1984,8 +1960,7 @@ class GwInfo(QObject):
             self.prev_action.action.trigger()
 
     def _enable_actions(self, dialog, enabled):
-        """ Enable actions according if layer is editable or not """
-
+        """Enable actions according if layer is editable or not"""
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
@@ -2027,12 +2002,10 @@ class GwInfo(QObject):
         action.setEnabled(enabled)
 
     def _check_datatype_validator(self, dialog, widget, btn):
+        """Functions called in ->  getattr(tools_gw, f"check_{widget.property('datatype')}")(value, widget, btn)
+        def check_integer(self, value, widget, btn_accept)
+        def check_double(self, value, widget, btn_accept)
         """
-        functions called in ->  getattr(tools_gw, f"check_{widget.property('datatype')}")(value, widget, btn)
-            def check_integer(self, value, widget, btn_accept)
-            def check_double(self, value, widget, btn_accept)
-        """
-
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"_check_{widget.property('datatype')}")(value, widget, btn)
@@ -2040,11 +2013,10 @@ class GwInfo(QObject):
             """ If the function called by getattr don't exist raise this exception """
 
     def _check_double(self, value, widget, btn_accept):
-        """ Check if the value is double or not.
-            This function is called in def check_datatype_validator(self, value, widget, btn)
-            getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
+        """Check if the value is double or not.
+        This function is called in def check_datatype_validator(self, value, widget, btn)
+        getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
         """
-
         if value is None or bool(re.search(r"^\d*$", value)) or bool(re.search(r"^\d+\.\d+$", value)):
             widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
@@ -2053,11 +2025,10 @@ class GwInfo(QObject):
             btn_accept.setEnabled(False)
 
     def _check_integer(self, value, widget, btn_accept):
-        """ Check if the value is an integer or not.
-            This function is called in def check_datatype_validator(self, value, widget, btn)
-            getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
+        """Check if the value is an integer or not.
+        This function is called in def check_datatype_validator(self, value, widget, btn)
+        getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
         """
-
         if value is None or bool(re.search(r"^\d*$", value)):
             widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
@@ -2081,29 +2052,26 @@ class GwInfo(QObject):
             btn_accept.setEnabled(False)
 
     def _check_tab_data(self, field):
-        """ Check if current tab name is tab_data """
-
+        """Check if current tab name is tab_data"""
         if field.get('tabname') != 'tab_data':
             return False
         return True
 
     def _clean_my_json(self, widget):
-        """ Delete keys if exist, when widget is autoupdate """
-
+        """Delete keys if exist, when widget is autoupdate"""
         try:
             self.my_json.pop(str(widget.property('columnname')), None)
         except KeyError:
             pass
 
     def _reset_my_json(self, reset_epa=True):
-        """ Clear the my_json dictionary """
-
+        """Clear the my_json dictionary"""
         self.my_json.clear()
         if reset_epa:
             self._reset_my_json_epa()
 
     def _reset_my_json_epa(self):
-        """ Clear the my_json_epa dictionary """
+        """Clear the my_json_epa dictionary"""
         self.my_json_epa.clear()
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
@@ -2134,8 +2102,7 @@ class GwInfo(QObject):
         return widget
 
     def _accept_auto_update(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
-        """
-        :param dialog:
+        """:param dialog:
         :param complet_result:
         :param _json:
         :param p_widget:
@@ -2143,7 +2110,6 @@ class GwInfo(QObject):
         :param close_dlg:
         :return: (boolean)
         """
-
         # Manage change epa_type message
         if _json.get('epa_type'):
             if new_feature is None:
@@ -2204,12 +2170,10 @@ class GwInfo(QObject):
         return widget
 
     def _reload_fields(self, dialog, result, p_widget):
-        """
-        :param dialog: QDialog where find and set widgets
+        """:param dialog: QDialog where find and set widgets
         :param result: row with info (json)
         :param p_widget: Widget that has changed
         """
-
         if not p_widget:
             return
 
@@ -2438,8 +2402,7 @@ class GwInfo(QObject):
             # TODO: Make autoupdate widgets work for other tabs as well
 
     def run_settopology(self, widget, **kwargs):
-        """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
-
+        """Sets node_1/2 from lineedit & converts widget into button if function run successfully"""
         dialog = kwargs['dialog']
         field = kwargs['field']
         complet_result = kwargs['complet_result']
@@ -2480,11 +2443,9 @@ class GwInfo(QObject):
         self.audit.open_audit_manager(self.feature_id, self.tablename)
 
     def _show_actions(self, dialog, tab_name, enable_actions=True):
+        """Hide all actions and show actions for the corresponding tab
+        :param tab_name: corresponding tab
         """
-        Hide all actions and show actions for the corresponding tab
-            :param tab_name: corresponding tab
-        """
-
         actions_list = dialog.findChildren(QAction)
         for action in actions_list:
             if not action.objectName() or action.objectName() == 'actionAudit':
@@ -2510,8 +2471,7 @@ class GwInfo(QObject):
     """ MANAGE TABS """
 
     def _tab_activation(self, dialog):
-        """ Call functions depend on tab selection """
-
+        """Call functions depend on tab selection"""
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
@@ -2635,8 +2595,7 @@ class GwInfo(QObject):
             self.tab_plan_loaded = True
 
     def _manage_dscenario_elements_tabs(self):
-        """ Manage dscenario elements tabs """
-
+        """Manage dscenario elements tabs"""
         if global_vars.project_type == 'ud':
             # Disable dscenario tabs
             tab_widget = self.dlg_cf.findChild(QTabWidget, 'tab_frelem_dscenario')
@@ -2657,7 +2616,7 @@ class GwInfo(QObject):
             tableview.doubleClicked.connect(partial(self._open_dscenario_element, self.dlg_cf, tableview))
 
     def _open_dscenario_element(self, dlg_cf, tableview):
-        """ Open dscenario element """
+        """Open dscenario element"""
         # Create double click event for dscenario tables
         dscenario_manager_btn = GwDscenarioManagerButton('', None, None, None, None)
         # Get first column value from the selected row
@@ -2737,8 +2696,7 @@ class GwInfo(QObject):
             tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
 
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
-        """ Put filter widgets into layout and set headers into QTableView """
-
+        """Put filter widgets into layout and set headers into QTableView"""
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName().replace('tab_', "")
         complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, id_name)
@@ -2789,13 +2747,11 @@ class GwInfo(QObject):
         return complet_list, widget_list
 
     def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
+        """Functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                         -> widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+        module = tools_backend_calls -> def open_rpt_result(**kwargs)
+                                     -> def filter_table(self, **kwargs)
         """
-        functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-                            -> widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-           module = tools_backend_calls -> def open_rpt_result(**kwargs)
-                                        -> def filter_table(self, **kwargs)
-         """
-
         model = None
         for widget in widget_list:
             if type(widget) is QTableView:
@@ -2913,8 +2869,7 @@ class GwInfo(QObject):
                 plan_layout.addItem(plan_vertical_spacer)
 
     def _add_label(self, field):
-        """ Add widgets QLineEdit type """
-
+        """Add widgets QLineEdit type"""
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
@@ -2950,8 +2905,7 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_generic, dlg_name='info_generic')
 
     def _set_catalog(self, dialog, form_name, table_name, feature_id, id_name):
-        """ Insert table 'cat_work'. Add cat_work """
-
+        """Insert table 'cat_work'. Add cat_work"""
         # Manage mandatory fields
         missing_mandatory = False
         widgets = dialog.findChildren(QWidget)
@@ -3006,8 +2960,7 @@ class GwInfo(QObject):
         self.dlg_cf.setEnabled(True)
 
     def _mouse_moved(self, layer, point):
-        """ Mouse motion detection """
-
+        """Mouse motion detection"""
         # Set active layer
         self.iface.setActiveLayer(layer)
         layer_name = tools_qgis.get_layer_source_table_name(layer)
@@ -3026,8 +2979,7 @@ class GwInfo(QObject):
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def _get_id(self, dialog, action, option, emit_point, child_type, widget_name, point, event):
-        """ Get selected attribute from snapped feature """
-
+        """Get selected attribute from snapped feature"""
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
         options = {
                     'arc': ['arc_id', 'tab_data_arc_id'],
@@ -3072,13 +3024,12 @@ class GwInfo(QObject):
             self._cancel_snapping_tool(dialog, action)
 
     def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False):
-        """
-        Function called in def get_id(self, dialog, action, option, point, event):
-            getattr(self, options[option][1])(feat_id, child_type)
+        """Function called in def get_id(self, dialog, action, option, point, event):
+        getattr(self, options[option][1])(feat_id, child_type)
 
-            :param feat_id: Id of the snapped feature
-            :param child_type: Feature type context.
-            :param simple: If True, only updates the label without backend calls.
+        :param feat_id: Id of the snapped feature
+        :param child_type: Feature type context.
+        :param simple: If True, only updates the label without backend calls.
         """
         if not simple:
 
@@ -3141,17 +3092,14 @@ class GwInfo(QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
     def _action_is_checked(self):
-        """ Recover snapping options when action add feature is un-checked """
-
+        """Recover snapping options when action add feature is un-checked"""
         if not self.iface.actionAddFeature().isChecked():
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
     def _open_new_feature(self, feature_id, connect_signal=None, linked_feature=None):
-        """
-        :param feature_id: Parameter sent by the featureAdded method itself
+        """:param feature_id: Parameter sent by the featureAdded method itself
         :return:
         """
-
         tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         if (linked_feature and linked_feature.get('geometry')):
@@ -3197,16 +3145,14 @@ class GwInfo(QObject):
             is_inserting = False
 
     def _get_combo_child(self, dialog, widget, feature_type, tablename, field_id):
+        """Find QComboBox child and populate it
+        :param dialog: QDialog
+        :param widget: QComboBox parent
+        :param feature_type: PIPE, ARC, JUNCTION, VALVE...
+        :param tablename: view of DB
+        :param field_id: Field id of tablename
+        :return: False if failed
         """
-        Find QComboBox child and populate it
-            :param dialog: QDialog
-            :param widget: QComboBox parent
-            :param feature_type: PIPE, ARC, JUNCTION, VALVE...
-            :param tablename: view of DB
-            :param field_id: Field id of tablename
-            :return: False if failed
-        """
-
         combo_parent = widget.property('columnname')
         combo_id = tools_qt.get_combo_value(dialog, widget)
 
@@ -3224,13 +3170,12 @@ class GwInfo(QObject):
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
 
     def _get_point_xy(self):
-        """ Capture point XY from the canvas """
+        """Capture point XY from the canvas"""
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
 
     def _update_geom(self, table_id, id_name, newfeature_id):
-        """ Update geometry field """
-
+        """Update geometry field"""
         srid = lib_vars.data_epsg
         sql = (f"UPDATE {table_id}"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
@@ -3242,8 +3187,7 @@ class GwInfo(QObject):
 
 
 def get_list(table_name, id_name=None, filter=None):
-    """ Mount and execute the query for gw_fct_getlist """
-
+    """Mount and execute the query for gw_fct_getlist"""
     feature = f'"tableName":"{table_name}"'
     filter_fields = '"limit": -1'
     if id_name and filter:
@@ -3471,8 +3415,7 @@ def open_epa_dlg(windowtitle, **kwargs):
 
 
 def _show_context_menu(qtableview, tableview):
-        """ Show custom context menu """
-
+        """Show custom context menu"""
         menu = QMenu(qtableview)
         if 'dscenario' in tableview['view'] and 'inflows' not in tableview['view']:
             action_delete = QAction("Delete dscenario", qtableview)
@@ -3976,10 +3919,9 @@ def edit_dscenario(**kwargs):
 
 
 def open_selected_element(**kwargs):
-    """
-    Open form of selected element of the @qtable??
-        function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
-        at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Open form of selected element of the @qtable??
+    function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
+    at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
@@ -4000,9 +3942,9 @@ def open_selected_element(**kwargs):
 
 
 def manage_element(element_id, **kwargs):
-    """ Function called in class tools_gw.add_button(...) -->
-            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-
+    """Function called in class tools_gw.add_button(...) -->
+    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    """
     feature = None
     complet_result = kwargs['complet_result']
     feature_type = complet_result['body']['feature']['featureType']
@@ -4031,7 +3973,7 @@ def manage_element(element_id, **kwargs):
 
 
 def add_frelem_to_dscenario(**kwargs):
-    """ Add frelem to dscenario """
+    """Add frelem to dscenario"""
     class_obj = kwargs['class']
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
@@ -4101,7 +4043,7 @@ def add_frelem_to_dscenario(**kwargs):
 
 
 def remove_frelem_from_dscenario(**kwargs):
-    """ Remove frelem from dscenario """
+    """Remove frelem from dscenario"""
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
 
@@ -4147,7 +4089,7 @@ def remove_frelem_from_dscenario(**kwargs):
 
 
 def _manage_element_new(elem, **kwargs):
-    """ Get inserted element_id and add it to current feature """
+    """Get inserted element_id and add it to current feature"""
     if elem.element_id is None:
         return
 
@@ -4158,7 +4100,7 @@ def _manage_element_new(elem, **kwargs):
 
 
 def _reload_table(**kwargs):
-    """ Get inserted element_id and add it to current feature """
+    """Get inserted element_id and add it to current feature"""
     dialog = kwargs['dialog']
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
@@ -4199,10 +4141,9 @@ def _reload_table(**kwargs):
 
 
 def open_selected_feature(**kwargs):
-    """
-    Open selected feature from @qtable
-        function called in -> def add_tableview(complet_result, field, dialog, module=sys.modules[__name__])
-        at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Open selected feature from @qtable
+    function called in -> def add_tableview(complet_result, field, dialog, module=sys.modules[__name__])
+    at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     qtable = kwargs['qtable']
     complet_list = kwargs['complet_result']
@@ -4316,8 +4257,7 @@ def open_visit_files(**kwargs):
 
 
 def new_visit(**kwargs):
-    """ Call button 64: om_add_visit """
-
+    """Call button 64: om_add_visit"""
     dlg_cf = kwargs['dialog']
     feature_type = kwargs['complet_result']['body']['feature']['featureType']
     feature_id = kwargs['complet_result']['body']['feature']['id']
@@ -4345,14 +4285,13 @@ def new_visit(**kwargs):
 
 
 def _update_visit_table(feature_type, date_event_from, date_event_to, tbl_event_cf):
-    """ Convenience fuction set as slot to update table after a Visit GUI close. """
+    """Convenience fuction set as slot to update table after a Visit GUI close."""
     table_name = "v_ui_event_x_" + feature_type
     tools_gw.set_dates_from_to(date_event_from, date_event_to, table_name, 'visit_start', 'visit_end')
 
 
 def open_visit_document(**kwargs):
-    """ Open document of selected record of the table """
-
+    """Open document of selected record of the table"""
     # search visit_id in table (targetwidget, columnfind)
     class_obj = kwargs['class']
     func_params = kwargs['func_params']
@@ -4464,8 +4403,7 @@ def open_selected_doc(tbl_list_doc):
 
 
 def open_gallery(**kwargs):
-    """ Open gallery of selected record of the table """
-
+    """Open gallery of selected record of the table"""
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
@@ -4495,12 +4433,11 @@ def open_gallery(**kwargs):
 
 
 def open_visit_event(**kwargs):
-    """
-    Open event of selected record of the table
-        Function called in:
-            def add_button(**kwargs) -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
-            def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]) ->
-                                        widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """Open event of selected record of the table
+    Function called in:
+        def add_button(**kwargs) -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+        def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]) ->
+                                    widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     class_obj = kwargs['class']
     dialog = kwargs['dialog']

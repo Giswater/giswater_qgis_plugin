@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -22,9 +21,10 @@ from ..maptool import GwMaptool
 
 
 class GwConnectLinkButton(GwMaptool):
-    """ Button 27: Connect Link
+    """Button 27: Connect Link
     User select connections from layer 'connec'
-    Execute SQL function: 'gw_fct_setlinktonetwork ' """
+    Execute SQL function: 'gw_fct_setlinktonetwork '
+    """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -65,8 +65,7 @@ class GwConnectLinkButton(GwMaptool):
     # region MAIN METHODS
 
     def clicked_event(self):
-        """ Event when button is clicked """
-
+        """Event when button is clicked"""
         # If a last selection exists (persisted in config), open that dialog directly
         last_ft = tools_gw.get_config_parser('btn_connect_link', 'last_feature_type', "user", "session")
         if last_ft not in (None, 'None', ''):
@@ -88,8 +87,7 @@ class GwConnectLinkButton(GwMaptool):
                 self.open_dlg()
 
     def open_dlg(self):
-        """ Main function to open 'Connect to network' dialog """
-
+        """Main function to open 'Connect to network' dialog"""
         # Create form and body
         form = {"formName": "generic", "formType": f"link_to_{self.feature_type}"}
         body = {"client": {"cur_user": tools_db.current_user}, "form": form}
@@ -139,7 +137,7 @@ class GwConnectLinkButton(GwMaptool):
         self._make_arc_field_readonly()
 
     def _setup_set_to_arc_button(self):
-        """ Setup set to arc button with dropdown menu (same as psector) """
+        """Setup set to arc button with dropdown menu (same as psector)"""
         btn_set_to_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_set_to_arc")
 
         if not btn_set_to_arc:
@@ -178,13 +176,13 @@ class GwConnectLinkButton(GwMaptool):
             pass
 
     def _make_arc_field_readonly(self):
-        """ Make arc field read-only (fallback if database config doesn't work) """
+        """Make arc field read-only (fallback if database config doesn't work)"""
         txt_arc_id = self.dlg_connect_link.findChild(QWidget, "tab_none_arc_id")
         if txt_arc_id and hasattr(txt_arc_id, 'setReadOnly'):
             txt_arc_id.setReadOnly(True)
 
     def _update_set_to_arc_button_state(self):
-        """ Update "Set to arc" button enabled state based on connec table content """
+        """Update "Set to arc" button enabled state based on connec table content"""
         btn_set_to_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_set_to_arc")
         btn_expr_arc = self.dlg_connect_link.findChild(QWidget, "tab_none_btn_expr_arc")
 
@@ -198,8 +196,7 @@ class GwConnectLinkButton(GwMaptool):
                 btn_expr_arc.setEnabled(has_connecs)
 
     def _cleanup_and_close(self):
-        """ Cleanup all visual elements when dialog is closed (same pattern as psector) """
-
+        """Cleanup all visual elements when dialog is closed (same pattern as psector)"""
         # Reset rubber bands (clear red highlighting)
         if hasattr(self, 'rubber_band_line') and self.rubber_band_line:
             tools_gw.reset_rubberband(self.rubber_band_line)
@@ -226,8 +223,7 @@ class GwConnectLinkButton(GwMaptool):
             tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
 
     def fill_tbl_ids(self, layer):
-        """ Fill table with selected features """
-
+        """Fill table with selected features"""
         # Initialize field variable
         field = {"value": []}
 
@@ -251,7 +247,6 @@ class GwConnectLinkButton(GwMaptool):
 
     def _fill_action_menu(self):
         """Fill the dropdown menu with actions (runtime memory of last selection)."""
-
         # Disconnect and remove previous actions
         for action in self.menu.actions():
             try:
@@ -282,8 +277,7 @@ class GwConnectLinkButton(GwMaptool):
     # region MAP TOOL EVENTS
 
     def activate(self):
-        """ Activate map tool """
-
+        """Activate map tool"""
         # Rubber band
         tools_gw.reset_rubberband(self.rubber_band)
 
@@ -305,8 +299,7 @@ class GwConnectLinkButton(GwMaptool):
             tools_qgis.show_info(msg, duration=9)
 
     def canvasMoveEvent(self, event):
-        """ With left click the digitizing is finished """
-
+        """With left click the digitizing is finished"""
         if event.buttons() == Qt.MouseButton.LeftButton:
 
             if not self.dragging:
@@ -322,8 +315,7 @@ class GwConnectLinkButton(GwMaptool):
         tools_gw.reset_rubberband(self.rubber_band, "polygon")
 
     def canvasReleaseEvent(self, event):
-        """ With left click the digitizing is finished """
-
+        """With left click the digitizing is finished"""
         # Manage if task is already running
         if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
             try:
@@ -403,8 +395,7 @@ class GwConnectLinkButton(GwMaptool):
         self.selected_rectangle = QgsRectangle(ll, ur)
 
     def _select_multiple_features(self, select_geometry):
-        """ Select multiple features on canvas """
-
+        """Select multiple features on canvas"""
         # TODO: Create button add_forced_arcs and manage selection with arcs
 
         # Get pressed keys on keyboard
@@ -426,13 +417,11 @@ class GwConnectLinkButton(GwMaptool):
             self.fill_tbl_ids(layer)
 
     def _selection_init(self):
-        """ Initialize selection mode """
-
+        """Initialize selection mode"""
         self.iface.actionSelect().trigger()
 
     def _selection_end(self):
-        """ Process selected features """
-
+        """Process selected features"""
         # Get current feature layer (connec/gully)
         layer = tools_qgis.get_layer_by_tablename(f've_{self.feature_type}')
 
@@ -441,7 +430,7 @@ class GwConnectLinkButton(GwMaptool):
         self.iface.actionPan().trigger()
 
     def _selection_end_arc(self):
-        """ Process selected arc features """
+        """Process selected arc features"""
         layer = self.iface.activeLayer()
         if not layer:
             return
@@ -463,7 +452,7 @@ class GwConnectLinkButton(GwMaptool):
         self.iface.actionPan().trigger()
 
     def _highlight_all_selected_arcs(self):
-        """ Highlight all selected arcs in red """
+        """Highlight all selected arcs in red"""
         # Always reset existing rubber band first
         tools_gw.reset_rubberband(self.rubber_band_line)
 
@@ -489,8 +478,7 @@ class GwConnectLinkButton(GwMaptool):
         self.rubber_band_line.show()
 
     def _save_dlg_values(self):
-        """ Save dialog values """
-
+        """Save dialog values"""
         pipe_diameter_value = self.pipe_diameter.text()
         max_distance_value = self.max_distance.text()
         linkcat_id_value = tools_qt.get_combo_value(self.dlg_connect_link, "tab_none_linkcat")
@@ -500,8 +488,7 @@ class GwConnectLinkButton(GwMaptool):
         tools_gw.set_config_parser(f'btn_connect_link_to_{self.feature_type}', 'linkcat_id', linkcat_id_value)
 
     def _set_to_arc(self, idx):
-        """ Handle 'Set to arc' button clicks - allows user to set exact connection point on arc """
-
+        """Handle 'Set to arc' button clicks - allows user to set exact connection point on arc"""
         if hasattr(self, 'emit_point') and self.emit_point is not None:
             tools_gw.disconnect_signal('connect_link', 'set_to_arc_ep_canvasClicked_set_arc_id')
             tools_gw.disconnect_signal('connect_link', 'set_to_arc_xyCoordinates_mouse_move_arc')
@@ -534,7 +521,7 @@ class GwConnectLinkButton(GwMaptool):
     # region ARC SELECTION METHODS
 
     def _mouse_move_arc(self, point):
-        """ Mouse move event for arc snapping (same as psector) """
+        """Mouse move event for arc snapping (same as psector)"""
         if not self.layer_arc or not self.snapper_manager:
             return
 
@@ -550,8 +537,7 @@ class GwConnectLinkButton(GwMaptool):
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
     def _set_arc_id(self, idx, point, event):
-        """ Set arc id from map click (same as psector) """
-
+        """Set arc id from map click (same as psector)"""
         # Manage right click
         if event == 2:
             tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
@@ -656,8 +642,7 @@ class GwConnectLinkButton(GwMaptool):
 
 
 def add(**kwargs):
-    """ Add button clicked event """
-
+    """Add button clicked event"""
     # Get class
     this = kwargs['class']
 
@@ -692,8 +677,7 @@ def add(**kwargs):
 
 
 def remove(**kwargs):
-    """ Remove button clicked event - Remove selected rows from table """
-
+    """Remove button clicked event - Remove selected rows from table"""
     # Get class
     this = kwargs['class']
 
@@ -767,8 +751,7 @@ def remove(**kwargs):
 
 
 def accept(**kwargs):
-    """ Accept button clicked event """
-
+    """Accept button clicked event"""
     # Get class
     this = kwargs['class']
 
@@ -847,14 +830,12 @@ def accept(**kwargs):
 
 
 def snapping(**kwargs):
-    """ Accept button clicked event """
-
+    """Accept button clicked event"""
     GwMaptool.clicked_event(kwargs['class'])
 
 
 def close(**kwargs):
-    """ Close button clicked event """
-
+    """Close button clicked event"""
     # Get class
     this = kwargs['class']
 
@@ -870,7 +851,6 @@ def close(**kwargs):
 
 def filter_expression(**kwargs):
     """Select features by expression for connec table"""
-
     # Get class
     this = kwargs['class']
 
@@ -898,7 +878,6 @@ def filter_expression(**kwargs):
 
 def filter_expression_arc(**kwargs):
     """Select arc features by expression for arc field"""
-
     # Get class
     this = kwargs['class']
 

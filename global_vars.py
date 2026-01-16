@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -76,8 +75,7 @@ active_signals = {}                        # A dictionary containing all connect
 # region Init Variables Functions
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_dir):
-    """ Function to initialize the global variables needed to load plugin """
-
+    """Function to initialize the global variables needed to load plugin"""
     global iface, canvas
     iface = p_iface
     canvas = p_canvas
@@ -87,8 +85,7 @@ def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_di
 
 
 def init_giswater_settings(setting_file):
-    """ Function to set Giswater settings: stored in the registry (on Windows) or .ini file (on Unix) """
-
+    """Function to set Giswater settings: stored in the registry (on Windows) or .ini file (on Unix)"""
     global giswater_settings
     giswater_settings = QSettings(setting_file, QSettings.Format.IniFormat)
     if hasattr(giswater_settings, "setIniCodec"):
@@ -96,8 +93,7 @@ def init_giswater_settings(setting_file):
 
 
 def init_qgis_settings(p_plugin_name):
-    """ Function to set QGIS settings: stored in the registry (on Windows) or .ini file (on Unix) """
-
+    """Function to set QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)"""
     lib_vars.plugin_name = p_plugin_name
 
 # endregion

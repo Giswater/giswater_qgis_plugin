@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -177,8 +176,7 @@ class GwCalculatePriority(GwTask):
         return float((value - min) * 10 / (max - min))
 
     def _get_arcs(self):
-        """ Get arcs """
-
+        """Get arcs"""
         columns = ""
 
         # Set columns variable depending of the method

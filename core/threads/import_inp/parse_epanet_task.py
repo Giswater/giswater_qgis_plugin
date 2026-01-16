@@ -49,8 +49,7 @@ class GwParseInpTask(GwTask):
 
 @dataclass(frozen=True)
 class Catalogs:
-    """
-    Represents the catalogs for each type of element in the INP file,
+    """Represents the catalogs for each type of element in the INP file,
     with the best correspondence in the DB.
     If a INP file doesn't have a type of node, its property receives `None`.
     """

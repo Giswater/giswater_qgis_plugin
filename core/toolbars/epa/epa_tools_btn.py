@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -28,7 +27,7 @@ from .epa_tools.go2iber import Go2Iber
 
 
 class GwEpaTools(GwAction):
-    """ Button 46: Epa tools """
+    """Button 46: Epa tools"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -53,8 +52,7 @@ class GwEpaTools(GwAction):
         self.menu.exec(menu_point)
 
     def _fill_action_menu(self):
-        """ Fill action menu """
-
+        """Fill action menu"""
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
@@ -96,8 +94,7 @@ class GwEpaTools(GwAction):
                 menu.menuAction().setParent(None)
 
     def _get_selected_action(self, name):
-        """ Gets selected action """
-
+        """Gets selected action"""
         if name == tools_qt.tr('Additional demand check'):
             add_demand_check = AddDemandCheck()
             add_demand_check.clicked_event()
@@ -150,7 +147,7 @@ class GwEpaTools(GwAction):
         return True
 
     def _get_file(self) -> Optional[Path]:
-        """ Get the GPKG file path from the user. """
+        """Get the GPKG file path from the user."""
         file_path = tools_qt.get_file(
             "Select GPKG file", "", "GPKG files (*.gpkg)"
         )

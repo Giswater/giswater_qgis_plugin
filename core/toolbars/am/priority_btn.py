@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -237,7 +236,8 @@ def configmaterial_from_tablewidget(table_widget, unknown_material):
 
 class GwAmPriorityButton(GwAction):
     """Button 2: Selection & priority calculation button
-    Select features and calculate priorities"""
+    Select features and calculate priorities
+    """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -839,7 +839,6 @@ class CalculatePriority:
 
     def old_manage_btn_snapping(self):
         """Fill btn_snapping QMenu"""
-
         # Functions
         icons_folder = os.path.join(
             lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}svg"
@@ -896,7 +895,6 @@ class CalculatePriority:
 
     def _selection_init(self):
         """Set canvas map tool to an instance of class 'GwSelectManager'"""
-
         # tools_gw.disconnect_signal('feature_delete')
         self.iface.actionSelect().trigger()
         # self.connect_signal_selection_changed()
@@ -950,7 +948,7 @@ class CalculatePriority:
             )
 
     def close_dlg(self):
-        """ Close dialog """
+        """Close dialog"""
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.remove_selection(True, layers=self.rel_layers)
         tools_gw.close_dialog(self.dlg_priority)

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -21,7 +20,7 @@ from .....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwWorkspaceManagerButton(GwAction):
-    """ Button 64: Workspace manager """
+    """Button 64: Workspace manager"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -34,8 +33,7 @@ class GwWorkspaceManagerButton(GwAction):
     # region private functions
 
     def _open_workspace_manager(self):
-        """ Open workspace manager """
-
+        """Open workspace manager"""
         # Main dialog
         self.dlg_workspace_manager = GwWorkspaceManagerUi(self)
         tools_gw.load_settings(self.dlg_workspace_manager)
@@ -124,8 +122,7 @@ class GwWorkspaceManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
 
     def _get_list(self, table_name='v_ui_workspace', filter_name=""):
-        """ Mount and execute the query for gw_fct_getlist """
-
+        """Mount and execute the query for gw_fct_getlist"""
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
@@ -139,8 +136,7 @@ class GwWorkspaceManagerButton(GwAction):
         return complet_list
 
     def _fill_tbl(self, filter_name=""):
-        """ Fill table with initial data into QTableView """
-
+        """Fill table with initial data into QTableView"""
         complet_list = self._get_list("v_ui_workspace", filter_name)
 
         if complet_list is False:
@@ -164,12 +160,10 @@ class GwWorkspaceManagerButton(GwAction):
         return complet_list
 
     def _fill_info(self, selected, deselected):
-        """
-        Fill info text area with details from selected workspace.
+        """Fill info text area with details from selected workspace.
 
         Note: The parameters come from the selectionChanged signal.
         """
-
         # Get id of selected workspace
         cols = selected.indexes()
         if not cols:
@@ -191,8 +185,7 @@ class GwWorkspaceManagerButton(GwAction):
                                   force_tab=False, call_set_tabs_enabled=False, close=False)
 
     def _create_workspace(self):
-        """ Create a workspace """
-
+        """Create a workspace"""
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
         if descript == '':
@@ -217,7 +210,6 @@ class GwWorkspaceManagerButton(GwAction):
 
     def _set_labels_current_workspace(self, dialog, result=None):
         """Set label for the current workspace."""
-
         # Prepare the JSON body to get the current workspace information
         extras = '"type": "workspace"'
         body = tools_gw.create_body(extras=extras)
@@ -237,8 +229,7 @@ class GwWorkspaceManagerButton(GwAction):
             print("Error: 'name' field is missing in the result")
 
     def _set_current_workspace(self):
-        """ Set the selected workspace as the current one """
-
+        """Set the selected workspace as the current one"""
         action = "CURRENT"
 
         # Get selected row
@@ -282,8 +273,7 @@ class GwWorkspaceManagerButton(GwAction):
             self._check_go2epa_options()
 
     def _check_go2epa_options(self, tab_name=None):
-        """ Refreshes the selectors' UI if it's open """
-
+        """Refreshes the selectors' UI if it's open"""
         # Get the selector UI if it's open
         windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
                 and (issubclass(type(x), GwGo2EpaOptionsUi))]
@@ -296,8 +286,7 @@ class GwWorkspaceManagerButton(GwAction):
                 pass
 
     def _toggle_privacy_workspace(self):
-        """ Set the selected workspace as public/private """
-
+        """Set the selected workspace as public/private"""
         action = "TOGGLE"
 
         # Get selected row
@@ -323,8 +312,7 @@ class GwWorkspaceManagerButton(GwAction):
             self._fill_tbl(self.filter_name.text())
 
     def _update_workspace(self):
-        """ Reset the values of the selected workspace """
-
+        """Reset the values of the selected workspace"""
         action = "UPDATE"
 
         # Get selected row
@@ -369,8 +357,7 @@ class GwWorkspaceManagerButton(GwAction):
                 self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
     def _delete_workspace(self):
-        """ Delete the selected workspace """
-
+        """Delete the selected workspace"""
         action = "DELETE"
 
         # Get selected row

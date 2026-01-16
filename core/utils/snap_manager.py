@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -41,22 +40,19 @@ class GwSnapManager(object):
         global_vars.snappers.append(self)
 
     def set_snapping_layers(self):
-        """ Set main snapping layers """
-
+        """Set main snapping layers"""
         self.layer_arc = tools_qgis.get_layer_by_tablename('ve_arc')
         self.layer_connec = tools_qgis.get_layer_by_tablename('ve_connec')
         self.layer_gully = tools_qgis.get_layer_by_tablename('ve_gully')
         self.layer_node = tools_qgis.get_layer_by_tablename('ve_node')
 
     def get_snapping_options(self):
-        """ Function that collects all the snapping options """
-
+        """Function that collects all the snapping options"""
         global_snapping_config = QgsProject.instance().snappingConfig()
         return global_snapping_config
 
     def get_snapper(self):
-        """ Return snapper """
-
+        """Return snapper"""
         snapper = QgsMapCanvas.snappingUtils(self.canvas)
         return snapper
 
@@ -118,8 +114,7 @@ class GwSnapManager(object):
         vertex_marker.hide()
 
     def get_event_point(self, event=None, point=None):
-        """ Get point """
-
+        """Get point"""
         event_point = None
         x = None
         y = None
@@ -183,8 +178,7 @@ class GwSnapManager(object):
         return self.is_valid
 
     def add_point(self, vertex_marker):
-        """ Create the appropriate map tool and connect to the corresponding signal """
-
+        """Create the appropriate map tool and connect to the corresponding signal"""
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
             active_layer = tools_qgis.get_layer_by_tablename('sys_version')
@@ -228,8 +222,7 @@ class GwSnapManager(object):
             vertex_marker.hide()
 
     def _get_xy(self, vertex_marker, emit_point, point):
-        """ Get coordinates of selected point """
-
+        """Get coordinates of selected point"""
         event_point = self.get_event_point(point=point)
         result = self.snap_to_project_config_layers(event_point)
         # Get snapped point only if snapping is valid

@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -28,8 +27,7 @@ class GwDocument(QObject):
     doc_added = pyqtSignal()
 
     def __init__(self, single_tool=True):
-        """ Class to control action 'Add document' of toolbar 'edit' """
-
+        """Class to control action 'Add document' of toolbar 'edit'"""
         QObject.__init__(self)
         # parameter to set if the document manager is working as
         # single tool or integrated in another tool
@@ -47,8 +45,7 @@ class GwDocument(QObject):
         self.is_new = False
 
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
-        """ Button 31: Add document """
-
+        """Button 31: Add document"""
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         # Create the dialog and signals
         self.dlg_add_doc = GwDocUi(self)
@@ -244,7 +241,7 @@ class GwDocument(QObject):
         return self.dlg_add_doc
 
     def _on_tab_changed(self):
-        """ Update rel_feature_type when tab changes """
+        """Update rel_feature_type when tab changes"""
         # Get current tab's feature type
         self.rel_feature_type = tools_gw.get_signal_change_tab(self.dlg_add_doc, self.excluded_layers)
 
@@ -442,14 +439,13 @@ class GwDocument(QObject):
         self._fill_table_doc_visit()
 
     def _get_existing_doc_names(self):
-        """ list of existing names """
+        """List of existing names"""
         sql = "SELECT name FROM doc ORDER BY name;"
         rows = tools_db.get_rows(sql)
         return [row['name'] for row in rows if 'name' in row]
 
     def manage_documents(self):
-        """ Button 32: Edit document """
-
+        """Button 32: Edit document"""
         # Create the dialog
         self.dlg_man = GwDocManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
@@ -482,7 +478,7 @@ class GwDocument(QObject):
         tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
 
     def _show_context_menu(self, qtableview, pos):
-        """ Show custom context menu """
+        """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
@@ -530,7 +526,7 @@ class GwDocument(QObject):
         self.get_document()
 
     def _refresh_manager_table(self):
-        """ Refresh the manager table """
+        """Refresh the manager table"""
         try:
             if getattr(self, 'dlg_man', None):
                 # Use the existing _fill_table method to refresh the table
@@ -539,8 +535,7 @@ class GwDocument(QObject):
             print(f"Error refreshing manager table: {e}")
 
     def _fill_combo_doc_type(self, widget):
-        """ Executes query and fill combo box """
-
+        """Executes query and fill combo box"""
         sql = ("SELECT id, idval"
                " FROM edit_typevalue"
                " WHERE typevalue = 'doc_type'"
@@ -553,8 +548,7 @@ class GwDocument(QObject):
             self._activate_relations()
 
     def _activate_relations(self):
-        """ Force user to set doc_id and doc_type """
-
+        """Force user to set doc_id and doc_type"""
         doc_type = tools_qt.get_combo_value(self.dlg_add_doc, self.dlg_add_doc.doc_type)
 
         if doc_type in (None, '', 'null'):
@@ -581,8 +575,7 @@ class GwDocument(QObject):
             tools_qgis.show_warning(message)
 
     def _manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None, close_dlg=True):
-        """ Insert or update table 'document'. Add document to selected feature """
-
+        """Insert or update table 'document'. Add document to selected feature"""
         # Get values from dialog
         name = tools_qt.get_text(self.dlg_add_doc, "doc_name", False, False)
         doc_type = tools_qt.get_combo_value(self.dlg_add_doc, self.dlg_add_doc.doc_type)
@@ -800,8 +793,7 @@ class GwDocument(QObject):
         self.get_document(row=widget.model().item(row, 0), item_id=selected_object_id)
 
     def _open_web_browser(self, dialog, widget=None):
-        """ Display url using the default browser """
-
+        """Display url using the default browser"""
         if widget is not None:
             url = tools_qt.get_text(dialog, widget)
             if url == 'null':
@@ -812,12 +804,12 @@ class GwDocument(QObject):
         webbrowser.open(url)
 
     def _get_point_xy(self):
-        """ Capture point XY from the canvas """
+        """Capture point XY from the canvas"""
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
 
     def _get_file_dialog(self, dialog, widget):
-        """ Get file dialog """
+        """Get file dialog"""
         files_path = tools_qt.get_open_files_path("Select files", "All (*.*)")
 
         file_text = ""
@@ -873,15 +865,14 @@ class GwDocument(QObject):
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type, feature_id=doc_id, feature_idname="doc_id")
 
     def convert_to_degrees(self, value):
-        """ Convert GPS coordinates stored in EXIF to degrees """
+        """Convert GPS coordinates stored in EXIF to degrees"""
         d = float(value[0])
         m = float(value[1])
         s = float(value[2])
         return d + (m / 60.0) + (s / 3600.0)
 
     def get_geolocation_gdal(self, file_path: str):
-        """ Extract geolocation metadata from an image file using GDAL """
-
+        """Extract geolocation metadata from an image file using GDAL"""
         dataset = gdal.Open(file_path)
         if not dataset:
             return None

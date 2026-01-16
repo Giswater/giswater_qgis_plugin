@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
+"""/***************************************************************************
         begin                : 2016-01-05
         copyright            : (C) 2016 by BGEO SL
         email                : derill@bgeo.es
@@ -39,7 +38,7 @@ if sys.version_info >= (3, 10):
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """ Load Giswater class from file giswater.
+    """Load Giswater class from file giswater.
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """

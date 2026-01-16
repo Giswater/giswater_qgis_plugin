@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -39,8 +38,7 @@ class GwVisit(QObject):
     visit_added = pyqtSignal(int)
 
     def __init__(self):
-        """ Class to control 'Add visit' of toolbar 'edit' """
-
+        """Class to control 'Add visit' of toolbar 'edit'"""
         QObject.__init__(self)
         self.canvas = global_vars.canvas
         self.schema_name = lib_vars.schema_name
@@ -57,12 +55,12 @@ class GwVisit(QObject):
 
     def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                   open_dlg=True, is_new_from_cf=False):
-        """ Button 16. Add visit.
+        """Button 16. Add visit.
         if visit_id => load record related to the visit_id
         if feature_type => lock feature_type in relations tab
         if feature_id => load related feature basing on feature_type in relation
-        if single_tool notify that the tool is used called from another dialog."""
-
+        if single_tool notify that the tool is used called from another dialog.
+        """
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
         # parameter to set if the dialog is working as single tool or integrated in another tool
@@ -264,8 +262,7 @@ class GwVisit(QObject):
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
     def manage_visits(self, feature_type=None, feature_id=None):
-        """ Button 17: manage visits """
-
+        """Button 17: manage visits"""
         # Create the dialog
         self.dlg_visit_manager = GwVisitManagerUi(self)
         tools_gw.load_settings(self.dlg_visit_manager)
@@ -332,7 +329,7 @@ class GwVisit(QObject):
         tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="visit_manager")
 
     def _show_context_menu(self, qtableview, pos):
-        """ Show custom context menu """
+        """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
@@ -354,8 +351,9 @@ class GwVisit(QObject):
     # region private functions
 
     def _update_table_visit(self, widget, table_name, expr_filter=None, cmb_visitclass=None, id=None):
-        """ Set a model with selected filter.
-                Attach that model to selected table """
+        """Set a model with selected filter.
+        Attach that model to selected table
+        """
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -405,8 +403,7 @@ class GwVisit(QObject):
         tools_qt.fill_combo_values(cmb_visitclass, str(current_visit_class), 0)
 
     def _delete_files(self, qtable, visit_id, event_id):
-        """ Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC """
-
+        """Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC"""
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -443,8 +440,7 @@ class GwVisit(QObject):
             return
 
     def _zoom_box(self, box):
-        """
-        :param box: (QgsRectangle)
+        """:param box: (QgsRectangle)
         """
         # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
         if not box.isNull():
@@ -529,8 +525,7 @@ class GwVisit(QObject):
         self.point_xy = self.snapper_manager.point_xy
 
     def _set_locked_relation(self):
-        """ Set feature_type and listed feature_id in @table_name to lock it """
-
+        """Set feature_type and listed feature_id in @table_name to lock it"""
         # Enable tab
         index = self._tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
@@ -567,11 +562,11 @@ class GwVisit(QObject):
             tools_gw.disconnect_signal('visit')
 
     def _manage_accepted(self):
-        """ Do all action when closed the dialog with Ok.
+        """Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
-        for multiple visits management. """
-
+        for multiple visits management.
+        """
         # tab Visit
         if self.current_tab_index == self._tab_index('tab_visit'):
             self._manage_leave_visit_tab()
@@ -606,8 +601,7 @@ class GwVisit(QObject):
         self.dlg_add_visit.close()
 
     def _execute_pgfunction(self):
-        """ Execute function 'gw_fct_om_visit_multiplier' """
-
+        """Execute function 'gw_fct_om_visit_multiplier'"""
         feature = f'"id":"{self.current_visit.id}"'
         body = tools_gw.create_body(feature=feature)
         complet_result = tools_gw.execute_procedure('gw_fct_om_visit_multiplier', body)
@@ -618,8 +612,7 @@ class GwVisit(QObject):
         tools_log.log_info(msg, msg_params=msg_params)
 
     def _update_geom(self):
-        """ Update geometry field """
-
+        """Update geometry field"""
         srid = lib_vars.data_epsg
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
@@ -627,9 +620,9 @@ class GwVisit(QObject):
         tools_db.execute_sql(sql)
 
     def _manage_rejected(self):
-        """ Do all action when closed the dialog with Cancel or X.
-        e.g. all necessary rollbacks and cleanings. """
-
+        """Do all action when closed the dialog with Cancel or X.
+        e.g. all necessary rollbacks and cleanings.
+        """
         try:
             self.canvas.setMapTool(self.previous_map_tool)
             # removed current working visit. This should cascade removing of all related records
@@ -646,20 +639,19 @@ class GwVisit(QObject):
             tools_log.log_info(msg, msg_params=msg_params)
 
     def _tab_index(self, tab_name):
-        """ Get the index of a tab basing on objectName. """
-
+        """Get the index of a tab basing on objectName."""
         for idx in range(self.tabs.count()):
             if self.tabs.widget(idx).objectName() == tab_name:
                 return idx
         return -1
 
     def _manage_visit_id_change(self, dialog, text):
-        """ Manage action when the visit id is changed.
+        """Manage action when the visit id is changed.
         A) Update current Visit record
         B) Fill the GUI values of the current visit
         C) load all related events in the relative table
-        D) load all related documents in the relative table. """
-
+        D) load all related documents in the relative table.
+        """
         self.event_parameter_id = None
         self.event_feature_type = None
         tools_qt.set_widget_enabled(self.dlg_add_visit, 'parameter_id', True)
@@ -694,11 +686,11 @@ class GwVisit(QObject):
         self._set_feature_type_by_visit_id()
 
     def _set_feature_type_by_visit_id(self):
-        """ Set the feature_type in Relation tab basing on visit_id.
+        """Set the feature_type in Relation tab basing on visit_id.
         The steps to follow are:
         1) check geometry type looking what table contain records related with visit_id
-        2) set gemetry type. """
-
+        2) set gemetry type.
+        """
         selected_feature_type = None
         feature_type_index = None
         for index in range(self.cmb_feature_type.count()):
@@ -728,9 +720,9 @@ class GwVisit(QObject):
             self.cmb_feature_type.currentIndexChanged.emit(feature_type_index)
 
     def _manage_leave_visit_tab(self):
-        """ Manage all the action when leaving the tab_visit
-        A) Manage sync between GUI values and Visit record in DB. """
-
+        """Manage all the action when leaving the tab_visit
+        A) Manage sync between GUI values and Visit record in DB.
+        """
         # A) fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
         self.current_visit.startdate = tools_qt.get_calendar_date(self.dlg_add_visit, 'startdate')
@@ -749,8 +741,7 @@ class GwVisit(QObject):
         self.current_visit.upsert()
 
     def _update_relations(self, dialog, delete_old_relations=True):
-        """ Save current selected features in every table of feature_type """
-
+        """Save current selected features in every table of feature_type"""
         if delete_old_relations:
             for index in range(self.cmb_feature_type.count()):
                 # Remove all old relations related with current visit_id and @feature_type
@@ -773,8 +764,7 @@ class GwVisit(QObject):
         tools_gw.enable_feature_type(dialog, widget_name, ids=self.rel_ids)
 
     def _delete_relations_feature_type(self, feature_type):
-        """ Remove all old relations related with current visit_id and @feature_type """
-
+        """Remove all old relations related with current visit_id and @feature_type"""
         if feature_type == '' or feature_type.lower() == 'all':
             return
 
@@ -797,8 +787,7 @@ class GwVisit(QObject):
             db_record.delete(where_clause=where_clause)
 
     def _update_relations_feature_type(self, feature_type):
-        """ Update relations of specific @feature_type """
-
+        """Update relations of specific @feature_type"""
         if feature_type == '' or feature_type.lower() == 'all':
             return
 
@@ -846,8 +835,7 @@ class GwVisit(QObject):
                 db_record.upsert()
 
     def _manage_tab_changed(self, dialog, index):
-        """ Do actions when tab is exit and entered. Actions depend on tab index """
-
+        """Do actions when tab is exit and entered. Actions depend on tab index"""
         # manage leaving tab
         # tab Visit
         if self.current_tab_index == self._tab_index('tab_visit'):
@@ -866,8 +854,7 @@ class GwVisit(QObject):
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
     def _set_parameter_id_combo(self, dialog):
-        """ Set parameter_id combo basing on current selections """
-
+        """Set parameter_id combo basing on current selections"""
         dialog.parameter_id.clear()
         parameter_type_id = tools_qt.get_combo_value(self.dlg_add_visit, "parameter_type_id", index=0)
         feature_type = tools_qt.get_combo_value(self.dlg_add_visit, "cmb_feature_type", index=0, add_quote=True)
@@ -887,8 +874,7 @@ class GwVisit(QObject):
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
     def _get_feature_type_of_parameter(self):
-        """ Get feature type of selected parameter """
-
+        """Get feature type of selected parameter"""
         sql = (f"SELECT feature_type "
                f"FROM config_visit_parameter "
                f"WHERE descript = '{self.parameter_id.currentText()}'")
@@ -913,8 +899,7 @@ class GwVisit(QObject):
             tools_log.log_info(msg, msg_params=msg_params)
 
     def _manage_tabs_enabled(self, enable_tabs=False):
-        """ Enable/Disable tabs depending feature_type """
-
+        """Enable/Disable tabs depending feature_type"""
         excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_link", "ve_element", "ve_gully",
                           "ve_element"]
         self.excluded_layers = excluded_layers
@@ -987,10 +972,10 @@ class GwVisit(QObject):
         tools_gw.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.rel_feature_type) + "_id")
 
     def _config_relation_table(self, dialog):
-        """ Set all actions related to the table, model and selectionModel.
+        """Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
-        where all callbacks are lost ance can't be registered. """
-
+        where all callbacks are lost ance can't be registered.
+        """
         if self.feature_type == '':
             return
 
@@ -1003,9 +988,10 @@ class GwVisit(QObject):
             tools_gw.set_tablemodel_config(dialog, "tbl_event_x_gully", "ve_gully")
 
     def _event_feature_type_selected(self, dialog, feature_type=None):
-        """ Manage selection change in feature_type combo box.
+        """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
-        setup model for features to select table """
+        setup model for features to select table
+        """
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
@@ -1047,19 +1033,19 @@ class GwVisit(QObject):
         self._get_features_visit_feature_type(self.visit_id.text(), feature_type, widget_table)
 
     def _lazy_configuration(self, widget, init_function):
-        """ set the init_function where all necessary events are set.
+        """Set the init_function where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
-        can create a table with a None model loosing any event connection. """
-
+        can create a table with a None model loosing any event connection.
+        """
         lazy_widget = widget
         lazy_init_function = init_function
 
         return lazy_widget, lazy_init_function
 
     def _get_features_visit_feature_type(self, visit_id, feature_type, widget_table=None):
-        """ Get features from table om_visit_x@feature_type of selected @visit_id
-        Select them in canvas and automatically load them into @widget_table """
-
+        """Get features from table om_visit_x@feature_type of selected @visit_id
+        Select them in canvas and automatically load them into @widget_table
+        """
         table_name = f'om_visit_x_{feature_type}'
         sql = f"SELECT {feature_type}_id FROM {table_name} WHERE visit_id = '{visit_id}'"
         rows = tools_db.get_rows(sql, log_info=False)
@@ -1090,8 +1076,7 @@ class GwVisit(QObject):
         tools_gw.disconnect_signal('visit')
 
     def _filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
-        """ Filter om_visit in self.dlg_visit_manager.tbl_visit based on (id AND text AND between dates) """
-
+        """Filter om_visit in self.dlg_visit_manager.tbl_visit based on (id AND text AND between dates)"""
         object_id = tools_qt.get_text(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
@@ -1160,8 +1145,7 @@ class GwVisit(QObject):
                     tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
     def _fill_combos(self, visit_id=None):
-        """ Fill combo boxes of the form """
-
+        """Fill combo boxes of the form"""
         # Visit tab
         # Fill ComboBox visitcat_id
         self._fill_visitcat(visit_id)
@@ -1223,8 +1207,7 @@ class GwVisit(QObject):
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
     def _fill_combo_parameter_id(self):
-        """ Fill combo parameter_id depending feature_type """
-
+        """Fill combo parameter_id depending feature_type"""
         sql = ("SELECT id, descript "
                "FROM config_visit_parameter ")
         where = None
@@ -1243,8 +1226,7 @@ class GwVisit(QObject):
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows)
 
     def _set_completers(self):
-        """ Set autocompleters of the form """
-
+        """Set autocompleters of the form"""
         # Adding auto-completion to a QLineEdit - visit_id
         self.completer = QCompleter()
         self.dlg_add_visit.visit_id.setCompleter(self.completer)
@@ -1276,8 +1258,7 @@ class GwVisit(QObject):
         self.completer.setModel(model)
 
     def _manage_document(self):
-        """ Access GUI to manage documents e.g Execute action of button 34 """
-
+        """Access GUI to manage documents e.g Execute action of button 34"""
         visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.get_document(
@@ -1286,8 +1267,7 @@ class GwVisit(QObject):
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
 
     def _event_insert(self):
-        """ Add and event basing on form associated to the selected parameter_id. """
-
+        """Add and event basing on form associated to the selected parameter_id."""
         # Parameter to save all selected files associated to events
         self.files_added = []
         self.files_all = []
@@ -1436,8 +1416,7 @@ class GwVisit(QObject):
                 model.appendRow(item)
 
     def _get_added_files(self, visit_id, event_id, save):
-        """ Get path of new files """
-
+        """Get path of new files"""
         sql = "SELECT id AS fextension, idval AS filetype FROM config_typevalue WHERE typevalue = 'filetype_typevalue'"
         rows = tools_db.get_rows(sql)
         f_types = []
@@ -1479,8 +1458,7 @@ class GwVisit(QObject):
                 self._save_files_added(visit_id, event_id)
 
     def _save_files_added(self, visit_id, event_id):
-        """ Save new files into DataBase """
-
+        """Save new files into DataBase"""
         if self.files_added:
             sql = "SELECT id AS fextension, idval AS filetype FROM config_typevalue WHERE typevalue = 'filetype_typevalue'"
             f_types = tools_db.get_rows(sql)
@@ -1502,15 +1480,14 @@ class GwVisit(QObject):
             tools_db.execute_sql(sql)
 
     def _manage_events_changed(self):
-        """ Action when at a Event model is changed.
-        A) if some record is available => enable OK button of VisitDialog """
-
+        """Action when at a Event model is changed.
+        A) if some record is available => enable OK button of VisitDialog
+        """
         state = (self.tbl_event.model().rowCount() > 0)
         self.dlg_add_visit.btn_accept.setEnabled(state)
 
     def _event_update(self):
-        """ Update selected event. """
-
+        """Update selected event."""
         # Parameter to save all selected files associated to events
         self.files_added = []
         self.files_all = []
@@ -1669,8 +1646,7 @@ class GwVisit(QObject):
         self._manage_events_changed()
 
     def _event_delete(self):
-        """ Delete a selected event. """
-
+        """Delete a selected event."""
         if not self.tbl_event.selectionModel().hasSelection():
             msg = "Any record selected"
             tools_qt.show_info_box(msg)
@@ -1720,8 +1696,7 @@ class GwVisit(QObject):
         self._manage_events_changed()
 
     def _document_insert(self, dialog):
-        """ Insert a document related to the current visit. """
-
+        """Insert a document related to the current visit."""
         doc_name = self.doc_id.text()
         visit_id = self.visit_id.text()
         if not doc_name:
@@ -1765,8 +1740,7 @@ class GwVisit(QObject):
         self.doc_id.clear()
 
     def _document_delete(self, dialog):
-        """ Delete a document from the current visit. """
-
+        """Delete a document from the current visit."""
         # Get selected rows. 0 is the column of the pk 0 'id'
         selected_list = self.tbl_document.selectionModel().selectedRows(0)
         if len(selected_list) == 0:
@@ -1811,8 +1785,7 @@ class GwVisit(QObject):
         tools_qt.fill_combo_values(self.dlg_event.position_id, node_list, True, False)
 
     def _visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
-        """ Set feature_type and layer depending selected tab """
-
+        """Set feature_type and layer depending selected tab"""
         # Get selected tab to set geometry type
         tab_idx = dialog.tab_feature.currentIndex()
         if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
@@ -1878,8 +1851,7 @@ class GwVisit(QObject):
         tools_gw.selection_init(self, dialog, table_object, GwSelectionMode.VISIT)
 
     def _get_data_from_event(self, visit_id):
-        """ Get parameter_id and feature_type from event of @visit_id """
-
+        """Get parameter_id and feature_type from event of @visit_id"""
         parameter_id = None
         feature_type = None
         sql = (f"SELECT visit_id, parameter_id, feature_type "
@@ -1895,9 +1867,9 @@ class GwVisit(QObject):
         return parameter_id, feature_type
 
     def _fill_widget_with_fields(self, dialog, data_object, field_names):
-        """ Fill the Widget with value get from data_object limited to
-        the list of field_names. """
-
+        """Fill the Widget with value get from data_object limited to
+        the list of field_names.
+        """
         for field_name in field_names:
             value = getattr(data_object, field_name)
             if not hasattr(dialog, field_name):

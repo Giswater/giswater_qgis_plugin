@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -31,8 +30,7 @@ class GwAutoMincutTask(GwTask):
         self.use_aux_conn = False
 
     def run(self):
-        """ Automatic mincut: Execute function 'gw_fct_mincut' """
-
+        """Automatic mincut: Execute function 'gw_fct_mincut'"""
         super().run()
 
         try:
@@ -90,8 +88,7 @@ class GwAutoMincutTask(GwTask):
             return False
 
     def cancel(self):
-        """ Cancel task - use mincut cursor connection instead of aux_conn """
-        
+        """Cancel task - use mincut cursor connection instead of aux_conn"""
         # Use mincut cursor connection if available
         if hasattr(self.mincut_class, 'mincut_aux_conn') and self.mincut_class.mincut_aux_conn:
             try:

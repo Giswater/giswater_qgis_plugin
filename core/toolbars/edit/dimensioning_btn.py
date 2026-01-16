@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -15,7 +14,7 @@ from ....libs import tools_qt, tools_qgis
 
 
 class GwDimensioningButton(GwMaptool):
-    """ Button 30: Dimensioning """
+    """Button 30: Dimensioning"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -85,7 +84,6 @@ class GwDimensioningButton(GwMaptool):
 
     def _reset_dimensioning(self):
         """Fully disables Dimensioning when editing is turned off."""
-
         # Disconnect the signal to prevent recursion
         tools_gw.disconnect_signal('dimensioning', 'activate_layer_editingStopped_reset_dimensioning')
 

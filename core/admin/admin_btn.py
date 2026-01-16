@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -55,8 +54,7 @@ from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 class GwAdminButton:
 
     def __init__(self):
-        """ Class to control toolbar 'om_ws' """
-
+        """Class to control toolbar 'om_ws'"""
         # Initialize instance attributes
         self.iface = global_vars.iface
         self.settings = global_vars.giswater_settings
@@ -84,8 +82,7 @@ class GwAdminButton:
         self.is_cm_project = False
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
-        """ Button 100: Execute SQL. Info show info """
-
+        """Button 100: Execute SQL. Info show info"""
         # Populate combo connections
         default_connection = self._populate_combo_connections()
         # Bug #733 was here
@@ -116,8 +113,7 @@ class GwAdminButton:
         self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog)
 
     def create_project_data_other_schema(self, project):
-        """ Create other schema """
-
+        """Create other schema"""
         self.other_project = project
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
@@ -329,8 +325,7 @@ class GwAdminButton:
                 tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
 
     def _get_cm_schema_name(self):
-        """
-        Return the name of the first schema whose sys_version table
+        """Return the name of the first schema whose sys_version table
         exists and has project_type = 'cm', or None if no such schema.
         """
         # find all schemas that actually define a sys_version table
@@ -369,7 +364,6 @@ class GwAdminButton:
         :param srid: The SRID to use.
         :return bool: True if all relevant folders were processed successfully, False otherwise.
         """
-
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
         else:
@@ -403,7 +397,7 @@ class GwAdminButton:
         return result
 
     def _vacuum_project_data_schema(self, verbose=False):
-        """ Execute task to vacuum schema """
+        """Execute task to vacuum schema"""
         description = "Vacuum schema"
         params = {'schema_name': self.schema_name, 'logs': True, 'verbose': verbose}
 
@@ -412,7 +406,7 @@ class GwAdminButton:
         QgsApplication.taskManager().triggerTask(self.task_vacuum_schema)
 
     def execute_vacuum(self, ask_confirm=False, verbose=False):
-        """ Ask confirmation to execute vacuum using a separate database connection """
+        """Ask confirmation to execute vacuum using a separate database connection"""
         if ask_confirm:
             msg = "Are you sure to execute vacuum on selected schema?"
             title = "Warning"
@@ -468,8 +462,7 @@ class GwAdminButton:
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
     def load_updates(self, project_type: Union[str, None] = None, update_changelog: bool = False, schema_name: Union[str, None] = None) -> bool:
-        """
-        Load updates for a given project type.
+        """Load updates for a given project type.
 
         :param project_type: The project type to use. If None, uses self.project_type_selected.
         :param update_changelog: Whether to update the changelog.
@@ -477,7 +470,6 @@ class GwAdminButton:
 
         :return bool: True if all updates were loaded successfully, False otherwise.
         """
-
         # Get current schema selected
         if schema_name is None:
             schema_name = self._get_schema_name()
@@ -512,8 +504,7 @@ class GwAdminButton:
         return status
 
     def init_dialog_create_project(self, project_type=None):
-        """ Initialize dialog (only once) """
-
+        """Initialize dialog (only once)"""
         self.dlg_readsql_create_project = GwAdminDbProjectUi(self)
         tools_gw.load_settings(self.dlg_readsql_create_project)
         self.dlg_readsql_create_project.btn_cancel_task.hide()
@@ -577,14 +568,12 @@ class GwAdminButton:
     # region 'Create Project'
 
     def load_base(self, dict_folders: dict) -> bool:
-        """
-        Load base files from a given dictionary of folders.
+        """Load base files from a given dictionary of folders.
         
         :param dict_folders: A dictionary with the folders and the number of files in each folder.
 
         :return bool: True if all files were loaded successfully, False otherwise.
         """
-
         for folder in dict_folders.keys():
             status = self._execute_files(folder, set_progress_bar=True)
             if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
@@ -646,15 +635,13 @@ class GwAdminButton:
         return True
 
     def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
-        """
-        Update the patch folders for a given update directory.
+        """Update the patch folders for a given update directory.
         :param folder_update (str): Path to the update directory containing patch folders.
         :param new_project (bool): Whether this is a new project (True) or an update to an existing one (False).
         :param project_type (Union[str, None], optional): The project type to use. If None, uses self.project_type_selected.
         :param no_ct (bool, optional): If True, skips certain processing steps (context-specific).
         :return bool: True if all relevant folders were processed successfully, False otherwise.
         """
-
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils) is True:
             status = self._load_sql(folder_utils, no_ct, set_progress_bar=True)
@@ -678,8 +665,7 @@ class GwAdminButton:
         return True
 
     def update_dict_folders(self, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False, folder_updates: str = '') -> bool:
-        """
-        Update the dictionary folders for a given update directory.
+        """Update the dictionary folders for a given update directory.
 
         :param new_project: Whether this is a new project (True) or an update to an existing one (False).
         :param project_type: The project type to use. If None, uses self.project_type_selected.
@@ -688,7 +674,6 @@ class GwAdminButton:
 
         :return bool: True if all relevant folders were processed successfully, False otherwise.
         """
-
         if not folder_updates:
             folder_updates = self.folder_updates
 
@@ -788,9 +773,9 @@ class GwAdminButton:
     # region private functions
 
     def _fill_table(self, qtable, table_name, model, expr_filter, edit_strategy=QSqlTableModel.EditStrategy.OnManualSubmit):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
-
+        """Set a model with selected filter.
+        Attach that model to selected table
+        """
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name not in table_name:
             table_name = schema_name + "." + table_name
@@ -813,8 +798,7 @@ class GwAdminButton:
         qtable.setModel(model)
 
     def _populate_combo_connections(self):
-        """ Fill the combo with the connections that exist in QGis """
-
+        """Fill the combo with the connections that exist in QGis"""
         s = QSettings()
         s.beginGroup("PostgreSQL/connections")
         default_connection = s.value('selected')
@@ -828,8 +812,7 @@ class GwAdminButton:
         return default_connection
 
     def _init_show_database(self):
-        """ Initialization code of the form (to be executed only once) """
-
+        """Initialization code of the form (to be executed only once)"""
         # Get SQL folder and check if exists
         self.sql_dir = os.path.normpath(os.path.join(lib_vars.plugin_dir, 'dbmodel'))
         if not os.path.exists(self.sql_dir):
@@ -931,8 +914,7 @@ class GwAdminButton:
         self._change_project_type(self.cmb_project_type)
 
     def _set_signals(self):
-        """ Set signals. Function has to be executed only once (during form initialization) """
-
+        """Set signals. Function has to be executed only once (during form initialization)"""
         self.dlg_readsql.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self._open_create_project))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
@@ -990,8 +972,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_markdown_generator.clicked.connect(partial(self._markdown_generator))
 
     def _activate_audit(self, other_project):
-        """ Activate audit functionality """
-
+        """Activate audit functionality"""
         sql = ("SELECT schema_name, schema_name FROM information_schema.schemata "
                "WHERE schema_name = 'audit'")
         rows = tools_db.get_rows(sql, commit=False)
@@ -1009,8 +990,7 @@ class GwAdminButton:
             tools_qgis.show_warning(msg)
 
     def _reload_audit_triggers(self):
-        """ Update audit triggers to start or stop auditing a table """
-
+        """Update audit triggers to start or stop auditing a table"""
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         result = tools_gw.execute_procedure('gw_fct_update_audit_triggers', schema_name=schema_name)
 
@@ -1019,36 +999,31 @@ class GwAdminButton:
             tools_qgis.show_success(msg)
 
     def _markdown_generator(self):
-        """ Initialize the markdown generator functionalities """
-
+        """Initialize the markdown generator functionalities"""
         qm_gen = GwAdminMarkdownGenerator()
         qm_gen.init_dialog()
 
     def _manage_translations(self):
-        """ Initialize the translation functionalities """
-
+        """Initialize the translation functionalities"""
         qm_gen = GwI18NGenerator()
         qm_gen.init_dialog()
         dict_info = tools_gw.get_project_info(self._get_schema_name())
         qm_gen.pass_schema_info(dict_info, self._get_schema_name())
 
     def _update_translations(self):
-        """ Initialize the translation functionalities """
-
+        """Initialize the translation functionalities"""
         qm_i18n_up = GwSchemaI18NUpdate()
         qm_i18n_up.init_dialog()
 
     def _i18n_manager(self):
-        """ Initialize the i18n functionalities """
-
+        """Initialize the i18n functionalities"""
         qm_i18n_manager = GwSchemaI18NManager()
         qm_i18n_manager.init_dialog()
         dict_info = tools_gw.get_project_info(self._get_schema_name())
         qm_i18n_manager.pass_schema_info(dict_info)
 
     def _import_osm(self):
-        """ Initialize import osm streetaxis functionality """
-
+        """Initialize import osm streetaxis functionality"""
         dlg_import_osm = GwImportOsm()
         dlg_import_osm.init_dialog(self._get_schema_name())
 
@@ -1201,8 +1176,7 @@ class GwAdminButton:
             self._manage_docker()
 
     def _set_credentials(self, dialog, new_connection=False):
-        """ Set connection parameters in settings """
-
+        """Set connection parameters in settings"""
         user_name = tools_qt.get_text(dialog, dialog.txt_user, False, False)
         password = tools_qt.get_text(dialog, dialog.txt_pass, False, False)
         settings = QSettings()
@@ -1260,8 +1234,7 @@ class GwAdminButton:
         self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
 
     def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype):
-        """ Generate QGIS project """
-
+        """Generate QGIS project"""
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
                                                     roletype, layer_project_type=tools_qt.get_combo_value(self.dlg_create_gis_project, 'cmb_project_type', 1),
@@ -1277,8 +1250,7 @@ class GwAdminButton:
             self._open_project(qgs_path)
 
     def _open_project(self, qgs_path):
-        """ Open a QGis project """
-
+        """Open a QGis project"""
         project = QgsProject.instance()
         project.read(qgs_path)
 
@@ -1343,8 +1315,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
 
     def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: Union[str, None] = None, set_progress_bar: bool = False) -> bool:
-        """
-        Load SQL files from a given folder.
+        """Load SQL files from a given folder.
 
         :param path_folder: The path to the folder to load the SQL files from.
         :param no_ct: Whether to skip the CT processing.
@@ -1353,7 +1324,6 @@ class GwAdminButton:
 
         :return bool: True if all files were loaded successfully, False otherwise.
         """
-
         for (path, _, _) in os.walk(path_folder):
             status = self._execute_files(path, no_ct=no_ct, utils_schema_name=utils_schema_name,
                                          set_progress_bar=set_progress_bar)
@@ -1365,8 +1335,7 @@ class GwAdminButton:
     """ Functions execute process """
 
     def _check_project_name(self, project_name, project_descript):
-        """ Check if @project_name and @project_descript are is valid """
-
+        """Check if @project_name and @project_descript are is valid"""
         sql = "SELECT word FROM pg_get_keywords() ORDER BY 1;"
         pg_keywords = tools_db.get_rows(sql, commit=False)
 
@@ -1422,8 +1391,7 @@ class GwAdminButton:
             return False
 
     def _bk_schema_name(self, list_schemas, project_name, i):
-        """ Check for available bk schema name """
-
+        """Check for available bk schema name"""
         if f"{project_name}{i}" not in list_schemas:
             return f"{project_name}{i}"
         else:
@@ -1466,15 +1434,13 @@ class GwAdminButton:
         QgsApplication.taskManager().triggerTask(self.task_rename_schema)
 
     def _load_custom_sql_files(self, dialog: QDialog, widget: QWidget) -> None:
-        """
-        Load custom SQL files from a given folder.
+        """Load custom SQL files from a given folder.
 
         :param dialog: The dialog to use.
         :param widget: The widget to use.
 
         :return bool: True if all files were loaded successfully, False otherwise.
         """
-
         folder_path = tools_qt.get_text(dialog, widget)
         if not isinstance(folder_path, str) or not folder_path:
             return
@@ -1496,8 +1462,7 @@ class GwAdminButton:
         self.error_count = 0
 
     def _get_schema_name(self) -> str:
-        """
-        Get the schema name from the dialog.
+        """Get the schema name from the dialog.
 
         :return str: The schema name.
         """
@@ -1511,12 +1476,10 @@ class GwAdminButton:
         return schema_name
 
     def _load_fct_ftrg(self) -> bool:
-        """
-        Load fct and ftrg files from utils and software folders.
+        """Load fct and ftrg files from utils and software folders.
 
         :return bool: True if all files were loaded successfully, False otherwise.
         """
-
         folder = os.path.join(self.folder_utils, self.file_pattern_fct)
 
         status = self._execute_files(folder)
@@ -1751,7 +1714,7 @@ class GwAdminButton:
         return True
 
     def _close_dialog_admin(self, dlg):
-        """ Close dialog """
+        """Close dialog"""
         tools_gw.close_dialog(dlg, delete_dlg=False)
         self.schema = None
 
@@ -1792,8 +1755,7 @@ class GwAdminButton:
         self._set_buttons_enabled()
 
     def _manage_srid(self):
-        """ Manage SRID configuration """
-
+        """Manage SRID configuration"""
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
         tools_qt.set_widget_text(self.dlg_readsql_create_project, self.filter_srid, '25831')
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
@@ -1936,15 +1898,13 @@ class GwAdminButton:
             self.dlg_readsql.btn_info.setEnabled(False)
 
     def _process_folder(self, folderpath: str, filepattern: str = '') -> bool:
-        """
-        Process a folder and return True if the folder exists, False otherwise.
+        """Process a folder and return True if the folder exists, False otherwise.
 
         :param folderpath: The path to the folder to process.
         :param filepattern: The pattern to use to filter the files.
 
         :return bool: True if the folder exists, False otherwise.
         """
-
         try:
             os.listdir(os.path.join(folderpath, filepattern))
             return True
@@ -1952,12 +1912,10 @@ class GwAdminButton:
             return False
 
     def _reload_fct_ftrg(self) -> None:
-        """
-        Reload fct and ftrg files from utils and software folders.
+        """Reload fct and ftrg files from utils and software folders.
 
         :return None:
         """
-
         self._load_fct_ftrg()
         status = (self.error_count == 0)
         if status:
@@ -2007,7 +1965,6 @@ class GwAdminButton:
 
     def _open_create_cm_project(self):
         """Open main CM launcher dialog (admin_cm_create.ui)"""
-
         self.dlg_readsql_create_cm_project = GwAdminCmCreateUi(self)
         tools_gw.load_settings(self.dlg_readsql_create_cm_project)
 
@@ -2073,7 +2030,6 @@ class GwAdminButton:
 
     def on_btn_create_base_clicked(self):
         """Handle the 'Create Base Schema' button click."""
-
         name = 'cm'
         description = 'cm'
 
@@ -2132,7 +2088,7 @@ class GwAdminButton:
         self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
 
     def on_btn_pschema_qgis_file_clicked(self):
-        """ Sets the project to be created as a 'CM' project. """
+        """Sets the project to be created as a 'CM' project."""
         self.is_cm_project = True
         tools_qgis.show_info(tools_qt.tr("Layer of CM project will be added to the project when create"), dialog=self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
@@ -2361,8 +2317,7 @@ class GwAdminButton:
             return status
 
     def _get_current_db_name(self):
-        """
-        Gets the database name from the currently selected connection in the admin dialog.
+        """Gets the database name from the currently selected connection in the admin dialog.
         """
         if not hasattr(self, 'dlg_readsql') or isdeleted(self.dlg_readsql):
             return None
@@ -2470,8 +2425,7 @@ class GwAdminButton:
             return status
 
     def _read_changelog(self, filelist, filedir):
-        """ Read contents of file 'changelog.txt' """
-
+        """Read contents of file 'changelog.txt'"""
         f = None
         if "changelog.txt" not in filelist:
             msg = "File '{0}' not found in: {1}"
@@ -2578,8 +2532,7 @@ class GwAdminButton:
                 self._set_info_project()
 
     def _delete_other_schema(self, schema):
-        """ Delete other schema """
-
+        """Delete other schema"""
         msg = "Are you sure you want delete schema '{0}'?"
         msg_params = (schema,)
         result = tools_qt.show_question(msg, "Info", force_action=True, msg_params=msg_params)
@@ -3205,8 +3158,7 @@ class GwAdminButton:
         tools_db.execute_sql(sql)
 
     def _change_project_type(self, widget):
-        """ Take current project type changed """
-
+        """Take current project type changed"""
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
         self.folder_software = os.path.join(self.sql_dir, self.project_type_selected)
 
@@ -3360,7 +3312,6 @@ class GwAdminButton:
         :param msg_error: The message to show if the process finished with some errors.
         :param parameter: The parameter to show in the message.
         """
-
         if status:
             if msg_ok is None:
                 msg = "Process finished successfully"
@@ -3373,8 +3324,7 @@ class GwAdminButton:
             tools_qgis.show_warning(msg_error, parameter=parameter)
 
     def _manage_json_message(self, json_result, parameter=None, title=None):
-        """ Manage message depending result @status """
-
+        """Manage message depending result @status"""
         message = json_result.get('message')
         if message:
 
@@ -3461,8 +3411,7 @@ class GwAdminButton:
         tools_gw.set_config_parser("btn_admin", "custom_sql_path", f"{folder_path}", "user", "session")
 
     def _manage_docker(self):
-        """ Puts the dialog in a docker, depending on the user configuration """
-
+        """Puts the dialog in a docker, depending on the user configuration"""
         try:
             tools_gw.close_docker('admin_position')
             lib_vars.session_vars['docker_type'] = 'qgis_form_docker'
@@ -3477,8 +3426,7 @@ class GwAdminButton:
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin')
 
     def _set_buttons_enabled(self):
-        """ Disable/enable buttons """
-
+        """Disable/enable buttons"""
         # Check schema name
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 

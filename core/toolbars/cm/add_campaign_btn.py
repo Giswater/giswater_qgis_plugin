@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -16,7 +15,7 @@ import json
 
 
 class GwAddCampaignButton(GwAction):
-    """ Button 84: Add new campaign """
+    """Button 84: Add new campaign"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -76,7 +75,7 @@ class GwAddCampaignButton(GwAction):
                 toolbar.addAction(self.action)
 
     def _fill_action_menu(self):
-        """ Fill action menu """
+        """Fill action menu"""
         if self.menu is None:
             return
 
@@ -94,8 +93,7 @@ class GwAddCampaignButton(GwAction):
             obj_action.triggered.connect(partial(self.clicked_event, action))
 
     def clicked_event(self, selected_action):
-        """ Open the correct campaign dialog based on user selection """
-
+        """Open the correct campaign dialog based on user selection"""
         # Handle direct campaign creation (for simple buttons or menu selections)
         if selected_action in (tools_qt.tr("Review"), tools_qt.tr("Visit"), tools_qt.tr("Inventory")):
             if self.menu is not None:

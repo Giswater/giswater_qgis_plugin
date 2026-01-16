@@ -1,5 +1,4 @@
-"""
-This file is part of Giswater
+"""This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -17,8 +16,9 @@ from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwArcFusionButton(GwMaptool):
-    """ Button 24: Fusion arc
-    User select one node. Execute SQL function: 'gw_fct_delete_node' """
+    """Button 24: Fusion arc
+    User select one node. Execute SQL function: 'gw_fct_delete_node'
+    """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -277,8 +277,7 @@ class GwArcFusionButton(GwMaptool):
         tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
     def _build_catalog_asset_widgets(self):
-        """ Build catalog and asset widgets """
-
+        """Build catalog and asset widgets"""
         # Get arc catalogs
         sql = "SELECT id, id as idval FROM cat_arc"
         rows = tools_db.get_rows(sql)
@@ -325,8 +324,7 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.cmb_statetype.setEnabled(False)
 
     def _manage_plan_widgets(self):
-        """ Manage plan widgets """
-
+        """Manage plan widgets"""
         if global_vars.psignals and global_vars.psignals['psector_active']:
             self.dlg_fusion.lbl_nodeaction.setVisible(False)
             self.dlg_fusion.cmb_nodeaction.setVisible(False)
@@ -350,8 +348,7 @@ class GwArcFusionButton(GwMaptool):
             tools_gw.set_config_parser("btn_arc_fusion", "cmb_statetype", state_type)
 
     def _get_feature_psector_id(self, feature_id, feature_type):
-        """ Get psector_id from a feature """
-
+        """Get psector_id from a feature"""
         table_name = f"plan_psector_x_{feature_type}"
         sql = f"""
             SELECT psector_id 
