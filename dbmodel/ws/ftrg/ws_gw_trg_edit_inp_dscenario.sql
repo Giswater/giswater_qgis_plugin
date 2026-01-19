@@ -130,8 +130,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			-- default values
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM ve_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM ve_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.roughness IS NULL THEN NEW.roughness = (SELECT roughness FROM temp_arc WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.dint IS NULL THEN NEW.dint = (SELECT diameter FROM temp_arc WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.roughness IS NULL THEN NEW.roughness = (SELECT roughness FROM temp_arc WHERE arc_id = NEW.arc_id::text);END IF;
+			IF NEW.dint IS NULL THEN NEW.dint = (SELECT diameter FROM temp_arc WHERE arc_id = NEW.arc_id::text);END IF;
 
 			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM ve_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM ve_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
