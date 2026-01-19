@@ -231,7 +231,7 @@ class GwGo2EpaManagerButton(GwAction):
         set_corporate_enabled, archive_enabled = True, True
         selected_rows = self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()
         last_status = None
-        for idx, index in enumerate(selected_rows):
+        for _idx, index in enumerate(selected_rows):
             is_corporate = None
             # set corporate
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, "rpt_stats")

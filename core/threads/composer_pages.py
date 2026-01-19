@@ -171,7 +171,7 @@ class GwComposerPages(GwTask):
 
         # Get all the files that have to be merged
         files = []
-        for (dirpath, dirnames, filenames) in os.walk(self.path):
+        for (_dirpath, _dirnames, filenames) in os.walk(self.path):
             files.extend(filenames)
             break
         files = [f for f in files if f"tomerge {self.prefix}" in f]

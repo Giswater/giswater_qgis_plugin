@@ -1984,7 +1984,7 @@ class GwImportInpTask(GwTask):
         """
         template = "(%s, %s, %s, %s, %s)"
         params = []
-        for i_name, i in self.network[INFLOWS].items():
+        for _i_name, i in self.network[INFLOWS].items():
             try:
                 node_id = self.node_ids[i.node]
             except KeyError:
@@ -2005,7 +2005,7 @@ class GwImportInpTask(GwTask):
         """
         template = "(1, %s, %s, %s, %s, %s, %s)"
         params = []
-        for dwf_name, dwf in self.network[DWF].items():
+        for _dwf_name, dwf in self.network[DWF].items():
             try:
                 node_id = self.node_ids[dwf.node]
             except KeyError:

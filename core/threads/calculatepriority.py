@@ -508,7 +508,7 @@ class GwCalculatePriority(GwTask):
                     val
                 ) values 
             """
-            for i in range(1000):
+            for _i in range(1000):
                 try:
                     (
                         arc_id,
@@ -958,7 +958,7 @@ class GwCalculatePriority(GwTask):
                     val
                 ) values 
             """
-            for i in range(1000):
+            for _i in range(1000):
                 try:
                     arc = second_iteration[index]
                     save_arcs_sql += f"""
@@ -1018,7 +1018,7 @@ class GwCalculatePriority(GwTask):
                     cum_length
                 ) values 
             """
-            for i in range(1000):
+            for _i in range(1000):
                 try:
                     arc = second_iteration[index]
                     if arc["replacement_year"] > self.target_year:

@@ -1008,7 +1008,7 @@ class GwNonVisual:
 
         # Clean nulls of the end of the list
         clean_list = []
-        for i, item in enumerate(temp_list):
+        for _i, item in enumerate(temp_list):
             last_idx = -1
             for j, value in enumerate(item):
                 if value != "null":
@@ -1830,7 +1830,7 @@ class GwNonVisual:
                 continue
 
             sql = "INSERT INTO ve_inp_pattern_value (pattern_id, "
-            for n, x in enumerate(row):
+            for n, _x in enumerate(row):
                 sql += f"factor_{n + 1}, "
             sql = sql.rstrip(", ") + ")"
             sql += f"VALUES ({pattern_id}, "
@@ -1859,7 +1859,7 @@ class GwNonVisual:
 
         # Clean nulls of the end of the list
         clean_list = []
-        for i, item in enumerate(temp_list):
+        for _i, item in enumerate(temp_list):
             last_idx = -1
             for j, value in enumerate(item):
                 if value != "null":
@@ -2657,7 +2657,7 @@ class GwNonVisual:
                 visible_widgets = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]
                 visible_widgets = self._order_list(visible_widgets)
 
-                for y, widget in enumerate(visible_widgets):
+                for _y, widget in enumerate(visible_widgets):
                     if type(widget) is QLineEdit:
                         value = tools_qt.get_text(dialog, widget)
                     else:
@@ -2845,7 +2845,7 @@ class GwNonVisual:
                 widgets_list = self._order_list(widgets_list)
 
                 sql = "INSERT INTO inp_lid_value (lidco_id, lidlayer,"
-                for y, widget in enumerate(widgets_list):
+                for y, _widget in enumerate(widgets_list):
                     sql += f"value_{y + 2}, "
                 sql = sql.rstrip(", ") + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
@@ -2929,7 +2929,7 @@ class GwNonVisual:
 
         # Clean nulls of the end of the list
         clean_list = []
-        for i, item in enumerate(temp_list):
+        for _i, item in enumerate(temp_list):
             last_idx = -1
             for j, value in enumerate(item):
                 if value not in ("null", None, "", "None"):

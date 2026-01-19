@@ -951,7 +951,7 @@ class GwLoadProject(QObject):
 
         # Group configuration by layer
         configs_by_layer = {}
-        for layer_name, field_name, field_order, is_hidden in config_rows:
+        for layer_name, field_name, _field_order, is_hidden in config_rows:
             configs_by_layer.setdefault(layer_name, []).append(
                 {"field": field_name, "hidden": bool(is_hidden)}
             )

@@ -486,7 +486,7 @@ class GwImportEpanet:
         if self.catalogs.inp_pipes:
             self.tbl_elements["pipes"] = {}
 
-            for (diameter, roughness), rec_catalog in self.catalogs.inp_pipes.items():
+            for (diameter, roughness), _rec_catalog in self.catalogs.inp_pipes.items():
                 row: int = tbl_arcs.rowCount()
                 tbl_arcs.setRowCount(row + 1)
 
@@ -561,7 +561,7 @@ class GwImportEpanet:
 
         self.tbl_elements["features"] = {}
 
-        for tag, rec_catalog, feature_class, feature_type in feature_types:
+        for tag, rec_catalog, _feature_class, _feature_type in feature_types:
             if rec_catalog is None:
                 continue
 
@@ -821,7 +821,7 @@ class GwImportEpanet:
 
         # Find the tag for the given element_type
         tag = None
-        for element, rec_catalog, element_tag in elements:
+        for element, _rec_catalog, element_tag in elements:
             if element == element_type:
                 tag = element_tag
                 break

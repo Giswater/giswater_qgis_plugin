@@ -1052,7 +1052,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     temp_layers_added = []
     srid = lib_vars.data_epsg
     i = 0
-    for k, v in list(data.items()):
+    for k, _v in list(data.items()):
         if str(k) == "info":
             text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled, close)
         elif k in ("point", "line", "polygon"):
@@ -3661,7 +3661,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                 return
             if not json_result["body"].get("data") or type(json_result["body"].get("data")) is list:
                 return
-            for key, value in list(json_result["body"]["data"].items()):
+            for key, _value in list(json_result["body"]["data"].items()):
                 if key.lower() in ("point", "line", "polygon"):
 
                     # Remove the layer if it exists
@@ -5012,7 +5012,7 @@ def remove_selection(remove_groups=True, layers=None):
             layer.removeSelection()
 
     if remove_groups and layers is not None:
-        for key, elems in layers.items():
+        for key, _elems in layers.items():
             for layer in layers[key]:
                 if layer:
                     layer.removeSelection()
@@ -5240,7 +5240,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=Qt.SortOrder.As
 
     # Reorder columns in the widget according to columnindex
     header = widget.horizontalHeader()
-    for i, (column_name, column_index) in enumerate(sorted(column_order.items(), key=lambda item: item[1])):
+    for i, (column_name, _column_index) in enumerate(sorted(column_order.items(), key=lambda item: item[1])):
         col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
         if col_idx is not None:
             current_visual_index = header.visualIndex(col_idx)

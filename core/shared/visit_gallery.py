@@ -52,7 +52,7 @@ class GwVisitGallery:
         # Fill the rest of the fields in gallery with 0
         limit = self.num_events % 9
         limit = 9 - limit
-        for k in range(0, limit):  # @UnusedVariable
+        for _k in range(0, limit):  # @UnusedVariable
             self.img_path_list1D.append(0)
 
         # Inicialization of two-dimensional array

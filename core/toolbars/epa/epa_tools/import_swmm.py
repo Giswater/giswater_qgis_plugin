@@ -550,7 +550,7 @@ class GwImportSwmm:
         if self.catalogs.inp_conduits:
             self.tbl_elements["conduits"] = {}
 
-            for cat_tuple, rec_catalog in self.catalogs.inp_conduits.items():
+            for cat_tuple, _rec_catalog in self.catalogs.inp_conduits.items():
                 row: int = tbl_arcs.rowCount()
                 tbl_arcs.setRowCount(row + 1)
 
@@ -616,7 +616,7 @@ class GwImportSwmm:
 
         self.tbl_elements["features"] = {}
 
-        for tag, rec_catalog, feature_class, feature_type in feature_types:
+        for tag, rec_catalog, _feature_class, _feature_type in feature_types:
             if rec_catalog is None:
                 continue
 
@@ -859,7 +859,7 @@ class GwImportSwmm:
 
         # Find the tag for the given element_type
         tag = None
-        for element, rec_catalog, element_tag in elements:
+        for element, _rec_catalog, element_tag in elements:
             if element == element_type:
                 tag = element_tag
                 break

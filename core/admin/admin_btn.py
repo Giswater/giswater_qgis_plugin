@@ -1704,7 +1704,7 @@ class GwAdminButton:
         # Process each version folder in order
         project_tuple = tuple(int(x) for x in str(self.project_version).split("."))
 
-        for major, minor, patch, folder_path in version_folders:
+        for major, minor, patch, _folder_path in version_folders:
             current_tuple = (major, minor, patch)
             if current_tuple > project_tuple:
                 folder_aux = os.path.join(self.folder_updates, str(major), str(minor), str(patch))
@@ -3299,7 +3299,7 @@ class GwAdminButton:
     def _set_log_text(self, dialog, data):
         """"""
 
-        for k, v in list(data.items()):
+        for k, _v in list(data.items()):
             if str(k) == "info":
                 tools_gw.fill_tab_log(dialog, data)
 

@@ -187,7 +187,7 @@ class GwAssignation(GwTask):
         self.by_diameter = 0
         self.any_pipe = 0
         arcs = {}
-        for leak_id, leak_arcs in leaks.items():
+        for _leak_id, leak_arcs in leaks.items():
             def is_arc_valid(x, validation_type):
                 if validation_type == "material_diameter":
                     return x["same_material"] and x["same_diameter"]

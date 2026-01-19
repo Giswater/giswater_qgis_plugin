@@ -295,7 +295,7 @@ class GwMenuLoad(QObject):
 
     def _reset_all_rubberbands(self):
         """Resets all active rubber bands"""
-        for i in range(0, len(global_vars.active_rubberbands)):
+        for _i in range(0, len(global_vars.active_rubberbands)):
             global_vars.active_rubberbands[0].reset()
             global_vars.active_rubberbands.pop(0)
 

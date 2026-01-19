@@ -422,7 +422,7 @@ class GwRecursiveEpa(GwTask):
             return False
 
         files_errors = []
-        for result_name, file_inp, file_rpt in self.file_pairs:
+        for _result_name, file_inp, _file_rpt in self.file_pairs:
             msg = "INP file not found"
             if file_inp is not None:
                 if not os.path.exists(file_inp):
@@ -453,7 +453,7 @@ class GwRecursiveEpa(GwTask):
 
     # region import rpt
     def import_rpt(self):
-        for result_name, file_inp, file_rpt in self.file_pairs:
+        for result_name, _file_inp, file_rpt in self.file_pairs:
             self._import_rpt(result_name, file_rpt)
 
     def _import_rpt(self, result_name, file_rpt):

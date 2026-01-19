@@ -452,7 +452,7 @@ class GwSelectManager(QgsMapTool):
     def _update_freehand_rubber_band(self):
         if len(self.points) >= 2:
             self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
-            for i, point in enumerate(self.points):
+            for _i, point in enumerate(self.points):
                 self.rubber_band.addPoint(point, False)
             self.rubber_band.addPoint(self.points[0], True)
             self.rubber_band.show()

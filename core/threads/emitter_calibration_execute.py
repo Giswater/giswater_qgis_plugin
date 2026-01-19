@@ -440,7 +440,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
         return interpolated_idx
 
     def _populate_effc_demand_variables(self, network_junctions, network_demand, effc_by_dma, demand_by_dma, sum_dem_x_c0, sum_dem):
-        for k, v in self.config.dmas.items():
+        for _k, v in self.config.dmas.items():
             dma = v["dma_id"]
             effc_by_dma[dma] = v["efficiency"]
             demand_by_dma[dma] = 0
