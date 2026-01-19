@@ -116,9 +116,9 @@ DECLARE
 	-- result variables
 	v_result json;
 	v_result_info json;
-	v_result_point json;
+	v_result_point_valid json;
 	v_result_point_invalid json;
-	v_result_line json;
+	v_result_line_valid json;
 	v_result_line_invalid json;
 
 	-- response variables
@@ -2489,7 +2489,7 @@ BEGIN
 			v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field
 		) INTO v_result;
 
-		v_result_line := v_result;
+		v_result_line_valid := v_result;
 
 
 		IF v_project_type = 'UD' THEN
@@ -2543,7 +2543,7 @@ BEGIN
 			v_query_text_aux
 			) INTO v_result;
 
-		v_result_point := v_result;
+		v_result_point_valid := v_result;
 
 		v_visible_layer := NULL;
 	END IF;
@@ -2551,8 +2551,8 @@ BEGIN
 
 	-- Control NULL values
 	v_result_info := COALESCE(v_result_info, '{}');
-	v_result_point := COALESCE(v_result_point, '{}');
-	v_result_line := COALESCE(v_result_line, '{}');
+	v_result_point_valid := COALESCE(v_result_point_valid, '{}');
+	v_result_line_valid := COALESCE(v_result_line_valid, '{}');
 	v_result_point_invalid := COALESCE(v_result_point_invalid, '{}');
 	v_result_line_invalid := COALESCE(v_result_line_invalid, '{}');
 	v_level := COALESCE(v_level, 0);
@@ -2575,8 +2575,8 @@ BEGIN
 				"netscenarioId": "'||v_netscenario::text||'", 
 				"hasConflicts": '||v_has_conflicts||', 
 				"info":'||v_result_info||',
-				"point":'||v_result_point||',
-				"line":'||v_result_line||',
+				"point_valid":'||v_result_point_valid||',
+				"line_valid":'||v_result_line_valid||',
 				"point_invalid":'||v_result_point_invalid||',
 				"line_invalid":'||v_result_line_invalid||'
 			}
