@@ -215,16 +215,6 @@ BEGIN
 	FROM v_temp_gully g
 	JOIN temp_pgr_arc a ON a.pgr_arc_id = g.arc_id;
 
-	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
-	SELECT link_id, feature_id, 'CONNEC'
-	FROM v_temp_link_connec l
-	JOIN temp_pgr_connec c ON c.pgr_connec_id = l.feature_id;
-
-	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
-	SELECT link_id, feature_id, 'GULLY'
-	FROM v_temp_link_gully l
-	JOIN temp_pgr_gully g ON g.pgr_gully_id = l.feature_id;
-
 	-- UPDATE treatment_type
 	UPDATE temp_pgr_node t
 	SET mapzone_id = n.treatment_type
@@ -250,26 +240,12 @@ BEGIN
 	WHERE t.pgr_gully_id = g.gully_id
 	AND g.treatment_type <> 0;
 
-	-- save as mapzone_id for links the treatment_type of the connec/gully
-	UPDATE temp_pgr_link t
-	SET mapzone_id = c.mapzone_id
-	FROM temp_pgr_connec c
-	WHERE t.feature_type = 'CONNEC'::varchar(16) AND t.pgr_feature_id = c.pgr_connec_id
-	AND c.mapzone_id <> 0;
-
-	UPDATE temp_pgr_link t
-	SET mapzone_id = g.mapzone_id
-	FROM temp_pgr_gully g
-	WHERE t.feature_type = 'GULLY'::varchar(16)
-	AND t.pgr_feature_id = g.pgr_gully_id
-	AND g.mapzone_id <> 0;
-
 	-- UPDATE como graph_delimiter HAS_TREATMENT
-	UPDATE temp_pgr_node n
-	SET  graph_delimiter = 'HAS_TREATMENT'
-	FROM v_temp_node t
-	WHERE n.pgr_node_id = t.node_id
-	AND t.has_treatment = TRUE;
+	UPDATE temp_pgr_node t
+	SET graph_delimiter = 'HAS_TREATMENT'
+	FROM node n
+	WHERE t.pgr_node_id = n.node_id
+	AND n.has_treatment = TRUE;
 
 	-- UPDATE mapzone_id = 3 (NOT TREATED) if treatment_type is not informed 
 	-- nodes 
@@ -374,10 +350,17 @@ BEGIN
 		WHERE g.gully_id = v.gully_id
 		AND COALESCE(g.treatment_type, 0) = 0; 
 
+		-- the treatment_type for links is the treatment_type of the connec/gully
 		UPDATE link l
 		SET treatment_type = t.mapzone_id
-		FROM temp_pgr_link t
-		WHERE t.pgr_link_id = l.link_id
+		FROM temp_pgr_gully t
+		WHERE t.gully_id = l.feature_id
+		AND t.mapzone_id IS DISTINCT FROM l.treatment_type;
+
+		UPDATE link l
+		SET treatment_type = t.mapzone_id
+		FROM temp_pgr_connec t
+		WHERE t.connec_id = l.feature_id
 		AND t.mapzone_id IS DISTINCT FROM l.treatment_type;
 
 	ELSE
@@ -473,17 +456,15 @@ BEGIN
 	END IF;
 
 	SELECT count(*) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
-	WHERE COALESCE (v.treatment_type, 0) = 0;
+	FROM temp_pgr_connec
+	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3522", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
-	SELECT count(DISTINCT gully_id) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
-	WHERE COALESCE (v.treatment_type, 0) = 0;
+	SELECT count(*) INTO v_count 
+	FROM temp_pgr_gully
+	WHERE mapzone_id = 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4342", "function":"3522", "criticity":"2", "prefix_id":"1002", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
@@ -504,17 +485,15 @@ BEGIN
 	END IF;
 
 	SELECT count(*) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_connec v ON v.arc_id = a.pgr_arc_id  
-	WHERE v.treatment_type > 0;
+	FROM temp_pgr_connec
+	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3522", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"connec"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;
 
 	SELECT count(*) INTO v_count 
-	FROM temp_pgr_arc a 
-	JOIN v_temp_gully v ON v.arc_id = a.pgr_arc_id  
-	WHERE v.treatment_type > 0;
+	FROM temp_pgr_gully
+	WHERE mapzone_id > 0;
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4344", "function":"3522", "criticity":"1", "prefix_id":"1001", "parameters":{"v_count":"'||v_count||'", "v_feature_type":"gully"}, "fid":"'||v_fid||'", "fcount":"'||v_count||'", "tempTable":"temp_"}}$$)';
 	END IF;

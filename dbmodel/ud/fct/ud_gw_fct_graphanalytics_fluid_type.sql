@@ -221,16 +221,6 @@ BEGIN
 	FROM v_temp_gully g
 	JOIN temp_pgr_arc a ON a.pgr_arc_id = g.arc_id;
 
-	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
-	SELECT link_id, feature_id, 'CONNEC'
-	FROM v_temp_link_connec l
-	JOIN temp_pgr_connec c ON c.pgr_connec_id = l.feature_id;
-
-	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
-	SELECT link_id, feature_id, 'GULLY'
-	FROM v_temp_link_gully l
-	JOIN temp_pgr_gully g ON g.pgr_gully_id = l.feature_id;
-
 	-- UPDATE fluid_type
 	UPDATE temp_pgr_node t
 	SET mapzone_id = n.fluid_type
@@ -255,19 +245,6 @@ BEGIN
 	FROM gully g
 	WHERE t.pgr_gully_id = g.gully_id
 	AND g.fluid_type <> 0;
-
-	-- save as mapzone_id for links the fluid_type of the connec/gully
-	UPDATE temp_pgr_link t
-	SET mapzone_id = c.mapzone_id
-	FROM temp_pgr_connec c
-	WHERE t.pgr_feature_id = c.pgr_connec_id
-	AND c.mapzone_id <> 0;
-
-	UPDATE temp_pgr_link t
-	SET mapzone_id = g.mapzone_id
-	FROM temp_pgr_gully g
-	WHERE t.pgr_feature_id = g.pgr_gully_id
-	AND g.mapzone_id <> 0;
 
 	-- UPDATE como graph_delimiter INITOVERFLOWPATH
 	UPDATE temp_pgr_arc t
@@ -372,10 +349,17 @@ BEGIN
 		WHERE t.pgr_arc_id = a.arc_id
 		AND t.mapzone_id IS DISTINCT FROM a.fluid_type;
 
+		-- the fluid_type for links is the fluid_type of the connec/gully
 		UPDATE link l
 		SET fluid_type = t.mapzone_id
-		FROM temp_pgr_link t
-		WHERE t.pgr_link_id = l.link_id
+		FROM temp_pgr_gully t
+		WHERE t.gully_id = l.feature_id
+		AND t.mapzone_id IS DISTINCT FROM l.fluid_type;
+
+		UPDATE link l
+		SET fluid_type = t.mapzone_id
+		FROM temp_pgr_connec t
+		WHERE t.connec_id = l.feature_id
 		AND t.mapzone_id IS DISTINCT FROM l.fluid_type;
 
 	ELSE
