@@ -20,6 +20,13 @@ EXAMPLE:
 SELECT gw_fct_getfeaturesfrompolygon($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831},
 "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters": {"functionFid": 3532, "featureType":"arc", "polygonGeom":"MULTIPOLYGON (((419617.361558083 4576465.809154497, 419618.8569710209 4576468.246374115, 419622.2276227002 4576466.157956117, 419620.73944153683 4576463.628078675, 419617.361558083 4576465.809154497)))"}}}$$);
 
+SELECT gw_fct_getfeaturesfrompolygon($${"client": {"device": 5, "lang": "es_ES", "infoType": 1},
+"form": {}, "feature": {}, "data": {"filterFields": {}, "pageInfo": {},
+"parameters": {
+    "featureType": "ARC",
+    "polygonGeom": "MULTIPOLYGON (((419419.13867777254 4576466.499338785, 419429.1574217372 4576487.650020488, 419537.69381468766 4576466.221040341, 419497.8971372725 4576396.368131032, 419419.13867777254 4576404.438785893, 419419.13867777254 4576466.499338785)))"
+}}}$$);
+
 */
 
 DECLARE
@@ -43,12 +50,12 @@ BEGIN
 
     v_feature_type := (p_data->'data'->'parameters'->>'featureType')::TEXT;
     v_polygon_geom := (p_data->'data'->'parameters'->>'polygonGeom')::TEXT;
-   
+
     -- Build key "data" with ids of intersected features
     EXECUTE FORMAT(
         'SELECT json_build_object(
             ''featureType'', %L,
-            ''featureId'', json_agg(%I)
+            ''featureIds'', json_agg(%I)
             ) FROM (SELECT %I FROM %I WHERE state = 1 AND ST_Intersects(the_geom, %L)
         )',
         LOWER(v_feature_type),
@@ -57,7 +64,7 @@ BEGIN
         LOWER(v_feature_type),
         ST_GeomFromText(v_polygon_geom, v_srid)
     ) INTO v_data;
- 
+
 
     -- Create return
     SELECT jsonb_build_object('level', log_level,'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
@@ -70,7 +77,15 @@ BEGIN
 
 
 	--  Return
-	RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "version":"'||v_version||'","body":{"form":{},"data":'||v_data||'}}')::json;
+	RETURN jsonb_build_object(
+	    'status', v_status,
+	    'message', v_message,
+	    'version', v_version,
+	    'body', jsonb_build_object(
+	        'form', '{}'::jsonb,
+	        'data', COALESCE(v_data::jsonb, '{}'::jsonb)
+	    )
+	);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
