@@ -315,10 +315,10 @@ BEGIN
 			);
 		END IF;
 	ELSE
-		-- v_node = one of the nodes of the arc v_arc that is not water source (SECTOR);
+		-- v_node = one of the nodes of the arc v_temp_arc that is not water source (SECTOR); 
 		SELECT node_id INTO v_node
-		FROM v_temp_node n
-		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2
+		FROM node n
+		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
 		WHERE a.arc_id = v_arc_id
 		AND 'SECTOR' <> ALL(n.graph_delimiter)
 		LIMIT 1;
@@ -849,7 +849,7 @@ BEGIN
 			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
 				SELECT 1
-				FROM v_temp_arc a
+				FROM arc a
 			  	LEFT JOIN sector_water s1 ON a.node_1 = s1.node_id
 			  	LEFT JOIN sector_water s2 ON a.node_2 = s2.node_id
 			  	WHERE t.pgr_node_id = a.minsector_id
@@ -1082,11 +1082,7 @@ BEGIN
 		SET
 			closed = m.closed,
 			broken = m.broken,
-			to_arc =
-				CASE
-					WHEN m.to_arc IS NULL THEN NULL
-					ELSE ARRAY[m.to_arc]
-				END,
+			to_arc = m.to_arc,
 			cost_mincut = -1,
 			reverse_cost_mincut = -1
 		FROM man_valve m
@@ -1101,18 +1097,18 @@ BEGIN
 		-- operative checkvalves
 		IF v_mode = 'MINSECTOR' THEN
 			UPDATE temp_pgr_arc_linegraph t
-			SET
-				cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN 1 ELSE -1 END,
-				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc[1] = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN -1 ELSE 1 END
-			WHERE t.closed = FALSE
+			SET 
+				cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM arc a WHERE t.to_arc = a.arc_id AND t.pgr_node_2 = a.minsector_id) THEN -1 ELSE 1 END
+			WHERE t.closed = FALSE 
 			AND t.broken = FALSE
 			AND t.to_arc IS NOT NULL;
 		ELSE
 			UPDATE temp_pgr_arc_linegraph t
-			SET
-				cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
-				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
-			WHERE t.closed = FALSE
+			SET 
+				cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
+			WHERE t.closed = FALSE 
 			AND t.broken = FALSE
 			AND t.to_arc IS NOT NULL;
 		END IF;
@@ -1356,7 +1352,7 @@ BEGIN
 			tpa.changestatus,
 			tpa.proposed,
 			n.the_geom,
-			tpa.to_arc[1]
+			tpa.to_arc
 		FROM temp_pgr_arc_linegraph tpa
 		JOIN node n ON n.node_id = tpa.pgr_node_id
 		WHERE tpa.mapzone_id <> 0;
@@ -1924,7 +1920,7 @@ BEGIN
 								tpa.changestatus,
 								tpa.proposed,
 								n.the_geom,
-								tpa.to_arc[1]
+								tpa.to_arc
 							FROM temp_pgr_arc_linegraph tpa
 							JOIN node n ON n.node_id = tpa.pgr_node_id
 							WHERE tpa.mapzone_id <> 0 
@@ -2182,7 +2178,7 @@ BEGIN
 	        "mincutId": ' || v_mincut_id ||'
 	      }
 	    }
-}');
+	}');
 	RETURN v_response;
 
 	--  Exception handling
