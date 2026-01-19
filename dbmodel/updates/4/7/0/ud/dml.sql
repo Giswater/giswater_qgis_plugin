@@ -77,3 +77,6 @@ UPDATE config_function SET style=
 WHERE id=2832;
 
 UPDATE config_param_system SET value='{"sys_table_id":"ve_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gullycat_id","orderby":"3","search_type":"gully"}', project_type='ud' WHERE "parameter"='basic_search_network_gully';
+
+-- 19/01/2026
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4470, 'Fluid type autoupdate is enabled. Disable it to update the fluid type with this function.', NULL, 2, true, 'ud', 'core', 'UI');

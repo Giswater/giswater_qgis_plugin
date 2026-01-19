@@ -97,10 +97,12 @@ DECLARE
 	v_commitchanges boolean;
 
 	--
+	v_fluidtype_autoupdate boolean;
 
 	v_level integer;
 	v_status text;
 	v_message text;
+	v_error_context text;
 
 	v_query_text text;
 	v_data json;
@@ -130,6 +132,13 @@ BEGIN
 	v_commitchanges = (p_data->'data'->'parameters'->>'commitChanges')::BOOLEAN;
 	-- for extra parameters
 	v_parameters = p_data->'data'->'parameters';
+
+	SELECT value::boolean INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
+
+	IF v_fluidtype_autoupdate IS TRUE THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4470", "function":"3424"}}$$)';
+	END IF;
+
 
 	-- it's not allowed to commit changes when psectors are used
  	IF v_usepsector THEN
@@ -537,6 +546,19 @@ BEGIN
 			}
 		}
 	}')::json, 2710, null, null, null)::json;
+
+	EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN json_build_object(
+		'status', 'Failed',
+		'NOSQLERR', SQLERRM,
+		'message', json_build_object(
+			'level', right(SQLSTATE, 1),
+			'text', SQLERRM
+		),
+		'SQLSTATE', SQLSTATE,
+		'SQLCONTEXT', v_error_context
+	);
 
 END;
 $BODY$
