@@ -2375,6 +2375,7 @@ BEGIN
 	EXECUTE format($sql$
 		SELECT jsonb_build_object(
 			'type', 'FeatureCollection',
+			'layerName', 'line_invalid',
 			'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
 		)
 		FROM (
@@ -2424,6 +2425,7 @@ BEGIN
 	EXECUTE format($sql$
 		SELECT jsonb_build_object(
 			'type', 'FeatureCollection',
+			'layerName', 'point_invalid',
 			'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
 		)
 		FROM (
@@ -2464,6 +2466,7 @@ BEGIN
 		EXECUTE format($sql$
 			SELECT jsonb_build_object(
 				'type', 'FeatureCollection',
+				'layerName', 'line_valid',
 				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
 			)
 			FROM (
@@ -2515,6 +2518,7 @@ BEGIN
 		EXECUTE format($sql$
 			SELECT jsonb_build_object(
 				'type', 'FeatureCollection',
+				'layerName', 'point_valid',
 				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
 			)
 			FROM (
@@ -2550,10 +2554,6 @@ BEGIN
 
 	-- Control NULL values
 	v_result_info := COALESCE(v_result_info, '{}');
-	v_result_point_valid := COALESCE(v_result_point_valid, '{}');
-	v_result_line_valid := COALESCE(v_result_line_valid, '{}');
-	v_result_point_invalid := COALESCE(v_result_point_invalid, '{}');
-	v_result_line_invalid := COALESCE(v_result_line_invalid, '{}');
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
@@ -2586,7 +2586,7 @@ BEGIN
 		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 		RETURN json_build_object(
 		'status', 'Failed',
-		'NOSQLERR', SQLERRM,
+		'NOSQLERRM', SQLERRM,
 		'message', json_build_object(
 			'level', right(SQLSTATE, 1),
 			'text', SQLERRM
