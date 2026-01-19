@@ -302,8 +302,7 @@ BEGIN
 	END IF;
 
 	IF v_mode = 'MINSECTOR' THEN
-		SELECT minsector_id INTO v_node
-		FROM v_temp_arc WHERE arc_id = v_arc_id;
+		v_node := (SELECT minsector_id FROM arc WHERE arc_id = v_arc_id);
 
 		IF v_node IS NULL OR v_node = 0 THEN
 			RETURN jsonb_build_object(
@@ -315,17 +314,29 @@ BEGIN
 			);
 		END IF;
 	ELSE
-		-- v_node = one of the nodes of the arc v_temp_arc that is not water source (SECTOR); 
-		SELECT node_id INTO v_node
-		FROM node n
-		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
-		WHERE a.arc_id = v_arc_id
-		AND 'SECTOR' <> ALL(n.graph_delimiter)
-		LIMIT 1;
+		-- pick one of the nodes of the arc v_temp_arc that is not water source (SECTOR); 
+		v_node := (
+			SELECT node_id
+			FROM v_temp_node n
+			JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
+			WHERE a.arc_id = v_arc_id
+			AND 'SECTOR' <> ALL(n.graph_delimiter)
+			LIMIT 1
+		);
 
-		-- v_node = 0 if arc in between 2 water sources
+		-- if arc in between 2 water sources, v_node = 0 
 		IF v_node IS NULL THEN
-			v_node := 0::integer;
+			IF EXISTS (
+				SELECT 1
+				FROM v_temp_node n
+				JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
+				WHERE a.arc_id = v_arc_id
+			) THEN 
+				v_node := 0::integer;
+			ELSE 
+				-- TODO: do something, it can happen that the node has is_operative = FALSE 
+				RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not operative, not found."}}')::json;
+			END IF;
 		END IF;
 	END IF;
 
