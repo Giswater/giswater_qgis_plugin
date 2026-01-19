@@ -178,3 +178,5 @@ select *, concat(''man_'',lower(feature_type)), position(concat(''man_'',lower(f
 select*from subq_3 where position = 0' WHERE fid=311;
 
 UPDATE sys_fprocess SET query_text='SELECT c.connec_id FROM plan_psector_x_connec c JOIN connec b USING (connec_id) WHERE link_id IS NULL AND pjoint_id IS NULL' WHERE fid=356;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4466, 'Start/End nodes is/are not valid(s)', 'Check elev data. Only NOT start/end nodes may have missed elev data', 2, true, 'ud', 'core', 'UI');

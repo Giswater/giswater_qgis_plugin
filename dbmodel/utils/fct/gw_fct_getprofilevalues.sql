@@ -263,20 +263,12 @@ BEGIN
 	END IF;
 
 	-- Check start-end nodes
-	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data. Only NOT start/end nodes may have missed elev data';
 	IF v_project_type = 'UD' THEN
 		IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
-			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) > 0
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) < 1
 		THEN
-			IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
-				WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_end::integer) = 0
-			THEN
-				v_level = 2;
-				v_message = v_nodemessage;
-			END IF;
-		ELSE
-			v_level = 2;
-			v_message = v_nodemessage;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		    "data":{"message":"4466", "function":"2832", "parameters":{}, "fid":'||v_fid||', "criticity":"2",  "is_process":true}}$$)';
 		END IF;
 	END IF;
 
