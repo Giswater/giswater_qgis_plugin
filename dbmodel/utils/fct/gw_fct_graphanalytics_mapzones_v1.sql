@@ -1177,6 +1177,7 @@ BEGIN
 
 	END IF; -- v_from_zero
 
+	-- RESOLVE EXCEPTION
 	-- remove mapzone_id for disconected components of the same mapzone; 
 	UPDATE temp_pgr_mapzone t
 	SET mapzone_id = 0, 
@@ -1257,6 +1258,7 @@ BEGIN
 	) src
 	WHERE t.pgr_node_id = src.pgr_node_id;
 
+	-- RESOLVE EXCEPTION
 	-- NodeParent self-conflict: connected non-toArc edges in the same component
 	UPDATE temp_pgr_mapzone m
 	SET mapzone_id = -1, name = 'Conflict'
