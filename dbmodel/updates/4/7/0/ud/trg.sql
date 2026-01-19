@@ -62,3 +62,9 @@ UPDATE
     FROM
     new.treatment_type))
     EXECUTE FUNCTION gw_trg_typevalue_fk('link');
+
+-- 19/01/2026
+CREATE TRIGGER gw_trg_v_edit_dma INSTEAD OF INSERT
+OR DELETE
+OR UPDATE ON
+ve_dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('EDIT');

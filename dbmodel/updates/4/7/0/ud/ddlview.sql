@@ -1005,3 +1005,38 @@ AS WITH typevalue AS (
  AND EXISTS (SELECT 1 FROM selector_sector ssec WHERE ssec.sector_id = n.sector_id AND ssec.cur_user = CURRENT_USER)
  AND EXISTS (SELECT 1 FROM selector_municipality sm WHERE sm.muni_id = n.muni_id AND sm.cur_user = CURRENT_USER)
  AND EXISTS (SELECT 1 FROM selector_expl se WHERE (se.expl_id = ANY (array_append(n.expl_visibility, n.expl_id))) AND se.cur_user = CURRENT_USER);
+
+-- 19/01/2026
+CREATE OR REPLACE VIEW ve_dma
+AS WITH sel_expl AS (
+         SELECT selector_expl.expl_id
+           FROM selector_expl
+          WHERE selector_expl.cur_user = CURRENT_USER
+        )
+ SELECT dma_id,
+    code,
+    name,
+    descript,
+    active,
+    dma_type,
+    expl_id,
+    sector_id,
+    muni_id,
+    avg_press,
+    pattern_id,
+    effc,
+    graphconfig::text AS graphconfig,
+    stylesheet,
+    lock_level,
+    link,
+    the_geom,
+    addparam::text AS addparam,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by
+   FROM dma d
+  WHERE (EXISTS ( SELECT 1
+           FROM sel_expl
+          WHERE sel_expl.expl_id = ANY (d.expl_id))) AND dma_id > 0;
+          
