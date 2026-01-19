@@ -2384,7 +2384,7 @@ BEGIN
 			'properties', to_jsonb(r) - 'the_geom'
 			) AS feature
 			FROM (
-			SELECT ta.pgr_arc_id, a.arccat_id, a.state, a.expl_id,
+			SELECT a.arc_id, a.arccat_id, a.state, a.expl_id,
 				array_to_string(mz.mapzone_ids, ',') AS %I,
 				(a.%I)::text AS %I,
 				a.the_geom,
@@ -2473,7 +2473,7 @@ BEGIN
 				'properties', to_jsonb(r) - 'the_geom'
 				) AS feature
 				FROM (
-				SELECT ta.pgr_arc_id, a.arccat_id, a.state, a.expl_id,
+				SELECT a.arc_id, a.arccat_id, a.state, a.expl_id,
 					array_to_string(mz.mapzone_ids, ',') AS %I,
 					(a.%I)::text AS %I,
 					a.the_geom,
