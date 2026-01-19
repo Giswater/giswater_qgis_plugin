@@ -2307,6 +2307,21 @@ BEGIN
 
 				ELSIF v_class = 'DMA' THEN
 
+					/*
+					IF v_class = 'DMA' THEN -- Execute DMA graph
+    
+						FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
+						LOOP
+							
+							EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
+							
+						END LOOP;
+					
+					END IF;
+
+					*/
+
 					-- it's SELECT DISTINCT in case the graph_delimiter is a source with 2 toArc with the same DMA 
 					-- restriction unicity: dma_id, node_id
 					INSERT INTO temp_pgr_om_waterbalance_dma_graph (node_id, dma_id, flow_sign)
@@ -2406,21 +2421,6 @@ BEGIN
 		v_query_text_aux := '';
 	END IF;
 
-<<<<<<< Updated upstream
-	IF v_class = 'DMA' THEN -- Execute DMA graph
-	
-		FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
-		LOOP
-			
-			EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
-			
-		END LOOP;
-	
-	END IF;
-
-
-=======
 	EXECUTE format($sql$
 		SELECT jsonb_build_object(
 			'type', 'FeatureCollection',
@@ -2450,7 +2450,6 @@ BEGIN
 		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field,
 		v_query_text_aux
 		) INTO v_result;
->>>>>>> Stashed changes
 
 	v_result_point_invalid := v_result;
 
