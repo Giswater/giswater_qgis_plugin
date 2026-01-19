@@ -15,6 +15,7 @@ DECLARE
 	v_view_name TEXT; -- EDIT | UI
 	v_mapzone_id INTEGER;
 	v_sector_id INTEGER;
+	v_count INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -104,7 +105,47 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
+		-- Check if there are operative elements in the mapzone before allowing delete
+		SELECT SUM(counts) INTO v_count FROM (
+			SELECT count(*) as counts
+				FROM node n
+				JOIN value_state_type vst ON vst.id = n.state_type
+				WHERE n.sector_id = OLD.sector_id
+					AND n.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM arc a
+				JOIN value_state_type vst ON vst.id = a.state_type
+				WHERE a.sector_id = OLD.sector_id
+					AND a.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM connec c
+				JOIN value_state_type vst ON vst.id = c.state_type
+				WHERE c.sector_id = OLD.sector_id
+					AND c.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM link l
+				JOIN value_state_type vst ON vst.id = l.state_type
+				WHERE l.sector_id = OLD.sector_id
+					AND l.state = 1
+					AND vst.is_operative
+		) combined;
+		IF COALESCE(v_count, 0) > 0 THEN
+			RAISE EXCEPTION 'Cannot delete Sector: operative elements exist for this Sector (sector_id=%).', OLD.sector_id
+				USING HINT = 'Deactivate or move the operative elements first.';
+		END IF;
 
+		UPDATE node SET sector_id = 0 WHERE sector_id = OLD.sector_id;
+		UPDATE arc SET sector_id = 0 WHERE sector_id = OLD.sector_id;
+		UPDATE connec SET sector_id = 0 WHERE sector_id = OLD.sector_id;
+		UPDATE gully SET sector_id = 0 WHERE sector_id = OLD.sector_id;
+		UPDATE link SET sector_id = 0 WHERE sector_id = OLD.sector_id;
+		
 		DELETE FROM sector WHERE sector_id = OLD.sector_id;
 		RETURN NULL;
 

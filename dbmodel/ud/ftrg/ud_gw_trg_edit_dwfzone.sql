@@ -13,6 +13,7 @@ $BODY$
 DECLARE
 	v_view_name TEXT;
 	v_dwfzone_id INTEGER;
+	v_count INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -69,6 +70,52 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
+			-- Check if there are operative elements in the mapzone before allowing delete
+		SELECT SUM(counts) INTO v_count FROM (
+			SELECT count(*) as counts
+				FROM node n
+				JOIN value_state_type vst ON vst.id = n.state_type
+				WHERE n.dwfzone_id = OLD.dwfzone_id
+					AND n.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM arc a
+				JOIN value_state_type vst ON vst.id = a.state_type
+				WHERE a.dwfzone_id = OLD.dwfzone_id
+					AND a.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM connec c
+				JOIN value_state_type vst ON vst.id = c.state_type
+				WHERE c.dwfzone_id = OLD.dwfzone_id
+					AND c.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM gully g
+				JOIN value_state_type vst ON vst.id = g.state_type
+				WHERE g.dwfzone_id = OLD.dwfzone_id
+					AND g.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM link l
+				JOIN value_state_type vst ON vst.id = l.state_type
+				WHERE l.dwfzone_id = OLD.dwfzone_id
+					AND l.state = 1
+					AND vst.is_operative
+		) combined;
+		IF COALESCE(v_count, 0) > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4468", "function":"3178","parameters":{"mapzone_name":"DWFzone", "mapzone_id":'||OLD.dwfzone_id||'}}}$$);';
+		END IF;
+
+		UPDATE node SET dwfzone_id = 0 WHERE dwfzone_id = OLD.dwfzone_id;
+		UPDATE arc SET dwfzone_id = 0 WHERE dwfzone_id = OLD.dwfzone_id;
+		UPDATE connec SET dwfzone_id = 0 WHERE dwfzone_id = OLD.dwfzone_id;
+		UPDATE gully SET dwfzone_id = 0 WHERE dwfzone_id = OLD.dwfzone_id;
+		UPDATE link SET dwfzone_id = 0 WHERE dwfzone_id = OLD.dwfzone_id;
 
 		DELETE FROM dwfzone WHERE dwfzone_id = OLD.dwfzone_id;
 		RETURN NULL;

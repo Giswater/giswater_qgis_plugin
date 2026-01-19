@@ -16,6 +16,7 @@ DECLARE
 	v_view_name TEXT; -- EDIT | UI
 	v_mapzone_id INTEGER;
 	v_presszone_id INTEGER;
+	v_count INTEGER;
 
 BEGIN
 
@@ -96,6 +97,45 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
+
+		-- Check if there are operative elements in the mapzone before allowing delete
+		SELECT SUM(counts) INTO v_count FROM (
+			SELECT count(*) as counts
+				FROM node n
+				JOIN value_state_type vst ON vst.id = n.state_type
+				WHERE n.presszone_id = OLD.presszone_id
+					AND n.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM arc a
+				JOIN value_state_type vst ON vst.id = a.state_type
+				WHERE a.presszone_id = OLD.presszone_id
+					AND a.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM connec c
+				JOIN value_state_type vst ON vst.id = c.state_type
+				WHERE c.presszone_id = OLD.presszone_id
+					AND c.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM link l
+				JOIN value_state_type vst ON vst.id = l.state_type
+				WHERE l.presszone_id = OLD.presszone_id
+					AND l.state = 1
+					AND vst.is_operative
+		) combined;
+		IF COALESCE(v_count, 0) > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4468", "function":"2926","parameters":{"mapzone_name":"Presszone", "mapzone_id":'||OLD.presszone_id||'}}}$$);';
+		END IF;
+
+		UPDATE node SET presszone_id = 0 WHERE presszone_id = OLD.presszone_id;
+		UPDATE arc SET presszone_id = 0 WHERE presszone_id = OLD.presszone_id;
+		UPDATE connec SET presszone_id = 0 WHERE presszone_id = OLD.presszone_id;
+		UPDATE link SET presszone_id = 0 WHERE presszone_id = OLD.presszone_id;
 
 		DELETE FROM presszone WHERE presszone_id = OLD.presszone_id;
 		RETURN NULL;
