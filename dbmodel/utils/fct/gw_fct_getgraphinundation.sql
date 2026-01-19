@@ -34,99 +34,67 @@ BEGIN
     v_mapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'mapzone');
     v_mapzone_field = v_mapzone || '_id';
 
-    v_querytext = '
-        WITH
-            mapzone AS (
-                SELECT 
-                    component, 
-                    CASE 
-                        WHEN CARDINALITY (mapzone_id) = 1 THEN mapzone_id[1]
-                        ELSE -1
-                    END AS mapzone_id,
-                    mapzone_id as name,
-                    CASE 
-                        WHEN CARDINALITY (mapzone_id) = 1 THEN name
-                        ELSE ''Conflict''
-                    END AS descript
-                FROM temp_pgr_mapzone
-            ),
-            arcs_drivingdistance AS (
-                SELECT start_vid,a.mapzone_id, a.arc_id, d.agg_cost
-                FROM temp_pgr_drivingdistance d
-                JOIN temp_pgr_arc a ON d.edge = a.pgr_arc_id 
-                WHERE arc_id IS NOT NULL
-            ),
-            arcs_add_node1_node2 AS (
-                SELECT dn.start_vid,a.mapzone_id, a.arc_id, dn.agg_cost + a.COST AS agg_cost
-                FROM temp_pgr_arc a
-                JOIN temp_pgr_drivingdistance dn ON a.pgr_node_1 = dn.node
-                WHERE a.arc_id IS NOT NULL 
-                AND a.COST > 0
-                AND NOT EXISTS (
-                    SELECT 1 FROM temp_pgr_drivingdistance da 
-                    WHERE da.start_vid = dn.start_vid
-                    AND da.edge = a.pgr_arc_id
-                )
-                UNION ALL
-                SELECT dn.start_vid, a.mapzone_id, a.arc_id, dn.agg_cost + a.reverse_cost AS agg_cost
-                FROM temp_pgr_arc a
-                JOIN temp_pgr_drivingdistance dn ON a.pgr_node_2 = dn.node
-                WHERE a.arc_id IS NOT NULL 
-                AND a.reverse_cost > 0
-                AND NOT EXISTS (
-                    SELECT 1 FROM temp_pgr_drivingdistance da 
-                    WHERE da.start_vid = dn.start_vid
-                    AND da.edge = a.pgr_arc_id
-                )
-            ),
-            arcs_add AS (
-                SELECT start_vid, mapzone_id, arc_id, min(agg_cost) AS agg_cost
-                FROM arcs_add_node1_node2
-                GROUP BY start_vid, mapzone_id, arc_id
-            ),
-            connected_arcs AS (
-                SELECT start_vid, mapzone_id AS component, arc_id, agg_cost 
-                FROM arcs_drivingdistance
-                UNION ALL 
-                SELECT start_vid, mapzone_id AS component,arc_id, agg_cost 
-                FROM arcs_add
-            )
-        SELECT jsonb_build_object(
-            ''type'', ''FeatureCollection'',
-            ''layerName'', ''Graphanalytics tstep process'',
-            ''features'', jsonb_agg(
-                jsonb_build_object(
-                    ''type'', ''Feature'',
-                    ''geometry'', ST_AsGeoJSON(ST_Transform(va.the_geom, 4326))::jsonb,
-                    ''properties'', jsonb_build_object(
-                        ''arc_id'', ca.arc_id,
-                        ''start_vid'', ca.start_vid,
-                        ''node_1'', va.node_1,
-                        ''node_2'', va.node_2,
-                        ''arc_type'', c.arc_type,
-                        ''state'', va.state,
-                        ''state_type'', va.state_type,
-                        ''is_operative'', va.is_operative,
-                        ''mapzone_id'', m.mapzone_id,
-                        ''mapzone_name'', array_to_string(m.name, '',''),
-                        ''mapzone_descript'', m.descript,
-                        ''timestep'', (date_trunc(''day'', now()) + ca.agg_cost * interval ''1 second'')::timestamp
-                    )
-                )
-            )
-        )
-        FROM connected_arcs ca
-        JOIN mapzone m USING (component)
-        JOIN v_temp_arc va USING (arc_id)
-        JOIN cat_arc c ON va.arccat_id = c.id
-        ;
-    ';
-
-    EXECUTE v_querytext INTO geojson_result;
+    EXECUTE format($sql$
+		SELECT jsonb_build_object(
+			'type', 'FeatureCollection',
+            'layerName', 'Graphanalytics tstep process',
+			'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
+		)
+		FROM (
+			SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(ST_Transform(r.the_geom, 4326))::jsonb,
+			'properties', to_jsonb(r) - 'the_geom'
+			) AS feature
+			FROM (
+			SELECT
+				SELECT a.arc_id, d.start_vid, a.node_1, a.node_2, a.arccat_id, a.state, a.expl_id,
+				array_to_string(m.mapzone_ids, ',') AS %I,
+				(a.%I)::text AS %I,
+				a.the_geom,
+				m.name AS descript
+			FROM temp_pgr_arc ta
+            JOIN temp_pgr_drivingdistance d ON ta.pgr_arc_id = d.node
+			JOIN arc a ON a.arc_id = ta.pgr_arc_id
+			JOIN temp_pgr_mapzone m ON m.component = ta.component
+			WHERE ta.mapzone_id IN (0, -1)
+			%s
+			) r
+		) f
+		$sql$,
+		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field,
+		v_query_text_aux
+		) INTO geojson_result;
 
     RETURN gw_fct_json_create_return((
-        '{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"' || v_version || '", "body":{"form":{},"data":{"line":' || geojson_result || '}}}'
+        '{"status":"Accepted", 
+        "message":{
+            "level":1, 
+            "text":"Process done successfully"
+        }, 
+        "version":"' || v_version || '", 
+        "body":{
+            "form":{},
+            "data":{
+                "line":' || geojson_result || '
+            }
+        }
+    }'
     )::json, 3336, null, null, null);
+
+    EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN json_build_object(
+		'status', 'Failed',
+		'NOSQLERRM', SQLERRM,
+		'message', json_build_object(
+			'level', right(SQLSTATE, 1),
+			'text', SQLERRM
+		),
+		'SQLSTATE', SQLSTATE,
+		'SQLCONTEXT', v_error_context
+	);
+    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
