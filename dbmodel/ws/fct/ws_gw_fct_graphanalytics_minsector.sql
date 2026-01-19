@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"comm
 --fid: 125,134
 
 - temp_pgr_node and pgr_temp_arc - temporary table
-- v_temp_arc, v_temp_node, v_temp_connec, v_temp_gully, v_temp_link_connec, v_temp_link_gully 
+- v_temp_arc, v_temp_node, v_temp_connec, v_temp_gully 
 are temporary views for active explotation and for is_operatiu = TRUE, with psectors or not, depending of usePlanPsector
 - Use the views for building temporary table;
 - Use the tables node, arc, connec, gully or link to get the_geom, are faster then the views
@@ -201,10 +201,11 @@ BEGIN
 	FROM v_temp_connec c
 	JOIN temp_pgr_arc a ON a.pgr_arc_id = c.arc_id;
 
-	INSERT INTO temp_pgr_link (pgr_link_id, pgr_feature_id, feature_type)
-	SELECT link_id, feature_id, 'CONNEC'
-	FROM v_temp_link_connec l
-	JOIN temp_pgr_connec c ON c.pgr_connec_id = l.feature_id;
+    INSERT INTO temp_pgr_old_mapzone (mapzone_id)
+    SELECT DISTINCT a.minsector_id
+    FROM temp_pgr_arc t
+    JOIN arc a ON t.pgr_arc_id = a.arc_id
+    WHERE a.minsector_id > 0;
 
     -- Preparing minsectors
     -- =======================
@@ -310,16 +311,11 @@ BEGIN
     ) n
     WHERE t.pgr_node_id = n.pgr_node_id;
 
-    -- update connec, link
+    -- update connec
     UPDATE temp_pgr_connec t
     SET mapzone_id = a.mapzone_id
     FROM temp_pgr_arc a 
     WHERE t.pgr_arc_id = a.pgr_arc_id;
-
-    UPDATE temp_pgr_link t
-    SET mapzone_id = c.mapzone_id
-    FROM temp_pgr_connec c
-    WHERE t.pgr_feature_id = c.pgr_connec_id;
 
     -- fill temp_pgr_minsector_graph
     INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
@@ -526,8 +522,8 @@ BEGIN
         -- First, SET minsector_id = 0 when the values don't exist anymore
         UPDATE arc a SET minsector_id = 0
         WHERE EXISTS (
-            SELECT 1 FROM v_temp_pgr_mapzone_old m
-            WHERE a.minsector_id = m.old_mapzone_id
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE a.minsector_id = m.mapzone_id
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
@@ -537,8 +533,8 @@ BEGIN
 
         UPDATE node n SET minsector_id = 0
         WHERE EXISTS (
-            SELECT 1 FROM v_temp_pgr_mapzone_old m
-            WHERE n.minsector_id = m.old_mapzone_id
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE n.minsector_id = m.mapzone_id
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_node tn
@@ -548,8 +544,8 @@ BEGIN
 
         UPDATE connec c SET minsector_id = 0
         WHERE EXISTS (
-            SELECT 1 FROM v_temp_pgr_mapzone_old m
-            WHERE c.minsector_id = m.old_mapzone_id
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE c.minsector_id = m.mapzone_id
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_connec tc
@@ -559,12 +555,12 @@ BEGIN
 
         UPDATE link l SET minsector_id = 0
         WHERE EXISTS (
-            SELECT 1 FROM v_temp_pgr_mapzone_old m
-            WHERE l.minsector_id = m.old_mapzone_id
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE l.minsector_id = m.mapzone_id
         )
         AND NOT EXISTS (
-            SELECT 1 FROM temp_pgr_link tl
-            WHERE tl.pgr_link_id = l.link_id
+            SELECT 1 FROM temp_pgr_connec t
+            WHERE t.pgr_connec_id = l.feature_id
         )
         AND l.minsector_id IS DISTINCT FROM 0;
 
@@ -572,8 +568,8 @@ BEGIN
         -- for these minsectors, will be done DELETE ON CASCADE  in the tables minsector_graph, minsector_mincut, minsector_mincut_valve
         DELETE FROM minsector m
         WHERE EXISTS (
-            SELECT 1 FROM v_temp_pgr_mapzone_old mo
-            WHERE m.minsector_id = mo.old_mapzone_id
+            SELECT 1 FROM temp_pgr_old_mapzone mo
+            WHERE m.minsector_id = mo.mapzone_id
         )
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_minsector tpm
@@ -651,8 +647,8 @@ BEGIN
 
         UPDATE link l
         SET minsector_id = t.mapzone_id
-        FROM temp_pgr_link t
-        WHERE l.link_id = t.pgr_link_id 
+        FROM temp_pgr_connec t
+        WHERE l.feature_id = t.pgr_connec_id 
         AND l.minsector_id IS DISTINCT FROM t.mapzone_id;
 
         v_visible_layer = '"ve_minsector"';
