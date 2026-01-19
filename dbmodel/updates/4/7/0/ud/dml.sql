@@ -76,3 +76,4 @@ UPDATE config_function SET style=
 }'::json
 WHERE id=2832;
 
+UPDATE config_param_system SET value='{"sys_table_id":"ve_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gullycat_id","orderby":"3","search_type":"gully"}', project_type='ud' WHERE "parameter"='basic_search_network_gully';
