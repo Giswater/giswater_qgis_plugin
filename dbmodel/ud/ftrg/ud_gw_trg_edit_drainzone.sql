@@ -13,7 +13,6 @@ $BODY$
 DECLARE
 	v_view_name TEXT;
 	v_drainzone_id INTEGER;
-	v_count INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -71,53 +70,6 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
-
-		-- Check if there are operative elements in the mapzone before allowing delete
-		SELECT SUM(counts) INTO v_count FROM (
-			SELECT count(*) as counts
-				FROM node n
-				JOIN value_state_type vst ON vst.id = n.state_type
-				WHERE n.drainzone_id = OLD.drainzone_id
-					AND n.state = 1
-					AND vst.is_operative
-			UNION ALL
-			SELECT count(*) as counts
-				FROM arc a
-				JOIN value_state_type vst ON vst.id = a.state_type
-				WHERE a.drainzone_id = OLD.drainzone_id
-					AND a.state = 1
-					AND vst.is_operative
-			UNION ALL
-			SELECT count(*) as counts
-				FROM connec c
-				JOIN value_state_type vst ON vst.id = c.state_type
-				WHERE c.drainzone_id = OLD.drainzone_id
-					AND c.state = 1
-					AND vst.is_operative
-			UNION ALL
-			SELECT count(*) as counts
-				FROM gully g
-				JOIN value_state_type vst ON vst.id = g.state_type
-				WHERE g.drainzone_id = OLD.drainzone_id
-					AND g.state = 1
-					AND vst.is_operative
-			UNION ALL
-			SELECT count(*) as counts
-				FROM link l
-				JOIN value_state_type vst ON vst.id = l.state_type
-				WHERE l.drainzone_id = OLD.drainzone_id
-					AND l.state = 1
-					AND vst.is_operative
-		) combined;
-		IF COALESCE(v_count, 0) > 0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4468", "function":"1112","parameters":{"mapzone_name":"Drainzone", "mapzone_id":'||OLD.drainzone_id||'}}}$$);';
-		END IF;
-
-		UPDATE node SET drainzone_id = 0 WHERE drainzone_id = OLD.drainzone_id;
-		UPDATE arc SET drainzone_id = 0 WHERE drainzone_id = OLD.drainzone_id;
-		UPDATE connec SET drainzone_id = 0 WHERE drainzone_id = OLD.drainzone_id;
-		UPDATE gully SET drainzone_id = 0 WHERE drainzone_id = OLD.drainzone_id;
-		UPDATE link SET drainzone_id = 0 WHERE drainzone_id = OLD.drainzone_id;
 
 		DELETE FROM drainzone WHERE drainzone_id = OLD.drainzone_id;
 		RETURN NULL;
