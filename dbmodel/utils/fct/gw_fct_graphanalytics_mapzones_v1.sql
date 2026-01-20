@@ -440,111 +440,95 @@ BEGIN
 				v_query_text_aux := '';
 			END IF;
 
-			-- nodeParent
+			-- prepare temp_pgr_graphconfig
+			-- use
 			EXECUTE format($sql$
-				UPDATE temp_pgr_node n
-				SET graph_delimiter = %L,
-					mapzone_id = s.mapzone_id
-				FROM (
-					SELECT DISTINCT ON (node_parent) node_parent, mapzone_id
-					FROM (
-						SELECT
-							elem_to_arc.value::int AS to_arc,
-							%I AS mapzone_id,
-							(use_item->>'nodeParent')::int AS node_parent
-						FROM %I t
-						JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
-						JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
-						WHERE (use_item->>'nodeParent') <> ''
-						AND t.graphconfig IS NOT NULL
-						AND t.active
-						%s
-					) x
-					ORDER BY node_parent, mapzone_id DESC
-				) s
-				WHERE n.pgr_node_id = s.node_parent
-				$sql$, v_graph_delimiter, v_mapzone_field, v_mapzone_table, v_query_text_aux
-			);
-
-			--toArc
-			EXECUTE format($sql$
-				UPDATE temp_pgr_arc a
-				SET mapzone_id = s.mapzone_id,
-					node_parent = s.node_parent
-				FROM (
-					SELECT DISTINCT ON (to_arc)
-						to_arc, mapzone_id, node_parent
-					FROM (
-						SELECT
-							elem_to_arc.value::int AS to_arc,
-							%I AS mapzone_id,
-							(use_item->>'nodeParent')::int AS node_parent
-						FROM %I t
-						JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
-						JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
-						WHERE (use_item->>'nodeParent') <> ''
-						AND t.graphconfig IS NOT NULL
-						AND t.active
-						%s
-					) x
-					WHERE EXISTS (
-						SELECT 1
-						FROM temp_pgr_node n
-						WHERE n.graph_delimiter = %L
-						AND n.pgr_node_id = x.node_parent
-						AND n.mapzone_id = x.mapzone_id
-					)
-					ORDER BY to_arc, node_parent DESC
-				) s
-				WHERE a.pgr_arc_id = s.to_arc
-				AND s.node_parent IN (a.pgr_node_1, a.pgr_node_2)
-				$sql$,
-				v_mapzone_field, v_mapzone_table, v_query_text_aux, v_graph_delimiter
-			);
-
-			-- forceClosed - cannot be forceClosed a node that is already v_graph_delimiter
-			EXECUTE format($sql$
-				UPDATE temp_pgr_node n
-				SET graph_delimiter = 'FORCECLOSED'
-				FROM (
-					SELECT DISTINCT
-						fc.value::int AS node_id
+				WITH graphconfig AS (
+					SELECT
+						t.%I AS mapzone_id,
+						NULLIF(use_item->>'nodeParent','')::int AS node_parent,
+						elem_to_arc.value::int AS to_arc
 					FROM %I t
-					JOIN LATERAL json_array_elements_text(
-						COALESCE(t.graphconfig->'forceClosed', '[]'::json)
-					) AS fc(value) ON TRUE
+					JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
+					LEFT JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
 					%s
-				) s
-				WHERE n.pgr_node_id = s.node_id
-				AND n.graph_delimiter <> %L
-				$sql$,
-				v_mapzone_table, v_query_text_aux, v_graph_delimiter
-			);
+				)
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
+				SELECT
+				mapzone_id,
+				'use',
+				node_parent,
+				to_arc
+				FROM graphconfig
+				WHERE mapzone_id > 0
+				AND (node_parent IS DISTINCT FROM 0 OR to_arc IS DISTINCT FROM 0);
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
 
+			-- forceClosed
+			EXECUTE format($sql$
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
+				SELECT
+					t.%I,
+					'forceClosed',
+					elem.value::int
+				FROM %I t
+				JOIN LATERAL json_array_elements_text(t.graphconfig->'forceClosed') AS elem(value) ON TRUE
+				WHERE t.graphconfig IS NOT NULL
+					AND t.active
+					%s;
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
+
+			-- ignore
+			EXECUTE format($sql$
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
+				SELECT
+					t.%I,
+					'ignore',
+					elem.value::int
+				FROM %I t
+				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
+				WHERE t.graphconfig IS NOT NULL
+					AND t.active
+					%s;
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
+
+			-- update temp_pgr_node (nodeParent)
+			UPDATE temp_pgr_node n
+			SET graph_delimiter = v_graph_delimiter,
+				mapzone_id = g.mapzone_id
+			FROM temp_pgr_graphconfig g
+			WHERE n.pgr_node_id = g.pgr_node_id
+			AND g.graph_type = 'use';
+
+			-- update temp_pgr_arc (toArc-nodeParent)
+			UPDATE temp_pgr_arc a
+			SET mapzone_id = g.mapzone_id,
+				node_parent = g.pgr_node_id
+			FROM temp_pgr_graphconfig g
+			WHERE a.pgr_arc_id = g.pgr_arc_id
+			AND g.graph_type = 'use';
+
+			-- update temp_pgr_node (forceClosed)
+			-- cannot be forceClosed a node that is already v_graph_delimiter
+			UPDATE temp_pgr_node n
+			SET graph_delimiter = 'FORCECLOSED'
+			FROM temp_pgr_graphconfig g
+			WHERE n.pgr_node_id = g.pgr_node_id
+			AND g.graph_type = 'forceClosed';
+
+			-- update temp_pgr_node (ignore)
 			-- ignore - cannot be Ignore a node that is already v_graph_delimiter
-			EXECUTE format($sql$
-				UPDATE temp_pgr_node n
-				SET graph_delimiter = 'IGNORE'
-				FROM (
-					SELECT DISTINCT
-						fc.value::int AS node_id
-					FROM %I t
-					JOIN LATERAL json_array_elements_text(
-						COALESCE(t.graphconfig->'ignore', '[]'::json)
-					) AS fc(value) ON TRUE
-					WHERE t.graphconfig IS NOT NULL
-					AND t.active
-					%s
-				) s
-				WHERE n.pgr_node_id = s.node_id
-				AND n.graph_delimiter <> %L
-				$sql$,
-				v_mapzone_table, v_query_text_aux, v_graph_delimiter
-			);
+			UPDATE temp_pgr_node n
+			SET graph_delimiter = 'IGNORE'
+			FROM temp_pgr_graphconfig g
+			WHERE n.pgr_node_id = g.pgr_node_id
+			AND g.graph_type = 'ignore';
 
 		END IF; -- v_from_zero
+
+		-- comun code 
 
 		-- init parameters
 		-- forceClosed - cannot be forceClosed a node that is already v_graph_delimiter
@@ -585,75 +569,83 @@ BEGIN
 			AND n.graph_delimiter  = v_graph_delimiter;
 
 		ELSE
-
-			-- nodeParent
+			-- prepare temp_pgr_graphconfig
+			-- use
 			EXECUTE format($sql$
-				UPDATE temp_pgr_node n
-				SET graph_delimiter = %L,
-					mapzone_id = s.mapzone_id
-				FROM (
-					SELECT DISTINCT ON (node_parent) node_parent, mapzone_id
-					FROM (
-						SELECT
-							(use_item->>'nodeParent')::int AS node_parent,
-							%I AS mapzone_id
-						FROM %I t
-						JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
-						WHERE (use_item->>'nodeParent') <> ''
-						AND t.graphconfig IS NOT NULL
-						AND t.active
-					) x
-					ORDER BY node_parent, mapzone_id DESC
-				) s
-				WHERE n.pgr_node_id = s.node_parent
-				$sql$,
-				v_graph_delimiter, v_mapzone_field, v_mapzone_table
-			);
-
-			-- Update node_parent and mapzone_id only for arcs whose pgr_node_2 is a graph_delimiter node
-			UPDATE temp_pgr_arc t
-			SET node_parent = n.pgr_node_id,
-				mapzone_id = n.mapzone_id
-			FROM temp_pgr_node n
-			WHERE t.pgr_node_2 = n.pgr_node_id
-			AND n.graph_delimiter = v_graph_delimiter;
+				WITH graphconfig AS (
+					SELECT
+					t.%I AS mapzone_id,
+					NULLIF(use_item->>'nodeParent','')::int AS node_parent
+					FROM %I t
+					JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
+					WHERE t.graphconfig IS NOT NULL
+					AND t.active
+				)
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
+				SELECT
+					mapzone_id,
+					'use',
+					node_parent
+				FROM graphconfig
+				WHERE mapzone_id > 0
+				AND node_parent IS DISTINCT FROM 0
+			$sql$, v_mapzone_field, v_mapzone_table);
 
 			-- forceClosed
 			EXECUTE format($sql$
-				UPDATE temp_pgr_arc a
-				SET graph_delimiter = 'FORCECLOSED'
-				FROM (
-					SELECT DISTINCT
-						fc.value::int AS arc_id
-					FROM %I t
-					JOIN LATERAL json_array_elements_text(COALESCE(t.graphconfig->'forceClosed', '[]'::json)
-					) AS fc(value) ON TRUE
-					WHERE t.graphconfig IS NOT NULL
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
+				SELECT
+					t.%I,
+					'forceClosed',
+					elem.value::int
+				FROM %I t
+				JOIN LATERAL json_array_elements_text(t.graphconfig->'forceClosed') AS elem(value) ON TRUE
+				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-				) s
-				WHERE a.pgr_arc_id = s.arc_id
-				$sql$,
-				v_mapzone_table
-			);
+			$sql$, v_mapzone_field, v_mapzone_table);
 
 			-- ignore
 			EXECUTE format($sql$
-				UPDATE temp_pgr_arc a
-				SET graph_delimiter = 'IGNORE'
-				FROM (
-					SELECT DISTINCT
-						fc.value::int AS arc_id
-					FROM %I t
-					JOIN LATERAL json_array_elements_text(
-						COALESCE(t.graphconfig->'ignore', '[]'::json)
-					) AS fc(value) ON TRUE
-					WHERE t.graphconfig IS NOT NULL
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
+				SELECT
+					t.%I,
+					'ignore',
+					elem.value::int
+				FROM %I t
+				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
+				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-				) s
-				WHERE a.pgr_arc_id = s.arc_id
-				$sql$,
-				v_mapzone_table
-			);
+			$sql$, v_mapzone_field, v_mapzone_table);
+
+			-- update temp_pgr_node (nodeParent)
+			UPDATE temp_pgr_node n
+			SET graph_delimiter = v_graph_delimiter,
+				mapzone_id = g.mapzone_id
+			FROM temp_pgr_graphconfig g
+			WHERE n.pgr_node_id = g.pgr_node_id
+			AND g.graph_type = 'use';
+
+			-- update temp_pgr_arc (inletArc-nodeParent only for arcs whose pgr_node_2 is a graph_delimiter node)
+			UPDATE temp_pgr_arc a
+			SET mapzone_id = g.mapzone_id,
+				node_parent = g.pgr_node_id
+			FROM temp_pgr_graphconfig g
+			WHERE a.pgr_node_2= g.pgr_node_id
+			AND g.graph_type = 'use';
+
+			-- update temp_pgr_arc (forceClosed)
+			UPDATE temp_pgr_arc a
+			SET graph_delimiter = 'FORCECLOSED'
+			FROM temp_pgr_graphconfig g
+			WHERE a.pgr_arc_id = g.pgr_arc_id
+			AND g.graph_type = 'forceClosed';
+
+			-- update temp_pgr_arc (ignore)
+			UPDATE temp_pgr_arc a
+			SET graph_delimiter = 'IGNORE'
+			FROM temp_pgr_graphconfig g
+			WHERE a.pgr_arc_id = g.pgr_arc_id
+			AND g.graph_type = 'ignore';
 
 		END IF; -- v_from_zero
 
