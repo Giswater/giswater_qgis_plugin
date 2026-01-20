@@ -186,5 +186,5 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 -- 20/01/2026
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_arrangenetwork(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_initnetwork(json);
-DELETE FROM sys_function WHERE id = 3326;
-DELETE FROM sys_function WHERE id = 3328;
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_arrangenetwork';
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_initnetwork';
