@@ -120,6 +120,7 @@ DECLARE
 	v_result_point_invalid json;
 	v_result_line_valid json;
 	v_result_line_invalid json;
+	v_result_graphconfig json;
 
 	-- response variables
 	v_level integer;
@@ -2356,6 +2357,41 @@ BEGIN
 
 	-- SECTION[epic=mapzones]: Creating temporal layers
 
+	-- graphconfig
+	EXECUTE format($sql$
+		SELECT jsonb_build_object(
+			'type', 'FeatureCollection',
+			'layerName', 'graphconfig',
+			'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
+		)
+		FROM (
+			SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(ST_Transform(r.the_geom, 4326))::jsonb,
+			'properties', to_jsonb(r) - 'the_geom'
+			) AS feature
+			FROM (
+			SELECT  
+				feature_id, 
+				'nodeParent' AS graph_type,
+				tn.mapzone_id AS %I,
+				n.%I AS %I,
+				n.the_geom,
+				mz.name AS name,
+				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript,
+				NULL::float AS rotation
+				FROM temp_pgr_node tn
+				JOIN node n ON n.node_id = tn.pgr_node_id
+				JOIN temp_pgr_mapzone mz ON mz.component = tn.component
+				WHERE n.graph_delimiter = %L
+			) r
+		) f
+		$sql$,
+		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field, v_graph_delimiter
+	) INTO v_result;
+
+	v_result_graphconfig := v_result;
+
 	EXECUTE format($sql$
 		SELECT jsonb_build_object(
 			'type', 'FeatureCollection',
@@ -2370,10 +2406,10 @@ BEGIN
 			) AS feature
 			FROM (
 			SELECT a.arc_id, a.arccat_id, a.state, a.expl_id,
-				array_to_string(mz.mapzone_ids, ',') AS %I,
+				ta.mapzone_id AS %I,
 				(a.%I)::text AS %I,
 				a.the_geom,
-				mz.name AS descript
+				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
 			FROM temp_pgr_arc ta
 			JOIN arc a ON a.arc_id = ta.pgr_arc_id
 			JOIN temp_pgr_mapzone mz ON mz.component = ta.component
@@ -2391,10 +2427,10 @@ BEGIN
 			UNION ALL
 			SELECT
 				g.gully_id AS feature_id, 'GULLY' AS feature_type, g.gullycat_id AS featurecat_id, g.state, g.expl_id,
-				array_to_string(mz.mapzone_ids, ',') AS %I,
+				tg.mapzone_id AS %I,
 				(g.%I)::text AS %I,
 				g.the_geom,
-				mz.name AS descript
+				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
 			FROM temp_pgr_gully tg
 			JOIN gully g ON g.gully_id = tg.pgr_gully_id
 			JOIN temp_pgr_mapzone mz ON mz.component = tg.component
@@ -2421,10 +2457,10 @@ BEGIN
 			FROM (
 			SELECT
 				c.connec_id AS feature_id, 'CONNEC'::text AS feature_type, c.conneccat_id AS featurecat_id, c.state, c.expl_id,
-				array_to_string(mz.mapzone_ids, ',') AS %I,
-				(c.%I)::text AS %I,
+				tpc.mapzone_id AS %I,
+				c.%I AS %I,
 				c.the_geom,
-				mz.name AS descript
+				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
 			FROM temp_pgr_connec tpc
 			JOIN connec c ON c.connec_id = tpc.pgr_connec_id
 			JOIN temp_pgr_mapzone mz ON mz.component = tpc.component
@@ -2461,8 +2497,8 @@ BEGIN
 				) AS feature
 				FROM (
 				SELECT a.arc_id, a.arccat_id, a.state, a.expl_id,
-					array_to_string(mz.mapzone_ids, ',') AS %I,
-					(a.%I)::text AS %I,
+					ta.mapzone_id AS %I,
+					a.%I AS %I,
 					a.the_geom,
 					mz.name AS descript
 				FROM temp_pgr_arc ta
@@ -2483,8 +2519,8 @@ BEGIN
 				UNION ALL
 				SELECT
 					g.gully_id AS feature_id, 'GULLY'::text AS feature_type, g.gullycat_id AS featurecat_id, g.state, g.expl_id,
-					array_to_string(mz.mapzone_ids, ',') AS %I,
-					(g.%I)::text AS %I,
+					tg.mapzone_id AS %I,
+					g.%I AS %I,
 					g.the_geom,
 					mz.name AS descript
 				FROM temp_pgr_gully tg
@@ -2514,8 +2550,8 @@ BEGIN
 				FROM (
 				SELECT
 					c.connec_id AS feature_id, 'CONNEC'::text AS feature_type, c.conneccat_id AS featurecat_id, c.state, c.expl_id,
-					array_to_string(mz.mapzone_ids, ',') AS %I,
-					(c.%I)::text AS %I,
+					tpc.mapzone_id AS %I,
+					c.%I AS %I,
 					c.the_geom,
 					mz.name AS descript
 				FROM temp_pgr_connec tpc
@@ -2558,6 +2594,7 @@ BEGIN
 				"netscenarioId": "'||v_netscenario::text||'", 
 				"hasConflicts": '||v_has_conflicts||', 
 				"info":'||v_result_info||',
+				"graphconfig":'||v_result_graphconfig||',
 				"point_valid":'||v_result_point_valid||',
 				"line_valid":'||v_result_line_valid||',
 				"point_invalid":'||v_result_point_invalid||',
