@@ -191,7 +191,7 @@ BEGIN
 		SELECT count(*)
 		FROM %I
 		WHERE active
-			AND %I NOT IN (0, -1)          -- 0 y -1 son conflicto/undefined
+			AND %I NOT IN (0, -1) -- 0 and -1 are conflict and undefined
 			AND ($1::integer[] IS NULL OR expl_id && $1::integer[])
 		$sql$, v_mapzone_table, v_mapzone_field)
 		INTO v_mapzone_count
