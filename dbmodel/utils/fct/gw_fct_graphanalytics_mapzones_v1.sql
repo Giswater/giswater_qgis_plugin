@@ -2616,14 +2616,19 @@ BEGIN
 	-- ENDSECTION
 
 	-- Control NULL values
+	v_status := COALESCE(v_status, 'Accepted');
 	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point_valid := COALESCE(v_result_point_valid, '{}');
+	v_result_line_valid := COALESCE(v_result_line_valid, '{}');
+	v_result_point_invalid := COALESCE(v_result_point_invalid, '{}');
+	v_result_line_invalid := COALESCE(v_result_line_invalid, '{}');
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
 	v_netscenario := COALESCE(v_netscenario, -1);
 
 	-- Return JSON
-		RETURN gw_fct_json_create_return(('{
+	RETURN gw_fct_json_create_return(('{
 		"status":"'||v_status||'", 
 		"message":{
 			"level":'||v_level||', 
