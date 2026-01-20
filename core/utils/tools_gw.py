@@ -3720,7 +3720,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
             if not json_result['body'].get('data') or type(json_result['body'].get('data')) is list:
                 return
             for key, value in list(json_result['body']['data'].items()):
-                if key.lower() in ('point', 'line', 'polygon'):
+                if any(g in key.lower() for g in ('point', 'line', 'polygon')):
 
                     # Remove the layer if it exists
                     layer_name = f'{key}'
