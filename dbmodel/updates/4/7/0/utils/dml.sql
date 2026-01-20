@@ -182,3 +182,9 @@ UPDATE sys_fprocess SET query_text='SELECT c.connec_id FROM plan_psector_x_conne
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4466, 'Start/End nodes is/are not valid(s)', 'Check elev data. Only NOT start/end nodes may have missed elev data', 2, true, 'ud', 'core', 'UI');
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES (4468, 'Cannot delete %mapzone_name% (%mapzone_id%): operative elements exist for this mapzone.', 'Deactivate or move the operative elements first.', 2, true, 'utils', 'core', 'UI');
+
+-- 20/01/2026
+DROP FUNCTION IF EXISTS gw_fct_graphanalytics_arrangenetwork(json);
+DROP FUNCTION IF EXISTS gw_fct_graphanalytics_initnetwork(json);
+DELETE FROM sys_function WHERE id = 3326;
+DELETE FROM sys_function WHERE id = 3328;
