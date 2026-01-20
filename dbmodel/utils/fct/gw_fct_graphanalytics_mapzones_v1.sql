@@ -2423,6 +2423,7 @@ BEGIN
 				JOIN arc a ON ta.pgr_arc_id = a.arc_id
 				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
 				AND ta.node_parent IS NOT NULL
+				
 				) r
 			) f
 			$sql$, v_mapzone_field, v_mapzone_field
@@ -2454,9 +2455,45 @@ BEGIN
 					JOIN node n ON n.node_id = tn.pgr_node_id
 					JOIN temp_pgr_mapzone mz ON mz.component = tn.component
 					WHERE tn.graph_delimiter = 'nodeParent'
+				UNION ALL 
+				SELECT 
+					a.arc_id AS feature_id, 
+					'toArc' AS graph_type,
+					ta.mapzone_id AS %I,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
+					ST_EndPoint (a.the_geom) AS the_geom,
+					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.99), st_lineinterpolatepoint(a.the_geom, 0.98))*400/6.28 AS rotation
+				FROM temp_pgr_arc ta 
+				JOIN arc a ON ta.pgr_arc_id = a.arc_id
+				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
+				AND ta.node_parent IS NOT NULL
+				UNION ALL 
+				SELECT 
+					a.arc_id AS feature_id, 
+					ta.graph_delimiter AS graph_type,
+					ta.mapzone_id AS %I,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
+					ST_StartPoint (a.the_geom) AS the_geom,
+					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28 AS rotation
+				FROM temp_pgr_arc ta 
+				JOIN arc a ON ta.pgr_arc_id = a.arc_id
+				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
+				AND ta.graph_delimiter = 'initoverflopath'
+				UNION ALL 
+				SELECT 
+					a.arc_id AS feature_id, 
+					ta.graph_delimiter AS graph_type,
+					ta.mapzone_id AS %I,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
+					ST_StartPoint (a.the_geom) AS the_geom,
+					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28 AS rotation
+				FROM temp_pgr_arc ta 
+				JOIN arc a ON ta.pgr_arc_id = a.arc_id
+				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
+				AND ta.graph_delimiter IN ('forceClosed', 'forceOpen') 
 				) r
 			) f
-			$sql$, v_mapzone_field
+			$sql$, v_mapzone_field, v_mapzone_field, v_mapzone_field, v_mapzone_field
 		) INTO v_result;
 
 	END IF; -- v_project_type
