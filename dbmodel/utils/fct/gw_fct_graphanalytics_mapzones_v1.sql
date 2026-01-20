@@ -1182,35 +1182,6 @@ BEGIN
 
 	END IF; -- v_from_zero
 
-	-- RESOLVE EXCEPTION
-	-- remove mapzone_id for disconected components of the same mapzone; 
-	UPDATE temp_pgr_mapzone t
-	SET mapzone_id = 0, 
-		name = 'Disconnected'
-	WHERE t.mapzone_id IN (
-	SELECT mapzone_id
-	FROM temp_pgr_mapzone
-	GROUP BY mapzone_id
-	HAVING count(component) > 1
-	);
-
-	-- remove mapzone id for nodeParents of mapzones that have no arc - some error in graphconfig 
-	UPDATE temp_pgr_mapzone mz
-	SET mapzone_id = 0,
-		name = 'Disconnected'
-	WHERE EXISTS (
-		SELECT 1
-		FROM temp_pgr_node n
-		WHERE n.mapzone_id = mz.mapzone_id
-		AND n.graph_delimiter = 'nodeParent'
-		AND NOT EXISTS (
-			SELECT 1
-			FROM temp_pgr_arc a
-			WHERE a.node_parent = n.pgr_node_id
-				AND a.mapzone_id = n.mapzone_id
-		)
-	);
-
 	-- for DWFZONE generate id for drainzone (will be the minimum value of arc id)
 	IF v_class = 'DWFZONE' THEN
 
