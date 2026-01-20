@@ -26,10 +26,14 @@ class GwManageCampaignLotButton(GwAction):
 
         self.actions = [tools_qt.tr('Manage Campaign'), tools_qt.tr('Manage Lot'), tools_qt.tr('Manage Workorder')]
 
-        # Conditionally remove 'Lot management' for role_cm_edit
+        # Conditionally remove menu options based on user role
         cm_roles = tools_gw.get_cm_user_role()
-        if cm_roles and 'role_cm_edit' in list(cm_roles):
-            self.actions.remove(tools_qt.tr('Manage Lot'))
+        if cm_roles:
+            cm_role_list = list(cm_roles)
+            if 'role_cm_edit' in cm_role_list:
+                self.actions.remove(tools_qt.tr('Manage Lot'))
+            elif 'role_cm_manager' in cm_role_list:
+                self.actions.remove(tools_qt.tr('Manage Campaign'))
 
         # Create a menu and add all the actions
         self.menu = QMenu()
