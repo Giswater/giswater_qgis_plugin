@@ -725,7 +725,8 @@ BEGIN
 		IF v_netscenario IS NOT NULL THEN
 			-- closed valves
 			UPDATE temp_pgr_arc_linegraph t 
-			SET closed = TRUE,
+			SET graph_delimiter = 'netscenClosedValve',
+				closed = TRUE,
 				broken = FALSE
 			FROM plan_netscenario_valve v
 			WHERE t.graph_delimiter = 'MINSECTOR'
@@ -735,7 +736,8 @@ BEGIN
 
 			-- open valves
 			UPDATE temp_pgr_arc_linegraph t
-			SET closed = FALSE,
+			SET graph_delimiter = 'netscenOpenedValve',
+				closed = FALSE,
 				broken = FALSE,
 				to_arc = NULL
 			FROM plan_netscenario_valve v
@@ -745,23 +747,38 @@ BEGIN
 			AND t.pgr_node_id = v.node_id;
 		END IF;
 
+		-- closed valves
+		UPDATE temp_pgr_arc_linegraph t 
+		SET graph_delimiter = 'closedValve'
+		WHERE t.graph_delimiter = 'MINSECTOR'
+		AND t.closed = TRUE;
+
+		-- check valves
+		UPDATE temp_pgr_arc_linegraph t 
+		SET graph_delimiter = 'checkValve'
+		WHERE t.graph_delimiter = 'MINSECTOR'
+		AND t.closed = FALSE 
+        AND t.broken = FALSE
+        AND t.to_arc IS NOT NULL;
+
+		-- open valves
+		UPDATE temp_pgr_arc_linegraph t 
+		SET graph_delimiter = 'openValve'
+		WHERE t.graph_delimiter = 'MINSECTOR';
+
 		-- COST/REVERSE_COST
 
 		-- closed valves
 		UPDATE temp_pgr_arc_linegraph t
         SET cost = -1, reverse_cost = -1
-        WHERE graph_delimiter = 'MINSECTOR'
-		AND t.closed = TRUE;
+        WHERE graph_delimiter IN ('closedValve', 'netscenClosedValve');
 
 		-- checkvalves
 		UPDATE temp_pgr_arc_linegraph t
 		SET 
 			cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
 			reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
-		WHERE graph_delimiter = 'MINSECTOR'
-		AND t.closed = FALSE 
-		AND t.broken = FALSE
-		AND t.to_arc IS NOT NULL;
+		WHERE graph_delimiter = 'checkValve';
 
 		-- forceClosed
 		UPDATE temp_pgr_arc_linegraph t
