@@ -143,7 +143,6 @@ BEGIN
 		UPDATE node SET sector_id = 0 WHERE sector_id = OLD.sector_id;
 		UPDATE arc SET sector_id = 0 WHERE sector_id = OLD.sector_id;
 		UPDATE connec SET sector_id = 0 WHERE sector_id = OLD.sector_id;
-		UPDATE gully SET sector_id = 0 WHERE sector_id = OLD.sector_id;
 		UPDATE link SET sector_id = 0 WHERE sector_id = OLD.sector_id;
 		
 		DELETE FROM sector WHERE sector_id = OLD.sector_id;
