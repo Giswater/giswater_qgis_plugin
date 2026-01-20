@@ -3007,8 +3007,6 @@ class GwNonVisual:
         float_list = []
         for lst in clean_list:
             temp_lst = []
-            if len(lst) < 2:
-                continue
             for item in lst:
                 try:
                     value = float(item)
