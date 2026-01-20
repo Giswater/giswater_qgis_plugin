@@ -2301,20 +2301,7 @@ BEGIN
 
 				ELSIF v_class = 'DMA' THEN
 
-					/*
-					IF v_class = 'DMA' THEN -- Execute DMA graph
-    
-						FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
-						LOOP
-							
-							EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
-							
-						END LOOP;
-					
-					END IF;
-
-					*/
+					RAISE NOTICE 'Filling temp_pgr_om_waterbalance_dma_graph ';
 
 					-- it's SELECT DISTINCT in case the graph_delimiter is a source with 2 toArc with the same DMA 
 					-- restriction unicity: dma_id, node_id
@@ -2347,11 +2334,14 @@ BEGIN
 					INSERT INTO om_waterbalance_dma_graph
 					SELECT * FROM temp_pgr_om_waterbalance_dma_graph;
 
-				RAISE NOTICE 'Filling temp_pgr_om_waterbalance_dma_graph ';
-
-
-
-
+					FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
+					LOOP
+						
+						EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
+						
+					END LOOP;
+					
 				END IF; -- v_class
 				
 			ELSE -- v_project_type (UD)
