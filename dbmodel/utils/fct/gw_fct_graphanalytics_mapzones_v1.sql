@@ -96,7 +96,6 @@ DECLARE
 	v_gullies_count integer;
 	v_mapzones_ids text;
 
-	v_graph_delimiter text;
 	v_mapzone_table text;
 	v_mapzone_field text;
 	v_visible_layer text;
@@ -175,7 +174,6 @@ BEGIN
 	END IF;
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
-	v_graph_delimiter := v_class;
 	v_mapzone_table := LOWER(v_class);
 	v_mapzone_field := v_mapzone_table || '_id';
 	IF v_netscenario IS NOT NULL THEN
@@ -340,9 +338,9 @@ BEGIN
 
 			-- update graph_delimiter for nodeParent
 			UPDATE temp_pgr_node t
-			SET graph_delimiter = v_graph_delimiter
+			SET graph_delimiter = 'nodeParent'
 			FROM v_temp_node n
-			WHERE v_graph_delimiter = ANY(n.graph_delimiter)
+			WHERE v_class = ANY(n.graph_delimiter)
 			AND t.pgr_node_id = n.node_id;
 
 			-- set node_parent for arcs connected to graph_delimiter METER, PUMP
@@ -354,7 +352,7 @@ BEGIN
 			SET node_parent = n.pgr_node_id
 			FROM temp_pgr_node n
 			JOIN meter_pump m ON m.node_id = n.pgr_node_id
-			WHERE n.graph_delimiter = v_graph_delimiter
+			WHERE n.graph_delimiter = 'nodeParent'
 			AND t.pgr_arc_id = m.to_arc
 			AND m.to_arc IS NOT NULL;	
 
@@ -372,7 +370,7 @@ BEGIN
 			INTO v_missing_to_arc
 			FROM temp_pgr_node n
 			JOIN missing_to_arc ma ON n.pgr_node_id = ma.node_id
-			WHERE n.graph_delimiter = v_graph_delimiter;		
+			WHERE n.graph_delimiter = 'nodeParent';		
 
 			IF v_missing_to_arc = 0 THEN 
 
@@ -390,7 +388,7 @@ BEGIN
 							n.pgr_node_id AS node_parent, a.pgr_arc_id
 						FROM temp_pgr_node n
 						JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-						WHERE n.graph_delimiter = v_graph_delimiter
+						WHERE n.graph_delimiter = 'nodeParent'
 						AND a.node_parent IS NULL
 						AND NOT EXISTS (
 							SELECT 1
@@ -497,7 +495,7 @@ BEGIN
 
 			-- update temp_pgr_node (nodeParent)
 			UPDATE temp_pgr_node n
-			SET graph_delimiter = v_graph_delimiter,
+			SET graph_delimiter = 'nodeParent',
 				mapzone_id = g.mapzone_id
 			FROM temp_pgr_graphconfig g
 			WHERE n.pgr_node_id = g.pgr_node_id
@@ -511,36 +509,28 @@ BEGIN
 			WHERE a.pgr_arc_id = g.pgr_arc_id
 			AND g.graph_type = 'use';
 
-			-- update temp_pgr_node (forceClosed)
-			-- cannot be forceClosed a node that is already v_graph_delimiter
+			-- update temp_pgr_node (forceClosed, ignore)
+			-- cannot be forceClosed/ignore a node that is already 'nodeParent'
 			UPDATE temp_pgr_node n
-			SET graph_delimiter = 'FORCECLOSED'
+			SET graph_delimiter = g.graph_type
 			FROM temp_pgr_graphconfig g
 			WHERE n.pgr_node_id = g.pgr_node_id
-			AND g.graph_type = 'forceClosed';
-
-			-- update temp_pgr_node (ignore)
-			-- ignore - cannot be Ignore a node that is already v_graph_delimiter
-			UPDATE temp_pgr_node n
-			SET graph_delimiter = 'IGNORE'
-			FROM temp_pgr_graphconfig g
-			WHERE n.pgr_node_id = g.pgr_node_id
-			AND g.graph_type = 'ignore';
+			AND g.graph_type IN  ('forceClosed', 'ignore');
 
 		END IF; -- v_from_zero
 
 		-- comun code 
 
 		-- init parameters
-		-- forceClosed - cannot be forceClosed a node that is already v_graph_delimiter
-		UPDATE temp_pgr_node n SET graph_delimiter = 'FORCECLOSED'
+		-- forceClosed - cannot be forceClosed a node that is already 'nodeParent'
+		UPDATE temp_pgr_node n SET graph_delimiter = 'forceClosed'
 		WHERE n.pgr_node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4)
-		AND n.graph_delimiter <> v_graph_delimiter;
+		AND n.graph_delimiter <> 'nodeParent';
 
-		-- ignore - cannot be ignore a node that is already v_graph_delimiter
-		UPDATE temp_pgr_node n SET graph_delimiter = 'IGNORE'
+		-- ignore - cannot be ignore a node that is already 'nodeParent'
+		UPDATE temp_pgr_node n SET graph_delimiter = 'ignore'
 		WHERE n.pgr_node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4)
-		AND n.graph_delimiter <> v_graph_delimiter;
+		AND n.graph_delimiter <> 'nodeParent';
 
 	ELSE -- v_project_type (UD)
 
@@ -557,9 +547,9 @@ BEGIN
 		IF v_from_zero THEN	
 			-- nodeParent
 			UPDATE temp_pgr_node t
-			SET graph_delimiter = v_graph_delimiter
+			SET graph_delimiter = 'nodeParent'
 			FROM v_temp_node n
-			WHERE v_graph_delimiter = ANY(n.graph_delimiter)
+			WHERE 'nodeParent' = ANY(n.graph_delimiter)
 			AND t.pgr_node_id = n.node_id;
 
 			-- set node_parent only for arcs whose pgr_node_2 is a graph_delimiter node
@@ -567,7 +557,7 @@ BEGIN
 			SET node_parent = n.pgr_node_id
 			FROM temp_pgr_node n
 			WHERE t.pgr_node_2 = n.pgr_node_id
-			AND n.graph_delimiter  = v_graph_delimiter;
+			AND n.graph_delimiter  = 'nodeParent';
 
 		ELSE
 			-- prepare temp_pgr_graphconfig
@@ -620,7 +610,7 @@ BEGIN
 
 			-- update temp_pgr_node (nodeParent)
 			UPDATE temp_pgr_node n
-			SET graph_delimiter = v_graph_delimiter,
+			SET graph_delimiter = 'nodeParent',
 				mapzone_id = g.mapzone_id
 			FROM temp_pgr_graphconfig g
 			WHERE n.pgr_node_id = g.pgr_node_id
@@ -636,14 +626,14 @@ BEGIN
 
 			-- update temp_pgr_arc (forceClosed)
 			UPDATE temp_pgr_arc a
-			SET graph_delimiter = 'FORCECLOSED'
+			SET graph_delimiter = 'forceClosed'
 			FROM temp_pgr_graphconfig g
 			WHERE a.pgr_arc_id = g.pgr_arc_id
 			AND g.graph_type = 'forceClosed';
 
 			-- update temp_pgr_arc (ignore)
 			UPDATE temp_pgr_arc a
-			SET graph_delimiter = 'IGNORE'
+			SET graph_delimiter = 'ignore'
 			FROM temp_pgr_graphconfig g
 			WHERE a.pgr_arc_id = g.pgr_arc_id
 			AND g.graph_type = 'ignore';
@@ -652,11 +642,11 @@ BEGIN
 
 		-- init parameters
 		-- forceClosed
-		UPDATE temp_pgr_arc a SET graph_delimiter = 'FORCECLOSED'
+		UPDATE temp_pgr_arc a SET graph_delimiter = 'forceClosed'
 		WHERE a.pgr_arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
 
 		-- ignore
-		UPDATE temp_pgr_arc a SET graph_delimiter = 'IGNORE'
+		UPDATE temp_pgr_arc a SET graph_delimiter = 'ignore'
 		WHERE a.pgr_arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 
 	END IF; -- v_project_type
@@ -689,7 +679,7 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 
-		-- UPDATE pgr_node_id for nodes with graph_delimiter (MINSECTOR, SECTOR, v_graph_delimiter, FORCECLOSED, IGNORE)
+		-- UPDATE pgr_node_id for nodes with graph_delimiter (MINSECTOR, SECTOR, 'nodeParent', forceClosed, ignore)
 		--checking node_1 for arc_1
 		UPDATE temp_pgr_arc_linegraph t
 		SET pgr_node_id = n.pgr_node_id
@@ -712,11 +702,11 @@ BEGIN
 		AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
 		AND ta.pgr_arc_id = t.pgr_arc_id;
 
-		-- UPDATE graph_delimiter for nodes that afect cost/reverse_cost (MINSECTOR, FORCECLOSED, IGNORE)
+		-- UPDATE graph_delimiter for nodes that afect cost/reverse_cost (MINSECTOR, forceClosed, ignore)
 		UPDATE temp_pgr_arc_linegraph t
 		SET graph_delimiter = n.graph_delimiter
 		FROM temp_pgr_node n
-		WHERE n.graph_delimiter IN ('MINSECTOR', 'FORCECLOSED', 'IGNORE')
+		WHERE n.graph_delimiter IN ('MINSECTOR', 'forceClosed', 'ignore')
 		AND t.pgr_node_id = n.pgr_node_id;
 
 		-- update aditional fields for valves (MINSECTOR)
@@ -776,16 +766,16 @@ BEGIN
 		-- forceClosed
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost = -1, reverse_cost = -1
-		WHERE graph_delimiter = 'FORCECLOSED';
+		WHERE graph_delimiter = 'forceClosed';
 
 		-- ignore
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost = 1, reverse_cost = 1
-		WHERE graph_delimiter = 'IGNORE';
+		WHERE graph_delimiter = 'ignore';
 
 	ELSE -- v_project_type (UD)
  
-		-- UPDATE pgr_node_id for nodes head of mapzones (v_graph_delimiter)
+		-- UPDATE pgr_node_id for nodes head of mapzones ('nodeParent')
 		--checking node_1 for arc_1
 		UPDATE temp_pgr_arc_linegraph t
 		SET pgr_node_id = n.pgr_node_id
@@ -793,7 +783,7 @@ BEGIN
 		JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
 		JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
 		JOIN temp_pgr_node n ON a1.pgr_node_1 = n.pgr_node_id
-		WHERE n.graph_delimiter = v_graph_delimiter
+		WHERE n.graph_delimiter = 'nodeParent'
 		AND a1.pgr_node_1 IN (a2.pgr_node_1, a2.pgr_node_2)
 		AND ta.pgr_arc_id = t.pgr_arc_id;
 
@@ -804,16 +794,16 @@ BEGIN
 		JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
 		JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
 		JOIN temp_pgr_node n ON a1.pgr_node_2 = n.pgr_node_id
-		WHERE n.graph_delimiter = v_graph_delimiter
+		WHERE n.graph_delimiter = 'nodeParent'
 		AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
 		AND ta.pgr_arc_id = t.pgr_arc_id;
 
-		-- UPDATE pgr_node_id, graph_delimiter for arcs (INITOVERFLOWPATH, FORCECLOSED, IGNORE)
+		-- UPDATE pgr_node_id, graph_delimiter for arcs (INITOVERFLOWPATH, forceClosed, ignore)
 		UPDATE temp_pgr_arc_linegraph t
 		SET graph_delimiter = a.graph_delimiter,
 			pgr_node_id = a.pgr_node_1
 		FROM temp_pgr_arc a
-		WHERE a.graph_delimiter IN ('INITOVERFLOWPATH', 'FORCECLOSED', 'IGNORE')
+		WHERE a.graph_delimiter IN ('INITOVERFLOWPATH', 'forceClosed', 'ignore')
 		AND a.pgr_arc_id = t.pgr_node_2;
 
 		-- COST/REVERSE_COST
@@ -828,18 +818,17 @@ BEGIN
 		-- forceClosed
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost = -1, reverse_cost = -1
-		WHERE graph_delimiter = 'FORCECLOSED';
+		WHERE graph_delimiter = 'forceClosed';
 
 		-- ignore
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost = 1, reverse_cost = 1
-		WHERE graph_delimiter = 'IGNORE';
+		WHERE graph_delimiter = 'ignore';
 
 
 	END IF; -- v_project_type
 
-	EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc_linegraph'
-    INTO v_pgr_distance; 
+	v_pgr_distance := (SELECT count(*)::int FROM temp_pgr_arc_linegraph);
 
 	-- Compute to_arc and assign arc node_parent (v_missing_to_arc > 0) 
 	-- =================================================================
@@ -857,7 +846,7 @@ BEGIN
 		SELECT array_agg(DISTINCT ta.pgr_arc_id)::int[]
 		INTO v_pgr_root_vids
 		FROM v_temp_node vn
-		JOIN temp_pgr_arc ta ON vn.node_id IN (ta.pgr_node_1, pgr_node_2)
+		JOIN temp_pgr_arc ta ON vn.node_id IN (ta.pgr_node_1, ta.pgr_node_2)
 		WHERE 'SECTOR' = ANY(vn.graph_delimiter)
 		AND NOT EXISTS (
 			SELECT 1 
@@ -887,9 +876,9 @@ BEGIN
 					FROM temp_pgr_node n
 					JOIN water_facility w ON w.node_id = n.pgr_node_id
 					WHERE n.pgr_node_id = a.pgr_node_id
-					AND n.graph_delimiter IN ('SECTOR', %L)
+					AND n.graph_delimiter IN ('SECTOR', 'nodeParent')
 			)
-		$sql$, v_graph_delimiter);
+		$sql$);
 
 		TRUNCATE temp_pgr_drivingdistance;
 		INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
@@ -932,7 +921,7 @@ BEGIN
 					n.pgr_node_id AS node_parent, a.pgr_arc_id
 				FROM temp_pgr_node n
 				JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-				WHERE n.graph_delimiter = v_graph_delimiter
+				WHERE n.graph_delimiter = 'nodeParent'
 				AND a.node_parent IS NULL
 				AND NOT EXISTS (
 					SELECT 1
@@ -991,11 +980,11 @@ BEGIN
 		OR NOT EXISTS (
 			SELECT 1
 			FROM temp_pgr_node n
-			WHERE n.graph_delimiter = %L
+			WHERE n.graph_delimiter = 'nodeParent'
 			AND n.pgr_node_id = a.pgr_node_id
 		)
 		$sql$
-	, v_source, v_target, v_graph_delimiter);
+	, v_source, v_target);
 
 	TRUNCATE temp_pgr_drivingdistance;
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
@@ -1190,7 +1179,7 @@ BEGIN
 		SELECT 1
 		FROM temp_pgr_node n
 		WHERE n.mapzone_id = mz.mapzone_id
-		AND n.graph_delimiter = v_graph_delimiter
+		AND n.graph_delimiter = 'nodeParent'
 		AND NOT EXISTS (
 			SELECT 1
 			FROM temp_pgr_arc a
@@ -1235,7 +1224,7 @@ BEGIN
 
 	-- end update temp_pgr_mapzone
 
-		-- update component, but NOT the mapzone_id for nodes v_graph_delimiter
+		-- update component, but NOT the mapzone_id for nodes 'nodeParent'
 	UPDATE temp_pgr_node t
 	SET component = src.component	
 	FROM (
@@ -1246,7 +1235,7 @@ BEGIN
 	FROM temp_pgr_node n
 	JOIN temp_pgr_arc a
 		ON a.node_parent = n.pgr_node_id
-	WHERE n.graph_delimiter = v_graph_delimiter
+	WHERE n.graph_delimiter = 'nodeParent'
 	GROUP BY n.pgr_node_id
 	) src
 	WHERE t.pgr_node_id = src.pgr_node_id;
@@ -1257,7 +1246,7 @@ BEGIN
 	SET mapzone_id = -1, name = 'Conflict'
 	WHERE EXISTS (
 		SELECT 1 FROM temp_pgr_node n
-		WHERE n.graph_delimiter = v_graph_delimiter
+		WHERE n.graph_delimiter = 'nodeParent'
 		AND n.component = m.component
 		AND m.component > 0
 		AND EXISTS (
@@ -1295,7 +1284,7 @@ BEGIN
 			HAVING count(DISTINCT a.component) = 1
 		) tn
 		WHERE t.pgr_node_id = tn.pgr_node_id
-		AND t.graph_delimiter <> v_graph_delimiter;
+		AND t.graph_delimiter <> 'nodeParent';
 
 	ELSE -- v_project_type (UD)
 		
@@ -1318,7 +1307,7 @@ BEGIN
 			HAVING count(DISTINCT a.component) = 1
 		) tn
 		WHERE t.pgr_node_id = tn.pgr_node_id
-		AND t.graph_delimiter <> v_graph_delimiter;
+		AND t.graph_delimiter <> 'nodeParent';
 
 	END IF; --v_project_type
 
@@ -1522,7 +1511,7 @@ BEGIN
 					mapzone_id,
 					json_agg(pgr_node_id ORDER BY pgr_node_id) AS forceclosed_json
 				FROM temp_pgr_node
-				WHERE graph_delimiter = 'FORCECLOSED'
+				WHERE graph_delimiter = 'forceClosed'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
@@ -1539,7 +1528,7 @@ BEGIN
 					mapzone_id,
 					json_agg(pgr_node_id ORDER BY pgr_node_id) AS ignore_json
 				FROM temp_pgr_node
-				WHERE graph_delimiter = 'IGNORE'
+				WHERE graph_delimiter = 'ignore'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
@@ -1578,7 +1567,7 @@ BEGIN
 					mapzone_id,
 					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS forceclosed_json
 				FROM temp_pgr_arc
-				WHERE graph_delimiter = 'FORCECLOSED'
+				WHERE graph_delimiter = 'forceClosed'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
@@ -1595,7 +1584,7 @@ BEGIN
 					mapzone_id,
 					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS ignore_json
 				FROM temp_pgr_arc
-				WHERE graph_delimiter = 'IGNORE'
+				WHERE graph_delimiter = 'ignore'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
@@ -2372,7 +2361,7 @@ BEGIN
 			) AS feature
 			FROM (
 			SELECT  
-				feature_id, 
+				n.node_id feature_id, 
 				'nodeParent' AS graph_type,
 				tn.mapzone_id AS %I,
 				n.%I AS %I,
@@ -2383,12 +2372,11 @@ BEGIN
 				FROM temp_pgr_node tn
 				JOIN node n ON n.node_id = tn.pgr_node_id
 				JOIN temp_pgr_mapzone mz ON mz.component = tn.component
-				WHERE n.graph_delimiter = %L
+				WHERE tn.graph_delimiter = 'nodeParent'
 			) r
 		) f
-		$sql$,
-		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field, v_graph_delimiter
-	) INTO v_result;
+	$sql$, v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field)
+	INTO v_result;
 
 	v_result_graphconfig := v_result;
 
