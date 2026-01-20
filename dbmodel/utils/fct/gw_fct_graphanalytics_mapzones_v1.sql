@@ -2371,65 +2371,95 @@ BEGIN
 
 	-- graphconfig
 	IF v_project_type = 'WS' THEN
-		v_query_text_aux := format($sql$
-			UNION ALL
-			SELECT  
-				n.node_id AS feature_id, 
-				tn.graph_delimiter AS graph_type,
-				tn.mapzone_id AS %I,
-				n.the_geom,
-				mz.name AS name,
-				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript,
-				NULL::float AS rotation
-				FROM temp_pgr_node tn
-				JOIN node n ON n.node_id = tn.pgr_node_id
-				JOIN temp_pgr_mapzone mz ON mz.component = tn.component
-				WHERE tn.graph_delimiter IN (
-					'forceClosed',
-					'forceOpen',
-					'closedValve',
-					'netscenClosedValve',
-					'netscenOpenedValve'
-				)
-			$sql$
-			,v_mapzone_field
-		);
 
-		v_query_text_aux := ' ' || v_query_text_aux;
-	ELSE
-		v_query_text_aux := '';
-	END IF;
-
-	EXECUTE format($sql$
-		SELECT jsonb_build_object(
-			'type', 'FeatureCollection',
-			'layerName', 'graphconfig',
-			'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
-		)
-		FROM (
+		EXECUTE format($sql$
 			SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(ST_Transform(r.the_geom, 4326))::jsonb,
-			'properties', to_jsonb(r) - 'the_geom'
-			) AS feature
+				'type', 'FeatureCollection',
+				'layerName', 'graphconfig',
+				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
+			)
 			FROM (
-			SELECT  
-				n.node_id AS feature_id, 
-				tn.graph_delimiter AS graph_type,
-				tn.mapzone_id AS %I,
-				n.the_geom,
-				mz.name AS name,
-				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript,
-				NULL::float AS rotation
-				FROM temp_pgr_node tn
-				JOIN node n ON n.node_id = tn.pgr_node_id
-				JOIN temp_pgr_mapzone mz ON mz.component = tn.component
-				WHERE tn.graph_delimiter = 'nodeParent'
-				%s
-			) r
-		) f
-		$sql$, v_mapzone_field, v_query_text_aux)
-	INTO v_result;
+				SELECT jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(ST_Transform(r.the_geom, 4326))::jsonb,
+				'properties', to_jsonb(r) - 'the_geom'
+				) AS feature
+				FROM (
+				SELECT  
+					n.node_id AS feature_id, 
+					tn.graph_delimiter AS graph_type,
+					tn.mapzone_id AS %I,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
+					n.the_geom,
+					NULL::float AS rotation
+					FROM temp_pgr_node tn
+					JOIN node n ON n.node_id = tn.pgr_node_id
+					JOIN temp_pgr_mapzone mz ON mz.component = tn.component
+					WHERE tn.graph_delimiter IN (
+						'nodeParent',
+						'forceClosed',
+						'forceOpen',
+						'closedValve',
+						'netscenClosedValve',
+						'netscenOpenedValve'
+					)
+				UNION ALL
+				SELECT 
+					a.arc_id AS feature_id, 
+					'toArc' AS graph_type,
+					ta.mapzone_id AS %I,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
+					CASE WHEN ta.pgr_node_1 = ta.node_parent THEN 
+						ST_StartPoint(a.the_geom)
+					ELSE 
+						ST_EndPoint (a.the_geom) 
+					END AS the_geom,
+					CASE WHEN ta.pgr_node_1 = ta.node_parent  THEN
+						st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28
+					ELSE
+						st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.99), st_lineinterpolatepoint(a.the_geom, 0.98))*400/6.28
+					END AS rotation
+				FROM temp_pgr_arc ta 
+				JOIN arc a ON ta.pgr_arc_id = a.arc_id
+				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
+				AND ta.node_parent IS NOT NULL
+				) r
+			) f
+			$sql$, v_mapzone_field, v_mapzone_field
+		) INTO v_result;
+
+	ELSE -- v_project_type
+
+		EXECUTE format($sql$
+			SELECT jsonb_build_object(
+				'type', 'FeatureCollection',
+				'layerName', 'graphconfig',
+				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
+			)
+			FROM (
+				SELECT jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(ST_Transform(r.the_geom, 4326))::jsonb,
+				'properties', to_jsonb(r) - 'the_geom'
+				) AS feature
+				FROM (
+				SELECT  
+					n.node_id AS feature_id, 
+					tn.graph_delimiter AS graph_type,
+					tn.mapzone_id AS %I,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
+					n.the_geom,
+					NULL::float AS rotation
+					FROM temp_pgr_node tn
+					JOIN node n ON n.node_id = tn.pgr_node_id
+					JOIN temp_pgr_mapzone mz ON mz.component = tn.component
+					WHERE tn.graph_delimiter = 'nodeParent'
+				) r
+			) f
+			$sql$, v_mapzone_field
+		) INTO v_result;
+
+	END IF; -- v_project_type
 
 	v_result_graphconfig := v_result;
 
@@ -2618,6 +2648,7 @@ BEGIN
 	-- Control NULL values
 	v_status := COALESCE(v_status, 'Accepted');
 	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_graphconfig := COALESCE(v_result_graphconfig, '{}');
 	v_result_point_valid := COALESCE(v_result_point_valid, '{}');
 	v_result_line_valid := COALESCE(v_result_line_valid, '{}');
 	v_result_point_invalid := COALESCE(v_result_point_invalid, '{}');
