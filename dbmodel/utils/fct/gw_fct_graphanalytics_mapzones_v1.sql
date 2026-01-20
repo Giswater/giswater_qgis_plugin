@@ -2296,7 +2296,7 @@ BEGIN
 					END 
 					FROM temp_pgr_node n
 					JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-					WHERE n.graph_delimiter = 'DMA'
+					WHERE n.graph_delimiter = 'nodeParent'
 					AND a.mapzone_id > 0;
 
 					WITH
