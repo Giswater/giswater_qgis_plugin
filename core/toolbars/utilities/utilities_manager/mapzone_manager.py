@@ -93,7 +93,7 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
-        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
+        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -289,8 +289,9 @@ class GwMapzoneManager:
         expr = "" if show_inactive else "active is true"
         self._fill_mapzone_table(expr=expr)
 
-    def _open_flood_analysis(self, dialog, mapzone_name):
+    def _open_flood_analysis(self):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
+        mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
 
         # Call gw_fct_getgraphinundation
         extras = f'"parameters":{{"mapzone": "{mapzone_name}"}}'
@@ -298,7 +299,7 @@ class GwMapzoneManager:
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
         if not json_result or json_result.get('status') != 'Accepted':
             msg = "No valid data received from the SQL function."
-            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
         # Extract mapzone_ids with data from json_result
         valid_mapzone_ids = set()
@@ -321,7 +322,7 @@ class GwMapzoneManager:
         config_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', config_body)
         if not config_result or config_result.get('status') != 'Accepted':
             msg = "Failed to retrieve graph configuration."
-            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
 
         # Get mapzones style by calling gw_fct_getstylemapzones
@@ -331,7 +332,7 @@ class GwMapzoneManager:
         style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
         if not style_result or style_result.get('status') != 'Accepted':
             msg = "Failed to retrieve mapzone styles."
-            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
 
         # Add the flooding data to a temporal layer
@@ -343,12 +344,12 @@ class GwMapzoneManager:
             self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
             msg = "Temporal layer created successfully."
-            tools_qgis.show_success(msg, dialog=dialog)
+            tools_qgis.show_success(msg, dialog=self.mapzone_mng_dlg)
             self.iface.mapCanvas().setExtent(vlayer.extent())
             self.iface.mapCanvas().refresh()
         else:
             msg = "Failed to retrieve the temporal layer"
-            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
 
     def _setup_temporal_layer(self, vlayer: QgsVectorLayer):
         """Sets the temporal properties for the layer, specifically using the timestep field."""
@@ -530,7 +531,7 @@ class GwMapzoneManager:
         self._run_mapzones_analysis(graph_class, self.user_selected_exploitation)
 
         # Call the existing flood analysis function
-        self._open_flood_analysis(dialog, graph_class)
+        self._open_flood_analysis()
 
         # Clear the selection after processing
         self.layer_node.removeSelection()
