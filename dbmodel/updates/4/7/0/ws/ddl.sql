@@ -57,7 +57,9 @@ CREATE TABLE dma_graph_meter(
 	attrib json NULL,
 	order_id int4 NULL,
 	the_geom public.geometry(LINESTRING, SRID_VALUE),
-	CONSTRAINT dma_graph_meter_pkey PRIMARY KEY (meter_id));
+	CONSTRAINT dma_graph_meter_pkey PRIMARY KEY (meter_id),
+	CONSTRAINT dma_graph_meter_meter_expl_unique UNIQUE (meter_id, expl_id)
+);
 
 ALTER TABLE cat_element DROP CONSTRAINT IF EXISTS cat_element_fkey_element_type;
 ALTER TABLE cat_element ADD CONSTRAINT cat_element_fkey_element_type FOREIGN KEY (element_type) REFERENCES cat_feature_element(id) ON DELETE RESTRICT ON UPDATE CASCADE;
