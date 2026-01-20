@@ -651,6 +651,144 @@ BEGIN
 
 	END IF; -- v_project_type
 
+	-- SECTION CHECK GRAPHCONFIG
+	--==============================
+
+	IF v_from_zero = FALSE THEN 
+	-- TODO ARNAU
+	-- check the data in temp_pgr_graphconfig (active mapzones)
+
+	-------------------------------------------------------------------
+
+	/*
+	--WS
+	--===============
+
+	-- no es troben nodeParent, forceClosed, forceOpen, toArc que no es troben:
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent
+		FROM temp_pgr_graphconfig g
+		LEFT JOIN temp_pgr_node n USING (pgr_node_id)
+		WHERE n.pgr_node_id IS NULL
+		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id;
+
+	-- toArc que no es troben
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
+		FROM temp_pgr_graphconfig g
+		LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
+		WHERE g.graph_type = 'use' AND a.pgr_arc_id IS NULL
+		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id;
+
+	-- Si es troben, nodes (nodeParent, forceClosed, forceOpen) que apareixen més d'una vegada
+		SELECT g.pgr_node_id AS nodeParent, array_agg(g.graph_type) AS graph_type_set, array_agg(g.mapzone_id) AS mapzone_id_set
+		FROM temp_pgr_graphconfig g
+		JOIN temp_pgr_node n USING (pgr_node_id)
+		GROUP BY g.pgr_node_id
+		HAVING  count(*) > 1
+		ORDER BY g.pgr_node_id;
+
+	-- toArc que apareixen amb més d'un nodeParent
+		SELECT g.pgr_arc_id AS toArc, array_agg(g.pgr_node_id) AS node_parent_set, array_agg(g.mapzone_id) AS mapzone_id_set
+		FROM temp_pgr_graphconfig g
+		JOIN temp_pgr_arc a USING (pgr_arc_id)
+		WHERE g.graph_type = 'use' 
+		GROUP BY g.pgr_arc_id
+		HAVING  count(*) > 1
+		ORDER BY g.pgr_arc_id;
+
+	-- toArc que no connecten amb nodeParent
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
+		FROM temp_pgr_graphconfig g
+		JOIN temp_pgr_arc a USING (pgr_arc_id)
+		WHERE g.graph_type = 'use' 
+		AND NOT EXISTS (
+			SELECT 1 FROM temp_pgr_node n 
+			WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+		)
+		ORDER BY g.mapzone_id,  g.pgr_node_id;
+
+	-- si nodeParent és meter o pump i toArc no coincideix amb to_arc
+		WITH 
+			meter_pump AS (
+				SELECT node_id, to_arc FROM man_meter
+				UNION ALL 
+				SELECT node_id, to_arc FROM man_pump		
+			)
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
+		FROM temp_pgr_graphconfig g
+		WHERE g.graph_type = 'use' 
+		AND EXISTS (
+			SELECT 1 FROM meter_pump m
+			WHERE m.node_id = g.pgr_node_id
+			AND m.to_arc <> g.pgr_arc_id
+		)
+		ORDER BY g.mapzone_id,  g.pgr_node_id;
+	
+	-- si nodeParent és tank, source, waterwell, wtp i toArc coincideix amb un inlet arc
+		WITH
+			inlet AS (
+				SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
+				UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
+				UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
+				UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
+			)
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
+		FROM temp_pgr_graphconfig g
+		WHERE g.graph_type = 'use' 
+		AND EXISTS (
+			SELECT 1 FROM inlet i
+			WHERE i.node_id = g.pgr_node_id
+			AND i.arc_id = g.pgr_arc_id
+		)
+		ORDER BY g.mapzone_id,  g.pgr_node_id;
+
+	-- not informed one of two: nodeParent and its toArc
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
+		FROM temp_pgr_graphconfig g
+		WHERE g.graph_type = 'use' 
+		AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
+		ORDER BY g.mapzone_id,  g.pgr_node_id;
+
+	-- UD
+	--====================
+
+	-- no es troben nodeParent a la xarxa
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent
+		FROM temp_pgr_graphconfig g
+		LEFT JOIN temp_pgr_node n USING (pgr_node_id)
+		WHERE WHERE g.graph_type = 'use' 
+		AND n.pgr_node_id IS NULL
+		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id;
+
+	-- no es troben forceClosed a la xarxa
+		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
+		FROM temp_pgr_graphconfig g
+		LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
+		WHERE g.graph_type IN ('forceClosed', 'forceOpen')
+		AND a.pgr_arc_id IS NULL
+		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id;
+
+	--nodeParent que apareixen més d'una vegada
+		SELECT g.pgr_node_id AS nodeParent, array_agg(g.graph_type) AS graph_type_set, array_agg(g.mapzone_id) AS mapzone_id_set
+		FROM temp_pgr_graphconfig g
+		JOIN temp_pgr_node n USING (pgr_node_id)
+		GROUP BY g.pgr_node_id
+		HAVING  count(*) > 1
+		ORDER BY g.pgr_node_id;
+
+	--forceClosed/forceOpen que apareixen més d'una vegada
+		SELECT g.pgr_node_id AS nodeParent, array_agg(g.graph_type) AS graph_type_set, array_agg(g.mapzone_id) AS mapzone_id_set
+		FROM temp_pgr_graphconfig g
+		JOIN temp_pgr_arc a USING (pgr_arc_id)
+		GROUP BY g.pgr_arc_id
+		HAVING  count(*) > 1
+		ORDER BY g.pgr_node_id;
+
+	-- ==============================
+	-- FIN SECTION CHECK GRAPHCONFIG
+	--===============================*/
+
+	END IF; --v_from_zero
+
 	-- GENERATE LINEGRAPH
 	-- ===================
 
