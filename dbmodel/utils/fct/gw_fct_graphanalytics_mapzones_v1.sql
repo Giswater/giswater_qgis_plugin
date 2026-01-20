@@ -2374,10 +2374,9 @@ BEGIN
 		v_query_text_aux := format($sql$
 			UNION ALL
 			SELECT  
-				n.node_id feature_id, 
+				n.node_id AS feature_id, 
 				tn.graph_delimiter AS graph_type,
 				tn.mapzone_id AS %I,
-				n.%I AS %I,
 				n.the_geom,
 				mz.name AS name,
 				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript,
@@ -2392,8 +2391,8 @@ BEGIN
 					'netscenClosedValve',
 					'netscenOpenedValve'
 				)
-			$sql$,
-			v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field
+			$sql$
+			,v_mapzone_field
 		);
 
 		v_query_text_aux := ' ' || v_query_text_aux;
@@ -2415,10 +2414,9 @@ BEGIN
 			) AS feature
 			FROM (
 			SELECT  
-				n.node_id feature_id, 
+				n.node_id AS feature_id, 
 				tn.graph_delimiter AS graph_type,
 				tn.mapzone_id AS %I,
-				n.%I AS %I,
 				n.the_geom,
 				mz.name AS name,
 				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript,
@@ -2430,7 +2428,7 @@ BEGIN
 				%s
 			) r
 		) f
-		$sql$, v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field, v_query_text_aux)
+		$sql$, v_mapzone_field, v_query_text_aux)
 	INTO v_result;
 
 	v_result_graphconfig := v_result;
