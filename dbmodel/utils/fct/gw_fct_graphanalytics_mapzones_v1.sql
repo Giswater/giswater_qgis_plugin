@@ -479,12 +479,12 @@ BEGIN
 					%s;
 			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
 
-			-- ignore
+			-- forceOpen
 			EXECUTE format($sql$
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
 				SELECT
 					t.%I,
-					'ignore',
+					'forceOpen',
 					elem.value::int
 				FROM %I t
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
@@ -515,7 +515,7 @@ BEGIN
 			SET graph_delimiter = g.graph_type
 			FROM temp_pgr_graphconfig g
 			WHERE n.pgr_node_id = g.pgr_node_id
-			AND g.graph_type IN  ('forceClosed', 'ignore');
+			AND g.graph_type IN  ('forceClosed', 'forceOpen');
 
 		END IF; -- v_from_zero
 
@@ -528,7 +528,7 @@ BEGIN
 		AND n.graph_delimiter <> 'nodeParent';
 
 		-- ignore - cannot be ignore a node that is already 'nodeParent'
-		UPDATE temp_pgr_node n SET graph_delimiter = 'ignore'
+		UPDATE temp_pgr_node n SET graph_delimiter = 'forceOpen'
 		WHERE n.pgr_node_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4)
 		AND n.graph_delimiter <> 'nodeParent';
 
@@ -536,9 +536,9 @@ BEGIN
 
 		-- prepare graph_delimiters
 
-		-- arcs 'INITOVERFLOWPATH'
+		-- arcs 'initoverflowpath'
 		UPDATE temp_pgr_arc t
-        SET graph_delimiter = 'INITOVERFLOWPATH'
+        SET graph_delimiter = 'initoverflowpath'
         FROM arc v
         WHERE v.arc_id = t.pgr_arc_id 
 		AND v.initoverflowpath;
@@ -600,7 +600,7 @@ BEGIN
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
 				SELECT
 					t.%I,
-					'ignore',
+					'forceOpen',
 					elem.value::int
 				FROM %I t
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
@@ -633,10 +633,10 @@ BEGIN
 
 			-- update temp_pgr_arc (ignore)
 			UPDATE temp_pgr_arc a
-			SET graph_delimiter = 'ignore'
+			SET graph_delimiter = 'forceOpen'
 			FROM temp_pgr_graphconfig g
 			WHERE a.pgr_arc_id = g.pgr_arc_id
-			AND g.graph_type = 'ignore';
+			AND g.graph_type = 'forceOpen';
 
 		END IF; -- v_from_zero
 
@@ -646,7 +646,7 @@ BEGIN
 		WHERE a.pgr_arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceClosed')::json))::int4);
 
 		-- ignore
-		UPDATE temp_pgr_arc a SET graph_delimiter = 'ignore'
+		UPDATE temp_pgr_arc a SET graph_delimiter = 'forceOpen'
 		WHERE a.pgr_arc_id IN (SELECT (json_array_elements_text((v_parameters->>'forceOpen')::json))::int4);
 
 	END IF; -- v_project_type
@@ -706,7 +706,7 @@ BEGIN
 		UPDATE temp_pgr_arc_linegraph t
 		SET graph_delimiter = n.graph_delimiter
 		FROM temp_pgr_node n
-		WHERE n.graph_delimiter IN ('MINSECTOR', 'forceClosed', 'ignore')
+		WHERE n.graph_delimiter IN ('MINSECTOR', 'forceClosed', 'forceOpen')
 		AND t.pgr_node_id = n.pgr_node_id;
 
 		-- update aditional fields for valves (MINSECTOR)
@@ -766,6 +766,12 @@ BEGIN
 		SET graph_delimiter = 'openValve'
 		WHERE t.graph_delimiter = 'MINSECTOR';
 
+		UPDATE temp_pgr_node n
+		SET graph_delimiter = a.graph_delimiter
+		FROM temp_pgr_arc_linegraph a
+		WHERE n.graph_delimiter = 'MINSECTOR'
+		AND n.pgr_node_id = a.pgr_node_id;
+
 		-- COST/REVERSE_COST
 
 		-- closed valves
@@ -788,7 +794,7 @@ BEGIN
 		-- ignore
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost = 1, reverse_cost = 1
-		WHERE graph_delimiter = 'ignore';
+		WHERE graph_delimiter = 'forceOpen';
 
 	ELSE -- v_project_type (UD)
  
@@ -815,12 +821,12 @@ BEGIN
 		AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
 		AND ta.pgr_arc_id = t.pgr_arc_id;
 
-		-- UPDATE pgr_node_id, graph_delimiter for arcs (INITOVERFLOWPATH, forceClosed, ignore)
+		-- UPDATE pgr_node_id, graph_delimiter for arcs (initoverflowpath, forceClosed, ignore)
 		UPDATE temp_pgr_arc_linegraph t
 		SET graph_delimiter = a.graph_delimiter,
 			pgr_node_id = a.pgr_node_1
 		FROM temp_pgr_arc a
-		WHERE a.graph_delimiter IN ('INITOVERFLOWPATH', 'forceClosed', 'ignore')
+		WHERE a.graph_delimiter IN ('initoverflowpath', 'forceClosed', 'forceOpen')
 		AND a.pgr_arc_id = t.pgr_node_2;
 
 		-- COST/REVERSE_COST
@@ -829,7 +835,7 @@ BEGIN
 		IF v_class = 'DWFZONE' THEN
 			UPDATE temp_pgr_arc_linegraph t
 			SET cost = -1, reverse_cost = -1
-			WHERE graph_delimiter = 'INITOVERFLOWPATH';
+			WHERE graph_delimiter = 'initoverflowpath';
 		END IF;
 
 		-- forceClosed
@@ -837,10 +843,10 @@ BEGIN
 		SET cost = -1, reverse_cost = -1
 		WHERE graph_delimiter = 'forceClosed';
 
-		-- ignore
+		-- forceOpen
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost = 1, reverse_cost = 1
-		WHERE graph_delimiter = 'ignore';
+		WHERE graph_delimiter = 'forceOpen';
 
 
 	END IF; -- v_project_type
@@ -1215,7 +1221,7 @@ BEGIN
 				FROM temp_pgr_arc_linegraph a
 				JOIN temp_pgr_arc n1 ON a.pgr_node_1 = n1.pgr_arc_id
 				JOIN temp_pgr_arc n2 ON a.pgr_node_2 = n2.pgr_arc_id
-				WHERE a.graph_delimiter = 'INITOVERFLOWPATH'
+				WHERE a.graph_delimiter = 'initoverflowpath'
 			)
 			SELECT row_number() OVER (ORDER BY source, target) AS id,
 					source,
@@ -1545,7 +1551,7 @@ BEGIN
 					mapzone_id,
 					json_agg(pgr_node_id ORDER BY pgr_node_id) AS ignore_json
 				FROM temp_pgr_node
-				WHERE graph_delimiter = 'ignore'
+				WHERE graph_delimiter = 'forceOpen'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
@@ -1601,7 +1607,7 @@ BEGIN
 					mapzone_id,
 					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS ignore_json
 				FROM temp_pgr_arc
-				WHERE graph_delimiter = 'ignore'
+				WHERE graph_delimiter = 'forceOpen'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
@@ -2364,6 +2370,37 @@ BEGIN
 	-- SECTION[epic=mapzones]: Creating temporal layers
 
 	-- graphconfig
+	IF v_project_type = 'WS' THEN
+		v_query_text_aux := format($sql$
+			UNION ALL
+			SELECT  
+				n.node_id feature_id, 
+				tn.graph_delimiter AS graph_type,
+				tn.mapzone_id AS %I,
+				n.%I AS %I,
+				n.the_geom,
+				mz.name AS name,
+				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript,
+				NULL::float AS rotation
+				FROM temp_pgr_node tn
+				JOIN node n ON n.node_id = tn.pgr_node_id
+				JOIN temp_pgr_mapzone mz ON mz.component = tn.component
+				WHERE tn.graph_delimiter IN (
+					'forceClosed',
+					'forceOpen',
+					'closedValve',
+					'netscenClosedValve',
+					'netscenOpenedValve'
+				)
+			$sql$,
+			v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field
+		);
+
+		v_query_text_aux := ' ' || v_query_text_aux;
+	ELSE
+		v_query_text_aux := '';
+	END IF;
+
 	EXECUTE format($sql$
 		SELECT jsonb_build_object(
 			'type', 'FeatureCollection',
@@ -2379,7 +2416,7 @@ BEGIN
 			FROM (
 			SELECT  
 				n.node_id feature_id, 
-				'nodeParent' AS graph_type,
+				tn.graph_delimiter AS graph_type,
 				tn.mapzone_id AS %I,
 				n.%I AS %I,
 				n.the_geom,
@@ -2390,9 +2427,10 @@ BEGIN
 				JOIN node n ON n.node_id = tn.pgr_node_id
 				JOIN temp_pgr_mapzone mz ON mz.component = tn.component
 				WHERE tn.graph_delimiter = 'nodeParent'
+				%s
 			) r
 		) f
-	$sql$, v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field)
+		$sql$, v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field, v_query_text_aux)
 	INTO v_result;
 
 	v_result_graphconfig := v_result;
@@ -2412,7 +2450,7 @@ BEGIN
 			FROM (
 			SELECT a.arc_id, a.arccat_id, a.state, a.expl_id,
 				ta.mapzone_id AS %I,
-				(a.%I)::text AS %I,
+				a.%I AS %I,
 				a.the_geom,
 				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
 			FROM temp_pgr_arc ta
@@ -2433,7 +2471,7 @@ BEGIN
 			SELECT
 				g.gully_id AS feature_id, 'GULLY' AS feature_type, g.gullycat_id AS featurecat_id, g.state, g.expl_id,
 				tg.mapzone_id AS %I,
-				(g.%I)::text AS %I,
+				g.%I AS %I,
 				g.the_geom,
 				mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
 			FROM temp_pgr_gully tg
@@ -2443,6 +2481,8 @@ BEGIN
 			$sql$,
 			v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field
 		);
+
+		v_query_text_aux := ' ' || v_query_text_aux;
 	ELSE
 		v_query_text_aux := '';
 	END IF;
@@ -2473,10 +2513,9 @@ BEGIN
 			%s
 			) r
 		) f
-		$sql$,
-		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field,
-		v_query_text_aux
-		) INTO v_result;
+		$sql$, 
+		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field, v_query_text_aux
+	) INTO v_result;
 
 	v_result_point_invalid := v_result;
 
@@ -2536,6 +2575,7 @@ BEGIN
 				v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field
 			);
 
+			v_query_text_aux := ' ' || v_query_text_aux;
 		ELSE
 			v_query_text_aux := '';
 		END IF;
