@@ -783,6 +783,15 @@ BEGIN
 		HAVING  count(*) > 1
 		ORDER BY g.pgr_node_id;
 
+	-- una ultima comprovació - quan 2 arcs tanquen un circle
+		SELECT lg.SOURCE AS arc_1, lg.target AS arc_2
+		FROM pgr_linegraph(
+			'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1::float8 AS cost, -1::float8 AS reverse_cost
+			FROM temp_pgr_arc',
+			directed := TRUE
+		) AS lg
+		WHERE reverse_cost =  1;
+
 	-- ==============================
 	-- FIN SECTION CHECK GRAPHCONFIG
 	--===============================*/
@@ -820,7 +829,8 @@ BEGIN
 		-- UPDATE pgr_node_id for nodes with graph_delimiter (MINSECTOR, SECTOR, 'nodeParent', forceClosed, ignore)
 		--checking node_1 for arc_1
 		UPDATE temp_pgr_arc_linegraph t
-		SET pgr_node_id = n.pgr_node_id
+		SET pgr_node_id = n.pgr_node_id,
+			graph_delimiter = n.graph_delimiter
 		FROM temp_pgr_arc_linegraph ta
 		JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
 		JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
@@ -831,7 +841,8 @@ BEGIN
 
 		--checking node_2 for arc_1
 		UPDATE temp_pgr_arc_linegraph t
-		SET pgr_node_id = n.pgr_node_id
+		SET pgr_node_id = n.pgr_node_id,
+			graph_delimiter = n.graph_delimiter
 		FROM temp_pgr_arc_linegraph ta
 		JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
 		JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
@@ -839,13 +850,6 @@ BEGIN
 		WHERE n.graph_delimiter <> 'NONE'
 		AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
 		AND ta.pgr_arc_id = t.pgr_arc_id;
-
-		-- UPDATE graph_delimiter for nodes that afect cost/reverse_cost (MINSECTOR, forceClosed, ignore)
-		UPDATE temp_pgr_arc_linegraph t
-		SET graph_delimiter = n.graph_delimiter
-		FROM temp_pgr_node n
-		WHERE n.graph_delimiter IN ('MINSECTOR', 'forceClosed', 'forceOpen')
-		AND t.pgr_node_id = n.pgr_node_id;
 
 		-- update aditional fields for valves (MINSECTOR)
 		-- valves from the network
@@ -1108,6 +1112,28 @@ BEGIN
 		AND t.node_parent IS NULL;
 
 	END IF; -- v_missing_to_arc
+
+	If v_project_type = 'WS' THEN 
+		-- after updating to_arcs for all nodeParent in case of from_zero and missing_arcs
+		-- update cost/reverse_cost for nodeParent (inletArcs are like checkvalves)
+		UPDATE temp_pgr_arc_linegraph l
+		SET COST = CASE 
+				WHEN a2.node_parent IS NOT NULL THEN  1 
+				ELSE -1
+		END 
+		FROM  temp_pgr_arc a2 
+		WHERE a2.pgr_arc_id = l.pgr_node_2
+		AND l.graph_delimiter IN ('nodeParent', 'SECTOR');
+
+		UPDATE temp_pgr_arc_linegraph l
+		SET reverse_cost = CASE 
+				WHEN a1.node_parent IS NOT NULL THEN  1 
+				ELSE -1
+		END 
+		FROM  temp_pgr_arc a1 
+		WHERE a1.pgr_arc_id = l.pgr_node_1
+		AND l.graph_delimiter = ('nodeParent', 'SECTOR');
+	END IF; 
 
 	-- FLOOD THE LINEGRAPH 
 	-- ====================
