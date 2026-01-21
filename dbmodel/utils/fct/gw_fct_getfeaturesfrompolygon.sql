@@ -37,8 +37,10 @@ v_status TEXT = 'Accepted';
 v_error_context TEXT;
 v_feature_type TEXT;
 v_sql TEXT;
-v_data TEXT;
+v_features JSONB;
 v_polygon_geom TEXT;
+rec RECORD;
+v_partialquerytext TEXT;
 
 
 BEGIN
@@ -50,32 +52,67 @@ BEGIN
 
     v_feature_type := (p_data->'data'->'parameters'->>'featureType')::TEXT;
     v_polygon_geom := (p_data->'data'->'parameters'->>'polygonGeom')::TEXT;
+   
+	CREATE TABLE temp_features (
+		feature_type TEXT,
+		feature_id INT
+	);
 
-    -- Build key "data" with ids of intersected features
-    EXECUTE FORMAT(
-        'SELECT json_build_object(
-            ''featureType'', %L,
-            ''featureIds'', json_agg(%I)
-            ) FROM (SELECT %I FROM %I WHERE state = 1 AND ST_Intersects(the_geom, %L)
-        )',
-        LOWER(v_feature_type),
-        LOWER(v_feature_type) || '_id',
-        LOWER(v_feature_type) || '_id',
-        LOWER(v_feature_type),
+    -- SECTION Check input params
+
+    -- Existing feature_type
+	IF (SELECT EXISTS(SELECT 1 FROM sys_feature_type WHERE id = UPPER(v_feature_type))) THEN
+	
+		v_partialquerytext = ' WHERE id = '||quote_literal(upper(v_feature_type))||'';
+	
+	ELSIF v_feature_type = 'ALL' THEN
+	
+		NULL;
+
+	ELSE
+			
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		"feature":{}, "data":{"message":"4474", "function":"3532", "fid":999, "parameters":{}}}$$)';
+
+	END IF;
+
+    -- Geometry validation
+    IF ST_GeometryType(v_polygon_geom) NOT IN ('ST_Polygon', 'ST_MultiPolygon') OR ST_IsValid(v_polygon_geom) IS FALSE THEN
+	
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		"feature":{}, "data":{"message":"4476", "function":"3532", "fid":999, "parameters":{}}}$$)';
+
+	END IF;
+
+    -- !SECTION 
+
+	-- Look for intersected features and store them in temp_features
+	FOR rec IN EXECUTE 'SELECT lower(id) AS feature_type FROM sys_feature_type '|| COALESCE(v_partialquerytext, '')
+   	LOOP
+		EXECUTE FORMAT(
+   		'INSERT INTO temp_features SELECT %L, %I FROM %I WHERE ST_Intersects(the_geom, %L)',
+   		rec.feature_type,
+        rec.feature_type || '_id',
+        've_' || rec.feature_type,
         ST_GeomFromText(v_polygon_geom, v_srid)
-    ) INTO v_data;
-
-
+        );
+    END LOOP;
+   
+    -- Build key "data" with ids of intersected features
+	SELECT jsonb_object_agg (feature_type, vals) INTO v_features FROM (
+	    SELECT feature_type, json_agg(feature_id) AS vals FROM temp_features GROUP BY feature_type
+	);
+	
     -- Create return
     SELECT jsonb_build_object('level', log_level,'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
 
-	-- Control NULLs
+    -- Control NULLs
    	v_status := COALESCE(v_status, '');
    	v_message := COALESCE(v_message, '{}');
 	v_version := COALESCE(v_version, '');
-    v_data := COALESCE(v_data, '{}');
+    v_features := COALESCE(v_features, '{}');
 
-
+	DROP TABLE IF EXISTS temp_features;
 	--  Return
 	RETURN jsonb_build_object(
 	    'status', v_status,
@@ -83,7 +120,9 @@ BEGIN
 	    'version', v_version,
 	    'body', jsonb_build_object(
 	        'form', '{}'::jsonb,
-	        'data', COALESCE(v_data::jsonb, '{}'::jsonb)
+	        'data', jsonb_build_object(
+                    'features', COALESCE(v_features::jsonb, '{}'::jsonb)
+             )
 	    )
 	);
 

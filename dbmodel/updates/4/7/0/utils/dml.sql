@@ -190,3 +190,7 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_arrangenet
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_initnetwork';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4472, 'Unable to find the path between both nodes. Check network continuity', 'Check network continuity', 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4474, 'Non-existing feature_type in table sys_feature_type', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4476, 'Input geometry is not valid.', 'Check geometry type or validity', 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
