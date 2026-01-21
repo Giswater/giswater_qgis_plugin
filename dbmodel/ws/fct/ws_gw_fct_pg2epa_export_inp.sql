@@ -39,7 +39,6 @@ v_valvemodeval text;
 v_networkmodeval text;
 v_return json;
 v_client_epsg integer;
-v_demand_weight_factor boolean;
 
 BEGIN
 
@@ -49,8 +48,6 @@ BEGIN
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_client_epsg = (p_data->>'client')::json->>'epsg';
-
-	SELECT (value)::boolean INTO v_demand_weight_factor FROM config_param_user WHERE parameter='inp_options_demand_weight_factor' AND cur_user = current_user;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_controls AS
 	 SELECT c.text
@@ -108,59 +105,17 @@ BEGIN
 		WHERE (a.curve_id::text IN ( SELECT temp_t_node.addparam::json ->> 'curve_id'::text
 		   FROM temp_t_node UNION SELECT temp_t_arc.addparam::json ->> 'curve_id'::text  FROM temp_t_arc)) ORDER BY a.rid, NULL::text;
 
-	IF v_demand_weight_factor = false THEN
-		CREATE OR REPLACE TEMP VIEW vi_t_demands AS
-			SELECT temp_t_demand.feature_id,
-			temp_t_demand.demand,
-			temp_t_demand.pattern_id,
-			concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type) AS other
-			FROM temp_t_demand
-			JOIN temp_t_node ON temp_t_demand.feature_id = temp_t_node.node_id
-			where temp_t_demand.demand is not null
-			ORDER BY temp_t_demand.feature_id, (concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type));
-	ELSE
-		CREATE OR REPLACE TEMP VIEW vi_t_demands AS
-			WITH scenarios AS (
-				SELECT 0 AS dscenario_id
-				UNION ALL
-				SELECT dscenario_id
-				FROM selector_inp_dscenario sid
-				WHERE cur_user = current_user
-			),
-			node_demand_dsc AS (
-				SELECT n.node_id,
-				n.dma_id,
-				s.dscenario_id,
-				COALESCE(d.demand, n.demand) AS node_demand,
-				COALESCE(d.pattern_id, n.pattern_id) as pattern_id
-				FROM temp_t_node n
-				JOIN scenarios s ON TRUE
-				LEFT JOIN temp_t_demand d
-					ON d.feature_id = n.node_id
-					AND d.dscenario_id = s.dscenario_id
-			),
-			dma_demand_dsc AS (
-				SELECT
-					dma_id,
-					dscenario_id,
-					SUM(node_demand) AS total_demand
-				FROM node_demand_dsc
-				GROUP BY dma_id, dscenario_id
-			)
-			SELECT
-				n.node_id as feature_id,
-				round((n.node_demand / NULLIF(d.total_demand, 0))::numeric, 6) AS demand,
-				concat('pattern_dma', n.dma_id) as pattern_id,
-				concat(';', n.dscenario_id) as other
-			FROM node_demand_dsc n
-			JOIN dma_demand_dsc d
-			ON d.dma_id = n.dma_id
-			AND d.dscenario_id = n.dscenario_id
-			ORDER BY
-				n.dscenario_id,
-				n.dma_id,
-				n.node_id;
-	END IF;
+	
+	CREATE OR REPLACE TEMP VIEW vi_t_demands AS
+		SELECT temp_t_demand.feature_id,
+		temp_t_demand.demand,
+		temp_t_demand.pattern_id,
+		concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type) AS other
+		FROM temp_t_demand
+		JOIN temp_t_node ON temp_t_demand.feature_id = temp_t_node.node_id
+		where temp_t_demand.demand is not null
+		ORDER BY temp_t_demand.feature_id, (concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type));
+
 
 	CREATE OR REPLACE TEMP VIEW vi_t_emitters AS
 	SELECT node_id, addparam::json->>'emitter_coeff' FROM temp_t_node
@@ -209,33 +164,18 @@ BEGIN
 	 AND config_param_user.value IS NOT NULL AND config_param_user.cur_user::name = CURRENT_USER ORDER BY 1;
 
 
-	IF v_demand_weight_factor = false THEN
-		CREATE OR REPLACE TEMP VIEW vi_t_junctions AS
-		SELECT temp_t_node.node_id,
-			CASE
-				WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
-				ELSE temp_t_node.top_elev
-			END AS elevation,
-			temp_t_node.demand,
-			temp_t_node.pattern_id,
-			concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, 0), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
-		FROM temp_t_node
-		WHERE temp_t_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying::text, 'TANK'::character varying::text])
-		ORDER BY temp_t_node.node_id;
-	ELSE
-		CREATE OR REPLACE TEMP VIEW vi_t_junctions AS
-		SELECT temp_t_node.node_id,
-			CASE
-				WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
-				ELSE temp_t_node.top_elev
-			END AS elevation,
-			0 as demand,
-			NULL::text as pattern_id,
-			concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, 0), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
-		FROM temp_t_node
-		WHERE temp_t_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying::text, 'TANK'::character varying::text])
-		ORDER BY temp_t_node.node_id;
-	END IF;
+	CREATE OR REPLACE TEMP VIEW vi_t_junctions AS
+	SELECT temp_t_node.node_id,
+		CASE
+			WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
+			ELSE temp_t_node.top_elev
+		END AS elevation,
+		temp_t_node.demand,
+		temp_t_node.pattern_id,
+		concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, 0), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
+	FROM temp_t_node
+	WHERE temp_t_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying::text, 'TANK'::character varying::text])
+	ORDER BY temp_t_node.node_id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_labels AS
@@ -304,18 +244,10 @@ BEGIN
 	  ORDER BY a.t;
 
 
-	IF v_demand_weight_factor = false THEN
-		CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
-		   SELECT a.pattern_id, a.factor_1, a.factor_2, a.factor_3, a.factor_4,  a.factor_5, a.factor_6, a.factor_7, a.factor_8, a.factor_9,
-		   a.factor_10,  a.factor_11, a.factor_12, a.factor_13, a.factor_14, a.factor_15, a.factor_16, a.factor_17, a.factor_18
-		   FROM t_rpt_inp_pattern_value a ORDER BY a.id;
-	ELSE
-		CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
-			SELECT concat('pattern_dma', dma_id) AS pattern_id
-			FROM dma
-			WHERE EXISTS (SELECT 1 FROM temp_t_node WHERE dma_id = dma.dma_id)
-			ORDER BY dma_id;
-	END IF;
+	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
+		SELECT a.pattern_id, a.factor_1, a.factor_2, a.factor_3, a.factor_4,  a.factor_5, a.factor_6, a.factor_7, a.factor_8, a.factor_9,
+		a.factor_10,  a.factor_11, a.factor_12, a.factor_13, a.factor_14, a.factor_15, a.factor_16, a.factor_17, a.factor_18
+		FROM t_rpt_inp_pattern_value a ORDER BY a.id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS

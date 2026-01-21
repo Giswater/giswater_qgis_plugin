@@ -27,3 +27,159 @@ INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('inp_options
 
 -- 21/01/2026
 UPDATE config_csv SET descript = 'The csv file must contain the following fields: dscenario_name, feature_id, feature_type, value, pattern_id, demand_type, source.' WHERE fid = 501;
+
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Scenario name:",
+    "value": "",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "name",
+    "widgettype": "text",
+    "layoutorder": 1
+  },
+  {
+    "label": "Scenario descript:",
+    "value": "",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "descript",
+    "widgettype": "text",
+    "layoutorder": 2
+  },
+  {
+    "label": "Exploitation:",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": "0",
+    "widgetname": "exploitation",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT expl_id as id, name as idval FROM exploitation where expl_id>0 UNION select 99999 as id, ''ALL'' as idval order by id desc",
+    "layoutorder": 4
+  },
+  {
+    "label": "Choose time method:",
+    "comboIds": [
+      1,
+      2
+    ],
+    "datatype": "text",
+    "comboNames": [
+      "PERIOD ID",
+      "DATE INTERVAL"
+    ],
+    "layoutname": "grl_option_parameters",
+    "widgetname": "patternOrDate",
+    "widgettype": "combo",
+    "isMandatory": true,
+    "layoutorder": 5
+  },
+  {
+    "label": "if PERIOD_ID - Period:",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": "1",
+    "widgetname": "period",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, code as idval FROM ext_cat_period",
+    "layoutorder": 6
+  },
+  {
+    "label": "[if DATE INTERVAL] Source CRM init date:",
+    "value": null,
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "initDate",
+    "widgettype": "datetime",
+    "layoutorder": 7
+  },
+  {
+    "label": "[if DATE INTERVAL] Source CRM end date:",
+    "value": "2015-07-30 00:00:00",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "endDate",
+    "widgettype": "datetime",
+    "layoutorder": 8
+  },
+  {
+    "label": "Only hydrometers with waterbal true:",
+    "value": null,
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "onlyIsWaterBal",
+    "widgettype": "check",
+    "layoutorder": 9
+  },
+  {
+    "label": "Feature pattern:",
+    "tooltip": "This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.",
+    "comboIds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "datatype": "text",
+    "comboNames": [
+      "NONE",
+      "SECTOR-DEFAULT",
+      "DMA-DEFAULT",
+      "DMA-PERIOD",
+      "HYDROMETER-PERIOD",
+      "HYDROMETER-CATEGORY",
+      "FEATURE-PATTERN"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": "",
+    "widgetname": "pattern",
+    "widgettype": "combo",
+    "layoutorder": 10
+  },
+  {
+    "label": "Demand units:",
+    "tooltip": "Choose units to insert volume data on demand column. This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.",
+    "comboIds": [
+      "LPS",
+      "LPM",
+      "MLD",
+      "CMH",
+      "CMD",
+      "CFS",
+      "GPM",
+      "MGD",
+      "AFD"
+    ],
+    "datatype": "text",
+    "comboNames": [
+      "LPS",
+      "LPM",
+      "MLD",
+      "CMH",
+      "CMD",
+      "CFS",
+      "GPM",
+      "MGD",
+      "AFD"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": "",
+    "widgetname": "demandUnits",
+    "widgettype": "combo",
+    "layoutorder": 11
+  },
+  {
+    "label": "Demand as DMA weight factor:",
+    "tooltip": "",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "export_weight",
+    "widgettype": "check",
+    "layoutorder": 12
+  }
+]'::json
+	WHERE id=3110;

@@ -63,6 +63,8 @@ v_queryhydro TEXT;
 v_percent_hydro text;
 v_proposed_enddate text;
 v_rec_hydro record;
+v_query_period text;
+v_dma_weight_factor boolean;
 
 BEGIN
 
@@ -83,6 +85,7 @@ BEGIN
 	v_tmethod :=  ((p_data ->>'data')::json->>'parameters')::json->>'patternOrDate';
 	v_startdate :=  ((p_data ->>'data')::json->>'parameters')::json->>'initDate'::text;
 	v_enddate :=  ((p_data ->>'data')::json->>'parameters')::json->>'endDate';
+	v_dma_weight_factor :=  ((p_data ->>'data')::json->>'parameters')::json->>'export_weight';
 
 
 	v_percent_hydro := (SELECT "value" FROM config_param_user WHERE "parameter" = 'epa_dscenario_percent_hydro_threshold');
@@ -233,39 +236,118 @@ BEGIN
 
 	IF v_tmethod = '1' THEN -- use period_id
 
-		v_querytext = '
-		with final_hydros as (
-			SELECT hydrometer_id, sum, custom_sum, pattern_id from ext_rtc_hydrometer_x_data where cat_period_id = '||quote_literal(v_period)||'
-		), aux_data AS (
-			SELECT b.hydrometer_id, b.connec_id AS feature_id, ''CONNEC'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_connec b JOIN connec a USING (connec_id) UNION
-					SELECT hydrometer_id, node_id AS feature_id, ''NODE'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_node JOIN node a USING (node_id)
-		)
-		SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
+		IF v_dma_weight_factor IS TRUE THEN
+
+			v_querytext = 
+				'WITH hydros AS (
+					SELECT hydrometer_id, c.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
+					from rtc_hydrometer_x_connec e
+						JOIN connec c ON c.connec_id = e.connec_id
+					UNION ALL
+					SELECT
+						hydrometer_id, n.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
+					from rtc_hydrometer_x_node e
+						JOIN node n ON n.node_id = e.node_id
+				),
+				data AS (
+					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, sum, custom_sum
+					FROM ext_rtc_hydrometer_x_data d
+					JOIN hydros h
+					ON h.hydrometer_id = d.hydrometer_id
+					WHERE d.cat_period_id = '||quote_literal(v_period)||'
+				)
+				SELECT
+					feature_type,
+					feature_id,
+					COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY dma_id) AS demand_weight,
+					sum,
+					custom_sum,
+					concat(''pattern_dma'', dma_id) AS pattern_id,
+					hydrometer_id,
+					expl_id,
+					dma_id
+				FROM data';
+
+		ELSE
+			v_querytext = '
+			with final_hydros as (
+				SELECT hydrometer_id, sum, custom_sum, pattern_id from ext_rtc_hydrometer_x_data where cat_period_id = '||quote_literal(v_period)||'
+			), aux_data AS (
+				SELECT b.hydrometer_id, b.connec_id AS feature_id, ''CONNEC'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_connec b JOIN connec a USING (connec_id) UNION
+						SELECT hydrometer_id, node_id AS feature_id, ''NODE'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_node JOIN node a USING (node_id)
+			)
+			SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
+		END IF;
 
 	ELSIF v_tmethod = '2' THEN -- calculate period
 
-		v_querytext = 'WITH
-	        period_calculat AS (
+		v_query_period = 
+		'WITH period_calculat AS (
 	        SELECT
-	                p.id, p.start_date::date, p.end_date::date, p.period_seconds AS p_seconds,
-	                CASE
-	                     WHEN p.start_date >= '||quote_literal(v_startdate)||'::date THEN p.start_date
-	                     ELSE '||quote_literal(v_startdate)||'
-	                END::date AS c_start_date,
-	                CASE
-	                    WHEN p.end_date <= '||quote_literal(v_enddate)||'::date + INTERVAL ''1 day'' THEN p.end_date
-	                     ELSE '||quote_literal(v_enddate)||'
-	                END::date AS c_end_date
-	            FROM ext_cat_period p
-	            ),
-	        period_selected AS (
-	             SELECT
-	                p.*,
-	                EXTRACT(EPOCH FROM p.c_end_date::date + INTERVAL ''1 day'') - EXTRACT(EPOCH FROM p.c_start_date) AS c_seconds
-	            FROM period_calculat p
-	            WHERE p.end_date >= '||quote_literal(v_startdate)||'
-	            AND  p.start_date <= '||quote_literal(v_enddate)||'::date + INTERVAL ''1 day''
-	      	), final_hydros AS  (
+				p.id, p.start_date::date, p.end_date::date, p.period_seconds AS p_seconds,
+				CASE
+					WHEN p.start_date >= '||quote_literal(v_startdate)||'::date THEN p.start_date
+					ELSE '||quote_literal(v_startdate)||'
+				END::date AS c_start_date,
+				CASE
+					WHEN p.end_date <= '||quote_literal(v_enddate)||'::date + INTERVAL ''1 day'' THEN p.end_date
+						ELSE '||quote_literal(v_enddate)||'
+				END::date AS c_end_date
+			FROM ext_cat_period p
+		),
+		period_selected AS (
+			SELECT
+				p.*,
+				EXTRACT(EPOCH FROM p.c_end_date::date + INTERVAL ''1 day'') - EXTRACT(EPOCH FROM p.c_start_date) AS c_seconds
+			FROM period_calculat p
+			WHERE p.end_date >= '||quote_literal(v_startdate)||'
+			AND  p.start_date <= '||quote_literal(v_enddate)||'::date + INTERVAL ''1 day''
+		),';
+
+		IF v_dma_weight_factor IS TRUE THEN
+			v_querytext = v_query_period||
+			'hydros AS (
+				SELECT b.hydrometer_id, b.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
+				FROM rtc_hydrometer_x_connec b
+				JOIN connec c ON c.connec_id = b.connec_id
+				UNION ALL
+				SELECT b.hydrometer_id, b.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
+				FROM rtc_hydrometer_x_node b
+				JOIN node n ON n.node_id = b.node_id
+			),
+			data AS (
+				SELECT
+					d.hydrometer_id,
+					h.dma_id,
+					h.feature_id,
+					h.feature_type,
+					h.expl_id,
+					SUM(d.sum * (p.c_seconds / p.p_seconds))::numeric(10,0) AS sum,
+					NULL::numeric AS custom_sum,
+					d.pattern_id
+				FROM ext_rtc_hydrometer_x_data d
+				JOIN period_selected p ON d.cat_period_id = p.id
+				JOIN hydros h ON d.hydrometer_id = h.hydrometer_id
+				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, d.pattern_id
+			)
+			SELECT
+				feature_type,
+				feature_id,
+				COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY dma_id) AS demand_weight,
+				sum,
+				custom_sum,
+				concat(''pattern_dma'', dma_id) AS pattern_id,
+				hydrometer_id,
+				expl_id,
+				dma_id
+			FROM data
+			WHERE feature_id IS NOT NULL
+			AND expl_id IN ('||v_expl||')';
+
+		ELSE
+
+		v_querytext = v_query_period||
+		'final_hydros AS  (
 			    SELECT
 			    d.hydrometer_id,
 			    sum(d.sum*(p.c_seconds/p.p_seconds))::numeric(10,0) AS sum, null as custom_sum, pattern_id
@@ -277,6 +359,7 @@ BEGIN
 				SELECT hydrometer_id, node_id AS feature_id, ''NODE'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_node JOIN node a USING (node_id)
 			)
 				SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
+		END IF;
 
 	END IF;
 
@@ -315,22 +398,28 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 
+		IF v_dma_weight_factor is true then
+			EXECUTE 'INSERT INTO inp_pattern (pattern_id, active)
+			SELECT concat(''pattern_dma'', dma_id), true
+			FROM dma
+			WHERE EXISTS (SELECT 1 FROM ('||v_querytext||') v WHERE v.dma_id = dma.dma_id)
+			ON CONFLICT DO NOTHING;';
 
-		-- insert connecs and nodes (netwjoins)
-		EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
-		WITH aux as ('||v_querytext||')
-		SELECT  feature_type, '||v_scenarioid||', feature_id,
-		(case when custom_sum is null then '||v_factor||'*sum::numeric else '||v_factor||'*custom_sum::numeric end) as volume,
-		hydrometer_id as source
-		FROM aux order by 2';
-
-
-		EXECUTE  '
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		WITH aux as ('||v_querytext||')
-		SELECT '||v_fid||', '||quote_literal(v_result_id)||', 1,
-		concat(count(hydrometer_id), '' rows (hydrometers) with demands on '', feature_type, '' have been inserted on inp_dscenario_demand.'')
-		FROM aux GROUP BY feature_type';
+			EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source, pattern_id)
+			WITH aux as ('||v_querytext||')
+			SELECT  feature_type, '||v_scenarioid||', feature_id,
+			demand_weight as volume,
+			hydrometer_id as source,
+			pattern_id
+			FROM aux order by 2';
+		ELSE
+			EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
+			WITH aux as ('||v_querytext||')
+			SELECT  feature_type, '||v_scenarioid||', feature_id,
+			(case when custom_sum is null then '||v_factor||'*sum::numeric else '||v_factor||'*custom_sum::numeric end) as volume,
+			hydrometer_id as source
+			FROM aux order by 2';
+		END IF;
 
 		-- real volume inserted
 		SELECT sum(demand)/v_factor INTO v_count2 FROM inp_dscenario_demand WHERE dscenario_id = v_scenarioid;
@@ -344,70 +433,71 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('The water loss could be motivated by current connecs with state = 0 which they was operative for that period with some hydrometer linked'));
 	
 		-- update patterns  (1 -> none)
-		
-		IF v_pattern = 2 THEN -- sector default
+		IF v_dma_weight_factor IS FALSE THEN
+			IF v_pattern = 2 THEN -- sector default
 
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
-			FROM sector s
-			JOIN connec USING (sector_id)
-			JOIN rtc_hydrometer_x_connec h USING (connec_id)
-			WHERE d.source = h.hydrometer_id
-			AND dscenario_id = v_scenarioid;
+				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
+				FROM sector s
+				JOIN connec USING (sector_id)
+				JOIN rtc_hydrometer_x_connec h USING (connec_id)
+				WHERE d.source = h.hydrometer_id
+				AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 3 THEN -- dma default
-			-- LO MATEIX PERÒ PER AL PATTERN DE LA DMA
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
-			FROM dma s
-			JOIN connec c ON c.dma_id = s.dma_id::integer
-			JOIN rtc_hydrometer_x_connec h USING (connec_id)
-			WHERE d.source = h.hydrometer_id
-			AND dscenario_id = v_scenarioid;
+			ELSIF v_pattern = 3 THEN -- dma default
+				-- LO MATEIX PERÒ PER AL PATTERN DE LA DMA
+				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
+				FROM dma s
+				JOIN connec c ON c.dma_id = s.dma_id::integer
+				JOIN rtc_hydrometer_x_connec h USING (connec_id)
+				WHERE d.source = h.hydrometer_id
+				AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 4 THEN -- dma period
+			ELSIF v_pattern = 4 THEN -- dma period
 
-			EXECUTE '
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
-			FROM ext_rtc_dma_period s
-			JOIN connec c ON c.dma_id = s.dma_id::integer
-			JOIN rtc_hydrometer_x_connec h USING (connec_id)
-			WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
-			AND dscenario_id = '||v_scenarioid||'';
+				EXECUTE '
+				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
+				FROM ext_rtc_dma_period s
+				JOIN connec c ON c.dma_id = s.dma_id::integer
+				JOIN rtc_hydrometer_x_connec h USING (connec_id)
+				WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
+				AND dscenario_id = '||v_scenarioid||'';
 
-		ELSIF v_pattern = 5 THEN -- hydrometer period
+			ELSIF v_pattern = 5 THEN -- hydrometer period
 
-			EXECUTE '
-			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id
-			FROM ext_rtc_hydrometer_x_data h
-			WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
-			AND dscenario_id = '||v_scenarioid||'';
+				EXECUTE '
+				UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id
+				FROM ext_rtc_hydrometer_x_data h
+				WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
+				AND dscenario_id = '||v_scenarioid||'';
 
-		ELSIF v_pattern = 6 THEN -- hydrometer category
+			ELSIF v_pattern = 6 THEN -- hydrometer category
 
-			UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
-			FROM ext_rtc_hydrometer h
-			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
-			WHERE d.source = h.hydrometer_id::text
-			AND dscenario_id = v_scenarioid;
+				UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
+				FROM ext_rtc_hydrometer h
+				JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
+				WHERE d.source = h.hydrometer_id::text
+				AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 7 THEN -- feature pattern
+			ELSIF v_pattern = 7 THEN -- feature pattern
 
-			-- update wjoins (connec)
-			UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
-			FROM inp_connec i
-			JOIN connec c USING (connec_id)
-			JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
-			WHERE d.source = h.hydrometer_id
-			AND dscenario_id = v_scenarioid;
-			
-			-- update netwjoins (node)
-			UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
-			FROM inp_junction i
-			JOIN node n USING (node_id)
-			JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
-			WHERE d.source = h.hydrometer_id
-			AND dscenario_id = v_scenarioid;
+				-- update wjoins (connec)
+				UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
+				FROM inp_connec i
+				JOIN connec c USING (connec_id)
+				JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
+				WHERE d.source = h.hydrometer_id
+				AND dscenario_id = v_scenarioid;
+				
+				-- update netwjoins (node)
+				UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
+				FROM inp_junction i
+				JOIN node n USING (node_id)
+				JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
+				WHERE d.source = h.hydrometer_id
+				AND dscenario_id = v_scenarioid;
 
 
+			END IF;
 		END IF;
 
 		IF v_pattern > 1 THEN
