@@ -22,7 +22,7 @@ UPDATE config_csv AS t SET alias = v.alias, descript = v.descript FROM (
     (470, 'Importar datos_x_del_hidrómetro', 'El archivo csv debe tener los siguientes campos hydrometer_id, cat_period_id, sum, value_date (opcional), value_type (opcional), value_status (opcional), value_state (opcional)'),
     (471, 'Importar valores de periodo de crm', 'El archivo csv debe tener los siguientes campos id, start_date, end_date, period_seconds (opcional), code'),
     (500, 'Importar el estado de la válvula', 'El archivo csv debe contener los siguientes campos: dscenario_name, node_id, status'),
-    (501, 'Importar demandas dscenario', 'El archivo csv debe tener los siguientes campos: dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source'),
+    (501, 'Importar demandas dscenario', 'El archivo csv debe tener los siguientes campos: dscenario_name, feature_id, feature_type, value, pattern_id, demand_type, source'),
     (504, 'Importar valores diarios del caudalímetro', 'Importar los valores diarios del caudalímetro en la tabla ext_rtc_scada_x_data según el archivo de ejemplo scada_flowmeter_daily_values.csv'),
     (506, 'Importar valores agg del caudalímetro', 'Importar los valores agregados del caudalímetro en la tabla ext_rtc_scada_x_data según el archivo de ejemplo scada_flowmeter_agg_values.csv'),
     (514, 'Importar netscenario válvulas cerradas', 'El archivo csv debe tener los siguientes campos netscenario_id, node_id, closed')

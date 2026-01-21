@@ -24,3 +24,6 @@ INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layo
 VALUES ('inp_options_demand_weight_factor','epaoptions','Use demand in DMA weight factor format','role_epa','Demand weight factor format:',true,(SELECT MAX(layoutorder) + 1 FROM sys_param_user WHERE formname='epaoptions' AND layoutname='lyt_general_2'),'ws',false,false,'boolean','check',true,'FALSE','lyt_general_2',true,'core');
 
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('inp_options_demand_weight_factor', 'FALSE', 'postgres') ON CONFLICT DO NOTHING;
+
+-- 21/01/2026
+UPDATE config_csv SET descript = 'The csv file must contain the following fields: dscenario_name, feature_id, feature_type, value, pattern_id, demand_type, source.' WHERE fid = 501;
