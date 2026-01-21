@@ -188,3 +188,5 @@ DROP FUNCTION IF EXISTS gw_fct_graphanalytics_arrangenetwork(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_initnetwork(json);
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_arrangenetwork';
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_initnetwork';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4472, 'Unable to find the path between both nodes. Check network continuity', 'Check network continuity', 2, true, 'ud', 'core', 'UI');

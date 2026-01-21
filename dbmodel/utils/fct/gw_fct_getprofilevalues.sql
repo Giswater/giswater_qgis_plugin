@@ -321,9 +321,16 @@ BEGIN
 			AND node_2 IS NOT NULL;
 		$sql$, v_cost_string);
 
-        INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
-		SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
-		FROM pgr_dijkstraVia (v_querytext, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
+       
+		BEGIN 
+	        INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
+			SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
+			FROM pgr_dijkstraVia (v_querytext, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
+		EXCEPTION WHEN OTHERS THEN
+			GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+			RETURN (SELECT json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', log_level, 'text', error_message), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)
+					FROM sys_message WHERE id = 4472)::json;
+		END;
 
 		INSERT INTO temp_ve_arc
 		SELECT * 
@@ -779,12 +786,6 @@ BEGIN
 	v_result_point = v_result;
 
 	v_result_polygon = '{}';
-
-
-	IF v_arc IS NULL THEN
-		v_message = 'Unable to create a Profile. Check your path continuity before continue!';
-		v_level = 2;
-	END IF;
 
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
