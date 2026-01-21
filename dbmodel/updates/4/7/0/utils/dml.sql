@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO minsector (minsector_id) VALUES(0) ON CONFLICT (minsector_id) DO NOTHING;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3530, 'gw_fct_exception_others', 'utils', 'function', 'text, text, text, text, text', 'json', 'Function to return exception information.', NULL, NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3530, 'gw_fct_exception_others', 'utils', 'function', 'text, text, text, text, text', 'json', 'Function to return exception information.', NULL, NULL, 'core', NULL) ON CONFLICT DO NOTHING;
 
 -- 08/01/2026
 UPDATE config_form_list
@@ -133,14 +133,14 @@ UPDATE config_form_list
 
 UPDATE sys_function SET "source"='cm' WHERE id=3426;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3532, 'gw_fct_getfeaturesfrompolygon', 'utils', 'function', 'json', 'json', 'Function to return the feature id that intersect with a given polygon', 'role_basic', NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3532, 'gw_fct_getfeaturesfrompolygon', 'utils', 'function', 'json', 'json', 'Function to return the feature id that intersect with a given polygon', 'role_basic', NULL, 'core', NULL) ON CONFLICT DO NOTHING;
 
 -- 13/01/2026
 UPDATE sys_fprocess SET except_level = 3 WHERE fid = 153;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3534, 'gw_fct_getarcauditvalues', 'utils', 'function', 'json', 'json', 'Function to return the arc divides and arc fusion within a given period of time.', 'role_basic', NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3534, 'gw_fct_getarcauditvalues', 'utils', 'function', 'json', 'json', 'Function to return the arc divides and arc fusion within a given period of time.', 'role_basic', NULL, 'core', NULL) ON CONFLICT DO NOTHING;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3536, 'gw_fct_getmincutminsector', 'utils', 'function', 'json', 'json', 'Function to return stats from a mincut minsector', 'role_basic', NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3536, 'gw_fct_getmincutminsector', 'utils', 'function', 'json', 'json', 'Function to return stats from a mincut minsector', 'role_basic', NULL, 'core', NULL) ON CONFLICT DO NOTHING;
 
 INSERT INTO inp_family (family_id, descript, age) VALUES('METAL', 'Metallic pipes', NULL);
 INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pipes', NULL);
@@ -156,7 +156,7 @@ DROP FUNCTION IF EXISTS gw_fct_graphanalytics_create_temptables(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_delete_temptables(json);
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_settempgeom(json);
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3538, 'gw_fct_getdmagraph', 'ws', 'function', 'json', 'json', 'Function to return and generate a graph for the calculated DMAs of a exploitation', 'role_om', NULL, 'core', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3538, 'gw_fct_getdmagraph', 'ws', 'function', 'json', 'json', 'Function to return and generate a graph for the calculated DMAs of a exploitation', 'role_om', NULL, 'core', NULL) ON CONFLICT DO NOTHING;
 
 UPDATE sys_fprocess SET query_text='SELECT array_agg(a.list::text) AS arr_list FROM (
 	SELECT concat(''Formname: '',formname, '', layoutname: '',layoutname, '', layoutorder: '',layoutorder) as list 
@@ -179,9 +179,9 @@ select*from subq_3 where position = 0' WHERE fid=311;
 
 UPDATE sys_fprocess SET query_text='SELECT c.connec_id FROM plan_psector_x_connec c JOIN connec b USING (connec_id) WHERE link_id IS NULL AND pjoint_id IS NULL' WHERE fid=356;
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4466, 'Start/End nodes is/are not valid(s)', 'Check elev data. Only NOT start/end nodes may have missed elev data', 2, true, 'ud', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4466, 'Start/End nodes is/are not valid(s)', 'Check elev data. Only NOT start/end nodes may have missed elev data', 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES (4468, 'Cannot delete %mapzone_name% (%mapzone_id%): operative elements exist for this mapzone.', 'Deactivate or move the operative elements first.', 2, true, 'utils', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES (4468, 'Cannot delete %mapzone_name% (%mapzone_id%): operative elements exist for this mapzone.', 'Deactivate or move the operative elements first.', 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
 
 -- 20/01/2026
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_arrangenetwork(json);
@@ -189,4 +189,4 @@ DROP FUNCTION IF EXISTS gw_fct_graphanalytics_initnetwork(json);
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_arrangenetwork';
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_initnetwork';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4472, 'Unable to find the path between both nodes. Check network continuity', 'Check network continuity', 2, true, 'ud', 'core', 'UI');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4472, 'Unable to find the path between both nodes. Check network continuity', 'Check network continuity', 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
