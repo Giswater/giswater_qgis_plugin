@@ -29,3 +29,6 @@ CREATE TABLE dwfzone_graph (
 	the_geom geometry(LINESTRING, SRID_VALUE),
 	CONSTRAINT dwfzone_graph_pkey PRIMARY KEY (node_id, dwfzone_1, dwfzone_2)
 );
+
+CREATE INDEX IF NOT EXISTS dwfzone_graph_node_id_idx ON dwfzone_graph USING btree (node_id);
+CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON dwfzone_graph USING gist (the_geom);

@@ -37,6 +37,9 @@ CREATE TABLE sector_graph (
 	CONSTRAINT sector_graph_pkey PRIMARY KEY (node_id, sector_1, sector_2)
 );
 
+CREATE INDEX IF NOT EXISTS sector_graph_node_id_idx ON sector_graph USING btree (node_id);
+CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON sector_graph USING gist (the_geom);
+
 CREATE TABLE dma_graph (
 	node_id int4 NOT NULL,
 	feature_class varchar(30),
@@ -49,3 +52,6 @@ CREATE TABLE dma_graph (
 	the_geom geometry(LINESTRING, SRID_VALUE),
 	CONSTRAINT dma_graph_pkey PRIMARY KEY (node_id, dma_1, dma_2)
 );
+
+CREATE INDEX IF NOT EXISTS dma_graph_node_id_idx ON dma_graph USING btree (node_id);
+CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON dma_graph USING gist (the_geom);

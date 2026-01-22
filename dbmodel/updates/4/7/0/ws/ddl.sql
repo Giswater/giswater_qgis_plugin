@@ -83,3 +83,6 @@ CREATE TABLE presszone_graph (
 	the_geom geometry(LINESTRING, SRID_VALUE),
 	CONSTRAINT presszone_graph_pkey PRIMARY KEY (node_id, presszone_1, presszone_2)
 );
+
+CREATE INDEX IF NOT EXISTS presszone_graph_node_id_idx ON presszone_graph USING btree (node_id);
+CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON presszone_graph USING gist (the_geom);
