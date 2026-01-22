@@ -194,3 +194,73 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4474, 'Non-existing feature_type in table sys_feature_type', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4476, 'Input geometry is not valid.', 'Check geometry type or validity', 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+-- 22/01/2026
+UPDATE config_function
+	SET "style"='{
+  "style": {
+    "point": {
+      "style": "categorized",
+      "field": "descript",
+      "transparency": 0.5,
+      "width": 2.5,
+      "values": [
+        {
+          "id": "Disconnected",
+          "color": [
+            255,
+            124,
+            64
+          ]
+        },
+        {
+          "id": "Conflict",
+          "color": [
+            14,
+            206,
+            253
+          ]
+        }
+      ]
+    },
+    "line": {
+      "style": "categorized",
+      "field": "descript",
+      "transparency": 0.5,
+      "width": 2.5,
+      "values": [
+        {
+          "id": "Disconnected",
+          "color": [
+            255,
+            124,
+            64
+          ]
+        },
+        {
+          "id": "Conflict",
+          "color": [
+            14,
+            206,
+            253
+          ]
+        }
+      ]
+    },
+    "polygon": {
+      "style": "categorized",
+      "field": "descript",
+      "transparency": 0.5
+    },
+    "graphconfig": {
+      "style": "qml",
+      "id": "103"
+    }
+  }
+}'::json,actions='[
+  {
+    "funcName": "set_style_mapzones",
+    "params": {}
+  }
+]'::json
+WHERE id=3508;
