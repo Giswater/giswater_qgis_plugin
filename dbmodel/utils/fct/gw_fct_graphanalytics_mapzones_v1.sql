@@ -2847,22 +2847,22 @@ BEGIN
 		'type', 'FeatureCollection',
 		'layerName', 'point_valid',
 		'features', '[]'::jsonb
-	));
+	)::json);
 	v_result_line_valid := COALESCE(v_result_line_valid, jsonb_build_object(
 		'type', 'FeatureCollection',
 		'layerName', 'line_valid',
 		'features', '[]'::jsonb
-	));
+	)::json);
 	v_result_point_invalid := COALESCE(v_result_point_invalid, jsonb_build_object(
 		'type', 'FeatureCollection',
 		'layerName', 'point_invalid',
 		'features', '[]'::jsonb
-	));
+	)::json);
 	v_result_line_invalid := COALESCE(v_result_line_invalid, jsonb_build_object(
 		'type', 'FeatureCollection',
 		'layerName', 'line_invalid',
 		'features', '[]'::jsonb
-	));
+	)::json);
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
@@ -2871,13 +2871,13 @@ BEGIN
 	v_result_line := jsonb_build_array(
 		v_result_line_valid,
 		v_result_line_invalid
-	);
+	)::json;
 
 	v_result_point := jsonb_build_array(
 		v_result_point_valid,
 		v_result_point_invalid,
 		v_result_graphconfig
-	);
+	)::json;
 
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
