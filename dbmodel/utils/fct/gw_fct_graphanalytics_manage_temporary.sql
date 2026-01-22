@@ -109,8 +109,8 @@ BEGIN
             pgr_node_2 INTEGER NULL,
             mapzone_id INTEGER DEFAULT 0,
             graph_delimiter VARCHAR(30) DEFAULT 'NONE',
-            "cost" INTEGER NOT NULL DEFAULT 1,
-            reverse_cost INTEGER NOT NULL DEFAULT 1,
+            "cost" FLOAT NOT NULL DEFAULT 1,
+            reverse_cost FLOAT NOT NULL DEFAULT 1,
             to_arc INTEGER,
             CONSTRAINT temp_pgr_arc_linegraph_pkey PRIMARY KEY (pgr_arc_id)
         );
@@ -127,8 +127,8 @@ BEGIN
                 pred INTEGER NULL,
                 node INTEGER NULL,
                 edge INTEGER NULL,
-                "cost" INTEGER NULL,
-                agg_cost INTEGER NULL,
+                "cost" FLOAT NULL,
+                agg_cost FLOAT NULL,
                 CONSTRAINT temp_pgr_drivingdistance_pkey PRIMARY KEY (seq)
             );
         CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_start_vid_idx ON temp_pgr_drivingdistance USING btree (start_vid);
@@ -218,8 +218,8 @@ BEGIN
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
-                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS cost_mincut INTEGER NOT NULL DEFAULT 1;
-                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS reverse_cost_mincut INTEGER NOT NULL DEFAULT 1;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS cost_mincut FLOAT NOT NULL DEFAULT 1;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS reverse_cost_mincut FLOAT NOT NULL DEFAULT 1;
             END IF;
 
             IF v_fct_name = 'MINSECTOR' THEN
@@ -239,8 +239,8 @@ BEGIN
                     pred INTEGER NULL,
                     node INTEGER NULL,
                     edge INTEGER NULL,
-                    "cost" INTEGER NULL,
-                    agg_cost INTEGER NULL,
+                    "cost" FLOAT NULL,
+                    agg_cost FLOAT NULL,
                     CONSTRAINT temp_pgr_drivingdistance_initoverflowpath_pkey PRIMARY KEY (seq)
                 );
                 CREATE INDEX IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath_start_vid_idx ON temp_pgr_drivingdistance_initoverflowpath USING btree (start_vid);
