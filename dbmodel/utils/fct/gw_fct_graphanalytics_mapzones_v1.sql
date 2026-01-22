@@ -117,8 +117,10 @@ DECLARE
 	v_result_info json;
 	v_result_point_valid json;
 	v_result_point_invalid json;
+	v_result_point json;
 	v_result_line_valid json;
 	v_result_line_invalid json;
+	v_result_line json;
 	v_result_graphconfig json;
 
 	-- response variables
@@ -2841,14 +2843,40 @@ BEGIN
 	v_status := COALESCE(v_status, 'Accepted');
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_graphconfig := COALESCE(v_result_graphconfig, '{}');
-	v_result_point_valid := COALESCE(v_result_point_valid, '{}');
-	v_result_line_valid := COALESCE(v_result_line_valid, '{}');
-	v_result_point_invalid := COALESCE(v_result_point_invalid, '{}');
-	v_result_line_invalid := COALESCE(v_result_line_invalid, '{}');
+	v_result_point_valid := COALESCE(v_result_point_valid, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'point_valid',
+		'features', '[]'::jsonb
+	));
+	v_result_line_valid := COALESCE(v_result_line_valid, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'line_valid',
+		'features', '[]'::jsonb
+	));
+	v_result_point_invalid := COALESCE(v_result_point_invalid, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'point_invalid',
+		'features', '[]'::jsonb
+	));
+	v_result_line_invalid := COALESCE(v_result_line_invalid, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'line_invalid',
+		'features', '[]'::jsonb
+	));
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
 	v_netscenario := COALESCE(v_netscenario, -1);
+
+	v_result_line := jsonb_build_array(
+		v_result_line_valid,
+		v_result_line_invalid
+	);
+
+	v_result_point := jsonb_build_array(
+		v_result_point_valid,
+		v_result_point_invalid
+	);
 
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
@@ -2866,10 +2894,8 @@ BEGIN
 				"hasConflicts": '||v_has_conflicts||', 
 				"info":'||v_result_info||',
 				"graphconfig":'||v_result_graphconfig||',
-				"point_valid":'||v_result_point_valid||',
-				"line_valid":'||v_result_line_valid||',
-				"point_invalid":'||v_result_point_invalid||',
-				"line_invalid":'||v_result_line_invalid||'
+				"point":'||v_result_point||',
+				"line":'||v_result_line||'
 			}
 		}
 	}')::json, 3508, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
