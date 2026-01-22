@@ -2875,7 +2875,8 @@ BEGIN
 
 	v_result_point := jsonb_build_array(
 		v_result_point_valid,
-		v_result_point_invalid
+		v_result_point_invalid,
+		v_result_graphconfig
 	);
 
 	-- Return JSON
@@ -2893,7 +2894,6 @@ BEGIN
 				"netscenarioId": "'||v_netscenario::text||'", 
 				"hasConflicts": '||v_has_conflicts||', 
 				"info":'||v_result_info||',
-				"graphconfig":'||v_result_graphconfig||',
 				"point":'||v_result_point||',
 				"line":'||v_result_line||'
 			}
