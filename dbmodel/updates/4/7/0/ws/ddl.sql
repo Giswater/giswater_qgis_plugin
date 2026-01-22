@@ -77,7 +77,6 @@ CREATE TABLE presszone_graph (
 	presszone_1 int4,
 	node_parent_1 int4,
 	presszone_2 int4,
-	node_parent_2 int4,
 	cost float4 DEFAULT 1 NOT NULL,
 	reverse_cost float4 DEFAULT 1 NOT NULL,
 	the_geom geometry(LINESTRING, SRID_VALUE),
