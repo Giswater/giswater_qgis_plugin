@@ -525,8 +525,6 @@ BEGIN
 
 		END IF; -- v_from_zero
 
-		-- comun code 
-
 		-- init parameters
 		-- forceClosed - cannot be forceClosed a node that is already 'nodeParent'
 		UPDATE temp_pgr_node n SET graph_delimiter = 'forceClosed'
@@ -1030,13 +1028,12 @@ BEGIN
 
 		END IF; -- v_missing_to_arc
 
-		-- UPDATE COST/REVERSE_COST
+		-- after updating to_arcs for all nodeParent in case of from_zero and missing_arcs
+		-- update cost/reverse_cost for nodeParent (inletArcs are like checkvalves)
 		If v_project_type = 'WS' THEN 
-			-- after updating to_arcs for all nodeParent in case of from_zero and missing_arcs
-			-- update cost/reverse_cost for nodeParent (inletArcs are like checkvalves)
 			UPDATE temp_pgr_arc_linegraph l
 			SET COST = CASE 
-					WHEN a2.node_parent IS NOT NULL THEN  1 
+					WHEN l.pgr_node_id = a2.node_parent THEN  1 
 					ELSE -1
 			END 
 			FROM  temp_pgr_arc a2 
@@ -1045,7 +1042,7 @@ BEGIN
 
 			UPDATE temp_pgr_arc_linegraph l
 			SET reverse_cost = CASE 
-					WHEN a1.node_parent IS NOT NULL THEN  1 
+					WHEN l.pgr_node_id = a1.node_parent THEN  1 
 					ELSE -1
 			END 
 			FROM  temp_pgr_arc a1 
