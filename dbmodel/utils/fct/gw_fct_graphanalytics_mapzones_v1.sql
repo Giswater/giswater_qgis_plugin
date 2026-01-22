@@ -1030,6 +1030,7 @@ BEGIN
 
 		END IF; -- v_missing_to_arc
 
+		-- UPDATE COST/REVERSE_COST
 		If v_project_type = 'WS' THEN 
 			-- after updating to_arcs for all nodeParent in case of from_zero and missing_arcs
 			-- update cost/reverse_cost for nodeParent (inletArcs are like checkvalves)
@@ -1147,7 +1148,7 @@ BEGIN
 		FROM temp_pgr_connectedcomponents c
 		WHERE c.node = t.pgr_arc_id;
 
-		-- update temp_pgr_mapzone 
+		-- update mapzone_ids, mapzone_id for temp_pgr_mapzone 
 		IF v_from_zero = TRUE THEN
 
 			IF v_project_type = 'WS' THEN
@@ -1299,29 +1300,13 @@ BEGIN
 
 		-- end update temp_pgr_mapzone
 
-			-- update component, but NOT the mapzone_id for nodes 'nodeParent'
-		UPDATE temp_pgr_node t
-		SET component = src.component	
-		FROM (
-		SELECT
-			n.pgr_node_id,
-			MIN (a.component) AS component,
-			MIN(a.mapzone_id) AS mapzone_id
-		FROM temp_pgr_node n
-		JOIN temp_pgr_arc a
-			ON a.node_parent = n.pgr_node_id
-		WHERE n.graph_delimiter = 'nodeParent'
-		GROUP BY n.pgr_node_id
-		) src
-		WHERE t.pgr_node_id = src.pgr_node_id;
-
 		-- update mapzone_id for arcs
 		UPDATE temp_pgr_arc t
 		SET mapzone_id = m.mapzone_id
 		FROM temp_pgr_mapzone m 
 		WHERE m.component = t.component;
 
-			-- RESOLVE EXCEPTION
+		-- RESOLVE EXCEPTION
 		-- NodeParent self-conflict: the arcs toArc and the ones that are not have the same mapzone_id
 		-- TODO: check if after solving all the Checking graphconfig errors, this part is still necessarly
 		
@@ -1359,52 +1344,24 @@ BEGIN
 		-- END EXCEPTION
 
 		-- update component/mapzone_id for nodes
-		IF v_project_type = 'WS' THEN
-
-			-- Nodes are updated only if all connected arcs belong to the same component (component ≠ 0).
-			-- If multiple components are detected, nodes stay at 0
-			UPDATE temp_pgr_node t
-			SET component = tn.component,
-				mapzone_id = tn.mapzone_id
-			FROM (
-				SELECT
-					n.pgr_node_id,
-					MIN (a.component) AS component,
-					MIN(a.mapzone_id) AS mapzone_id
-				FROM temp_pgr_node n
-				JOIN temp_pgr_arc a
-				ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
-				WHERE a.component <> 0
-				GROUP BY n.pgr_node_id
-				HAVING count(DISTINCT a.component) = 1
-			) tn
-			WHERE t.pgr_node_id = tn.pgr_node_id
-			AND t.graph_delimiter <> 'nodeParent';
-
-		ELSE -- v_project_type (UD)
-			
-			-- update nodes (not the nodeParents of mapzones)
-			-- Nodes are updated only if all connected arcs belong to the same component (component ≠ 0).
-			-- If multiple components are detected, nodes stay at 0
-			UPDATE temp_pgr_node t
-			SET component = tn.component,
-				mapzone_id = tn.mapzone_id
-			FROM (
-				SELECT
-					n.pgr_node_id,
-					MIN (a.component) AS component,
-					MIN(a.mapzone_id) AS mapzone_id
-				FROM temp_pgr_node n
-				JOIN temp_pgr_arc a
-				ON n.pgr_node_id = a.pgr_node_2
-				WHERE a.component <> 0
-				GROUP BY n.pgr_node_id
-				HAVING count(DISTINCT a.component) = 1
-			) tn
-			WHERE t.pgr_node_id = tn.pgr_node_id
-			AND t.graph_delimiter <> 'nodeParent';
-
-		END IF; --v_project_type
+		-- Nodes are updated only if all connected arcs belong to the same component (component ≠ 0).
+		-- If multiple components are detected, nodes stay at 0
+		UPDATE temp_pgr_node t
+		SET component = tn.component,
+			mapzone_id = tn.mapzone_id
+		FROM (
+			SELECT
+				n.pgr_node_id,
+				MIN (a.component) AS component,
+				MIN(a.mapzone_id) AS mapzone_id
+			FROM temp_pgr_node n
+			JOIN temp_pgr_arc a
+			ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
+			WHERE a.component <> 0
+			GROUP BY n.pgr_node_id
+			HAVING count(DISTINCT a.component) = 1
+		) tn
+		WHERE t.pgr_node_id = tn.pgr_node_id;
 
 		-- update connec
 		UPDATE temp_pgr_connec t
