@@ -1376,6 +1376,100 @@ BEGIN
 			WHERE t.pgr_arc_id = a.pgr_arc_id;
 		END IF;
 
+		-- UPDATE MAPZONE_GRAPH FOR WS 
+		IF v_project_type = 'WS' THEN
+			WITH 
+				linegraph AS (
+					SELECT 
+						l.pgr_node_id,
+						l.pgr_node_1 AS arc_1, a1.mapzone_id AS mapzone_1,a1.node_parent AS node_parent_1,
+						l.pgr_node_2 AS arc_2, a2.mapzone_id AS mapzone_2, a2.node_parent AS node_parent_2
+					FROM temp_pgr_arc_linegraph l 
+					JOIN temp_pgr_arc a1 ON a1.pgr_arc_id = l.pgr_node_1
+					JOIN temp_pgr_arc a2 ON a2.pgr_arc_id = l.pgr_node_2
+					WHERE l.graph_delimiter = 'nodeParent'
+					AND a1.mapzone_id > 0 AND a2.mapzone_id > 0
+				),
+				inlet_arc AS (
+					SELECT arc_1 AS end_vid, pgr_node_id AS end_node
+					FROM linegraph 
+					WHERE node_parent_1 IS DISTINCT FROM pgr_node_id
+					UNION ALL 
+					SELECT arc_2 AS end_vid, pgr_node_id AS end_node
+					FROM linegraph 
+					WHERE node_parent_2 IS DISTINCT FROM pgr_node_id
+				)
+			INSERT INTO temp_pgr_mapzone_graph (start_vid, end_vid, mapzone_id, node_parent_1, node_parent_2)
+			SELECT DISTINCT ON (a.node_parent, i.end_node) d.start_vid,i.end_vid, a.mapzone_id, a.node_parent AS node_parent_1, i.end_node AS node_parent_2
+			FROM inlet_arc i 
+			JOIN temp_pgr_drivingdistance d ON d.node = i.end_vid
+			JOIN temp_pgr_arc a ON d.start_vid = a.pgr_arc_id
+			WHERE a.node_parent IS NOT NULL
+			ORDER BY a.node_parent, i.end_node,  agg_cost;
+			
+			-- update feature_class
+			UPDATE temp_pgr_mapzone_graph t
+			SET feature_class_1 = cf.feature_class  
+			FROM node n 
+			JOIN cat_node cn ON n.nodecat_id = cn.id 
+			JOIN cat_feature cf ON cn.node_type  = cf.id
+			WHERE t.node_parent_1 = n.node_id;
+
+			UPDATE temp_pgr_mapzone_graph t
+			SET feature_class_2 = cf.feature_class  
+			FROM node n 
+			JOIN cat_node cn ON n.nodecat_id = cn.id 
+			JOIN cat_feature cf ON cn.node_type  = cf.id
+			WHERE t.node_parent_2 = n.node_id;
+
+			-- Dijkstra
+			INSERT INTO temp_pgr_dijkstra (seq, path_seq, start_vid, end_vid, node, edge, COST, agg_cost)
+			SELECT seq, path_seq, start_vid, end_vid, node, edge, COST, agg_cost
+			FROM pgr_Dijkstra(
+			'
+				SELECT
+					a.pgr_arc_id AS id,
+					a.pgr_node_1 AS source,
+					a.pgr_node_2 AS target,
+					a.cost,
+					a.reverse_cost
+				FROM temp_pgr_arc_linegraph a
+				WHERE a.pgr_node_id IS NULL
+				OR NOT EXISTS (
+					SELECT 1
+					FROM temp_pgr_node n
+					WHERE n.graph_delimiter = ''nodeParent''
+					AND n.pgr_node_id = a.pgr_node_id
+				)
+			',
+			'SELECT  
+				start_vid as source,
+				end_vid AS target
+			FROM temp_pgr_mapzone_graph
+			',
+			directed => TRUE 
+			);
+
+			-- update the_geom
+			UPDATE temp_pgr_mapzone_graph t
+			SET the_geom = s.the_geom
+			FROM (
+				SELECT d.start_vid, d.end_vid, st_collect(a.the_geom) AS the_geom
+				FROM temp_pgr_dijkstra d 
+				JOIN arc a ON a.arc_id = d.node
+				GROUP BY d.start_vid, d.end_vid
+			) s
+			WHERE t.start_vid = s.start_vid AND t.end_vid = s.end_vid;
+
+			-- if an arc is between 2 nodeParents
+			UPDATE temp_pgr_mapzone_graph t
+			SET the_geom = a.the_geom
+			FROM arc a
+			WHERE t.start_vid = t.end_vid
+			AND t.start_vid = a.arc_id;
+
+		END IF;
+
 		-- CONFLICT COUNTS
 		SELECT count(*)
 		INTO v_arcs_count
