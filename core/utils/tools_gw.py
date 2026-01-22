@@ -3663,7 +3663,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
         tools_qt.manage_exception(title)
 
 
-def manage_json_return(json_result, sql, rubber_band=None, i=None):
+def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C901
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
@@ -3719,113 +3719,120 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                 return
             if not json_result['body'].get('data') or type(json_result['body'].get('data')) is list:
                 return
-            for key, value in list(json_result['body']['data'].items()):
-                if any(g in key.lower() for g in ('point', 'line', 'polygon')):
+            lista = []
+            for group in list(json_result['body']['data'].items()):
+                if group[0].lower() in ('point', 'line', 'polygon'):
+                    if type(group[1]) is not list:
+                            lista.append(group)
+                    else:
+                        for layer in group[1]:
+                            lista.append((group[0], layer))
 
-                    # Remove the layer if it exists
-                    layer_name = f'{key}'
-                    if json_result['body']['data'][key].get('layerName'):
-                        layer_name = json_result['body']['data'][key]['layerName']
-                    tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
+            for key, value in lista:
+                # Remove the layer if it exists
+                layer_name = f'{key}'
+                if value.get('layerName'):
+                    layer_name = value['layerName']
+                tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
 
-                    if 'features' not in json_result['body']['data'][key]:
-                        continue
-                    if json_result['body']['data'][key]['features'] is None or len(json_result['body']['data'][key]['features']) == 0:
-                        continue
+                if 'features' not in value:
+                    continue
+                if value['features'] is None or len(value['features']) == 0:
+                    continue
 
-                    # Get values for create and populate layer
-                    geojson_str = json.dumps(json_result['body']['data'][key])
-                    vsipath = f"/vsimem/{layer_name}.geojson"
-                    gdal.FileFromMemBuffer(vsipath, geojson_str)
-                    v_layer = QgsVectorLayer(vsipath, layer_name, 'ogr')
-                    if not v_layer.crs().isValid():
-                        v_layer.setCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
-                    v_layer.updateExtents()
-                    geometry_type = v_layer.geometryType()
-                    QgsProject.instance().addMapLayer(v_layer, False)
-                    root = QgsProject.instance().layerTreeRoot()
-                    my_group = root.findGroup('GW Temporal Layers')
-                    if my_group is None:
-                        my_group = root.insertGroup(0, 'GW Temporal Layers')
-                    my_group.insertLayer(i, v_layer)
+                # Get values for create and populate layer
+                geojson_str = json.dumps(value)
+                vsipath = f"/vsimem/{layer_name}.geojson"
+                gdal.FileFromMemBuffer(vsipath, geojson_str)
+                v_layer = QgsVectorLayer(vsipath, layer_name, 'ogr')
+                if not v_layer.crs().isValid():
+                    v_layer.setCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
+                v_layer.updateExtents()
+                geometry_type = v_layer.geometryType()
+                QgsProject.instance().addMapLayer(v_layer, False)
+                root = QgsProject.instance().layerTreeRoot()
+                my_group = root.findGroup('GW Temporal Layers')
+                if my_group is None:
+                    my_group = root.insertGroup(0, 'GW Temporal Layers')
+                my_group.insertLayer(i, v_layer)
 
-                    # Increase iterator
-                    i = i + 1
+                # Increase iterator
+                i = i + 1
 
-                    # Get values for set layer style
-                    opacity = 100
+                # Get values for set layer style
+                opacity = 100
 
-                    style_type = return_manager['style']
+                style_type = return_manager['style']
 
-                    if 'style' in return_manager and 'values' in return_manager['style'][key]:
-                        if 'transparency' in return_manager['style'][key]['values']:
-                            opacity = return_manager['style'][key]['values']['transparency']
-                    if style_type[key]['style'] == 'categorized':
-                        if 'transparency' in return_manager['style'][key]:
-                            opacity = return_manager['style'][key]['transparency']
-                        color_values = {}
-                        for item in return_manager['style'][key].get('values', []):
-                            color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
-                            color_values[item['id']] = {
-                                'color': color,
-                                'legend_id': item.get('legend_id')
-                            }
-                        cat_field = str(style_type[key]['field'])
-                        size = style_type[key]['width'] if style_type[key].get('width') else 2
-                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
+                if 'style' in return_manager and 'values' in return_manager['style'][key]:
+                    if 'transparency' in return_manager['style'][key]['values']:
+                        opacity = return_manager['style'][key]['values']['transparency']
+                if style_type[key]['style'] == 'categorized':
+                    if 'transparency' in return_manager['style'][key]:
+                        opacity = return_manager['style'][key]['transparency']
+                    color_values = {}
+                    for item in return_manager['style'][key].get('values', []):
+                        color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
+                        color_values[item['id']] = {
+                            'color': color,
+                            'legend_id': item.get('legend_id')
+                        }
+                    cat_field = str(style_type[key]['field'])
+                    size = style_type[key]['width'] if style_type[key].get('width') else 2
+                    tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
 
-                    elif style_type[key]['style'] == 'random':
-                        size = style_type['width'] if style_type.get('width') else 2
-                        if geometry_type == 'Point':
-                            v_layer.renderer().symbol().setSize(size)
-                        elif geometry_type in ('Polygon', 'Multipolygon'):
-                            pass
-                        else:
-                            v_layer.renderer().symbol().setWidth(size)
-                        v_layer.renderer().symbol().setOpacity(opacity)
+                elif style_type[key]['style'] == 'random':
+                    size = style_type['width'] if style_type.get('width') else 2
+                    if geometry_type == 'Point':
+                        v_layer.renderer().symbol().setSize(size)
+                    elif geometry_type in ('Polygon', 'Multipolygon'):
+                        pass
+                    else:
+                        v_layer.renderer().symbol().setWidth(size)
+                    v_layer.renderer().symbol().setOpacity(opacity)
 
-                    elif style_type[key]['style'] == 'qml':
-                        style_id = style_type[key]['id']
-                        extras = f'"style_id":"{style_id}", "layername":"{key}"'
-                        body = create_body(extras=extras)
-                        style = execute_procedure('gw_fct_getstyle', body)
-                        if style is None or style.get('status') == 'Failed':
-                            return
-                        if 'styles' in style['body']:
-                            for style_name, qml in style['body']['styles'].items():
-                                if qml is None:
-                                    continue
+                elif style_type[key]['style'] == 'qml':
+                    style_id = style_type[key]['id']
+                    extras = f'"style_id":"{style_id}", "layername":"{key}"'
+                    body = create_body(extras=extras)
+                    style = execute_procedure('gw_fct_getstyle', body)
+                    if style is None or style.get('status') == 'Failed':
+                        return
+                    if 'styles' in style['body']:
+                        for style_name, qml in style['body']['styles'].items():
+                            if qml is None:
+                                continue
 
-                                valid_qml, error_message = validate_qml(qml)
-                                if not valid_qml:
-                                    msg = "The QML file is invalid."
-                                    tools_qgis.show_warning(msg, parameter=error_message)
-                                else:
-                                    style_manager = v_layer.styleManager()
+                            valid_qml, error_message = validate_qml(qml)
+                            if not valid_qml:
+                                msg = "The QML file is invalid."
+                                tools_qgis.show_warning(msg, parameter=error_message)
+                            else:
+                                style_manager = v_layer.styleManager()
 
-                                    default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
-                                    # add style with new name
-                                    style_manager.renameStyle(default_style_name, style_name)
-                                    # set new style as current
-                                    style_manager.setCurrentStyle(style_name)
-                                    tools_qgis.create_qml(v_layer, qml)
+                                default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
+                                # add style with new name
+                                style_manager.renameStyle(default_style_name, style_name)
+                                # set new style as current
+                                style_manager.setCurrentStyle(style_name)
+                                tools_qgis.create_qml(v_layer, qml)
 
-                    elif style_type[key]['style'] == 'unique':
-                        color = style_type[key]['values']['color']
-                        size = style_type['width'] if style_type.get('width') else 2
-                        color = QColor(color[0], color[1], color[2])
-                        if key == 'point':
-                            v_layer.renderer().symbol().setSize(size)
-                        elif key == 'line':
-                            v_layer.renderer().symbol().setWidth(size)
-                        elif key == 'polygon':
-                            pass
-                        v_layer.renderer().symbol().setColor(color)
-                        v_layer.renderer().symbol().setOpacity(opacity)
+                elif style_type[key]['style'] == 'unique':
+                    color = style_type[key]['values']['color']
+                    size = style_type['width'] if style_type.get('width') else 2
+                    color = QColor(color[0], color[1], color[2])
+                    if key == 'point':
+                        v_layer.renderer().symbol().setSize(size)
+                    elif key == 'line':
+                        v_layer.renderer().symbol().setWidth(size)
+                    elif key == 'polygon':
+                        pass
+                    v_layer.renderer().symbol().setColor(color)
+                    v_layer.renderer().symbol().setOpacity(opacity)
 
-                    global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
-                    if margin:
-                        tools_qgis.set_margin(v_layer, margin)
+                global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+                if margin:
+                    tools_qgis.set_margin(v_layer, margin)
 
     except Exception as e:
         msg = "{0}: {1}"
