@@ -3764,24 +3764,29 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
 
                 style_type = return_manager['style']
 
-                if 'style' in return_manager and 'values' in return_manager['style'][key]:
-                    if 'transparency' in return_manager['style'][key]['values']:
-                        opacity = return_manager['style'][key]['values']['transparency']
-                if style_type[key]['style'] == 'categorized':
-                    if 'transparency' in return_manager['style'][key]:
-                        opacity = return_manager['style'][key]['transparency']
+                if return_manager['style'].get(layer_name):
+                    return_manager_style = style_type[layer_name]
+                else:
+                    return_manager_style = style_type[key]
+
+                if 'style' in return_manager and 'values' in return_manager_style:
+                    if 'transparency' in return_manager_style['values']:
+                        opacity = return_manager_style['values']['transparency']
+                if return_manager_style['style'] == 'categorized':
+                    if 'transparency' in return_manager_style:
+                        opacity = return_manager_style['transparency']
                     color_values = {}
-                    for item in return_manager['style'][key].get('values', []):
+                    for item in return_manager_style.get('values', []):
                         color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                         color_values[item['id']] = {
                             'color': color,
                             'legend_id': item.get('legend_id')
                         }
-                    cat_field = str(style_type[key]['field'])
-                    size = style_type[key]['width'] if style_type[key].get('width') else 2
+                    cat_field = str(return_manager_style['field'])
+                    size = return_manager_style['width'] if return_manager_style.get('width') else 2
                     tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
 
-                elif style_type[key]['style'] == 'random':
+                elif return_manager_style['style'] == 'random':
                     size = style_type['width'] if style_type.get('width') else 2
                     if geometry_type == 'Point':
                         v_layer.renderer().symbol().setSize(size)
@@ -3791,8 +3796,8 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
                         v_layer.renderer().symbol().setWidth(size)
                     v_layer.renderer().symbol().setOpacity(opacity)
 
-                elif style_type[key]['style'] == 'qml':
-                    style_id = style_type[key]['id']
+                elif return_manager_style['style'] == 'qml':
+                    style_id = return_manager_style['id']
                     extras = f'"style_id":"{style_id}", "layername":"{key}"'
                     body = create_body(extras=extras)
                     style = execute_procedure('gw_fct_getstyle', body)
@@ -3817,8 +3822,8 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
                                 style_manager.setCurrentStyle(style_name)
                                 tools_qgis.create_qml(v_layer, qml)
 
-                elif style_type[key]['style'] == 'unique':
-                    color = style_type[key]['values']['color']
+                elif return_manager_style['style'] == 'unique':
+                    color = return_manager_style['values']['color']
                     size = style_type['width'] if style_type.get('width') else 2
                     color = QColor(color[0], color[1], color[2])
                     if key == 'point':
