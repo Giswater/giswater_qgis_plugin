@@ -112,7 +112,7 @@ BEGIN
 		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'')
 		AND addparam IS NULL
 		AND query_text IS NOT NULL
-		AND function_name ILIKE ''%graphanalytics%''
+		AND function_name ILIKE ''%gw_fct_graphanalytics_check_data%'' 
 		AND (parameters::text ILIKE ''%'||v_graphclass||'%'' OR parameters IS NULL)
 		AND active
 	';
