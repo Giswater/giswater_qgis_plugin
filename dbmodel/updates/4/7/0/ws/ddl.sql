@@ -72,16 +72,18 @@ ALTER TABLE minsector_graph DROP CONSTRAINT minsector_graph_pkey;
 ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_pk PRIMARY KEY (node_id,minsector_1,minsector_2);
 
 CREATE TABLE presszone_graph (
-	node_id int4 NOT NULL,
-	feature_class varchar(30),
+	node_id_parent_1 int4 NOT NULL,
+	feature_class_1 varchar(30),
 	presszone_1 int4,
-	node_parent_1 int4,
+	node_id_parent_2 int4,
+	feature_class_2 varchar(30),
 	presszone_2 int4,
 	cost float4 DEFAULT 1 NOT NULL,
 	reverse_cost float4 DEFAULT 1 NOT NULL,
 	the_geom geometry(LINESTRING, SRID_VALUE),
-	CONSTRAINT presszone_graph_pkey PRIMARY KEY (node_id, presszone_1, presszone_2)
+	CONSTRAINT presszone_graph_pkey PRIMARY KEY (node_id_parent_1, presszone_1, node_id_parent_2, presszone_2)
 );
 
-CREATE INDEX IF NOT EXISTS presszone_graph_node_id_idx ON presszone_graph USING btree (node_id);
+CREATE INDEX IF NOT EXISTS presszone_graph_node_id_parent_1_idx ON presszone_graph USING btree (node_id_parent_1);
+CREATE INDEX IF NOT EXISTS presszone_graph_node_id_parent_2_idx ON presszone_graph USING btree (node_id_parent_2);
 CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON presszone_graph USING gist (the_geom);
