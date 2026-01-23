@@ -671,22 +671,22 @@ BEGIN
             sector_water AS ( 
                 SELECT m.node_id, m.inlet_arc
                 FROM man_tank m
-                JOIN temp_pgr_node n USING (node_id)
+                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
                 WHERE 'SECTOR' = n.graph_delimiter
                 UNION ALL  
                 SELECT m.node_id, m.inlet_arc
                 FROM man_source m
-                JOIN temp_pgr_node n USING (node_id)
+                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
                 WHERE 'SECTOR' = n.graph_delimiter
                 UNION ALL
                 SELECT m.node_id, m.inlet_arc
                 FROM man_waterwell m
-                JOIN temp_pgr_node n USING (node_id)
+                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
                 WHERE 'SECTOR' = n.graph_delimiter 
                 UNION ALL
                 SELECT m.node_id, m.inlet_arc
                 FROM man_wtp m
-                JOIN temp_pgr_node n USING (node_id)
+                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
                 WHERE 'SECTOR' = n.graph_delimiter
             )
         UPDATE temp_pgr_node_minsector t
@@ -694,8 +694,8 @@ BEGIN
         WHERE EXISTS (
             SELECT 1
             FROM temp_pgr_arc a
-            LEFT JOIN sector_water s1 ON a.node_1 = s1.node_id
-            LEFT JOIN sector_water s2 ON a.node_2 = s2.node_id
+            LEFT JOIN sector_water s1 ON a.pgr_node_1 = s1.node_id
+            LEFT JOIN sector_water s2 ON a.pgr_node_2 = s2.node_id
             WHERE t.pgr_node_id = a.mapzone_id
             AND (
                 (s1.node_id IS NOT NULL AND a.pgr_arc_id <> ALL(COALESCE(s1.inlet_arc,ARRAY[]::int[])))
@@ -710,7 +710,7 @@ BEGIN
         SELECT t.node_id, t.minsector_1, t.minsector_2, 'MINSECTOR', 1, 1, -1, -1, m.closed, m.broken,
             CASE
                 WHEN m.to_arc IS NULL THEN NULL
-                ELSE ARRAY[m.to_arc]
+                ELSE to_arc--ARRAY[m.to_arc]
             END AS to_arc
         FROM temp_pgr_minsector_graph t
         JOIN man_valve m ON t.node_id = m.node_id;
