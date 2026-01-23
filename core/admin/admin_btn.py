@@ -1774,6 +1774,7 @@ class GwAdminButton:
         sql = "SELECT table_schema FROM information_schema.tables WHERE table_name = 'sys_version'"
         rows = tools_db.get_rows(sql, commit=self.dev_commit)
         if rows is None:
+            tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, None)
             return
 
         result_list = []
