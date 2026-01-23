@@ -133,8 +133,7 @@ DECLARE
 	v_error_context text;
 
 	-- check variables
-	v_querytext text;
-	v_rec record;
+	v_check_fid integer;
 
 BEGIN
 
@@ -220,6 +219,10 @@ BEGIN
         )
     );
 	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+
+	IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
 
 	-- Create temporary tables
 	-- =======================
@@ -673,7 +676,11 @@ BEGIN
         )
     );
 
-	PERFORM gw_fct_manage_temp_tables(v_data);
+	SELECT gw_fct_manage_temp_tables(v_data) INTO v_response;
+	
+	IF v_response->>'status' <> 'Accepted' THEN
+		RETURN v_response;
+	END IF;
 
 	-- create temp tables
 	v_data :=
@@ -690,27 +697,39 @@ BEGIN
         )
     );
 	
-	PERFORM gw_fct_manage_temp_tables(v_data);
+	SELECT gw_fct_manage_temp_tables(v_data) INTO v_response;
+
+	IF v_response->>'status' <> 'Accepted' THEN
+		RETURN v_response;
+	END IF;
+
 
 	IF v_from_zero = FALSE THEN
 
-	-- getting sys_fprocess to be executed
-	v_querytext = '
-		SELECT * FROM sys_fprocess
-		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'')
-		AND addparam IS NULL
-		AND (query_text IS NOT NULL AND query_text <> '''')
-		AND function_name ILIKE ''%gw_fct_graphanalytics_mapzones_v1%''
-		AND active ORDER BY fid ASC
-	';
+		-- getting sys_fprocess to be executed
+		v_query_text := format(
+			$sql$
+			SELECT fid FROM sys_fprocess
+			WHERE project_type IN (LOWER(%L), 'utils')
+			AND addparam IS NULL
+			AND (query_text IS NOT NULL AND query_text <> '')
+			AND function_name ILIKE '%%gw_fct_graphanalytics_mapzones_v1%%'
+			AND active ORDER BY fid ASC
+			$sql$,
+			v_project_type
+		);
 
-	-- loop for checks
-	FOR v_rec IN EXECUTE v_querytext LOOP
-		EXECUTE 'SELECT gw_fct_check_fprocess($${"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-	END LOOP;
+		-- loop for checks
+		FOR v_check_fid IN EXECUTE v_query_text LOOP
+			EXECUTE format(
+				'SELECT gw_fct_check_fprocess($${"data":{"parameters":{"functionFid":%s, "checkFid":"%s"}}}$$)', 
+				v_fid, v_check_fid
+			);
+		END LOOP;
 	
 	END IF; --v_from_zero
 
+	-- check if there are any errors or from_zero is true
 	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) = 0 OR v_from_zero = TRUE THEN
 
 	-- GENERATE LINEGRAPH
