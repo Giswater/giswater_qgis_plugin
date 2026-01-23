@@ -1421,6 +1421,14 @@ BEGIN
 			JOIN cat_feature cf ON cn.node_type  = cf.id
 			WHERE t.node_parent_2 = n.node_id;
 
+			-- update the_geom
+			-- if an arc is between 2 nodeParents
+			UPDATE temp_pgr_mapzone_graph t
+			SET the_geom = a.the_geom
+			FROM arc a
+			WHERE t.start_vid = t.end_vid
+			AND t.start_vid = a.arc_id;
+
 			-- Dijkstra
 			INSERT INTO temp_pgr_dijkstra (seq, path_seq, start_vid, end_vid, node, edge, COST, agg_cost)
 			SELECT seq, path_seq, start_vid, end_vid, node, edge, COST, agg_cost
@@ -1445,11 +1453,11 @@ BEGIN
 				start_vid as source,
 				end_vid AS target
 			FROM temp_pgr_mapzone_graph
+			WHERE start_vid <> end_vid
 			',
 			directed => TRUE 
 			);
 
-			-- update the_geom
 			UPDATE temp_pgr_mapzone_graph t
 			SET the_geom = s.the_geom
 			FROM (
@@ -1459,13 +1467,6 @@ BEGIN
 				GROUP BY d.start_vid, d.end_vid
 			) s
 			WHERE t.start_vid = s.start_vid AND t.end_vid = s.end_vid;
-
-			-- if an arc is between 2 nodeParents
-			UPDATE temp_pgr_mapzone_graph t
-			SET the_geom = a.the_geom
-			FROM arc a
-			WHERE t.start_vid = t.end_vid
-			AND t.start_vid = a.arc_id;
 
 		END IF;
 
