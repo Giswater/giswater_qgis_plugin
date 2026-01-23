@@ -117,6 +117,9 @@ jobs:
       - name: Create Sample Schema
         run: python test/execute_sql_files.py ud
 
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_REF_NAME//\//-}" >> $GITHUB_ENV
+
       - name: Dump DB for image
         if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
         run: |
@@ -137,9 +140,9 @@ jobs:
           context: .
           file: docker/gw-db/Dockerfile
           push: true
-          tags: ghcr.io/Giswater/gw-db:${{ github.ref_name }}-pg${{ matrix.pg_version }}-ud
+          tags: ghcr.io/giswater/gw-db:${{ env.IMAGE_TAG }}-pg${{ matrix.pg_version }}-ud
           build-args: |
-            GW_DUMP=gw_ws.dump
+            GW_DUMP=gw_ud.dump
             PG_MAJOR=${{ matrix.pg_version }}
       - name: Run all SQL tests in sequence
         run: |
