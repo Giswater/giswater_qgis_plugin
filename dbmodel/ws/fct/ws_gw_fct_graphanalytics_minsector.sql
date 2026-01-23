@@ -707,11 +707,7 @@ BEGIN
         -- insert the valves as arcs;
         -- the table that is used: temp_pgr_arc_linegraph where pgr_node_id is the valve and pgr_node_1/pgr_node_2 are the connected minsectors
         INSERT INTO temp_pgr_arc_linegraph (pgr_node_id, pgr_node_1, pgr_node_2, graph_delimiter, cost, reverse_cost, cost_mincut, reverse_cost_mincut, closed, broken, to_arc)
-        SELECT t.node_id, t.minsector_1, t.minsector_2, 'MINSECTOR', 1, 1, -1, -1, m.closed, m.broken,
-            CASE
-                WHEN m.to_arc IS NULL THEN NULL
-                ELSE to_arc--ARRAY[m.to_arc]
-            END AS to_arc
+        SELECT t.node_id, t.minsector_1, t.minsector_2, 'MINSECTOR', 1, 1, -1, -1, m.closed, m.broken, m.to_arc
         FROM temp_pgr_minsector_graph t
         JOIN man_valve m ON t.node_id = m.node_id;
 
@@ -723,8 +719,8 @@ BEGIN
 
         -- operative checkvalves
         UPDATE temp_pgr_arc_linegraph t
-        SET cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id  AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
-            reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc[1] = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
+        SET cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc = a.pgr_arc_id  AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
+            reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
         WHERE t.closed = FALSE 
         AND t.broken = FALSE
         AND t.to_arc IS NOT NULL;
@@ -859,7 +855,7 @@ BEGIN
 
             INSERT INTO temp_pgr_minsector_mincut_valve
                 (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
-            SELECT v_record_minsector.pgr_node_id, a.pgr_node_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc[1], changestatus
+            SELECT v_record_minsector.pgr_node_id, a.pgr_node_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc, changestatus
             FROM temp_pgr_arc_linegraph a
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.mapzone_id <> 0;
