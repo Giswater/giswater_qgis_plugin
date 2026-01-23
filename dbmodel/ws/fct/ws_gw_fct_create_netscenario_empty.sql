@@ -106,7 +106,7 @@ BEGIN
 
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3766", "function":"3260", "fid":"'||v_fid||'", "criticity":"3", "is_process":true}}$$)';
+                       "data":{"message":"3766", "function":"3260", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 	END IF;
 
