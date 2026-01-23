@@ -171,7 +171,7 @@ BEGIN
 				feature_class_1 varchar(30) NULL,
 				node_parent_2 int4 NOT NULL,
 				feature_class_2 varchar(30) NULL,
-				the_geom geometry(linestring, SRID_VALUE),
+				the_geom geometry(MultiLineString, SRID_VALUE),
 				CONSTRAINT temp_pgr_mapzone_graph_pkey PRIMARY KEY (id)
 			);
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_start_vid_idx ON temp_pgr_mapzone_graph USING btree (start_vid);
