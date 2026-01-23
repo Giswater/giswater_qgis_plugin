@@ -236,7 +236,7 @@ BEGIN
 
     -- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
     INSERT INTO temp_pgr_arc_linegraph (
-        pgr_arc_id, pgr_node_1, pgr_node_2, cost, reverse_cost
+        pgr_arc_id, pgr_node_1, pgr_node_2, cost_mincut, reverse_cost_mincut
     )
     SELECT seq, source, target, cost, -1
     FROM pgr_linegraph(
@@ -248,40 +248,60 @@ BEGIN
         directed => FALSE
     );
 
-    -- update cost = -1 for graph_delimiter = SECTOR, MINSECTOR
+    -- update cost_mincut = -1 for graph_delimiter = SECTOR, MINSECTOR
     --checking node_1 for arc_1
     UPDATE temp_pgr_arc_linegraph t
-    SET cost = -1
+    SET pgr_node_id = n.pgr_node_id,
+        graph_delimiter = n.graph_delimiter,
+        cost_mincut = -1
     FROM temp_pgr_arc_linegraph ta
     JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
     JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
-    WHERE EXISTS (
-        SELECT 1
-        FROM temp_pgr_node n
-        WHERE n.graph_delimiter <> 'NONE'
-        AND n.pgr_node_id = a1.pgr_node_1
-    )
-    AND (a1.pgr_node_1 = a2.pgr_node_1 OR a1.pgr_node_1 = a2.pgr_node_2)
+    JOIN temp_pgr_node n ON a1.pgr_node_1 = n.pgr_node_id
+    WHERE n.graph_delimiter <> 'NONE'
+    AND a1.pgr_node_1 IN (a2.pgr_node_1, a2.pgr_node_2)
     AND ta.pgr_arc_id = t.pgr_arc_id;
 
     --checking node_2 for arc_1
     UPDATE temp_pgr_arc_linegraph t
-    SET cost = -1
+    SET pgr_node_id = n.pgr_node_id,
+        graph_delimiter = n.graph_delimiter,
+        cost_mincut = -1
     FROM temp_pgr_arc_linegraph ta
     JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
     JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
-    WHERE EXISTS (
-        SELECT 1
-        FROM temp_pgr_node n
-        WHERE n.graph_delimiter <> 'NONE'
-        AND n.pgr_node_id = a1.pgr_node_2
-    )
-    AND (a1.pgr_node_2 = a2.pgr_node_1 OR a1.pgr_node_2 = a2.pgr_node_2)
+    JOIN temp_pgr_node n ON a1.pgr_node_2 = n.pgr_node_id
+    WHERE n.graph_delimiter <> 'NONE'
+    AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
     AND ta.pgr_arc_id = t.pgr_arc_id;
+
+    -- update aditional fields for valves (MINSECTOR)
+    UPDATE temp_pgr_arc_linegraph t
+    SET 
+        closed = m.closed,
+        broken = m.broken,
+        to_arc = m.to_arc
+    FROM man_valve m
+    WHERE t.graph_delimiter = 'MINSECTOR'
+    AND t.pgr_node_id = m.node_id; 
+
+    -- closed valves
+    UPDATE temp_pgr_arc_linegraph t 
+    SET cost = -1, reverse_cost = -1
+    WHERE t.graph_delimiter = 'MINSECTOR'
+    AND t.closed = TRUE;
+
+    -- check valves
+    UPDATE temp_pgr_arc_linegraph t 
+    SET cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
+		reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
+    WHERE t.graph_delimiter = 'MINSECTOR'
+    AND t.closed = FALSE 
+    AND t.to_arc IS NOT NULL;
 
     -- Generate the minsectors
     v_query_text :=
-    'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost 
+    'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost_mincut as cost
     FROM temp_pgr_arc_linegraph';
 
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
@@ -318,13 +338,25 @@ BEGIN
     WHERE t.pgr_arc_id = a.pgr_arc_id;
 
     -- fill temp_pgr_minsector_graph
-    INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
-    SELECT n.pgr_node_id, min(a.mapzone_id) AS minsector_1, max(a.mapzone_id) AS minsector_2
-    FROM temp_pgr_node n
-    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
-    WHERE n.graph_delimiter = 'MINSECTOR'
-    GROUP BY n.pgr_node_id
-    HAVING count(DISTINCT a.mapzone_id) = 2;
+    INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2, cost, reverse_cost)
+    SELECT
+        l.pgr_node_id AS node_id,
+        a1.mapzone_id AS minsector_1,
+        a2.mapzone_id AS minsector_2,
+        l.cost,
+        l.reverse_cost
+    FROM temp_pgr_arc_linegraph l
+    JOIN temp_pgr_arc a1 ON l.pgr_node_1 = a1.pgr_arc_id
+    JOIN temp_pgr_arc a2 ON l.pgr_node_2 = a2.pgr_arc_id
+    WHERE l.graph_delimiter = 'MINSECTOR'
+    AND a1.mapzone_id <> a2.mapzone_id;
+
+    UPDATE temp_pgr_minsector_graph t
+    SET feature_class = cf.feature_class
+    FROM node n 
+    JOIN cat_node cn ON n.nodecat_id = cn.id 
+    JOIN cat_feature cf ON cn.node_type  = cf.id
+    WHERE t.node_id = n.node_id;
 
     -- fill temp_pgr_minsector
     INSERT INTO temp_pgr_minsector(minsector_id)
@@ -606,8 +638,8 @@ BEGIN
         );
 
         -- fill minsector_graph
-        INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
-        SELECT node_id, minsector_1, minsector_2 
+        INSERT INTO minsector_graph (node_id, feature_class, minsector_1, minsector_2, cost, reverse_cost)
+        SELECT node_id, feature_class, minsector_1, minsector_2, cost, reverse_cost 
         FROM temp_pgr_minsector_graph;
 
         -- update minsector
