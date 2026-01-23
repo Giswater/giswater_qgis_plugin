@@ -1326,25 +1326,23 @@ BEGIN
 		-- NodeParent self-conflict: the arcs toArc and the ones that are not have the same mapzone_id
 		-- TODO: check if after solving all the Checking graphconfig errors, this part is still necessarly
 		
-		WITH a AS (
-			SELECT  DISTINCT n.pgr_node_id, a.mapzone_id, a.node_parent
-		FROM temp_pgr_node n
-		JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		WHERE n.graph_delimiter = 'nodeParent'
-		AND a.mapzone_id > 0
-		),
-		conflict_mapzone_id AS (
-			SELECT a.pgr_node_id, a.mapzone_id
-			FROM a
-			GROUP BY a.pgr_node_id, mapzone_id
-		HAVING count(*) >1
+		WITH 
+			selfconflict AS (
+			SELECT DISTINCT l.pgr_node_id, n.mapzone_id
+			FROM temp_pgr_arc a
+			JOIN temp_pgr_arc_linegraph l ON a.pgr_arc_id IN (l.pgr_node_1, l.pgr_node_2)
+			JOIN temp_pgr_node n ON l.pgr_node_id = n.pgr_node_id
+			WHERE l.graph_delimiter = 'nodeParent'
+			AND a.mapzone_id > 0 
+			AND a.mapzone_id = n.mapzone_id
+			AND a.node_parent IS DISTINCT FROM l.pgr_node_id
 		)
 		UPDATE temp_pgr_mapzone m
 		SET mapzone_id = -1, name = 'Conflict'
 		WHERE EXISTS (
 			SELECT 1 
-			FROM conflict_mapzone_id cm
-			WHERE cm.mapzone_id = m.mapzone_id
+			FROM selfconflict s
+			WHERE s.mapzone_id = m.mapzone_id
 		);
 
 		UPDATE temp_pgr_arc a
