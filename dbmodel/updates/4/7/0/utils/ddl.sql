@@ -25,34 +25,30 @@ ALTER TABLE cat_material ADD CONSTRAINT fk_cat_material_family FOREIGN KEY (fami
 
 -- 22/01/2026
 CREATE TABLE sector_graph (
-	node_id_parent_1 int4 NOT NULL,
-	feature_class_1 varchar(30),
-	sector_1 int4,
-	node_id_parent_2 int4,
-	feature_class_2 varchar(30),
-	sector_2 int4,
-	cost float4 DEFAULT 1 NOT NULL,
-	reverse_cost float4 DEFAULT 1 NOT NULL,the_geom geometry(LINESTRING, SRID_VALUE),
-	CONSTRAINT sector_graph_pkey PRIMARY KEY (node_id_parent_1, sector_1, node_id_parent_2, sector_2)
+	node_1 int4 NOT NULL,
+	sector_id int4 NOT NULL,
+	node_2 int4,
+	expl_id int4[] NULL,
+	muni_id int4[] NULL,
+	the_geom geometry(MULTILINESTRING, SRID_VALUE),
+	CONSTRAINT sector_graph_pkey PRIMARY KEY (node_1, node_2)
 );
 
-CREATE INDEX IF NOT EXISTS sector_graph_node_id_parent_1_idx ON sector_graph USING btree (node_id_parent_1);
-CREATE INDEX IF NOT EXISTS sector_graph_node_id_parent_2_idx ON sector_graph USING btree (node_id_parent_2);
+CREATE INDEX IF NOT EXISTS sector_graph_node_1_idx ON sector_graph USING btree (node_1);
+CREATE INDEX IF NOT EXISTS sector_graph_node_2_idx ON sector_graph USING btree (node_2);
 CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON sector_graph USING gist (the_geom);
 
 CREATE TABLE dma_graph (
-	node_id_parent_1 int4 NOT NULL,
-	feature_class_1 varchar(30),
-	dma_1 int4,
-	node_id_parent_2 int4,
-	feature_class_2 varchar(30),
-	dma_2 int4,
-	cost float4 DEFAULT 1 NOT NULL,
-	reverse_cost float4 DEFAULT 1 NOT NULL,
-	the_geom geometry(LINESTRING, SRID_VALUE),
-	CONSTRAINT dma_graph_pkey PRIMARY KEY (node_id_parent_1, dma_1, node_id_parent_2, dma_2)
+	node_1 int4 NOT NULL,
+	dma_id int4 NOT NULL,
+	node_2 int4 NOT NULL,
+	expl_id int4[] NULL,
+	muni_id int4[] NULL,
+	sector_id int4[] NULL,
+	the_geom geometry(MULTILINESTRING, SRID_VALUE),
+	CONSTRAINT dma_graph_pkey PRIMARY KEY (node_1, node_2)
 );
 
-CREATE INDEX IF NOT EXISTS dma_graph_node_id_parent_1_idx ON dma_graph USING btree (node_id_parent_1);
-CREATE INDEX IF NOT EXISTS dma_graph_node_id_parent_2_idx ON dma_graph USING btree (node_id_parent_2);
+CREATE INDEX IF NOT EXISTS dma_graph_node_1_idx ON dma_graph USING btree (node_1);
+CREATE INDEX IF NOT EXISTS dma_graph_node_2_idx ON dma_graph USING btree (node_2);
 CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON dma_graph USING gist (the_geom);
