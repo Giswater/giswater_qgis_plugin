@@ -1338,7 +1338,7 @@ BEGIN
 			AND a.node_parent IS DISTINCT FROM l.pgr_node_id
 		)
 		UPDATE temp_pgr_mapzone m
-		SET mapzone_id = -1, name = 'Conflict'
+		SET mapzone_id = -1, name = 'SelfConflict'
 		WHERE EXISTS (
 			SELECT 1 
 			FROM selfconflict s
@@ -1943,6 +1943,11 @@ BEGIN
 			GROUP BY ta.mapzone_id
 			) s
 			WHERE s.mapzone_id = m.mapzone_id;
+
+			-- UPDATE mapzone_graph
+			IF v_project_type = 'WS' AND v_netscenario IS NULL THEN 
+
+			END IF;
 
 			-- UPDATE TABLES
 			-- ======================
