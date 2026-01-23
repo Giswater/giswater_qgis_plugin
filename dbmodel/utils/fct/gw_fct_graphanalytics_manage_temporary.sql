@@ -167,17 +167,17 @@ BEGIN
 				start_vid int4 NOT NULL, 
 				end_vid int4 NOT NULL,
 				mapzone_id int4 NOT NULL,
-				node_parent_1 int4 NOT NULL,
+				node_1 int4 NOT NULL,
 				feature_class_1 varchar(30) NULL,
-				node_parent_2 int4 NOT NULL,
+				node_2 int4 NOT NULL,
 				feature_class_2 varchar(30) NULL,
 				the_geom geometry(MultiLineString, SRID_VALUE),
 				CONSTRAINT temp_pgr_mapzone_graph_pkey PRIMARY KEY (id)
 			);
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_start_vid_idx ON temp_pgr_mapzone_graph USING btree (start_vid);
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_end_vid_idx ON temp_pgr_mapzone_graph USING btree (end_vid);
-			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_parent_1_idx ON temp_pgr_mapzone_graph USING btree (node_parent_1);
-			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_parent_2_idx ON temp_pgr_mapzone_graph USING btree (node_parent_2);
+			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_1_idx ON temp_pgr_mapzone_graph USING btree (node_1);
+			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_2_idx ON temp_pgr_mapzone_graph USING btree (node_2);
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_mapzone_id_idx ON temp_pgr_mapzone_graph USING btree (mapzone_id);
 
 			CREATE TEMP TABLE IF NOT EXISTS temp_pgr_dijkstra (

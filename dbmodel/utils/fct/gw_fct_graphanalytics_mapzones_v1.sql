@@ -122,6 +122,7 @@ DECLARE
 	v_result_line_invalid json;
 	v_result_line json;
 	v_result_graphconfig json;
+	v_result_graphline json;
 
 	-- response variables
 	v_level integer;
@@ -1381,8 +1382,8 @@ BEGIN
 				linegraph AS (
 					SELECT 
 						l.pgr_node_id,
-						l.pgr_node_1 AS arc_1, a1.mapzone_id AS mapzone_1,a1.node_parent AS node_parent_1,
-						l.pgr_node_2 AS arc_2, a2.mapzone_id AS mapzone_2, a2.node_parent AS node_parent_2
+						l.pgr_node_1 AS arc_1, a1.mapzone_id AS mapzone_1,a1.node_parent AS node_1,
+						l.pgr_node_2 AS arc_2, a2.mapzone_id AS mapzone_2, a2.node_parent AS node_2
 					FROM temp_pgr_arc_linegraph l 
 					JOIN temp_pgr_arc a1 ON a1.pgr_arc_id = l.pgr_node_1
 					JOIN temp_pgr_arc a2 ON a2.pgr_arc_id = l.pgr_node_2
@@ -1392,14 +1393,14 @@ BEGIN
 				inlet_arc AS (
 					SELECT arc_1 AS end_vid, pgr_node_id AS end_node
 					FROM linegraph 
-					WHERE node_parent_1 IS DISTINCT FROM pgr_node_id
+					WHERE node_1 IS DISTINCT FROM pgr_node_id
 					UNION ALL 
 					SELECT arc_2 AS end_vid, pgr_node_id AS end_node
 					FROM linegraph 
-					WHERE node_parent_2 IS DISTINCT FROM pgr_node_id
+					WHERE node_2 IS DISTINCT FROM pgr_node_id
 				)
-			INSERT INTO temp_pgr_mapzone_graph (start_vid, end_vid, mapzone_id, node_parent_1, node_parent_2)
-			SELECT DISTINCT ON (a.node_parent, i.end_node) d.start_vid,i.end_vid, a.mapzone_id, a.node_parent AS node_parent_1, i.end_node AS node_parent_2
+			INSERT INTO temp_pgr_mapzone_graph (start_vid, end_vid, mapzone_id, node_1, node_2)
+			SELECT DISTINCT ON (a.node_parent, i.end_node) d.start_vid,i.end_vid, a.mapzone_id, a.node_parent AS node_1, i.end_node AS node_2
 			FROM inlet_arc i 
 			JOIN temp_pgr_drivingdistance d ON d.node = i.end_vid
 			JOIN temp_pgr_arc a ON d.start_vid = a.pgr_arc_id
@@ -1412,14 +1413,14 @@ BEGIN
 			FROM node n 
 			JOIN cat_node cn ON n.nodecat_id = cn.id 
 			JOIN cat_feature cf ON cn.node_type  = cf.id
-			WHERE t.node_parent_1 = n.node_id;
+			WHERE t.node_1 = n.node_id;
 
 			UPDATE temp_pgr_mapzone_graph t
 			SET feature_class_2 = cf.feature_class  
 			FROM node n 
 			JOIN cat_node cn ON n.nodecat_id = cn.id 
 			JOIN cat_feature cf ON cn.node_type  = cf.id
-			WHERE t.node_parent_2 = n.node_id;
+			WHERE t.node_2 = n.node_id;
 
 			-- update the_geom
 			-- if an arc is between 2 nodeParents
@@ -2626,6 +2627,36 @@ BEGIN
 
 	v_result_graphconfig := v_result;
 
+	-- mapzone_graph (ONLY FOR WS)
+	IF v_project_type = 'WS' THEN
+		EXECUTE format($sql$
+			SELECT jsonb_build_object(
+				'type', 'FeatureCollection',
+				'layerName', 'graphline',
+				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
+			)
+			FROM (
+				SELECT jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(ST_Transform(r.the_geom, 4326))::jsonb,
+				'properties', to_jsonb(r) - 'the_geom'
+				) AS feature
+				FROM (
+				SELECT tg.id, tg.node_1, tg.feature_class_1, tg.node_2, tg.feature_class_2,
+					tg.mapzone_id AS %I,
+					tg.the_geom,
+					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
+				FROM temp_pgr_mapzone_graph tg
+				JOIN temp_pgr_mapzone mz ON mz.mapzone_id = tg.mapzone_id
+				) r
+			) f
+			$sql$,
+			v_mapzone_field
+		) INTO v_result;
+	END IF;
+
+	v_result_graphline := v_result;
+
 	EXECUTE format($sql$
 		SELECT jsonb_build_object(
 			'type', 'FeatureCollection',
@@ -2832,20 +2863,26 @@ BEGIN
 		'layerName', 'line_invalid',
 		'features', '[]'::jsonb
 	)::json);
+	v_result_graphline := COALESCE(v_result_graphline, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'graphline',
+		'features', '[]'::jsonb
+	)::json);
 	v_level := COALESCE(v_level, 0);
 	v_message := COALESCE(v_message, '');
 	v_version := COALESCE(v_version, '');
 	v_netscenario := COALESCE(v_netscenario, -1);
 
 	v_result_line := jsonb_build_array(
-		v_result_line_valid,
-		v_result_line_invalid
+		v_result_graphline,
+		v_result_line_invalid,
+		v_result_line_valid
 	)::json;
 
 	v_result_point := jsonb_build_array(
+		v_result_graphconfig,
 		v_result_point_valid,
-		v_result_point_invalid,
-		v_result_graphconfig
+		v_result_point_invalid	
 	)::json;
 
 	-- drop temp tables
