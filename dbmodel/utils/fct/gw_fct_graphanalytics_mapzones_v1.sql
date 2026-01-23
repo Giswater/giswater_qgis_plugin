@@ -657,20 +657,6 @@ BEGIN
 
 	-- SECTION CHECK GRAPHCONFIG
 	--==============================
-
-	IF v_from_zero = FALSE THEN
-
-	-- getting sys_fprocess to be executed
-	v_querytext = '
-		SELECT * FROM sys_fprocess
-		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'')
-		AND addparam IS NULL
-		AND (query_text IS NOT NULL AND query_text <> '''')
-		AND function_name ILIKE ''%gw_fct_graphanalytics_mapzones_v1%''
-		AND active ORDER BY fid ASC
-	';
-
-	-- loop for checks
 	-- drop temp tables
 	v_data :=
     jsonb_build_object(
@@ -705,13 +691,26 @@ BEGIN
 	
 	PERFORM gw_fct_manage_temp_tables(v_data);
 
+	IF v_from_zero = FALSE THEN
+
+	-- getting sys_fprocess to be executed
+	v_querytext = '
+		SELECT * FROM sys_fprocess
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'')
+		AND addparam IS NULL
+		AND (query_text IS NOT NULL AND query_text <> '''')
+		AND function_name ILIKE ''%gw_fct_graphanalytics_mapzones_v1%''
+		AND active ORDER BY fid ASC
+	';
+
+	-- loop for checks
 	FOR v_rec IN EXECUTE v_querytext LOOP
 		EXECUTE 'SELECT gw_fct_check_fprocess($${"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
 	END LOOP;
 	
 	END IF; --v_from_zero
 
-	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) = 0 THEN
+	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) = 0 OR v_from_zero = TRUE THEN
 
 	-- GENERATE LINEGRAPH
 	-- ===================
