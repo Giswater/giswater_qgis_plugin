@@ -33,6 +33,7 @@ DECLARE
 
     -- extra variables
     v_return_message TEXT;
+    v_mapzone_field text;
 
     -- CHECKS
     v_arc_list TEXT;
@@ -54,6 +55,32 @@ BEGIN
 
     IF v_action = 'CREATE' THEN
         -- Create temporary tables
+
+        v_mapzone_field :=
+        CASE
+            WHEN v_fct_name LIKE '%TYPE'
+                THEN lower(v_fct_name)
+
+            WHEN v_fct_name = 'MINCUT'
+                THEN 'minsector_id'
+
+            WHEN v_fct_name = 'MINSECTOR'
+                THEN 'minsector_id'
+
+            WHEN v_fct_name = 'OMUNIT'
+                THEN 'omunit_id'
+
+            WHEN v_fct_type = 'MAPZONE'
+                THEN lower(v_fct_name) || '_id'
+
+            ELSE NULL
+        END;
+
+        IF v_mapzone_field IS NULL THEN
+            RAISE EXCEPTION
+                'Cannot determine mapzone field for v_fct_name = %',
+                v_fct_name;
+        END IF;
 
         CREATE TEMP TABLE IF NOT EXISTS temp_pgr_old_mapzone (
             mapzone_id INTEGER,
@@ -178,7 +205,7 @@ BEGIN
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_end_vid_idx ON temp_pgr_mapzone_graph USING btree (end_vid);
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_1_idx ON temp_pgr_mapzone_graph USING btree (node_1);
 			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_2_idx ON temp_pgr_mapzone_graph USING btree (node_2);
-			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_mapzone_id_idx ON temp_pgr_mapzone_graph USING btree (mapzone_id);
+			CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_mapzone_id_idx ON temp_pgr_mapzone_graph USING btree (mapzone_id);
 
 			CREATE TEMP TABLE IF NOT EXISTS temp_pgr_dijkstra (
                 seq INTEGER NOT NULL,
@@ -296,133 +323,83 @@ BEGIN
         IF v_use_psector = 'true' THEN
             -- with psectors
 
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
-            SELECT
-                a.arc_id,
-                a.node_1,
-                a.node_2,
-                a.expl_id,
-                a.the_geom
-            FROM arc a 
-            LEFT JOIN LATERAL ( 
-                SELECT pp_1.state
-                FROM plan_psector_x_arc pp_1
-                WHERE pp_1.arc_id = a.arc_id 
-                AND pp_1.psector_id IN ( 
-                    SELECT sp.psector_id
-                    FROM selector_psector sp
-                    WHERE sp.cur_user = CURRENT_USER
-                )
-                ORDER BY pp_1.psector_id DESC
-                LIMIT 1
-            ) pp ON TRUE
-            JOIN value_state_type vst ON vst.id = a.state_type
-            JOIN exploitation e ON e.expl_id = a.expl_id
-            WHERE COALESCE(pp.state, a.state) = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE
-            AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
+                SELECT
+                    a.arc_id,
+                    a.node_1,
+                    a.node_2,
+                    a.expl_id,
+                    l.$I,
+                    a.the_geom
+                FROM arc a
+                LEFT JOIN LATERAL (
+                    SELECT pp_1.state
+                    FROM plan_psector_x_arc pp_1
+                    WHERE pp_1.arc_id = a.arc_id
+                    AND pp_1.psector_id IN (
+                        SELECT sp.psector_id
+                        FROM selector_psector sp
+                        WHERE sp.cur_user = CURRENT_USER
+                    )
+                    ORDER BY pp_1.psector_id DESC
+                    LIMIT 1
+                ) pp ON TRUE
+                JOIN value_state_type vst ON vst.id = a.state_type
+                JOIN exploitation e ON e.expl_id = a.expl_id
+                WHERE COALESCE(pp.state, a.state) = 1
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE
+                AND a.node_1 IS NOT NULL
+                AND a.node_2 IS NOT NULL;
+            $sql$, v_mapzone_field);
 
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
-            SELECT 
-                n.node_id,
-                cf.graph_delimiter,
-                n.expl_id,
-                n.the_geom
-            FROM node n
-            LEFT JOIN LATERAL ( 
-                SELECT pp_1.state
-                FROM plan_psector_x_node pp_1
-                WHERE pp_1.node_id = n.node_id 
-                AND pp_1.psector_id IN ( 
-                    SELECT sp.psector_id
-                    FROM selector_psector sp
-                    WHERE sp.cur_user = CURRENT_USER
-                )
-                ORDER BY pp_1.psector_id DESC
-                LIMIT 1
-            ) pp ON true
-            JOIN cat_node cn ON cn.id = n.nodecat_id
-            JOIN cat_feature_node cf ON cf.id = cn.node_type
-            JOIN value_state_type vst ON vst.id = n.state_type
-            JOIN exploitation e ON e.expl_id = n.expl_id
-            WHERE COALESCE(pp.state, n.state) = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE;
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
+                SELECT
+                    n.node_id,
+                    cn.node_type,
+                    cf.graph_delimiter,
+                    n.expl_id,
+                    l.$I,
+                    n.the_geom
+                FROM node n
+                LEFT JOIN LATERAL (
+                    SELECT pp_1.state
+                    FROM plan_psector_x_node pp_1
+                    WHERE pp_1.node_id = n.node_id
+                    AND pp_1.psector_id IN (
+                        SELECT sp.psector_id
+                        FROM selector_psector sp
+                        WHERE sp.cur_user = CURRENT_USER
+                    )
+                    ORDER BY pp_1.psector_id DESC
+                    LIMIT 1
+                ) pp ON TRUE
+                JOIN cat_node cn ON cn.id = n.nodecat_id
+                JOIN cat_feature_node cf ON cf.id = cn.node_type
+                JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN exploitation e ON e.expl_id = n.expl_id
+                WHERE COALESCE(pp.state, n.state) = 1
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
+            $sql$, v_mapzone_field);
 
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
-            SELECT 
-                c.connec_id,
-                COALESCE(pp.arc_id, c.arc_id) AS arc_id,
-                c.customer_code,
-                c.expl_id
-            FROM connec c
-            LEFT JOIN LATERAL ( 
-                SELECT pp_1.state, pp_1.arc_id
-                FROM plan_psector_x_connec pp_1
-                WHERE pp_1.connec_id = c.connec_id 
-                AND pp_1.psector_id IN ( 
-                    SELECT sp.psector_id
-                    FROM selector_psector sp
-                    WHERE sp.cur_user = CURRENT_USER
-                )
-                ORDER BY pp_1.psector_id DESC, pp_1.state DESC
-                LIMIT 1
-            ) pp ON TRUE
-            JOIN value_state_type vst ON vst.id = c.state_type
-            JOIN exploitation e ON e.expl_id = c.expl_id
-            WHERE COALESCE(pp.state, c.state) = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE;
-
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
-            SELECT
-                l.link_id,
-                COALESCE(pp.arc_id, c.arc_id) AS arc_id,
-                l.feature_id,
-                l.feature_type,
-                l.expl_id
-            FROM link l
-            JOIN connec c ON l.feature_id = c.connec_id
-            LEFT JOIN LATERAL (
-                SELECT pp1.connec_id, pp1.psector_id
-                FROM plan_psector_x_connec pp1
-                WHERE pp1.connec_id = l.feature_id
-                AND pp1.psector_id IN (
-                    SELECT sp.psector_id
-                    FROM selector_psector sp
-                    WHERE sp.cur_user = CURRENT_USER
-                )
-                ORDER BY pp1.psector_id DESC
-                LIMIT 1
-            ) last_ps ON true
-            LEFT JOIN LATERAL ( 
-                SELECT pp2.state, pp2.arc_id
-                FROM plan_psector_x_connec pp2
-                WHERE pp2.link_id = l.link_id 
-                AND pp2.psector_id = last_ps.psector_id
-                LIMIT 1
-            ) pp ON TRUE
-            JOIN value_state_type vst ON vst.id = l.state_type
-            JOIN exploitation e ON e.expl_id = l.expl_id
-            WHERE COALESCE(pp.state, l.state) = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE
-            AND l.feature_type = 'CONNEC';
-
-            IF v_project_type = 'UD' THEN
-
-                CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
-                SELECT 
-                    g.gully_id,
-                    COALESCE(pp.arc_id, g.arc_id) AS arc_id,
-                    g.expl_id
-                FROM gully g
-                LEFT JOIN LATERAL ( 
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
+                SELECT
+                    c.connec_id,
+                    COALESCE(pp.arc_id, c.arc_id) AS arc_id,
+                    c.customer_code,
+                    c.expl_id,
+                    l.$I,
+                    c.the_geom
+                FROM connec c
+                LEFT JOIN LATERAL (
                     SELECT pp_1.state, pp_1.arc_id
-                    FROM plan_psector_x_gully pp_1
-                    WHERE pp_1.gully_id = g.gully_id 
-                    AND pp_1.psector_id IN ( 
+                    FROM plan_psector_x_connec pp_1
+                    WHERE pp_1.connec_id = c.connec_id
+                    AND pp_1.psector_id IN (
                         SELECT sp.psector_id
                         FROM selector_psector sp
                         WHERE sp.cur_user = CURRENT_USER
@@ -430,19 +407,92 @@ BEGIN
                     ORDER BY pp_1.psector_id DESC, pp_1.state DESC
                     LIMIT 1
                 ) pp ON TRUE
-                JOIN value_state_type vst ON vst.id = g.state_type
-                JOIN exploitation e ON e.expl_id = g.expl_id
-                WHERE COALESCE(pp.state, g.state) = 1 
+                JOIN value_state_type vst ON vst.id = c.state_type
+                JOIN exploitation e ON e.expl_id = c.expl_id
+                WHERE COALESCE(pp.state, c.state) = 1
                 AND vst.is_operative = TRUE
                 AND e.active = TRUE;
+            $sql$, v_mapzone_field);
 
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
+                SELECT
+                    l.link_id,
+                    COALESCE(pp.arc_id, c.arc_id) AS arc_id,
+                    l.feature_id,
+                    l.feature_type,
+                    l.expl_id,
+                    l.$I,
+                    l.the_geom
+                FROM link l
+                JOIN connec c ON l.feature_id = c.connec_id
+                LEFT JOIN LATERAL (
+                    SELECT pp1.connec_id, pp1.psector_id
+                    FROM plan_psector_x_connec pp1
+                    WHERE pp1.connec_id = l.feature_id
+                    AND pp1.psector_id IN (
+                        SELECT sp.psector_id
+                        FROM selector_psector sp
+                        WHERE sp.cur_user = CURRENT_USER
+                    )
+                    ORDER BY pp1.psector_id DESC
+                    LIMIT 1
+                ) last_ps ON TRUE
+                LEFT JOIN LATERAL (
+                    SELECT pp2.state, pp2.arc_id
+                    FROM plan_psector_x_connec pp2
+                    WHERE pp2.link_id = l.link_id
+                    AND pp2.psector_id = last_ps.psector_id
+                    LIMIT 1
+                ) pp ON TRUE
+                JOIN value_state_type vst ON vst.id = l.state_type
+                JOIN exploitation e ON e.expl_id = l.expl_id
+                WHERE COALESCE(pp.state, l.state) = 1
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE
+                AND l.feature_type = 'CONNEC';
+            $sql$, v_mapzone_field);
+
+            IF v_project_type = 'UD' THEN
+
+                EXECUTE format($sql$
+                    CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
+                    SELECT
+                        g.gully_id,
+                        COALESCE(pp.arc_id, g.arc_id) AS arc_id,
+                        g.expl_id,
+                        g.%I,
+                        g.the_geom
+                    FROM gully g
+                    LEFT JOIN LATERAL (
+                        SELECT pp_1.state, pp_1.arc_id
+                        FROM plan_psector_x_gully pp_1
+                        WHERE pp_1.gully_id = g.gully_id
+                        AND pp_1.psector_id IN (
+                            SELECT sp.psector_id
+                            FROM selector_psector sp
+                            WHERE sp.cur_user = CURRENT_USER
+                        )
+                        ORDER BY pp_1.psector_id DESC, pp_1.state DESC
+                        LIMIT 1
+                    ) pp ON TRUE
+                    JOIN value_state_type vst ON vst.id = g.state_type
+                    JOIN exploitation e ON e.expl_id = g.expl_id
+                    WHERE COALESCE(pp.state, g.state) = 1
+                    AND vst.is_operative = TRUE
+                    AND e.active = TRUE;
+                $sql$, v_mapzone_field);
+
+            EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
                 SELECT
                     l.link_id,
                     COALESCE(pp.arc_id, g.arc_id) AS arc_id,
                     l.feature_id,
                     l.feature_type,
-                    l.expl_id
+                    l.expl_id,
+                    l.%I,
+                    l.the_geom
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
                 LEFT JOIN LATERAL (
@@ -456,114 +506,139 @@ BEGIN
                     )
                     ORDER BY pp1.psector_id DESC
                     LIMIT 1
-                ) last_ps ON true
-                LEFT JOIN LATERAL ( 
+                ) last_ps ON TRUE
+                LEFT JOIN LATERAL (
                     SELECT pp2.state, pp2.arc_id
                     FROM plan_psector_x_gully pp2
-                    WHERE pp2.link_id = l.link_id 
+                    WHERE pp2.link_id = l.link_id
                     AND pp2.psector_id = last_ps.psector_id
                     LIMIT 1
                 ) pp ON TRUE
                 JOIN value_state_type vst ON vst.id = l.state_type
                 JOIN exploitation e ON e.expl_id = l.expl_id
-                WHERE COALESCE(pp.state, l.state) = 1 
+                WHERE COALESCE(pp.state, l.state) = 1
                 AND vst.is_operative = TRUE
                 AND e.active = TRUE
                 AND l.feature_type = 'GULLY';
+            $sql$, v_mapzone_field);
 
             END IF;
 
         ELSE
             -- without psectors
 
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
-            SELECT
-                a.arc_id,
-                a.node_1,
-                a.node_2,
-                a.expl_id,
-                a.the_geom
-            FROM arc a
-            JOIN value_state_type vst ON vst.id = a.state_type
-            JOIN exploitation e ON e.expl_id = a.expl_id
-            WHERE a.state = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE
-            AND node_1 IS NOT NULL AND node_2 IS NOT NULL;
-
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
-            SELECT
-                n.node_id,
-                cf.graph_delimiter,
-                n.expl_id,
-                n.the_geom
-            FROM node n
-            JOIN value_state_type vst ON vst.id = n.state_type
-            JOIN exploitation e ON e.expl_id = n.expl_id
-            JOIN cat_node cn ON cn.id = n.nodecat_id
-            JOIN cat_feature_node cf ON cf.id = cn.node_type
-            WHERE n.state = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE;
-
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
-            SELECT
-                c.connec_id,
-                c.arc_id,
-                c.customer_code,
-                c.expl_id
-            FROM connec c
-            JOIN value_state_type vst ON vst.id = c.state_type
-            JOIN exploitation e ON e.expl_id = c.expl_id
-            WHERE c.state = 1 
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE;
-
-            CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
-            SELECT
-                l.link_id,
-                c.arc_id,
-                l.feature_id,
-                l.feature_type,
-                l.expl_id
-            FROM link l
-            JOIN connec c ON l.feature_id = c.connec_id
-            JOIN value_state_type vst ON vst.id = l.state_type
-            JOIN exploitation e ON e.expl_id = l.expl_id
-            WHERE l.state = 1
-            AND vst.is_operative = TRUE
-            AND e.active = TRUE
-            AND l.feature_type = 'CONNEC';
-
-            IF v_project_type = 'UD' THEN
-
-                CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_arc AS
                 SELECT
-                    g.gully_id,
-                    g.arc_id,
-                    g.expl_id
-                FROM gully g
-                JOIN value_state_type vst ON vst.id = g.state_type
-                JOIN exploitation e ON e.expl_id = g.expl_id
-                WHERE g.state = 1 
+                    a.arc_id,
+                    a.node_1,
+                    a.node_2,
+                    a.expl_id,
+                    a.%I,
+                    a.the_geom
+                FROM arc a
+                JOIN value_state_type vst ON vst.id = a.state_type
+                JOIN exploitation e ON e.expl_id = a.expl_id
+                WHERE a.state = 1
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE
+                AND a.node_1 IS NOT NULL
+                AND a.node_2 IS NOT NULL;
+            $sql$, v_mapzone_field);
+
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
+                SELECT
+                    n.node_id,
+                    cn.node_type,
+                    cf.graph_delimiter,
+                    n.expl_id,
+                    n.%I,
+                    n.the_geom
+                FROM node n
+                JOIN value_state_type vst ON vst.id = n.state_type
+                JOIN exploitation e ON e.expl_id = n.expl_id
+                JOIN cat_node cn ON cn.id = n.nodecat_id
+                JOIN cat_feature_node cf ON cf.id = cn.node_type
+                WHERE n.state = 1
                 AND vst.is_operative = TRUE
                 AND e.active = TRUE;
+            $sql$, v_mapzone_field);
 
-                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
+                SELECT
+                    c.connec_id,
+                    c.arc_id,
+                    c.customer_code,
+                    c.expl_id,
+                    c.%I,
+                    c.the_geom
+                FROM connec c
+                JOIN value_state_type vst ON vst.id = c.state_type
+                JOIN exploitation e ON e.expl_id = c.expl_id
+                WHERE c.state = 1
+                AND vst.is_operative = TRUE
+                AND e.active = TRUE;
+            $sql$, v_mapzone_field);
+
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
                     l.link_id,
-                    g.arc_id,
+                    c.arc_id,
                     l.feature_id,
                     l.feature_type,
-                    l.expl_id
+                    l.expl_id,
+                    l.%I,
+                    l.the_geom
                 FROM link l
-                JOIN gully g ON l.feature_id = g.gully_id
+                JOIN connec c ON l.feature_id = c.connec_id
                 JOIN value_state_type vst ON vst.id = l.state_type
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE l.state = 1
                 AND vst.is_operative = TRUE
                 AND e.active = TRUE
-                AND l.feature_type = 'GULLY';
+                AND l.feature_type = 'CONNEC';
+            $sql$, v_mapzone_field);
+
+            IF v_project_type = 'UD' THEN
+
+                EXECUTE format($sql$
+                    CREATE OR REPLACE TEMPORARY VIEW v_temp_gully AS
+                    SELECT
+                        g.gully_id,
+                        g.arc_id,
+                        g.expl_id,
+                        g.%I,
+                        g.the_geom
+                    FROM gully g
+                    JOIN value_state_type vst ON vst.id = g.state_type
+                    JOIN exploitation e ON e.expl_id = g.expl_id
+                    WHERE g.state = 1
+                    AND vst.is_operative = TRUE
+                    AND e.active = TRUE;
+                $sql$, v_mapzone_field);
+
+                EXECUTE format($sql$
+                    CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
+                    SELECT
+                        l.link_id,
+                        g.arc_id,
+                        l.feature_id,
+                        l.feature_type,
+                        l.expl_id,
+                        l.%I,
+                        l.the_geom
+                    FROM link l
+                    JOIN gully g ON l.feature_id = g.gully_id
+                    JOIN value_state_type vst ON vst.id = l.state_type
+                    JOIN exploitation e ON e.expl_id = l.expl_id
+                    WHERE l.state = 1
+                    AND vst.is_operative = TRUE
+                    AND e.active = TRUE
+                    AND l.feature_type = 'GULLY';
+                $sql$, v_mapzone_field);
 
             END IF;
 

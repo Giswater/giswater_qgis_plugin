@@ -302,7 +302,7 @@ BEGIN
 	END IF;
 
 	IF v_mode = 'MINSECTOR' THEN
-		v_node := (SELECT minsector_id FROM arc WHERE arc_id = v_arc_id);
+		v_node := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
 		IF v_node IS NULL OR v_node = 0 THEN
 			RETURN jsonb_build_object(
@@ -855,7 +855,7 @@ BEGIN
 			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
 				SELECT 1
-				FROM arc a
+				FROM v_temp_arc a
 			  	LEFT JOIN sector_water s1 ON a.node_1 = s1.node_id
 			  	LEFT JOIN sector_water s2 ON a.node_2 = s2.node_id
 			  	WHERE t.pgr_node_id = a.minsector_id
@@ -1281,15 +1281,14 @@ BEGIN
 			INSERT INTO om_mincut_arc (result_id, arc_id, the_geom)
 			SELECT v_mincut_id, a.arc_id, a.the_geom
 			FROM temp_pgr_node_minsector m
-			JOIN arc a ON a.minsector_id = m.pgr_node_id
+			JOIN v_temp_arc a ON a.minsector_id = m.pgr_node_id
 			WHERE m.mapzone_id <> 0;
 
 			-- insert nodes
 			INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
-			SELECT v_mincut_id, n.node_id, n.the_geom, cn.node_type
+			SELECT v_mincut_id, n.node_id, n.the_geom, n.node_type
 			FROM temp_pgr_node_minsector m
-			JOIN node n ON n.minsector_id = m.pgr_node_id
-			JOIN cat_node cn ON n.nodecat_id = cn.id
+			JOIN v_temp_node n ON n.minsector_id = m.pgr_node_id
 			WHERE m.mapzone_id <> 0;
 
 		ELSE
@@ -1438,7 +1437,8 @@ BEGIN
 
 		-- insert hydrometer from node
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT v_mincut_id, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
+		SELECT v_mincut_id, rhxn.hydrometer_id 
+		FROM rtc_hydrometer_x_node rhxn
 		JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id
 		JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.hydrometer_id
 		WHERE result_id = v_mincut_id
@@ -1697,7 +1697,7 @@ BEGIN
 						AND NOT EXISTS (
 							SELECT 1
 							FROM om_mincut_arc oma
-							JOIN arc a ON oma.arc_id = a.arc_id
+							JOIN v_temp_arc a ON oma.arc_id = a.arc_id
 							WHERE (oma.result_id = %L OR oma.result_id = ANY(%L))
 								AND a.minsector_id = tpn.pgr_node_id
 						);
@@ -1728,7 +1728,7 @@ BEGIN
 							AND (
 								NOT EXISTS (
 									SELECT 1
-									FROM arc a
+									FROM v_temp_arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
 									WHERE oma.result_id = %L
 									AND a.minsector_id = tpa.pgr_node_1
@@ -1736,7 +1736,7 @@ BEGIN
 								OR
 								NOT EXISTS (
 									SELECT 1
-									FROM arc a
+									FROM v_temp_arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
 									WHERE oma.result_id = %L
 									AND a.minsector_id = tpa.pgr_node_2
@@ -1789,7 +1789,7 @@ BEGIN
 								INSERT INTO om_mincut_arc (result_id, arc_id, the_geom) 
 								SELECT %L, a.arc_id, a.the_geom
 								FROM temp_pgr_node_minsector tpn
-								JOIN arc a ON a.minsector_id = tpn.pgr_node_id
+								JOIN v_temp_arc a ON a.minsector_id = tpn.pgr_node_id
 								WHERE tpn.mapzone_id <> 0
 								AND EXISTS (
 									SELECT 1 
@@ -1799,7 +1799,7 @@ BEGIN
 								)
 								AND NOT EXISTS (
 									SELECT 1
-									FROM arc a
+									FROM v_temp_arc a
 									JOIN om_mincut_arc oma ON oma.arc_id = a.arc_id
 									WHERE oma.result_id = %L 
 									AND a.minsector_id = tpn.pgr_node_id
@@ -1809,10 +1809,9 @@ BEGIN
 							-- insert nodes
 							EXECUTE format('
 								INSERT INTO om_mincut_node (result_id, node_id, node_type, the_geom) 
-								SELECT %L, n.node_id, cn.node_type, n.the_geom
+								SELECT %L, n.node_id, n.node_type, n.the_geom
 								FROM temp_pgr_node_minsector tpn
-								JOIN node n ON n.minsector_id = tpn.pgr_node_id
-								JOIN cat_node cn ON n.nodecat_id = cn.id
+								JOIN v_temp_node n ON n.minsector_id = tpn.pgr_node_id
 								WHERE tpn.mapzone_id <> 0
 								AND EXISTS (
 									SELECT 1 
@@ -1822,7 +1821,7 @@ BEGIN
 								)
 								AND NOT EXISTS (
 									SELECT 1 
-									FROM node n
+									FROM v_temp_node n
 									JOIN om_mincut_node omn ON omn.node_id = n.node_id
 									WHERE omn.result_id = %L 
 									AND n.minsector_id = tpn.pgr_node_id
