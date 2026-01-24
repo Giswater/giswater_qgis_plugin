@@ -248,7 +248,7 @@ BEGIN
         directed => FALSE
     );
 
-    -- update cost_mincut = -1 for graph_delimiter = SECTOR, MINSECTOR
+    -- Propagate original node_id for valves (MINSECTOR) and water facilities (SECTOR) to the linegraph and tag them in graph_delimiter
     --checking node_1 for arc_1
     UPDATE temp_pgr_arc_linegraph t
     SET pgr_node_id = n.pgr_node_id,
@@ -274,30 +274,6 @@ BEGIN
     WHERE n.graph_delimiter <> 'NONE'
     AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
     AND ta.pgr_arc_id = t.pgr_arc_id;
-
-    -- update aditional fields for valves (MINSECTOR)
-    UPDATE temp_pgr_arc_linegraph t
-    SET 
-        closed = m.closed,
-        broken = m.broken,
-        to_arc = m.to_arc
-    FROM man_valve m
-    WHERE t.graph_delimiter = 'MINSECTOR'
-    AND t.pgr_node_id = m.node_id; 
-
-    -- closed valves
-    UPDATE temp_pgr_arc_linegraph t 
-    SET cost = -1, reverse_cost = -1
-    WHERE t.graph_delimiter = 'MINSECTOR'
-    AND t.closed = TRUE;
-
-    -- check valves
-    UPDATE temp_pgr_arc_linegraph t 
-    SET cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
-		reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
-    WHERE t.graph_delimiter = 'MINSECTOR'
-    AND t.closed = FALSE 
-    AND t.to_arc IS NOT NULL;
 
     -- Generate the minsectors
     v_query_text :=
@@ -338,13 +314,11 @@ BEGIN
     WHERE t.pgr_arc_id = a.pgr_arc_id;
 
     -- fill temp_pgr_minsector_graph
-    INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2, cost, reverse_cost)
+    INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
     SELECT
         l.pgr_node_id AS node_id,
         a1.mapzone_id AS minsector_1,
-        a2.mapzone_id AS minsector_2,
-        l.cost,
-        l.reverse_cost
+        a2.mapzone_id AS minsector_2
     FROM temp_pgr_arc_linegraph l
     JOIN temp_pgr_arc a1 ON l.pgr_node_1 = a1.pgr_arc_id
     JOIN temp_pgr_arc a2 ON l.pgr_node_2 = a2.pgr_arc_id
@@ -352,10 +326,9 @@ BEGIN
     AND a1.mapzone_id <> a2.mapzone_id;
 
     UPDATE temp_pgr_minsector_graph t
-    SET feature_class = cf.feature_class
+    SET feature_class = cn.id
     FROM node n 
-    JOIN cat_node cn ON n.nodecat_id = cn.id 
-    JOIN cat_feature cf ON cn.node_type  = cf.id
+    JOIN cat_node cn ON n.nodecat_id = cn.id
     WHERE t.node_id = n.node_id;
 
     -- fill temp_pgr_minsector
@@ -638,8 +611,8 @@ BEGIN
         );
 
         -- fill minsector_graph
-        INSERT INTO minsector_graph (node_id, feature_class, minsector_1, minsector_2, cost, reverse_cost)
-        SELECT node_id, feature_class, minsector_1, minsector_2, cost, reverse_cost 
+        INSERT INTO minsector_graph (node_id, feature_class, minsector_1, minsector_2)
+        SELECT node_id, feature_class, minsector_1, minsector_2
         FROM temp_pgr_minsector_graph;
 
         -- update minsector
@@ -738,47 +711,58 @@ BEGIN
 
         -- insert the valves as arcs;
         -- the table that is used: temp_pgr_arc_linegraph where pgr_node_id is the valve and pgr_node_1/pgr_node_2 are the connected minsectors
-        INSERT INTO temp_pgr_arc_linegraph (pgr_node_id, pgr_node_1, pgr_node_2, graph_delimiter, cost, reverse_cost, cost_mincut, reverse_cost_mincut, closed, broken, to_arc)
-        SELECT t.node_id, t.minsector_1, t.minsector_2, 'MINSECTOR', 1, 1, -1, -1, m.closed, m.broken, m.to_arc
-        FROM temp_pgr_minsector_graph t
-        JOIN man_valve m ON t.node_id = m.node_id;
+        INSERT INTO temp_pgr_arc_linegraph (pgr_node_id, pgr_node_1, pgr_node_2, graph_delimiter, cost, reverse_cost, cost_mincut, reverse_cost_mincut)
+        SELECT t.node_id, t.minsector_1, t.minsector_2, 'MINSECTOR', 1, 1, -1, -1
+        FROM temp_pgr_minsector_graph t;
 
-        -- UPDATE cost/reverse_cost
-        -- close valves
+        -- update aditional fields for valves (MINSECTOR)
         UPDATE temp_pgr_arc_linegraph t
+        SET 
+            closed = m.closed,
+            broken = m.broken,
+            to_arc = m.to_arc
+        FROM man_valve m
+        WHERE t.graph_delimiter = 'MINSECTOR'
+        AND t.pgr_node_id = m.node_id; 
+
+        -- closed valves
+        UPDATE temp_pgr_arc_linegraph t 
         SET cost = -1, reverse_cost = -1
-        WHERE t.closed = TRUE;
+        WHERE t.graph_delimiter = 'MINSECTOR'
+        AND t.closed = TRUE;
 
-        -- operative checkvalves
-        UPDATE temp_pgr_arc_linegraph t
-        SET cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc = a.pgr_arc_id  AND t.pgr_node_2 = a.mapzone_id) THEN 1 ELSE -1 END,
-            reverse_cost = CASE WHEN EXISTS (SELECT 1 FROM temp_pgr_arc a WHERE t.to_arc = a.pgr_arc_id AND t.pgr_node_2 = a.mapzone_id) THEN -1 ELSE 1 END
-        WHERE t.closed = FALSE 
-        AND t.broken = FALSE
+        -- check valves
+        UPDATE temp_pgr_arc_linegraph t 
+        SET cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
+            reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
+        WHERE t.graph_delimiter = 'MINSECTOR'
+        AND t.closed = FALSE 
         AND t.to_arc IS NOT NULL;
 
-        -- UPDATE cost_mincut/reverse_cost_mincut
-        -- ignore_broken_valves 
+        -- v_ignore_broken_valves
         IF v_ignore_broken_valves THEN
+            -- update cost/reverse for the broken open checkvalves (behave as open valves)
             UPDATE temp_pgr_arc_linegraph t
-            SET cost_mincut = 0, reverse_cost_mincut = 0
+            SET cost = 1, reverse_cost = 1
+            WHERE cost <> reverse_cost
+            AND t.broken = TRUE;
+
+            -- update cost_mincut/reverse_cost_mincut (open broken valves cannot be manipulated)
+            UPDATE temp_pgr_arc_linegraph t
+            SET cost_mincut = 1, reverse_cost_mincut = 1
             WHERE t.closed = FALSE
             AND t.broken = TRUE;
         END IF;
 
-        -- operative checkvalves
-        IF v_ignore_check_valves THEN
+        -- update cost_mincut/reverse_cost_mincut (depending of ignore check_valves)
+		IF v_ignore_check_valves THEN
             UPDATE temp_pgr_arc_linegraph t
-            SET cost_mincut = 0, reverse_cost_mincut = 0
-            WHERE t.closed = FALSE
-            AND t.broken = FALSE
-            AND t.to_arc IS NOT NULL;
+            SET cost_mincut = 1, reverse_cost_mincut = 1
+            WHERE cost <> reverse_cost;
         ELSE
             UPDATE temp_pgr_arc_linegraph t
             SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
-            WHERE t.closed = FALSE
-            AND t.broken = FALSE
-            AND t.to_arc IS NOT NULL;
+            WHERE cost <> reverse_cost;
         END IF;
 
         -- the unaccess valves
