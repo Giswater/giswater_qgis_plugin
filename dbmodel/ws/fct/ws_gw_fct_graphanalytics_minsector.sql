@@ -672,27 +672,21 @@ BEGIN
 
         -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SECTOR (graph_delimiter as 'SECTOR')
         -- TANK, SOURCE, WATERWELL, WTP
-        WITH 
-            sector_water AS ( 
-                SELECT m.node_id, m.inlet_arc
-                FROM man_tank m
-                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
-                WHERE 'SECTOR' = n.graph_delimiter
-                UNION ALL  
-                SELECT m.node_id, m.inlet_arc
-                FROM man_source m
-                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
-                WHERE 'SECTOR' = n.graph_delimiter
+        WITH
+            water AS (
+                SELECT node_id, inlet_arc FROM man_tank
                 UNION ALL
-                SELECT m.node_id, m.inlet_arc
-                FROM man_waterwell m
-                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
-                WHERE 'SECTOR' = n.graph_delimiter 
+                SELECT node_id, inlet_arc FROM man_source
                 UNION ALL
-                SELECT m.node_id, m.inlet_arc
-                FROM man_wtp m
-                JOIN temp_pgr_node n ON n.pgr_node_id = m.node_id
-                WHERE 'SECTOR' = n.graph_delimiter
+                SELECT node_id, inlet_arc FROM man_waterwell
+                UNION ALL
+                SELECT node_id, inlet_arc FROM man_wtp
+            ),
+            sector_water AS (
+                SELECT w.node_id, w.inlet_arc
+                FROM water w
+                JOIN v_temp_node n USING (node_id)
+                WHERE 'SECTOR' = ANY (n.graph_delimiter)
             )
         UPDATE temp_pgr_node_minsector t
         SET graph_delimiter = 'SECTOR'
