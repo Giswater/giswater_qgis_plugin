@@ -326,7 +326,7 @@ BEGIN
     AND a1.mapzone_id <> a2.mapzone_id;
 
     UPDATE temp_pgr_minsector_graph t
-    SET feature_class = cn.id
+    SET feature_class = cn.node_type
     FROM node n 
     JOIN cat_node cn ON n.nodecat_id = cn.id
     WHERE t.node_id = n.node_id;

@@ -195,9 +195,9 @@ BEGIN
 				end_vid int4 NOT NULL,
 				mapzone_id int4 NOT NULL,
 				node_1 int4 NOT NULL,
-				feature_class_1 varchar(30) NULL,
+				node_type_1 varchar(30) NULL,
 				node_2 int4 NOT NULL,
-				feature_class_2 varchar(30) NULL,
+				node_type_2 varchar(30) NULL,
 				the_geom geometry(MultiLineString, SRID_VALUE),
 				CONSTRAINT temp_pgr_mapzone_graph_pkey PRIMARY KEY (id)
 			);

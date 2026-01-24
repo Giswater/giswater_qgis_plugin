@@ -1424,19 +1424,17 @@ BEGIN
 			WHERE a.node_parent IS NOT NULL
 			ORDER BY a.node_parent, i.end_node,  agg_cost;
 			
-			-- update feature_class
+			-- update node_type
 			UPDATE temp_pgr_mapzone_graph t
-			SET feature_class_1 = cf.feature_class  
+			SET node_type_1 = cn.node_type  
 			FROM node n 
 			JOIN cat_node cn ON n.nodecat_id = cn.id 
-			JOIN cat_feature cf ON cn.node_type  = cf.id
 			WHERE t.node_1 = n.node_id;
 
 			UPDATE temp_pgr_mapzone_graph t
-			SET feature_class_2 = cf.feature_class  
+			SET node_type_2 = cn.node_type  
 			FROM node n 
 			JOIN cat_node cn ON n.nodecat_id = cn.id 
-			JOIN cat_feature cf ON cn.node_type  = cf.id
 			WHERE t.node_2 = n.node_id;
 
 			-- update the_geom
@@ -2664,7 +2662,7 @@ BEGIN
 				'properties', to_jsonb(r) - 'the_geom'
 				) AS feature
 				FROM (
-				SELECT tg.id, tg.node_1, tg.feature_class_1, tg.node_2, tg.feature_class_2,
+				SELECT tg.id, tg.node_1, tg.node_type_1, tg.node_2, tg.node_type_2,
 					tg.mapzone_id AS %I,
 					tg.the_geom,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS descript
