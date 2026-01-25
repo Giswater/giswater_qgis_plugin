@@ -330,7 +330,7 @@ BEGIN
                     a.node_1,
                     a.node_2,
                     a.expl_id,
-                    l.$I,
+                    a.%I,
                     a.the_geom
                 FROM arc a
                 LEFT JOIN LATERAL (
@@ -361,7 +361,7 @@ BEGIN
                     cn.node_type,
                     cf.graph_delimiter,
                     n.expl_id,
-                    l.$I,
+                    n.%I,
                     n.the_geom
                 FROM node n
                 LEFT JOIN LATERAL (
@@ -392,7 +392,7 @@ BEGIN
                     COALESCE(pp.arc_id, c.arc_id) AS arc_id,
                     c.customer_code,
                     c.expl_id,
-                    l.$I,
+                    c.%I,
                     c.the_geom
                 FROM connec c
                 LEFT JOIN LATERAL (
@@ -422,7 +422,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
-                    l.$I,
+                    l.%I,
                     l.the_geom
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
