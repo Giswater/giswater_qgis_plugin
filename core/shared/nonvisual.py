@@ -2237,10 +2237,13 @@ class GwNonVisual:
         self.dialog.txt_id.setMaxLength(16)
 
         # Populate combobox
-        self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
+        sql = f"SELECT * FROM ve_inp_timeseries WHERE id = '{timser_id}'"
+        row = tools_db.get_row(sql)
+
+        self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type, row)
 
         if timser_id is not None:
-            self._populate_timeser_widgets(timser_id, duplicate=duplicate)
+            self._populate_timeser_widgets(timser_id, duplicate=duplicate, row=row)
         else:
             self._load_timeseries_widgets(self.dialog)
 
@@ -2288,23 +2291,23 @@ class GwNonVisual:
                     col_pos += 1
                 tbl_timeseries_value.setItem(row_pos, col_pos, item)
 
-    def _populate_timeser_combos(self, cmb_expl_id, cmb_times_type, cmb_timeser_type):
+    def _populate_timeser_combos(self, cmb_expl_id, cmb_times_type, cmb_timeser_type, row=None):
         """ Populates timeseries dialog combos """
 
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_timeser_type, rows)
+            tools_qt.fill_combo_values(cmb_timeser_type, rows, selected_id=row.get('timser_type', None), index_to_compare=0)
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_timeseries'"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_times_type, rows)
+            tools_qt.fill_combo_values(cmb_times_type, rows, selected_id=row.get('times_type', None), index_to_compare=0)
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True, selected_id=row.get('expl_id', None), index_to_compare=0)
 
-    def _populate_timeser_widgets(self, timser_id, duplicate=False):
+    def _populate_timeser_widgets(self, timser_id, duplicate=False, row=None):
         """ Fills in all the values for timeseries dialog """
 
         # Variables
@@ -2316,16 +2319,11 @@ class GwNonVisual:
 
         txt_id = self.dialog.txt_id
         chk_active = self.dialog.chk_active
-        cmb_timeser_type = self.dialog.cmb_timeser_type
-        cmb_times_type = self.dialog.cmb_times_type
         txt_descript = self.dialog.txt_descript
-        cmb_expl_id = self.dialog.cmb_expl_id
         txt_fname = self.dialog.txt_fname
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
         txt_addparam = self.dialog.txt_addparam
 
-        sql = f"SELECT * FROM ve_inp_timeseries WHERE id = '{timser_id}'"
-        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -2334,10 +2332,7 @@ class GwNonVisual:
             tools_qt.set_widget_text(self.dialog, txt_id, timser_id)
             tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, chk_active, row['active'])
-        tools_qt.set_widget_text(self.dialog, cmb_timeser_type, row['timser_type'])
-        tools_qt.set_widget_text(self.dialog, cmb_times_type, row['times_type'])
         tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
-        tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, txt_fname, row['fname'])
         tools_qt.set_widget_text(self.dialog, txt_addparam, addparam)
 
