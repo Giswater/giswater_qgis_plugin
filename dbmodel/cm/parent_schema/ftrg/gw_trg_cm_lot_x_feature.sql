@@ -39,7 +39,7 @@ BEGIN
             SELECT rolname INTO v_user_role_name 
             FROM pg_user u JOIN pg_auth_members m ON (m.member = u.usesysid) 
             JOIN pg_roles r ON (r.oid = m.roleid)
-            WHERE u.usename = current_user and rolname ilike '%cm%';
+            WHERE u.usename = current_user and rolname = 'role_cm_field';
 
             -- Only proceed if the user's role is 'role_cm_field'
             IF v_user_role_name = v_field_role_name THEN
