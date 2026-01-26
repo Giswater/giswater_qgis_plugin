@@ -30,7 +30,7 @@ SELECT col_is_pk('minsector_graph', ARRAY['node_id'], 'Columns node_id should be
 
 -- Check column types
 SELECT col_type_is('minsector_graph', 'node_id', 'integer', 'Column node_id should be integer');
-SELECT col_type_is('minsector_graph', 'node_type', 'integer', 'Column node_type should be integer');
+SELECT col_type_is('minsector_graph', 'node_type', 'character varying(30)', 'Column node_type should be character varying(30)');
 SELECT col_type_is('minsector_graph', 'minsector_1', 'integer', 'Column minsector_1 should be integer');
 SELECT col_type_is('minsector_graph', 'minsector_2', 'integer', 'Column minsector_2 should be integer');
 
