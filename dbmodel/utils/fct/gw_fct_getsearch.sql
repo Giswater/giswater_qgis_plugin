@@ -176,7 +176,18 @@ BEGIN
 					end if;
 				end if;
 
-				v_sys_query_text := concat(v_sys_query_text, ' ORDER BY regexp_replace(', (v_tab_params->>'sys_display_name')::text, ',''[^0-9a-zA-Z]+'','''',''g'')');
+				v_sys_query_text := concat(
+				    v_sys_query_text,
+				    ' ORDER BY (CASE WHEN ',
+				    (v_tab_params->>'sys_pk')::text, '::text = ''', v_filter::text, ''' THEN 0 ',
+				    'WHEN ', (v_tab_params->>'sys_display_name')::text,
+				    ' ~* ''\m', v_filter::text, '\M'' THEN 1 ',
+				    'WHEN ', (v_tab_params->>'sys_display_name')::text,
+				    ' ILIKE ''', v_filter::text, '%'' THEN 2 ',
+				    'ELSE 3 END), ',
+				    'regexp_replace(', (v_tab_params->>'sys_display_name')::text,
+				    ',''[^0-9a-zA-Z]+'','''',''g'')'
+				);
 
 				v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sys_query_text::text, ' ');
 
