@@ -65,11 +65,9 @@ ALTER TABLE cat_element DROP CONSTRAINT IF EXISTS cat_element_fkey_element_type;
 ALTER TABLE cat_element ADD CONSTRAINT cat_element_fkey_element_type FOREIGN KEY (element_type) REFERENCES cat_feature_element(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- 22/01/2026
-ALTER TABLE minsector_graph RENAME COLUMN nodecat_id TO feature_class;
-ALTER TABLE minsector_graph ADD "cost" float4 DEFAULT 1 NOT NULL;
-ALTER TABLE minsector_graph ADD reverse_cost float4 DEFAULT 1 NOT NULL;
+ALTER TABLE minsector_graph RENAME COLUMN nodecat_id TO node_type;
 ALTER TABLE minsector_graph DROP CONSTRAINT minsector_graph_pkey;
-ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_pk PRIMARY KEY (node_id,minsector_1,minsector_2);
+ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_pk PRIMARY KEY (node_id, minsector_1, minsector_2);
 
 CREATE TABLE presszone_graph (
 	node_1 int4 NOT NULL,

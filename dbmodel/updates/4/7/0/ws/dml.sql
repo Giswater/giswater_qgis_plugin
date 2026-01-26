@@ -183,3 +183,8 @@ UPDATE config_toolbox
   }
 ]'::json
 	WHERE id=3110;
+
+-- 26/01/2026
+UPDATE config_param_system
+SET value='true'
+WHERE "parameter"='ignoreBrokenOnlyMassiveMincut';
