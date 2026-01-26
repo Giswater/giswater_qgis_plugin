@@ -125,8 +125,6 @@ jobs:
         run: |
           /usr/lib/postgresql/${{ matrix.pg_version }}/bin/pg_dump \
             -h localhost -p ${{ env.PORT }} -U postgres -Fc -f gw_ws.dump gw_db
-          /usr/lib/postgresql/${{ matrix.pg_version }}/bin/pg_dumpall \
-            -h localhost -p ${{ env.PORT }} -U postgres --globals-only -f gw_ws.globals.sql
 
       - name: Log in to GHCR
         if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
@@ -146,7 +144,6 @@ jobs:
           tags: ghcr.io/giswater/gw-db:${{ env.IMAGE_TAG }}-pg${{ matrix.pg_version }}-ws
           build-args: |
             GW_DUMP=gw_ws.dump
-            GW_GLOBALS=gw_ws.globals.sql
             PG_MAJOR=${{ matrix.pg_version }}
 
       - name: Run all SQL tests in sequence

@@ -9,6 +9,5 @@ RUN apt-get update \
        postgresql-${PG_MAJOR}-pgrouting \
        postgresql-${PG_MAJOR}-pgtap \
     && rm -rf /var/lib/apt/lists/*
-COPY ${GW_GLOBALS} /docker-entrypoint-initdb.d/00-gw_globals.sql
 COPY ${GW_DUMP} /docker-entrypoint-initdb.d/10-gw_ws.dump
 COPY docker/gw-db/restore.sh /docker-entrypoint-initdb.d/20-restore.sh
