@@ -153,9 +153,23 @@ BEGIN
 
         IF v_count = 0 THEN
 
+            UPDATE temp_pgr_arc_linegraph a
+            SET proposed = TRUE
+            WHERE a.mapzone_id = 1
+            AND a.cost >= 0
+            AND a.reverse_cost >= 0
+            AND EXISTS (
+                SELECT 1 
+                FROM temp_pgr_node_minsector n 
+                WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+                AND n.graph_delimiter = 'SECTOR'
+                AND n.pgr_node_id = ANY (v_root_vids)
+            );
+
             UPDATE temp_pgr_node_minsector m
             SET mapzone_id = 1
-            WHERE m.pgr_node_id = ANY (v_root_vids);
+            WHERE m.graph_delimiter <> 'SECTOR'
+            AND m.pgr_node_id = ANY (v_root_vids);
         
         ELSE 
             v_query_text = '
