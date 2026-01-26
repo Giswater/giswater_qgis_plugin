@@ -525,13 +525,13 @@ BEGIN
 
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
-		
-		IF v_talblenameorigin = 've_man_frelem' THEN 
+
+		IF v_talblenameorigin = 've_man_frelem' THEN
 			v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_talblenameorigin);
 		ELSE
 			v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable);
 		END IF;
-		
+
 		i = 1;
 		v_querytext := v_querytext || ' WHERE ';
 		FOREACH idname IN ARRAY v_idname_array loop
@@ -878,7 +878,7 @@ BEGIN
 	-- Feature info
 	v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',v_id,
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'schemaName', v_schemaname,
-		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json);
+		'geometry', v_geometry, 'zoomCanvasMargin',v_canvasmargin);
 
 
 
