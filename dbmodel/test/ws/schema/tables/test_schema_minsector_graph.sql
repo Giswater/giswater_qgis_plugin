@@ -20,28 +20,25 @@ SELECT has_table('minsector_graph'::name, 'Table minsector_graph should exist');
 SELECT columns_are(
     'minsector_graph',
     ARRAY[
-        'node_id', 'feature_class', 'minsector_1', 'minsector_2', 'cost', 'reverse_cost'
+        'node_id', 'node_type', 'minsector_1', 'minsector_2'
     ],
     'Table minsector_graph should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('minsector_graph', ARRAY['node_id', 'minsector_1', 'minsector_2'], 'Columns node_id, minsector_1, minsector_2 should be primary key');
+SELECT col_is_pk('minsector_graph', ARRAY['node_id'], 'Columns node_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('minsector_graph', 'node_id', 'integer', 'Column node_id should be integer');
-SELECT col_type_is('minsector_graph', 'feature_class', 'character varying(30)', 'Column feature_class should be character varying(30)');
+SELECT col_type_is('minsector_graph', 'node_type', 'integer', 'Column node_type should be integer');
 SELECT col_type_is('minsector_graph', 'minsector_1', 'integer', 'Column minsector_1 should be integer');
 SELECT col_type_is('minsector_graph', 'minsector_2', 'integer', 'Column minsector_2 should be integer');
-SELECT col_type_is('minsector_graph', 'cost', 'float4', 'Column cost should be float4');
-SELECT col_type_is('minsector_graph', 'reverse_cost', 'float4', 'Column reverse_cost should be float4');
 
 -- Check constraints
 SELECT col_not_null('minsector_graph', 'node_id', 'Column node_id should be NOT NULL');
+SELECT col_not_null('minsector_graph', 'node_type', 'Column node_type should be NOT NULL');
 SELECT col_not_null('minsector_graph', 'minsector_1', 'Column minsector_1 should be NOT NULL');
 SELECT col_not_null('minsector_graph', 'minsector_2', 'Column minsector_2 should be NOT NULL');
-SELECT col_not_null('minsector_graph', 'cost', 'Column cost should be NOT NULL');
-SELECT col_not_null('minsector_graph', 'reverse_cost', 'Column reverse_cost should be NOT NULL');
 
 -- Check foreign key
 SELECT fk_ok('minsector_graph', ARRAY['minsector_1'], 'minsector', ARRAY['minsector_id'], 'Table should have foreign key from minsector_1 to minsector(minsector_id)');
