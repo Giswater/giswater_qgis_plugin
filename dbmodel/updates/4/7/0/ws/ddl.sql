@@ -66,8 +66,6 @@ ALTER TABLE cat_element ADD CONSTRAINT cat_element_fkey_element_type FOREIGN KEY
 
 -- 22/01/2026
 ALTER TABLE minsector_graph RENAME COLUMN nodecat_id TO node_type;
-ALTER TABLE minsector_graph DROP CONSTRAINT minsector_graph_pkey;
-ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_pk PRIMARY KEY (node_id, minsector_1, minsector_2);
 
 CREATE TABLE presszone_graph (
 	node_1 int4 NOT NULL,
