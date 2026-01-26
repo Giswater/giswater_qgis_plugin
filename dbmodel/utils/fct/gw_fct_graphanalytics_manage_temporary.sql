@@ -275,7 +275,7 @@ BEGIN
                 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
 
-                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS adjacent_mincut_id INTEGER;
+                ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS adjacent_mincut_id INTEGER DEFAULT 0;
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS proposed BOOL DEFAULT FALSE;
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS changestatus BOOL DEFAULT FALSE;
