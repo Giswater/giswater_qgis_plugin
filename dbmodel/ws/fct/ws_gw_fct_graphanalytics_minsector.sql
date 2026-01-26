@@ -725,13 +725,15 @@ BEGIN
         WHERE t.graph_delimiter = 'MINSECTOR'
         AND t.closed = TRUE;
 
-        -- check valves
+        -- check valves (compare minsector of to_arc with pgr_node_2 because pgr_node_2 is a minsector)
         UPDATE temp_pgr_arc_linegraph t 
-        SET cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
-            reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
+        SET cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN 1 ELSE -1 END,
+            reverse_cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN -1 ELSE 1 END
+        FROM temp_pgr_arc a 
         WHERE t.graph_delimiter = 'MINSECTOR'
         AND t.closed = FALSE 
-        AND t.to_arc IS NOT NULL;
+        AND t.to_arc IS NOT NULL
+        AND a.pgr_arc_id = t.to_arc;
 
         -- v_ignore_broken_valves
         IF v_ignore_broken_valves THEN

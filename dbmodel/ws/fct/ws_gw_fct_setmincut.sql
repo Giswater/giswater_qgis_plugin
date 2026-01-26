@@ -1084,13 +1084,26 @@ BEGIN
 		WHERE t.graph_delimiter = 'MINSECTOR'
 		AND t.closed = TRUE;
 
-		-- check valves
-		UPDATE temp_pgr_arc_linegraph t 
-		SET cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
-			reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
-		WHERE t.graph_delimiter = 'MINSECTOR'
-		AND t.closed = FALSE 
-		AND t.to_arc IS NOT NULL;
+		-- check valves (compare minsector of to_arc with pgr_node_2 because pgr_node_2 is a minsector)
+		IF v_mode = 'MINSECTOR' THEN 
+			UPDATE temp_pgr_arc_linegraph t 
+			SET cost = CASE WHEN a.minsector_id = t.pgr_node_2 THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN a.minsector_id = t.pgr_node_2 THEN -1 ELSE 1 END
+			FROM arc a 
+			WHERE t.graph_delimiter = 'MINSECTOR'
+			AND t.closed = FALSE 
+			AND t.to_arc IS NOT NULL
+			AND a.arc_id = t.to_arc;
+		ELSE
+			UPDATE temp_pgr_arc_linegraph t 
+			SET cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN 1 ELSE -1 END,
+				reverse_cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN -1 ELSE 1 END
+			FROM temp_pgr_arc a 
+			WHERE t.graph_delimiter = 'MINSECTOR'
+			AND t.closed = FALSE 
+			AND t.to_arc IS NOT NULL
+			AND a.pgr_arc_id = t.to_arc;
+		END IF;
 
 		-- update cost/reverse for the broken open checkvalves (behave as open valves)
 		UPDATE temp_pgr_arc_linegraph t
