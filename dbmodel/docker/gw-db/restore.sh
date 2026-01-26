@@ -28,7 +28,6 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "GRANT role_adm
 
 # Skip topology schema managed by PostGIS to avoid conflict with existing extension.
 pg_restore \
-  --exclude-schema=topology \
   -U "$POSTGRES_USER" \
   -d "$POSTGRES_DB" \
-  /docker-entrypoint-initdb.d/10-gw_ws.dump
+  /docker-entrypoint-initdb.d/10-gw_db.dump
