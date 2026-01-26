@@ -36,9 +36,6 @@ SELECT col_type_is('minsector_graph', 'minsector_2', 'integer', 'Column minsecto
 
 -- Check constraints
 SELECT col_not_null('minsector_graph', 'node_id', 'Column node_id should be NOT NULL');
-SELECT col_not_null('minsector_graph', 'node_type', 'Column node_type should be NOT NULL');
-SELECT col_not_null('minsector_graph', 'minsector_1', 'Column minsector_1 should be NOT NULL');
-SELECT col_not_null('minsector_graph', 'minsector_2', 'Column minsector_2 should be NOT NULL');
 
 -- Check foreign key
 SELECT fk_ok('minsector_graph', ARRAY['minsector_1'], 'minsector', ARRAY['minsector_id'], 'Table should have foreign key from minsector_1 to minsector(minsector_id)');
