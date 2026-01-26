@@ -888,16 +888,16 @@ BEGIN
 			v_query_text := '
 				WITH
 					water AS (
-						SELECT node_id, inlet_arc FROM man_tank
+						SELECT node_id FROM man_tank
 						UNION ALL
-						SELECT node_id, inlet_arc FROM man_source
+						SELECT node_id FROM man_source
 						UNION ALL
-						SELECT node_id, inlet_arc FROM man_waterwell
+						SELECT node_id FROM man_waterwell
 						UNION ALL
-						SELECT node_id, inlet_arc FROM man_wtp
+						SELECT node_id FROM man_wtp
 					),
 					sector_water AS (
-						SELECT w.node_id, w.inlet_arc
+						SELECT w.node_id
 						FROM water w
 						JOIN v_temp_node n USING (node_id)
 						WHERE ''SECTOR'' = ANY (n.graph_delimiter)
@@ -923,14 +923,14 @@ BEGIN
 			WHERE t.pgr_node_id = n.node_id
 			AND 'MINSECTOR' = ANY (n.graph_delimiter);
 
-			-- insert arcs
+			-- insert arcs (including the arcs that would be connected to the SECTOR nodes)
 			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
 			SELECT a.arc_id, a.node_1, a.node_2
 			FROM v_temp_arc a
 			WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
-			AND EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
+			OR EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
 
-			-- insert the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
+			-- set the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
 			-- TANKS, SOURCE, WATERWELL, WTP
 			WITH
 				water AS (
@@ -948,19 +948,18 @@ BEGIN
 					JOIN v_temp_node n USING (node_id)
 					WHERE 'SECTOR' = ANY (n.graph_delimiter)
 				)
-			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2, graph_delimiter)
-			SELECT a.arc_id, a.node_1, a.node_2, 'SECTOR'
-			FROM v_temp_arc a
+				UPDATE temp_pgr_arc a 
+				SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
 				SELECT 1
 				FROM sector_water s
-				WHERE (s.node_id = a.node_1 OR s.node_id = a.node_2)
-        		AND a.arc_id <> ALL(COALESCE(s.inlet_arc,ARRAY[]::int[]))
+				WHERE (s.node_id = a.pgr_node_1 OR s.node_id = a.pgr_node_2)
+        		AND a.pgr_arc_id <> ALL(COALESCE(s.inlet_arc, ARRAY[]::int[]))
 			)
 			AND EXISTS (
 				SELECT 1
 				FROM temp_pgr_node n
-				WHERE (n.pgr_node_id = a.node_1 OR n.pgr_node_id = a.node_2)
+				WHERE (n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2)
 			);
 
 			-- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
@@ -1036,7 +1035,7 @@ BEGIN
 			SELECT DISTINCT mapzone_id, 'MINSECTOR'
 			FROM temp_pgr_arc;
 
-			-- keep only 'MINSECTOR' lines with a1.mapzone_id <> a2.mapzone_id in temp_pgr_arc_linegraph
+			-- remove line that are not 'MINSECTOR' 
 			DELETE FROM temp_pgr_arc_linegraph
 			WHERE graph_delimiter <> 'MINSECTOR';
 
@@ -1053,6 +1052,7 @@ BEGIN
 			) s
 			WHERE l.pgr_arc_id = s.pgr_arc_id;
 
+			-- remove MINSECTORS with a1.mapzone_id = a2.mapzone_id (keep the valves that are border for minsectors)
 			DELETE FROM temp_pgr_arc_linegraph
 			WHERE pgr_node_1 = pgr_node_2;
 
