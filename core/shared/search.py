@@ -298,7 +298,7 @@ class GwSearch:
             # two ruberbands (the one from self.open_custom_form (...) and this one) we delete these
 
             try:
-                margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+                margin = float(complet_result['body']['feature']['zoomCanvasMargin'])
             except ValueError:
                 margin = 50
 
