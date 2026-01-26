@@ -31,6 +31,11 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "GRANT role_bas
 psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "GRANT role_epa TO role_plan;"
 psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "GRANT role_admin TO role_system;"
 
+# Allow TCP connections for tests.
+psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "ALTER SYSTEM SET listen_addresses = '*';"
+echo "host all all 0.0.0.0/0 scram-sha-256" >> "$PGDATA/pg_hba.conf"
+echo "host all all ::/0 scram-sha-256" >> "$PGDATA/pg_hba.conf"
+
 # Skip topology schema managed by PostGIS to avoid conflict with existing extension.
 pg_restore \
   -U "$POSTGRES_USER" \
