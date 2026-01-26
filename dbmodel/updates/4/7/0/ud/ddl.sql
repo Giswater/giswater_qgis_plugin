@@ -19,11 +19,10 @@ ALTER TABLE dma ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", 
 -- 22/01/2026
 CREATE TABLE dwfzone_graph (
 	node_1 int4 NOT NULL,
-	dwfzone_id int4 NOT NULL,
+	node_type_1 int4 NOT NULL,
 	node_2 int4 NOT NULL,
-	expl_id int4[] NULL,
-	muni_id int4[] NULL,
-	sector_id int4[] NULL,
+	node_type_2 int4 NOT NULL,
+	dwfzone_id int4 NOT NULL,
 	the_geom geometry(MULTILINESTRING, SRID_VALUE),
 	CONSTRAINT dwfzone_graph_pkey PRIMARY KEY (node_1, node_2)
 );

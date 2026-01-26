@@ -26,10 +26,10 @@ ALTER TABLE cat_material ADD CONSTRAINT fk_cat_material_family FOREIGN KEY (fami
 -- 22/01/2026
 CREATE TABLE sector_graph (
 	node_1 int4 NOT NULL,
-	sector_id int4 NOT NULL,
+	node_type_1 int4 NOT NULL,
 	node_2 int4,
-	expl_id int4[] NULL,
-	muni_id int4[] NULL,
+	node_type_2 int4 NOT NULL,
+	sector_id int4 NOT NULL,
 	the_geom geometry(MULTILINESTRING, SRID_VALUE),
 	CONSTRAINT sector_graph_pkey PRIMARY KEY (node_1, node_2)
 );
@@ -40,11 +40,10 @@ CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON sector_graph USING gist (the_ge
 
 CREATE TABLE dma_graph (
 	node_1 int4 NOT NULL,
-	dma_id int4 NOT NULL,
+	node_type_1 int4 NOT NULL,
 	node_2 int4 NOT NULL,
-	expl_id int4[] NULL,
-	muni_id int4[] NULL,
-	sector_id int4[] NULL,
+	node_type_2 int4 NOT NULL,
+	dma_id int4 NOT NULL,
 	the_geom geometry(MULTILINESTRING, SRID_VALUE),
 	CONSTRAINT dma_graph_pkey PRIMARY KEY (node_1, node_2)
 );

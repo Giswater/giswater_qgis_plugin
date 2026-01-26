@@ -73,11 +73,10 @@ ALTER TABLE minsector_graph ADD CONSTRAINT minsector_graph_pk PRIMARY KEY (node_
 
 CREATE TABLE presszone_graph (
 	node_1 int4 NOT NULL,
+	node_type_1 int4 NOT NULL,
 	node_2 int4 NOT NULL,
+	node_type_2 int4 NOT NULL,
 	presszone_id int4 NOT NULL,
-	expl_id int4[] NULL,
-	muni_id int4[] NULL,
-	sector_id int4[] NULL,
 	the_geom geometry(MultiLineString, SRID_VALUE),
 	CONSTRAINT presszone_graph_pkey PRIMARY KEY (node_1, node_2)
 );
