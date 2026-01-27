@@ -416,3 +416,9 @@ VALUES(655, 'PROCESS_NAME_13', 'ud', NULL, 'core', true, 'Check mapzones', NULL,
 			directed := TRUE
 		) AS lg
 		WHERE reverse_cost =  1', 'INFO_MESSAGE_13', '[gw_fct_graphanalytics_mapzones_v1]', true);
+
+-- 27/01/2026
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4478, 'There are no exploitations in your exploitation selection', 'Change your exploitation selection', 2, true, 'utils', 'core', 'UI');
+
+UPDATE sys_function SET return_type = 'integer[]' WHERE id = 3510;

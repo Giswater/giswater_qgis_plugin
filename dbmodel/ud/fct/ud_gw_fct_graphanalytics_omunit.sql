@@ -38,7 +38,7 @@ DECLARE
 
     -- dialog
     v_expl_id TEXT;
-    v_expl_id_array TEXT[];
+    v_expl_id_array INTEGER[];
     v_usepsector BOOLEAN;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
@@ -93,7 +93,13 @@ BEGIN
 	END IF;
 
     -- Get exploitation ID array
-    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
+    v_expl_id_array := gw_fct_get_expl_id_array(v_expl_id);
+
+    -- if v_expl_id_array is null, return error
+    IF v_expl_id_array IS NULL THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		       	"data":{"message":"4478", "function":"3492","parameters":null}}$$);';
+    END IF;
 
     -- Get user variable for disabling lock level
     SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
@@ -136,7 +142,7 @@ BEGIN
 
     v_data := jsonb_build_object(
         'data', jsonb_build_object(
-            'expl_id_array', array_to_string(v_expl_id_array, ','),
+            'expl_id_array', array_to_string(v_expl_id_array::text[], ','),
             'mapzone_name', 'OMUNIT',
 			'cost', v_cost,
 			'reverse_cost', v_reverse_cost

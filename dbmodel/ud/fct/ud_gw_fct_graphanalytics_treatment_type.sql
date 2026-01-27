@@ -132,7 +132,13 @@ BEGIN
 	END IF;
 
     -- Get exploitation ID array
-    v_expl_id_array := string_to_array(gw_fct_get_expl_id_array(v_expl_id), ',')::integer[];
+    v_expl_id_array := gw_fct_get_expl_id_array(v_expl_id);
+
+    -- if v_expl_id_array is null, return error
+    IF v_expl_id_array IS NULL THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		       	"data":{"message":"4478", "function":"3522","parameters":null}}$$);';
+    END IF;
 
 	-- Delete temporary tables
 	-- =======================
@@ -179,7 +185,7 @@ BEGIN
         components AS (
             SELECT c.component
             FROM connectedcomponents c
-            WHERE $1 IS NULL
+            WHERE cardinality($1) = 0
             OR EXISTS (
                 SELECT 1
                 FROM v_temp_arc v
