@@ -381,6 +381,16 @@ BEGIN
 					v_querytext := v_querytext || ' , state_type = '||v_state_type||' ';
 				end if;
 
+				-- set default values for mapzones columns
+				v_querytext := v_querytext || ' , sector_id = 0';
+				IF v_feature_type != 'element' THEN
+					IF v_projecttype = 'WS' THEN
+						v_querytext := v_querytext || ' , dma_id = 0, dqa_id = 0, presszone_id = 0, minsector_id = 0';
+					ELSIF v_projecttype = 'UD' THEN
+						v_querytext := v_querytext || ' , dma_id = 0, dwfzone_id = 0, omunit_id = 0';
+					END IF;
+				END IF;
+
 				v_querytext := v_querytext || ' WHERE '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
 
 				execute v_querytext;
