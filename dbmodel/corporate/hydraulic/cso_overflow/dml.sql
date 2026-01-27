@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public;
 
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
-VALUES(9997, 'gw_fct_cso_calculation', 'ud', 'function', 'json', 'json', 'CSO Algorithm', 'role_admin', NULL, 'core');
+VALUES(9997, 'gw_fct_cso_calculation', 'ud', 'function', 'json', 'json', 'CSO Algorithm', 'role_admin', NULL, 'core') ON CONFLICT DO NOTHING;
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) 
 VALUES(9997, 'CSO Algorithm', '{"featureType":[]}'::json, '[
@@ -23,7 +23,7 @@ VALUES(9997, 'CSO Algorithm', '{"featureType":[]}'::json, '[
     "selectedId": null,
     "widgetname": "exploitation",
     "widgettype": "combo",
-    "dvQueryText": "SELECT expl_id AS id, concat(expl_id, ' - ', name) AS idval FROM exploitation e WHERE length(expl_id::text) <3 AND expl_id>0 ORDER BY 1",
+    "dvQueryText": "SELECT expl_id AS id, concat(expl_id, '' - '', name) AS idval FROM exploitation e WHERE length(expl_id::text) <3 AND expl_id>0 ORDER BY 1",
     "layoutorder": 1
   },
   {
@@ -42,7 +42,7 @@ VALUES(9997, 'CSO Algorithm', '{"featureType":[]}'::json, '[
     "layoutname": "grl_option_parameters",
     "widgetname": "mode",
     "widgettype": "combo",
-    "dvQueryText": "SELECT 'CALIBRATION' as id, 'CALIBRATION' as idval UNION SELECT 'EXECUTION' as id, 'EXECUTION' as idval",
+    "dvQueryText": "SELECT ''CALIBRATION'' as id, ''CALIBRATION'' as idval UNION SELECT ''EXECUTION'' as id, ''EXECUTION'' as idval",
     "layoutorder": 3
   },
   {
@@ -54,4 +54,4 @@ VALUES(9997, 'CSO Algorithm', '{"featureType":[]}'::json, '[
     "layoutname": "grl_option_parameters",
     "layoutorder": 4
   }
-]'::json, NULL, true;
+]'::json, NULL, TRUE)  ON CONFLICT DO NOTHING;

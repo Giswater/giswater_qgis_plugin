@@ -11,6 +11,9 @@ SET search_path = "SCHEMA_NAME", public;
 
 -- ANCHOR Tables
 
+CREATE SEQUENCE IF NOT EXISTS cso_subc_id_seq;
+CREATE SEQUENCE IF NOT EXISTS cso_area_type_id_seq;
+
 CREATE TABLE cso_inp_system_subc (
 	node_id varchar NOT NULL,
 	drainzone_id integer NULL,
