@@ -100,18 +100,24 @@ BEGIN
 
 	raise notice 'attributes';
 
-    WITH z AS (
+	execute  '
+	WITH ext_raster_slope AS (
+		SELECT ST_Clip(r.rast, g.the_geom, NULL::double precision, true) as rast
+		FROM (
+			SELECT ST_Slope(rast, 1, ''32BF'', ''PERCENT'') AS rast FROM ext_raster_dem
+		) r
+		JOIN '||v_clip_table||' g
+		ON ST_Intersects(r.rast, g.the_geom)
+	), z AS (
 		SELECT subc_id, 
 		(ST_SummaryStatsAgg(ST_Clip(r.rast, s.the_geom), 1, TRUE)).mean AS slope 
 		FROM ext_raster_slope r JOIN inp_subcatchment s ON st_intersects(r.rast, s.the_geom) 
-		--WHERE s.descript = 'flag_create_subcatchments'
-		--AND (stats).count > 0     -- evita NULLs cuando el clip no pisa pixeles
 		GROUP BY s.subc_id
 	)
 	UPDATE inp_subcatchment t
 	SET slope = z.slope
 	FROM z
-	WHERE t.subc_id = z.subc_id;     
+	WHERE t.subc_id = z.subc_id';     
               
 
 	-- Clean empty geometries
