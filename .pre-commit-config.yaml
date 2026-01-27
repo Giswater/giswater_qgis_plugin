@@ -1,31 +1,8 @@
 repos:
-  # Auto-fix unused imports and variables
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
-    hooks:
-      - id: autoflake
-        exclude: ^(packages|dbmodel|test|i18n|icons)/
-        args:
-          - --in-place
-          - --remove-all-unused-imports
-          - --remove-unused-variables
-
-  # Auto-fix whitespace, blank lines, formatting
-  - repo: https://github.com/hhatto/autopep8
-    rev: v2.3.1
-    hooks:
-      - id: autopep8
-        exclude: ^(packages|dbmodel|test|i18n|icons)/
-        args:
-          - --in-place
-          - --max-line-length=120
-          - --select=E2,E3,E4,E7
-
-  # Check remaining issues
+  # Ruff check and format
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.8
+    rev: v0.14.14
     hooks:
-      - id: ruff
-        exclude: ^(packages|dbmodel|test|i18n|icons)/
-        args:
-          - --config=ruff.toml
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
