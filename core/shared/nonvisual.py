@@ -3,6 +3,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
 # -*- coding: utf-8 -*-
 import os
 import json
@@ -13,26 +14,51 @@ from functools import partial
 try:
     from scipy.interpolate import CubicSpline
     import numpy as np
+
     scipy_imported = True
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QShortcut, QApplication, QMenu, QAction, QPushButton, QHeaderView
+from qgis.PyQt.QtWidgets import (
+    QAbstractItemView,
+    QTableView,
+    QTableWidget,
+    QTableWidgetItem,
+    QSizePolicy,
+    QLineEdit,
+    QGridLayout,
+    QComboBox,
+    QShortcut,
+    QApplication,
+    QMenu,
+    QAction,
+    QPushButton,
+    QHeaderView,
+)
 from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
-from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
-    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint, \
-    GwNonVisualRoughnessUi
+from ..ui.ui_manager import (
+    GwNonVisualManagerUi,
+    GwNonVisualControlsUi,
+    GwNonVisualCurveUi,
+    GwNonVisualPatternUDUi,
+    GwNonVisualPatternWSUi,
+    GwNonVisualRulesUi,
+    GwNonVisualTimeseriesUi,
+    GwNonVisualLidsUi,
+    GwNonVisualPrint,
+    GwNonVisualRoughnessUi,
+)
 from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log, tools_os
 from ... import global_vars
+
 tr = tools_qt.tr
 
 
 class GwNonVisual:
-
     def __init__(self):
         """Class to control 'Add element' of toolbar 'edit'"""
         self.plugin_dir = lib_vars.plugin_dir
@@ -41,19 +67,35 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg: GwNonVisualManagerUi = None
-        self.dict_views = {"ws": {"cat_mat_roughness": f'{tr("roughness")}', "ve_inp_curve": f'{tr("curves")}',
-                                 "ve_inp_pattern": f'{tr("patterns")}', "ve_inp_controls": f'{tr("controls")}',
-                                 "ve_inp_rules": f'{tr("rules")}'},
-                           "ud": {"ve_inp_curve": f'{tr("curves")}', "ve_inp_pattern": f'{tr("patterns")}',
-                                 "ve_inp_timeseries": f'{tr("timeseries")}',
-                                 "ve_inp_controls": f'{tr("controls")}', "inp_lid": f'{tr("lids")}'}}
-        self.dict_ids = {"cat_mat_roughness": "id", "ve_inp_curve": "id", "ve_inp_curve_value": "curve_id",
-                         "ve_inp_pattern": "pattern_id", "ve_inp_pattern_value": "pattern_id",
-                         "ve_inp_controls": "id",
-                         "ve_inp_rules": "id",
-                         "ve_inp_timeseries": "id", "ve_inp_timeseries_value": "timser_id",
-                         "inp_lid": "lidco_id", "inp_lid_value": "lidco_id",
-                         }
+        self.dict_views = {
+            "ws": {
+                "cat_mat_roughness": f"{tr('roughness')}",
+                "ve_inp_curve": f"{tr('curves')}",
+                "ve_inp_pattern": f"{tr('patterns')}",
+                "ve_inp_controls": f"{tr('controls')}",
+                "ve_inp_rules": f"{tr('rules')}",
+            },
+            "ud": {
+                "ve_inp_curve": f"{tr('curves')}",
+                "ve_inp_pattern": f"{tr('patterns')}",
+                "ve_inp_timeseries": f"{tr('timeseries')}",
+                "ve_inp_controls": f"{tr('controls')}",
+                "inp_lid": f"{tr('lids')}",
+            },
+        }
+        self.dict_ids = {
+            "cat_mat_roughness": "id",
+            "ve_inp_curve": "id",
+            "ve_inp_curve_value": "curve_id",
+            "ve_inp_pattern": "pattern_id",
+            "ve_inp_pattern_value": "pattern_id",
+            "ve_inp_controls": "id",
+            "ve_inp_rules": "id",
+            "ve_inp_timeseries": "id",
+            "ve_inp_timeseries_value": "timser_id",
+            "inp_lid": "lidco_id",
+            "inp_lid_value": "lidco_id",
+        }
         self.valid = (True, "")
 
     def get_nonvisual(self, object_name):
@@ -78,8 +120,12 @@ class GwNonVisual:
         # Connect dialog signals
         self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.cmb_curve_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
-        self.manager_dlg.cmb_pattern_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
-        self.manager_dlg.cmb_timser_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_pattern_type.currentIndexChanged.connect(
+            partial(self._filter_table, self.manager_dlg, None)
+        )
+        self.manager_dlg.cmb_timser_type.currentIndexChanged.connect(
+            partial(self._filter_table, self.manager_dlg, None)
+        )
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.btn_duplicate.clicked.connect(partial(self._duplicate_object, self.manager_dlg))
         self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
@@ -122,19 +168,27 @@ class GwNonVisual:
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
-        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
+        action_open.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos)
+        )
         menu.addAction(action_open)
 
         action_toggle = QAction("Toggle active", qtableview)
-        action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
+        action_toggle.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active")
+        )
         menu.addAction(action_toggle)
 
         action_duplicate = QAction("Duplicate", qtableview)
-        action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
+        action_duplicate.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate")
+        )
         menu.addAction(action_duplicate)
 
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
+        action_delete.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete")
+        )
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
@@ -186,7 +240,6 @@ class GwNonVisual:
         self._reload_manager_table()
 
     def _manage_tabs_changed(self):
-
         tab_name = self.manager_dlg.main_tab.currentWidget().objectName()
 
         visibility_settings = {  # tab_name: (chk_active, btn_print, cmb_curve_type, cmb_pattern_type, cmb_timser_type)
@@ -197,7 +250,9 @@ class GwNonVisual:
         }
         default_visibility = (True, False, False, False, False)
 
-        chk_active_visible, btn_print_visible, cmb_curve_type, cmb_pattern_type, cmb_timser_type = visibility_settings.get(tab_name, default_visibility)
+        chk_active_visible, btn_print_visible, cmb_curve_type, cmb_pattern_type, cmb_timser_type = (
+            visibility_settings.get(tab_name, default_visibility)
+        )
 
         self.manager_dlg.chk_active.setVisible(chk_active_visible)
         if btn_print_visible and global_vars.project_type == "ud":
@@ -231,7 +286,9 @@ class GwNonVisual:
         if hasattr(self, function_name):
             getattr(self, function_name)(object_id)
 
-    def _fill_manager_table(self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
+    def _fill_manager_table(
+        self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None
+    ):
         """Fills manager table"""
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
@@ -258,9 +315,14 @@ class GwNonVisual:
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=QHeaderView.ResizeMode.Stretch, stretchLastSection=False)
-        tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
+        tools_qt.set_tableview_config(
+            widget,
+            selection=QAbstractItemView.SelectionBehavior.SelectRows,
+            edit_triggers=set_edit_triggers,
+            section_resize_mode=QHeaderView.ResizeMode.Stretch,
+            stretch_last_section=False,
+        )
+        tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.') :]}")
 
         # Sort the table by feature id
         model.sort(1, Qt.SortOrder.AscendingOrder)
@@ -411,7 +473,6 @@ class GwNonVisual:
             self._populate_filter_combos()
 
     def _print_object(self):
-
         # Get dialog
         self.dlg_print = GwNonVisualPrint(self)
         tools_gw.load_settings(self.dlg_print)
@@ -422,7 +483,8 @@ class GwNonVisual:
 
         # Triggers
         self.dlg_print.btn_path.clicked.connect(
-            partial(tools_qt.get_folder_path, self.dlg_print, self.dlg_print.txt_path))
+            partial(tools_qt.get_folder_path, self.dlg_print, self.dlg_print.txt_path)
+        )
         self.dlg_print.btn_accept.clicked.connect(partial(self._exec_print))
         self.dlg_print.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_print))
 
@@ -430,7 +492,6 @@ class GwNonVisual:
         tools_gw.open_dialog(self.dlg_print, dlg_name="nonvisual_print")
 
     def _exec_print(self):
-
         path = tools_qt.get_text(self.dlg_print, "txt_path")
 
         if path in (None, "null", "") or not os.path.exists(path):
@@ -443,8 +504,10 @@ class GwNonVisual:
         cross_arccat = tools_qt.is_checked(self.dlg_print, "chk_cross_arccat")
 
         if cross_arccat:
-            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from {self.schema_name}.ve_inp_curve ic join {self.schema_name}.cat_arc ca on ca.curve_id = ic.id " \
-                  f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
+            sql = (
+                f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from {self.schema_name}.ve_inp_curve ic join {self.schema_name}.cat_arc ca on ca.curve_id = ic.id "
+                f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
+            )
             curve_results = tools_db.get_rows(sql)
             if curve_results is None:
                 msg = "There is no valid shape curve in the list"
@@ -458,8 +521,10 @@ class GwNonVisual:
                 msg = "Export done succesfully"
                 tools_qgis.show_info(msg, dialog=self.manager_dlg)
         else:
-            sql = f"select id as curve_id from {self.schema_name}.ve_inp_curve ic " \
-                  f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
+            sql = (
+                f"select id as curve_id from {self.schema_name}.ve_inp_curve ic "
+                f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
+            )
             curve_results = tools_db.get_rows(sql)
             if curve_results is None:
                 msg = "There is no valid shape curve in the list"
@@ -499,7 +564,6 @@ class GwNonVisual:
         tools_gw.open_dialog(self.dialog, dlg_name="nonvisual_roughness")
 
     def _populate_cmb_matcat_id(self, combobox):
-
         sql = "SELECT id, matcat_id as idval FROM cat_mat_roughness"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -615,8 +679,10 @@ class GwNonVisual:
                 return
 
             # Insert cat_mat_roughness
-            sql = f"INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness, descript, active)" \
-                  f"VALUES('{matcat_id}', '{period_id}', '{init_age}', '{end_age}', '{roughness}', '{descript}', '{active}')"
+            sql = (
+                f"INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness, descript, active)"
+                f"VALUES('{matcat_id}', '{period_id}', '{init_age}', '{end_age}', '{roughness}', '{descript}', '{active}')"
+            )
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -709,10 +775,14 @@ class GwNonVisual:
         is_new = (curve_id is None) or duplicate
 
         # Connect dialog signals
-        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
+        cmb_curve_type.currentIndexChanged.connect(
+            partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value)
+        )
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
-        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, self.plot_widget))
+        tbl_curve_value.cellChanged.connect(
+            partial(self._manage_curve_plot, self.dialog, tbl_curve_value, self.plot_widget)
+        )
         self.dialog.btn_delete_item.clicked.connect(partial(self._manage_delete_btn, tbl_curve_value, self.plot_widget))
         self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, is_new))
         self._connect_dialog_signals()
@@ -721,7 +791,11 @@ class GwNonVisual:
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
         self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget, None, None)
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+        tools_qt.set_tableview_config(
+            tbl_curve_value,
+            section_resize_mode=QHeaderView.ResizeMode.Stretch,
+            edit_triggers=QTableView.EditTrigger.DoubleClicked,
+        )
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name="nonvisual_curve")
@@ -926,7 +1000,9 @@ class GwNonVisual:
                         try:
                             cur_value = float(cur_cell.data(0))
                             prev_value = float(prev_cell.data(0))
-                            if (cur_value < prev_value) and (curve_type != "SHAPE" and global_vars.project_type != "ud"):
+                            if (cur_value < prev_value) and (
+                                curve_type != "SHAPE" and global_vars.project_type != "ud"
+                            ):
                                 valid = False
                                 self.valid = NOT_VALID_ASCENDING
                         except ValueError:
@@ -1013,7 +1089,7 @@ class GwNonVisual:
             for j, value in enumerate(item):
                 if value != "null":
                     last_idx = j
-            clean_list.append(item[:last_idx + 1])
+            clean_list.append(item[: last_idx + 1])
 
         # Convert list items to float
         float_list = []
@@ -1105,7 +1181,6 @@ class GwNonVisual:
         plot_widget.draw()
 
     def _manage_delete_btn(self, table, plot_widget):
-
         if table.item(table.currentRow(), 0) is not None or table.item(table.currentRow(), 1) is not None:
             table.removeRow(table.currentRow())
             self._manage_curve_plot(self.dialog, table, plot_widget, None, None)
@@ -1146,8 +1221,10 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_curve
-            sql = f"INSERT INTO inp_curve (id, curve_type, descript, expl_id)" \
-                  f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id})"
+            sql = (
+                f"INSERT INTO inp_curve (id, curve_type, descript, expl_id)"
+                f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id})"
+            )
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting curve."
@@ -1222,8 +1299,7 @@ class GwNonVisual:
             if row == (["null"] * tbl_curve_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO ve_inp_curve_value (curve_id, x_value, y_value) " \
-                  f"VALUES ({curve_id}, "
+            sql = f"INSERT INTO ve_inp_curve_value (curve_id, x_value, y_value) VALUES ({curve_id}, "
             for x in row:
                 sql += f"{x}, "
             sql = sql.rstrip(", ") + ")"
@@ -1234,6 +1310,7 @@ class GwNonVisual:
                 tools_db.dao.rollback()
                 return False
         return True
+
     # endregion
 
     # region patterns
@@ -1246,7 +1323,10 @@ class GwNonVisual:
             self.dialog = GwNonVisualPatternUDUi(self)
         else:
             msg = "{0}: project type '{1}' not supported"
-            msg_params = ("get_patterns", global_vars.project_type,)
+            msg_params = (
+                "get_patterns",
+                global_vars.project_type,
+            )
             tools_log.log_warning(msg, msg_params=msg_params)
             return
         tools_gw.load_settings(self.dialog)
@@ -1276,7 +1356,9 @@ class GwNonVisual:
 
         # Populate custom context menu
         tbl_pattern_value.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        tbl_pattern_value.customContextMenuRequested.connect(partial(self._paste_patterns_custom_menu, tbl_pattern_value))
+        tbl_pattern_value.customContextMenuRequested.connect(
+            partial(self._paste_patterns_custom_menu, tbl_pattern_value)
+        )
 
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, tbl_pattern_value)
@@ -1307,7 +1389,9 @@ class GwNonVisual:
 
         # Signals
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
-        tbl_pattern_value.cellChanged.connect(partial(self._manage_ws_patterns_plot, tbl_pattern_value, self.plot_widget))
+        tbl_pattern_value.cellChanged.connect(
+            partial(self._manage_ws_patterns_plot, tbl_pattern_value, self.plot_widget)
+        )
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = (pattern_id is None) or duplicate
@@ -1407,9 +1491,11 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_expl_id, str(row["expl_id"]), 0)
 
         # Populate table pattern_values
-        sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, " \
-              f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 " \
-              f"FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
+        sql = (
+            f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, "
+            f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 "
+            f"FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
+        )
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -1470,8 +1556,7 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_pattern
-            sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id)" \
-                  f"VALUES({pattern_id}, {observ}, {expl_id})"
+            sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id)VALUES({pattern_id}, {observ}, {expl_id})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
@@ -1548,8 +1633,8 @@ class GwNonVisual:
             for i, x in enumerate(row):
                 sql_columns.append(f"factor_{i + 1}")
                 sql_values.append(x)
-            sql = f"""INSERT INTO ve_inp_pattern_value (pattern_id, {','.join(sql_columns)}) 
-                        VALUES ({pattern_id}, {','.join(map(str, sql_values))});"""
+            sql = f"""INSERT INTO ve_inp_pattern_value (pattern_id, {",".join(sql_columns)}) 
+                        VALUES ({pattern_id}, {",".join(map(str, sql_values))});"""
             print(sql)
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
@@ -1576,7 +1661,9 @@ class GwNonVisual:
             df_list = [0] * x_offset
             df_list.extend(lst)
 
-            plot_widget.axes.bar(range(0, len(df_list)), df_list, width=1, align="edge", color="lightcoral", edgecolor="indianred")
+            plot_widget.axes.bar(
+                range(0, len(df_list)), df_list, width=1, align="edge", color="lightcoral", edgecolor="indianred"
+            )
             if len(df_list) > 10:
                 plot_widget.axes.set_xticks(range(0, len(df_list), 2))
             else:
@@ -1623,7 +1710,9 @@ class GwNonVisual:
             self._load_ud_pattern_widgets(self.dialog)
 
         # Signals
-        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, self.plot_widget))
+        cmb_pattern_type.currentIndexChanged.connect(
+            partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, self.plot_widget)
+        )
 
         self._manage_patterns_tableviews(self.dialog, cmb_pattern_type, self.plot_widget)
 
@@ -1755,8 +1844,10 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_pattern
-            sql = f"INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id)" \
-                  f"VALUES({pattern_id}, '{pattern_type}', {observ}, {expl_id})"
+            sql = (
+                f"INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id)"
+                f"VALUES({pattern_id}, '{pattern_type}', {observ}, {expl_id})"
+            )
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
@@ -1864,7 +1955,7 @@ class GwNonVisual:
             for j, value in enumerate(item):
                 if value != "null":
                     last_idx = j
-            clean_list.append(item[:last_idx + 1])
+            clean_list.append(item[: last_idx + 1])
 
         # Convert list items to float
         float_list = []
@@ -1887,7 +1978,9 @@ class GwNonVisual:
             df_list = [0] * x_offset
             df_list.extend(lst)
 
-            plot_widget.axes.bar(range(0, len(df_list)), df_list, width=1, align="edge", color="lightcoral", edgecolor="indianred")
+            plot_widget.axes.bar(
+                range(0, len(df_list)), df_list, width=1, align="edge", color="lightcoral", edgecolor="indianred"
+            )
             if len(df_list) > 10:
                 plot_widget.axes.set_xticks(range(0, len(df_list), 2))
             else:
@@ -1916,7 +2009,9 @@ class GwNonVisual:
 
         # Connect dialog signals
         is_new = (control_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id, dscenario_id))
+        self.dialog.btn_accept.clicked.connect(
+            partial(self._accept_controls, self.dialog, is_new, control_id, dscenario_id)
+        )
         self._connect_dialog_signals()
 
         # Open dialog
@@ -1991,12 +2086,13 @@ class GwNonVisual:
 
             # Insert inp_dscenario_controls
             if dscenario_id is not None:
-                sql = f"INSERT INTO inp_dscenario_controls (dscenario_id, sector_id,text,active)" \
-                      f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
+                sql = (
+                    f"INSERT INTO inp_dscenario_controls (dscenario_id, sector_id,text,active)"
+                    f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
+                )
             # Insert inp_controls
             else:
-                sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
-                      f"VALUES({sector_id}, {text}, {active})"
+                sql = f"INSERT INTO inp_controls (sector_id,text,active)VALUES({sector_id}, {text}, {active})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -2122,12 +2218,13 @@ class GwNonVisual:
 
             # Insert inp_dscenario_rules
             if dscenario_id is not None:
-                sql = f"INSERT INTO inp_dscenario_rules (dscenario_id, sector_id, text, active)" \
-                      f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
+                sql = (
+                    f"INSERT INTO inp_dscenario_rules (dscenario_id, sector_id, text, active)"
+                    f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
+                )
             # Insert inp_rules
             else:
-                sql = f"INSERT INTO inp_rules (sector_id, text, active)" \
-                    f"VALUES({sector_id}, {text}, {active})"
+                sql = f"INSERT INTO inp_rules (sector_id, text, active)VALUES({sector_id}, {text}, {active})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -2177,7 +2274,9 @@ class GwNonVisual:
 
         # Populate custom context menu
         tbl_timeseries_value.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        tbl_timeseries_value.customContextMenuRequested.connect(partial(self._paste_timeseries_custom_menu, tbl_timeseries_value))
+        tbl_timeseries_value.customContextMenuRequested.connect(
+            partial(self._paste_timeseries_custom_menu, tbl_timeseries_value)
+        )
 
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.StandardKey.Paste, tbl_timeseries_value)
@@ -2194,7 +2293,11 @@ class GwNonVisual:
             self._load_timeseries_widgets(self.dialog)
 
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+        tools_qt.set_tableview_config(
+            tbl_timeseries_value,
+            section_resize_mode=QHeaderView.ResizeMode.Stretch,
+            edit_triggers=QTableView.EditTrigger.DoubleClicked,
+        )
 
         is_new = (timser_id is None) or duplicate
 
@@ -2392,8 +2495,10 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_timeseries
-            sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, active, descript, fname, expl_id, addparam)" \
-                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {active}, {descript}, {fname}, {expl_id}, $${addparam}$$)"
+            sql = (
+                f"INSERT INTO inp_timeseries (id, timser_type, times_type, active, descript, fname, expl_id, addparam)"
+                f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {active}, {descript}, {fname}, {expl_id}, $${addparam}$$)"
+            )
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting timeseries."
@@ -2505,7 +2610,6 @@ class GwNonVisual:
                     tools_db.dao.rollback()
                     return False
         elif times_type == "RELATIVE":
-
             for row in values:
                 if row == (["null"] * tbl_timeseries_value.columnCount()):
                     continue
@@ -2597,8 +2701,10 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_lidtype, str(lidco_type), 0)
 
         # Populate tab values
-        sql = f"SELECT value_2, value_3, value_4, value_5, value_6, value_7,value_8 " \
-              f"FROM inp_lid_value WHERE lidco_id='{lidco_id}'"
+        sql = (
+            f"SELECT value_2, value_3, value_4, value_5, value_6, value_7,value_8 "
+            f"FROM inp_lid_value WHERE lidco_id='{lidco_id}'"
+        )
         rows = tools_db.get_rows(sql)
 
         if rows:
@@ -2654,7 +2760,9 @@ class GwNonVisual:
             if dialog.tab_lidlayers.isTabVisible(i):
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                visible_widgets = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]
+                visible_widgets = [
+                    widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)
+                ]
                 visible_widgets = self._order_list(visible_widgets)
 
                 for _y, widget in enumerate(visible_widgets):
@@ -2669,7 +2777,6 @@ class GwNonVisual:
         tools_gw.set_config_parser("nonvisual_lids", "txt_name", name)
 
     def _manage_lids_tabs(self, dialog):
-
         cmb_lidtype = dialog.cmb_lidtype
         tab_lidlayers = dialog.tab_lidlayers
         lidco_id = str(cmb_lidtype.currentText())
@@ -2713,17 +2820,39 @@ class GwNonVisual:
     def _manage_lids_hide_widgets(self, dialog, lid_id):
         """Hides widgets that are not necessary in specific tabs"""
         # List of widgets
-        widgets_hide = {"BC": {"lbl_swale_side_slope", "txt_5_swale_side_slope", "lbl_drain_delay", "txt_4_drain_delay"},
-                        "RG": {"lbl_swale_side_slope", "txt_5_swale_side_slope"},
-                        "GR": {"lbl_swale_side_slope", "txt_5_swale_side_slope"},
-                        "IT": {"lbl_swale_side_slope", "txt_5_swale_side_slope", "lbl_drain_delay", "txt_4_drain_delay"},
-                        "PP": {"lbl_swale_side_slope", "txt_5_swale_side_slope", "lbl_drain_delay", "txt_4_drain_delay"},
-                        "RB": {"lbl_seepage_rate", "txt_3_seepage_rate", "lbl_clogging_factor_storage", "txt_4_clogging_factor_storage"},
-                        "RD": {"lbl_vegetation_volume", "txt_2_vegetation_volume", "lbl_swale_side_slope", "txt_5_swale_side_slope",
-                               "lbl_flow_exponent", "lbl_offset", "lbl_drain_delay", "lbl_open_level",
-                               "lbl_closed_level", "lbl_control_curve", "lbl_flow_description", "txt_2_flow_exponent",
-                               "txt_3_offset", "txt_4_drain_delay", "txt_5_open_level", "txt_6_closed_level", "txt_7_cmb_control_curve", },
-                        "VS": {""}}
+        widgets_hide = {
+            "BC": {"lbl_swale_side_slope", "txt_5_swale_side_slope", "lbl_drain_delay", "txt_4_drain_delay"},
+            "RG": {"lbl_swale_side_slope", "txt_5_swale_side_slope"},
+            "GR": {"lbl_swale_side_slope", "txt_5_swale_side_slope"},
+            "IT": {"lbl_swale_side_slope", "txt_5_swale_side_slope", "lbl_drain_delay", "txt_4_drain_delay"},
+            "PP": {"lbl_swale_side_slope", "txt_5_swale_side_slope", "lbl_drain_delay", "txt_4_drain_delay"},
+            "RB": {
+                "lbl_seepage_rate",
+                "txt_3_seepage_rate",
+                "lbl_clogging_factor_storage",
+                "txt_4_clogging_factor_storage",
+            },
+            "RD": {
+                "lbl_vegetation_volume",
+                "txt_2_vegetation_volume",
+                "lbl_swale_side_slope",
+                "txt_5_swale_side_slope",
+                "lbl_flow_exponent",
+                "lbl_offset",
+                "lbl_drain_delay",
+                "lbl_open_level",
+                "lbl_closed_level",
+                "lbl_control_curve",
+                "lbl_flow_description",
+                "txt_2_flow_exponent",
+                "txt_3_offset",
+                "txt_4_drain_delay",
+                "txt_5_open_level",
+                "txt_6_closed_level",
+                "txt_7_cmb_control_curve",
+            },
+            "VS": {""},
+        }
 
         # Hide widgets in list
         for i in range(dialog.tab_lidlayers.count()):
@@ -2747,8 +2876,9 @@ class GwNonVisual:
             return
 
         img = f"ud_lid_{row[0]}"
-        tools_qt.add_image(self.dialog, "lbl_section_image",
-                           f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}.png")
+        tools_qt.add_image(
+            self.dialog, "lbl_section_image", f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}.png"
+        )
 
     def _accept_lids(self, dialog, is_new, lidco_id):
         """Manage accept button (insert & update)"""
@@ -2826,22 +2956,25 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
     def _insert_lids_values(self, dialog, lidco_id, lidco_type):
-
-        control_values = {"BC": {"txt_1_thickness", "txt_1_thickness_storage"},
-                    "RG": {"txt_1_thickness", "txt_1_thickness_storage"},
-                    "GR": {"txt_1_thickness", "drainmat_2"},
-                    "IT": {"txt_1_thickness_storage"},
-                    "PP": {"txt_1_thickness_pavement", "txt_1_thickness_storage"},
-                    "RB": {""},
-                    "RD": {""},
-                    "VS": {"txt_1_berm_height"}}
+        control_values = {
+            "BC": {"txt_1_thickness", "txt_1_thickness_storage"},
+            "RG": {"txt_1_thickness", "txt_1_thickness_storage"},
+            "GR": {"txt_1_thickness", "drainmat_2"},
+            "IT": {"txt_1_thickness_storage"},
+            "PP": {"txt_1_thickness_pavement", "txt_1_thickness_storage"},
+            "RB": {""},
+            "RD": {""},
+            "VS": {"txt_1_berm_height"},
+        }
 
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                widgets_list = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]
+                widgets_list = [
+                    widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)
+                ]
                 widgets_list = self._order_list(widgets_list)
 
                 sql = "INSERT INTO inp_lid_value (lidco_id, lidlayer,"
@@ -2878,7 +3011,6 @@ class GwNonVisual:
 
     # region private functions
     def _setfields(self, id, table_name, fields):
-
         feature = f'"id":"{id}", '
         feature += f'"tableName":"{table_name}" '
         extras = f'"fields":{fields}'
@@ -2892,14 +3024,12 @@ class GwNonVisual:
         return True
 
     def _reload_manager_table(self):
-
         try:
             self.manager_dlg.main_tab.currentWidget().model().select()
         except Exception:
             pass
 
     def _connect_dialog_signals(self):
-
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
@@ -2934,7 +3064,7 @@ class GwNonVisual:
             for j, value in enumerate(item):
                 if value not in ("null", None, "", "None"):
                     last_idx = j
-            clean_list.append(item[:last_idx + 1])
+            clean_list.append(item[: last_idx + 1])
 
         # Convert list items to float
         float_list = []
@@ -2952,7 +3082,6 @@ class GwNonVisual:
         return float_list
 
     def _read_tbl_values(self, table, clear_nulls=False):
-
         values = list()
         for y in range(0, table.rowCount()):
             values.append(list())
@@ -2972,7 +3101,6 @@ class GwNonVisual:
         return values
 
     def _populate_cmb_sector_id(self, dialog, combobox):
-
         tooltip = "Active sectors for user selection (check selector sector)"
         combobox.setToolTip(tooltip)
         sql = "SELECT sector_id as id, name as idval FROM ve_sector WHERE sector_id > 0"
@@ -2985,7 +3113,6 @@ class GwNonVisual:
             tools_qt.set_widget_enabled(dialog, "btn_accept", False)
 
     def _create_plot_widget(self, dialog):
-
         plot_widget = MplCanvas(dialog, width=5, height=4, dpi=100)
         plot_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
         plot_widget.setMinimumSize(100, 100)

@@ -3,6 +3,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
 # -*- coding: utf-8 -*-
 import csv
 import os
@@ -41,7 +42,9 @@ class GwWorkcat:
 
         # Populate custom context menu
         self.dlg_man.tbl_workcat.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.dlg_man.tbl_workcat.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_workcat))
+        self.dlg_man.tbl_workcat.customContextMenuRequested.connect(
+            partial(self._show_context_menu, self.dlg_man.tbl_workcat)
+        )
 
         # Auto-completion
         table_object = "workcat"
@@ -55,7 +58,8 @@ class GwWorkcat:
         # Set signals
         self.dlg_man.workcat_name.textChanged.connect(self._fill_workcat_table)
         self.dlg_man.tbl_workcat.doubleClicked.connect(
-            partial(self._open_selected_workcat, self.dlg_man, self.dlg_man.tbl_workcat))
+            partial(self._open_selected_workcat, self.dlg_man, self.dlg_man.tbl_workcat)
+        )
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(self._handle_delete)
@@ -87,7 +91,7 @@ class GwWorkcat:
                 self.dlg_man.tbl_workcat = tools_gw.add_tableview_header(self.dlg_man.tbl_workcat, field)
                 self.dlg_man.tbl_workcat = tools_gw.fill_tableview_rows(self.dlg_man.tbl_workcat, field)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, "cat_work", Qt.SortOrder.AscendingOrder)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         return True
 
     def _open_selected_workcat(self, dialog, widget):
@@ -101,8 +105,9 @@ class GwWorkcat:
         id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
         selected_object_id = widget.model().item(row, id_col_idx).text()
 
-        keep_open_form = tools_gw.get_config_parser("dialogs_actions", "workcat_manager_keep_open", "user", "init",
-                                                    prefix=True)
+        keep_open_form = tools_gw.get_config_parser(
+            "dialogs_actions", "workcat_manager_keep_open", "user", "init", prefix=True
+        )
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
 
@@ -143,8 +148,10 @@ class GwWorkcat:
         workid_key2 = dialog.workid_key_2.text()
         builddate = dialog.builtdate.date().toString("yyyy-MM-dd")
 
-        sql = (f"INSERT INTO cat_work (id, descript, link, workid_key1, workid_key2, builtdate) "
-               f"VALUES ('{workid}', '{descript}', '{link}', '{workid_key1}', '{workid_key2}', '{builddate}')")
+        sql = (
+            f"INSERT INTO cat_work (id, descript, link, workid_key1, workid_key2, builtdate) "
+            f"VALUES ('{workid}', '{descript}', '{link}', '{workid_key1}', '{workid_key2}', '{builddate}')"
+        )
 
         status = tools_db.execute_sql(sql)
         if status:
@@ -259,37 +266,71 @@ class GwWorkcat:
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
         self.items_dialog.btn_doc_insert.clicked.connect(
-            partial(self._document_insert, self.items_dialog, "doc_x_workcat", "workcat_id", item["sys_id"]))
-        self.items_dialog.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.items_dialog.tbl_document, "doc_x_workcat"))
+            partial(self._document_insert, self.items_dialog, "doc_x_workcat", "workcat_id", item["sys_id"])
+        )
+        self.items_dialog.btn_doc_delete.clicked.connect(
+            partial(tools_gw.delete_selected_rows, self.items_dialog.tbl_document, "doc_x_workcat")
+        )
         self.items_dialog.btn_doc_new.clicked.connect(
-            partial(self._manage_document, self.items_dialog.tbl_document, item["sys_id"]))
-        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, "path"))
+            partial(self._manage_document, self.items_dialog.tbl_document, item["sys_id"])
+        )
+        self.items_dialog.btn_open_doc.clicked.connect(
+            partial(tools_qt.document_open, self.items_dialog.tbl_document, "path")
+        )
         self.items_dialog.tbl_document.doubleClicked.connect(
-            partial(tools_qt.document_open, self.items_dialog.tbl_document, "path"))
+            partial(tools_qt.document_open, self.items_dialog.tbl_document, "path")
+        )
 
         self.items_dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
-            partial(self._get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+            partial(self._get_folder_dialog, self.items_dialog, self.items_dialog.txt_path)
+        )
         self.items_dialog.rejected.connect(partial(self._restore_selectors, current_selectors))
         self.items_dialog.rejected.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(self._reset_rubber_band)
         self.items_dialog.btn_state1.clicked.connect(
-            partial(self._force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+            partial(self._force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm)
+        )
         self.items_dialog.btn_state0.clicked.connect(
-            partial(self._force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+            partial(self._force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end)
+        )
         self.items_dialog.btn_export_to_csv.clicked.connect(
-            partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
-                    self.items_dialog.txt_path))
+            partial(
+                self.export_to_csv,
+                self.items_dialog,
+                self.items_dialog.tbl_psm,
+                self.items_dialog.tbl_psm_end,
+                self.items_dialog.txt_path,
+            )
+        )
 
-        self.items_dialog.txt_name.textChanged.connect(partial(
-            self._workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name,
-            table_name, workcat_id, field_id))
-        self.items_dialog.txt_name_end.textChanged.connect(partial(
-            self._workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end,
-            self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
+        self.items_dialog.txt_name.textChanged.connect(
+            partial(
+                self._workcat_filter_by_text,
+                self.items_dialog,
+                self.items_dialog.tbl_psm,
+                self.items_dialog.txt_name,
+                table_name,
+                workcat_id,
+                field_id,
+            )
+        )
+        self.items_dialog.txt_name_end.textChanged.connect(
+            partial(
+                self._workcat_filter_by_text,
+                self.items_dialog,
+                self.items_dialog.tbl_psm_end,
+                self.items_dialog.txt_name_end,
+                table_name_end,
+                workcat_id,
+                field_id,
+            )
+        )
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self._open_feature_form, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm.clicked.connect(partial(self._get_parameters, self.items_dialog.tbl_psm))
-        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self._open_feature_form, self.items_dialog.tbl_psm_end))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(
+            partial(self._open_feature_form, self.items_dialog.tbl_psm_end)
+        )
         self.items_dialog.tbl_psm_end.clicked.connect(partial(self._get_parameters, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
@@ -355,9 +396,11 @@ class GwWorkcat:
                 field_id = "id"
             for field in form_tab["fields"]:
                 _id = field[field_id]
-                extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
-                          f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
-                          f'"addSchema":"{qgis_project_add_schema}"')
+                extras = (
+                    f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
+                    f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
+                    f'"addSchema":"{qgis_project_add_schema}"'
+                )
                 body = tools_gw.create_body(extras=extras)
                 tools_gw.execute_procedure("gw_fct_setselectors", body)
         tools_qgis.refresh_map_canvas()
@@ -366,39 +409,36 @@ class GwWorkcat:
         """Active exploitations are compared with workcat farms.
         If there is consistency nothing happens, if there is no consistency force this exploitations to selector.
         """
-        sql = (f"SELECT a.expl_id, a.expl_name FROM "
-               f"  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
-               f"   WHERE workcat_id='{workcat_id}' "
-               f"   UNION SELECT expl_id, expl_name FROM v_ui_workcat_x_feature_end "
-               f"   WHERE workcat_id_end='{workcat_id}'"
-               f"   ) AS a "
-               f" WHERE expl_id NOT IN "
-               f"  (SELECT expl_id FROM selector_expl "
-               f"   WHERE cur_user=current_user)")
+        sql = (
+            f"SELECT a.expl_id, a.expl_name FROM "
+            f"  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
+            f"   WHERE workcat_id='{workcat_id}' "
+            f"   UNION SELECT expl_id, expl_name FROM v_ui_workcat_x_feature_end "
+            f"   WHERE workcat_id_end='{workcat_id}'"
+            f"   ) AS a "
+            f" WHERE expl_id NOT IN "
+            f"  (SELECT expl_id FROM selector_expl "
+            f"   WHERE cur_user=current_user)"
+        )
         rows = tools_db.get_rows(sql)
         if not rows:
             return
 
         if len(rows) > 0:
             for row in rows:
-                sql = (f"INSERT INTO selector_expl(expl_id, cur_user) "
-                       f" VALUES('{row[0]}', current_user)")
+                sql = f"INSERT INTO selector_expl(expl_id, cur_user)  VALUES('{row[0]}', current_user)"
                 tools_db.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             tools_qgis.show_info(msg)
 
     def _update_selector_workcat(self, workcat_id):
         """Update table selector_workcat"""
-        sql = ("DELETE FROM selector_workcat "
-               " WHERE cur_user = current_user;\n")
-        sql += (f"INSERT INTO selector_workcat(workcat_id, cur_user) "
-                f" VALUES('{workcat_id}', current_user);\n")
+        sql = "DELETE FROM selector_workcat  WHERE cur_user = current_user;\n"
+        sql += f"INSERT INTO selector_workcat(workcat_id, cur_user)  VALUES('{workcat_id}', current_user);\n"
         tools_db.execute_sql(sql)
 
     def _set_enable_qatable_by_state(self, qtable, _id, qbutton):
-
-        sql = (f"SELECT state_id FROM selector_state "
-               f" WHERE cur_user = current_user AND state_id ='{_id}'")
+        sql = f"SELECT state_id FROM selector_state  WHERE cur_user = current_user AND state_id ='{_id}'"
         row = tools_db.get_row(sql)
         if row is None:
             qtable.setEnabled(False)
@@ -406,25 +446,24 @@ class GwWorkcat:
 
     def _get_folder_dialog(self, dialog, widget):
         """Get folder dialog"""
-        tools_qt.get_save_file_path(dialog, widget, "*.csv", "Save as", os.path.expanduser("~/Documents" if os.name == "nt" else "~"))
+        tools_qt.get_save_file_path(
+            dialog, widget, "*.csv", "Save as", os.path.expanduser("~/Documents" if os.name == "nt" else "~")
+        )
 
     def _force_state(self, qbutton, state, qtable):
         """Force selected state and set qtable enabled = True"""
-        sql = (f"SELECT state_id "
-               f"FROM selector_state "
-               f"WHERE cur_user = current_user AND state_id = '{state}'")
+        sql = f"SELECT state_id FROM selector_state WHERE cur_user = current_user AND state_id = '{state}'"
         row = tools_db.get_row(sql)
         if row:
             return
 
-        sql = (f"INSERT INTO selector_state(state_id, cur_user) "
-               f"VALUES('{state}', current_user)")
+        sql = f"INSERT INTO selector_state(state_id, cur_user) VALUES('{state}', current_user)"
         tools_db.execute_sql(sql)
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
         tools_qgis.refresh_map_canvas()
         qtable.model().select()
-        
+
         # Trigger selection after state is activated
         if hasattr(self, "current_workcat_id"):
             if state == 1:
@@ -433,7 +472,6 @@ class GwWorkcat:
                 self._select_workcat_features(self.current_workcat_id, "workcat_id_end", state=0)
 
     def _write_to_csv(self, dialog, folder_path=None, all_rows=None):
-
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator="\n")
             writer.writerows(all_rows)
@@ -445,17 +483,18 @@ class GwWorkcat:
         """Filter list of workcats by workcat_id and field_id"""
         # Use workcat_id_end for the _end table
         workcat_field = "workcat_id_end" if "feature_end" in table_name else "workcat_id"
-        
+
         result_select = tools_qt.get_text(dialog, widget_txt)
         if result_select != "null":
-            expr = (f"{workcat_field} = '{workcat_id}'"
-                    f" and {field_id} ILIKE '%{result_select}%'")
+            expr = f"{workcat_field} = '{workcat_id}' and {field_id} ILIKE '%{result_select}%'"
         else:
             expr = f"{workcat_field} ILIKE '%{workcat_id}%'"
         self._workcat_fill_table(qtable, table_name, expr=expr)
         tools_gw.set_tablemodel_config(dialog, qtable, table_name)
 
-    def _workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
+    def _workcat_fill_table(
+        self, widget, table_name, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None
+    ):
         """Fill table @widget filtering query by @workcat_id
         Set a model with selected filter.
         Attach that model to selected table
@@ -493,11 +532,15 @@ class GwWorkcat:
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
-        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
+        action_open.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos)
+        )
         menu.addAction(action_open)
 
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
+        action_delete.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete")
+        )
         menu.addAction(action_delete)
 
         # Show menu
@@ -534,17 +577,15 @@ class GwWorkcat:
             pass
 
     def _fill_label_data(self, workcat_id, table_name, extension=None):
-
         if workcat_id == "null":
             return
 
         # Use workcat_id_end for the _end table
         workcat_field = "workcat_id_end" if "feature_end" in table_name else "workcat_id"
-        
+
         features = ["NODE", "CONNEC", "GULLY", "ELEMENT", "ARC"]
         for feature in features:
-            sql = (f"SELECT feature_id "
-                   f" FROM {table_name}")
+            sql = f"SELECT feature_id  FROM {table_name}"
             sql += f" WHERE {workcat_field} = '{workcat_id}' AND feature_type = '{feature}'"
             rows = tools_db.get_rows(sql)
             if extension is not None:
@@ -570,9 +611,7 @@ class GwWorkcat:
             if feature == "ARC":
                 for row in rows:
                     arc_id = str(row[0])
-                    sql = (f"SELECT st_length2d(the_geom)::numeric(12,2) "
-                           f" FROM arc"
-                           f" WHERE arc_id = '{arc_id}'")
+                    sql = f"SELECT st_length2d(the_geom)::numeric(12,2)  FROM arc WHERE arc_id = '{arc_id}'"
                     row = tools_db.get_row(sql)
                     if row:
                         length = length + row[0]
@@ -603,9 +642,7 @@ class GwWorkcat:
             return
 
         # Check if document already exist
-        sql = (f"SELECT doc_id"
-               f" FROM {tablename}"
-               f" WHERE doc_id = '{doc_id}' AND {field} = '{field_value}'")
+        sql = f"SELECT doc_id FROM {tablename} WHERE doc_id = '{doc_id}' AND {field} = '{field_value}'"
         row = tools_db.get_row(sql)
         if row:
             msg = "Document already exist"
@@ -613,8 +650,7 @@ class GwWorkcat:
             return
 
         # Insert into new table
-        sql = (f"INSERT INTO {tablename} (doc_id, {field})"
-               f" VALUES ('{doc_id}', '{field_value}')")
+        sql = f"INSERT INTO {tablename} (doc_id, {field}) VALUES ('{doc_id}', '{field_value}')"
         status = tools_db.execute_sql(sql)
         if status:
             msg = "Document inserted successfully"
@@ -627,7 +663,6 @@ class GwWorkcat:
         dialog.tbl_document.model().select()
 
     def _get_parameters(self, qtable, index):
-
         tools_gw.reset_rubberband(self.aux_rubber_band)
         row = index.row()
         column_index = tools_qt.get_col_index_by_col_name(qtable, "feature_type")
@@ -686,7 +721,6 @@ class GwWorkcat:
             self._select_workcat_features(self.current_workcat_id, "workcat_id_end", state=0)
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
-
         folder_path = tools_qt.get_text(dialog, path)
         if folder_path is None or folder_path == "null":
             path.setStyleSheet("border: 1px solid red")

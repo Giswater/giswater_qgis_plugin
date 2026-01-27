@@ -9,7 +9,16 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 from qgis.PyQt.QtGui import QStandardItemModel
-from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea, QHeaderView
+from qgis.PyQt.QtWidgets import (
+    QTableView,
+    QWidget,
+    QAbstractItemView,
+    QLabel,
+    QLineEdit,
+    QGridLayout,
+    QScrollArea,
+    QHeaderView,
+)
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
@@ -17,7 +26,6 @@ from ...libs import tools_qt, tools_db, tools_qgis, lib_vars
 
 
 class GwAudit:
-
     def __init__(self):
         """Class to control toolbar 'om_ws'"""
 
@@ -51,7 +59,9 @@ class GwAudit:
         self._fill_manager_table(complet_list)
 
         self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(
+            self.dlg_audit_manager.tbl_audit, section_resize_mode=QHeaderView.ResizeMode.Interactive
+        )
 
         # Connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))
@@ -78,7 +88,9 @@ class GwAudit:
             self.date.setEnabled(False)
         else:
             # Convert first_snapshot_date to QDateTime for widget
-            q_first_snapshot_date = QDateTime(QDate(first_log_date.year, first_log_date.month, first_log_date.day), QTime(0, 0, 0))
+            q_first_snapshot_date = QDateTime(
+                QDate(first_log_date.year, first_log_date.month, first_log_date.day), QTime(0, 0, 0)
+            )
 
             # Set minimum date to first snapshot date
             self.date.setMinimumDateTime(q_first_snapshot_date)
@@ -131,7 +143,11 @@ class GwAudit:
         for log_id in form:
             # Create body
             # body = {"client": {"cur_user": tools_db.current_user}, "form": {"logId": log_id}, "schema": {"parent_schema": lib_vars.schema_name}}
-            body = {"client": {"cur_user": tools_db.current_user}, "form": log_id, "schema": {"parent_schema": lib_vars.schema_name}}
+            body = {
+                "client": {"cur_user": tools_db.current_user},
+                "form": log_id,
+                "schema": {"parent_schema": lib_vars.schema_name},
+            }
 
             # Execute procedure
             result = tools_gw.execute_procedure("gw_fct_getauditlogdata", body, schema_name="audit")
@@ -227,11 +243,15 @@ class GwAudit:
 
             # Check if has data
             if field["value"]:
-                self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, field)
+                self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(
+                    self.dlg_audit_manager.tbl_audit, field
+                )
                 self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, field)
 
         tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, "audit_results")
-        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
+        tools_qt.set_tableview_config(
+            self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.EditTrigger.NoEditTriggers
+        )
 
         self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
 
@@ -270,7 +290,7 @@ def open(**kwargs):
 def open_date(**kwargs):
     """Open audit in selected date"""
     class_obj = kwargs["class"]
-    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString('yyyy-MM-dd')}' AND \"schema\" = '{lib_vars.schema_name}' AND feature_id = '{class_obj.feature_id}' ORDER BY tstamp ASC"""
+    query = f"""SELECT id FROM audit.log WHERE tstamp::date = '{class_obj.date.dateTime().toString("yyyy-MM-dd")}' AND \"schema\" = '{lib_vars.schema_name}' AND feature_id = '{class_obj.feature_id}' ORDER BY tstamp ASC"""
     rows = tools_db.get_rows(query)
 
     form = []

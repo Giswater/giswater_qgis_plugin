@@ -3,6 +3,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
 # -*- coding: utf-8 -*-
 import webbrowser
 import json
@@ -40,11 +41,31 @@ class GwDocument(QObject):
         self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_link", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit", "doc_x_element"]
+        self.doc_tables = [
+            "doc_x_node",
+            "doc_x_arc",
+            "doc_x_connec",
+            "doc_x_link",
+            "doc_x_gully",
+            "doc_x_workcat",
+            "doc_x_psector",
+            "doc_x_visit",
+            "doc_x_element",
+        ]
         self.point_xy = {"x": None, "y": None}
         self.is_new = False
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
+    def get_document(
+        self,
+        tablename=None,
+        qtable=None,
+        item_id=None,
+        feature=None,
+        feature_type=None,
+        row=None,
+        list_tabs=None,
+        doc_tables=None,
+    ):
         """Button 31: Add document"""
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         # Create the dialog and signals
@@ -155,7 +176,8 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_insert_workcat.clicked.connect(partial(self._insert_workcat, self.dlg_add_doc))
         self.dlg_add_doc.btn_delete_workcat.clicked.connect(partial(self._delete_workcat, self.dlg_add_doc))
         self.dlg_add_doc.feature_id_workcat.textChanged.connect(
-            partial(tools_gw.set_completer_object, self.dlg_add_doc, "workcat"))
+            partial(tools_gw.set_completer_object, self.dlg_add_doc, "workcat")
+        )
 
         # Config Psector
         tools_gw.set_completer_widget("plan_psector", self.dlg_add_doc.feature_id_psector, "name")
@@ -163,7 +185,8 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_insert_psector.clicked.connect(partial(self._insert_psector, self.dlg_add_doc))
         self.dlg_add_doc.btn_delete_psector.clicked.connect(partial(self._delete_psector, self.dlg_add_doc))
         self.dlg_add_doc.feature_id_psector.textChanged.connect(
-            partial(tools_gw.set_completer_object, self.dlg_add_doc, "psector"))
+            partial(tools_gw.set_completer_object, self.dlg_add_doc, "psector")
+        )
 
         # Config Visit
         tools_gw.set_completer_widget("om_visit", self.dlg_add_doc.feature_id_visit, "id")
@@ -171,18 +194,33 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_insert_visit.clicked.connect(partial(self._insert_visit, self.dlg_add_doc))
         self.dlg_add_doc.btn_delete_visit.clicked.connect(partial(self._delete_visit, self.dlg_add_doc))
         self.dlg_add_doc.feature_id_visit.textChanged.connect(
-            partial(tools_gw.set_completer_object, self.dlg_add_doc, "visit"))
+            partial(tools_gw.set_completer_object, self.dlg_add_doc, "visit")
+        )
 
         # Set signals
-        self.excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_gully",
-                                "ve_man_genelem", "ve_link", "ve_element"]
+        self.excluded_layers = [
+            "ve_arc",
+            "ve_node",
+            "ve_connec",
+            "ve_man_frelem",
+            "ve_gully",
+            "ve_man_genelem",
+            "ve_link",
+            "ve_element",
+        ]
         layers_visibility = tools_gw.get_parent_layers_visibility()
 
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.rejected.connect(
-            lambda: setattr(self, "layers", tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
+            lambda: setattr(
+                self,
+                "layers",
+                tools_gw.manage_close(
+                    self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers
+                ),
+            )
         )
         # Widgets
         self.dlg_add_doc.doc_name.textChanged.connect(partial(self._check_doc_exists))
@@ -197,7 +235,13 @@ class GwDocument(QObject):
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, True)
         )
         self.dlg_add_doc.btn_cancel.clicked.connect(
-            lambda: setattr(self, "layers", tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers))
+            lambda: setattr(
+                self,
+                "layers",
+                tools_gw.manage_close(
+                    self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.rel_layers
+                ),
+            )
         )
         self.dlg_add_doc.btn_apply.clicked.connect(
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id, False)
@@ -205,30 +249,93 @@ class GwDocument(QObject):
         # Tab relations
         self.dlg_add_doc.tab_feature.currentChanged.connect(self._on_tab_changed)
         self.dlg_add_doc.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT, False, None, None))
+            partial(
+                tools_gw.insert_feature,
+                self,
+                self.dlg_add_doc,
+                table_object,
+                GwSelectionMode.DEFAULT,
+                False,
+                None,
+                None,
+            )
+        )
         self.dlg_add_doc.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT, None, None)
+        )
         self.dlg_add_doc.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
+            partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT)
+        )
         self.dlg_add_doc.btn_expr_select.clicked.connect(
-            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT)
+            partial(
+                tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT
+            )
         )
 
-        self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                               self.dlg_add_doc.tbl_doc_x_arc, "ve_arc", "arc_id", self.rubber_band, 5))
-        self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                self.dlg_add_doc.tbl_doc_x_node, "ve_node", "node_id", self.rubber_band, 10))
-        self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                  self.dlg_add_doc.tbl_doc_x_connec, "ve_connec", "connec_id", self.rubber_band, 10))
-        self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_gully, "ve_gully", "gully_id", self.rubber_band, 10))
-        self.dlg_add_doc.tbl_doc_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_link, "ve_link", "link_id", self.rubber_band, 10))
-        self.dlg_add_doc.tbl_doc_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
-                                                                 self.dlg_add_doc.tbl_doc_x_element, "ve_element", "element_id", self.rubber_band, 10))
+        self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(
+            partial(
+                tools_qgis.highlight_feature_by_id,
+                self.dlg_add_doc.tbl_doc_x_arc,
+                "ve_arc",
+                "arc_id",
+                self.rubber_band,
+                5,
+            )
+        )
+        self.dlg_add_doc.tbl_doc_x_node.clicked.connect(
+            partial(
+                tools_qgis.highlight_feature_by_id,
+                self.dlg_add_doc.tbl_doc_x_node,
+                "ve_node",
+                "node_id",
+                self.rubber_band,
+                10,
+            )
+        )
+        self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(
+            partial(
+                tools_qgis.highlight_feature_by_id,
+                self.dlg_add_doc.tbl_doc_x_connec,
+                "ve_connec",
+                "connec_id",
+                self.rubber_band,
+                10,
+            )
+        )
+        self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(
+            partial(
+                tools_qgis.highlight_feature_by_id,
+                self.dlg_add_doc.tbl_doc_x_gully,
+                "ve_gully",
+                "gully_id",
+                self.rubber_band,
+                10,
+            )
+        )
+        self.dlg_add_doc.tbl_doc_x_link.clicked.connect(
+            partial(
+                tools_qgis.highlight_feature_by_id,
+                self.dlg_add_doc.tbl_doc_x_link,
+                "ve_link",
+                "link_id",
+                self.rubber_band,
+                10,
+            )
+        )
+        self.dlg_add_doc.tbl_doc_x_element.clicked.connect(
+            partial(
+                tools_qgis.highlight_feature_by_id,
+                self.dlg_add_doc.tbl_doc_x_element,
+                "ve_element",
+                "element_id",
+                self.rubber_band,
+                10,
+            )
+        )
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
-                partial(self._fill_table_doc, self.dlg_add_doc, feature_type, feature[feature_type + "_id"]))
+                partial(self._fill_table_doc, self.dlg_add_doc, feature_type, feature[feature_type + "_id"])
+            )
 
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
@@ -450,7 +557,7 @@ class GwDocument(QObject):
         self.dlg_man = GwDocManagerUi(self)
         self.dlg_man.setProperty("class_obj", self)
         tools_gw.load_settings(self.dlg_man)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document)
 
         # Adding auto-completion to a QLineEdit
@@ -459,7 +566,9 @@ class GwDocument(QObject):
 
         # Populate custom context menu
         self.dlg_man.tbl_document.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.dlg_man.tbl_document.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_document))
+        self.dlg_man.tbl_document.customContextMenuRequested.connect(
+            partial(self._show_context_menu, self.dlg_man.tbl_document)
+        )
 
         status = self._fill_table()
         if not status:
@@ -468,7 +577,8 @@ class GwDocument(QObject):
         # Set signals
         self.dlg_man.doc_name.textChanged.connect(self._fill_table)
         self.dlg_man.tbl_document.doubleClicked.connect(
-            partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
+            partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object)
+        )
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(self._handle_delete)
@@ -482,11 +592,15 @@ class GwDocument(QObject):
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
-        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
+        action_open.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos)
+        )
         menu.addAction(action_open)
 
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
+        action_delete.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete")
+        )
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
@@ -516,7 +630,7 @@ class GwDocument(QObject):
                 self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
                 self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, "v_ui_doc", Qt.SortOrder.AscendingOrder)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         return True
 
@@ -536,10 +650,7 @@ class GwDocument(QObject):
 
     def _fill_combo_doc_type(self, widget):
         """Executes query and fill combo box"""
-        sql = ("SELECT id, idval"
-               " FROM edit_typevalue"
-               " WHERE typevalue = 'doc_type'"
-               " ORDER BY id;")
+        sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'doc_type' ORDER BY id;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(widget, rows, add_empty=True)
         doctype_vdefault = tools_gw.get_config_value("edit_doctype_vdefault")
@@ -557,7 +668,6 @@ class GwDocument(QObject):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
 
     def _activate_tabs(self, activate):
-
         # Enable tabs
         for n in range(2, 5):
             self.dlg_add_doc.tabWidget.setTabEnabled(n, activate)
@@ -604,8 +714,10 @@ class GwDocument(QObject):
                 if doc_id is None:
                     return
             else:
-                msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
-                       "all selected documents and your name won't be used.")
+                msg = (
+                    "You have selected multiple documents. In this case, name will be a sequential number for "
+                    "all selected documents and your name won't be used."
+                )
                 title = "Add document"
                 answer = tools_qt.show_question(msg, title)
                 if answer:
@@ -618,8 +730,10 @@ class GwDocument(QObject):
             if len(self.files_path) <= 1:
                 sql = self._update_doc_sql(doc_type, observ, date, doc_id, path, the_geom, name)
             else:
-                msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
-                       "all selected documents and your name won't be used.")
+                msg = (
+                    "You have selected multiple documents. In this case, name will be a sequential number for "
+                    "all selected documents and your name won't be used."
+                )
                 title = "Add document"
                 answer = tools_qt.show_question(msg, title)
                 if answer:
@@ -642,8 +756,7 @@ class GwDocument(QObject):
         if the_geom:
             fields += ", the_geom"
             values += f", {the_geom}"
-        sql = (f"INSERT INTO doc ({fields}) "
-               f"VALUES ({values}) RETURNING id;")
+        sql = f"INSERT INTO doc ({fields}) VALUES ({values}) RETURNING id;"
         new_doc_id = tools_db.execute_returning(sql)
         sql = ""
         if new_doc_id is False:
@@ -652,15 +765,16 @@ class GwDocument(QObject):
         return sql, doc_id
 
     def _update_doc_sql(self, doc_type, observ, date, doc_id, path, the_geom, name):
-        sql = (f"UPDATE doc "
-               f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', name = '{name}'")
+        sql = (
+            f"UPDATE doc "
+            f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', name = '{name}'"
+        )
         if the_geom:
             sql += f", the_geom = {the_geom}"
         sql += f" WHERE id = '{doc_id}';"
         return sql
 
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable, doc_name, close_dlg=True):
-
         if sql is not None and sql != "":
             tools_db.execute_sql(sql)
 
@@ -682,16 +796,11 @@ class GwDocument(QObject):
             "workcat": workcat_ids,
             "psector": psector_ids,
             "visit": visit_ids,
-            "element": element_ids
+            "element": element_ids,
         }
         if self.project_type == "ud":
             data["gully"] = gully_ids
-        parameters = {
-            "project_type": self.project_type,
-            "object_id": doc_id,
-            "table_name": "doc",
-            "data": data
-        }
+        parameters = {"project_type": self.project_type, "object_id": doc_id, "table_name": "doc", "data": data}
 
         # Create request body with parameters
         extras = f'"parameters":{json.dumps(parameters)}'
@@ -712,8 +821,7 @@ class GwDocument(QObject):
 
         # Update the associated table
         if tablename:
-            sql = (f"INSERT INTO doc_x_{tablename} (doc_id, {tablename}_id) "
-                   f" VALUES('{doc_id}', '{item_id}')")
+            sql = f"INSERT INTO doc_x_{tablename} (doc_id, {tablename}_id)  VALUES('{doc_id}', '{item_id}')"
             tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
             if tablename == "psector":
@@ -765,7 +873,6 @@ class GwDocument(QObject):
         self.dlg_add_doc.doc_name.setToolTip("")
 
     def _open_selected_object_document(self, dialog, widget, table_object):
-
         # Check if there is a dlg_doc already open
         if hasattr(self, "dlg_add_doc") and not isdeleted(self.dlg_add_doc) and self.dlg_add_doc.isVisible():
             return
@@ -784,8 +891,9 @@ class GwDocument(QObject):
         selected_object_id = widget.model().item(row, id_col_idx).text()
 
         # Close this dialog and open selected object
-        keep_open_form = tools_gw.get_config_parser("dialogs_actions", "doc_manager_keep_open", "user", "init",
-                                                    prefix=True)
+        keep_open_form = tools_gw.get_config_parser(
+            "dialogs_actions", "doc_manager_keep_open", "user", "init", prefix=True
+        )
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
 
@@ -832,7 +940,6 @@ class GwDocument(QObject):
         return files_path
 
     def _fill_dialog_document(self, dialog, table_object, single_tool_mode=None, doc_id=None):
-
         # Reset list of selected records
         self.rel_ids, self.rel_list_ids = tools_gw.reset_feature_list()
 
@@ -845,9 +952,7 @@ class GwDocument(QObject):
         if object_name in (None, "", "null"):
             filter_str = f"id = '{doc_id}'"
         # Check if we already have data with selected object_id
-        sql = (f"SELECT * "
-               f" FROM {table_object}"
-               f" WHERE {filter_str}")
+        sql = f"SELECT *  FROM {table_object} WHERE {filter_str}"
         row = tools_db.get_row(sql, log_info=False)
 
         # Fill input widgets with data of the @row
@@ -862,7 +967,9 @@ class GwDocument(QObject):
 
         # Check related @feature_type
         for feature_type in list_feature_type:
-            tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type, feature_id=doc_id, feature_idname="doc_id")
+            tools_gw.get_rows_by_feature_type(
+                self, dialog, table_object, feature_type, feature_id=doc_id, feature_idname="doc_id"
+            )
 
     def convert_to_degrees(self, value):
         """Convert GPS coordinates stored in EXIF to degrees"""

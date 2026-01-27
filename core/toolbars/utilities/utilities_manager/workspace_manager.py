@@ -3,6 +3,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
 # -*- coding: utf-8 -*-
 import json
 from functools import partial
@@ -23,11 +24,9 @@ class GwWorkspaceManagerButton(GwAction):
     """Button 64: Workspace manager"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
     def clicked_event(self):
-
         self._open_workspace_manager()
 
     # region private functions
@@ -60,14 +59,15 @@ class GwWorkspaceManagerButton(GwAction):
         selection_model.selectionChanged.connect(partial(self._fill_info))
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
 
-        self.dlg_workspace_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_workspace_manager))
+        self.dlg_workspace_manager.btn_cancel.clicked.connect(
+            partial(tools_gw.close_dialog, self.dlg_workspace_manager)
+        )
         self.dlg_workspace_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_workspace_manager))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_workspace_manager, "workspace_manager")
 
     def _open_update_workspace_dlg(self):
-
         # Create workspace dialog
         self.dlg_create_workspace = GwCreateWorkspaceUi(self)
         self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, "txt_workspace_name")
@@ -92,7 +92,7 @@ class GwWorkspaceManagerButton(GwAction):
         index = self.tbl_wrkspcm.selectionModel().currentIndex()
         value = index.sibling(index.row(), 0).data()
 
-        sql = (f"SELECT name, descript, private FROM cat_workspace WHERE id = {value}")
+        sql = f"SELECT name, descript, private FROM cat_workspace WHERE id = {value}"
         row = tools_db.get_row(sql)
 
         tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_name, row["name"])
@@ -103,7 +103,6 @@ class GwWorkspaceManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_create_workspace, "workspace_create")
 
     def _open_create_workspace_dlg(self):
-
         # Create workspace dialog
         self.dlg_create_workspace = GwCreateWorkspaceUi(self)
         self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, "txt_workspace_name")
@@ -155,7 +154,9 @@ class GwWorkspaceManagerButton(GwAction):
                 self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
             # TODO: config_form_tableview
             # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', Qt.SortOrder.DescendingOrder, True)
-            tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SelectionMode.SingleSelection)
+            tools_qt.set_tableview_config(
+                self.tbl_wrkspcm, selection_mode=QAbstractItemView.SelectionMode.SingleSelection
+            )
 
         return complet_list
 
@@ -168,7 +169,9 @@ class GwWorkspaceManagerButton(GwAction):
         cols = selected.indexes()
         if not cols:
             if deselected.indexes():
-                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.SelectionFlag.Select)
+                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(
+                    deselected, QItemSelectionModel.SelectionFlag.Select
+                )
                 return
             tools_qt.set_widget_text(self.dlg_workspace_manager, "tab_log_txt_infolog", "")
             return
@@ -181,8 +184,13 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
         if result and result["status"] == "Accepted":
-            tools_gw.fill_tab_log(self.dlg_workspace_manager, result["body"]["data"],
-                                  force_tab=False, call_set_tabs_enabled=False, close=False)
+            tools_gw.fill_tab_log(
+                self.dlg_workspace_manager,
+                result["body"]["data"],
+                force_tab=False,
+                call_set_tabs_enabled=False,
+                close=False,
+            )
 
     def _create_workspace(self):
         """Create a workspace"""
@@ -249,7 +257,9 @@ class GwWorkspaceManagerButton(GwAction):
 
         if result and result.get("message") and result["message"].get("text"):
             msg = result["message"].get("text")
-            tools_qgis.show_message(msg, Qgis.MessageLevel(result["message"].get("level")), dialog=self.dlg_workspace_manager)
+            tools_qgis.show_message(
+                msg, Qgis.MessageLevel(result["message"].get("level")), dialog=self.dlg_workspace_manager
+            )
 
         if result and result["status"] == "Accepted":
             # Set labels
@@ -275,8 +285,11 @@ class GwWorkspaceManagerButton(GwAction):
     def _check_go2epa_options(self, tab_name=None):
         """Refreshes the selectors' UI if it's open"""
         # Get the selector UI if it's open
-        windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
-                and (issubclass(type(x), GwGo2EpaOptionsUi))]
+        windows = [
+            x
+            for x in QApplication.allWidgets()
+            if getattr(x, "isVisible", False) and (issubclass(type(x), GwGo2EpaOptionsUi))
+        ]
         if windows:
             try:
                 dialog = windows[0]
@@ -342,7 +355,9 @@ class GwWorkspaceManagerButton(GwAction):
         title = "Update configuration"
         answer = tools_qt.show_question(msg, title, index.sibling(index.row(), 1).data())
         if answer:
-            extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}", "id": "{value}"'
+            extras = (
+                f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}", "id": "{value}"'
+            )
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure("gw_fct_workspacemanager", body)
 
@@ -372,12 +387,16 @@ class GwWorkspaceManagerButton(GwAction):
         value = index.sibling(index.row(), 0).data()
 
         msg = "Are you sure you want to delete these records?"
-        sql = "SELECT value FROM config_param_user WHERE parameter='utils_workspace_current' AND cur_user = current_user"
+        sql = (
+            "SELECT value FROM config_param_user WHERE parameter='utils_workspace_current' AND cur_user = current_user"
+        )
         row = tools_db.get_row(sql)
         if row and row[0]:
             if row[0] == f"{value}":
-                msg = ("WARNING: This will remove the 'utils_workspace_current' variable for your user!\n"
-                        "Are you sure you want to delete these records?")
+                msg = (
+                    "WARNING: This will remove the 'utils_workspace_current' variable for your user!\n"
+                    "Are you sure you want to delete these records?"
+                )
 
         title = "Delete records"
         answer = tools_qt.show_question(msg, title, index.sibling(index.row(), 1).data())

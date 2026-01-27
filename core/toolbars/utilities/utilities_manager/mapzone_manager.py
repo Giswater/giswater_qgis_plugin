@@ -3,6 +3,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
 # -*- coding: utf-8 -*-
 import json
 
@@ -11,9 +12,30 @@ from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QDateTime
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton, QHeaderView, QListWidget
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QMenu,
+    QTableView,
+    QAbstractItemView,
+    QGridLayout,
+    QLabel,
+    QWidget,
+    QComboBox,
+    QPushButton,
+    QHeaderView,
+    QListWidget,
+)
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
+from qgis.core import (
+    QgsVectorLayer,
+    QgsLineSymbol,
+    QgsRendererCategory,
+    QgsDateTimeRange,
+    Qgis,
+    QgsCategorizedSymbolRenderer,
+    QgsTemporalNavigationObject,
+    QgsInterval,
+)
 
 from qgis.gui import QgsMapToolEmitPoint, QgsMapToolPan
 
@@ -26,7 +48,6 @@ from .....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwMapzoneManager:
-
     def __init__(self):
         """Class to control 'Add element' of toolbar 'edit'"""
         self.plugin_dir = lib_vars.plugin_dir
@@ -46,14 +67,13 @@ class GwMapzoneManager:
         self.mapzone_status = {
             "enabled": ["sector", "dma", "dqa", "presszone", "dwfzone"],
             "enabledMacromapzone": ["macrosector", "macrodma", "macrodqa", "macroomzone"],
-            "disabled": ["omzone", "supplyzone", "drainzone"]
+            "disabled": ["omzone", "supplyzone", "drainzone"],
         }
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
         self.user_selected_exploitation = "-901"
 
     def manage_mapzones(self):
-
         # Create dialog
         self.mapzone_mng_dlg = GwMapzoneManagerUi(self)
         tools_gw.load_settings(self.mapzone_mng_dlg)
@@ -64,8 +84,10 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = []
-        project_tabs = {"ws": ["macrosector", "sector", "presszone", "macrodma", "dma", "macrodqa", "dqa", "macroomzone"],
-                        "ud": ["macrosector", "sector", "drainzone", "dwfzone", "dma", "macroomzone"]}
+        project_tabs = {
+            "ws": ["macrosector", "sector", "presszone", "macrodma", "dma", "macrodqa", "dqa", "macroomzone"],
+            "ud": ["macrosector", "sector", "drainzone", "dwfzone", "dma", "macroomzone"],
+        }
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
 
@@ -106,7 +128,9 @@ class GwMapzoneManager:
 
         # Connect checkbox state change to save settings
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(self._save_show_inactive_state)
-        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, "mapzone_manager"))
+        self.mapzone_mng_dlg.finished.connect(
+            partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, "mapzone_manager")
+        )
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
 
         self._manage_current_changed()
@@ -158,7 +182,9 @@ class GwMapzoneManager:
         # Enable/Disable config button on macrodma and macrosector
         list_tabs_no_config = []
         list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, "v_ui_macrodma"))
-        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, "v_ui_macrosector"))
+        list_tabs_no_config.append(
+            tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, "v_ui_macrosector")
+        )
         if self.mapzone_mng_dlg.main_tab.currentIndex() in list_tabs_no_config:
             self.mapzone_mng_dlg.btn_config.setEnabled(False)
         else:
@@ -216,9 +242,15 @@ class GwMapzoneManager:
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=QHeaderView.ResizeMode.Interactive)
-        tools_gw.set_tablemodel_config(self.mapzone_mng_dlg, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
+        tools_qt.set_tableview_config(
+            widget,
+            selection=QAbstractItemView.SelectionBehavior.SelectRows,
+            edit_triggers=set_edit_triggers,
+            section_resize_mode=QHeaderView.ResizeMode.Interactive,
+        )
+        tools_gw.set_tablemodel_config(
+            self.mapzone_mng_dlg, widget, f"{self.table_name[len(f'{self.schema_name}.') :]}"
+        )
 
         # Hide unwanted columns
         col_idx = tools_qt.get_col_index_by_col_name(widget, "dscenario_id")
@@ -260,7 +292,11 @@ class GwMapzoneManager:
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         macromapzone_function_id: int = 3482
         mapzone_function_id: int = 2768
-        function_id: int = macromapzone_function_id if mapzone_name in self.mapzone_status["enabledMacromapzone"] else mapzone_function_id
+        function_id: int = (
+            macromapzone_function_id
+            if mapzone_name in self.mapzone_status["enabledMacromapzone"]
+            else mapzone_function_id
+        )
 
         # Connect signals - refresh table when dialog is closed
         connect = [self._refresh_mapzone_table_on_close]
@@ -320,7 +356,9 @@ class GwMapzoneManager:
             return
 
         # Get mapzones style by calling gw_fct_getstylemapzones
-        style_extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
+        style_extras = (
+            f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
+        )
         style_body = tools_gw.create_body(extras=style_extras)
 
         style_result = tools_gw.execute_procedure("gw_fct_getstylemapzones", style_body)
@@ -351,7 +389,6 @@ class GwMapzoneManager:
             temporal_properties = vlayer.temporalProperties()
 
             if "timestep" in [field.name() for field in vlayer.fields()]:
-
                 temporal_properties.setStartField("timestep")
                 temporal_properties.setEndField("timestep")
 
@@ -541,10 +578,7 @@ class GwMapzoneManager:
 
         # Create the JSON body directly with the "parameters" key
         body = tools_gw.create_body(
-            extras=(
-                f'"parameters":{{"graphClass":"{graph_class_upper}", '
-                f'"exploitation":"{exploitation}"}}'
-            )
+            extras=(f'"parameters":{{"graphClass":"{graph_class_upper}", "exploitation":"{exploitation}"}}')
         )
 
         # Execute the procedure
@@ -610,56 +644,77 @@ class GwMapzoneManager:
         self.child_type = None
         # nodeParent
         self.config_dlg.btn_snapping_nodeParent.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent,
-                    "ve_node", "nodeParent", None,
-                    self.child_type))
+            partial(
+                self.get_snapped_feature_id,
+                self.config_dlg,
+                self.config_dlg.btn_snapping_nodeParent,
+                "ve_node",
+                "nodeParent",
+                None,
+                self.child_type,
+            )
+        )
         self.config_dlg.btn_expr_nodeParent.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, "nodeParent"))
+            partial(self._select_with_expression_dialog, self.config_dlg, "nodeParent")
+        )
         self.config_dlg.txt_nodeParent.textEdited.connect(partial(self._txt_node_parent_finished))
         # toArc
         self.config_dlg.btn_snapping_toArc.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, "ve_arc",
-                    "toArc", None,
-                    self.child_type))
+            partial(
+                self.get_snapped_feature_id,
+                self.config_dlg,
+                self.config_dlg.btn_snapping_toArc,
+                "ve_arc",
+                "toArc",
+                None,
+                self.child_type,
+            )
+        )
         self.config_dlg.btn_expr_toArc.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, "toArc"))
-        self.config_dlg.btn_add_nodeParent.clicked.connect(
-            partial(self._add_node_parent, self.config_dlg)
+            partial(self._select_with_expression_dialog, self.config_dlg, "toArc")
         )
-        self.config_dlg.btn_remove_nodeParent.clicked.connect(
-            partial(self._remove_node_parent, self.config_dlg)
-        )
+        self.config_dlg.btn_add_nodeParent.clicked.connect(partial(self._add_node_parent, self.config_dlg))
+        self.config_dlg.btn_remove_nodeParent.clicked.connect(partial(self._remove_node_parent, self.config_dlg))
         # Force closed
         # Set variables based on project type
         layer = "ve_node" if global_vars.project_type == "ws" else "ve_arc"
 
         self.config_dlg.btn_snapping_forceClosed.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
-                    layer, "forceClosed", None,
-                    self.child_type))
+            partial(
+                self.get_snapped_feature_id,
+                self.config_dlg,
+                self.config_dlg.btn_snapping_forceClosed,
+                layer,
+                "forceClosed",
+                None,
+                self.child_type,
+            )
+        )
         self.config_dlg.btn_expr_forceClosed.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, "forceClosed"))
-        self.config_dlg.btn_add_forceClosed.clicked.connect(
-            partial(self._add_force_closed, self.config_dlg)
+            partial(self._select_with_expression_dialog, self.config_dlg, "forceClosed")
         )
-        self.config_dlg.btn_remove_forceClosed.clicked.connect(
-            partial(self._remove_force_closed, self.config_dlg)
-        )
+        self.config_dlg.btn_add_forceClosed.clicked.connect(partial(self._add_force_closed, self.config_dlg))
+        self.config_dlg.btn_remove_forceClosed.clicked.connect(partial(self._remove_force_closed, self.config_dlg))
         # Ignore
         # Set variables based on project type
         layer = "ve_node" if global_vars.project_type == "ws" else "ve_arc"
 
         self.config_dlg.btn_snapping_ignore.clicked.connect(
-            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
-                    layer, "ignore", None, self.child_type))
+            partial(
+                self.get_snapped_feature_id,
+                self.config_dlg,
+                self.config_dlg.btn_snapping_ignore,
+                layer,
+                "ignore",
+                None,
+                self.child_type,
+            )
+        )
         self.config_dlg.btn_expr_ignore.clicked.connect(
-            partial(self._select_with_expression_dialog, self.config_dlg, "ignore"))
-        self.config_dlg.btn_add_ignore.clicked.connect(
-            partial(self._add_ignore, self.config_dlg)
+            partial(self._select_with_expression_dialog, self.config_dlg, "ignore")
         )
-        self.config_dlg.btn_remove_ignore.clicked.connect(
-            partial(self._remove_ignore, self.config_dlg)
-        )
+        self.config_dlg.btn_add_ignore.clicked.connect(partial(self._add_ignore, self.config_dlg))
+        self.config_dlg.btn_remove_ignore.clicked.connect(partial(self._remove_ignore, self.config_dlg))
         # Preview
         self.config_dlg.btn_clear_preview.clicked.connect(partial(self._clear_preview, self.config_dlg))
         # Dialog buttons
@@ -694,7 +749,6 @@ class GwMapzoneManager:
         tools_gw.open_dialog(self.config_dlg, "mapzone_config", title=dlg_title)
 
     def _config_dlg_finished(self, dialog):
-
         self._cancel_snapping_tool(dialog, None)
         self.iface.actionPan().trigger()
         tools_gw.close_dialog(dialog)
@@ -736,34 +790,49 @@ class GwMapzoneManager:
 
         # Set signals
         tools_gw.disconnect_signal("mapzone_manager_snapping", "get_snapped_feature_id_xyCoordinates_mouse_moved")
-        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
-                                "mapzone_manager_snapping", "get_snapped_feature_id_xyCoordinates_mouse_moved")
+        tools_gw.connect_signal(
+            self.canvas.xyCoordinates,
+            partial(self._mouse_moved, layer),
+            "mapzone_manager_snapping",
+            "get_snapped_feature_id_xyCoordinates_mouse_moved",
+        )
 
         tools_gw.disconnect_signal("mapzone_manager_snapping", "get_snapped_feature_id_ep_canvasClicked_get_id")
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        tools_gw.connect_signal(emit_point.canvasClicked,
-                                partial(self._get_id, dialog, action, option, emit_point, child_type),
-                                "mapzone_manager_snapping", "get_snapped_feature_id_ep_canvasClicked_get_id")
+        tools_gw.connect_signal(
+            emit_point.canvasClicked,
+            partial(self._get_id, dialog, action, option, emit_point, child_type),
+            "mapzone_manager_snapping",
+            "get_snapped_feature_id_ep_canvasClicked_get_id",
+        )
 
     def _show_context_menu(self, qtableview):
         """Show custom context menu"""
         menu = QMenu(qtableview)
 
         action_update = QAction("Update", qtableview)
-        action_update.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update"))
+        action_update.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update")
+        )
         menu.addAction(action_update)
 
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
+        action_delete.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete")
+        )
         menu.addAction(action_delete)
 
         action_toggle_active = QAction("Toggle Active", qtableview)
-        action_toggle_active.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
+        action_toggle_active.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active")
+        )
         menu.addAction(action_toggle_active)
 
         action_config = QAction("Config", qtableview)
-        action_config.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_config"))
+        action_config.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_config")
+        )
         menu.addAction(action_config)
 
         menu.exec(QCursor.pos())
@@ -794,8 +863,12 @@ class GwMapzoneManager:
         force_closed_id_field = "node_id" if global_vars.project_type == "ws" else "arc_id"
         ignore_id_field = "node_id" if global_vars.project_type == "ws" else "arc_id"
 
-        options = {"nodeParent": ["node_id", "_set_node_parent"], "toArc": ["arc_id", "_set_to_arc"],
-                   "forceClosed": [force_closed_id_field, "_set_force_closed"], "ignore": [ignore_id_field, "_set_ignore"]}
+        options = {
+            "nodeParent": ["node_id", "_set_node_parent"],
+            "toArc": ["arc_id", "_set_to_arc"],
+            "forceClosed": [force_closed_id_field, "_set_force_closed"],
+            "ignore": [ignore_id_field, "_set_ignore"],
+        }
 
         if event == Qt.MouseButton.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -888,8 +961,10 @@ class GwMapzoneManager:
         node_parent_id = self.node_parent
         to_arc_list = json.dumps(list(self.to_arc_list))
         preview = tools_qt.get_text(dialog, "txt_preview")
-        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
+        parameters = (
+            f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
@@ -921,8 +996,10 @@ class GwMapzoneManager:
         node_parent_id = self.node_parent
         preview = tools_qt.get_text(dialog, "txt_preview")
 
-        parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"nodeParent": "{node_parent_id}"'
+        parameters = (
+            f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"nodeParent": "{node_parent_id}"'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
@@ -954,8 +1031,10 @@ class GwMapzoneManager:
         force_closed_list = json.dumps(list(self.force_closed_list))
         preview = tools_qt.get_text(dialog, "txt_preview")
 
-        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"forceClosed": {force_closed_list}'
+        parameters = (
+            f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"forceClosed": {force_closed_list}'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
@@ -987,8 +1066,10 @@ class GwMapzoneManager:
         force_closed_list = json.dumps(list(self.force_closed_list))
         preview = tools_qt.get_text(dialog, "txt_preview")
 
-        parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"forceClosed": {force_closed_list}'
+        parameters = (
+            f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"forceClosed": {force_closed_list}'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
@@ -1020,8 +1101,10 @@ class GwMapzoneManager:
         ignore_list = json.dumps(list(self.ignore_list))
         preview = tools_qt.get_text(dialog, "txt_preview")
 
-        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"ignore": {ignore_list}'
+        parameters = (
+            f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"ignore": {ignore_list}'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
@@ -1053,8 +1136,10 @@ class GwMapzoneManager:
         ignore_list = json.dumps(list(self.ignore_list))
         preview = tools_qt.get_text(dialog, "txt_preview")
 
-        parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"ignore": {ignore_list}'
+        parameters = (
+            f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"ignore": {ignore_list}'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
@@ -1091,8 +1176,10 @@ class GwMapzoneManager:
 
         if not preview:
             return
-        parameters = f'"action": "UPDATE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
-                     f'"config": {preview}'
+        parameters = (
+            f'"action": "UPDATE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", '
+            f'"config": {preview}'
+        )
         if self.netscenario_id is not None:
             parameters += f', "netscenarioId": {self.netscenario_id}'
         extras = f'"parameters": {{{parameters}}}'
@@ -1171,7 +1258,7 @@ class GwMapzoneManager:
             None,  # No table object needed for expression selection
             layer_name,
             self._selection_init,
-            partial(self._selection_end, option)
+            partial(self._selection_end, option),
         )
 
     def _selection_init(self):
@@ -1308,7 +1395,9 @@ class GwMapzoneManager:
 
         msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(msg, title, [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True)
+        answer = tools_qt.show_question(
+            msg, title, [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True
+        )
         if answer:
             # Build WHERE IN clause for SQL
             where_clause = f"{field_id} IN ({', '.join(map(str, mapzone_ids))})"
@@ -1332,12 +1421,13 @@ class GwMapzoneManager:
 
         # Ordenar els camps per layoutorder abans de construir el diàleg
         if "body" in result and "data" in result["body"] and "fields" in result["body"]["data"]:
-            sorted_fields = sorted(result["body"]["data"]["fields"],
-                                    key=lambda x: x.get("layoutorder", 0))
+            sorted_fields = sorted(result["body"]["data"]["fields"], key=lambda x: x.get("layoutorder", 0))
             result["body"]["data"]["fields"] = sorted_fields
 
         # Construir el diàleg amb la versió millorada
-        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions, tab_name="tab_none")
+        tools_gw.build_dialog_info(
+            self.add_dlg, result, my_json=self.my_json_add, layout_positions=layout_positions, tab_name="tab_none"
+        )
 
         layout = self.add_dlg.findChild(QGridLayout, "lyt_main_1")
         self.add_dlg.actionEdit.setVisible(False)
@@ -1390,13 +1480,15 @@ class GwMapzoneManager:
         self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(self._manage_current_changed)
         self.add_dlg.btn_accept.clicked.connect(
-            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+            partial(
+                self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action
+            )
+        )
 
         # Open dlg
         tools_gw.open_dialog(self.add_dlg, dlg_name="info_generic", title=dlg_title)
 
     def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
-
         if not my_json:
             return
 
@@ -1461,7 +1553,9 @@ class GwMapzoneManager:
         try:
             # Get the last active tab from configuration using existing tools_gw functions
             dlg_name = self.mapzone_mng_dlg.objectName()
-            last_active_tab_name = tools_gw.get_config_parser("dialogs_tab", f"{dlg_name}_mapzone_manager", "user", "session")
+            last_active_tab_name = tools_gw.get_config_parser(
+                "dialogs_tab", f"{dlg_name}_mapzone_manager", "user", "session"
+            )
 
             if last_active_tab_name:
                 # Find the tab index by name

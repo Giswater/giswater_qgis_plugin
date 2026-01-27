@@ -3,6 +3,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
 # -*- coding: utf-8 -*-
 from functools import partial
 from qgis.PyQt.sip import isdeleted
@@ -12,8 +13,23 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor, QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegularExpression, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
-    QShortcut, QApplication, QWidget, QLabel, QGridLayout, QToolButton, QPushButton, QHeaderView
+from qgis.PyQt.QtWidgets import (
+    QTableView,
+    QAbstractItemView,
+    QMenu,
+    QCheckBox,
+    QWidgetAction,
+    QComboBox,
+    QAction,
+    QShortcut,
+    QApplication,
+    QWidget,
+    QLabel,
+    QGridLayout,
+    QToolButton,
+    QPushButton,
+    QHeaderView,
+)
 from qgis.PyQt.QtWidgets import QLineEdit
 
 from ..dialog import GwAction
@@ -30,35 +46,57 @@ class GwDscenarioManagerButton(GwAction):
     """Button 45: Dscenario manager"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = "node"
-        self.feature_types = ["element_id", "node_id", "arc_id", "feature_id", "connec_id", "nodarc_id", "rg_id", "poll_id", "sector_id", "lidco_id"]
-        self.filter_dict = {"inp_dscenario_controls": {"filter_table": "ve_sector", "feature_type": "sector"},
-                            "inp_dscenario_rules": {"filter_table": "ve_sector", "feature_type": "sector"},
-                            "inp_dscenario_demand": {"filter_table": ["ve_inp_junction", "ve_inp_connec"], "feature_type": ["node", "connec"]},
-                            "inp_dscenario_raingage": {"filter_table": "ve_raingage", "feature_type": "rg"},
-                            # DISABLED:
-                            # "inp_dscenario_lids": {"filter_table": "ve_inp_dscenario_lids", "feature_type": "lidco"},
-                            # "inp_dscenario_inflows": {"filter_table": "ve_inp_inflows", "feature_type": "node"},
-                            # "inp_dscenario_treatment": {"filter_table": "ve_inp_treatment", "feature_type": "node"},
-                            # "inp_dscenario_flwreg_pump": {"filter_table": "ve_inp_pump", "feature_type": "arc"},
-                            # "inp_dscenario_flwreg_weir": {"filter_table": "ve_inp_weir", "feature_type": "arc"},
-                            # "inp_dscenario_flwreg_orifice": {"filter_table": "ve_inp_orifice", "feature_type": "arc"},
-                            # "inp_dscenario_flwreg_outlet": {"filter_table": "ve_inp_outlet", "feature_type": "arc"},
-                            # "inp_dscenario_inflows_poll": {"filter_table": "ve_inp_inflows_poll", "feature_type": "poll"},
-                            }
-        self.filter_disabled = ["inp_dscenario_lids", "inp_dscenario_inflows", "inp_dscenario_treatment",
-                                "inp_dscenario_flwreg_pump", "inp_dscenario_flwreg_weir", "inp_dscenario_flwreg_orifice",
-                                "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll",  # "inp_dscenario_pump_additional"
-                                ]
+        self.feature_types = [
+            "element_id",
+            "node_id",
+            "arc_id",
+            "feature_id",
+            "connec_id",
+            "nodarc_id",
+            "rg_id",
+            "poll_id",
+            "sector_id",
+            "lidco_id",
+        ]
+        self.filter_dict = {
+            "inp_dscenario_controls": {"filter_table": "ve_sector", "feature_type": "sector"},
+            "inp_dscenario_rules": {"filter_table": "ve_sector", "feature_type": "sector"},
+            "inp_dscenario_demand": {
+                "filter_table": ["ve_inp_junction", "ve_inp_connec"],
+                "feature_type": ["node", "connec"],
+            },
+            "inp_dscenario_raingage": {"filter_table": "ve_raingage", "feature_type": "rg"},
+            # DISABLED:
+            # "inp_dscenario_lids": {"filter_table": "ve_inp_dscenario_lids", "feature_type": "lidco"},
+            # "inp_dscenario_inflows": {"filter_table": "ve_inp_inflows", "feature_type": "node"},
+            # "inp_dscenario_treatment": {"filter_table": "ve_inp_treatment", "feature_type": "node"},
+            # "inp_dscenario_flwreg_pump": {"filter_table": "ve_inp_pump", "feature_type": "arc"},
+            # "inp_dscenario_flwreg_weir": {"filter_table": "ve_inp_weir", "feature_type": "arc"},
+            # "inp_dscenario_flwreg_orifice": {"filter_table": "ve_inp_orifice", "feature_type": "arc"},
+            # "inp_dscenario_flwreg_outlet": {"filter_table": "ve_inp_outlet", "feature_type": "arc"},
+            # "inp_dscenario_inflows_poll": {"filter_table": "ve_inp_inflows_poll", "feature_type": "poll"},
+        }
+        self.filter_disabled = [
+            "inp_dscenario_lids",
+            "inp_dscenario_inflows",
+            "inp_dscenario_treatment",
+            "inp_dscenario_flwreg_pump",
+            "inp_dscenario_flwreg_weir",
+            "inp_dscenario_flwreg_orifice",
+            "inp_dscenario_flwreg_outlet",
+            "inp_dscenario_inflows_poll",  # "inp_dscenario_pump_additional"
+        ]
         self.dict_ids = {"ve_cat_hydrology": "name", "ve_cat_dwf": "idval", "ve_cat_dscenario": "name"}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
         if self.project_type == "ud":
-
-            self.views_dict = {"ve_cat_hydrology": "hydrology_id", "ve_cat_dwf": "id",
-                               "ve_cat_dscenario": "dscenario_id"}
+            self.views_dict = {
+                "ve_cat_hydrology": "hydrology_id",
+                "ve_cat_dwf": "id",
+                "ve_cat_dscenario": "dscenario_id",
+            }
             self.menu = QMenu()
             self.menu.setObjectName("GW_dsenario_menu")
             self._fill_dscenario_menu()
@@ -72,7 +110,6 @@ class GwDscenarioManagerButton(GwAction):
             self.views_dict = {"ve_cat_dscenario": "dscenario_id"}
 
     def clicked_event(self):
-
         if self.project_type == "ws":
             self._open_dscenario_manager()
         elif self.project_type == "ud":
@@ -98,8 +135,11 @@ class GwDscenarioManagerButton(GwAction):
             del action
         action_group = self.action.property("action_group")
 
-        buttons = [[tools_qt.tr("Dscenario manager"), "_open_dscenario_manager"], [tools_qt.tr("Hydrology scenario manager"), "_open_hydrology_manager"],
-                   [tools_qt.tr("DWF scenario manager"), "_open_dwf_manager"]]
+        buttons = [
+            [tools_qt.tr("Dscenario manager"), "_open_dscenario_manager"],
+            [tools_qt.tr("Hydrology scenario manager"), "_open_hydrology_manager"],
+            [tools_qt.tr("DWF scenario manager"), "_open_dwf_manager"],
+        ]
 
         for button in buttons:
             button_name = button[0]
@@ -145,38 +185,84 @@ class GwDscenarioManagerButton(GwAction):
 
         # Populate custom context menu
         self.dlg_hydrology_manager.tbl_dscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.dlg_hydrology_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_hydrology_manager.tbl_dscenario))
+        self.dlg_hydrology_manager.tbl_dscenario.customContextMenuRequested.connect(
+            partial(self._show_context_menu, self.dlg_hydrology_manager.tbl_dscenario)
+        )
 
         # Connect main dialog signals
-        self.dlg_hydrology_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, "ve_cat_hydrology", "Catalogs"))
-        self.dlg_hydrology_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                        "ve_cat_hydrology", None,
-                                                                        dialog=self.dlg_hydrology_manager,
-                                                                        scenario_type="hydrology"))
-        self.dlg_hydrology_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_hydrology_manager, "ve_cat_hydrology", 3294))
-        self.dlg_hydrology_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3100,
-                                                                       "ve_cat_hydrology", dialog=self.dlg_hydrology_manager, scenario_type="hydrology"))
-        self.dlg_hydrology_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_hydrology_manager, "ve_cat_hydrology", True))
-        self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_hydrology_manager, "ve_cat_hydrology", scenario_type="hydrology"))
+        self.dlg_hydrology_manager.btn_toc.clicked.connect(
+            partial(self._manage_add_layers, "ve_cat_hydrology", "Catalogs")
+        )
+        self.dlg_hydrology_manager.txt_name.textChanged.connect(
+            partial(
+                self._fill_manager_table,
+                "ve_cat_hydrology",
+                None,
+                dialog=self.dlg_hydrology_manager,
+                scenario_type="hydrology",
+            )
+        )
+        self.dlg_hydrology_manager.btn_duplicate.clicked.connect(
+            partial(self._duplicate_selected_dscenario, self.dlg_hydrology_manager, "ve_cat_hydrology", 3294)
+        )
+        self.dlg_hydrology_manager.btn_toolbox.clicked.connect(
+            partial(
+                self._open_toolbox_function,
+                3100,
+                "ve_cat_hydrology",
+                dialog=self.dlg_hydrology_manager,
+                scenario_type="hydrology",
+            )
+        )
+        self.dlg_hydrology_manager.btn_update.clicked.connect(
+            partial(self._manage_properties, self.dlg_hydrology_manager, "ve_cat_hydrology", True)
+        )
+        self.dlg_hydrology_manager.btn_delete.clicked.connect(
+            partial(
+                self._delete_selected_dscenario,
+                self.dlg_hydrology_manager,
+                "ve_cat_hydrology",
+                scenario_type="hydrology",
+            )
+        )
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
-        self.dlg_hydrology_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
-                                                self.dlg_hydrology_manager, self.tbl_dscenario, "ve_cat_hydrology", "inp_options_hydrology_current", scenario_type="hydrology"))
+        self.dlg_hydrology_manager.btn_toggle_active.clicked.connect(
+            partial(
+                self._manage_toggle_active,
+                self.dlg_hydrology_manager,
+                self.tbl_dscenario,
+                "ve_cat_hydrology",
+                "inp_options_hydrology_current",
+                scenario_type="hydrology",
+            )
+        )
         self.dlg_hydrology_manager.chk_active.stateChanged.connect(
-            partial(self._fill_manager_table, "ve_cat_hydrology",
-                    dialog=self.dlg_hydrology_manager,
-                    scenario_type="hydrology"))
+            partial(
+                self._fill_manager_table,
+                "ve_cat_hydrology",
+                dialog=self.dlg_hydrology_manager,
+                scenario_type="hydrology",
+            )
+        )
 
         self.dlg_hydrology_manager.btn_update_dscenario.clicked.connect(
-            partial(self.update_current_scenario, self.dlg_hydrology_manager, qtbl=self.tbl_dscenario,
-                    scenario_type="hydrology", col_id_name="hydrology_id", view_name="ve_cat_hydrology",))
+            partial(
+                self.update_current_scenario,
+                self.dlg_hydrology_manager,
+                qtbl=self.tbl_dscenario,
+                scenario_type="hydrology",
+                col_id_name="hydrology_id",
+                view_name="ve_cat_hydrology",
+            )
+        )
 
-        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_hydrology_manager, "ve_cat_hydrology"))
+        self.tbl_dscenario.doubleClicked.connect(
+            partial(self._manage_properties, self.dlg_hydrology_manager, "ve_cat_hydrology")
+        )
 
         self.dlg_hydrology_manager.btn_cancel.clicked.connect(
-            partial(tools_gw.close_dialog, self.dlg_hydrology_manager))
+            partial(tools_gw.close_dialog, self.dlg_hydrology_manager)
+        )
         self.dlg_hydrology_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_hydrology_manager))
         self.dlg_hydrology_manager.finished.connect(partial(self.save_user_values))
 
@@ -215,38 +301,56 @@ class GwDscenarioManagerButton(GwAction):
 
         # Populate custom context menu
         self.dlg_dwf_manager.tbl_dscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.dlg_dwf_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_dwf_manager.tbl_dscenario))
+        self.dlg_dwf_manager.tbl_dscenario.customContextMenuRequested.connect(
+            partial(self._show_context_menu, self.dlg_dwf_manager.tbl_dscenario)
+        )
 
         # Connect main dialog signals
         self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, "ve_cat_dwf", "Catalogs"))
-        self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                  "ve_cat_dwf", None,
-                                                                  dialog=self.dlg_dwf_manager,
-                                                                  scenario_type="dwf"))
-        self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dwf_manager, "ve_cat_dwf", 3296))
-        self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
-                                                                 "ve_cat_dwf", dialog=self.dlg_dwf_manager, scenario_type="dwf"))
-        self.dlg_dwf_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_dwf_manager, "ve_cat_dwf", True))
-        self.dlg_dwf_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_dwf_manager, "ve_cat_dwf", scenario_type="dwf"))
+        self.dlg_dwf_manager.txt_name.textChanged.connect(
+            partial(self._fill_manager_table, "ve_cat_dwf", None, dialog=self.dlg_dwf_manager, scenario_type="dwf")
+        )
+        self.dlg_dwf_manager.btn_duplicate.clicked.connect(
+            partial(self._duplicate_selected_dscenario, self.dlg_dwf_manager, "ve_cat_dwf", 3296)
+        )
+        self.dlg_dwf_manager.btn_toolbox.clicked.connect(
+            partial(self._open_toolbox_function, 3102, "ve_cat_dwf", dialog=self.dlg_dwf_manager, scenario_type="dwf")
+        )
+        self.dlg_dwf_manager.btn_update.clicked.connect(
+            partial(self._manage_properties, self.dlg_dwf_manager, "ve_cat_dwf", True)
+        )
+        self.dlg_dwf_manager.btn_delete.clicked.connect(
+            partial(self._delete_selected_dscenario, self.dlg_dwf_manager, "ve_cat_dwf", scenario_type="dwf")
+        )
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
-        self.dlg_dwf_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
-                                                self.dlg_dwf_manager, self.tbl_dscenario, "ve_cat_dwf", "inp_options_dwfscenario_current", scenario_type="dwf"))
+        self.dlg_dwf_manager.btn_toggle_active.clicked.connect(
+            partial(
+                self._manage_toggle_active,
+                self.dlg_dwf_manager,
+                self.tbl_dscenario,
+                "ve_cat_dwf",
+                "inp_options_dwfscenario_current",
+                scenario_type="dwf",
+            )
+        )
         self.dlg_dwf_manager.chk_active.stateChanged.connect(
-            partial(self._fill_manager_table, "ve_cat_dwf",
-                    dialog=self.dlg_dwf_manager,
-                    scenario_type="dwf"))
+            partial(self._fill_manager_table, "ve_cat_dwf", dialog=self.dlg_dwf_manager, scenario_type="dwf")
+        )
 
         self.dlg_dwf_manager.btn_update_dscenario.clicked.connect(
-            partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf",
-                    col_id_name="id", view_name="ve_cat_dwf"))
+            partial(
+                self.update_current_scenario,
+                self.dlg_dwf_manager,
+                qtbl=self.tbl_dscenario,
+                scenario_type="dwf",
+                col_id_name="id",
+                view_name="ve_cat_dwf",
+            )
+        )
 
         self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_dwf_manager, "ve_cat_dwf"))
 
-        self.dlg_dwf_manager.btn_cancel.clicked.connect(
-            partial(tools_gw.close_dialog, self.dlg_dwf_manager))
+        self.dlg_dwf_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dwf_manager))
         self.dlg_dwf_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dwf_manager))
         self.dlg_dwf_manager.finished.connect(partial(self.save_user_values))
 
@@ -287,27 +391,41 @@ class GwDscenarioManagerButton(GwAction):
 
         # Populate custom context menu
         self.dlg_dscenario_manager.tbl_dscenario.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.dlg_dscenario_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_dscenario_manager.tbl_dscenario))
+        self.dlg_dscenario_manager.tbl_dscenario.customContextMenuRequested.connect(
+            partial(self._show_context_menu, self.dlg_dscenario_manager.tbl_dscenario)
+        )
 
         # Connect main dialog signals
-        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                        "ve_cat_dscenario", None))
-        self.dlg_dscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, "ve_inp_dscenario", "Dscenario"))
-        self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dscenario_manager, "ve_cat_dscenario", 3156))
-        self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
-                                                                       "ve_cat_dscenario"))
-        self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_dscenario_manager, "ve_cat_dscenario", True))
-        self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_dscenario_manager, "ve_cat_dscenario"))
+        self.dlg_dscenario_manager.txt_name.textChanged.connect(
+            partial(self._fill_manager_table, "ve_cat_dscenario", None)
+        )
+        self.dlg_dscenario_manager.btn_toc.clicked.connect(
+            partial(self._manage_add_layers, "ve_inp_dscenario", "Dscenario")
+        )
+        self.dlg_dscenario_manager.btn_duplicate.clicked.connect(
+            partial(self._duplicate_selected_dscenario, self.dlg_dscenario_manager, "ve_cat_dscenario", 3156)
+        )
+        self.dlg_dscenario_manager.btn_toolbox.clicked.connect(
+            partial(self._open_toolbox_function, 3042, "ve_cat_dscenario")
+        )
+        self.dlg_dscenario_manager.btn_update.clicked.connect(
+            partial(self._manage_properties, self.dlg_dscenario_manager, "ve_cat_dscenario", True)
+        )
+        self.dlg_dscenario_manager.btn_delete.clicked.connect(
+            partial(self._delete_selected_dscenario, self.dlg_dscenario_manager, "ve_cat_dscenario")
+        )
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
-        self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
-                                                self.dlg_dscenario_manager, self.tbl_dscenario, "ve_cat_dscenario"))
+        self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(
+            partial(self._manage_toggle_active, self.dlg_dscenario_manager, self.tbl_dscenario, "ve_cat_dscenario")
+        )
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
-        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table, "ve_cat_dscenario"))
+        self.dlg_dscenario_manager.chk_active.stateChanged.connect(
+            partial(self._fill_manager_table, "ve_cat_dscenario")
+        )
 
-        self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
+        self.dlg_dscenario_manager.btn_cancel.clicked.connect(
+            partial(tools_gw.close_dialog, self.dlg_dscenario_manager)
+        )
         self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
@@ -320,32 +438,46 @@ class GwDscenarioManagerButton(GwAction):
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", self.tbl_dscenario)
-        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
+        action_open.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos)
+        )
         menu.addAction(action_open)
 
         if qtableview.objectName() in ("ve_cat_hydrology", "ve_cat_dwf"):
             action_toggle = QAction("Current dscenario", qtableview)
-            action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update_dscenario"))
+            action_toggle.triggered.connect(
+                partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update_dscenario")
+            )
             menu.addAction(action_toggle)
 
         action_toggle = QAction("Toggle active", qtableview)
-        action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
+        action_toggle.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active")
+        )
         menu.addAction(action_toggle)
 
         action_duplicate = QAction("Duplicate", qtableview)
-        action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
+        action_duplicate.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate")
+        )
         menu.addAction(action_duplicate)
 
         action_update = QAction("Update", qtableview)
-        action_update.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update"))
+        action_update.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update")
+        )
         menu.addAction(action_update)
 
         action_toolbox = QAction("Toolbox", qtableview)
-        action_toolbox.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toolbox"))
+        action_toolbox.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toolbox")
+        )
         menu.addAction(action_toolbox)
 
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
+        action_delete.triggered.connect(
+            partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete")
+        )
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
@@ -364,7 +496,6 @@ class GwDscenarioManagerButton(GwAction):
             return
 
         for index in selected_list:
-
             col_idx = tools_qt.get_col_index_by_col_name(tableview, self.views_dict[view])
             if not col_idx:
                 col_idx = 0
@@ -373,7 +504,12 @@ class GwDscenarioManagerButton(GwAction):
             active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, "active")).data()
             active = tools_os.set_boolean(active)
 
-            if parameter and tools_gw.get_config_value(parameter) and active and str(tools_gw.get_config_value(parameter)[0]) == str(scenario_id):
+            if (
+                parameter
+                and tools_gw.get_config_value(parameter)
+                and active
+                and str(tools_gw.get_config_value(parameter)[0]) == str(scenario_id)
+            ):
                 msg = "Cannot set inactive a current scenario. Please update current first."
                 tools_qgis.show_warning(msg, dialog=dialog)
                 return
@@ -506,7 +642,11 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.set_tableview_config(self.tbl_dscenario)
         # Optionally set current scenario label if context provided
 
-        if dialog is not None and dialog.findChild(QWidget, "lbl_vdefault_dscenario").isVisible() and scenario_type is not None:
+        if (
+            dialog is not None
+            and dialog.findChild(QWidget, "lbl_vdefault_dscenario").isVisible()
+            and scenario_type is not None
+        ):
             self._set_label_current_dscenario_type(dialog, scenario_type=scenario_type, from_open_dialog=True)
         return complet_list
 
@@ -533,11 +673,15 @@ class GwDscenarioManagerButton(GwAction):
             num = value[0]
             label = value[1]
             action = create_menu.addAction(f"{label}")
-            action.triggered.connect(partial(self._open_toolbox_function, num, view, label=label, dialog=dialog, scenario_type=scenario_type))
+            action.triggered.connect(
+                partial(self._open_toolbox_function, num, view, label=label, dialog=dialog, scenario_type=scenario_type)
+            )
 
         dialog.btn_create.setMenu(create_menu)
 
-    def _open_toolbox_function(self, function, view, signal=None, connect=None, label=None, dialog=None, scenario_type=None):
+    def _open_toolbox_function(
+        self, function, view, signal=None, connect=None, label=None, dialog=None, scenario_type=None
+    ):
         """Execute currently selected function from combobox and dynamically append additional logic
         for specific scenarios without removing defaults.
         """
@@ -553,8 +697,10 @@ class GwDscenarioManagerButton(GwAction):
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
 
         # Default connections
-        default_connect = [partial(self._fill_manager_table, view, dialog=dialog, scenario_type=scenario_type),
-                           partial(tools_gw.refresh_selectors)]
+        default_connect = [
+            partial(self._fill_manager_table, view, dialog=dialog, scenario_type=scenario_type),
+            partial(tools_gw.refresh_selectors),
+        ]
 
         # Merge connect with defaults
         if connect is None:
@@ -617,8 +763,10 @@ class GwDscenarioManagerButton(GwAction):
         # Get selected dscenario id
         values = [index.sibling(index.row(), 0).data() for index in selected_list]
 
-        msg = ("CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n"
-                  "Are you sure you want to delete these records?")
+        msg = (
+            "CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n"
+            "Are you sure you want to delete these records?"
+        )
         title = "Delete records"
         answer = tools_qt.show_question(msg, title, values, force_action=True)
         if answer:
@@ -665,9 +813,11 @@ class GwDscenarioManagerButton(GwAction):
 
         default_tab_idx = 0
         # Select all dscenario views
-        sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
-              f"AND table_name LIKE 'inp_dscenario%'" \
-              f"ORDER BY table_name;"
+        sql = (
+            f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' "
+            f"AND table_name LIKE 'inp_dscenario%'"
+            f"ORDER BY table_name;"
+        )
         rows = tools_db.get_rows(sql)
         if rows:
             views = [x[0] for x in rows]
@@ -685,7 +835,9 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
-        self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties, self.dlg_dscenario_manager, "ve_cat_dscenario"))
+        self.dlg_dscenario.btn_properties.clicked.connect(
+            partial(self._manage_properties, self.dlg_dscenario_manager, "ve_cat_dscenario")
+        )
         self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers, "ve_inp_dscenario", "Dscenario"))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
@@ -749,7 +901,7 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"SELECT DISTINCT column_name, ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' ORDER BY ordinal_position;"
+        sql = f"SELECT DISTINCT column_name, ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.') :]}' ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
 
         # FIELDS
@@ -758,7 +910,8 @@ class GwDscenarioManagerButton(GwAction):
 
         # VALUES
         values_str = ", ".join(
-            [f"'{self.selected_dscenario_id}'", f"'{feature_id}'"] + [f"'{value}'" for value in values])
+            [f"'{self.selected_dscenario_id}'", f"'{feature_id}'"] + [f"'{value}'" for value in values]
+        )
 
         sql = f"INSERT INTO ve_{view} ({columns_str}) VALUES ({values_str});"
         tools_db.execute_sql(sql)
@@ -809,8 +962,13 @@ class GwDscenarioManagerButton(GwAction):
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
-        tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
+        tools_qt.set_tableview_config(
+            widget,
+            selection=QAbstractItemView.SelectionBehavior.SelectRows,
+            edit_triggers=set_edit_triggers,
+            section_resize_mode=QHeaderView.ResizeMode.Interactive,
+        )
+        tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{self.table_name[len(f'{self.schema_name}.') :]}")
 
         # Hide unwanted columns
         col_idx = tools_qt.get_col_index_by_col_name(widget, "dscenario_id")
@@ -856,7 +1014,9 @@ class GwDscenarioManagerButton(GwAction):
             add_id = not (feature_type == "id")
             if feature_type == "id":
                 feature_type = "concat(node_id, ' (order_id ', order_id, ')')"
-            tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=add_id, filter_mode="contains")
+            tools_gw.set_completer_widget(
+                table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=add_id, filter_mode="contains"
+            )
 
         tableview = self.dlg_dscenario.main_tab.currentWidget()
 
@@ -888,7 +1048,7 @@ class GwDscenarioManagerButton(GwAction):
         self._enable_widgets(enable, tableview)
 
     def _enable_widgets(self, enable, tableview):
-        """  """
+        """ """
 
         tools_qt.set_widget_enabled(self.dlg_dscenario, "txt_feature_id", enable)
         tools_qt.set_widget_enabled(self.dlg_dscenario, "btn_insert", enable)
@@ -1052,8 +1212,11 @@ class GwDscenarioManagerButton(GwAction):
         # Signals
         self.props_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.props_dlg))
         self.props_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.props_dlg))
-        self.props_dlg.btn_accept.clicked.connect(partial(self._accept_props_dlg, self.props_dlg, tablename, pkey,
-                                                          self.selected_dscenario_id, self.my_json_add))
+        self.props_dlg.btn_accept.clicked.connect(
+            partial(
+                self._accept_props_dlg, self.props_dlg, tablename, pkey, self.selected_dscenario_id, self.my_json_add
+            )
+        )
 
         # Open dlg
         title = f"Properties for Dscenario: {self.selected_dscenario_id}"
@@ -1104,8 +1267,10 @@ class GwDscenarioManagerButton(GwAction):
             layer_list.append(tools_qgis.get_layer_source_table_name(layer))
 
         geom_layers = []
-        sql = f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{lib_vars.schema_name}' " \
-              f"AND f_table_name LIKE '{table_name}%';"
+        sql = (
+            f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{lib_vars.schema_name}' "
+            f"AND f_table_name LIKE '{table_name}%';"
+        )
         rows = tools_db.get_rows(sql)
 
         if rows:
@@ -1153,7 +1318,8 @@ class GwDscenarioManagerButton(GwAction):
                 widget.setStyleSheet("margin: 5px 5px 5px 8px;")
 
                 widgetAction.defaultWidget().stateChanged.connect(
-                    partial(self._check_action_ischecked, tablename, the_geom, pk, -1, alias.strip(), sub_group))
+                    partial(self._check_action_ischecked, tablename, the_geom, pk, -1, alias.strip(), sub_group)
+                )
 
         main_menu.exec(click_point)
 
@@ -1167,7 +1333,15 @@ class GwDscenarioManagerButton(GwAction):
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="EPA", sub_group=sub_group, style_id=style_id, alias=alias)
+                tools_gw.add_layer_database(
+                    tablename,
+                    the_geom=the_geom,
+                    field_id=pk,
+                    group="EPA",
+                    sub_group=sub_group,
+                    style_id=style_id,
+                    alias=alias,
+                )
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
@@ -1177,7 +1351,6 @@ class GwDscenarioManagerButton(GwAction):
                     tools_qgis.remove_layer_from_toc(layer.name(), "EPA", sub_group)
 
     def _manage_load_all(self, menu, state=None):
-
         if state == 2:
             for child in menu.actions():
                 if not child.isChecked():
@@ -1202,9 +1375,11 @@ class GwDscenarioManagerButton(GwAction):
         if view == "inp_dscenario_pump_additional":
             return self._manage_insert_pump_additional(view)
 
-        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS " \
-              f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' " \
-              f"ORDER BY ordinal_position;"
+        sql = (
+            f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS "
+            f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.') :]}' "
+            f"ORDER BY ordinal_position;"
+        )
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -1237,13 +1412,11 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_dscenario_table()
 
     def _manage_upsert_controls(self, control_id=None):
-
         nonvisual = GwNonVisual()
         nonvisual.get_controls(control_id=control_id, dscenario_id=self.selected_dscenario_id)
         nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
 
     def _manage_upsert_rules(self, rule_id=None):
-
         nonvisual = GwNonVisual()
         nonvisual.get_rules(rule_id=rule_id, dscenario_id=self.selected_dscenario_id)
         nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
@@ -1285,7 +1458,6 @@ class GwDscenarioManagerButton(GwAction):
             self._fill_dscenario_table()
 
     def _manage_btn_snapping(self, checked: bool):
-
         if checked:
             self._manage_select()
         else:
@@ -1329,8 +1501,12 @@ class GwDscenarioManagerButton(GwAction):
 
     def connect_signal_selection_changed(self):
         """Connect signal selectionChanged"""
-        tools_gw.connect_signal(global_vars.canvas.selectionChanged, partial(self._manage_selection),
-                                "dscenario_snapping", "connect_signal_selection_changed_selectionChanged_manage_selection")
+        tools_gw.connect_signal(
+            global_vars.canvas.selectionChanged,
+            partial(self._manage_selection),
+            "dscenario_snapping",
+            "connect_signal_selection_changed_selectionChanged_manage_selection",
+        )
 
     def _manage_selection(self):
         """Slot function for signal 'canvas.selectionChanged'"""
@@ -1409,7 +1585,7 @@ class GwDscenarioManagerButton(GwAction):
             self.dlg_dscenario.main_tab.currentWidget(),
             layer_name,
             self._selection_init,
-            self._selection_end
+            self._selection_end,
         )
 
     def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
@@ -1459,7 +1635,10 @@ class GwDscenarioManagerButton(GwAction):
         self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(self._manage_current_changed)
         self.add_dlg.btn_accept.clicked.connect(
-            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+            partial(
+                self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action
+            )
+        )
         # Open dlg
         tools_gw.open_dialog(self.add_dlg, dlg_name="info_generic", title=dlg_title)
 
