@@ -738,8 +738,8 @@ BEGIN
 	-- check if there are any errors or from_zero is true
 	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) = 0 OR v_from_zero = TRUE THEN
 
-	-- GENERATE LINEGRAPH
-	-- ===================
+		-- GENERATE LINEGRAPH
+		-- ===================
 
 		IF v_project_type = 'WS' THEN
 			v_reverse_cost := 1;
