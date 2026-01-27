@@ -246,15 +246,15 @@ class GwAudit:
     def _get_list(self):
         """ Mount and execute the query for gw_fct_getlist """
 
-        feature = '"tableName":"audit_results"'
         filter_fields = f""""limit": -1, 
                         "feature_id": {{"filterSign":"=", "value":"{self.feature_id}"}},
                         "table_name": {{"filterSign":"=", "value":"{self.table_name}"}}
                         """
         page_info = '"pageInfo":{"orderBy":"tstamp", "orderType":"DESC"}'
+        extras = f'"tableName":"audit_results", {page_info}'
 
         # Create json body
-        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields, extras=page_info)
+        body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
             return False

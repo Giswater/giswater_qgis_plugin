@@ -601,12 +601,12 @@ class GwInfo(QObject):
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
-        
+
         self._show_actions(self.dlg_cf, 'tab_data')
         if self.new_feature_id is not None and self.feature_type not in ('element'):
             self._enable_action(self.dlg_cf, "actionCentered", False)
             self._enable_action(self.dlg_cf, "actionSetToArc", False)
-        
+
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         try:
@@ -2849,10 +2849,15 @@ class GwInfo(QObject):
 
     def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', id_name=None):
 
-        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
-        id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name
-        feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{self.feature_id}"'
-        body = tools_gw.create_body(form, feature, filter_fields)
+        if id_name is None:
+            id_name = complet_result['body']['feature']['idName']
+
+        if filter_fields:
+            filter_fields = f'"{id_name}":{{"value":"{self.feature_id}","filterSign":"="}}, {filter_fields}'
+        else:
+            filter_fields = f'"{id_name}":{{"value":"{self.feature_id}","filterSign":"="}}'
+        extras = f'"tableName":"{linkedobject}"'
+        body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
             return False

@@ -11,6 +11,7 @@ import subprocess
 import webbrowser
 
 from functools import partial
+from warnings import warn
 from qgis.PyQt.QtCore import QDate, QRegularExpression, Qt
 from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox, QMenu
@@ -273,18 +274,24 @@ def manage_visit_class(**kwargs):
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
 
+    # Get visit class
     current_visit_class = tools_gw.get_values(dialog, widget)
     if current_visit_class[columnname] in (None, -1, '-1'):
         return
+    # Get table name
     sql = (f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}")
     ui_tablename = tools_db.get_row(sql)
+    if ui_tablename in (None, []):
+        return
     table_view = dialog.tab_main.currentWidget().findChildren(QTableView)
     if table_view in (None, []):
         return
     table_view = table_view[0]
-    feature = f'"tableName":"{ui_tablename[0]}"'
+    # Manage parameters
+    extras = f'"tableName":"{ui_tablename[0]}"'
     filter_fields = f'"{field_id}": {{"filterSign":"=", "value":"{feature_id}"}}'
-    body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+    body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
+    # Execute procedure
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
         widget.removeItem(widget.currentIndex())
@@ -1121,11 +1128,26 @@ def close_manager(**kwargs):
 
 def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id='', id_name=''):
 
-    form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
-    if complet_result['body'].get('feature') and complet_result['body']['feature'].get('idName'):
-        id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name
-    feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{feature_id}"'
-    body = tools_gw.create_body(form, feature, filter_fields)
+    # TODO: remove this
+    # Deprecation warning
+    if form_name or tab_name or widgetname or formtype:
+        warn('form_name, tab_name, widgetname and formtype are deprecated, use filter_fields instead', DeprecationWarning, stacklevel=2)
+
+    # Manage id_name
+    if id_name is None:
+        try:
+            id_name = complet_result['body']['feature']['idName']
+        except KeyError:
+            id_name = None
+    # Parameters
+    extras = f'"tableName":"{linkedobject}"'
+    if filter_fields:
+        filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}, {filter_fields}'
+    else:
+        filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}'
+    # Create body
+    body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
+    # Execute procedure
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
     if json_result is None or json_result['status'] == 'Failed':
         return False

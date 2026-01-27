@@ -1087,31 +1087,31 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 continue
             if data[k]['features'] is None or len(data[k]['features']) == 0:
                 continue
-            
+
             aux_layer_name = layer_name
             try:
                 if not layer_name:
                     aux_layer_name = data[k]['layerName']
             except KeyError:
                 aux_layer_name = str(k)
-            
+
             if del_old_layers:
                 tools_qgis.remove_layer_from_toc(aux_layer_name, group)
-            
+
             # Use GeoJSON approach like manage_json_return
             geojson_str = json.dumps(data[k])
             vsipath = f"/vsimem/{aux_layer_name}.geojson"
             gdal.FileFromMemBuffer(vsipath, geojson_str)
             v_layer = QgsVectorLayer(vsipath, aux_layer_name, 'ogr')
-            
+
             # Set CRS if not valid
             if not v_layer.crs().isValid():
                 v_layer.setCrs(QgsCoordinateReferenceSystem(f'EPSG:{srid}'))
             v_layer.updateExtents()
-            
+
             # Get geometry type from layer (like manage_json_return)
             geometry_type = v_layer.geometryType()
-            
+
             # Add layer to project and group
             QgsProject.instance().addMapLayer(v_layer, False)
             root = QgsProject.instance().layerTreeRoot()
@@ -7039,11 +7039,17 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
 def _get_list(complet_result, form_name='', filter_fields='', widgetname='', formtype='',
               linkedobject=''):
 
-    form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
+    # TODO: remove this
+    # Deprecation warning
+    if form_name or widgetname or formtype:
+        warn('form_name, widgetname and formtype are deprecated', DeprecationWarning, stacklevel=2)
+
     if linkedobject is None:
         return
-    feature = f'"tableName":"{linkedobject}"'
-    body = create_body(form, feature, filter_fields)
+    # Create body
+    extras = f'"tableName":"{linkedobject}"'
+    body = create_body(filter_fields=filter_fields, extras=extras)
+    # Execute procedure
     json_result = execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
         return False
@@ -7058,7 +7064,7 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
     if id_field is None:
         id_field = "id_val"
 
-    feature = f'"tableName":"{table_name}"'
+    extras = f'"tableName":"{table_name}"'
     filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
 
     if filter_id is not None:
@@ -7067,7 +7073,7 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
     if filter_active is not None:
         filter_fields += f', "active": {{"filterSign":"=", "value":"{filter_active}"}}'
 
-    body = create_body(feature=feature, filter_fields=filter_fields)
+    body = create_body(filter_fields=filter_fields, extras=extras)
     json_result = execute_procedure('gw_fct_getlist', body)
 
     if json_result is None or json_result['status'] == 'Failed':
