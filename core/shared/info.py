@@ -2749,37 +2749,38 @@ class GwInfo(QObject):
         # Get headers from complet_list
         headers = complet_list['body']['form']['headers']
 
-        for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
-                continue
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if 'hidden' in data and data['hidden']:
+            return False, False
 
-            widget = self.dlg_cf.findChild(QTableView, field['widgetname'])
-            if widget is None:
-                continue
-            widget = tools_gw.add_tableview_header(widget, field, headers)
-            widget = tools_gw.fill_tableview_rows(widget, field)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
-            widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
-            if 'tab_epa' in widgetname:
-                widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
-                model = widget.model()
-                tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
-                setattr(self, f"my_json_{tbl_upsert}", {})
+        widget = self.dlg_cf.findChild(QTableView, widgetname)
+        if widget is None:
+            return False, False
+        widget = tools_gw.add_tableview_header(widget, fields, headers)
+        widget = tools_gw.fill_tableview_rows(widget, fields)
+        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
+        if 'tab_epa' in widgetname:
+            widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
+            model = widget.model()
+            tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
+            setattr(self, f"my_json_{tbl_upsert}", {})
 
-                # get view addparam
-                addparam = None
-                sql = f"SELECT addparam FROM sys_table WHERE id = '{tbl_upsert}'"
-                row = tools_db.get_row(sql)
-                if row:
-                    addparam = row[0]
-                    if addparam:
-                        addparam = addparam.get('pkey')
-                model.dataChanged.connect(partial(tbl_data_changed, self, tbl_upsert, widget, model, addparam))
-                dialog.btn_accept.clicked.connect(partial(save_tbl_changes, tbl_upsert, self, dialog, addparam))
+            # get view addparam
+            addparam = None
+            sql = f"SELECT addparam FROM sys_table WHERE id = '{tbl_upsert}'"
+            row = tools_db.get_row(sql)
+            if row:
+                addparam = row[0]
+                if addparam:
+                    addparam = addparam.get('pkey')
+            model.dataChanged.connect(partial(tbl_data_changed, self, tbl_upsert, widget, model, addparam))
+            dialog.btn_accept.clicked.connect(partial(save_tbl_changes, tbl_upsert, self, dialog, addparam))
 
-            # Populate custom context menu
-            widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, self.tab_main.widget(index_tab)))
+        # Populate custom context menu
+        widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, self.tab_main.widget(index_tab)))
 
         widget_list = []
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))

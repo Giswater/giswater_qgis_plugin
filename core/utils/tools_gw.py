@@ -16,7 +16,7 @@ import sqlite3
 import webbrowser
 import xml.etree.ElementTree as ET
 
-from typing import Literal, Dict, Optional, Union
+from typing import Literal, Dict, Optional, Union, Any, List
 from qgis.PyQt.sip import isdeleted
 from osgeo import gdal
 from warnings import warn
@@ -5408,7 +5408,7 @@ def get_icon(icon, folder="dialogs", log_info=True):
         return None
 
 
-def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_headers: Optional[list] = []) -> QWidget:
+def add_tableview_header(widget: QWidget, fields: Optional[List[Dict[str, Any]]] = [], json_headers: Optional[list] = []) -> QWidget:
 
     model = widget.model()
     if model is None:
@@ -5422,8 +5422,8 @@ def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_heade
         # Get headers
         headers = []
 
-        if field and field['value'] is not None:
-            for x in field['value'][0]:
+        if fields:
+            for x in fields[0]:
                 headers.append(x)
 
         # If there are not rows in tableview, set headers from json_headers
@@ -5440,12 +5440,12 @@ def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_heade
     return widget
 
 
-def fill_tableview_rows(widget, field):
-    if field is None or field.get('value') is None:
+def fill_tableview_rows(widget, fields: List[Dict[str, Any]]):
+    if not fields:
         return widget
     model = widget.model()
 
-    for item in field['value']:
+    for item in fields:
         row = []
         for value in item.values():
             if value is None:
@@ -7568,8 +7568,8 @@ def _manage_tableview(**kwargs):
     class_self = kwargs['class']
     module = tools_backend_calls
     widget = add_tableview(complet_result, field, dialog, module, class_self)
-    widget = add_tableview_header(widget, field)
-    widget = fill_tableview_rows(widget, field)
+    widget = add_tableview_header(widget, field['value'])
+    widget = fill_tableview_rows(widget, field['value'])
     tools_qt.set_tableview_config(widget)
     return widget
 
