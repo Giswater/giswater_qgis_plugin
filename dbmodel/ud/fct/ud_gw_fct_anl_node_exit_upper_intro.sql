@@ -52,14 +52,11 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=111;
     DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=111;
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2206", "fid":"111 "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3990", "function":"2206", "fid":"111", "criticity":"4", "prefix_id":"1001", "is_process":true}}$$)';
-
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3974", "function":"2206", "fid":"111", "criticity":"4", "is_process":true}}$$)';
+	
+	PERFORM gw_fct_getmessage(json_build_object('client', json_build_object('data', json_build_object('function','2206', 'fid','111', 'criticity','4', 'is_process',true, 'is_header',true))::json));
+	PERFORM gw_fct_getmessage(json_build_object('client', json_build_object('data', json_build_object('message','3990', 'function','2206', 'fid','111', 'criticity','4', 'prefix_id','1001', 'is_process',true))::json));
+	PERFORM gw_fct_getmessage(json_build_object('client', json_build_object('data', json_build_object('message','3974', 'function','2206', 'fid','111', 'criticity','4', 'is_process',true))::json));
+	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, '');
 
 
