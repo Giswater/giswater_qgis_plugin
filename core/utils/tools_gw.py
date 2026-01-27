@@ -7016,17 +7016,20 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     tab_name = 'tab_none'
     if complet_list is False:
         return False, False
-    for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']:
-            continue
-        short_name = f'{tab_name}_{field["widgetname"]}'
-        widget = dialog.findChild(QTableView, short_name)
-        if widget is None:
-            continue
-        widget = add_tableview_header(widget, field)
-        widget = fill_tableview_rows(widget, field)
-        widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
-        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+    data = complet_list['body']['data']
+    fields = data['fields']
+
+    if data.get('hidden'):
+        return False, False
+    short_name = f'{tab_name}_{widgetname}'
+    widget = dialog.findChild(QTableView, short_name)
+    if widget is None:
+        return False, False
+
+    widget = add_tableview_header(widget, fields)
+    widget = fill_tableview_rows(widget, fields)
+    widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
+    tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
     widget_list = []
     widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))

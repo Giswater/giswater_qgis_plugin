@@ -429,19 +429,20 @@ def filter_table(**kwargs):
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id, id_name=field_id)
     if complet_list is False:
         return False
-    for field in complet_list['body']['data']['fields']:
-        qtable = dialog.findChild(QTableView, field['widgetname'])
-        if qtable is None:
-            qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
-        if qtable:
-            if field['value'] is None:
-                model.removeRows(0, model.rowCount())
-                return complet_list
-            model.clear()
-            tools_gw.add_tableview_header(qtable, field)
-            tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, Qt.SortOrder.DescendingOrder)
-            tools_qt.set_tableview_config(qtable)
+    # for field in complet_list['body']['data']['fields']:
+    qtable = dialog.findChild(QTableView, widgetname)
+    if qtable is None:
+        qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
+    if qtable:
+        fields = complet_list['body']['data']['fields']
+        if not fields:
+            model.removeRows(0, model.rowCount())
+            return complet_list
+        model.clear()
+        tools_gw.add_tableview_header(qtable, fields)
+        tools_gw.fill_tableview_rows(qtable, fields)
+        tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, Qt.SortOrder.DescendingOrder)
+        tools_qt.set_tableview_config(qtable)
 
     return complet_list
 
@@ -1141,10 +1142,11 @@ def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widge
             id_name = None
     # Parameters
     extras = f'"tableName":"{linkedobject}"'
-    if filter_fields:
-        filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}, {filter_fields}'
-    else:
-        filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}'
+    if id_name and feature_id:
+        if filter_fields:
+            filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}, {filter_fields}'
+        else:
+            filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}'
     # Create body
     body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
     # Execute procedure
