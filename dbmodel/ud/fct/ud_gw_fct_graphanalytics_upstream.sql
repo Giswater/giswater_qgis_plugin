@@ -7,9 +7,9 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2218
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace(character varying);
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace(json);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_upstream(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_flow_trace(character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_flow_trace(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_upstream(p_data json)
 RETURNS json AS
 
 $BODY$
@@ -47,7 +47,7 @@ v_status text;
 v_message text;
 
 v_project_type text;
-v_node bigint;
+v_node integer;
 v_point public.geometry;
 v_sensibility_f float;
 v_sensibility float;
@@ -61,7 +61,7 @@ v_client_epsg integer;
 v_query text;
 v_source text;
 v_target text;
-v_distance int;
+v_distance float;
 v_mainstream text;
 v_diverted_flow text;
 v_context text;
@@ -79,7 +79,7 @@ BEGIN
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
-	SELECT (p_data->'feature'->'id'->>0)::bigint INTO v_node;
+	SELECT (p_data->'feature'->'id'->>0)::int INTO v_node;
 
 	v_context = 'Flow trace';
 	v_fid = 220;
@@ -119,10 +119,27 @@ BEGIN
 	-- create temp tables
 	DROP TABLE IF EXISTS t_anl_arc;
 	DROP TABLE IF EXISTS t_anl_node;
+	
 	CREATE TEMP TABLE t_anl_arc (LIKE anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE t_anl_node (LIKE anl_node INCLUDING ALL);
+	ALTER TABLE t_anl_arc
+	ALTER COLUMN arc_id TYPE int4
+	USING arc_id::int4;
+	ALTER TABLE t_anl_arc
+	ALTER COLUMN node_1 TYPE int4
+	USING node_1::int4;
+	ALTER TABLE t_anl_arc
+	ALTER COLUMN node_2 TYPE int4
+	USING node_2::int4;
+	CREATE INDEX IF NOT EXISTS t_anl_arc_node1_idx ON t_anl_arc USING btree (node_1);
+	CREATE INDEX IF NOT EXISTS t_anl_arc_node2_idx ON t_anl_arc USING btree (node_2);
 
-	v_query := $sql$
+	CREATE TEMP TABLE t_anl_node (LIKE anl_node INCLUDING ALL);
+	ALTER TABLE t_anl_node
+	ALTER COLUMN node_id TYPE int4
+	USING node_id::int4;
+
+	-- mainstream + diverted flow
+	v_query := format($sql$
 		WITH
 			arc_selected AS (
 				SELECT a.arc_id, a.node_1, a.node_2
@@ -133,27 +150,28 @@ BEGIN
 				AND a.is_operative = TRUE
 			)
 		SELECT
-			a.arc_id::bigint AS id,
-			a.node_2::bigint AS source,
-			a.node_1::bigint AS target,
+			arc_id::bigint AS id,
+			%I::bigint AS source,
+			%I::bigint AS target,
 			1::float8 AS cost,
 			-1::float8 AS reverse_cost
-			FROM arc_selected a
-	$sql$;
+			FROM arc_selected
+	$sql$, v_source, v_target);
 
-	EXECUTE 'SELECT count(*)::int FROM ve_arc'
+	EXECUTE 'SELECT count(*)::float FROM ve_arc'
 	INTO v_distance;
 
     IF v_node IS NOT NULL THEN
-		DROP TABLE IF EXISTS tmp_upstream_nodes;
-	  	CREATE TEMP TABLE tmp_upstream_nodes ON COMMIT DROP AS
-		SELECT node
-		FROM pgr_drivingdistance(v_query, v_node, v_distance);
-
-        INSERT INTO t_anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
-        SELECT n.node_id, v_fid, n.node_type, n.state, n.expl_id, n.drainzone_id, v_diverted_flow, n.the_geom
-        FROM tmp_upstream_nodes t
-        JOIN ve_node n ON n.node_id = t.node;
+        EXECUTE $sql$
+			INSERT INTO t_anl_node (node_id, fid, nodecat_id, state, expl_id, drainzone_id, addparam, the_geom)
+			SELECT n.node_id, $1, n.node_type, n.state, n.expl_id, n.drainzone_id, $2, n.the_geom
+				FROM (
+				SELECT node
+				FROM pgr_drivingdistance($3, $4, $5)
+			) t
+			JOIN ve_node n ON n.node_id = t.node;
+		$sql$
+		USING v_fid, v_diverted_flow, v_query, v_node, v_distance;
     END IF;
 
 	-- mainstream
@@ -169,39 +187,36 @@ BEGIN
 				AND a.initoverflowpath IS DISTINCT FROM TRUE
 				AND EXISTS (
 					SELECT 1 FROM t_anl_node an
-					WHERE an.cur_user = %L
-					AND an.fid = %s
-					AND an.node_id = (a.%I)::text
+					WHERE an.node_id = (a.%I)
 				)
 			)
 		SELECT
-			a.arc_id::bigint AS id,
-			a.node_2::bigint AS source,
-			a.node_1::bigint AS target,
+			arc_id::bigint AS id,
+			%I::bigint AS source,
+			%I::bigint AS target,
 			1::float8 AS cost,
 			-1::float8 AS reverse_cost
-			FROM arc_selected a
-	$sql$, current_user, v_fid, v_source);
+			FROM arc_selected
+	$sql$, v_source, v_source, v_target);
 
     IF v_node IS NOT NULL THEN
-		DROP TABLE IF EXISTS tmp_mainstream_nodes;
-		CREATE TEMP TABLE tmp_mainstream_nodes ON COMMIT DROP AS
-		SELECT node
-		FROM pgr_drivingdistance(v_query, v_node, v_distance);
-
-        UPDATE t_anl_node n SET addparam = v_mainstream
-        FROM tmp_mainstream_nodes t
-        WHERE n.cur_user = current_user AND n.fid = v_fid
-        AND (n.node_id)::bigint = t.node;
+		EXECUTE $sql$
+			UPDATE t_anl_node n
+			SET addparam = $1
+			FROM (
+				SELECT node
+				FROM pgr_drivingdistance($2, $3, $4)
+			) t
+			WHERE n.node_id = t.node;
+		$sql$
+		USING v_mainstream, v_query, v_node, v_distance;
     END IF;
 
-	INSERT INTO t_anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom)
-	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom
+	INSERT INTO t_anl_arc (arc_id, fid, arccat_id, state, expl_id, drainzone_id, addparam, the_geom, omunit_id)
+	SELECT a.arc_id, v_fid, a.arc_type, a.state, a.expl_id, a.drainzone_id, n2.addparam, a.the_geom, a.omunit_id
 	FROM ve_arc a
-	JOIN t_anl_node n1 ON a.node_1 = n1.node_id::bigint
-	JOIN t_anl_node n2 ON a.node_2 = n2.node_id::bigint
-	WHERE n1.cur_user=current_user AND n1.fid = v_fid
-	AND n2.cur_user=current_user AND n2.fid = v_fid;
+	JOIN t_anl_node n1 ON a.node_1 = n1.node_id
+	JOIN t_anl_node n2 ON a.node_2 = n2.node_id;
 
 	v_result_line := jsonb_build_object(
 		'type', 'FeatureCollection',
@@ -214,8 +229,8 @@ BEGIN
 					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 					'properties', to_jsonb(row) - 'the_geom'
 				) AS feature
-				FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
-				FROM t_anl_arc WHERE cur_user=current_user AND fid=v_fid) row
+				FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, omunit_id, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
+				FROM t_anl_arc) row
 			) features
 		), '[]'::jsonb)
 	)::text;
@@ -232,17 +247,15 @@ BEGIN
 					'properties', to_jsonb(row) - 'the_geom'
 				) AS feature
 				FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id AS node_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, ST_Transform(the_geom, 4326) as the_geom
-				FROM  t_anl_node WHERE cur_user=current_user AND fid=v_fid
+				FROM  t_anl_node
 				UNION
-				SELECT v_context as context, c.expl_id, c.connec_id::text, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
-				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id::text = a.arc_id
-				WHERE cur_user=current_user AND fid=v_fid
+				SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
+				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id = a.arc_id
 				AND c.state > 0
 				AND c.is_operative = TRUE
 				UNION
-				SELECT v_context as context, g.expl_id, g.gully_id::text, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
-				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id::text = a.arc_id
-				WHERE cur_user=current_user AND fid=v_fid
+				SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
+				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id = a.arc_id
 				AND g.state > 0
 				AND g.is_operative = TRUE) row
 			) features

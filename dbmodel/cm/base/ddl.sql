@@ -723,7 +723,7 @@ CREATE TABLE cm_audit.log (
 	feature_id int4 NOT NULL,
 	feature_type text NULL,
 	"action" text NULL,
-	sql text NULL limit 100 characters,
+	sql varchar(100) NULL,
 	old_value json NULL,
 	new_value json NULL,
 	insert_by TEXT NULL,
@@ -762,34 +762,27 @@ CREATE TABLE cm.doc (
 	CONSTRAINT name_chk UNIQUE (name)
 );
 
-GRANT ALL ON TABLE cm.doc TO role_cm_manager;
-GRANT ALL ON TABLE cm.doc TO role_cm_field;
-
 --drop table cm.doc_x_node;
 CREATE TABLE cm.doc_x_node (
 	doc_id int4 NOT NULL,
 	node_id int4 NULL,
 	node_uuid uuid NOT NULL,
+	featurecat_id varchar(30),
 	CONSTRAINT doc_x_node_pkey PRIMARY KEY (doc_id, node_uuid)
 );
 
 ALTER TABLE cm.doc_x_node ADD CONSTRAINT doc_x_node_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-GRANT ALL ON TABLE cm.doc_x_node TO role_cm_manager;
-GRANT ALL ON TABLE cm.doc_x_node TO role_cm_field;
 
 --drop table cm.doc_x_arc;
 CREATE TABLE cm.doc_x_arc (
 	doc_id int4 NOT NULL,
 	arc_id int4 NULL,
 	arc_uuid uuid NOT NULL,
+	featurecat_id varchar(30),
 	CONSTRAINT doc_x_arc_pkey PRIMARY KEY (doc_id, arc_uuid)
 );
 
 ALTER TABLE cm.doc_x_arc ADD CONSTRAINT doc_x_arc_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-GRANT ALL ON TABLE cm.doc_x_arc TO role_cm_manager;
-GRANT ALL ON TABLE cm.doc_x_arc TO role_cm_field;
 
 --drop table cm.doc_x_connec;
 CREATE TABLE cm.doc_x_connec (
@@ -801,9 +794,6 @@ CREATE TABLE cm.doc_x_connec (
 
 ALTER TABLE cm.doc_x_connec ADD CONSTRAINT doc_x_connec_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-GRANT ALL ON TABLE cm.doc_x_connec TO role_cm_manager;
-GRANT ALL ON TABLE cm.doc_x_connec TO role_cm_field;
-
 --drop table cm.doc_x_link;
 CREATE TABLE cm.doc_x_link (
 	doc_id int4 NOT NULL,
@@ -813,7 +803,4 @@ CREATE TABLE cm.doc_x_link (
 );
 
 ALTER TABLE cm.doc_x_link ADD CONSTRAINT doc_x_link_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-GRANT ALL ON TABLE cm.doc_x_link TO role_cm_manager;
-GRANT ALL ON TABLE cm.doc_x_link TO role_cm_field;
 

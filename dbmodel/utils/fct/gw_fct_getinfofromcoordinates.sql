@@ -92,7 +92,6 @@ v_debug json;
 v_msgerr json;
 v_featuredialog text;
 v_client_epsg integer;
-v_field_state text;
 v_parent text;
 
 BEGIN
@@ -231,10 +230,6 @@ BEGIN
 		if v_parent is null then -- look for parent
 			select lower(feature_type) into v_parent from cat_feature where parent_layer  = v_layer.layer_id limit 1;
 		end if;
-		
-		EXECUTE 'SELECT column_name FROM information_schema.columns 
-		WHERE table_name='||quote_literal(v_schemaname)||' and column_name=''state'' and table_schema='||quote_literal(v_layer)||''
-		INTO v_field_state;
 	        
 		IF v_layer.geomtype = 'polygon' THEN
 
@@ -267,12 +262,25 @@ BEGIN
 			else 
 				
 			--  Get element from active layer, using parent layer with exists wich enhances a lot the performance
-				v_querystring = concat('WITH params AS (SELECT ''',v_point,'''::geometry(POINT,SRID_VALUE) as pt) 
-				SELECT lc.',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' lc WHERE EXISTS
-				(SELECT 1 FROM ',quote_ident(v_parent),' lp, params p WHERE lc.',quote_ident(v_idname),'= lp.',quote_ident(v_idname),' 
-				AND lp.the_geom && st_expand(p.pt, ',v_sensibility,')
-				AND st_dwithin (pt, lp.the_geom, ',v_sensibility,') 
-				ORDER BY  CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, ST_Distance(lp.the_geom, pt) asc LIMIT 1)');									
+				v_querystring = concat(
+					'WITH params AS (SELECT ',
+						'''', v_point, '''::geometry(POINT,', v_client_epsg, ') as pt, ', 
+						v_sensibility, '::double precision AS r)',
+
+					', near AS (',
+						'SELECT lp.', quote_ident(v_idname), ', lp.state, lp.', quote_ident(v_the_geom),
+						' FROM ', quote_ident(v_parent), ' lp, params p',
+						' ORDER BY lp.', quote_ident(v_the_geom), ' <-> p.pt',
+						' LIMIT 200)',
+					
+					' SELECT n.', quote_ident(v_idname),
+					' FROM near n, params p',
+					' WHERE n.', quote_ident(v_the_geom), ' && ST_Expand(p.pt, p.r)',
+					' AND ST_DWithin(n.', quote_ident(v_the_geom), ', p.pt, p.r)',
+					' ORDER BY CASE WHEN n.state=1 THEN 1 WHEN n.state=2 THEN 2 WHEN n.state=0 THEN 3 ELSE 4 END,',
+					' n.', quote_ident(v_the_geom), ' <-> p.pt',
+					' LIMIT 1'
+				);
 			end if;			
 		
 			EXECUTE v_querystring INTO v_id;

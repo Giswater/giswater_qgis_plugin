@@ -23,7 +23,7 @@ DECLARE
 
 v_device integer;
 v_infotype integer;
-v_id  character varying;
+v_id integer;
 v_version text;
 v_text text[];
 text text;
@@ -38,8 +38,8 @@ v_projecttype text;
 v_closedstatus boolean;
 v_message json;
 v_afterinsert boolean;
-v_node1 text;
-v_node2 text;
+v_node1 integer;
+v_node2 integer;
 v_node1_geom public.geometry;
 v_node2_geom public.geometry;
 v_arc_geom public.geometry;
@@ -65,9 +65,9 @@ BEGIN
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
-	v_id := (p_data ->> 'feature')::json->> 'id';
-	v_node1 := (((p_data ->> 'data')::json->> 'fields')::json)->>'node_1';
-	v_node2 := (((p_data ->> 'data')::json->> 'fields')::json)->>'node_2';
+	v_id := ((p_data -> 'feature')->> 'id');
+	v_node1 := ((p_data -> 'data')-> 'fields')->>'node_1';
+	v_node2 := ((p_data -> 'data')-> 'fields')->>'node_2';
 
 	
 	-- Get gdb parameters

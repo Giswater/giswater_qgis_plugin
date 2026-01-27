@@ -187,7 +187,6 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EOUTLET', 'FRELEM','ELEMENT', 've_element', 've_element_outlet', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EWEIR', 'FRELEM','ELEMENT', 've_element', 've_element_eweir', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM','ELEMENT', 've_element', 've_element_pump', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam, inventory_vdefault) VALUES('OUT_MANHOLE', 'MANHOLE', 'NODE', NULL, 've_node', 've_node_out_manhole', 'Out_manhole', NULL, true, true, NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 UPDATE cat_feature_node SET epa_default='OUTFALL', num_arcs=1, isexitupperintro=2, graph_delimiter='{DWFZONE}' WHERE id='OUT_MANHOLE';
 

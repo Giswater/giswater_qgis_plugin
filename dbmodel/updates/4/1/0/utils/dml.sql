@@ -219,7 +219,8 @@ INSERT INTO config_form_fields
 VALUES('v_edit_link', 'form_feature', 'tab_data', 'macrosector_id', 'lyt_data_1', 22, 'integer', 'combo', 'Macrosector id', 'Macrosector id', NULL, false, false, false, false, NULL, 'SELECT macrosector_id as id, name as idval FROM macrosector WHERE macrosector_id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('v_edit_link', 'form_feature', 'tab_none', 'n_hydrometer', 'lyt_data_1', 35, 'integer', 'text', 'N_hydrometer', 'N_hydrometer', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+VALUES('v_edit_link', 'form_feature', 'tab_none', 'n_hydrometer', 'lyt_data_1', 35, 'integer', 'text', 'N_hydrometer', 'N_hydrometer', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL)
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('v_edit_link', 'form_feature', 'tab_data', 'presszone_name', 'lyt_data_1', 21, 'string', 'text', 'presszone_name', 'presszone_name', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
@@ -484,7 +485,9 @@ INSERT INTO sys_message (id, error_message, log_level, project_type, source, mes
 
 -- 30/04/2025
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('v_edit_plan_psector','form_feature','tab_none','creation_date','date','datetime','Creation Date:','Creation Date',false,false,true,false,'{"setMultiline":false}'::json,false);
+	VALUES ('v_edit_plan_psector','form_feature','tab_none','creation_date','date','datetime','Creation Date:','Creation Date',false,false,true,false,'{"setMultiline":false}'::json,false)
+  ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,isfilter,widgetcontrols,hidden,web_layoutorder)
 	VALUES ('generic','psector','tab_general','creation_date','lyt_general_7',1,'date','datetime','Creation date:','Creation date:',false,false,true,false,false,'{"setMultiline":false}'::json,false,3);
@@ -528,7 +531,8 @@ VALUES
 ('v_edit_link', 'form_feature', 'tab_data', 'comment', 'lyt_data_1', 45, 'string', 'text', 'Comment', 'Comment', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
 ('v_edit_link', 'form_feature', 'tab_data', 'descript', 'lyt_data_1', 46, 'string', 'text', 'Descript', 'Descript', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
 ('v_edit_link', 'form_feature', 'tab_data', 'link', 'lyt_data_1', 47, 'string', 'hyperlink', 'Link', 'Link', false, false, true, false, '{"setMultiline":false}'::json, false, NULL),
-('v_edit_link', 'form_feature', 'tab_data', 'num_value', 'lyt_data_1', 48, 'double', 'text', 'Num Value', 'Num Value', false, false, true, false, '{"setMultiline":false}'::json, false, NULL);
+('v_edit_link', 'form_feature', 'tab_data', 'num_value', 'lyt_data_1', 48, 'double', 'text', 'Num Value', 'Num Value', false, false, true, false, '{"setMultiline":false}'::json, false, NULL)
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE sys_param_user SET widgettype='text' WHERE id='qgis_composers_folderpath';
 
@@ -559,7 +563,7 @@ INSERT INTO node_add (node_id) SELECT node_id FROM node ON CONFLICT (node_id) DO
 INSERT INTO arc_add (arc_id) SELECT arc_id FROM arc ON CONFLICT (arc_id) DO NOTHING;
 
 -- 19/05/2025
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_link', 'Shows editable information about links.', 'role_basic', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 1, 'Link (parent)', NULL, NULL, NULL, 'core', NULL);
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('v_edit_link', 'Shows editable information about links.', 'role_basic', '{"template": [1]}', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 1, 'Link (parent)', NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_table SET project_template = '{"template": [1]}' WHERE id IN (
 	'v_edit_cat_feature_node',

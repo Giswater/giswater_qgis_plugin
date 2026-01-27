@@ -39,6 +39,7 @@ DECLARE
 	v_expl_id integer;
 	v_fid integer;
 	v_prev_search_path text;
+	v_lot_id_array integer[];
 
 BEGIN
 
@@ -50,6 +51,7 @@ BEGIN
     v_check_fid := (p_data->'data'->'parameters'->>'checkFid')::integer;
     v_function_fid := (p_data->'data'->'parameters'->>'functionFid')::integer;
 	v_replace_params := (p_data->'data'->'parameters'->>'replaceParams')::json;
+	v_lot_id_array := string_to_array((p_data->'data'->'parameters'->>'lot_id_array'), ',')::integer[];
 
 	-- get fprocess data
 	SELECT
@@ -93,7 +95,23 @@ BEGIN
 		v_process_info_msg = regexp_replace(v_process_info_msg, '%feature_ids%', v_replace_params->>'feature_ids', 'gi');
 		v_process_info_msg = regexp_replace(v_process_info_msg, '%check_column%', v_replace_params->>'check_column', 'gi');
 	END IF;
-
+	
+	IF v_lot_id_array IS NOT NULL THEN
+		-- Check if the lot_id column exists in the query result
+		BEGIN
+			EXECUTE 'CREATE TEMP TABLE tmp_lot_check_q AS SELECT * FROM (' || v_process_query_text || ') as qq LIMIT 0;';
+			PERFORM 1 FROM information_schema.columns
+			WHERE table_schema = (SELECT nspname FROM pg_namespace WHERE oid = pg_my_temp_schema())
+			  AND table_name = 'tmp_lot_check_q'
+			  AND column_name = 'lot_id';
+			IF FOUND THEN
+				v_process_query_text := 'SELECT * FROM (' || v_process_query_text || ') q WHERE lot_id = ANY(ARRAY[' || array_to_string(v_lot_id_array, ',') || ']::integer[])';
+			END IF;
+			EXECUTE 'DROP TABLE IF EXISTS tmp_lot_check_q;';
+		EXCEPTION WHEN OTHERS THEN
+			EXECUTE 'DROP TABLE IF EXISTS tmp_lot_check_q;';
+		END;
+	END IF;
     -- manage query count
 	IF v_process_query_text ILIKE '%string_agg%' THEN
 		EXECUTE 'WITH mec AS ('||v_process_query_text||'),

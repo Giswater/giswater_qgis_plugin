@@ -201,7 +201,7 @@ BEGIN
 		LEFT JOIN cat_material ON matcat_id = cat_material.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
 		WHERE epa_type !=''UNDEFINED'' '||v_statetype||'
-		AND ''ARC'' = ANY (cat_material.feature_type)
+		AND (''ARC'' = ANY (cat_material.feature_type) OR cat_material.feature_type IS NULL)
 		AND a.sector_id > 0
 		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user';
 

@@ -23,9 +23,11 @@ DECLARE
     feature_uuid_column text;
     feature_uuid_value uuid;
     v_feature_id int;
+    v_featurecat_id text;
 BEGIN
     EXECUTE 'SET search_path TO ' || quote_literal(TG_TABLE_SCHEMA) || ', public';
     feature_type := TG_ARGV[0];
+    v_featurecat_id := TG_ARGV[1];
     v_new_data := to_jsonb(NEW);
     doc_table := 'doc_x_' || feature_type;
     feature_column := feature_type || '_id';
@@ -37,8 +39,8 @@ BEGIN
         VALUES (NEW.path, NEW.name, NEW.doc_type, NEW.observ)
         RETURNING id INTO NEW.doc_id;
 
-        EXECUTE 'INSERT INTO ' || doc_table || ' (doc_id, ' || feature_uuid_column || ') VALUES ($1, $2)'
-        USING NEW.doc_id, feature_uuid_value;
+        EXECUTE 'INSERT INTO ' || doc_table || ' (doc_id, ' || feature_uuid_column || ', featurecat_id) VALUES ($1, $2, $3)'
+        USING NEW.doc_id, feature_uuid_value, v_featurecat_id;
 
         RETURN NEW;
 
@@ -46,13 +48,12 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        EXECUTE format('SELECT ($1).%I', feature_column)
-        INTO v_old_value
-        USING OLD;
+        -- Get UUID from OLD row (primary key is doc_id + feature_uuid)
+        feature_uuid_value := (to_jsonb(OLD)->>feature_uuid_column)::uuid;
 
-        v_sql := 'DELETE FROM ' || doc_table || ' WHERE doc_id = ' || quote_literal(OLD.doc_id) ||
-                 ' AND ' || feature_column || ' = ' || quote_literal(v_old_value) || ';';
-        EXECUTE v_sql;
+        -- Delete using primary key (doc_id, feature_uuid) for precision
+        EXECUTE format('DELETE FROM %I WHERE doc_id = $1 AND %I = $2', doc_table, feature_uuid_column)
+        USING OLD.doc_id, feature_uuid_value;
 
         RETURN NULL;
     END IF;

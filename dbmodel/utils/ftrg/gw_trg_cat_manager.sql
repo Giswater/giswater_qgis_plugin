@@ -13,26 +13,27 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_cat_manager()
 $BODY$
 DECLARE
 	rec_manager record;
-	rec_sector integer;
 	rec_role text;
+	rec_expl integer;
 	rec_user text;
 	v_new_id integer;
-BEGIN
+BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF (TG_OP = 'INSERT' AND NEW.rolename != '{}') THEN
-		INSERT INTO config_user_x_sector (sector_id, username, manager_id)
-		SELECT sector_id, COALESCE(m.rolname, s.rolname) AS usern, NEW.id
-		FROM (SELECT unnest(sector_id) sector_id FROM cat_manager WHERE id=NEW.id) p
+
+		INSERT INTO config_user_x_expl (expl_id, username)
+		SELECT expl, COALESCE(m.rolname, s.rolname) AS usern
+		FROM (SELECT unnest(expl_id) AS expl FROM cat_manager WHERE id = NEW.id) p
 		CROSS JOIN (SELECT unnest(rolename) AS role FROM cat_manager WHERE id = NEW.id) q
 		LEFT JOIN pg_roles r ON q.role = r.rolname
 		LEFT JOIN pg_auth_members am ON r.oid = am.roleid
 		LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE
 		LEFT JOIN pg_roles s ON q.role = s.rolname AND s.rolcanlogin = TRUE
 		WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
-		ON CONFLICT (sector_id, username) DO NOTHING;
-
+		ON CONFLICT (expl_id, username) DO NOTHING;
+			
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -50,27 +51,26 @@ BEGIN
 				FROM pg_roles s
 				WHERE s.rolname = rec_role AND s.rolcanlogin = TRUE
 			LOOP
-				FOREACH rec_sector IN ARRAY OLD.sector_id LOOP
-					DELETE FROM config_user_x_sector WHERE rec_user=username and sector_id=rec_sector and manager_id=OLD.id;
+				FOREACH rec_expl IN ARRAY OLD.expl_id LOOP
+					DELETE FROM config_user_x_expl WHERE rec_user=username and expl_id=rec_expl;
 				END LOOP;
-
 			END LOOP;
 		END LOOP;
 
 		-- ADD new references
-		INSERT INTO config_user_x_sector (sector_id, username, manager_id)
-		SELECT sector_id, COALESCE(m.rolname, s.rolname) AS usern, NEW.id
-		FROM (SELECT unnest(sector_id) sector_id FROM cat_manager WHERE id=NEW.id) p
+		INSERT INTO config_user_x_expl (expl_id, username)
+		SELECT expl, COALESCE(m.rolname, s.rolname) AS usern
+		FROM (SELECT unnest(expl_id) AS expl FROM cat_manager WHERE id = NEW.id) p
 		CROSS JOIN (SELECT unnest(rolename) AS role FROM cat_manager WHERE id = NEW.id) q
 		LEFT JOIN pg_roles r ON q.role = r.rolname
 		LEFT JOIN pg_auth_members am ON r.oid = am.roleid
 		LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE
 		LEFT JOIN pg_roles s ON q.role = s.rolname AND s.rolcanlogin = TRUE
 		WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
-		ON CONFLICT (sector_id, username) DO NOTHING;
-
+		ON CONFLICT (expl_id, username) DO NOTHING;
+			
 		RETURN NEW;
-
+		
 	ELSIF TG_OP = 'DELETE' THEN
 
 		-- REMOVE All old references, and add new ones
@@ -86,30 +86,29 @@ BEGIN
 				FROM pg_roles s
 				WHERE s.rolname = rec_role AND s.rolcanlogin = TRUE
 			LOOP
-				FOREACH rec_sector IN ARRAY OLD.sector_id LOOP
-					DELETE FROM config_user_x_sector WHERE rec_user=username and sector_id=rec_sector and manager_id=OLD.id;
+				FOREACH rec_expl IN ARRAY OLD.expl_id LOOP
+					DELETE FROM config_user_x_expl WHERE rec_user=username and expl_id=rec_expl;
 				END LOOP;
-
 			END LOOP;
 		END LOOP;
 
 		-- Check for others managers missing references
 		FOR rec_manager IN
-			SELECT id, expl_id, rolename, sector_id
+			SELECT id, expl_id, rolename
 			FROM cat_manager
 		LOOP
 
-			INSERT INTO config_user_x_sector (sector_id, username, manager_id)
-			SELECT sector_id, COALESCE(m.rolname, s.rolname) AS usern, rec_manager.id
-			FROM (SELECT unnest(sector_id) AS sector_id FROM cat_manager WHERE id = rec_manager.id) p
+			INSERT INTO config_user_x_expl (expl_id, username)
+			SELECT expl, COALESCE(m.rolname, s.rolname) AS usern
+			FROM (SELECT unnest(expl_id) AS expl FROM cat_manager WHERE id = rec_manager.id) p
 			CROSS JOIN (SELECT unnest(rolename) AS role FROM cat_manager WHERE id = rec_manager.id) q
 			LEFT JOIN pg_roles r ON q.role = r.rolname
 			LEFT JOIN pg_auth_members am ON r.oid = am.roleid
 			LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE
 			LEFT JOIN pg_roles s ON q.role = s.rolname AND s.rolcanlogin = TRUE
 			WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
-			ON CONFLICT (sector_id, username) DO NOTHING;
-
+			ON CONFLICT (expl_id, username) DO NOTHING;
+		
 		END LOOP;
 
 		RETURN OLD;

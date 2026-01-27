@@ -93,9 +93,9 @@ BEGIN
 
 
 	v_querytext = concat (' INSERT INTO t_anl_node (num_arcs, arc_id, node_id, top_elev, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user, 
-				dma_id, presszone_id, dqa_id, minsector_id)
+				dma_id, presszone_id, dqa_id, minsector_id, builtdate, family)
 				SELECT c.numarcs, to_arc, b.node_id::integer, top_elev, elev, nodecat_id, sector_id, state, state_type, ''MANDATORY'', demand, the_geom, 124, current_user, dma_id, 
-				presszone_id, dqa_id, minsector_id
+				presszone_id, dqa_id, minsector_id, builtdate, family
 				FROM ( ',v_querytext, ' ) b JOIN ( ',v_query_number,' ) c ON b.node_id = c.node_id::text');
 	EXECUTE v_querytext;
 
@@ -123,9 +123,9 @@ BEGIN
 					   LEFT JOIN man_frelem ON s.node_id=man_frelem.node_id WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL';
 
 		v_querytext = concat (' INSERT INTO t_anl_node (num_arcs, arc_id, node_id, top_elev, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, 
-				the_geom, fid, cur_user, dma_id, presszone_id, dqa_id, minsector_id)
+				the_geom, fid, cur_user, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family)
 				SELECT c.numarcs, to_arc, b.node_id::integer, top_elev, elev, nodecat_id, sector_id, state, state_type, ''NOT-MANDATORY'', demand, the_geom, 124, 
-				current_user, dma_id, presszone_id, dqa_id, minsector_id
+				current_user, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family
 				FROM ( ',v_querytext, ' ) b JOIN ( ',v_query_number,' ) c ON b.node_id = c.node_id::text');
 		EXECUTE v_querytext;
 	END IF;
@@ -149,84 +149,84 @@ BEGIN
 	RAISE NOTICE 'new nodes when numarcs = 1 (1)';
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
+		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family) 
 		WITH querytext AS (SELECT node_id::text, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
-		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
+		arc_distance, the_geom, minsector_id, builtdate, family FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id::text, ''_n2a_1'') as node_id, top_elev, elev, ''NODE2ARC'',
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
-		3, dma_id, presszone_id, dqa_id, n.minsector_id
+		3, dma_id, presszone_id, dqa_id, n.minsector_id, n.builtdate, n.family
 		FROM temp_t_arc c LEFT JOIN querytext n ON node_1 = node_id
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (2)';
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
+		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family) 
 		WITH querytext AS (SELECT node_id::text, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
-		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
+		arc_distance, the_geom, minsector_id, builtdate, family FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id::text, ''_n2a_2'') as node_id, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
-		4, dma_id, presszone_id, dqa_id, n.minsector_id
+		4, dma_id, presszone_id, dqa_id, n.minsector_id, n.builtdate, n.family
 		FROM temp_t_arc c LEFT JOIN querytext n ON node_2 = node_id
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (3)';
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
+		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family) 
 		WITH querytext AS (SELECT node_id::text, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
-		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
+		arc_distance, the_geom, minsector_id, builtdate, family FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id::text, ''_n2a_2'') as node_id, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_startpoint(c.the_geom) AS the_geom,
 		n.node_id,
-		4, dma_id, presszone_id, dqa_id, n.minsector_id
+		4, dma_id, presszone_id, dqa_id, n.minsector_id, n.builtdate, n.family
 		FROM temp_t_arc c LEFT JOIN querytext n ON node_1 = node_id
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 1 (4)';
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
+		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family) 
 		WITH querytext AS (SELECT node_id::text, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
-		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
+		arc_distance, the_geom, minsector_id, builtdate, family FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id::text, ''_n2a_1'') as node_id, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_endpoint(c.the_geom) AS the_geom,
 		n.node_id,
-		3, dma_id, presszone_id, dqa_id, n.minsector_id
+		3, dma_id, presszone_id, dqa_id, n.minsector_id, n.builtdate, n.family
 		FROM temp_t_arc c LEFT JOIN querytext n ON node_2 = node_id
 		WHERE n.num_arcs = 1';
 
 	RAISE NOTICE 'new nodes when numarcs = 2 (1)';
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
+		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family) 
 		WITH querytext AS (SELECT node_id::text, num_arcs, top_elev, elev, nodecat_id,state, state_type, descript, 
-		arc_distance, the_geom, minsector_id FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
+		arc_distance, the_geom, minsector_id, builtdate, family FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id::text, ''_n2a_1'') as node_id, top_elev, elev, ''NODE2ARC'',
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
-		1, dma_id, presszone_id, dqa_id, n.minsector_id
+		1, dma_id, presszone_id, dqa_id, n.minsector_id, n.builtdate, n.family
 		FROM temp_t_arc c LEFT JOIN querytext n ON node_1 = node_id
 		WHERE n.num_arcs = 2';
 
 	RAISE NOTICE 'new nodes when numarcs = 2 (2)';
 	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id) 
+		the_geom, nodeparent, arcposition, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family) 
 		WITH querytext AS (SELECT node_id::text, num_arcs, top_elev, elev, nodecat_id, state, state_type, descript, 
-		arc_distance, minsector_id, the_geom FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
+		arc_distance, minsector_id, builtdate, family, the_geom FROM t_anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id::text, ''_n2a_2'') as node_id, top_elev, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
-		2, dma_id, presszone_id, dqa_id, n.minsector_id
+		2, dma_id, presszone_id, dqa_id, n.minsector_id, n.builtdate, n.family
 		FROM temp_t_arc c LEFT JOIN querytext n ON node_2 = node_id
 		WHERE n.num_arcs = 2 ';
 
@@ -248,7 +248,7 @@ BEGIN
 
 		RAISE NOTICE 'new arcs when numarcs = 1 (NODE2ARC-ENDPOINT)';
 		EXECUTE 'INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
-			status, the_geom, minorloss, addparam, dma_id, presszone_id, dqa_id, minsector_id)
+			status, the_geom, minorloss, addparam, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family)
 			
 				WITH result AS (SELECT * FROM temp_t_node)
 				SELECT DISTINCT ON (a.nodeparent)
@@ -270,7 +270,7 @@ BEGIN
 				c.addparam::json->>''status'' status,
 				st_makeline(a.the_geom, b.the_geom) AS the_geom,
 				case when (c.addparam::json->>''minorloss'')::text !='''' then  (c.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
-				c.addparam, a.dma_id, a.presszone_id, a.dqa_id, a.minsector_id
+				c.addparam, a.dma_id, a.presszone_id, a.dqa_id, a.minsector_id, a.builtdate, a.family
 				FROM 	result a,
 					result b
 					LEFT JOIN result c ON c.node_id = b.nodeparent
@@ -278,7 +278,7 @@ BEGIN
 
 		RAISE NOTICE 'new arcs when numarcs = 2 (NODE2ARC) with offset  % ', v_offset;
 		EXECUTE 'INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
-			status, the_geom, minorloss, addparam, dma_id, presszone_id, dqa_id, minsector_id)
+			status, the_geom, minorloss, addparam, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family)
 
 			WITH result AS (SELECT * FROM temp_t_node) 
 			SELECT DISTINCT ON (a.nodeparent)
@@ -300,7 +300,7 @@ BEGIN
 			c.addparam::json->>''status'' status,
 			st_makeline(a.the_geom, b.the_geom) AS the_geom,
 			case when (c.addparam::json->>''minorloss'')::text !='''' then  (c.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
-			c.addparam, a.dma_id, a.presszone_id, a.dqa_id, c.minsector_id
+			c.addparam, a.dma_id, a.presszone_id, a.dqa_id, c.minsector_id, c.builtdate, c.family
 			FROM 	result a,
 				result b
 				LEFT JOIN result c ON c.node_id = b.nodeparent

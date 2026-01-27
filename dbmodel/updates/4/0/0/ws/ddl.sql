@@ -2234,7 +2234,7 @@ BEGIN
 		ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_muni_id_fkey;
 		ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_streetaxis_muni_id_fkey;
 
-		DROP VIEW v_ext_municipality;
+		DROP VIEW IF EXISTS v_ext_municipality;
 
 		-- DROP TABLE ext_municipality;
 		ALTER TABLE ext_municipality RENAME CONSTRAINT ext_municipality_pkey TO _ext_municipality_pkey;

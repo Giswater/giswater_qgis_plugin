@@ -43,7 +43,7 @@ SELECT has_index('arc', 'arc_arccat', 'Table should have index on arccat_id');
 SELECT has_index('arc', 'arc_dma', 'Table should have index on dma_id');
 SELECT has_index('arc', 'arc_dqa', 'Table should have index on dqa_id');
 SELECT has_index('arc', 'arc_exploitation', 'Table should have index on expl_id');
-SELECT has_index('arc', 'arc_expl_visibility_idx', 'Table should have index on expl_visibility');
+SELECT has_index('arc', 'arc_expl_visibility_gin', 'Table should have index on expl_visibility');
 SELECT has_index('arc', 'arc_index', 'Table should have spatial index');
 SELECT has_index('arc', 'arc_muni', 'Table should have index on muni_id');
 SELECT has_index('arc', 'arc_node1', 'Table should have index on node_1');

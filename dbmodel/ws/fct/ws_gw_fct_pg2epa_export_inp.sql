@@ -105,6 +105,7 @@ BEGIN
 		WHERE (a.curve_id::text IN ( SELECT temp_t_node.addparam::json ->> 'curve_id'::text
 		   FROM temp_t_node UNION SELECT temp_t_arc.addparam::json ->> 'curve_id'::text  FROM temp_t_arc)) ORDER BY a.rid, NULL::text;
 
+	
 	CREATE OR REPLACE TEMP VIEW vi_t_demands AS
 		SELECT temp_t_demand.feature_id,
 		temp_t_demand.demand,
@@ -164,17 +165,17 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_junctions AS
-	 SELECT temp_t_node.node_id,
+	SELECT temp_t_node.node_id,
 		CASE
-		    WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
-		    ELSE temp_t_node.top_elev
+			WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
+			ELSE temp_t_node.top_elev
 		END AS elevation,
-	    temp_t_node.demand,
-	    temp_t_node.pattern_id,
-	    concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, '0'::text), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
-	   FROM temp_t_node
-	  WHERE temp_t_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying::text, 'TANK'::character varying::text])
-	  ORDER BY temp_t_node.node_id;
+		temp_t_node.demand,
+		temp_t_node.pattern_id,
+		concat(';', temp_t_node.sector_id, ' ', COALESCE(temp_t_node.presszone_id, 0), ' ', COALESCE(temp_t_node.dma_id, 0), ' ', COALESCE(temp_t_node.dqa_id, 0), ' ', COALESCE(temp_t_node.minsector_id, 0), ' ', temp_t_node.node_type) AS other
+	FROM temp_t_node
+	WHERE temp_t_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying::text, 'TANK'::character varying::text])
+	ORDER BY temp_t_node.node_id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_labels AS
@@ -244,14 +245,14 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
-	   SELECT a.pattern_id, a.factor_1, a.factor_2, a.factor_3, a.factor_4,  a.factor_5, a.factor_6, a.factor_7, a.factor_8, a.factor_9,
-	   a.factor_10,  a.factor_11, a.factor_12, a.factor_13, a.factor_14, a.factor_15, a.factor_16, a.factor_17, a.factor_18
-	   FROM t_rpt_inp_pattern_value a ORDER BY a.id;
+		SELECT a.pattern_id, a.factor_1, a.factor_2, a.factor_3, a.factor_4,  a.factor_5, a.factor_6, a.factor_7, a.factor_8, a.factor_9,
+		a.factor_10,  a.factor_11, a.factor_12, a.factor_13, a.factor_14, a.factor_15, a.factor_16, a.factor_17, a.factor_18
+		FROM t_rpt_inp_pattern_value a ORDER BY a.id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS
 	 SELECT arc_id, node_1, node_2, length, diameter, roughness, minorloss, status::character varying(30) AS status,
-	 concat(';', sector_id, ' ', COALESCE(presszone_id, '0'::text), ' ', COALESCE(dma_id, 0), ' ', COALESCE(dqa_id, 0), ' ', COALESCE(minsector_id, 0), ' ', arccat_id) AS other
+	 concat(';', sector_id, ' ', COALESCE(presszone_id, 0), ' ', COALESCE(dma_id, 0), ' ', COALESCE(dqa_id, 0), ' ', COALESCE(minsector_id, 0), ' ', arccat_id) AS other
 	 FROM temp_t_arc  WHERE epa_type::text = ANY (ARRAY['PIPE'::character varying::text, 'SHORTPIPE'::character varying::text, 'NODE2NODE'::character varying::text, 'FRSHORTPIPE'::character varying::text]);
 
 
@@ -264,23 +265,8 @@ BEGIN
 	    a.valve_type,
 	    a.setting,
 	    a.minorloss,
-	    concat(';', a.sector_id, ' ', COALESCE(a.presszone_id, '0'::text), ' ', COALESCE(a.dma_id, 0), ' ', COALESCE(a.dqa_id, 0), ' ', COALESCE(a.minsector_id, 0), ' ', a.arccat_id) AS other
-	   FROM ( SELECT arc_id::text AS arc_id,
-		    node_1,
-		    node_2,
-		    diameter,
-		    ((addparam::json ->> 'valve_type'::text))::character varying(18) AS valve_type,
-		    addparam::json ->> 'setting'::text AS setting,
-		    minorloss,
-		    sector_id,
-		    dma_id,
-		    presszone_id,
-		    dqa_id,
-		    minsector_id,
-		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'PRV'::text OR (addparam::json ->> 'valve_type'::text) = 'PSV'::text OR (addparam::json ->> 'valve_type'::text) = 'PBV'::text
-		UNION
-		 SELECT arc_id,
+	    concat(';', a.sector_id, ' ', COALESCE(a.presszone_id, 0), ' ', COALESCE(a.dma_id, 0), ' ', COALESCE(a.dqa_id, 0), ' ', COALESCE(a.minsector_id, 0), ' ', a.arccat_id) AS other
+	   FROM (SELECT arc_id,
 		    node_1,
 		    node_2,
 		    diameter,
@@ -293,37 +279,7 @@ BEGIN
 		    dqa_id,
 		    minsector_id,
 		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'FCV'::text
-		UNION
-		 SELECT arc_id,
-		    node_1,
-		    node_2,
-		    diameter,
-		    addparam::json ->> 'valve_type'::text AS valve_type,
-		    addparam::json ->> 'setting'::text AS setting,
-		    minorloss,
-		    sector_id,
-		    dma_id,
-		    presszone_id,
-		    dqa_id,
-		    minsector_id,
-		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'TCV'::text
-		UNION
-		 SELECT arc_id,
-		    node_1,
-		    node_2,
-		    diameter,
-		    addparam::json ->> 'valve_type'::text AS valve_type,
-		    addparam::json ->> 'setting'::text AS setting,
-		    minorloss,
-		    sector_id,
-		    dma_id,
-		    presszone_id,
-		    dqa_id,
-		    minsector_id,
-		    arccat_id
-		   FROM temp_t_arc WHERE (addparam::json ->> 'valve_type'::text) = 'GPV'::text
+		   FROM temp_t_arc WHERE addparam::json ->> 'valve_type'::text IN ('PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV')
 		UNION
 		 SELECT arc_id,
 		    node_1,

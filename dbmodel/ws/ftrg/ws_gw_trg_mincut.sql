@@ -43,7 +43,8 @@ BEGIN
            OLD.forecast_start    IS DISTINCT FROM NEW.forecast_start OR
            OLD.forecast_end      IS DISTINCT FROM NEW.forecast_end OR
            OLD.assigned_to       IS DISTINCT FROM NEW.assigned_to OR
-           OLD.output::text      IS DISTINCT FROM NEW.output::text
+           OLD.output::text      IS DISTINCT FROM NEW.output::text OR
+           OLD.shutoff_required  IS DISTINCT FROM NEW.shutoff_required
         THEN
             UPDATE om_mincut 
                SET modification_date = now(),

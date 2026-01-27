@@ -20,7 +20,7 @@ SELECT has_table('cat_material'::name, 'Table cat_material should exist');
 SELECT columns_are(
     'cat_material',
     ARRAY[
-        'id', 'descript', 'feature_type', 'featurecat_id', 'n', 'link', 'active'
+        'id', 'descript', 'feature_type', 'featurecat_id', 'n', 'link', 'active', 'family'
     ],
     'Table cat_material should have the correct columns'
 );
@@ -36,6 +36,10 @@ SELECT col_type_is('cat_material', 'featurecat_id', 'text[]', 'Column featurecat
 SELECT col_type_is('cat_material', 'n', 'numeric(12, 4)', 'Column n should be numeric(12, 4)');
 SELECT col_type_is('cat_material', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('cat_material', 'active', 'bool', 'Column active should be bool');
+SELECT col_type_is('cat_material', 'family', 'varchar(100)', 'Column family should be varchar(100)');
+
+-- Check foreign keys
+SELECT fk_ok('cat_material','family','inp_family','family_id','Table should have foreign key from family to inp_family.family_id');
 
 -- Check default values
 SELECT col_has_default('cat_material', 'active', 'Column active should have default value');

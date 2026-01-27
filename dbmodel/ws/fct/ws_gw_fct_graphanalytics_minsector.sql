@@ -19,6 +19,12 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"comm
 
 --fid: 125,134
 
+- temp_pgr_node and pgr_temp_arc - temporary table
+- v_temp_arc, v_temp_node, v_temp_connec, v_temp_gully 
+are temporary views for active explotation and for is_operatiu = TRUE, with psectors or not, depending of usePlanPsector
+- Use the views for building temporary table;
+- Use the tables node, arc, connec, gully or link to get the_geom, are faster then the views
+
 
 */
 
@@ -26,7 +32,7 @@ DECLARE
 
     -- dialog
     v_expl_id TEXT;
-    v_expl_id_array TEXT[];
+    v_expl_id_array INTEGER[];
     v_usepsector BOOLEAN;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
@@ -34,9 +40,9 @@ DECLARE
 
     v_data JSON;
 
-    v_hydrometer_service INT[];
     v_fid INTEGER = 134;
     v_query_text TEXT;
+    v_query_text_components TEXT;
 
     v_version TEXT;
     v_srid INTEGER;
@@ -45,9 +51,6 @@ DECLARE
     v_visible_layer TEXT;
     v_ignore_broken_valves BOOLEAN;
     v_ignore_check_valves BOOLEAN;
-
-    -- CHECKS
-    v_arc_list TEXT;
 
     v_response JSON;
     v_error_context TEXT;
@@ -74,7 +77,7 @@ DECLARE
 
 
     -- parameters
-    v_pgr_distance INTEGER;
+    v_pgr_distance float;
 
 BEGIN
 
@@ -112,7 +115,13 @@ BEGIN
 	END IF;
 
     -- Get exploitation ID array
-    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
+    v_expl_id_array := gw_fct_get_expl_id_array(v_expl_id);
+
+    -- if v_expl_id_array is null, return error
+    IF v_expl_id_array IS NULL THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		       	"data":{"message":"4478", "function":"2706","parameters":null}}$$);';
+    END IF;
 
 	-- Get user variable for disabling lock level
     SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
@@ -120,22 +129,6 @@ BEGIN
     -- Set disable lock level to true for this operation
     UPDATE config_param_user SET value = '{"update":true, "delete":true}'
     WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
-
-    -- CHECKS
-    -- =======================
-
-	-- Check for arcs with missing node_1 or node_2
-    SELECT string_agg(arc_id::text, ',') INTO v_arc_list FROM arc
-    JOIN value_state_type vst ON vst.id = arc.state_type
-    WHERE vst.is_operative = TRUE
-    AND (arc.node_1 IS NULL OR arc.node_2 IS NULL)
-    AND arc.state > 0;
-
-    IF v_arc_list IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4022", "function":"2706", "fid":"'||v_fid||'", "is_process":true,
-		"parameters":{"v_arc_list":"'||v_arc_list||'"}}}$$)';
-	END IF;
-
 
 	-- Delete temporary tables
 	-- =======================
@@ -168,185 +161,254 @@ BEGIN
     EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "fid":"'||v_fid||'","criticity":"0", "tempTable":"temp_", "is_process":true, "is_header":"true", "label_id":"3012", "separator_id":"2010"}}$$)';
 
     -- Initialize process
-	-- =======================
-    v_data := jsonb_build_object(
-        'data', jsonb_build_object(
-            'expl_id_array', array_to_string(v_expl_id_array, ','),
-            'mapzone_name', 'MINSECTOR',
-			'cost', 1,
-			'reverse_cost', 1
+    -- =======================
+    v_query_text := $q$
+        SELECT arc_id AS id, node_1 AS source, node_2 AS target, 1 AS cost
+        FROM v_temp_arc
+    $q$;
+
+    -- INSERT
+	EXECUTE format($sql$
+        WITH connectedcomponents AS (
+            SELECT *
+            FROM pgr_connectedcomponents($q$%s$q$)
+        ),
+        components AS (
+            SELECT c.component
+            FROM connectedcomponents c
+            WHERE cardinality($1) = 0
+            OR EXISTS (
+                SELECT 1
+                FROM v_temp_arc v
+                WHERE v.expl_id = ANY($1)
+                AND v.node_1 = c.node
+            )
+            GROUP BY c.component
         )
-    )::text;
-    SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+        INSERT INTO temp_pgr_node (pgr_node_id)
+        SELECT c.node
+        FROM connectedcomponents c
+        WHERE EXISTS (
+            SELECT 1
+            FROM components cc
+            WHERE cc.component = c.component
+        )
+    $sql$, v_query_text)
+    USING v_expl_id_array;
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
+	INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
+	SELECT a.arc_id, a.node_1, a.node_2
+	FROM v_temp_arc a
+	JOIN temp_pgr_node n1 ON n1.pgr_node_id = a.node_1
+	JOIN temp_pgr_node n2 ON n2.pgr_node_id = a.node_2;
 
-    UPDATE temp_pgr_node n SET old_mapzone_id = t.minsector_id
-    FROM v_temp_node t WHERE n.node_id = t.node_id;
-	
-	UPDATE temp_pgr_arc a SET old_mapzone_id = t.minsector_id 
-    FROM v_temp_arc t WHERE a.arc_id = t.arc_id;
+	INSERT INTO temp_pgr_connec (pgr_connec_id, pgr_arc_id)
+	SELECT c.connec_id, c.arc_id
+	FROM v_temp_connec c
+	JOIN temp_pgr_arc a ON a.pgr_arc_id = c.arc_id;
 
+    INSERT INTO temp_pgr_old_mapzone (mapzone_id)
+    SELECT DISTINCT a.minsector_id
+    FROM temp_pgr_arc t
+    JOIN arc a ON t.pgr_arc_id = a.arc_id
+    WHERE a.minsector_id > 0;
+
+    -- Preparing minsectors
+    -- =======================
+    -- nodes water sources (SECTOR)
+    -- tank, source, waterwell, wtp
     UPDATE temp_pgr_node t
-    SET graph_delimiter = 'SECTOR', modif = TRUE
+    SET graph_delimiter = 'SECTOR'
     FROM v_temp_node n
-    WHERE 'SECTOR' = ANY(n.graph_delimiter)
-    AND t.node_id = n.node_id;
+    JOIN (
+        SELECT node_id FROM man_tank
+        UNION ALL
+        SELECT node_id FROM man_source
+        UNION ALL
+        SELECT node_id FROM man_waterwell
+        UNION ALL
+        SELECT node_id FROM man_wtp
+    ) m ON m.node_id = n.node_id
+    WHERE 'SECTOR' = ANY(n.graph_delimiter) 
+    AND t.pgr_node_id = n.node_id;
 
-    -- NODES VALVES (MINSECTOR)
+    -- nodes valves (MINSECTOR)
     UPDATE temp_pgr_node t
-    SET
-        graph_delimiter = 'MINSECTOR',
-        modif = TRUE
+    SET graph_delimiter = 'MINSECTOR'
     FROM v_temp_node n
-    JOIN man_valve v USING (node_id)
+    JOIN man_valve m ON n.node_id = m.node_id
     WHERE 'MINSECTOR' = ANY(n.graph_delimiter)
-    AND t.node_id = n.node_id; 
+    AND t.pgr_node_id = n.node_id;  
 
-    -- Generate new arcs when n.modif = TRUE AND (a.modif1 = TRUE OR a.modif2 = TRUE)
-    -- arc_id is NULL for the new arcs, old_arc_id = arc_id of the old arc
-	-- =======================
-    v_data := jsonb_build_object(
-        'data', jsonb_build_object(
-            'mapzone_name', 'MINSECTOR',
-			'cost', 0,
-			'reverse_cost', 0
-        )
-    )::text;
-    SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
+    -- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
+    INSERT INTO temp_pgr_arc_linegraph (
+        pgr_arc_id, pgr_node_1, pgr_node_2, cost_mincut, reverse_cost_mincut
+    )
+    SELECT seq, source, target, cost, -1
+    FROM pgr_linegraph(
+        'SELECT pgr_arc_id AS id,
+                pgr_node_1 AS source,
+                pgr_node_2 AS target,
+                1 AS cost
+        FROM temp_pgr_arc',
+        directed => FALSE
+    );
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
+    -- Propagate original node_id for valves (MINSECTOR) and water facilities (SECTOR) to the linegraph and tag them in graph_delimiter
+    --checking node_1 for arc_1
+    UPDATE temp_pgr_arc_linegraph t
+    SET pgr_node_id = n.pgr_node_id,
+        graph_delimiter = n.graph_delimiter,
+        cost_mincut = -1
+    FROM temp_pgr_arc_linegraph ta
+    JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
+    JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
+    JOIN temp_pgr_node n ON a1.pgr_node_1 = n.pgr_node_id
+    WHERE n.graph_delimiter <> 'NONE'
+    AND a1.pgr_node_1 IN (a2.pgr_node_1, a2.pgr_node_2)
+    AND ta.pgr_arc_id = t.pgr_arc_id;
+
+    --checking node_2 for arc_1
+    UPDATE temp_pgr_arc_linegraph t
+    SET pgr_node_id = n.pgr_node_id,
+        graph_delimiter = n.graph_delimiter,
+        cost_mincut = -1
+    FROM temp_pgr_arc_linegraph ta
+    JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
+    JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
+    JOIN temp_pgr_node n ON a1.pgr_node_2 = n.pgr_node_id
+    WHERE n.graph_delimiter <> 'NONE'
+    AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
+    AND ta.pgr_arc_id = t.pgr_arc_id;
 
     -- Generate the minsectors
     v_query_text :=
-    'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
-    FROM temp_pgr_arc a
-    WHERE a.arc_id IS NOT NULL';
+    'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost_mincut as cost
+    FROM temp_pgr_arc_linegraph';
+
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
 
-    -- Update the mapzone_id field for arcs and nodes
-    UPDATE temp_pgr_node AS n
-    SET mapzone_id = agg.min_node
+    -- Update the mapzone_id field for arcs (mapzone_id = min(arc_id) for the connected arcs)
+    UPDATE temp_pgr_arc a 
+    SET mapzone_id = c.component
+    FROM temp_pgr_connectedcomponents c
+    WHERE a.pgr_arc_id = c.node;
+
+    -- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters 
+    UPDATE temp_pgr_arc 
+    SET mapzone_id = pgr_arc_id
+    WHERE mapzone_id = 0;
+
+    -- update the mapzone_id field for nodes, except nodes that are graph_delimiter = 'SECTOR' or are in between minsectors (valves)
+    UPDATE temp_pgr_node t
+    SET mapzone_id = n.mapzone_id
     FROM (
-        SELECT c.component, MIN(COALESCE (n.node_id, n.old_node_id)) AS min_node
-        FROM temp_pgr_connectedcomponents c
-        JOIN temp_pgr_node n on n.pgr_node_id = c.node
+        SELECT n.pgr_node_id, min(a.mapzone_id) AS mapzone_id
+        FROM temp_pgr_node n
+        JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
         WHERE n.graph_delimiter <> 'SECTOR'
-        GROUP BY c.component
-    ) AS agg
-    JOIN temp_pgr_connectedcomponents AS c ON c.component = agg.component
-    WHERE n.pgr_node_id = c.node;
+        GROUP BY n.pgr_node_id
+        HAVING count(DISTINCT a.mapzone_id) = 1
+    ) n
+    WHERE t.pgr_node_id = n.pgr_node_id;
 
-    UPDATE temp_pgr_arc a SET mapzone_id = n.mapzone_id
-    FROM temp_pgr_node n
-    WHERE a.pgr_node_1 = n.pgr_node_id
-    AND a.arc_id IS NOT NULL;
+    -- update connec
+    UPDATE temp_pgr_connec t
+    SET mapzone_id = a.mapzone_id
+    FROM temp_pgr_arc a 
+    WHERE t.pgr_arc_id = a.pgr_arc_id;
 
-    -- if an arc is between 2 water sources nodes, minsector_id = arc_id
-    UPDATE temp_pgr_arc a SET mapzone_id = a.arc_id
-    FROM v_temp_arc va
-    WHERE a.arc_id IS NOT NULL
-    AND a.mapzone_id = 0
-    AND a.arc_id = va.arc_id
-    AND EXISTS (
-        SELECT 1 FROM v_temp_node n
-        WHERE 'SECTOR' = ANY (n.graph_delimiter)
-        AND va.node_1 = n.node_id
-    )
-    AND EXISTS (
-        SELECT 1 FROM v_temp_node n
-        WHERE 'SECTOR' = ANY (n.graph_delimiter)
-        AND va.node_2 = n.node_id
-    );
-
+    -- fill temp_pgr_minsector_graph
     INSERT INTO temp_pgr_minsector_graph (node_id, minsector_1, minsector_2)
-    SELECT COALESCE(n1.node_id, n2.node_id), n1.mapzone_id, n2.mapzone_id
-    FROM temp_pgr_arc a
-    JOIN temp_pgr_node n1 ON a.pgr_node_1 = n1.pgr_node_id
-    JOIN temp_pgr_node n2 ON a.pgr_node_2 = n2.pgr_node_id
-    WHERE a.arc_id IS NULL AND a.graph_delimiter = 'MINSECTOR'
-    AND n1.mapzone_id <> 0 AND n2.mapzone_id <> 0
-    AND n1.mapzone_id <> n2.mapzone_id;
+    SELECT
+        l.pgr_node_id AS node_id,
+        a1.mapzone_id AS minsector_1,
+        a2.mapzone_id AS minsector_2
+    FROM temp_pgr_arc_linegraph l
+    JOIN temp_pgr_arc a1 ON l.pgr_node_1 = a1.pgr_arc_id
+    JOIN temp_pgr_arc a2 ON l.pgr_node_2 = a2.pgr_arc_id
+    WHERE l.graph_delimiter = 'MINSECTOR'
+    AND a1.mapzone_id <> a2.mapzone_id;
 
-    -- Insert into minsector temporary table
-    INSERT INTO temp_pgr_minsector
+    UPDATE temp_pgr_minsector_graph t
+    SET node_type = cn.node_type
+    FROM node n 
+    JOIN cat_node cn ON n.nodecat_id = cn.id
+    WHERE t.node_id = n.node_id;
+
+    -- fill temp_pgr_minsector
+    INSERT INTO temp_pgr_minsector(minsector_id)
     SELECT DISTINCT mapzone_id
     FROM temp_pgr_arc
     WHERE mapzone_id > 0;
 
-    -- Set mapzone_id to 0 for nodes at the border of minsectors
-    UPDATE temp_pgr_node n SET mapzone_id = 0
-    FROM temp_pgr_minsector_graph s
-    WHERE n.node_id = s.node_id;
-
     -- Update minsector temporary num_border
-    UPDATE temp_pgr_minsector t SET num_border = a.num
+    UPDATE temp_pgr_minsector t
+    SET num_border = a.num_border 
     FROM (
-        SELECT a.mapzone_id, COUNT(*) AS num
-        FROM temp_pgr_node n
-        JOIN v_temp_node vn ON vn.node_id = n.node_id -- real nodes
-        JOIN v_temp_arc va ON vn.node_id IN (va.node_1, va.node_2)
-        JOIN temp_pgr_arc a ON va.arc_id = a.arc_id -- real arcs
-        WHERE n.mapzone_id = 0 AND a.mapzone_id > 0
-        GROUP BY a.mapzone_id
-    ) a WHERE a.mapzone_id = t.minsector_id;
+        SELECT m.minsector_id, count(*) AS num_border
+        FROM temp_pgr_minsector m
+        JOIN temp_pgr_minsector_graph g ON m.minsector_id = g.minsector_1 OR m.minsector_id = minsector_2
+        GROUP BY m.minsector_id
+    ) a
+    WHERE t.minsector_id = a.minsector_id;
+
     UPDATE temp_pgr_minsector SET num_border = 0 WHERE num_border IS NULL;
 
     -- Update minsector temporary num_connec
     UPDATE temp_pgr_minsector t SET num_connec = c.num_connec
     FROM (
-        SELECT a.mapzone_id, COUNT(*) AS num_connec
-        FROM v_temp_connec v
-        JOIN temp_pgr_arc a on v.arc_id = a.arc_id
-        WHERE a.mapzone_id > 0
-        GROUP BY a.mapzone_id
-    ) c WHERE c.mapzone_id = t.minsector_id;
+        SELECT mapzone_id, count(*) AS num_connec
+        FROM temp_pgr_connec
+        GROUP BY mapzone_id
+    ) c
+    WHERE c.mapzone_id = t.minsector_id;
+
     UPDATE temp_pgr_minsector SET num_connec = 0 WHERE num_connec IS NULL;
 
     -- Update minsector temporary num_hydro
-    SELECT ARRAY(SELECT jsonb_array_elements_text(value::jsonb->'1')::integer)
-    INTO v_hydrometer_service
-    FROM config_param_system
-    WHERE parameter = 'admin_hydrometer_state';
-
     WITH
-    	hydrometer AS (
-    		SELECT h.hydrometer_id, a.mapzone_id
-			FROM rtc_hydrometer_x_connec h
-			JOIN v_temp_connec c USING (connec_id)
-			JOIN temp_pgr_arc a USING (arc_id)
-			WHERE a.mapzone_id >0
-			UNION
-			SELECT h.hydrometer_id, n.mapzone_id
-			FROM rtc_hydrometer_x_node h
-			JOIN temp_pgr_node n USING (node_id)
-			WHERE n.mapzone_id >0
-		),
-		hydrometer_result AS (
-			SELECT h.mapzone_id, count(*) AS num_hydro
-			FROM hydrometer h
-			JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
-			GROUP BY h.mapzone_id
-		)
-	UPDATE temp_pgr_minsector t
-	SET num_hydro = h.num_hydro
-	FROM hydrometer_result h
-	WHERE t.minsector_id = h.mapzone_id;
+        hydrometer AS (
+            SELECT h.hydrometer_id, c.mapzone_id
+            FROM rtc_hydrometer_x_connec h
+            JOIN temp_pgr_connec c ON c.pgr_connec_id = h.connec_id
+
+            UNION
+            SELECT h.hydrometer_id, n.mapzone_id
+            FROM rtc_hydrometer_x_node h
+            JOIN temp_pgr_node n ON n.pgr_node_id = h.node_id
+            WHERE n.mapzone_id > 0
+        ),
+        hydrometer_result AS (
+            SELECT h.mapzone_id, count(*) AS num_hydro
+            FROM hydrometer h
+            JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
+            WHERE e.state_id IN (
+                SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER
+                FROM config_param_system
+                WHERE parameter = 'admin_hydrometer_state'
+            )
+            GROUP BY h.mapzone_id
+        )
+    UPDATE temp_pgr_minsector t
+    SET num_hydro = h.num_hydro
+    FROM hydrometer_result h
+    WHERE t.minsector_id = h.mapzone_id;
+
     UPDATE temp_pgr_minsector SET num_hydro = 0 WHERE num_hydro IS NULL;
 
-	-- Update minsector temporary length
-    UPDATE temp_pgr_minsector SET length = b.length FROM (
-        SELECT mapzone_id AS minsector_id, SUM(st_length2d(va.the_geom)::NUMERIC(12,2)) AS length
-		FROM temp_pgr_arc ta
-		JOIN v_temp_arc va USING (arc_id)
-		WHERE ta.mapzone_id > 0
-        GROUP BY ta.mapzone_id
-    ) b WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
+    -- Update minsector temporary length
+    UPDATE temp_pgr_minsector
+    SET length = m.length
+    FROM (
+        SELECT t.mapzone_id AS minsector_id,
+            SUM(st_length2d(a.the_geom)::NUMERIC(12,2)) AS length
+        FROM temp_pgr_arc t
+        JOIN arc a ON a.arc_id = t.pgr_arc_id
+        GROUP BY t.mapzone_id
+    ) m
+    WHERE m.minsector_id = temp_pgr_minsector.minsector_id;
 
     -- update geometry of mapzones
     IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
@@ -361,7 +423,7 @@ BEGIN
                     WITH polygon AS (
                         SELECT ST_Collect(v.the_geom) AS g, t.mapzone_id AS minsector_id
                         FROM temp_pgr_arc t
-                        JOIN v_temp_arc v USING (arc_id)
+                        JOIN arc v ON v.arc_id = t.pgr_arc_id
                         GROUP BY t.mapzone_id
                     )
                     SELECT 
@@ -383,8 +445,7 @@ BEGIN
             FROM (
                 SELECT t.mapzone_id AS minsector_id, (ST_Buffer(ST_Collect(v.the_geom),'||v_geomparamupdate||')) AS geom 
                 FROM temp_pgr_arc t
-                JOIN v_temp_arc v USING (arc_id)
-                WHERE mapzone_id > 0 
+                JOIN arc v ON v.arc_id = t.pgr_arc_id 
                 GROUP BY t.mapzone_id
             ) b 
             WHERE b.minsector_id = temp_pgr_minsector.minsector_id;
@@ -401,15 +462,13 @@ BEGIN
                 FROM (
                     SELECT t.mapzone_id AS minsector_id, ST_Buffer(ST_Collect(v.the_geom), '||v_geomparamupdate||') AS geom 
                     FROM temp_pgr_arc t
-                    JOIN v_temp_arc v USING (arc_id)
-                    WHERE mapzone_id::integer > 0
+                    JOIN arc v ON v.arc_id = t.pgr_arc_id
                     GROUP BY t.mapzone_id 
                     UNION
                     SELECT t.mapzone_id AS minsector_id, ST_Collect(ext_plot.the_geom) AS geom 
-                    FROM temp_pgr_arc t 
-                    JOIN v_temp_connec vc USING (arc_id)
+                    FROM temp_pgr_connec t 
+                    JOIN connec vc ON vc.connec_id = t.pgr_connec_id
                     LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code AND ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
-                    WHERE mapzone_id::integer > 0 
                     GROUP BY t.mapzone_id
                 ) c 
                 GROUP BY minsector_id
@@ -419,14 +478,14 @@ BEGIN
         EXECUTE v_query_text;
     END IF;
 
-	-- Update minsector temporary exploitation
+    -- Update minsector temporary exploitation
     UPDATE temp_pgr_minsector t
     SET expl_id = sub.expl_id_arr,
-    dma_id = sub.dma_id_arr,
-    dqa_id = sub.dqa_id_arr,
-    muni_id = sub.muni_id_arr,
-    sector_id = sub.sector_id_arr,
-    supplyzone_id = sub.supplyzone_id_arr
+        dma_id = sub.dma_id_arr,
+        dqa_id = sub.dqa_id_arr,
+        muni_id = sub.muni_id_arr,
+        sector_id = sub.sector_id_arr,
+        supplyzone_id = sub.supplyzone_id_arr
     FROM (
         SELECT
             ta.mapzone_id AS minsector_id,
@@ -437,12 +496,12 @@ BEGIN
             array_agg(DISTINCT va.sector_id) AS sector_id_arr,
             array_agg(DISTINCT va.supplyzone_id) AS supplyzone_id_arr
         FROM temp_pgr_arc ta
-		JOIN v_temp_arc va USING (arc_id)
+        JOIN arc va ON va.arc_id = ta.pgr_arc_id
         GROUP BY ta.mapzone_id
     ) sub
     WHERE sub.minsector_id = t.minsector_id;
 
-	IF v_commitchanges IS FALSE THEN
+    IF v_commitchanges IS FALSE THEN
         -- Polygons
         EXECUTE 'SELECT jsonb_build_object(
                 ''type'', ''FeatureCollection'',
@@ -460,18 +519,6 @@ BEGIN
                     num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector'' AS layer 
                 FROM temp_pgr_minsector
             ) row
-            UNION
-            SELECT jsonb_build_object(
-                ''type'',       ''Feature'',
-                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-                ''properties'', to_jsonb(row) - ''the_geom''
-            ) AS feature
-            FROM (
-                SELECT 
-                    minsector_id, dma_id, dqa_id, presszone_id, expl_id, sector_id, muni_id, supplyzone_id, 
-                    num_border, num_connec, num_hydro, length, the_geom, ''ve_minsector_mincut'' AS layer 
-                FROM v_temp_minsector_mincut
-            ) row
         ) features' INTO v_result;
 
         v_result_polygon := v_result;
@@ -479,274 +526,328 @@ BEGIN
         v_visible_layer = NULL;
 
         -- Message
-        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001",	 "is_process":true}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001", "is_process":true}}$$)';
 
     ELSE
 
-        -- Update minsector
-        DELETE FROM minsector
+        -- First, SET minsector_id = 0 when the values don't exist anymore
+        UPDATE arc a SET minsector_id = 0
         WHERE EXISTS (
-            SELECT 1 FROM v_temp_pgr_mapzone_old
-            WHERE minsector.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE a.minsector_id = m.mapzone_id
         )
-        OR EXISTS (
-            SELECT 1 FROM temp_pgr_minsector
-            WHERE minsector.minsector_id = temp_pgr_minsector.minsector_id
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_arc ta 
+            WHERE ta.pgr_arc_id = a.arc_id
+        )
+        AND a.minsector_id IS DISTINCT FROM 0;
+
+        UPDATE node n SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE n.minsector_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_node tn
+            WHERE tn.pgr_node_id = n.node_id
+        )
+        AND n.minsector_id IS DISTINCT FROM 0;
+
+        UPDATE connec c SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE c.minsector_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_connec tc
+            WHERE tc.pgr_connec_id = c.connec_id
+        )
+        AND c.minsector_id IS DISTINCT FROM 0;
+
+        UPDATE link l SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE l.minsector_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_connec t
+            WHERE t.pgr_connec_id = l.feature_id
+        )
+        AND l.minsector_id IS DISTINCT FROM 0;
+
+        -- Second, delete the minsectors that don't exist anymore;
+        -- for these minsectors, will be done DELETE ON CASCADE  in the tables minsector_graph, minsector_mincut, minsector_mincut_valve
+        DELETE FROM minsector m
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone mo
+            WHERE m.minsector_id = mo.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_minsector tpm
+            WHERE m.minsector_id = tpm.minsector_id
         );
 
-        INSERT INTO minsector SELECT * FROM temp_pgr_minsector;
+        -- For the minsectors kept in the table minsector, delete from minsector_graph, minsector_mincut, minsector_mincut_valve
+        DELETE FROM minsector_graph mg
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector m WHERE mg.minsector_1 = m.minsector_id
+        )
+        OR EXISTS (
+            SELECT 1 FROM temp_pgr_minsector m WHERE mg.minsector_2 = m.minsector_id
+        );
 
-        INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
-        SELECT node_id, minsector_1, minsector_2 FROM temp_pgr_minsector_graph;
+        DELETE FROM minsector_mincut mm
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector m WHERE mm.minsector_id = m.minsector_id
+        );
 
-        v_query_text = '
-            WITH arcs AS (
-                SELECT 
-                    arc_id, mapzone_id
-                FROM temp_pgr_arc
-            )
-            UPDATE arc SET minsector_id = arcs.mapzone_id
-            FROM arcs
-            WHERE arc.arc_id = arcs.arc_id
-            AND arc.minsector_id IS DISTINCT FROM arcs.mapzone_id;';
-        EXECUTE v_query_text;
+        DELETE FROM minsector_mincut_valve mm
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_minsector m WHERE mm.minsector_id = m.minsector_id
+        );
 
-        v_query_text = '
-            WITH nodes AS (
-                SELECT 
-                    node_id, mapzone_id
-                FROM temp_pgr_node
-            )
-            UPDATE node SET minsector_id = nodes.mapzone_id
-            FROM nodes
-            WHERE node.node_id = nodes.node_id
-            AND node.minsector_id IS DISTINCT FROM nodes.mapzone_id;';
-        EXECUTE v_query_text;
+        -- Insert new minsectors
+        INSERT INTO minsector (minsector_id)
+        SELECT tpm.minsector_id
+        FROM temp_pgr_minsector tpm
+        WHERE NOT EXISTS (
+            SELECT 1 
+            FROM minsector m 
+            WHERE tpm.minsector_id = m.minsector_id
+        );
 
-        v_query_text = '
-            WITH connecs AS (
-                SELECT 
-                    connec_id, mapzone_id
-                FROM temp_pgr_arc
-                JOIN v_temp_connec vc USING (arc_id)
-            )
-            UPDATE connec SET minsector_id = connecs.mapzone_id
-            FROM connecs
-            WHERE connec.connec_id = connecs.connec_id
-            AND connec.minsector_id IS DISTINCT FROM connecs.mapzone_id;';
-        EXECUTE v_query_text;
+        -- fill minsector_graph
+        INSERT INTO minsector_graph (node_id, node_type, minsector_1, minsector_2)
+        SELECT node_id, node_type, minsector_1, minsector_2
+        FROM temp_pgr_minsector_graph;
 
-        v_query_text = '
-            WITH links AS (
-                SELECT 
-                    link_id, mapzone_id
-                FROM temp_pgr_arc
-                JOIN v_temp_link_connec vc USING (arc_id)
-            )
-            UPDATE link SET minsector_id = links.mapzone_id
-            FROM links
-            WHERE link.link_id = links.link_id
-            AND link.minsector_id IS DISTINCT FROM links.mapzone_id;';
-        EXECUTE v_query_text;
+        -- update minsector
+        UPDATE minsector m
+        SET num_border = tpm.num_border,
+            num_connec = tpm.num_connec,
+            num_hydro = tpm.num_hydro,
+            length = tpm.length,
+            the_geom = tpm.the_geom,
+            expl_id = tpm.expl_id,
+            dma_id = tpm.dma_id,
+            dqa_id = tpm.dqa_id,
+            muni_id = tpm.muni_id,
+            sector_id = tpm.sector_id,
+            supplyzone_id = tpm.supplyzone_id
+        FROM temp_pgr_minsector tpm
+        WHERE tpm.minsector_id = m.minsector_id;
 
-        v_query_text = '
-            UPDATE arc SET minsector_id = 0
-            WHERE EXISTS (
-                SELECT 1 FROM v_temp_pgr_mapzone_old
-                WHERE arc.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-            )
-            AND NOT EXISTS (
-                SELECT 1 FROM temp_pgr_arc tpa WHERE tpa.mapzone_id = arc.minsector_id
-            )
-            AND arc.minsector_id IS DISTINCT FROM 0;
-        ';
-        EXECUTE v_query_text;
+         -- update arc, node, connec, link
+        UPDATE arc a
+        SET minsector_id = t.mapzone_id
+        FROM temp_pgr_arc t
+        WHERE a.arc_id = t.pgr_arc_id
+        AND a.minsector_id IS DISTINCT FROM t.mapzone_id;
 
-        v_query_text = '
-            UPDATE node SET minsector_id = 0
-            WHERE EXISTS (
-                SELECT 1 FROM v_temp_pgr_mapzone_old
-                WHERE node.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-            )
-            AND NOT EXISTS (
-                SELECT 1 FROM temp_pgr_node tpn WHERE tpn.mapzone_id = node.minsector_id
-            )
-            AND node.minsector_id IS DISTINCT FROM 0;
-        ';
-        EXECUTE v_query_text;
+        UPDATE node n 
+        SET minsector_id = t.mapzone_id
+        FROM temp_pgr_node t
+        WHERE n.node_id = t.pgr_node_id
+        AND n.minsector_id IS DISTINCT FROM t.mapzone_id;
 
-        v_query_text = '
-            UPDATE connec SET minsector_id = 0
-            WHERE EXISTS (
-                SELECT 1 FROM v_temp_pgr_mapzone_old
-                WHERE connec.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-            )
-            AND NOT EXISTS (
-                SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_connec vc USING (arc_id) WHERE vc.connec_id = connec.connec_id
-            )
-            AND connec.minsector_id IS DISTINCT FROM 0;
-        ';
-        EXECUTE v_query_text;
+        UPDATE connec c
+        SET minsector_id = t.mapzone_id
+        FROM temp_pgr_connec t
+        WHERE c.connec_id = t.pgr_connec_id
+        AND c.minsector_id IS DISTINCT FROM t.mapzone_id;
 
-        v_query_text = '
-            UPDATE link SET minsector_id = 0
-            WHERE EXISTS (
-                SELECT 1 FROM v_temp_pgr_mapzone_old
-                WHERE link.minsector_id = v_temp_pgr_mapzone_old.old_mapzone_id
-            )
-            AND NOT EXISTS (
-                SELECT 1 FROM temp_pgr_arc ta JOIN v_temp_link_connec vc USING (arc_id) WHERE vc.link_id = link.link_id
-            )
-            AND link.minsector_id IS DISTINCT FROM 0;
-        ';
-        EXECUTE v_query_text;
+        UPDATE link l
+        SET minsector_id = t.mapzone_id
+        FROM temp_pgr_connec t
+        WHERE l.feature_id = t.pgr_connec_id 
+        AND l.minsector_id IS DISTINCT FROM t.mapzone_id;
 
-        v_visible_layer ='"ve_minsector"';
+        v_visible_layer = '"ve_minsector"';
 
     END IF;
-
 
     IF v_execute_massive_mincut THEN
         -- PREPARE tables for Massive Mincut
         -- Initialize process
-		-- =======================
-        v_data := jsonb_build_object(
-            'data', jsonb_build_object(
-                'expl_id_array', array_to_string(v_expl_id_array, ','),
-                'mapzone_name', 'MINCUT',
-                'mode', 'MINSECTOR',
-				'cost', 1,
-				'reverse_cost', 1
+        -- =======================
+        TRUNCATE temp_pgr_arc_linegraph;
+
+        -- insert MINSECTOR nodes
+        INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter)
+        SELECT minsector_id, 'MINSECTOR' FROM temp_pgr_minsector;
+
+        -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SECTOR (graph_delimiter as 'SECTOR')
+        -- TANK, SOURCE, WATERWELL, WTP
+        WITH
+            water AS (
+                SELECT node_id, inlet_arc FROM man_tank
+                UNION ALL
+                SELECT node_id, inlet_arc FROM man_source
+                UNION ALL
+                SELECT node_id, inlet_arc FROM man_waterwell
+                UNION ALL
+                SELECT node_id, inlet_arc FROM man_wtp
+            ),
+            sector_water AS (
+                SELECT w.node_id, w.inlet_arc
+                FROM water w
+                JOIN v_temp_node n USING (node_id)
+                WHERE 'SECTOR' = ANY (n.graph_delimiter)
             )
-        )::text;
-		SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+        UPDATE temp_pgr_node_minsector t
+        SET graph_delimiter = 'SECTOR'
+        WHERE EXISTS (
+            SELECT 1
+            FROM temp_pgr_arc a
+            LEFT JOIN sector_water s1 ON a.pgr_node_1 = s1.node_id
+            LEFT JOIN sector_water s2 ON a.pgr_node_2 = s2.node_id
+            WHERE t.pgr_node_id = a.mapzone_id
+            AND (
+                (s1.node_id IS NOT NULL AND a.pgr_arc_id <> ALL(COALESCE(s1.inlet_arc,ARRAY[]::int[])))
+                OR
+                (s2.node_id IS NOT NULL AND a.pgr_arc_id <> ALL(COALESCE(s2.inlet_arc,ARRAY[]::int[])))
+            )
+        );
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
-		END IF;
+        -- insert the valves as arcs;
+        -- the table that is used: temp_pgr_arc_linegraph where pgr_node_id is the valve and pgr_node_1/pgr_node_2 are the connected minsectors
+        INSERT INTO temp_pgr_arc_linegraph (pgr_node_id, pgr_node_1, pgr_node_2, graph_delimiter, cost, reverse_cost, cost_mincut, reverse_cost_mincut)
+        SELECT t.node_id, t.minsector_1, t.minsector_2, 'MINSECTOR', 1, 1, -1, -1
+        FROM temp_pgr_minsector_graph t;
 
-        --UPDATE to_arc, closed, broken and cost, new arcs when the node is SECTOR
-		UPDATE temp_pgr_node_minsector t
-		SET modif = TRUE
-		WHERE graph_delimiter = 'SECTOR';
+        -- update aditional fields for valves (MINSECTOR)
+        UPDATE temp_pgr_arc_linegraph t
+        SET 
+            closed = m.closed,
+            broken = m.broken,
+            to_arc = m.to_arc
+        FROM man_valve m
+        WHERE t.graph_delimiter = 'MINSECTOR'
+        AND t.pgr_node_id = m.node_id; 
 
-        v_data := jsonb_build_object(
-			'data', jsonb_build_object(
-				'mapzone_name', 'MINCUT',
-				'mode', 'MINSECTOR',
-			    'cost', 0,
-			    'reverse_cost', 0
-			)
-		)::text;
+        -- closed valves
+        UPDATE temp_pgr_arc_linegraph t 
+        SET cost = -1, reverse_cost = -1
+        WHERE t.graph_delimiter = 'MINSECTOR'
+        AND t.closed = TRUE;
 
-		SELECT gw_fct_graphanalytics_arrangenetwork(v_data) INTO v_response;
+        -- check valves (compare minsector of to_arc with pgr_node_2 because pgr_node_2 is a minsector)
+        UPDATE temp_pgr_arc_linegraph t 
+        SET cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN 1 ELSE -1 END,
+            reverse_cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN -1 ELSE 1 END
+        FROM temp_pgr_arc a 
+        WHERE t.graph_delimiter = 'MINSECTOR'
+        AND t.closed = FALSE 
+        AND t.to_arc IS NOT NULL
+        AND a.pgr_arc_id = t.to_arc;
 
-		IF v_response->>'status' <> 'Accepted' THEN
-			RETURN v_response;
-		END IF;
-
-        -- establishing the borders of the mincut (update cost_mincut/reverse_cost_mincut)
-        UPDATE temp_pgr_arc_minsector a
-        SET cost_mincut = -1, reverse_cost_mincut = -1
-        WHERE a.graph_delimiter IN ('MINSECTOR', 'SECTOR');
-
-        -- the broken open valves
+        -- v_ignore_broken_valves
         IF v_ignore_broken_valves THEN
-            UPDATE temp_pgr_arc_minsector a
-            SET cost_mincut = 0, reverse_cost_mincut = 0
-            WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.closed = FALSE
-            AND a.broken = TRUE;
+            -- update cost/reverse for the broken open checkvalves (behave as open valves)
+            UPDATE temp_pgr_arc_linegraph t
+            SET cost = 1, reverse_cost = 1
+            WHERE cost <> reverse_cost
+            AND t.broken = TRUE;
+
+            -- update cost_mincut/reverse_cost_mincut (open broken valves cannot be manipulated)
+            UPDATE temp_pgr_arc_linegraph t
+            SET cost_mincut = 1, reverse_cost_mincut = 1
+            WHERE t.closed = FALSE
+            AND t.broken = TRUE;
         END IF;
 
-        -- check valves
-        IF v_ignore_check_valves THEN
-            UPDATE temp_pgr_arc_minsector a
-            SET cost_mincut = 0, reverse_cost_mincut = 0
-            WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.closed = FALSE
-            AND a.cost <> a.reverse_cost;
-		ELSE
-            UPDATE temp_pgr_arc_minsector a
+        -- update cost_mincut/reverse_cost_mincut (depending of ignore check_valves)
+		IF v_ignore_check_valves THEN
+            UPDATE temp_pgr_arc_linegraph t
+            SET cost_mincut = 1, reverse_cost_mincut = 1
+            WHERE cost <> reverse_cost;
+        ELSE
+            UPDATE temp_pgr_arc_linegraph t
             SET cost_mincut = cost, reverse_cost_mincut = reverse_cost
-            WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.closed = FALSE
-            AND a.cost <> a.reverse_cost;
-		END IF;
+            WHERE cost <> reverse_cost;
+        END IF;
 
         -- the unaccess valves
         IF v_ignore_unaccess_valves = FALSE THEN
             EXECUTE format('
                 WITH today_mincuts AS (
-					SELECT o.id AS result_id
-					FROM om_mincut o
-					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
-					WHERE o.mincut_state IN (%s, %s)
-						AND o.mincut_class = %s
-						AND c.virtual = FALSE 
-						AND o.forecast_start <= o.forecast_end 
-						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
-				)
-                UPDATE temp_pgr_arc_minsector tpa
+                    SELECT o.id AS result_id
+                    FROM om_mincut o
+                    JOIN om_mincut_cat_type c ON o.mincut_type = c.id
+                    WHERE o.mincut_state IN (%s, %s)
+                        AND o.mincut_class = %s
+                        AND c.virtual = FALSE
+                        AND o.forecast_start <= o.forecast_end
+                        AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
+                )
+                UPDATE temp_pgr_arc_linegraph tpa
                 SET unaccess = TRUE, cost_mincut = 0, reverse_cost_mincut = 0
-                WHERE tpa.graph_delimiter = ''MINSECTOR''
-                AND tpa.closed = FALSE 
+                WHERE tpa.closed = FALSE
                 AND tpa.to_arc IS NULL
                 AND EXISTS (
                     SELECT 1
                     FROM om_mincut_valve omv
                     JOIN today_mincuts tm USING (result_id)
                     WHERE omv.unaccess = TRUE
-                    AND omv.node_id = tpa.arc_id
-            );',
-            v_mincut_plannified_state, v_mincut_in_progress_state,
-            v_mincut_network_class,
-            v_day_start, v_day_end);
+                        AND omv.node_id = tpa.pgr_node_id
+                );',
+                v_mincut_plannified_state, v_mincut_in_progress_state,
+                v_mincut_network_class,
+                v_day_start, v_day_end
+            );
         END IF;
 
         -- the changestatus valves
         IF v_ignore_changestatus_valves = FALSE THEN
             EXECUTE format('
                 WITH today_mincuts AS (
-					SELECT o.id AS result_id
-					FROM om_mincut o
-					JOIN om_mincut_cat_type c ON o.mincut_type = c.id 
-					WHERE o.mincut_state IN (%s, %s)
-						AND o.mincut_class = %s
-						AND c.virtual = FALSE 
-						AND o.forecast_start <= o.forecast_end 
-						AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
-				)
-                UPDATE temp_pgr_arc_minsector tpa
+                    SELECT o.id AS result_id
+                    FROM om_mincut o
+                    JOIN om_mincut_cat_type c ON o.mincut_type = c.id
+                    WHERE o.mincut_state IN (%s, %s)
+                        AND o.mincut_class = %s
+                        AND c.virtual = FALSE
+                        AND o.forecast_start <= o.forecast_end
+                        AND tsrange(o.forecast_start, o.forecast_end, ''[]'') && tsrange(%L, %L, ''[]'')
+                )
+                UPDATE temp_pgr_arc_linegraph tpa
                 SET changestatus = TRUE, cost = 0, reverse_cost = 0
-                WHERE tpa.graph_delimiter = ''MINSECTOR''
-                AND tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
+                WHERE tpa.closed = TRUE AND tpa.broken = FALSE AND tpa.to_arc IS NULL
                 AND EXISTS (
                     SELECT 1
                     FROM om_mincut_valve omv
                     JOIN today_mincuts tm USING (result_id)
                     WHERE omv.changestatus = TRUE
-                    AND omv.node_id = tpa.arc_id
-            );',
-            v_mincut_plannified_state, v_mincut_in_progress_state,
-            v_mincut_network_class,
-            v_day_start, v_day_end);
+                        AND omv.node_id = tpa.pgr_node_id
+                );',
+                v_mincut_plannified_state, v_mincut_in_progress_state,
+                v_mincut_network_class,
+                v_day_start, v_day_end
+            );
         END IF;
 
         -- FINISH preparing
 
         -- CORE MASSIVE MINCUT
+        -- insert minsectors with num_border = 0
+        INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
+        SELECT minsector_id, minsector_id
+        FROM temp_pgr_minsector
+        WHERE num_border = 0;
+
         v_query_text = '
-            SELECT node_id, pgr_node_id FROM temp_pgr_node_minsector WHERE graph_delimiter = ''MINSECTOR''
+            SELECT minsector_id AS pgr_node_id
+            FROM temp_pgr_minsector
+            WHERE num_border > 0
         ';
 
-        SELECT count(*) INTO v_pgr_distance FROM temp_pgr_arc_minsector;
+        SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_linegraph;
 
         FOR v_record_minsector IN EXECUTE v_query_text LOOP
 
-            UPDATE temp_pgr_arc_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
+            UPDATE temp_pgr_arc_linegraph SET mapzone_id = 0 WHERE mapzone_id <> 0;
             UPDATE temp_pgr_node_minsector SET mapzone_id = 0 WHERE mapzone_id <> 0;
-            UPDATE temp_pgr_arc_minsector SET proposed = FALSE WHERE proposed;
+            UPDATE temp_pgr_arc_linegraph SET proposed = FALSE WHERE proposed;
 
             v_data := jsonb_build_object(
                 'data', jsonb_build_object(
@@ -765,16 +866,18 @@ BEGIN
 
             -- insert the mincut_minsector_id
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
-            SELECT v_record_minsector.node_id, n.node_id
+            SELECT v_record_minsector.pgr_node_id, n.pgr_node_id
             FROM temp_pgr_node_minsector n
             WHERE n.graph_delimiter = 'MINSECTOR'
             AND n.mapzone_id <> 0;
 
-            INSERT INTO temp_pgr_minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
-            SELECT v_record_minsector.node_id, a.arc_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc[1], changestatus
-            FROM temp_pgr_arc_minsector a
+            INSERT INTO temp_pgr_minsector_mincut_valve
+                (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
+            SELECT v_record_minsector.pgr_node_id, a.pgr_node_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc, changestatus
+            FROM temp_pgr_arc_linegraph a
             WHERE a.graph_delimiter = 'MINSECTOR'
             AND a.mapzone_id <> 0;
+
         END LOOP;
 
         IF v_commitchanges THEN

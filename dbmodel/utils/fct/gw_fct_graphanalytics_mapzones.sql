@@ -139,6 +139,7 @@ v_query_link_gully text;
 v_dscenario_valve text;
 v_netscenario text;
 v_has_conflicts boolean = false;
+rec record;
 
 -- LOCK LEVEL LOGIC
 v_original_disable_locklevel json;
@@ -1541,6 +1542,18 @@ BEGIN
 
 		UPDATE config_param_user SET value = v_netscenario::text WHERE parameter = 'plan_netscenario_current' AND cur_user = current_user;
 
+	END IF;
+
+	IF v_class = 'DMA' THEN -- Execute DMA graph
+	
+		FOR rec IN SELECT DISTINCT expl_id FROM temp_t_node
+		LOOP
+			
+			EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
+			"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
+			
+		END LOOP;
+	
 	END IF;
 
 	-- Control nulls

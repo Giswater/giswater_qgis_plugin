@@ -180,3 +180,21 @@ INSERT INTO element_x_node SELECT element_id, node_id from man_frelem;
 update plan_psector set active=true;
 
 ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
+
+-- update is_last
+UPDATE om_visit_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+
+UPDATE om_visit_x_arc SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
+UPDATE om_visit_x_node SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
+UPDATE om_visit_x_connec SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
+UPDATE om_visit_x_link SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
+UPDATE om_visit_x_gully SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_gully GROUP BY gully_id);
+
+UPDATE om_visit_x_arc SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
+UPDATE om_visit_x_node SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
+UPDATE om_visit_x_connec SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
+UPDATE om_visit_x_link SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
+UPDATE om_visit_x_gully SET is_last = TRUE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_gully GROUP BY gully_id);
+
+UPDATE cat_feature_node set isprofilesurface = FALSE WHERE isprofilesurface IS NULL;

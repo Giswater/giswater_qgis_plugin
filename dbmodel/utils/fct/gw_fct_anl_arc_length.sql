@@ -64,11 +64,11 @@ BEGIN
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, node_1, node_2, expl_id, fid, the_geom, length)
 		SELECT arc_id, arccat_id, state, node_1, node_2, expl_id, '||v_fid||', the_geom, st_length(the_geom) 
-		FROM  '||v_worklayer||' WHERE arc_id IN ('||v_array||') AND  (st_length(the_geom)  < '||v_shorterthan||' OR st_length(the_geom) > '||v_biggerthan||');';
+		FROM  '||v_worklayer||' WHERE arc_id IN ('||v_array||') AND  (st_length(the_geom)  < '||quote_nullable(v_shorterthan)||' OR st_length(the_geom) > '||quote_nullable(v_biggerthan)||');';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, node_1, node_2, expl_id, fid, the_geom, length)
 		SELECT arc_id, arccat_id, state, node_1, node_2, expl_id, '||v_fid||', the_geom, st_length(the_geom) 
-		FROM  '||v_worklayer||' WHERE  (st_length(the_geom)  < '||v_shorterthan||' OR st_length(the_geom) > '||v_biggerthan||');';
+		FROM  '||v_worklayer||' WHERE  (st_length(the_geom)  < '||quote_nullable(v_shorterthan)||' OR st_length(the_geom) > '||quote_nullable(v_biggerthan)||');';
 	END IF;
 
 	-- get results

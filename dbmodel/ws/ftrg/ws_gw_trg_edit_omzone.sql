@@ -13,6 +13,7 @@ $BODY$
 DECLARE
 	v_view_name TEXT;
 	v_omzone_id INTEGER;
+	v_count INTEGER;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -68,6 +69,45 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
+
+		-- Check if there are operative elements in the mapzone before allowing delete
+		SELECT SUM(counts) INTO v_count FROM (
+			SELECT count(*) as counts
+				FROM node n
+				JOIN value_state_type vst ON vst.id = n.state_type
+				WHERE n.omzone_id = OLD.omzone_id
+					AND n.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM arc a
+				JOIN value_state_type vst ON vst.id = a.state_type
+				WHERE a.omzone_id = OLD.omzone_id
+					AND a.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM connec c
+				JOIN value_state_type vst ON vst.id = c.state_type
+				WHERE c.omzone_id = OLD.omzone_id
+					AND c.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM link l
+				JOIN value_state_type vst ON vst.id = l.state_type
+				WHERE l.omzone_id = OLD.omzone_id
+					AND l.state = 1
+					AND vst.is_operative
+		) combined;
+		IF COALESCE(v_count, 0) > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4468", "function":"1112","parameters":{"mapzone_name":"OMzone", "mapzone_id":'||OLD.omzone_id||'}}}$$);';
+		END IF;
+
+		UPDATE node SET omzone_id = 0 WHERE omzone_id = OLD.omzone_id;
+		UPDATE arc SET omzone_id = 0 WHERE omzone_id = OLD.omzone_id;
+		UPDATE connec SET omzone_id = 0 WHERE omzone_id = OLD.omzone_id;
+		UPDATE link SET omzone_id = 0 WHERE omzone_id = OLD.omzone_id;
 
 		DELETE FROM omzone WHERE omzone_id = OLD.omzone_id;
 		RETURN NULL;

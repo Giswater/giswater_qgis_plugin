@@ -131,19 +131,25 @@ BEGIN
 
 	END LOOP;
 
-	    -- Check and create missing catalog entries
-        SELECT cm.gw_fct_cm_check_catalogs(json_build_object('data', json_build_object(
-            'projectType', v_project_type,
-            'version', v_version,
-            'fromProduction', true,
-            'campaign_id', v_campaign::text,
-            'lot_id', null
-        ))) INTO v_cat_result;
-        v_cat_log := COALESCE(v_cat_result->'body'->>'log', '');
-        IF v_cat_log IS NOT NULL THEN
-            SELECT COUNT(*) INTO v_catalogs_created FROM regexp_matches(v_cat_log, 'Created new catalog entry', 'g');
-            v_catalogs_created := COALESCE(v_catalogs_created, 0);
-        END IF;
+	-- Check and create missing catalog entries
+	SELECT cm.gw_fct_cm_check_catalogs(json_build_object('data', json_build_object(
+		'projectType', v_project_type,
+		'version', v_version,
+		'fromProduction', true,
+		'campaign_id', v_campaign::text,
+		'lot_id', null
+	))) INTO v_cat_result;
+	v_cat_log := COALESCE(v_cat_result->'body'->>'log', '');
+	IF v_cat_log IS NOT NULL THEN
+		SELECT COUNT(*) INTO v_catalogs_created FROM regexp_matches(v_cat_log, 'Created new catalog entry', 'g');
+		v_catalogs_created := COALESCE(v_catalogs_created, 0);
+	END IF;
+	
+	-- manage campaing status value (INTEGRATED) and clean selectors
+	UPDATE cm.om_campaign SET status=9 WHERE campaign_id=v_campaign;
+	UPDATE cm.om_campaign_lot SET status=9 WHERE campaign_id=v_campaign;
+	DELETE FROM cm.selector_lot where lot_id in (select lot_id from cm.om_campaign_lot where campaign_id=v_campaign);
+	DELETE FROM cm.selector_campaign where campaign_id = v_campaign;
 
 	-- managing results
   	v_result := COALESCE(v_result, '{}');

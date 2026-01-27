@@ -1320,9 +1320,15 @@ BEGIN
 			ORDER BY fid ASC
 		';
 
+		IF v_lot_id IS NOT NULL THEN
+			v_lot_id_array := array[v_lot_id];
+		ELSE
+			SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE campaign_id = v_campaign_id GROUP BY campaign_id;
+		END IF;
+
 		FOR v_rec IN EXECUTE v_querytext LOOP
 			EXECUTE
-				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || '}}}$$)'
+				'SELECT cm.gw_fct_cm_check_fprocess($${"data":{"parameters":{"functionFid":' || v_fid || ',"checkFid":' || v_rec.fid || ',"lot_id_array":"' || array_to_string(v_lot_id_array, ',') || '"}}}$$)'
 				INTO v_check_result;
             v_fprocess_checks_count := v_fprocess_checks_count + 1;
 			

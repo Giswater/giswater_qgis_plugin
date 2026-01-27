@@ -19,6 +19,7 @@ DECLARE
 	v_newpattern JSON;
 	v_status BOOLEAN;
 	v_value TEXT;
+	v_count INTEGER;
 
 BEGIN
 
@@ -128,6 +129,45 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
+
+		-- Check if there are operative elements in the mapzone before allowing delete
+		SELECT SUM(counts) INTO v_count FROM (
+			SELECT count(*) as counts
+				FROM node n
+				JOIN value_state_type vst ON vst.id = n.state_type
+				WHERE n.dma_id = OLD.dma_id
+					AND n.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM arc a
+				JOIN value_state_type vst ON vst.id = a.state_type
+				WHERE a.dma_id = OLD.dma_id
+					AND a.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM connec c
+				JOIN value_state_type vst ON vst.id = c.state_type
+				WHERE c.dma_id = OLD.dma_id
+					AND c.state = 1
+					AND vst.is_operative
+			UNION ALL
+			SELECT count(*) as counts
+				FROM link l
+				JOIN value_state_type vst ON vst.id = l.state_type
+				WHERE l.dma_id = OLD.dma_id
+					AND l.state = 1
+					AND vst.is_operative
+		) combined;
+		IF COALESCE(v_count, 0) > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4468", "function":"1112","parameters":{"mapzone_name":"DMA", "mapzone_id":'||OLD.dma_id||'}}}$$);';
+		END IF;
+
+		UPDATE node SET dma_id = 0 WHERE dma_id = OLD.dma_id;
+		UPDATE arc SET dma_id = 0 WHERE dma_id = OLD.dma_id;
+		UPDATE connec SET dma_id = 0 WHERE dma_id = OLD.dma_id;
+		UPDATE link SET dma_id = 0 WHERE dma_id = OLD.dma_id;
 
 		DELETE FROM dma WHERE dma_id = OLD.dma_id;
 		RETURN NULL;

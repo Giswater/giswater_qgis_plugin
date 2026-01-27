@@ -59,7 +59,8 @@ SELECT columns_are(
         'notified',
         'output',
         'reagent_lot',
-        'equipment_code'
+        'equipment_code',
+        'shutoff_required'
     ],
     'View v_om_mincut should have the correct columns'
 );

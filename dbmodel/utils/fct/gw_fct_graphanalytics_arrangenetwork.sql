@@ -71,13 +71,8 @@ BEGIN
         );
     END IF;
 
-    IF v_mode = 'MINSECTOR' THEN
-        v_temp_arc_table = 'temp_pgr_arc_minsector'::regclass;
-        v_temp_node_table = 'temp_pgr_node_minsector'::regclass;
-    ELSE
-        v_temp_arc_table = 'temp_pgr_arc'::regclass;
-        v_temp_node_table = 'temp_pgr_node'::regclass;
-    END IF;
+    v_temp_arc_table = 'temp_pgr_arc'::regclass;
+    v_temp_node_table = 'temp_pgr_node'::regclass;
 
     IF v_mapzone_name IN ('MINSECTOR', 'MINCUT') THEN
         v_graph_delimiter := 'SECTOR';

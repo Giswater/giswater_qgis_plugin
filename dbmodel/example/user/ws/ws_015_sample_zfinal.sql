@@ -165,3 +165,19 @@ UPDATE plan_psector_x_node set psector_id = 1 WHERE node_id IN (10761);
 UPDATE plan_psector_x_arc set psector_id = 1 WHERE arc_id IN (20851,20861);
 UPDATE plan_psector_x_connec set psector_id = 1 WHERE connec_id IN (114462,114461);
 DELETE FROM plan_psector_x_connec WHERE connec_id IN (3105);
+
+-- update is_last
+UPDATE om_visit_event SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+UPDATE om_visit_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+
+UPDATE om_visit_x_arc SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
+UPDATE om_visit_x_node SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
+UPDATE om_visit_x_connec SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
+UPDATE om_visit_x_link SET is_last = TRUE WHERE id IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
+
+UPDATE om_visit_x_arc SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_arc GROUP BY arc_id);
+UPDATE om_visit_x_node SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_node GROUP BY node_id);
+UPDATE om_visit_x_connec SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_connec GROUP BY connec_id);
+UPDATE om_visit_x_link SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
+
+UPDATE cat_feature_node SET graph_delimiter='{PRESSZONE}' WHERE id='PRESSURE_METER';

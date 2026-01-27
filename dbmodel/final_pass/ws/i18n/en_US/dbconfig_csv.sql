@@ -22,7 +22,7 @@ UPDATE config_csv AS t SET alias = v.alias, descript = v.descript FROM (
     (470, 'Import hydrometer_x_data', 'The csv file must contain the following fields: hydrometer_id, cat_period_id, sum, value_date (optional), value_type (optional), value_status (optional), value_state (optional).'),
     (471, 'Import crm period values', 'The csv file must contain the following fields: id, start_date, end_date, period_seconds (optional), code.'),
     (500, 'Import valve status', 'The csv file must contain the following fields: dscenario_name, node_id, status.'),
-    (501, 'Import dscenario demands', 'The csv file must contain the following fields: dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source.'),
+    (501, 'Import dscenario demands', 'The csv file must contain the following fields: dscenario_name, feature_id, feature_type, value, pattern_id, demand_type, source.'),
     (504, 'Import flowmeter daily values', 'Import daily flowmeter values into the table ext_rtc_scada_x_data according to the example file scada_flowmeter_daily_values.csv.'),
     (506, 'Import flowmeter aggregated values', 'Import aggregated flowmeter values into the table ext_rtc_scada_x_data according to the example file scada_flowmeter_agg_values.csv.'),
     (514, 'Import netscenario closed valves', 'The csv file must contain the following fields: netscenario_id, node_id, closed.')

@@ -65,36 +65,39 @@ BEGIN
 
 		v_querytext = concat ('WITH mapzone_query as (select * from ',v_mapzone,' WHERE active)
 				SELECT n.node_id::text AS feature_id, ''nodeParent''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL::float  AS rotation, n.the_geom
-				FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''use''::text)::json)::json ->>''nodeParent'')::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
+				FROM ( SELECT NULLIF((json_array_elements_text((graphconfig::json ->> ''use''::text)::json)::json ->>''nodeParent''), '''')::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 				JOIN node n USING (node_id)
+				WHERE a.node_id IS NOT NULL
 			UNION
 				SELECT n.node_id::text AS feature_id, ''forceClosed''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name,NULL AS rotation, n.the_geom
-				FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''forceClosed''::text)::json))::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
+				FROM ( SELECT NULLIF(json_array_elements_text((graphconfig::json ->> ''forceClosed''::text)::json), '''')::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 				JOIN node n USING (node_id)
+				WHERE a.node_id IS NOT NULL
 			UNION
 				SELECT n.node_id::text AS feature_id,''forceOpen''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL AS rotation, n.the_geom
-				FROM ( SELECT (json_array_elements_text((graphconfig::json ->> ''forceOpen''::text)::json))::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
+				FROM ( SELECT NULLIF(json_array_elements_text((graphconfig::json ->> ''forceOpen''::text)::json), '''')::integer AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 				JOIN node n USING (node_id)
+				WHERE a.node_id IS NOT NULL
 			UNION
 				SELECT node_id::text AS feature_id, ''closedValve''::text AS graph_type, ',v_mapzone_id,'::integer, ',v_mapzone_name,', NULL AS rotation, n.the_geom
 				FROM ve_node n JOIN ',v_mapzone ,' USING (',v_mapzone_id,') WHERE closed_valve IS TRUE
 			UNION
 				SELECT arc_id::text AS feature_id, ''toArc''::text AS graph_type, mp.',v_mapzone_id,'::integer, mp.',v_mapzone_name,',
-				CASE WHEN node_1 IN (SELECT (json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent'')::integer AS node_id) THEN
+				CASE WHEN node_1 IN (SELECT node_id FROM (SELECT NULLIF((json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent''), '''')::integer AS node_id) sub WHERE node_id IS NOT NULL) THEN
 					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28
 				else
 					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.99), st_lineinterpolatepoint(a.the_geom, 0.98))*400/6.28
 				end as rotation,
-		
-				CASE WHEN node_1 IN (SELECT (json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent'')::integer AS node_id) THEN
+				CASE WHEN node_1 IN (SELECT node_id FROM (SELECT NULLIF((json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent''), '''')::integer AS node_id) sub WHERE node_id IS NOT NULL) THEN
 					st_lineinterpolatepoint(a.the_geom, 0.01::double precision)
 				else
 					st_lineinterpolatepoint(a.the_geom, 0.99::double precision)
 				end as the_geom
 				FROM
-				(SELECT (json_array_elements_text((json_array_elements_text((mapzone_query.graphconfig::json ->> ''use''::text)::json)::json ->> ''toArc''::text)::json))::integer AS arc_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,', graphconfig
+				(SELECT NULLIF(json_array_elements_text((json_array_elements_text((mapzone_query.graphconfig::json ->> ''use''::text)::json)::json ->> ''toArc''::text)::json), '''')::integer AS arc_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,', graphconfig
 				FROM mapzone_query) mp
-				JOIN arc a USING (arc_id)');
+				JOIN arc a USING (arc_id)
+				WHERE mp.arc_id IS NOT NULL');
 
 		IF v_context = 'NETSCENARIO' THEN
 

@@ -127,14 +127,25 @@ BEGIN
 	END IF;
 
 	-- getting sys_fprocess to be executed
-	v_querytext = '
-		SELECT * FROM sys_fprocess 
-		WHERE project_type IN (lower('||quote_literal(v_project_type)||'), ''utils'') 
-		AND addparam IS NULL 
-		AND query_text IS NOT NULL 
-		AND function_name ILIKE ''%pg2epa_check%'' AND function_name NOT ILIKE ''%pg2epa_check_data%''
-		AND active ORDER BY fid ASC
-	';
+	IF v_networkmode = 4 THEN
+		v_querytext = '
+			SELECT * FROM sys_fprocess 
+			WHERE project_type IN (lower('||quote_literal(v_project_type)||'), ''utils'') 
+			AND addparam IS NULL 
+			AND query_text IS NOT NULL 
+			AND function_name ILIKE ''%pg2epa_check%'' AND function_name NOT ILIKE ''%pg2epa_check_data%''
+			AND active ORDER BY fid ASC
+		';
+	ELSE
+		v_querytext = '
+			SELECT * FROM sys_fprocess 
+			WHERE project_type IN (lower('||quote_literal(v_project_type)||'), ''utils'') 
+			AND addparam IS NULL 
+			AND query_text IS NOT NULL 
+			AND function_name ILIKE ''%pg2epa_check%'' AND function_name NOT ILIKE ''%pg2epa_check_data%'' AND function_name NOT ILIKE ''%pg2epa_check_networkmode_connec%''
+			AND active ORDER BY fid ASC
+		';
+	END IF;
 
 	-- loop for checks
 	FOR v_rec IN EXECUTE v_querytext

@@ -118,6 +118,9 @@ SELECT col_default_is('element', 'created_by', 'CURRENT_USER', 'Column created_b
 SELECT col_default_is('element', 'trace_featuregeom', 'true', 'Column trace_featuregeom should have default value');
 SELECT col_default_is('element', 'sector_id', '0', 'Column sector_id should have default value');
 
+-- Check indexes
+SELECT has_index('element', 'element_expl_visibility_gin', 'Table should have index on expl_visibility');
+
 SELECT * FROM finish();
 
 ROLLBACK;

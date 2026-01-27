@@ -995,18 +995,18 @@ WHERE cff.formname = t.formname
 
 
 -- 06/11/2025
--- When updating y1, custom_y1, elev1, or custom_elev1, also refresh node_2 fields
+-- When updating y1, elev1, or custom_elev1, also refresh node_2 fields
 UPDATE config_form_fields 
-SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
-WHERE columnname IN ('y1', 'custom_y1', 'elev1', 'custom_elev1')
+SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
+WHERE columnname IN ('y1', 'elev1', 'custom_elev1')
 AND formname LIKE 've_arc_%'
 AND formtype = 'form_feature'
 AND widgetcontrols::text LIKE '%autoupdateReloadFields%';
 
--- When updating y2, custom_y2, elev2, or custom_elev2, also refresh node_1 fields
+-- When updating y2, elev2, or custom_elev2, also refresh node_1 fields
 UPDATE config_form_fields 
-SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
-WHERE columnname IN ('y2', 'custom_y2', 'elev2', 'custom_elev2')
+SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
+WHERE columnname IN ('y2', 'elev2', 'custom_elev2')
 AND formname LIKE 've_arc_%'
 AND formtype = 'form_feature'
 AND widgetcontrols::text LIKE '%autoupdateReloadFields%';
@@ -1087,28 +1087,25 @@ UPDATE config_form_fields
 
 -- 02/12/2025
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
-WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_y1' AND tabname='tab_data';
-UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_y2' AND tabname='tab_data';
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
 UPDATE config_form_fields
-SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
+SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'::json
 WHERE formname ILIKE 've_arc_%' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
 
 

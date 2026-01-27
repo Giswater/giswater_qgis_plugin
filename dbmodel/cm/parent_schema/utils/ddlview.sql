@@ -169,3 +169,95 @@ JOIN om_campaign_lot_x_link ocll ON ocll.lot_id = ocl.lot_id
 JOIN om_campaign_x_link oclink ON oclink.campaign_id = ocl.campaign_id AND oclink.link_id = ocll.link_id
 WHERE sl.cur_user = "current_user"()::text;
 
+-- Views UI documents per feature (generated dynamically)
+
+DO $$
+DECLARE
+  parent_s text := 'PARENT_SCHEMA';
+  rec RECORD;
+  view_name text;
+  doc_table text;
+  feature_uuid_col text;
+  feature_id_col text;
+  trigger_name text;
+  v_count int := 0;
+  v_query text;
+BEGIN
+  -- Create doc views per feature based on cat_feature
+  -- Only node and arc features have featurecat_id in doc_x_node/doc_x_arc
+  -- Use dynamic SQL to query cat_feature from parent schema
+  v_query := format('SELECT id, feature_type FROM %I.cat_feature WHERE feature_type IN (''NODE'', ''ARC'')', parent_s);
+  
+  FOR rec IN EXECUTE v_query
+  LOOP
+    v_count := v_count + 1;
+    view_name := format('v_ui_doc_x_%s', lower(rec.id));
+    feature_uuid_col := format('%s_uuid', lower(rec.feature_type));
+    feature_id_col := format('%s_id', lower(rec.feature_type));
+    
+    -- Create view filtering by featurecat_id
+    IF rec.feature_type = 'NODE' THEN
+      EXECUTE format(
+        'CREATE OR REPLACE VIEW cm.%I AS
+         SELECT dxn.doc_id,
+                dxn.%I,
+                d.name,
+                d.doc_type,
+                d.path,
+                d.observ,
+                d.date,
+                d.user_name,
+                dxn.%I,
+                dxn.featurecat_id
+         FROM cm.doc_x_node dxn
+         JOIN cm.doc d ON d.id::text = dxn.doc_id::text
+         WHERE dxn.featurecat_id = %L',
+        view_name, feature_id_col, feature_uuid_col, rec.id
+      );
+    ELSIF rec.feature_type = 'ARC' THEN
+      EXECUTE format(
+        'CREATE OR REPLACE VIEW cm.%I AS
+         SELECT dxa.doc_id,
+                dxa.%I,
+                d.name,
+                d.doc_type,
+                d.path,
+                d.observ,
+                d.date,
+                d.user_name,
+                dxa.%I,
+                dxa.featurecat_id
+         FROM cm.doc_x_arc dxa
+         JOIN cm.doc d ON d.id::text = dxa.doc_id::text
+         WHERE dxa.featurecat_id = %L',
+        view_name, feature_id_col, feature_uuid_col, rec.id
+      );
+    END IF;
+    
+    -- Grant permissions
+    EXECUTE format('GRANT ALL ON TABLE cm.%I TO role_cm_manager', view_name);
+    EXECUTE format('GRANT ALL ON TABLE cm.%I TO role_cm_field', view_name);
+    
+    -- Create trigger (passes feature_type and featurecat_id as TG_ARGV[0] and TG_ARGV[1])
+    trigger_name := format('gw_trg_ui_doc_x_%s', lower(rec.id));
+    EXECUTE format('DROP TRIGGER IF EXISTS %I ON cm.%I', trigger_name, view_name);
+    EXECUTE format(
+      'CREATE TRIGGER %I
+       INSTEAD OF INSERT OR DELETE OR UPDATE
+       ON cm.%I
+       FOR EACH ROW
+       EXECUTE FUNCTION cm.gw_trg_ui_doc(%L, %L)',
+      trigger_name, view_name, lower(rec.feature_type), rec.id
+    );
+  END LOOP;
+  
+  -- Raise notice if no views were created
+  IF v_count = 0 THEN
+    RAISE NOTICE 'No doc views created: No features found in %.cat_feature with feature_type IN (''NODE'', ''ARC'')', parent_s;
+  ELSE
+    RAISE NOTICE 'Created % doc views (v_ui_doc_x_*)', v_count;
+  END IF;
+EXCEPTION WHEN OTHERS THEN
+  RAISE EXCEPTION 'Error creating doc views in schema %: %', parent_s, SQLERRM;
+END
+$$;

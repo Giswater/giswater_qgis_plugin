@@ -9,8 +9,9 @@ or (at your option) any later version.
 --FUNCTION CODE: 2796
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectors(p_data json)
-  RETURNS json AS
-$BODY$
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 
 /*example
 
@@ -104,6 +105,8 @@ v_has_custom_order_by boolean;
 v_project_type text;
 v_tabnetworksignal integer = 0;
 v_custom_order_by_column text;
+v_isreturnsetselectors boolean;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -126,6 +129,7 @@ BEGIN
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
+	v_isreturnsetselectors := ((p_data ->>'client')::json->>'isReturnSetSelectors')::boolean;
 
 	IF v_addschema IS NOT NULL THEN v_tabnetworksignal = -1; END IF;
 
@@ -171,64 +175,85 @@ BEGIN
 	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
-	-- create temp tables related to expl x user variable
-	DROP TABLE IF EXISTS temp_exploitation;
-	DROP TABLE IF EXISTS temp_macroexploitation;
-	DROP TABLE IF EXISTS temp_sector;
-	DROP TABLE IF EXISTS temp_macrosector;
-	DROP TABLE IF EXISTS temp_municipality;
-	DROP TABLE IF EXISTS temp_t_mincut;
-	DROP TABLE IF EXISTS temp_network;
+	raise notice '10';
 
-	IF v_expl_x_user is false then
-		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
-		CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
-		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
-		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
-		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
-		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
-		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
+	IF v_isreturnsetselectors IS FALSE OR v_isreturnsetselectors IS NULL THEN
 
-		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
-		END IF;
-	ELSE
-		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e
-		JOIN config_user_x_expl USING (expl_id)	WHERE e.active and expl_id > 0 and username = current_user order by 1;
-
-		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
-		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
-
-		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
-		JOIN temp_exploitation e USING (macroexpl_id)
-		WHERE m.active and m.macroexpl_id > 0 order by 1;
-
-		CREATE TEMP TABLE temp_sector as
-		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active from sector s
-		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
-		JOIN exploitation e ON e.expl_id=n.expl_id
-		JOIN config_user_x_expl c ON c.expl_id=n.expl_id WHERE s.active and s.sector_id > 0 and username = current_user
- 			UNION
-		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active from sector s
-		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
-		WHERE n.sector_id is null AND s.active and s.sector_id > 0
-		order by 1;
-
-		CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
-		JOIN temp_sector e USING (macrosector_id)
-		WHERE m.active and m.macrosector_id > 0;
-
-		CREATE TEMP TABLE temp_municipality as
-		select distinct on (muni_id) muni_id, em.name, descript, em.active from ext_municipality em
-		JOIN (SELECT DISTINCT expl_id, muni_id FROM node)n USING (muni_id)
-		JOIN exploitation e ON e.expl_id=n.expl_id
-		JOIN config_user_x_expl c ON c.expl_id=n.expl_id
-		WHERE em.active and username = current_user;
-
-		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_t_mincut AS select distinct on (m.id) m.* from om_mincut m
-			JOIN config_user_x_expl USING (expl_id)
-			where username = current_user and m.id > 0;
+		-- create temp tables related to expl x user variable
+		DROP TABLE IF EXISTS temp_muni_sector_expl;
+		DROP TABLE IF EXISTS temp_exploitation;
+		DROP TABLE IF EXISTS temp_macroexploitation;
+		DROP TABLE IF EXISTS temp_sector;
+		DROP TABLE IF EXISTS temp_macrosector;
+		DROP TABLE IF EXISTS temp_municipality;
+		DROP TABLE IF EXISTS temp_t_mincut;
+		DROP TABLE IF EXISTS temp_network;
+	
+		-- create auxiliar table temp_aux_sector_muni
+		CREATE TEMP TABLE temp_muni_sector_expl AS
+		SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
+		UNION
+		SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0)
+		WHERE expl_id is not null;
+	
+		IF v_expl_x_user is false then
+			CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
+			CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
+			CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
+			CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
+			CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
+			CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
+			FROM om_typevalue WHERE typevalue = 'network_type' order by id;
+	
+			IF v_project_type = 'WS' THEN
+				CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
+			END IF;
+		ELSE
+			-- create temp_exploitation with the cat_manager configuration
+			CREATE TEMP TABLE temp_exploitation as SELECT e.* FROM exploitation e WHERE e.active AND e.expl_id > 0
+			AND EXISTS (SELECT 1 FROM cat_manager cm
+			WHERE e.expl_id = ANY (cm.expl_id)
+			AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
+			WHERE pg_has_role(current_user, r.role, 'member'))) ORDER BY 1;
+	
+			-- create table for temp_network
+			CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
+			FROM om_typevalue WHERE typevalue = 'network_type' order by id;
+	
+			-- create table for temp_macroexploitation
+			CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
+			JOIN temp_exploitation e USING (macroexpl_id)
+			WHERE m.active and m.macroexpl_id > 0 order by 1;
+	
+			-- create table for temp_sector
+			CREATE TEMP TABLE temp_sector as
+			SELECT s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active 
+			FROM temp_muni_sector_expl t
+			JOIN temp_exploitation e USING (expl_id)
+			JOIN sector s ON s.sector_id = t.sector_id
+			WHERE s.active AND s.sector_id > 0;
+	
+			-- create table for temp_macrosector
+			CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
+			JOIN temp_sector e USING (macrosector_id)
+			WHERE m.active and m.macrosector_id > 0;
+	
+			-- create table for temp_municipality
+			CREATE TEMP TABLE temp_municipality as
+			SELECT em.muni_id, em.name, em.observ, em.active 
+			FROM temp_muni_sector_expl t
+			JOIN temp_exploitation e USING (expl_id)
+			JOIN ext_municipality em ON em.muni_id = t.muni_id
+			WHERE em.active;
+	
+			IF v_project_type = 'WS' THEN
+				CREATE TEMP TABLE temp_t_mincut AS SELECT DISTINCT ON (m.id) m.* FROM om_mincut m
+				WHERE m.id > 0 AND EXISTS (SELECT 1 FROM cat_manager cm
+		        WHERE m.expl_id = ANY (cm.expl_id)
+		        AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
+		        WHERE pg_has_role(current_user, r.role, 'member')
+		        ))ORDER BY m.id;
+			END IF;
 		END IF;
 	END IF;
 
@@ -542,6 +567,7 @@ BEGIN
 		v_action := json_extract_path_text(p_data,'data','action');
 		IF v_action = '' THEN v_action = NULL; END IF;
 
+		DROP TABLE IF EXISTS temp_muni_sector_expl;
 		DROP TABLE IF EXISTS temp_exploitation;
 		DROP TABLE IF EXISTS temp_macroexploitation;
 		DROP TABLE IF EXISTS temp_sector;
@@ -584,6 +610,5 @@ BEGIN
 	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$function$
+;

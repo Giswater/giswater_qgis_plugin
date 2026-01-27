@@ -108,12 +108,17 @@ DROP VIEW IF EXISTS v_om_mincut_current_hydrometer;
 -- Add link column to ext_rtc_hydrometer table
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"link", "dataType":"text", "isUtils":"False"}}$$);
 
--- Create sequence and add constraint to ext_rtc_hydrometer table
-CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
-ALTER TABLE ext_rtc_hydrometer ADD CONSTRAINT ext_rtc_hydrometer_code_unique UNIQUE (code);
+-- Fix missing hydrometers before creating foreign key
+INSERT INTO ext_rtc_hydrometer (id)
+SELECT hydrometer_id FROM ext_rtc_hydrometer_x_data erhxd WHERE hydrometer_id::text NOT IN (SELECT id FROM ext_rtc_hydrometer)
+ON CONFLICT (id) DO NOTHING;
 
 -- Update code column to id column
 UPDATE ext_rtc_hydrometer SET code = id;
+
+-- Create sequence and add constraint to ext_rtc_hydrometer table
+CREATE SEQUENCE ext_rtc_hydrometer_hydrometer_id_seq;
+ALTER TABLE ext_rtc_hydrometer ADD CONSTRAINT ext_rtc_hydrometer_code_unique UNIQUE (code);
 
 -- Create constraints to autoupdate the hydrometer_id column
 ALTER TABLE ext_rtc_hydrometer_x_data ADD CONSTRAINT ext_rtc_hydrometer_x_data_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES ext_rtc_hydrometer(id) ON UPDATE CASCADE ON DELETE CASCADE;

@@ -81,6 +81,24 @@ BEGIN
 
 			-- Setting expl_id only the first time expl_id is null
 			UPDATE om_visit SET expl_id=v_expl_id WHERE id=NEW.visit_id AND expl_id IS NULL;
+
+			-- update is_last visit from each feature_type
+			
+			UPDATE om_visit_event SET is_last = TRUE WHERE id = NEW.id;
+			UPDATE om_visit_event SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_event GROUP BY visit_id);
+		
+			EXECUTE format(
+			    'UPDATE %I SET is_last = TRUE WHERE id = $1',
+			    'om_visit_x_' || v_featuretype
+			) USING NEW.id;
+		
+			EXECUTE format(
+			    'UPDATE %I SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM %I GROUP BY %I)',
+			    'om_visit_x_' || v_featuretype,
+			    'om_visit_x_' || v_featuretype,
+			    v_featuretype || '_id'
+			);
+
 		END IF;
 
 		RETURN NEW;

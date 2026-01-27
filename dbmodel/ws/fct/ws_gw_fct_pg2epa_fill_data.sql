@@ -59,7 +59,7 @@ BEGIN
 	raise notice 'Inserting nodes on temp_t_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	v_querytext = ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+	v_querytext = ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age, builtdate)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
 		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
@@ -67,7 +67,8 @@ BEGIN
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, top_elev, top_elev-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, n.dma_id, presszone_id, dqa_id, minsector_id,
-		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end)
+		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end),
+		n.builtdate
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id
@@ -83,11 +84,12 @@ BEGIN
 	IF v_networkmode = 4 THEN
 
 		EXECUTE ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, 
-			dma_id, presszone_id, dqa_id, minsector_id, age)
+			dma_id, presszone_id, dqa_id, minsector_id, age, builtdate)
 			SELECT DISTINCT ON (c.connec_id)
 			c.connec_id, top_elev, top_elev-depth as elev, ''CONNEC'', conneccat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
 			c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
-			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
+			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end),
+			c.builtdate
 			FROM selector_sector, ve_connec c
 			JOIN value_state_type ON id = state_type
 			WHERE c.sector_id = selector_sector.sector_id 
@@ -97,6 +99,15 @@ BEGIN
 			AND selector_sector.cur_user = "current_user"()::text '
 			||v_statetype;
 	END IF;
+
+	UPDATE temp_t_node SET "family" = q."family"
+	FROM (
+		SELECT n.node_id, cm."family" 
+		FROM node n
+		JOIN cat_node c ON c.id = n.nodecat_id 
+		JOIN cat_material cm ON cm.id = c.matcat_id 
+	) q
+	WHERE temp_t_node.node_id = q.node_id::text;
 	
 	-- set bottom elevation as elev for tanks in case invert_level is not null
 	UPDATE temp_t_node SET elev = invert_level FROM man_tank WHERE invert_level IS NOT NULL AND temp_t_node.node_id = man_tank.node_id::text
@@ -145,7 +156,7 @@ BEGIN
 	raise notice 'inserting arcs on temp_t_arc table';
 
 	v_querytext = 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
-		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age, family, builtdate)
 		SELECT DISTINCT ON (arc_id)
 		ve_arc.arc_id, node_1, node_2, ve_arc.arc_type, arccat_id, epa_type, ve_arc.sector_id, ve_arc.state, ve_arc.state_type, ve_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
@@ -153,7 +164,9 @@ BEGIN
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from ve_arc (dint)...
 		ve_arc.the_geom,
 		ve_arc.expl_id, ve_arc.dma_id, presszone_id, dqa_id, minsector_id,
-		(case when ve_arc.builtdate is not null then (now()::date-ve_arc.builtdate)/30 else 0 end)
+		(case when ve_arc.builtdate is not null then (now()::date-ve_arc.builtdate)/30 else 0 end),
+		cat_material."family",
+		ve_arc.builtdate
 		FROM selector_sector, ve_arc
 			LEFT JOIN value_state_type ON id=ve_arc.state_type
 			LEFT JOIN cat_arc ON ve_arc.arccat_id = cat_arc.id
@@ -193,7 +206,7 @@ BEGIN
 
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
 		EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
-			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
+			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age, family, builtdate)
 			SELECT concat(''CO'',connec_id), connec_id as node_1, 
 			CASE 	WHEN t.exit_type = ''ARC'' THEN concat(''VN'',t.link_id)
 				WHEN t.exit_type IN (''NODE'', ''CONNEC'') THEN t.exit_id::text 
@@ -204,13 +217,16 @@ BEGIN
 			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from ve_arc (dint)...
 			t.the_geom,
 			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
-			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
+			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end),
+			cat_material."family",
+			c.builtdate
 			FROM selector_sector, link t
 			JOIN ve_connec c ON connec_id = t.feature_id
 			JOIN value_state_type ON value_state_type.id = c.state_type
 			JOIN cat_connec ON cat_connec.id = conneccat_id
 			JOIN inp_connec USING (connec_id)
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_connec.matcat_id
+			LEFT JOIN cat_material ON cat_material.id = cat_connec.matcat_id
 				WHERE (now()::date - (CASE WHEN c.builtdate IS NULL THEN ''1900-01-01''::date ELSE c.builtdate END))/365 >= cat_mat_roughness.init_age
 				AND (now()::date - (CASE WHEN c.builtdate IS NULL THEN ''1900-01-01''::date ELSE c.builtdate END))/365 <= cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user

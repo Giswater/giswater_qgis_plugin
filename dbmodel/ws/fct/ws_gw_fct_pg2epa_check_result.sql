@@ -48,7 +48,7 @@ BEGIN
 		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
 		AND addparam IS NULL 
 		AND query_text IS NOT NULL 
-		AND function_name ILIKE ''%pg2epa_check_network%'' 
+		AND function_name ILIKE ''%pg2epa_check_resultk%'' 
 		AND active ORDER BY fid ASC
 	';
 
@@ -74,8 +74,8 @@ BEGIN
 
 				IF object_rec.colname IN ('arc', 'node') THEN
 
-					EXECUTE 'INSERT INTO t_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
-					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), ve_inp_dscenario_'||object_rec.tabname||'.the_geom 
+					EXECUTE 'INSERT INTO t_'||object_rec.colname||' ('||object_rec.colname||'_id, descript, the_geom) 
+					SELECT '||object_rec.colname||'_id, concat(''Present on '',count(*),'' enabled dscenarios''), ve_inp_dscenario_'||object_rec.tabname||'.the_geom 
 					FROM ve_inp_dscenario_'||object_rec.tabname||' JOIN '||	object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP 
 					BY '||object_rec.colname||'_id, ve_inp_dscenario_'||object_rec.tabname||'.the_geom having count(arc_id) > 1';
 

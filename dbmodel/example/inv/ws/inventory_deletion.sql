@@ -68,3 +68,5 @@ UPDATE man_pump SET to_arc=null WHERE node_id = 1105;
 
 ALTER TABLE sector ENABLE TRIGGER gw_trg_edit_controls;
 ALTER TABLE dqa ENABLE TRIGGER gw_trg_edit_controls;
+
+UPDATE man_valve SET to_arc=null WHERE node_id = 1107;

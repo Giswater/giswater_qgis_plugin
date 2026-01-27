@@ -175,7 +175,7 @@ SELECT fk_ok('connec', 'workcat_id', 'cat_work', 'id', 'Table should have foreig
 -- Check indexes
 SELECT has_index('connec', 'connec_asset_id_idx', 'Table should have index on asset_id');
 SELECT has_index('connec', 'connec_connecat', 'Table should have index on conneccat_id');
-SELECT has_index('connec', 'connec_expl_visibility_idx', 'Table should have index on expl_visibility');
+SELECT has_index('connec', 'connec_expl_visibility_gin', 'Table should have index on expl_visibility');
 SELECT has_index('connec', 'connec_exploitation', 'Table should have index on expl_id');
 SELECT has_index('connec', 'connec_index', 'Table should have index on the_geom');
 SELECT has_index('connec', 'connec_muni', 'Table should have index on muni_id');

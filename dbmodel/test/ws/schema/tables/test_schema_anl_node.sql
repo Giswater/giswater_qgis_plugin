@@ -23,7 +23,7 @@ SELECT columns_are(
         'id', 'node_id', 'nodecat_id', 'state', 'num_arcs', 'node_id_aux', 'nodecat_id_aux', 'state_aux', 'expl_id', 'fid',
         'cur_user', 'the_geom', 'arc_distance', 'arc_id', 'descript', 'result_id', 'total_distance', 'sys_type', 'code',
         'cat_geom1', 'top_elev', 'elev', 'depth', 'state_type', 'sector_id', 'losses', 'dma_id', 'presszone_id', 'dqa_id',
-        'minsector_id', 'demand', 'addparam'
+        'minsector_id', 'demand', 'addparam', 'family', 'builtdate'
     ],
     'Table anl_node should have the correct columns'
 );
@@ -69,6 +69,8 @@ SELECT col_type_is('anl_node', 'dqa_id', 'integer', 'Column dqa_id should be int
 SELECT col_type_is('anl_node', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('anl_node', 'demand', 'double precision', 'Column demand should be double precision');
 SELECT col_type_is('anl_node', 'addparam', 'text', 'Column addparam should be text');
+SELECT col_type_is('anl_node', 'family', 'varchar(100)', 'Column family should be varchar(100)');
+SELECT col_type_is('anl_node', 'builtdate', 'date', 'Column builtdate should be date');
 
 -- Check foreign keys
 SELECT hasnt_fk('anl_node', 'Table anl_node should have no foreign keys');

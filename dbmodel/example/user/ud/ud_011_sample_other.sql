@@ -497,8 +497,24 @@ INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
 UPDATE link SET the_geom=the_geom;
 
+ALTER TABLE om_visit DISABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_arc DISABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_node DISABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_connec DISABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_link DISABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_gully DISABLE TRIGGER gw_trg_om_visit;
+
 SELECT gw_fct_fill_doc_tables();
-SELECT gw_fct_fill_om_tables();  -- 6 segons
+SELECT gw_fct_fill_om_tables();
+
+ALTER TABLE om_visit ENABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_arc ENABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_node ENABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_connec ENABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_link ENABLE TRIGGER gw_trg_om_visit;
+ALTER TABLE om_visit_x_gully ENABLE TRIGGER gw_trg_om_visit;
+
+UPDATE om_visit set "status"="status";
 
 INSERT INTO doc_x_visit (doc_id, visit_id)
 SELECT
@@ -696,3 +712,7 @@ UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHE
 
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 107, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('ve_arc', 108, 'qml') ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+
+INSERT INTO inp_family (family_id, descript, age) VALUES('METAL', 'Metallic pipes', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;
+INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pipes', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;
+INSERT INTO inp_family (family_id, descript, age) VALUES('OTHER', 'Other', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;

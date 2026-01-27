@@ -90,7 +90,7 @@ SELECT col_not_null('node', 'expl_id', 'Column expl_id should be NOT NULL');
 -- Check indexes
 SELECT has_index('node', 'node_sys_code_idx', 'Table should have index on sys_code');
 SELECT has_index('node', 'node_asset_id_idx', 'Table should have index on asset_id');
-SELECT has_index('node', 'node_expl_visibility_idx', 'Table should have index on expl_visibility');
+SELECT has_index('node', 'node_expl_visibility_gin', 'Table should have index on expl_visibility');
 
 -- Check value constraint
 SELECT col_has_check('node', 'epa_type', 'Column epa_type should have a check constraint');

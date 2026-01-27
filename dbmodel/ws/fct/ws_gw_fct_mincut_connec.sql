@@ -36,7 +36,7 @@ v_macroexpl integer;
 v_mincutrec record;
 v_result json;
 v_result_info json;
-v_connec_id text;
+v_connec_id integer;
 v_geom geometry;
 
 

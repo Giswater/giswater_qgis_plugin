@@ -38,7 +38,7 @@ DECLARE
 
     -- dialog
     v_expl_id TEXT;
-    v_expl_id_array TEXT[];
+    v_expl_id_array INTEGER[];
     v_usepsector BOOLEAN;
     v_updatemapzgeom INTEGER;
     v_geomparamupdate FLOAT;
@@ -93,7 +93,13 @@ BEGIN
 	END IF;
 
     -- Get exploitation ID array
-    v_expl_id_array = gw_fct_get_expl_id_array(v_expl_id);
+    v_expl_id_array := gw_fct_get_expl_id_array(v_expl_id);
+
+    -- if v_expl_id_array is null, return error
+    IF v_expl_id_array IS NULL THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		       	"data":{"message":"4478", "function":"3492","parameters":null}}$$);';
+    END IF;
 
     -- Get user variable for disabling lock level
     SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
@@ -136,7 +142,7 @@ BEGIN
 
     v_data := jsonb_build_object(
         'data', jsonb_build_object(
-            'expl_id_array', array_to_string(v_expl_id_array, ','),
+            'expl_id_array', array_to_string(v_expl_id_array::text[], ','),
             'mapzone_name', 'OMUNIT',
 			'cost', v_cost,
 			'reverse_cost', v_reverse_cost
@@ -165,11 +171,11 @@ BEGIN
     -- SECTION: Create omunits and macroomunits
     --------------------------------------------------
 
-    -- fill table temp_pgr_linegraph using pgr_lineGraph for oriented graphs 
+    -- fill table temp_pgr_arc_linegraph using pgr_lineGraph for oriented graphs 
     -- in the result, reverse_cost will be always -1
-    -- source and target are connected arcs
+    -- pgr_node_1 and pgr_node_2 are connected arcs
     -- FOR SIMPLICITY WE USE ARC_ID, NODE_1, NODE_2 AND NOT PGR_ARC_ID, PGR_NODE_1, PGR_NODE_2
-    INSERT INTO temp_pgr_linegraph (seq, source, target, COST, reverse_cost)
+    INSERT INTO temp_pgr_arc_linegraph (pgr_arc_id, pgr_node_1, pgr_node_2, COST, reverse_cost)
     SELECT seq, source, target, cost, reverse_cost
     FROM pgr_lineGraph(
     'SELECT arc_id as id, node_1 as source, node_2 as target, cost, reverse_cost
@@ -182,7 +188,7 @@ BEGIN
     WITH 
         pair_arcs AS (
             SELECT 
-                l.SOURCE, l.seq, l.target,
+                l.pgr_node_1, l.pgr_arc_id, l.pgr_node_2,
                 CASE
                     WHEN a1.initoverflowpath = a2.initoverflowpath THEN 0  -- the same: first
                     ELSE 1                                        -- not the same: after
@@ -190,27 +196,27 @@ BEGIN
                 abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
                 - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
                 ) AS azimuth_difference
-            FROM temp_pgr_linegraph l
-            JOIN v_temp_arc a1 ON l."source" = a1.arc_id
-            JOIN v_temp_arc a2 ON l."target" = a2.arc_id
+            FROM temp_pgr_arc_linegraph l
+            JOIN v_temp_arc a1 ON l.pgr_node_1 = a1.arc_id
+            JOIN v_temp_arc a2 ON l.pgr_node_2 = a2.arc_id
         ),
         best_pair AS (
-            SELECT DISTINCT ON (SOURCE) SOURCE, target, seq
+            SELECT DISTINCT ON (pgr_node_1) pgr_node_1, pgr_node_2, pgr_arc_id
             FROM pair_arcs
-            ORDER BY SOURCE, initoverflowpath, azimuth_difference, target
+            ORDER BY pgr_node_1, initoverflowpath, azimuth_difference, pgr_node_2
         )
-    UPDATE temp_pgr_linegraph l
+    UPDATE temp_pgr_arc_linegraph l
     SET graph_delimiter = 'CATCHMENT'
-    WHERE NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.seq = l.seq);
+    WHERE NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.pgr_arc_id = l.pgr_arc_id);
 
     -- MACROOMUNITS
-    -- choose the best candidate among SOURCE arcs; the ones that are not the best candidate will have graph_delimiter = 'MACROOMUNIT'; 
+    -- choose the best candidate among pgr_node_1 arcs; the ones that are not the best candidate will have graph_delimiter = 'MACROOMUNIT'; 
     -- every macroomunit will be a chain, the relation between arcs-in and arcs-out of a node is 1:1
     -- TODO improve the condition, add section and elevation - if it's needed
     WITH 
         pair_arcs AS (
             SELECT 
-                l.SOURCE,l.seq, l.target, l.graph_delimiter,
+                l.pgr_node_1,l.pgr_arc_id, l.pgr_node_2, l.graph_delimiter,
                 CASE
                     WHEN a1.initoverflowpath = a2.initoverflowpath THEN 0  -- the same: first
                     ELSE 1                                        -- not the same: after
@@ -218,41 +224,41 @@ BEGIN
                 abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
                 - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
                 ) AS azimuth_difference
-            FROM temp_pgr_linegraph l
-            JOIN v_temp_arc a1 ON l."source" = a1.arc_id
-            JOIN v_temp_arc a2 ON l."target" = a2.arc_id
+            FROM temp_pgr_arc_linegraph l
+            JOIN v_temp_arc a1 ON l.pgr_node_1 = a1.arc_id
+            JOIN v_temp_arc a2 ON l.pgr_node_2 = a2.arc_id
             WHERE graph_delimiter = 'NONE'
         ),
         best_pair AS (
-            SELECT DISTINCT ON (target) target, source, seq
+            SELECT DISTINCT ON (pgr_node_2) pgr_node_2, pgr_node_1, pgr_arc_id
             FROM pair_arcs
-            ORDER BY target, initoverflowpath, azimuth_difference, source
+            ORDER BY pgr_node_2, initoverflowpath, azimuth_difference, pgr_node_1
         )
-    UPDATE temp_pgr_linegraph l
+    UPDATE temp_pgr_arc_linegraph l
     SET graph_delimiter = 'MACROOMUNIT'
     WHERE l.graph_delimiter = 'NONE'
-    AND NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.seq = l.seq);
+    AND NOT EXISTS (SELECT 1 FROM best_pair bp WHERE bp.pgr_arc_id = l.pgr_arc_id);
 
     -- OMUNITS
     -- =======================
     --TODO maybe should be good checking the accessibility of the node with graph_delimiter = 'OMUNIT'
-    UPDATE temp_pgr_linegraph l
+    UPDATE temp_pgr_arc_linegraph l
     SET graph_delimiter = 'OMUNIT'
     FROM temp_pgr_arc a
     WHERE l.graph_delimiter ='NONE'
-        AND l.source = a.arc_id
+        AND l.pgr_node_1 = a.arc_id
         AND EXISTS (
             SELECT 1 FROM temp_pgr_node n WHERE n.graph_delimiter = 'OMUNIT'
             AND a.pgr_node_2 = n.pgr_node_id   
         );
 
-    -- generate omunit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'OMUNIT', 'MACROOMUNIT' AND 'CATCHMENT'
+    -- generate omunit_id applying connectedComponents over temp_pgr_arc_linegraph filtering graph_delimiter = 'OMUNIT', 'MACROOMUNIT' AND 'CATCHMENT'
     TRUNCATE temp_pgr_connectedcomponents;
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node 
     FROM pgr_connectedcomponents(
-        'SELECT seq AS id, source, target, cost 
-        FROM temp_pgr_linegraph
+        'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost 
+        FROM temp_pgr_arc_linegraph
         WHERE graph_delimiter <> ''OMUNIT'' 
             AND graph_delimiter <> ''MACROOMUNIT'' 
             AND graph_delimiter <> ''CATCHMENT'' 
@@ -276,8 +282,8 @@ BEGIN
         vertices AS (
             SELECT id, in_edges, out_edges
             FROM pgr_extractvertices('
-                SELECT seq AS id, source, target, cost, reverse_cost 
-                FROM temp_pgr_linegraph 
+                SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
+                FROM temp_pgr_arc_linegraph 
                 WHERE graph_delimiter <> ''OMUNIT'' 
                     AND graph_delimiter <> ''MACROOMUNIT'' 
                     AND graph_delimiter <> ''CATCHMENT'' 
@@ -293,8 +299,8 @@ BEGIN
         vertices AS (
             SELECT id, in_edges, out_edges
             FROM pgr_extractvertices('
-                SELECT seq AS id, source, target, cost, reverse_cost 
-                FROM temp_pgr_linegraph 
+                SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
+                FROM temp_pgr_arc_linegraph 
                 WHERE graph_delimiter <> ''OMUNIT'' 
                     AND graph_delimiter <> ''MACROOMUNIT'' 
                     AND graph_delimiter <> ''CATCHMENT'' 
@@ -319,13 +325,13 @@ BEGIN
 
     -- MACROOMUNITS
     -- =======================
-    -- generate macroomunit_id applying connectedComponents over temp_pgr_linegraph filtering graph_delimiter = 'MACROOMUNIT' and 'CATCHMENT'
+    -- generate macroomunit_id applying connectedComponents over temp_pgr_arc_linegraph filtering graph_delimiter = 'MACROOMUNIT' and 'CATCHMENT'
     TRUNCATE temp_pgr_connectedcomponents;
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node 
     FROM pgr_connectedcomponents(
-        'SELECT seq AS id, source, target, cost 
-        FROM temp_pgr_linegraph
+        'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost 
+        FROM temp_pgr_arc_linegraph
         WHERE graph_delimiter <> ''MACROOMUNIT''
         AND graph_delimiter <> ''CATCHMENT'' 
         '
@@ -365,8 +371,8 @@ BEGIN
         vertices AS (
             SELECT id, in_edges, out_edges
             FROM pgr_extractvertices('
-                SELECT seq AS id, source, target, cost, reverse_cost 
-                FROM temp_pgr_linegraph 
+                SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
+                FROM temp_pgr_arc_linegraph 
                 WHERE graph_delimiter <> ''CATCHMENT'' 
                 ' 
             )
@@ -375,15 +381,15 @@ BEGIN
     FROM vertices 
     WHERE out_edges IS NULL; 
 
-    -- use pgr_depthFirstSearch for the lineGraph of the network, from target to source 
+    -- use pgr_depthFirstSearch for the lineGraph of the network, from pgr_node_2 to pgr_node_1 
     -- TODO order using elev2 instead of macromapzone_id for a better ordering, could be faster
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, node, edge, "cost", agg_cost)
     (
         SELECT seq, "depth", start_vid, node, edge, "cost", agg_cost
         FROM pgr_depthFirstSearch(
-            'SELECT l.seq AS id, l.target AS source, l.source AS target, l.cost, l.reverse_cost 
-            FROM temp_pgr_linegraph l
-            JOIN temp_pgr_arc a ON l. target = a.arc_id
+            'SELECT l.pgr_arc_id AS id, l.pgr_node_2 AS source, l.pgr_node_1 AS target, l.cost, l.reverse_cost 
+            FROM temp_pgr_arc_linegraph l
+            JOIN temp_pgr_arc a ON l. pgr_node_2 = a.arc_id
             WHERE l.graph_delimiter <> ''CATCHMENT''
             ORDER BY a.macromapzone_id',
         v_root_vids, directed => true)

@@ -36,20 +36,48 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
-	WITH geomtable AS (SELECT column_name, table_name from information_schema.columns WHERE udt_name='geometry' and table_schema in ('SCHEMA_NAME', 'am')),
-	idtable AS (SELECT column_name, table_name from information_schema.columns WHERE ordinal_position=1 and table_schema in ('SCHEMA_NAME', 'am'))
-	SELECT array_agg(row_to_json(d)) FROM (SELECT concat('{"levels": ', ct.idval, '}') as context, alias as "layerName", st.id as "tableName",
-	CASE WHEN c.column_name IS NULL THEN 'None'
-	WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
-	ELSE c.column_name END AS "geomField",
-	CASE WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
-	ELSE st.addparam->>'pkey' END AS "tableId"
-	FROM sys_table st
-	join config_typevalue ct ON ct.id= context
-	left join geomtable c ON st.id =c.table_name
-	left join idtable i ON st.id =i.table_name
-	WHERE typevalue = 'sys_table_context' and (c.column_name IS null or c.column_name != 'link_the_geom') and ct.idval !='["HIDDEN"]'
-	ORDER BY  json_extract_path_text(ct.addparam,'orderBy')::integer,orderby, alias)d into v_fields_array;
+	WITH geomtable AS (
+		SELECT column_name,
+			table_name
+		from information_schema.columns
+		WHERE udt_name='geometry'
+			and table_schema in ('SCHEMA_NAME', 'am')
+	),
+	idtable AS (
+		SELECT 	column_name,
+				table_name
+		FROM (
+    		SELECT column_name, table_name,
+           	ROW_NUMBER() OVER (
+               	PARTITION BY table_schema, table_name
+               	ORDER BY ordinal_position
+           	) AS rn
+    		FROM information_schema.columns
+    		WHERE table_schema IN ('SCHEMA_NAME', 'am')
+		) t
+		WHERE rn = 1
+	)
+	SELECT array_agg(row_to_json(d))
+	FROM (
+		SELECT concat('{"levels": ', ct.idval, '}') as context,
+		alias as "layerName",
+		st.id as "tableName",
+		CASE
+			WHEN c.column_name IS NULL THEN 'None'
+			WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
+			ELSE c.column_name
+		END AS "geomField",
+		CASE
+			WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+			ELSE st.addparam->>'pkey'
+		END AS "tableId"
+		FROM sys_table st
+		join config_typevalue ct ON ct.id= context
+		left join geomtable c ON st.id =c.table_name
+		left join idtable i ON st.id =i.table_name
+		WHERE typevalue = 'sys_table_context' and (c.column_name IS null or c.column_name != 'link_the_geom') and ct.idval !='["HIDDEN"]'
+		ORDER BY  json_extract_path_text(ct.addparam,'orderBy')::integer,orderby, alias
+	)d into v_fields_array;
 
 	v_fields := array_to_json(v_fields_array);
 

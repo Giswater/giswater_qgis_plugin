@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'id', 'result_id', 'node_id', 'top_elev', 'elev', 'node_type', 'nodecat_id', 'epa_type', 'sector_id', 'state',
         'state_type', 'annotation', 'demand', 'the_geom', 'expl_id', 'pattern_id', 'addparam', 'nodeparent', 'arcposition',
-        'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age'
+        'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age', 'builtdate'
     ],
     'Table rpt_inp_node should have the correct columns'
 );
@@ -51,10 +51,11 @@ SELECT col_type_is('rpt_inp_node', 'addparam', 'text', 'Column addparam should b
 SELECT col_type_is('rpt_inp_node', 'nodeparent', 'character varying(16)', 'Column nodeparent should be varchar(16)');
 SELECT col_type_is('rpt_inp_node', 'arcposition', 'smallint', 'Column arcposition should be smallint');
 SELECT col_type_is('rpt_inp_node', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('rpt_inp_node', 'presszone_id', 'text', 'Column presszone_id should be text');
+SELECT col_type_is('rpt_inp_node', 'presszone_id', 'integer', 'Column presszone_id should be integer');
 SELECT col_type_is('rpt_inp_node', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('rpt_inp_node', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('rpt_inp_node', 'age', 'integer', 'Column age should be integer');
+SELECT col_type_is('rpt_inp_node', 'builtdate', 'date', 'Column builtdate should be date');
 
 -- Check default values
 SELECT col_has_default('rpt_inp_node', 'id', 'Column id should have a default value');

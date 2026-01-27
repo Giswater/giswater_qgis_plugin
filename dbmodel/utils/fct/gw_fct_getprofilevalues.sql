@@ -240,7 +240,7 @@ BEGIN
 	);
 	CREATE INDEX IF NOT EXISTS temp_pgr_dijkstra_node_idx ON temp_pgr_dijkstra USING btree (node);
 	CREATE INDEX IF NOT EXISTS temp_pgr_dijkstra_edge_idx ON temp_pgr_dijkstra USING btree (edge);
-	
+
 	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_ve_arc (LIKE SCHEMA_NAME.ve_arc INCLUDING ALL);
@@ -263,20 +263,12 @@ BEGIN
 	END IF;
 
 	-- Check start-end nodes
-	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data. Only NOT start/end nodes may have missed elev data';
 	IF v_project_type = 'UD' THEN
 		IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
-			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) > 0
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) < 1
 		THEN
-			IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
-				WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_end::integer) = 0
-			THEN
-				v_level = 2;
-				v_message = v_nodemessage;
-			END IF;
-		ELSE
-			v_level = 2;
-			v_message = v_nodemessage;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		    "data":{"message":"4466", "function":"2832", "parameters":{}, "fid":'||v_fid||', "criticity":"2",  "is_process":true}}$$)';
 		END IF;
 	END IF;
 
@@ -287,7 +279,7 @@ BEGIN
 			v_fcatgeom = 'cat_geom1';
 			v_fymax = 'ymax';
 			v_fslope = 'slope';
-			v_fsyselev = 'sys_elev'; 
+			v_fsyselev = 'sys_elev';
 			v_fsysymax = 'sys_ymax';
 			v_elev1 = 'case when node_1=node then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node then sys_elev2 else sys_elev1 end';
@@ -298,15 +290,15 @@ BEGIN
 
 		ELSIF v_project_type = 'WS' THEN
 
-			v_fcatgeom = 'cat_dnom::float*0.001';  
-			v_fymax = 'depth'; 
+			v_fcatgeom = 'cat_dnom::float*0.001';
+			v_fymax = 'depth';
 			v_fslope = '
 				case 
 				when node_1=node then 100*(elevation1 - depth1 - elevation2 + depth2)/gis_length 
 				else 100*(elevation2 - depth2 - elevation1 + depth1)/gis_length 
 				end
 			';
-			v_fsyselev = 'top_elev - depth'; 
+			v_fsyselev = 'top_elev - depth';
 			v_fsysymax = 'depth';
 			v_elev1 = 'case when node_1=node then elevation1 else elevation2 end';
 			v_elev2 = 'case when node_1=node then elevation2 else elevation1 end';
@@ -329,13 +321,20 @@ BEGIN
 			AND node_2 IS NOT NULL;
 		$sql$, v_cost_string);
 
-        INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
-		SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
-		FROM pgr_dijkstraVia (v_querytext, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
+
+		BEGIN
+	        INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
+			SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
+			FROM pgr_dijkstraVia (v_querytext, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
+		EXCEPTION WHEN OTHERS THEN
+			GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+			RETURN (SELECT json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', log_level, 'text', error_message), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)
+					FROM sys_message WHERE id = 4472)::json;
+		END;
 
 		INSERT INTO temp_ve_arc
-		SELECT * 
-		FROM ve_arc a 
+		SELECT *
+		FROM ve_arc a
 		WHERE EXISTS (SELECT 1 FROM temp_pgr_dijkstra d WHERE d.edge = a.arc_id);
 
 		-- insert edge values on temp_anl_arc table
@@ -344,7 +343,7 @@ BEGIN
 				fid, arc_id, code, node_1, 
 				node_2, 
 				sys_type, arccat_id, cat_geom1, length, 
-				slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom
+				slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, omunit_id, the_geom
 			)
 			SELECT  
 				222, arc_id, b.code, e.node, 
@@ -353,7 +352,7 @@ BEGIN
 				END AS node_2,
 				sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
 				'||v_fslope||', e.route_agg_cost, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-				||v_elev1||', '||v_elev2||', expl_id, the_geom 
+				||v_elev1||', '||v_elev2||', expl_id, omunit_id, the_geom 
 			FROM temp_pgr_dijkstra e
 			JOIN temp_ve_arc b ON e.edge = b.arc_id
 			JOIN cat_arc ON arccat_id = id';
@@ -386,7 +385,7 @@ BEGIN
 			-- generate arc_x_link values
 			IF v_project_type = 'UD' THEN
 				INSERT INTO temp_link_x_arc
-				SELECT  
+				SELECT
 					a.link_id, a.vnode_id, a.arc_id, a.feature_type, a.feature_id, a.node_1,  a.node_2,
 					(a.gis_length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
 					(a.gis_length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
@@ -398,15 +397,15 @@ BEGIN
 					CASE
 						WHEN a.exit_elev IS NULL THEN (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3)
 						ELSE a.exit_elev
-					END AS exit_elev	
+					END AS exit_elev
 				FROM (
-					SELECT 
+					SELECT
 						t.link_id, t.exit_id::integer as vnode_id,
-						t.feature_type, t.feature_id, 
+						t.feature_type, t.feature_id,
 						t.exit_topelev, t.exit_elev,
 						ve_arc.gis_length,
 						st_linelocatepoint(ve_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate,
-						ve_arc.arc_id, ve_arc.node_1, ve_arc.node_2, 
+						ve_arc.arc_id, ve_arc.node_1, ve_arc.node_2,
 						ve_arc.sys_elev1, ve_arc.sys_elev2, ve_arc.sys_y1, ve_arc.sys_y2,
 						ve_arc.sys_elev1 + ve_arc.sys_y1 AS top_elev1,
 						ve_arc.sys_elev2 + ve_arc.sys_y2 AS top_elev2
@@ -427,19 +426,19 @@ BEGIN
 						ELSE a.exit_topelev
 					END AS exit_topelev,
 					(a.depth1 - a.locate * (a.depth1 - a.depth2))::numeric(12,3) AS exit_ymax,
-					CASE 
-						WHEN a.exit_elev IS NULL THEN (a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3) 
+					CASE
+						WHEN a.exit_elev IS NULL THEN (a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3)
 						ELSE a.exit_elev
 					END AS exit_elev
 				FROM (
-						SELECT 
-							t.link_id, t.exit_id::integer as vnode_id, 
-							t.feature_type, t.feature_id, 
+						SELECT
+							t.link_id, t.exit_id::integer as vnode_id,
+							t.feature_type, t.feature_id,
 							t.exit_topelev, t.exit_elev,
 							ve_arc.gis_length,
-							st_linelocatepoint(ve_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate, 
-							ve_arc.arc_id, ve_arc.node_1, ve_arc.node_2, 
-							ve_arc.elevation1, ve_arc.elevation2,  ve_arc.depth1,  ve_arc.depth2, 
+							st_linelocatepoint(ve_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate,
+							ve_arc.arc_id, ve_arc.node_1, ve_arc.node_2,
+							ve_arc.elevation1, ve_arc.elevation2,  ve_arc.depth1,  ve_arc.depth2,
 							ve_arc.elevation1 - ve_arc.depth1 AS elev1,  ve_arc.elevation2 - ve_arc.depth2 AS elev2
 						FROM temp_ve_arc ve_arc
 						JOIN temp_link t ON t.exit_id::integer = ve_arc.arc_id
@@ -474,19 +473,19 @@ BEGIN
 			-- initNode
 			SELECT node_id FROM temp_anl_node WHERE total_distance = 0 INTO v_last_nid;
 			SELECT sys_type FROM temp_anl_node WHERE total_distance = 0 INTO v_last_systype;
-			v_last_dist := 0; 			
+			v_last_dist := 0;
 
 			-- start with the second node_id from temp_anl_node
-			FOR object_rec IN 
-				SELECT node_id, sys_type, total_distance 
-				FROM temp_anl_node 
-				WHERE total_distance > 0 
+			FOR object_rec IN
+				SELECT node_id, sys_type, total_distance
+				FROM temp_anl_node
+				WHERE total_distance > 0
 				ORDER BY total_distance
 			LOOP
 				IF object_rec.sys_type = 'LINK' THEN
 					IF object_rec.total_distance < (v_last_dist + v_linksdistance) THEN
 						DELETE FROM temp_anl_node WHERE node_id = object_rec.node_id;
-					ELSE 
+					ELSE
 						v_last_nid := object_rec.node_id;
 						v_last_systype:= object_rec.sys_type;
 						v_last_dist := object_rec.total_distance;
@@ -566,6 +565,7 @@ BEGIN
 				ELSE
 					v_level  = 2;
 					v_message = 'Interpolation tool it is designed to interpolate with data missed maximun at two consecutives nodes. Please check your data!';
+					v_status = 'Failed';
 				END IF;
 
 				UPDATE temp_anl_node SET result_id = 'interpolated', descript = gw_fct_json_object_set_key(descript::json, 'top_elev', 'None'::text)
@@ -585,6 +585,7 @@ BEGIN
 				ELSE
 					v_level  = 2;
 					v_message = 'Interpolation tool it is designed to interpolate with data missed maximun at two consecutives nodes. Please check your data!';
+					v_status = 'Failed';
 				END IF;
 
 				UPDATE temp_anl_node SET  result_id = 'interpolated', descript = gw_fct_json_object_set_key(descript::json, 'elev', 'None'::text)
@@ -634,12 +635,12 @@ BEGIN
 				IF v_compheight < v_profheigtht THEN
 					v_level = 2;
 					v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
-					RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+					RETURN (concat('{"status":"Failed", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 				END IF;
 				IF v_compwidth < v_profwidth THEN
 					v_level = 2;
 					v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
-					RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+					RETURN (concat('{"status":"Failed", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 				END IF;
 			END IF;
 		ELSE
@@ -662,12 +663,12 @@ BEGIN
 			IF v_compheight < v_profheigtht THEN
 				v_level = 2;
 				v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
-				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+				RETURN (concat('{"status":"Failed", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 			END IF;
 			IF v_compwidth < v_profwidth THEN
 				v_level = 2;
 				v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
-				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+				RETURN (concat('{"status":"Failed", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 			END IF;
 			-- calculate the init point to start to draw profile
 			v_initv = (v_compheight - v_profheigtht)/2;
@@ -708,7 +709,7 @@ BEGIN
 
 		-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM temp_anl_arc ORDER BY total_length) row;
+		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2, omunit_id FROM temp_anl_arc ORDER BY total_length) row;
 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM temp_anl_node WHERE nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
@@ -735,51 +736,58 @@ BEGIN
 
 	END IF;
 
-	IF v_device = 5 THEN
-		SELECT jsonb_build_object(
-		    'type', 'FeatureCollection',
-		    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-		) INTO v_result
-		FROM (
-	  	SELECT jsonb_build_object(
-	     'type',       'Feature',
-	    'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom'
-	  	) AS feature
-	  	FROM (SELECT arc_id, arccat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-	  	FROM  temp_anl_arc) row) features;
+
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Profile line',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+		'type',       'Feature',
+	'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+	'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (
+		SELECT arc_id, arccat_id, descript::jsonb,expl_id, ST_Transform(the_geom, 4326) as the_geom, 'ARC' as feature_type
+		FROM  temp_anl_arc
+		UNION
+		SELECT l.link_id::text, linkcat_id, descript::jsonb, expl_id, ST_Transform(the_geom, 4326) as the_geom, 'LINK' as feature_type
+		FROM link l
+		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
 
 
-		v_result_line = v_result;
+	v_result_line = v_result;
 
-		SELECT jsonb_build_object(
-			'type', 'FeatureCollection',
-			'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-		) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM (SELECT node_id, nodecat_id, descript::json,expl_id, ST_Transform(the_geom, 4326) as the_geom
-		FROM  temp_anl_node WHERE nodecat_id!='VNODE') row) features;
+	SELECT jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Profile point',
+		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+	) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+		'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+	) AS feature
+	FROM (
+		SELECT node_id, nodecat_id, descript::jsonb,expl_id, ST_Transform(the_geom, 4326) as the_geom, 'NODE' as feature_type
+		FROM temp_anl_node
+		WHERE nodecat_id!='VNODE'
+		UNION
+		SELECT c.connec_id::text, conneccat_id, c.descript::jsonb, c.expl_id, ST_Transform(c.the_geom, 4326) as the_geom, 'CONNEC' as feature_type
+		FROM connec c
+		JOIN link l ON c.connec_id = l.feature_id
+		JOIN temp_link_x_arc la ON l.link_id = la.link_id
+		UNION
+		SELECT g.gully_id::text, gullycat_id, g.descript::jsonb, g.expl_id, ST_Transform(g.the_geom, 4326) as the_geom, 'GULLY' as feature_type
+		FROM gully g
+		JOIN link l ON g.gully_id = l.feature_id
+		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
 
-		v_result_point = v_result;
+	v_result_point = v_result;
 
-		v_result_polygon = '{}';
-
-	ELSE
-		v_result_polygon = '{}';
-		v_result_line = '{}';
-		v_result_point = '{}';
-
-	END IF;
-
-	IF v_arc IS NULL THEN
-		v_message = 'Unable to create a Profile. Check your path continuity before continue!';
-		v_level = 2;
-	END IF;
+	v_result_polygon = '{}';
 
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
@@ -801,7 +809,7 @@ BEGIN
 	DROP TABLE IF EXISTS temp_pgr_dijkstra;
 
 	--  Return
-	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
                ',"data":{"legend":'||v_guitarlegend||','||
 			'"scale":"'||v_scale||'",'||
@@ -813,7 +821,7 @@ BEGIN
 			'"arc":'||v_arc||','||
 			'"point":'||v_result_point||','||
 			'"line":'||v_result_line||','||
-			'"polygon":'||v_result_polygon||'}}}')::json;
+			'"polygon":'||v_result_polygon||'}}}')::json, 2832, null, null, null);
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

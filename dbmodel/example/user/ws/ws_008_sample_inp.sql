@@ -1128,3 +1128,7 @@ UPDATE man_valve SET to_arc = '2095' WHERE node_id = '1083';
 
 INSERT INTO inp_valve VALUES ('1083', 'PRV', 100.0000, 30.0000, NULL, NULL, NULL, NULL);
 INSERT INTO inp_valve VALUES ('1107', 'FCV', 100.0000, 0, NULL, NULL, NULL, NULL);
+
+INSERT INTO inp_family (family_id, descript, age) VALUES('METAL', 'Metallic pipes', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;
+INSERT INTO inp_family (family_id, descript, age) VALUES('PLASTIC', 'Plastic pipes', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;
+INSERT INTO inp_family (family_id, descript, age) VALUES('OTHER', 'Other', 10) ON CONFLICT (family_id) DO UPDATE SET age = 10;

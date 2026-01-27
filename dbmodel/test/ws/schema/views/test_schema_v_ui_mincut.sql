@@ -50,7 +50,8 @@ SELECT columns_are('v_ui_mincut', ARRAY[
     'notified',
     'output',
     'reagent_lot',
-    'equipment_code'
+    'equipment_code',
+    'shutoff_required'
 ], 'View v_ui_mincut should have the correct columns');
 
 SELECT * FROM finish();

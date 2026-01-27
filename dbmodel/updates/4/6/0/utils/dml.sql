@@ -45,18 +45,18 @@ VALUES (4462,'Commit changes: %v_commit_changes%',0,true,'ud','core','UI');
 UPDATE config_form_fields SET label = 'Sys elev 2:' WHERE label = 'Elevation of the selected node 2:';
 
 -- 06/11/2025
--- When updating y1, custom_y1, elev1, or custom_elev1, also refresh node_2 fields
+-- When updating y1, elev1, or custom_elev1, also refresh node_2 fields
 UPDATE config_form_fields 
-SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
-WHERE columnname IN ('y1', 'custom_y1', 'elev1', 'custom_elev1')
+SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
+WHERE columnname IN ('y1', 'elev1', 'custom_elev1')
 AND formname LIKE 've_arc_%'
 AND formtype = 'form_feature'
 AND widgetcontrols::text LIKE '%autoupdateReloadFields%';
 
--- When updating y2, custom_y2, elev2, or custom_elev2, also refresh node_1 fields
+-- When updating y2, elev2, or custom_elev2, also refresh node_1 fields
 UPDATE config_form_fields 
-SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
-WHERE columnname IN ('y2', 'custom_y2', 'elev2', 'custom_elev2')
+SET widgetcontrols = '{"autoupdateReloadFields":["node_1", "y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'::json
+WHERE columnname IN ('y2', 'elev2', 'custom_elev2')
 AND formname LIKE 've_arc_%'
 AND formtype = 'form_feature'
 AND widgetcontrols::text LIKE '%autoupdateReloadFields%';

@@ -33,7 +33,7 @@ GRANT role_basic to basic_user;
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setprofile($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "profile_id":"12", "listArcs":"[159]","initNode":"64", "endNode":"37",
+    "data":{"filterFields":{}, "pageInfo":{}, "profile_id":"12", "listArcs":"[159]","initNode":"64", "midNodes":"[]", "endNode":"37",
     "linksDistance":1, "scale":{ "eh":1000, "ev":1000}, "title":"null", "date":"16/08/2024"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setprofile returns status "Accepted"'

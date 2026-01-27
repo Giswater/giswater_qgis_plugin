@@ -76,11 +76,11 @@ BEGIN
 
 			INSERT INTO inp_dscenario_demand(
 			dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
-			SELECT v_dscenario_id, csv2, 'CONNEC',csv4::float, csv5, substring(csv6,1,18), csv7 FROM temp_csv JOIN connec ON csv2 = connec_id WHERE cur_user=current_user AND fid = v_fid;
+			SELECT v_dscenario_id, csv2::integer, 'CONNEC',csv4::float, csv5, substring(csv6,1,18), csv7 FROM temp_csv JOIN connec ON csv2 = connec_id::text WHERE cur_user=current_user AND fid = v_fid;
 
 			INSERT INTO inp_dscenario_demand(
 			dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
-			SELECT v_dscenario_id, csv2, 'NODE',csv4::float, csv5, substring(csv6,1,18), csv7 FROM temp_csv JOIN man_netwjoin ON csv2 = node_id WHERE cur_user=current_user AND fid = v_fid;
+			SELECT v_dscenario_id, csv2::integer, 'NODE',csv4::float, csv5, substring(csv6,1,18), csv7 FROM temp_csv JOIN man_netwjoin ON csv2 = node_id::text WHERE cur_user=current_user AND fid = v_fid;
 
 			-- manage log (fid: v_fid)
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

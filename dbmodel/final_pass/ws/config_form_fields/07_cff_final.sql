@@ -13,4 +13,9 @@ UPDATE config_form_fields SET iseditable = false where formname ilike 've_arc_%'
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_connec_%' and columnname = 'state';
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_link_%' and columnname = 'state';
 
+UPDATE config_form_fields SET hidden = TRUE WHERE formname = 've_node_pump' AND columnname = 'expl_visibility';
+
+UPDATE config_form_fields SET layoutorder = 14 WHERE formname = 've_element' AND columnname = 'rotation';
+UPDATE config_form_fields SET layoutorder = 15 WHERE formname = 've_element' AND columnname = 'model_id';
+
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
