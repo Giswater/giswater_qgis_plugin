@@ -41,10 +41,10 @@ v_action text;
 v_mincut_id integer;
 v_mincut_class integer;
 v_valve_node_id integer;
-v_pgr_root_vid integer;
 v_arc_id integer;
-v_arc_exists boolean;
+v_exists boolean;
 v_node integer;
+v_minsector_id integer;
 v_init_node integer;
 v_use_plan_psectors boolean;
 v_mincut_version text;
@@ -301,10 +301,20 @@ BEGIN
 		WHERE id = v_mincut_id;
 	END IF;
 
-	IF v_mode = 'MINSECTOR' THEN
-		v_node := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+	-- check if there is at least one operative node, if not - exit
+	IF NOT EXISTS (
+		SELECT 1
+		FROM v_temp_node n
+		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
+		WHERE a.arc_id = v_arc_id
+	) THEN 
+		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not operative, not found."}}')::json;
+	END IF;
 
-		IF v_node IS NULL OR v_node = 0 THEN
+	IF v_mode = 'MINSECTOR' THEN
+		v_minsector_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
+
+		IF v_minsector_id IS NULL OR v_minsector_id = 0 THEN
 			RETURN jsonb_build_object(
 				'status', 'Failed',
 				'message', jsonb_build_object(
@@ -314,59 +324,40 @@ BEGIN
 			);
 		END IF;
 	ELSE
-		-- pick one of the nodes of the arc v_temp_arc that is not water source (SECTOR); 
-		v_node := (
-			SELECT node_id
-			FROM v_temp_node n
-			JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
-			WHERE a.arc_id = v_arc_id
-			AND 'SECTOR' <> ALL(n.graph_delimiter)
-			LIMIT 1
-		);
-
-		-- if arc in between 2 water sources, v_node = 0 
-		IF v_node IS NULL THEN
-			IF EXISTS (
-				SELECT 1
+		-- pick one of the nodes of the arc v_temp_arc that is not water source (SECTOR); 0 if the arc is in between 2 nodes SECTOR
+		v_node := COALESCE(
+			(
+				SELECT n.node_id
 				FROM v_temp_node n
-				JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
+				JOIN v_temp_arc a 
+					ON n.node_id = a.node_1 
+					OR n.node_id = a.node_2 
 				WHERE a.arc_id = v_arc_id
-			) THEN 
-				v_node := 0::integer;
-			ELSE 
-				-- TODO: do something, it can happen that the node has is_operative = FALSE 
-				RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not operative, not found."}}')::json;
-			END IF;
-		END IF;
+				AND 'SECTOR' <> ALL (n.graph_delimiter)
+				LIMIT 1
+			),
+			0
+		);
 	END IF;
 
 	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
 	END IF;
 
-	-- check if the arc exists in the cluster:
+	-- check if the minsector_id of the arc exists in the cluster:
 		-- true: refresh mincut
 		-- false: init and refresh mincut
-	IF v_mode = 'MINSECTOR' THEN
-		SELECT EXISTS (
-			SELECT 1
-			FROM temp_pgr_node_minsector
-			WHERE pgr_node_id = v_node
-		)
-		INTO v_arc_exists;
-	ELSE
-		SELECT EXISTS (
-			SELECT 1
-			FROM temp_pgr_arc
-			WHERE pgr_arc_id = v_arc_id
-		)
-		INTO v_arc_exists;
-	END IF;
+	SELECT EXISTS (
+		SELECT 1
+		FROM temp_pgr_node_minsector
+		WHERE pgr_node_id = v_minsector_id
+	)
+	INTO v_exists;
 
 	-- manage actions
 	------------------
 	IF v_action = 'mincutNetwork' THEN
-		IF v_arc_exists IS FALSE THEN
+		IF v_exists IS FALSE THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
 		ELSE
@@ -405,7 +396,7 @@ BEGIN
 		END IF;
 
 	ELSIF v_action = 'mincutRefresh' THEN
-		IF v_arc_exists IS FALSE THEN
+		IF v_exists IS FALSE THEN
 			v_init_mincut := TRUE;
 			v_prepare_mincut := FALSE;
 		ELSE
@@ -433,7 +424,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			IF v_arc_exists IS FALSE THEN
+			IF v_exists IS FALSE THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
 			ELSE
@@ -460,7 +451,7 @@ BEGIN
 			v_prepare_mincut := FALSE;
 			v_core_mincut := FALSE;
 		ELSE
-			IF v_arc_exists IS FALSE THEN
+			IF v_exists IS FALSE THEN
 				v_init_mincut := TRUE;
 				v_prepare_mincut := FALSE;
 			ELSE
@@ -495,7 +486,7 @@ BEGIN
 			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
 
 			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id = v_mincut_id) <= date(now()) THEN
-				IF v_arc_exists IS FALSE THEN
+				IF v_exists IS FALSE THEN
 					v_init_mincut := TRUE;
 					v_prepare_mincut := FALSE;
 				ELSE
@@ -830,7 +821,7 @@ BEGIN
 			';
 			INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter)
 			SELECT node, 'MINSECTOR'
-			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
+			FROM pgr_drivingdistance(v_query_text, v_minsector_id, v_pgr_distance, directed => false);
 
 			-- NODES graph_delimiter = 'SECTOR'
 			-- MINSECTORS that contain an arc that connects to a node SECTOR-WATER and is not inlet_arc 
@@ -883,52 +874,65 @@ BEGIN
 			TRUNCATE temp_pgr_node_minsector;
 			TRUNCATE temp_pgr_arc_linegraph;
 
-			-- insert nodes (the graph is without water sources that are SECTOR)
-			SELECT count(*)::float FROM  v_temp_arc INTO v_pgr_distance;
-			v_query_text := '
-				WITH
-					water AS (
-						SELECT node_id FROM man_tank
-						UNION ALL
-						SELECT node_id FROM man_source
-						UNION ALL
-						SELECT node_id FROM man_waterwell
-						UNION ALL
-						SELECT node_id FROM man_wtp
-					),
-					sector_water AS (
-						SELECT w.node_id
-						FROM water w
-						JOIN v_temp_node n USING (node_id)
-						WHERE ''SECTOR'' = ANY (n.graph_delimiter)
-					)
-				SELECT
-					arc_id AS id,
-					node_1 AS source,
-					node_2 AS target,
-					1 AS cost
+			IF v_node = 0 THEN 
+
+				-- arc is in between 2 nodes SECTOR, insert it in temp_pgr_arc
+				INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
+				SELECT a.arc_id, a.node_1, a.node_2
+				FROM v_temp_arc a 
+				WHERE a.arc_id = v_arc_id;
+
+			ELSE
+
+				-- insert nodes (the graph is without water sources that are SECTOR)
+				SELECT count(*)::float FROM  v_temp_arc INTO v_pgr_distance;
+
+				v_query_text := '
+					WITH
+						water AS (
+							SELECT node_id FROM man_tank
+							UNION ALL
+							SELECT node_id FROM man_source
+							UNION ALL
+							SELECT node_id FROM man_waterwell
+							UNION ALL
+							SELECT node_id FROM man_wtp
+						),
+						sector_water AS (
+							SELECT w.node_id
+							FROM water w
+							JOIN v_temp_node n USING (node_id)
+							WHERE ''SECTOR'' = ANY (n.graph_delimiter)
+						)
+					SELECT
+						arc_id AS id,
+						node_1 AS source,
+						node_2 AS target,
+						1 AS cost
+					FROM v_temp_arc a
+					WHERE NOT EXISTS (SELECT 1 FROM sector_water s WHERE s.node_id = a.node_1)
+					AND NOT EXISTS (SELECT 1 FROM sector_water s WHERE s.node_id = a.node_2)
+				';
+				INSERT INTO temp_pgr_node (pgr_node_id)
+				SELECT node
+				FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
+
+				-- nodes that are valve MINSECTOR
+				UPDATE temp_pgr_node t
+				SET graph_delimiter = 'MINSECTOR'
+				FROM v_temp_node n
+				JOIN man_valve m ON n.node_id = m.node_id
+				WHERE t.pgr_node_id = n.node_id
+				AND 'MINSECTOR' = ANY (n.graph_delimiter);
+
+				-- insert arcs (including the arcs that would be connected to the SECTOR nodes)
+				INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
+				SELECT a.arc_id, a.node_1, a.node_2
 				FROM v_temp_arc a
-				WHERE NOT EXISTS (SELECT 1 FROM sector_water s WHERE s.node_id = a.node_1)
-				AND NOT EXISTS (SELECT 1 FROM sector_water s WHERE s.node_id = a.node_2)
-			';
-			INSERT INTO temp_pgr_node (pgr_node_id)
-			SELECT node
-			FROM pgr_drivingdistance(v_query_text, v_node, v_pgr_distance, directed => false);
-
-			-- nodes that are valve MINSECTOR
-			UPDATE temp_pgr_node t
-			SET graph_delimiter = 'MINSECTOR'
-			FROM v_temp_node n
-			JOIN man_valve m ON n.node_id = m.node_id
-			WHERE t.pgr_node_id = n.node_id
-			AND 'MINSECTOR' = ANY (n.graph_delimiter);
-
-			-- insert arcs (including the arcs that would be connected to the SECTOR nodes)
-			INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
-			SELECT a.arc_id, a.node_1, a.node_2
-			FROM v_temp_arc a
-			WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
-			OR EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
+				WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
+				OR EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
+			
+			END IF;
 
 			-- set the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
 			-- TANKS, SOURCE, WATERWELL, WTP
@@ -948,8 +952,8 @@ BEGIN
 					JOIN v_temp_node n USING (node_id)
 					WHERE 'SECTOR' = ANY (n.graph_delimiter)
 				)
-				UPDATE temp_pgr_arc a 
-				SET graph_delimiter = 'SECTOR'
+			UPDATE temp_pgr_arc a 
+			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
 				SELECT 1
 				FROM sector_water s
@@ -1005,24 +1009,38 @@ BEGIN
 
 			-- Generate the minsectors
 			--------------------------
-			v_query_text :=
-			'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost_mincut as cost
-			FROM temp_pgr_arc_linegraph';
 
-			TRUNCATE temp_pgr_connectedcomponents;
-			INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
-			SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
+			PERFORM 1 FROM temp_pgr_arc_linegraph LIMIT 1;
 
-			-- Update the mapzone_id field for arcs (mapzone_id = min(arc_id) for the connected arcs)
-			UPDATE temp_pgr_arc a
-			SET mapzone_id = c.component
-			FROM temp_pgr_connectedcomponents c
-			WHERE a.pgr_arc_id = c.node;
+			IF NOT FOUND THEN
+				-- there is just one arc in temp_pgr_arc (mapzone_id = arc_id)
+				UPDATE temp_pgr_arc
+				SET mapzone_id = pgr_arc_id
+				WHERE mapzone_id = 0;     
+        	ELSE 
+				v_query_text :=
+				'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost_mincut as cost
+				FROM temp_pgr_arc_linegraph';
 
-			-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters
-			UPDATE temp_pgr_arc
-			SET mapzone_id = pgr_arc_id
-			WHERE mapzone_id = 0;
+				TRUNCATE temp_pgr_connectedcomponents;
+				INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
+				SELECT seq, component, node FROM pgr_connectedcomponents(v_query_text);
+
+				-- Update the mapzone_id field for arcs (mapzone_id = min(arc_id) for the connected arcs)
+				UPDATE temp_pgr_arc a
+				SET mapzone_id = c.component
+				FROM temp_pgr_connectedcomponents c
+				WHERE a.pgr_arc_id = c.node;
+
+				-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters 
+				UPDATE temp_pgr_arc
+				SET mapzone_id = pgr_arc_id
+				WHERE mapzone_id = 0;
+
+			END IF;
+
+			-- set v_minsector_id 
+			v_minsector_id := (SELECT mapzone_id FROM temp_pgr_arc WHERE pgr_arc_id = v_arc_id);
 
 			-- END ALGORITHM GENERATE MINSECTORS
 
@@ -1035,7 +1053,7 @@ BEGIN
 			SELECT DISTINCT mapzone_id, 'MINSECTOR'
 			FROM temp_pgr_arc;
 
-			-- remove line that are not 'MINSECTOR' 
+			-- remove line that are not 'MINSECTOR'
 			DELETE FROM temp_pgr_arc_linegraph
 			WHERE graph_delimiter <> 'MINSECTOR';
 
@@ -1204,36 +1222,17 @@ BEGIN
 		-- mincut
 		---------
 
-		IF v_mode = 'MINSECTOR' THEN
-			v_pgr_root_vid := v_node;
-		ELSE
-			-- arc between 2 diposits, the value for minsector_id for this arc is arc_id
-			IF v_node = 0 THEN
-				v_pgr_root_vid := v_arc_id;
-			ELSE
-				SELECT mapzone_id INTO v_pgr_root_vid
-				FROM temp_pgr_arc
-				WHERE pgr_arc_id = v_arc_id;
-			END IF;
-		END IF;
-
 		SELECT count(*)::float INTO v_pgr_distance FROM temp_pgr_arc_linegraph;
 
 		IF v_pgr_distance = 0 THEN
-			IF v_node = 0 THEN
-				-- the choosen arc is between 2 water sources, temp_pgr_node_minsector and temp_pgr_arc_linegraph don't have rows
-				INSERT INTO temp_pgr_node_minsector (pgr_node_id, graph_delimiter, mapzone_id)
-				VALUES (v_pgr_root_vid, 'SECTOR', 1);
-			ELSE
-				-- the choosen arc is in an isolated minsector; temp_pgr_arc_linegraph doesn't have rows
-				UPDATE temp_pgr_node_minsector SET mapzone_id = 1 WHERE pgr_node_id = v_pgr_root_vid;
-			END IF;
+			-- the choosen arc is isolated
+			UPDATE temp_pgr_node_minsector SET mapzone_id = 1;
 		ELSE
 			-- Use jsonb_build_object for cleaner and safer JSON construction
 			v_data := jsonb_build_object(
 				'data', jsonb_build_object(
 					'pgrDistance', v_pgr_distance,
-					'pgrRootVids', ARRAY[v_pgr_root_vid],
+					'pgrRootVids', ARRAY[v_minsector_id],
 					'ignoreCheckValvesMincut', v_ignore_check_valves,
 					'mode', v_mode
 				)
@@ -1690,7 +1689,7 @@ BEGIN
 				v_data := jsonb_build_object(
 					'data', jsonb_build_object(
 						'pgrDistance', v_pgr_distance,
-						'pgrRootVids', ARRAY[v_pgr_root_vid],
+						'pgrRootVids', ARRAY[v_minsector_id],
 						'ignoreCheckValvesMincut', v_ignore_check_valves,
 						'mode', v_mode
 					)
