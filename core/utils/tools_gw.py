@@ -7013,14 +7013,14 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
 
     complet_list = _get_list(complet_result, filter_fields, linkedobject)
     tab_name = 'tab_none'
-    if complet_list is False:
+    if complet_list in (False, None):
         return False, False
     data = complet_list['body']['data']
     fields = data['fields']
 
     if data.get('hidden'):
         return False, False
-    short_name = f'{tab_name}_{widgetname}'
+    short_name = f'{tab_name}_{widgetname}' if tab_name not in widgetname else widgetname
     widget = dialog.findChild(QTableView, short_name)
     if widget is None:
         return False, False
@@ -7564,8 +7564,8 @@ def _manage_tableview(**kwargs):
     class_self = kwargs['class']
     module = tools_backend_calls
     widget = add_tableview(complet_result, field, dialog, module, class_self)
-    widget = add_tableview_header(widget, field['value'])
-    widget = fill_tableview_rows(widget, field['value'])
+    widget = add_tableview_header(widget, field.get('value'))
+    widget = fill_tableview_rows(widget, field.get('value'))
     tools_qt.set_tableview_config(widget)
     return widget
 
