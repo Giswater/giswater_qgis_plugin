@@ -204,7 +204,8 @@ UPDATE man_type_category SET category_type = replace (category_type, 'Standard',
 UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
 UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
 
-UPDATE ve_node SET nodecat_id = 'SHTFF-VALVE110-PN16' WHERE node_id = '1092';
+UPDATE ve_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
+UPDATE man_valve SET to_arc=2037 WHERE node_id=1092;
 
 UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
 
