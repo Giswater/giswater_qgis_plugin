@@ -1146,6 +1146,12 @@ BEGIN
             WHERE cost <> reverse_cost;
         END IF;
 
+		-- Update cost_mincut / reverse_cost_mincut when the valve no longer exists 
+		-- this can occur in v_mode = 'MINSECTOR' if the valve was substituted or became obsolete after the minsectors were calculated
+		UPDATE temp_pgr_arc_linegraph t
+		SET cost_mincut = 1, reverse_cost_mincut = 1
+		WHERE t.closed IS NULL;
+
 	END IF;
 
 	IF v_prepare_mincut THEN
