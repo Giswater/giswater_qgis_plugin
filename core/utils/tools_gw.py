@@ -19,7 +19,6 @@ import xml.etree.ElementTree as ET
 from typing import Literal, Dict, Optional, Union, Any, List
 from qgis.PyQt.sip import isdeleted
 from osgeo import gdal
-from warnings import warn
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -7012,7 +7011,7 @@ def _get_extent_parameters(schema_name, table_name="node", geom_name="the_geom")
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
 
-    complet_list = _get_list(complet_result, '', filter_fields, widgetname, 'form_feature', linkedobject)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject)
     tab_name = 'tab_none'
     if complet_list is False:
         return False, False
@@ -7041,13 +7040,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     return complet_list, widget_list
 
 
-def _get_list(complet_result, form_name='', filter_fields='', widgetname='', formtype='',
-              linkedobject=''):
-
-    # TODO: remove this
-    # Deprecation warning
-    if form_name or widgetname or formtype:
-        warn('form_name, widgetname and formtype are deprecated', DeprecationWarning, stacklevel=2)
+def _get_list(complet_result, filter_fields='', linkedobject=''):
 
     if linkedobject is None:
         return

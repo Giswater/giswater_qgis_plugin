@@ -11,7 +11,6 @@ import subprocess
 import webbrowser
 
 from functools import partial
-from warnings import warn
 from qgis.PyQt.QtCore import QDate, QRegularExpression, Qt
 from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QTableView, QWidget, QDoubleSpinBox, QSpinBox, QMenu
@@ -421,12 +420,7 @@ def filter_table(**kwargs):
         feature_id = complet_result['body']['feature']['id']
     filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
     filter_fields = get_filter_qtableview(dialog, widget_list, complet_result, filter_fields)
-    try:
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception:
-        tab_name = 'main'
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id, id_name=field_id)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject, feature_id, id_name=field_id)
     if complet_list is False:
         return False
     # for field in complet_list['body']['data']['fields']:
@@ -434,7 +428,10 @@ def filter_table(**kwargs):
     if qtable is None:
         qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
     if qtable:
-        fields = complet_list['body']['data']['fields']
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if data.get('hidden'):
+            return False
         if not fields:
             model.removeRows(0, model.rowCount())
             return complet_list
@@ -464,25 +461,23 @@ def filter_table_mincut(**kwargs):
     func_params = kwargs['func_params']
 
     filter_fields = get_filter_qtableview_mincut(dialog, widget_list, func_params)
-    try:
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception:
-        tab_name = 'main'
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject, feature_id)
     if complet_list is False:
         return False
-    for field in complet_list['body']['data']['fields']:
-        qtable = dialog.findChild(QTableView, field['widgetname'])
-        if qtable:
-            if field['value'] is None:
-                model.removeRows(0, model.rowCount())
-                return complet_list
-            model.clear()
-            tools_gw.add_tableview_header(qtable, field)
-            tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], Qt.SortOrder.DescendingOrder)
-            tools_qt.set_tableview_config(qtable)
+    data = complet_list['body']['data']
+    fields = data['fields']
+    if data.get('hidden'):
+        return False
+    qtable = dialog.findChild(QTableView, widgetname)
+    if qtable:
+        if not fields:
+            model.removeRows(0, model.rowCount())
+            return complet_list
+        model.clear()
+        tools_gw.add_tableview_header(qtable, fields)
+        tools_gw.fill_tableview_rows(qtable, fields)
+        tools_gw.set_tablemodel_config(dialog, qtable, widgetname, Qt.SortOrder.DescendingOrder)
+        tools_qt.set_tableview_config(qtable)
 
     return complet_list
 
@@ -838,24 +833,25 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     except Exception:
         tab_name = 'main'
         no_tabs = True
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject)
 
     if complet_list is False:
         return False, False
 
     headers = complet_list['body']['form'].get('headers')
 
-    for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']:
-            continue
+    data = complet_list['body']['data']
+    fields = data['fields']
+    if data.get('hidden'):
+        return False, False
+    widget = dialog.findChild(QTableView, widgetname)
+    if widget is None:
+        return False, False
 
-        widget = dialog.findChild(QTableView, field['widgetname'])
-        if widget is None:
-            continue
-        widget = tools_gw.add_tableview_header(widget, field, headers)
-        widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
-        tools_qt.set_tableview_config(widget)
+    widget = tools_gw.add_tableview_header(widget, fields, headers)
+    widget = tools_gw.fill_tableview_rows(widget, fields)
+    widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
+    tools_qt.set_tableview_config(widget)
 
     widget_list = []
     if no_tabs:
@@ -1127,12 +1123,7 @@ def close_manager(**kwargs):
 # region private functions
 
 
-def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id='', id_name=''):
-
-    # TODO: remove this
-    # Deprecation warning
-    if form_name or tab_name or widgetname or formtype:
-        warn('form_name, tab_name, widgetname and formtype are deprecated, use filter_fields instead', DeprecationWarning, stacklevel=2)
+def _get_list(complet_result, filter_fields='', linkedobject='', feature_id='', id_name=''):
 
     # Manage id_name
     if id_name is None:
