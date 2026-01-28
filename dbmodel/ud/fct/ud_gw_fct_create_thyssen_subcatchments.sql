@@ -60,15 +60,15 @@ BEGIN
 	IF v_clip IS NOT NULL then
 
 		IF v_clip = 'muni' THEN
-			v_clip_table = 'ext_municipality';
+			v_clip_table = 'v_ext_municipality';
 		ELSE
-			v_clip_table = lower(v_clip);
+			v_clip_table = 've_' || lower(v_clip);
 		END IF;
 	
 	ELSE
 	
 		v_clip = 'muni';
-		v_clip_table = 'ext_municipality';
+		v_clip_table = 'v_ext_municipality';
 		
 	END IF;
 
@@ -85,7 +85,7 @@ BEGIN
 		INSERT INTO inp_subcatchment (subc_id, outlet_id, sector_id, muni_id, hydrology_id, descript, the_geom)
 		WITH mec AS (
 			SELECT (st_dump(st_voronoipolygons(ST_Collect(the_geom)))).geom AS the_geom
-			FROM node WHERE epa_type = ''JUNCTION''
+			FROM node WHERE epa_type = ''JUNCTION'' AND state = 1
 		)
 		SELECT concat(''S'', b.node_id), b.node_id, b.sector_id, b.muni_id, '||v_hyd||', ''flag_create_subcatchments'', st_intersection(a.the_geom, m.the_geom) FROM mec a 
 		JOIN node b ON st_intersects(a.the_geom, b.the_geom)
