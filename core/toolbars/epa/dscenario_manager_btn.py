@@ -825,7 +825,7 @@ class GwDscenarioManagerButton(GwAction):
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns

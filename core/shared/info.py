@@ -601,12 +601,12 @@ class GwInfo(QObject):
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
-        
+
         self._show_actions(self.dlg_cf, 'tab_data')
         if self.new_feature_id is not None and self.feature_type not in ('element'):
             self._enable_action(self.dlg_cf, "actionCentered", False)
             self._enable_action(self.dlg_cf, "actionSetToArc", False)
-        
+
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         try:
@@ -2758,7 +2758,7 @@ class GwInfo(QObject):
                 continue
             widget = tools_gw.add_tableview_header(widget, field, headers)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, section_resize_mode=QHeaderView.ResizeMode.Interactive)
             widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))

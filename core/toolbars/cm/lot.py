@@ -187,7 +187,7 @@ class AddNewLot:
         for table_name in relation_table_names:
             view = getattr(self.dlg_lot, table_name, None)
             if view:
-                tools_qt.set_tableview_config(view, sortingEnabled=True)
+                tools_qt.set_tableview_config(view, sorting_enabled=True)
                 view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
                 view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)  # or SingleSelection
                 view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)

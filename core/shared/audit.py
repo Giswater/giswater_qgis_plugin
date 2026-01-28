@@ -53,7 +53,7 @@ class GwAudit:
         self._fill_manager_table(complet_list)
 
         self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         # Connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))

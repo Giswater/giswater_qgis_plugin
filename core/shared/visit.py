@@ -269,7 +269,7 @@ class GwVisit(QObject):
         # Create the dialog
         self.dlg_visit_manager = GwVisitManagerUi(self)
         tools_gw.load_settings(self.dlg_visit_manager)
-        tools_qt.set_tableview_config(self.dlg_visit_manager.tbl_visit, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_visit_manager.tbl_visit, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         if feature_type is None:
             # Set a model with selected filter. Attach that model to selected table

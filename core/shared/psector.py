@@ -1271,7 +1271,7 @@ class GwPsector:
 
     def _get_widget_value_for_insert(self, widget_name: str) -> Optional[str]:
         """Get widget value formatted for SQL INSERT"""
-            
+
         widget = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
         if widget is None:
             return None
@@ -1969,7 +1969,7 @@ class GwPsector:
         # Tables
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.qtbl_psm, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         # Populate custom context menu
         self.dlg_psector_mng.tbl_psm.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
