@@ -189,8 +189,6 @@ DROP FUNCTION IF EXISTS gw_fct_graphanalytics_initnetwork(json);
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_arrangenetwork';
 DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_initnetwork';
 
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4472, 'Unable to find the path between both nodes. Check network continuity', 'Check network continuity', 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
-
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4474, 'Non-existing feature_type in table sys_feature_type', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4476, 'Input geometry is not valid.', 'Check geometry type or validity', 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
@@ -422,3 +420,10 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4478, 'There are no exploitations in your exploitation selection', 'Change your exploitation selection', 2, true, 'utils', 'core', 'UI');
 
 UPDATE sys_function SET return_type = 'integer[]' WHERE id = 3510;
+
+-- 28/01/2026
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4480, 'Some nodes are not connected in the routing graph (state > 0 filter). Disconnected nodes: %v_disconnected%', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4482, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;

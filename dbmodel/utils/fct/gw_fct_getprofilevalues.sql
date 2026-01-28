@@ -55,93 +55,95 @@ Is mandatory start-end nodes must have data, and must be profile_surface = true
 
 DECLARE
 
-v_init  integer;
-v_init_aux integer;
-v_mid text;
-v_end text;
-v_end_aux integer;
-v_nodes integer[];
-v_i json;
-v_hs float;
-v_vs float;
-v_arc json;
-v_node json;
-v_terrain json;
-v_llegend json;
-v_stylesheet json;
-v_version text;
-v_status text = 'Accepted';
-v_level integer = 3;
-v_message text = 'Profile done successfully';
-v_guitarlegend json;
-v_textarc text;
-v_textnode text;
-v_vdefault json;
-v_leaflet json;
-v_composer text;
-v_templates json;
-v_json json;
-v_project_type text;
-v_height float;
-v_index integer;
-v_mapcomposer_name text;
-v_scaletofit boolean;
-v_array_width float[];
-v_scale text;
-v_extension json;
-v_vstext text;
-v_hstext text;
-v_legendfactor float;
-v_linksdistance float;
-v_arc_geom1 float;
-v_node_geom1 float;
-i integer = 0;
-v_dist float[];
-v_telev float[];
-v_elev float[];
-v_nid integer[];
-v_systype text[];
-v_elevation float;
-v_distance float;
-v_compheight float;
-v_compwidth float;
-v_profheigtht float;
-v_profwidth float;
-v_error_context text;
-v_initv float;
-v_inith float;
-v_initpoint json;
+	v_init  integer;
+	v_init_aux integer;
+	v_mid text;
+	v_end text;
+	v_end_aux integer;
+	v_nodes integer[];
+	v_i json;
+	v_hs float;
+	v_vs float;
+	v_arc json;
+	v_node json;
+	v_terrain json;
+	v_llegend json;
+	v_stylesheet json;
+	v_version text;
+	v_status text = 'Accepted';
+	v_level integer = 3;
+	v_message text = 'Profile done successfully';
+	v_guitarlegend json;
+	v_textarc text;
+	v_textnode text;
+	v_vdefault json;
+	v_leaflet json;
+	v_composer text;
+	v_templates json;
+	v_json json;
+	v_project_type text;
+	v_height float;
+	v_index integer;
+	v_mapcomposer_name text;
+	v_scaletofit boolean;
+	v_array_width float[];
+	v_scale text;
+	v_extension json;
+	v_vstext text;
+	v_hstext text;
+	v_legendfactor float;
+	v_linksdistance float;
+	v_arc_geom1 float;
+	v_node_geom1 float;
+	i integer = 0;
+	v_dist float[];
+	v_telev float[];
+	v_elev float[];
+	v_nid integer[];
+	v_systype text[];
+	v_elevation float;
+	v_distance float;
+	v_compheight float;
+	v_compwidth float;
+	v_profheigtht float;
+	v_profwidth float;
+	v_error_context text;
+	v_initv float;
+	v_inith float;
+	v_initpoint json;
 
 
--- field variables to work with UD/WS
-v_fcatgeom text;
-v_fymax text;
-v_fslope text;
-v_fsyselev text;
-v_fsysymax text;
-v_querytext text;
-v_elev1 text;
-v_elev2 text;
-v_z1 text;
-v_z2 text;
-v_y1 text;
-v_y2 text;
-v_papersize integer;
-v_count integer;
-v_nodemessage text;
-v_count_int integer;
-object_rec record;
-v_vnode_status boolean;
-v_result json;
-v_result_line json;
-v_result_point json;
-v_result_polygon json;
-v_device integer;
-v_nonpriority_statetype text;
-v_cost_string text;
-v_last_dist float;
-v_last_nid text;
-v_last_systype text;
+	-- field variables to work with UD/WS
+	v_fcatgeom text;
+	v_fymax text;
+	v_fslope text;
+	v_fsyselev text;
+	v_fsysymax text;
+	v_querytext text;
+	v_elev1 text;
+	v_elev2 text;
+	v_z1 text;
+	v_z2 text;
+	v_y1 text;
+	v_y2 text;
+	v_papersize integer;
+	v_count integer;
+	v_nodemessage text;
+	v_count_int integer;
+	object_rec record;
+	v_vnode_status boolean;
+	v_result json;
+	v_result_line json;
+	v_result_point json;
+	v_result_polygon json;
+	v_device integer;
+	v_nonpriority_statetype text;
+	v_cost_string text;
+	v_last_dist float;
+	v_last_nid text;
+	v_last_systype text;
+
+	v_disconnected integer[];
 
 BEGIN
 
@@ -176,6 +178,15 @@ BEGIN
   	SELECT (value::json->>'arc')::json->>'cat_geom1' INTO v_arc_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'vnodeStatus') INTO v_vnode_status FROM config_param_system WHERE parameter = 'om_profile_vdefault';
+
+	-- drop temporary tables
+	DROP TABLE IF EXISTS temp_anl_arc;
+	DROP TABLE IF EXISTS temp_anl_node;
+	DROP TABLE IF EXISTS temp_ve_arc;
+	DROP TABLE IF EXISTS temp_vnode;
+	DROP TABLE IF EXISTS temp_link;
+	DROP TABLE IF EXISTS temp_link_x_arc;
+	DROP TABLE IF EXISTS temp_pgr_dijkstra;
 
 	CREATE TEMP TABLE temp_vnode (
 		id serial NOT NULL,
@@ -321,16 +332,27 @@ BEGIN
 			AND node_2 IS NOT NULL;
 		$sql$, v_cost_string);
 
+		SELECT array_agg(nid)
+		INTO v_disconnected
+		FROM (
+			WITH via AS (SELECT unnest(v_nodes) AS nid)
+			SELECT via.nid
+			FROM via
+			LEFT JOIN ve_arc a
+				ON a.state > 0
+				AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL
+				AND (a.node_1 = via.nid OR a.node_2 = via.nid)
+			GROUP BY via.nid
+			HAVING count(a.arc_id) = 0
+		) q;
 
-		BEGIN
-	        INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
-			SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
-			FROM pgr_dijkstraVia (v_querytext, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
-		EXCEPTION WHEN OTHERS THEN
-			GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-			RETURN (SELECT json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', log_level, 'text', error_message), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)
-					FROM sys_message WHERE id = 4472)::json;
-		END;
+		IF v_disconnected IS NOT NULL AND array_length(v_disconnected, 1) > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2832","parameters":{"v_disconnected":"'||array_to_string(v_disconnected, ',')||'"}, "is_process":true}}$$);';
+		END IF;
+
+		INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
+		SELECT seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost
+		FROM pgr_dijkstraVia (v_querytext, v_nodes, directed => FALSE, strict => TRUE, U_turn_on_edge => TRUE);
 
 		INSERT INTO temp_ve_arc
 		SELECT *
@@ -788,6 +810,10 @@ BEGIN
 	v_result_point = v_result;
 
 	v_result_polygon = '{}';
+
+	IF v_arc IS NULL THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2832","parameters":null, "is_process":true}}$$);';
+	END IF;
 
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
