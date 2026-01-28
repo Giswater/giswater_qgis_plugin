@@ -46,7 +46,6 @@ BEGIN
 			ELSE "family"
 		END AS "family",
 		CASE
-			WHEN builtdate IS NULL THEN NULL
 			WHEN builtdate > CURRENT_DATE - (f.age || ' years')::INTERVAL THEN 'NEW'
 			ELSE 'OLD'
 		END AS cal_age,
