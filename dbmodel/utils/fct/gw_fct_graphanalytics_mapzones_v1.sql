@@ -133,7 +133,7 @@ DECLARE
 	v_error_context text;
 
 	-- check variables
-	v_check_fid integer;
+	message text;
 
 BEGIN
 
@@ -712,27 +712,279 @@ BEGIN
 
 	IF v_from_zero = FALSE THEN
 
-		-- getting sys_fprocess to be executed
-		v_query_text := format(
-			$sql$
-			SELECT fid FROM sys_fprocess
-			WHERE project_type IN (LOWER(%L), 'utils')
-			AND addparam IS NULL
-			AND (query_text IS NOT NULL AND query_text <> '')
-			AND function_name ILIKE '%%gw_fct_graphanalytics_mapzones_v1%%'
-			AND active ORDER BY fid ASC
-			$sql$,
-			v_project_type
-		);
+		IF v_project_type = 'WS' THEN
+			-- Check if there are any nodes in the graphconfig that are not in the network
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.mapzone_id,
+					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
+					AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				LEFT JOIN temp_pgr_node n USING (pgr_node_id)
+				WHERE n.pgr_node_id IS NULL
+				GROUP BY g.mapzone_id
+				ORDER BY g.mapzone_id
+			) sub;
 
-		-- loop for checks
-		FOR v_check_fid IN EXECUTE v_query_text LOOP
-			EXECUTE format(
-				'SELECT gw_fct_check_fprocess($${"data":{"parameters":{"functionFid":%s, "checkFid":"%s"}}}$$)', 
-				v_fid, v_check_fid
-			);
-		END LOOP;
-	
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are any arcs in the graphconfig that are not in the network
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.mapzone_id,
+					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
+				WHERE g.graph_type = 'use' AND a.pgr_arc_id IS NULL
+				GROUP BY g.mapzone_id
+				ORDER BY g.mapzone_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4484", "function":"2706","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+			
+			-- Check if there are any nodes set in more than one mapzone
+			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.pgr_node_id,
+					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				JOIN temp_pgr_node n USING (pgr_node_id)
+				GROUP BY g.pgr_node_id
+				HAVING  count(*) > 1
+				ORDER BY g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4488", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4490", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are any arcs set in more than one nodeParent
+			SELECT string_agg(concat('arc_id: ', arc_id, ' - ', pair_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.pgr_arc_id AS arc_id,
+					string_agg(concat('[mapzone_id: ', g.mapzone_id, ', node_id: ', g.pgr_node_id, ']'), ' ' ORDER BY g.mapzone_id) AS pair_block
+				FROM temp_pgr_graphconfig g
+				JOIN temp_pgr_arc a USING (pgr_arc_id)
+				WHERE g.graph_type = 'use'
+				GROUP BY g.pgr_arc_id
+				HAVING COUNT(*) > 1
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4492", "function":"2706","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4494", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are any to_arcs not connected to its nodeParent
+			SELECT string_agg(mapzone_arcs, ', ')
+			INTO message
+			FROM (
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ',g.pgr_node_id,', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+				FROM temp_pgr_graphconfig g
+				JOIN temp_pgr_arc a USING (pgr_arc_id)
+				WHERE g.graph_type = 'use' 
+				AND g.pgr_node_id NOT IN (a.pgr_node_1, a.pgr_node_2) 
+				ORDER BY g.mapzone_id,  g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4496", "function":"2706","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4498", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are pump/meter nodeParent where its to_arc is not the same as in its man_table
+			SELECT string_agg(mapzone_arcs, ', ')
+			INTO message
+			FROM (
+				WITH 
+				meter_pump AS (
+					SELECT node_id, to_arc FROM man_meter
+					UNION ALL 
+					SELECT node_id, to_arc FROM man_pump		
+				)
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+				FROM temp_pgr_graphconfig g
+				WHERE g.graph_type = 'use' 
+				AND EXISTS (
+					SELECT 1 FROM meter_pump m
+					WHERE m.node_id = g.pgr_node_id
+					AND m.to_arc <> g.pgr_arc_id
+				)
+				ORDER BY g.mapzone_id,  g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4500", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4502", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are tank/source/waterwell/wtp nodeParent where its inlet_arc is not the same as in its man_table
+			SELECT string_agg(mapzone_arcs, ', ')
+			INTO message
+			FROM (
+				WITH
+				inlet AS (
+					SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
+					UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
+					UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
+					UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
+				)
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+				FROM temp_pgr_graphconfig g
+				WHERE g.graph_type = 'use' 
+				AND EXISTS (
+					SELECT 1 FROM inlet i
+					WHERE i.node_id = g.pgr_node_id
+					AND i.arc_id <> g.pgr_arc_id
+				)
+				ORDER BY g.mapzone_id,  g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if nodeParent or toArc is null
+			SELECT string_agg(mapzone_arcs, ', ')
+			INTO message
+			FROM (
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+				FROM temp_pgr_graphconfig g
+				WHERE g.graph_type = 'use' 
+				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
+				ORDER BY g.mapzone_id,  g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"2706","parameters":{"feature_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+		ELSIF v_project_type = 'UD' THEN
+
+			-- Check if there are any nodeParents in the graphconfig that are not in the operative network
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.mapzone_id,
+					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
+					AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				LEFT JOIN temp_pgr_node n USING (pgr_node_id)
+				WHERE g.graph_type = 'use' 
+				AND n.pgr_node_id IS NULL
+				GROUP BY g.mapzone_id
+				ORDER BY g.mapzone_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4512", "function":"3508","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4514", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are any forceClose/forceOpen in the graphconfig that are not in the operative network
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.mapzone_id,
+					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
+				WHERE g.graph_type IN ('forceClosed', 'forceOpen')
+				AND a.pgr_arc_id IS NULL
+				GROUP BY g.mapzone_id
+				ORDER BY g.mapzone_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4516", "function":"3508","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4518", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are any nodeParents set in more than one mapzone
+			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.pgr_node_id,
+					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				JOIN temp_pgr_node n USING (pgr_node_id)
+				GROUP BY g.pgr_node_id
+				HAVING  count(*) > 1
+				ORDER BY g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4520", "function":"3508","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4522", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check if there are any forceClosed/forceOpen set in more than one mapzone
+			SELECT string_agg(concat('arc_id: ', sub.pgr_arc_id, ' - mapzone_ids: ', mapzone_block), '; ')
+			INTO message
+			FROM (
+				SELECT
+					g.pgr_arc_id,
+					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
+				FROM temp_pgr_graphconfig g
+				JOIN temp_pgr_arc a USING (pgr_arc_id)
+				GROUP BY g.pgr_arc_id
+				HAVING  count(*) > 1
+				ORDER BY g.pgr_arc_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4524", "function":"3508","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+
+			-- Check when 2 arcs that make a circle
+			-- SELECT concat('arc_1: ', lg.source, ' - arc_2: ', lg.target) AS message
+			-- INTO message
+			-- FROM pgr_linegraph(
+			-- 	'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1::float8 AS cost, -1::float8 AS reverse_cost
+			-- 	FROM temp_pgr_arc',
+			-- 	directed := TRUE
+			-- ) AS lg
+			-- WHERE reverse_cost =  1;
+
+			-- IF message IS NOT NULL THEN
+			-- 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"3508","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			-- ELSE
+			-- 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			-- END IF;
+		END IF;
 	END IF; --v_from_zero
 
 	-- check if there are any errors or from_zero is true

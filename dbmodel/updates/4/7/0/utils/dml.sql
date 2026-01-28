@@ -264,169 +264,11 @@ UPDATE config_function
 WHERE id=3508;
 
 
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(643, 'PROCESS_NAME_1', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_1', NULL, NULL,
-'SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent
-		FROM temp_pgr_graphconfig g
-		LEFT JOIN temp_pgr_node n USING (pgr_node_id)
-		WHERE n.pgr_node_id IS NULL
-		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id','INFO_MESSAGE_1', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(644, 'PROCESS_NAME_2', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_2', NULL, NULL,
-'SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
-		FROM temp_pgr_graphconfig g
-		LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
-		WHERE g.graph_type = ''use'' AND a.pgr_arc_id IS NULL
-		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_2', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(645, 'PROCESS_NAME_3', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_3', NULL, NULL,
-'SELECT g.pgr_node_id AS nodeParent, array_agg(g.graph_type) AS graph_type_set, array_agg(g.mapzone_id) AS mapzone_id_set
-		FROM temp_pgr_graphconfig g
-		JOIN temp_pgr_node n USING (pgr_node_id)
-		GROUP BY g.pgr_node_id
-		HAVING  count(*) > 1
-		ORDER BY g.pgr_node_id', 'INFO_MESSAGE_3', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(646, 'PROCESS_NAME_4', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_4', NULL, NULL,
-'SELECT g.pgr_arc_id AS toArc, array_agg(g.pgr_node_id) AS node_parent_set, array_agg(g.mapzone_id) AS mapzone_id_set
-		FROM temp_pgr_graphconfig g
-		JOIN temp_pgr_arc a USING (pgr_arc_id)
-		WHERE g.graph_type = ''use'' 
-		GROUP BY g.pgr_arc_id
-		HAVING  count(*) > 1
-		ORDER BY g.pgr_arc_id', 'INFO_MESSAGE_4', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(647, 'PROCESS_NAME_5', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_5', NULL, NULL,
-'SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
-		FROM temp_pgr_graphconfig g
-		JOIN temp_pgr_arc a USING (pgr_arc_id)
-		WHERE g.graph_type = ''use'' 
-		AND NOT EXISTS (
-			SELECT 1 FROM temp_pgr_node n 
-			WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		)
-		ORDER BY g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_5', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(648, 'PROCESS_NAME_6', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_6', NULL, NULL,
-'WITH 
-			meter_pump AS (
-				SELECT node_id, to_arc FROM man_meter
-				UNION ALL 
-				SELECT node_id, to_arc FROM man_pump		
-			)
-		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
-		FROM temp_pgr_graphconfig g
-		WHERE g.graph_type = ''use'' 
-		AND EXISTS (
-			SELECT 1 FROM meter_pump m
-			WHERE m.node_id = g.pgr_node_id
-			AND m.to_arc <> g.pgr_arc_id
-		)
-		ORDER BY g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_6', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(649, 'PROCESS_NAME_7', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_7', NULL, NULL,
-'WITH
-			inlet AS (
-				SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
-				UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
-				UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
-				UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
-			)
-		SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
-		FROM temp_pgr_graphconfig g
-		WHERE g.graph_type = ''use'' 
-		AND EXISTS (
-			SELECT 1 FROM inlet i
-			WHERE i.node_id = g.pgr_node_id
-			AND i.arc_id = g.pgr_arc_id
-		)
-		ORDER BY g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_7', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(650, 'PROCESS_NAME_8', 'ws', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_8', NULL, NULL,
-'SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
-		FROM temp_pgr_graphconfig g
-		WHERE g.graph_type = ''use'' 
-		AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
-		ORDER BY g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_8', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(651, 'PROCESS_NAME_9', 'ud', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_9', NULL, NULL,
-'SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent
-		FROM temp_pgr_graphconfig g
-		LEFT JOIN temp_pgr_node n USING (pgr_node_id)
-		WHERE WHERE g.graph_type = ''use'' 
-		AND n.pgr_node_id IS NULL
-		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_9', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(652, 'PROCESS_NAME_10', 'ud', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_10', NULL, NULL,
-'SELECT g.graph_type, g.mapzone_id , g.pgr_node_id AS nodeParent, g.pgr_arc_id AS toArc
-		FROM temp_pgr_graphconfig g
-		LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
-		WHERE g.graph_type IN (''forceClosed'', ''forceOpen'')
-		AND a.pgr_arc_id IS NULL
-		ORDER BY g.graph_type desc, g.mapzone_id,  g.pgr_node_id', 'INFO_MESSAGE_10', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(653, 'PROCESS_NAME_11', 'ud', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_11', NULL, NULL,
-'SELECT g.pgr_node_id AS nodeParent, array_agg(g.graph_type) AS graph_type_set, array_agg(g.mapzone_id) AS mapzone_id_set
-		FROM temp_pgr_graphconfig g
-		JOIN temp_pgr_node n USING (pgr_node_id)
-		GROUP BY g.pgr_node_id
-		HAVING  count(*) > 1
-		ORDER BY g.pgr_node_id', 'INFO_MESSAGE_11', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(654, 'PROCESS_NAME_12', 'ud', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_12', NULL, NULL,
-'SELECT g.pgr_node_id AS nodeParent, array_agg(g.graph_type) AS graph_type_set, array_agg(g.mapzone_id) AS mapzone_id_set
-		FROM temp_pgr_graphconfig g
-		JOIN temp_pgr_arc a USING (pgr_arc_id)
-		GROUP BY g.pgr_arc_id
-		HAVING  count(*) > 1
-		ORDER BY g.pgr_node_id', 'INFO_MESSAGE_12', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg,
-query_text, info_msg, function_name, active)
-VALUES(655, 'PROCESS_NAME_13', 'ud', NULL, 'core', true, 'Check mapzones', NULL, 3, 'ERROR_MESSAGE_13', NULL, NULL,
-'SELECT lg.SOURCE AS arc_1, lg.target AS arc_2
-		FROM pgr_linegraph(
-			''SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1::float8 AS cost, -1::float8 AS reverse_cost
-			FROM temp_pgr_arc'',
-			directed := TRUE
-		) AS lg
-		WHERE reverse_cost =  1', 'INFO_MESSAGE_13', '[gw_fct_graphanalytics_mapzones_v1]', true);
-
 -- 27/01/2026
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4478, 'There are no exploitations in your exploitation selection', 'Change your exploitation selection', 2, true, 'utils', 'core', 'UI');
 
 UPDATE sys_function SET return_type = 'integer[]' WHERE id = 3510;
-
--- 28/01/2026
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
-VALUES(4480, 'Some nodes are not connected in the routing graph (state > 0 filter). Disconnected nodes: %v_disconnected%', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
-VALUES(4482, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
 
 -- massive update of cat_workspace to remove selector_hydrometer
 UPDATE cat_workspace
@@ -444,3 +286,71 @@ SET
   )::json,
   lastupdate_timestamp = now(),
   lastupdate_user = CURRENT_USER;
+
+-- 28/01/2026
+-- Check mapzones v1
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4480, 'The following nodes don''t exist in the operative network: %node_list%', 'Check nodes in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4482, 'All nodes in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4484, 'The following to_arcs don''t exist in the operative network: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4486, 'All arcs in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4488, 'The following nodes are set in multiple mapzones: %node_list%', 'Check nodes in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4490, 'There are no nodes set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4492, 'The following arcs are set in more than one nodeParent: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4494, 'There are no arcs set in more than one nodeParent', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4496, 'The following arcs are not connected to its nodeParent: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4498, 'There are no arcs not connected to its nodeParent', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4500, 'The folowing pump/meter nodeParents don''t have the same to_arc on their graphconfig and man_table: %node_list%', 'Check for different to_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4502, 'There are no pump/meter nodeParents with different to_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4504, 'The folowing tank/source/waterwell/wtp nodeParents don''t have the same inlet_arc on their graphconfig and man_table: %node_list%', 'Check for different inlet_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4506, 'There are no tank/source/waterwell/wtp nodeParents with different inlet_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4508, 'The following nodeParent/to_arc are null: %feature_list%', 'Check for nulls in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4510, 'There are no nodeParent or to_arc null', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4512, 'The following nodeParents don''t exist in the operative network: %node_list%', 'Check nodeParents in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4514, 'All nodeParents in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4516, 'The following forceClosed/forceOpen don''t exist in the operative network: %node_list%', 'Check forceClosed/forceOpen in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4518, 'All forceClosed/forceOpen in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4520, 'The following nodeParents are set in multiple mapzones: %node_list%', 'Check nodeParents in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4522, 'There are no nodeParents set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4524, 'The following forceClosed/forceOpen are set in multiple mapzones: %arc_list%', 'Check forceClosed/forceOpen in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4526, 'There are no forceClosed/forceOpen set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4528, 'Some nodes are not connected in the routing graph (state > 0 filter). Disconnected nodes: %v_disconnected%', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4430, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
