@@ -256,8 +256,8 @@ BEGIN
 				v_new_record.node_1 := (SELECT node_id FROM ve_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), ve_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM ve_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), ve_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
-				v_new_record.sys_code := v_new_record.arc_id;
 				v_new_record.asset_id = v_asset_id;
+				v_new_record.uuid := gen_random_uuid();
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3376", "function":"2112", "parameters":{"arc_id":"'||v_new_record.arc_id||'"}, "fid":"214", "criticity":"1", "is_process":true}}$$)';
 

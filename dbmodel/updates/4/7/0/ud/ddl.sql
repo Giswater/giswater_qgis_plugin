@@ -30,3 +30,6 @@ CREATE TABLE dwfzone_graph (
 CREATE INDEX IF NOT EXISTS dwfzone_graph_node_1_idx ON dwfzone_graph USING btree (node_1);
 CREATE INDEX IF NOT EXISTS dwfzone_graph_node_2_idx ON dwfzone_graph USING btree (node_2);
 CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON dwfzone_graph USING gist (the_geom);
+
+-- 28/01/2026
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_sys_code_unique;

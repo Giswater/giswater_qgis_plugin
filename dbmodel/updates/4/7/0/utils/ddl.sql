@@ -51,3 +51,9 @@ CREATE TABLE dma_graph (
 CREATE INDEX IF NOT EXISTS dma_graph_node_1_idx ON dma_graph USING btree (node_1);
 CREATE INDEX IF NOT EXISTS dma_graph_node_2_idx ON dma_graph USING btree (node_2);
 CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON dma_graph USING gist (the_geom);
+
+-- 28/01/2026
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_sys_code_unique;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_sys_code_unique;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_sys_code_unique;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS element_sys_code_unique;

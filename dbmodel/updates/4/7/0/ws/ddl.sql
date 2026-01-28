@@ -80,3 +80,4 @@ CREATE TABLE presszone_graph (
 CREATE INDEX IF NOT EXISTS presszone_graph_node_1_idx ON presszone_graph USING btree (node_1);
 CREATE INDEX IF NOT EXISTS presszone_graph_node_2_idx ON presszone_graph USING btree (node_2);
 CREATE INDEX IF NOT EXISTS the_geom_graph_idx ON presszone_graph USING gist (the_geom);
+
