@@ -253,6 +253,22 @@ BEGIN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_viewname;
 		END IF;
 
+		-- if addfield table does not exists (when creating a new object in cat_feature)
+		IF (SELECT EXISTS (SELECT table_name FROM information_schema.TABLES WHERE table_schema = CURRENT_SCHEMA AND table_name = v_feature_childtable_name)) IS FALSE THEN
+			
+			-- create the addfields table and add as many columns as common addfields
+			FOR rec IN SELECT param_name, datatype_id FROM sys_addfields WHERE cat_feature_id IS NULL
+			LOOP
+
+				EXECUTE 'SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"'||v_cat_feature||'"},
+				"data":{"action":"CREATE", "parameters":{"columnname":"'||rec.param_name||'", "datatype":"'||rec.datatype_id||'",
+				"widgettype":"check", "label":"'||rec.param_name||'","ismandatory":"False",
+				"active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$)';
+				
+			END LOOP;
+		
+		END IF;
+
 		v_data_view = '{
 		"schema":"'||v_schemaname ||'",
 		"body":{"viewname":"'||v_viewname||'",
