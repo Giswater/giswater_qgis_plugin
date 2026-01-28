@@ -427,3 +427,20 @@ VALUES(4480, 'Some nodes are not connected in the routing graph (state > 0 filte
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4482, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+-- massive update of cat_workspace to remove selector_hydrometer
+UPDATE cat_workspace
+SET
+  config = (
+    jsonb_set(
+      config::jsonb,
+      '{selectors}',
+      (
+        SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+        FROM jsonb_array_elements((config::jsonb)->'selectors') AS elem
+        WHERE NOT (elem ? 'selector_hydrometer')
+      )
+    )
+  )::json,
+  lastupdate_timestamp = now(),
+  lastupdate_user = CURRENT_USER;
