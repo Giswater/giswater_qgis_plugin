@@ -100,14 +100,14 @@ BEGIN
 
 		FOREACH rec_node_id in ARRAY(v_node_list) LOOP
 			p_data = jsonb_set(p_data::jsonb,'{data,parameters,node}'::text[], rec_node_id::jsonb);
-			EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($$'||p_data||'$$);'
+			EXECUTE 'SELECT gw_fct_graphanalytics_upstream($$'||p_data||'$$);'
 			INTO v_result_json;
 		END LOOP;
 
 	ELSIF v_node_id IS NOT NULL THEN
 		EXECUTE 'select exists(select 1 from '||v_layer||' where node_id='||quote_literal(v_node_id)||')' into v_exists;
 		IF v_exists THEN
-			EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($$'||p_data||'$$);'
+			EXECUTE 'SELECT gw_fct_graphanalytics_upstream($$'||p_data||'$$);'
 			INTO v_result_json;
 		END IF;
 
