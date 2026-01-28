@@ -62,7 +62,7 @@ BEGIN
 		IF v_clip = 'muni' THEN
 			v_clip_table = 'ext_municipality';
 		ELSE
-			v_clip_table = v_clip;
+			v_clip_table = lower(v_clip);
 		END IF;
 	
 	ELSE
@@ -89,7 +89,8 @@ BEGIN
 		)
 		SELECT concat(''S'', b.node_id), b.node_id, b.sector_id, b.muni_id, '||v_hyd||', ''flag_create_subcatchments'', st_intersection(a.the_geom, m.the_geom) FROM mec a 
 		JOIN node b ON st_intersects(a.the_geom, b.the_geom)
-		JOIN '||v_clip_table||' m USING ('||v_clip||'_id)';
+		JOIN '||v_clip_table||' m USING ('||lower(v_clip)||'_id)
+		ON CONFLICT DO NOTHING';
 
 		
 
@@ -101,25 +102,24 @@ BEGIN
 	raise notice 'attributes';
 
 	execute  '
-	WITH ext_raster_slope AS (
-		SELECT ST_Clip(r.rast, g.the_geom, NULL::double precision, true) as rast
-		FROM (
-			SELECT ST_Slope(rast, 1, ''32BF'', ''PERCENT'') AS rast FROM ext_raster_dem
-		) r
-		JOIN '||v_clip_table||' g
-		ON ST_Intersects(r.rast, g.the_geom)
-	), z AS (
-		SELECT subc_id, 
-		(ST_SummaryStatsAgg(ST_Clip(r.rast, s.the_geom), 1, TRUE)).mean AS slope 
-		FROM ext_raster_slope r JOIN inp_subcatchment s ON st_intersects(r.rast, s.the_geom) 
-		GROUP BY s.subc_id
-	)
 	UPDATE inp_subcatchment t
-	SET slope = z.slope
-	FROM z
-	WHERE t.subc_id = z.subc_id';     
-              
-
+	SET slope = z.slope FROM (
+		WITH ext_raster_slope AS (
+			SELECT ST_Clip(r.rast, g.the_geom, NULL::double precision, true) as rast
+			FROM (
+				SELECT ST_Slope(rast, 1, ''32BF'', ''PERCENT'') AS rast FROM ext_raster_dem
+			) r
+			JOIN '||v_clip_table||' g
+			ON ST_Intersects(r.rast, g.the_geom)
+		)
+			SELECT subc_id, 
+			(ST_SummaryStatsAgg(ST_Clip(r.rast, s.the_geom), 1, TRUE)).mean AS slope 
+			FROM ext_raster_slope r JOIN inp_subcatchment s ON st_intersects(r.rast, s.the_geom) 
+			GROUP BY s.subc_id
+		) z	WHERE t.subc_id = z.subc_id';     
+                   
+ 
+	RAISE NOTICE 'atrributes - 2';
 	-- Clean empty geometries
 	DELETE FROM inp_subcatchment
 	WHERE ST_IsEmpty(the_geom) OR ST_Area(the_geom) < 1.0;
@@ -129,8 +129,7 @@ BEGIN
 
 	-- Area (planar units)
 	UPDATE inp_subcatchment
-	SET area = ST_Area(the_geom), --slope = 2, 
-	rg_id = 'RG-01'
+	SET area = ST_Area(the_geom) --slope = 2, 
 	WHERE descript = 'flag_create_subcatchments';
 
 	-- Characteristic length: use LongestLine (no per-row quadratic point pairs)
