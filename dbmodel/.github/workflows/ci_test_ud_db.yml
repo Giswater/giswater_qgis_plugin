@@ -117,6 +117,38 @@ jobs:
       - name: Create Sample Schema
         run: python test/execute_sql_files.py ud
 
+      - name: Run all SQL tests in sequence
+        run: |
+          TEST_GROUPS="${{ github.event.inputs.tests || 'all' }}"
+          EXIT_CODE=0
+          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"schema"* ]]; then
+            echo "Running SCHEMA tests..."
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/test_tables.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/tables/*.sql || EXIT_CODE=1
+          fi
+
+          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"security"* ]]; then
+            echo "Running SECURITY tests..."
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/security/*.sql || EXIT_CODE=1
+          fi
+
+          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"function"* ]]; then
+            echo "Running FUNCTION tests..."
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/function/*.sql || EXIT_CODE=1
+          fi
+
+          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"data"* ]]; then
+            echo "Running DATA tests..."
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/data/*.sql || EXIT_CODE=1
+          fi
+
+          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"performance"* ]]; then
+            echo "Running PERFORMANCE tests..."
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/performance/*.sql || EXIT_CODE=1
+          fi
+
+          exit $EXIT_CODE
+
       - name: Set image tag
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
@@ -149,34 +181,3 @@ jobs:
           build-args: |
             GW_DUMP=gw_ud.dump
             PG_MAJOR=${{ matrix.pg_version }}
-      - name: Run all SQL tests in sequence
-        run: |
-          TEST_GROUPS="${{ github.event.inputs.tests || 'all' }}"
-          EXIT_CODE=0
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"schema"* ]]; then
-            echo "Running SCHEMA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/test_tables.sql || EXIT_CODE=1
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/tables/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"security"* ]]; then
-            echo "Running SECURITY tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/security/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"function"* ]]; then
-            echo "Running FUNCTION tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/function/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"data"* ]]; then
-            echo "Running DATA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/data/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"performance"* ]]; then
-            echo "Running PERFORMANCE tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/performance/*.sql || EXIT_CODE=1
-          fi
-
-          exit $EXIT_CODE
