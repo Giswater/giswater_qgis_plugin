@@ -988,7 +988,12 @@ BEGIN
 	END IF; --v_from_zero
 
 	-- check if there are any errors or from_zero is true
-	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) = 0 OR v_from_zero = TRUE THEN
+	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) > 0 THEN
+
+		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, expl_id, name)
+		VALUES (0,0, array[0]::int[], array[0]::int[], 'Disconnected');
+
+	ELSE
 
 		-- GENERATE LINEGRAPH
 		-- ===================
