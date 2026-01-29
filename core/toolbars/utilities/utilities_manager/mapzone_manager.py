@@ -386,11 +386,18 @@ class GwMapzoneManager:
             msg = "No valid data received from the SQL function."
             tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
+        line_data = json_result.get('body', {}).get('data', {}).get('line')
+        if not line_data:
+            msg = "No valid line data received from the SQL function."
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
+            return
+
+        line_layers = line_data if isinstance(line_data, list) else [line_data]
+
         # Extract mapzone_ids with data from json_result
         valid_mapzone_ids = set()
-        if 'body' in json_result and 'data' in json_result['body'] and 'line' in json_result['body']['data']:
-            # Access the 'features' list in 'line'
-            features = json_result['body']['data']['line'].get('features', [])
+        for layer_data in line_layers:
+            features = (layer_data or {}).get('features', [])
             if features is not None:
                 for feature in features:
                     properties = feature.get('properties', {})
@@ -420,18 +427,24 @@ class GwMapzoneManager:
             tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
 
-        # Add the flooding data to a temporal layer
-        layer_name = json_result['body']['data']['line'].get('layerName')
-        vlayer = tools_qgis.get_layer_by_layername(layer_name)
-
-        if vlayer and vlayer.isValid():
+        # Add the flooding data to temporal layer(s)
+        vlayer_list = []
+        for layer_data in line_layers:
+            layer_name = (layer_data or {}).get('layerName')
+            if not layer_name:
+                continue
+            vlayer = tools_qgis.get_layer_by_layername(layer_name)
+            if not vlayer or not vlayer.isValid():
+                continue
             # Apply styling only to valid mapzones
             self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
+            vlayer_list.append(vlayer)
+
+        if vlayer_list:
             msg = "Temporal layer created successfully."
             tools_qgis.show_success(msg, dialog=self.mapzone_mng_dlg)
-            self.iface.mapCanvas().setExtent(vlayer.extent())
-            self.iface.mapCanvas().refresh()
+            tools_qgis.zoom_to_layer(vlayer_list[0])
         else:
             msg = "Failed to retrieve the temporal layer"
             tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
@@ -462,6 +475,7 @@ class GwMapzoneManager:
         """Applies styles to the layer based on the mapzone styles retrieved, filtering only those with data in valid_mapzone_ids."""
 
         categories = []
+        valid_mapzone_ids_str = {str(mapzone_id) for mapzone_id in valid_mapzone_ids if mapzone_id is not None}
 
         for mapzone in mapzones:
             try:
@@ -472,14 +486,17 @@ class GwMapzoneManager:
             values = mapzone.get('values', [])
 
             # Only include values that match the `mapzone_id`s present in valid_mapzone_ids
-            filtered_values = [value for value in values if value['id'] in valid_mapzone_ids]
+            filtered_values = [
+                value for value in values
+                if str(value.get('id')) in valid_mapzone_ids_str
+            ]
             if not filtered_values:
                 continue
 
             # Process each filtered value to apply styling
             for value in filtered_values:
-                mapzone_id = value['id']
-                color_str = value['stylesheet']['featureColor']
+                mapzone_id = value.get('id')
+                color_str = value.get('stylesheet', {}).get('featureColor', '0,0,0')
                 r, g, b = map(int, color_str.split(','))
 
                 # Create color with full opacity
@@ -506,8 +523,7 @@ class GwMapzoneManager:
             self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
             self.iface.mapCanvas().refreshAllLayers()
         else:
-            msg = "No valid mapzones with values were found to apply styles."
-            tools_qgis.show_warning(msg)
+            return
 
     def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
         """Activates the Temporal Controller with animated temporal navigation."""
