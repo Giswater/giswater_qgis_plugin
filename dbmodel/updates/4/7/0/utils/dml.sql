@@ -393,3 +393,5 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4536, 'The following arcs make a circle: %arc_list%', 'Check your netwrok arcs', 0, true, 'utils', 'core', 'AUDIT');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4538, 'There are no arcs making a circle', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+DELETE FROM config_form_fields WHERE columnname = 'nodarc_id' AND formname ILIKE '%ve_epa_%';
