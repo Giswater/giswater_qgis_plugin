@@ -852,11 +852,11 @@ BEGIN
 				)
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
-				WHERE g.graph_type = 'use' 
+				WHERE g.graph_type = 'use'
 				AND EXISTS (
 					SELECT 1 FROM inlet i
 					WHERE i.node_id = g.pgr_node_id
-					AND i.arc_id <> g.pgr_arc_id
+					AND i.arc_id = g.pgr_arc_id
 				)
 				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
