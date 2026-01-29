@@ -884,6 +884,107 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
+			IF v_use_plan_psector = FALSE THEN 
+				-- Check if there are pump/meter nodeParent where its to_arc is not the same as in its man_table
+				SELECT string_agg(mapzone_arcs, ', ')
+				INTO message
+				FROM (
+					WITH 
+					meter_pump AS (
+						SELECT node_id, to_arc FROM man_meter
+						UNION ALL 
+						SELECT node_id, to_arc FROM man_pump		
+					)
+					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+					FROM temp_pgr_graphconfig g
+					WHERE g.graph_type = 'use' 
+					AND EXISTS (
+						SELECT 1 FROM meter_pump m
+						WHERE m.node_id = g.pgr_node_id
+						AND m.to_arc <> g.pgr_arc_id
+					)
+					ORDER BY g.mapzone_id,  g.pgr_node_id
+				) sub;
+
+				IF message IS NOT NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4500", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				ELSE
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4502", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				END IF;
+
+				-- Check if there are tank/source/waterwell/wtp nodeParent where its to_arc is inlet in its man_table
+				SELECT string_agg(mapzone_arcs, ', ')
+				INTO message
+				FROM (
+					WITH
+					inlet AS (
+						SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
+						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
+						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
+						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
+					)
+					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+					FROM temp_pgr_graphconfig g
+					WHERE g.graph_type = 'use' 
+					AND EXISTS (
+						SELECT 1 FROM inlet i
+						WHERE i.node_id = g.pgr_node_id
+						AND i.arc_id = g.pgr_arc_id
+					)
+					ORDER BY g.mapzone_id,  g.pgr_node_id
+				) sub;
+
+				IF message IS NOT NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				ELSE
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				END IF;
+
+				-- check if there are arcs fore nodeParents that are not toArc, neither inlet_arc 
+				SELECT string_agg(mapzone_arcs, ', ')
+				INTO message
+				FROM (
+					WITH inlet AS (
+						SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
+						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
+						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
+						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
+						)
+					SELECT
+						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.pgr_arc_id, ')') AS mapzone_arcs
+					FROM temp_pgr_arc a
+					JOIN temp_pgr_node n ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+					JOIN temp_pgr_graphconfig g ON g.pgr_node_id = n.pgr_node_id
+					WHERE n.graph_delimiter = 'nodeParent'
+				AND g.graph_type = 'use'
+				AND EXISTS (
+					SELECT 1 FROM inlet i
+					WHERE i.node_id = g.pgr_node_id
+				)
+				AND NOT EXISTS (
+					SELECT 1
+					FROM inlet i
+					WHERE i.node_id = g.pgr_node_id
+						AND i.arc_id  = g.pgr_arc_id
+				)
+				AND NOT EXISTS (
+					SELECT 1
+					FROM temp_pgr_graphconfig ga
+					WHERE ga.graph_type = 'use'
+						AND ga.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+						AND ga.pgr_arc_id  = a.pgr_arc_id
+				)
+				) sub;
+				/*
+				IF message IS NOT NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				ELSE
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				END IF;
+				*/
+
+			END IF;
+
 		ELSIF v_project_type = 'UD' THEN
 
 			-- Check if there are any nodeParents in the graphconfig that are not in the operative network
