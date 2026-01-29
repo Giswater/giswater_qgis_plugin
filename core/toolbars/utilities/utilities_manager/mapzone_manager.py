@@ -53,6 +53,7 @@ class GwMapzoneManager:
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
         self.user_selected_exploitation = '-901'
+        self._flood_enabled_by_tab = {}
 
     def manage_mapzones(self):
 
@@ -172,15 +173,19 @@ class GwMapzoneManager:
         if mapzone_type in self.mapzone_status["enabled"]:
             # enabled
             self.mapzone_mng_dlg.btn_execute.setEnabled(True)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(self._flood_enabled_by_tab.get(mapzone_type, False))
         elif mapzone_type in self.mapzone_status["enabledMacromapzone"]:
             # enabledMacromapzone
             self.mapzone_mng_dlg.btn_execute.setEnabled(True)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
         elif mapzone_type in self.mapzone_status["disabled"]:
             # disabled
             self.mapzone_mng_dlg.btn_execute.setEnabled(False)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
         else:
             # fallback
             self.mapzone_mng_dlg.btn_execute.setEnabled(False)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
@@ -278,8 +283,16 @@ class GwMapzoneManager:
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
-        if run_button and self.mapzone_mng_dlg.btn_flood:
-            run_button.clicked.connect(partial(self.mapzone_mng_dlg.btn_flood.setEnabled, True))
+        enable_flood = mapzone_name in self.mapzone_status["enabled"]
+        if run_button and self.mapzone_mng_dlg.btn_flood and enable_flood:
+            run_button.clicked.connect(partial(self._enable_flood_for_tab, mapzone_name))
+
+    def _enable_flood_for_tab(self, mapzone_name):
+        """Enable flood button only for the current mapzone tab."""
+        if mapzone_name not in self.mapzone_status["enabled"]:
+            return
+        self._flood_enabled_by_tab[mapzone_name] = True
+        self.mapzone_mng_dlg.btn_flood.setEnabled(True)
 
     def _refresh_mapzone_table_on_close(self, result_ignored=None):
         """ Refreshes the table when the dialog is closed, ignoring the result signal. """
@@ -405,27 +418,6 @@ class GwMapzoneManager:
                     if mapzone_id is not None:
                         valid_mapzone_ids.add(mapzone_id)
 
-        # Get graphconfig for mapzone using gw_fct_getgraphconfig
-        graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        config_extras = f'"context":"OPERATIVE", "mapzone":"{graph_class}"'
-        config_body = tools_gw.create_body(extras=config_extras)
-
-        # Call gw_fct_getgraphconfig
-        config_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', config_body)
-        if not config_result or config_result.get('status') != 'Accepted':
-            msg = "Failed to retrieve graph configuration."
-            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
-            return
-
-        # Get mapzones style by calling gw_fct_getstylemapzones
-        style_extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
-        style_body = tools_gw.create_body(extras=style_extras)
-
-        style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
-        if not style_result or style_result.get('status') != 'Accepted':
-            msg = "Failed to retrieve mapzone styles."
-            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
-            return
 
         # Add the flooding data to temporal layer(s)
         vlayer_list = []
@@ -437,7 +429,6 @@ class GwMapzoneManager:
             if not vlayer or not vlayer.isValid():
                 continue
             # Apply styling only to valid mapzones
-            self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
             vlayer_list.append(vlayer)
 
@@ -563,8 +554,8 @@ class GwMapzoneManager:
             return
 
         # Set temporal extents in the temporal controller
-        min_time = min(temporal_values)
-        max_time = max(temporal_values)
+        min_time = min(temporal_values).addSecs(-1)
+        max_time = max(temporal_values).addSecs(1)
         temporal_controller.setTemporalExtents(QgsDateTimeRange(min_time, max_time))
 
         # Set frame duration using QgsInterval for 1 second
