@@ -2715,6 +2715,7 @@ BEGIN
 						WHERE n.graph_delimiter = 'nodeParent'
 						AND a.mapzone_id > 0;
 
+						
 						WITH
 						affected_dma AS (
 							SELECT DISTINCT dma_id FROM temp_pgr_om_waterbalance_dma_graph
@@ -2734,6 +2735,8 @@ BEGIN
 						INSERT INTO om_waterbalance_dma_graph
 						SELECT * FROM temp_pgr_om_waterbalance_dma_graph;
 
+						-- todo work in progress
+						/* 
 						FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
 						LOOP
 							
@@ -2741,6 +2744,7 @@ BEGIN
 							"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
 							
 						END LOOP;
+						*/
 						
 					END IF; -- v_class
 					
