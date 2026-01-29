@@ -228,7 +228,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (282, 'pipes with null values for roughness. Check roughness catalog columns (init_age,end_age,roughness) before continue.''.', 'Roughness catalog checked. No mandatory values missed.', 'Null values on roughness catalog '),
     (283, 'registers on arc''s catalog with null values on dint column.''.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
     (284, 'arcs without values on sys_elev1 or sys_elev2.', 'No arcs with null values on field elevation (sys_elev1 or sys_elev2) have been found.', 'Arcs without elevation'),
-    (285, 'raingages with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type).', 'Mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed.', 'Null values on raingage'),
+    (285, 'raingages with null values at least on mandatory columns for rain type (form_type, intvl, scf, rgage_type).', 'Mandatory colums for raingage (form_type, intvl, scf, rgage_type) have been checked without any values missed.', 'Null values on raingage'),
     (286, 'raingages with null values on the mandatory column for ''TIMESERIES'' raingage type.', 'Mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed.', 'Null values on raingage timeseries'),
     (287, 'raingages with null values at least on mandatory columns for ''FILE'' raingage type (fname, sta, units).', 'Mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed.', 'Null values on raingage file'),
     (288, NULL, NULL, 'Store psector values for specific user'),
