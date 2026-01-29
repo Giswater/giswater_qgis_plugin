@@ -347,7 +347,7 @@ BEGIN
 		) q;
 
 		IF v_disconnected IS NOT NULL AND array_length(v_disconnected, 1) > 0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2832","parameters":{"v_disconnected":"'||array_to_string(v_disconnected, ',')||'"}, "is_process":true}}$$);';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4528", "function":"2832","parameters":{"v_disconnected":"'||array_to_string(v_disconnected, ',')||'"}, "is_process":true}}$$);';
 		END IF;
 
 		INSERT INTO temp_pgr_dijkstra (seq, path_id, path_seq, start_vid, end_vid, node, edge, cost, agg_cost, route_agg_cost)
@@ -812,7 +812,7 @@ BEGIN
 	v_result_polygon = '{}';
 
 	IF v_arc IS NULL THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2832","parameters":null, "is_process":true}}$$);';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4530", "function":"2832","parameters":null, "is_process":true}}$$);';
 	END IF;
 
 	-- control null values

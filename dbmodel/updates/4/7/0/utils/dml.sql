@@ -290,67 +290,68 @@ SET
 -- 28/01/2026
 -- Check mapzones v1
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4480, 'The following nodes don''t exist in the operative network: %node_list%', 'Check nodes in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4480, 'The following nodes don''t exist in the operative network: %node_list%', 'Check nodes in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4482, 'All nodes in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4482, 'All nodes in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4484, 'The following to_arcs don''t exist in the operative network: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4484, 'The following to_arcs don''t exist in the operative network: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4486, 'All arcs in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4486, 'All arcs in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4488, 'The following nodes are set in multiple mapzones: %node_list%', 'Check nodes in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4488, 'The following nodes are set in multiple mapzones: %node_list%', 'Check nodes in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4490, 'There are no nodes set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4490, 'There are no nodes set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4492, 'The following arcs are set in more than one nodeParent: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4492, 'The following arcs are set in more than one nodeParent: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4494, 'There are no arcs set in more than one nodeParent', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4494, 'There are no arcs set in more than one nodeParent', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4496, 'The following arcs are not connected to its nodeParent: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4496, 'The following arcs are not connected to its nodeParent: %arc_list%', 'Check arcs in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4498, 'There are no arcs not connected to its nodeParent', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4498, 'There are no arcs not connected to its nodeParent', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4500, 'The folowing pump/meter nodeParents don''t have the same to_arc on their graphconfig and man_table: %node_list%', 'Check for different to_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4500, 'The folowing pump/meter nodeParents don''t have the same to_arc on their graphconfig and man_table: %node_list%', 'Check for different to_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4502, 'There are no pump/meter nodeParents with different to_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4502, 'There are no pump/meter nodeParents with different to_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4504, 'The folowing tank/source/waterwell/wtp nodeParents don''t have the same inlet_arc on their graphconfig and man_table: %node_list%', 'Check for different inlet_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4504, 'The folowing tank/source/waterwell/wtp nodeParents don''t have the same inlet_arc on their graphconfig and man_table: %node_list%', 'Check for different inlet_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4506, 'There are no tank/source/waterwell/wtp nodeParents with different inlet_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4506, 'There are no tank/source/waterwell/wtp nodeParents with different inlet_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4508, 'The following nodeParent/to_arc are null: %feature_list%', 'Check for nulls in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4508, 'The following nodeParent/to_arc are null: %feature_list%', 'Check for nulls in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4510, 'There are no nodeParent or to_arc null', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4510, 'There are no nodeParent or to_arc null', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4512, 'The following nodeParents don''t exist in the operative network: %node_list%', 'Check nodeParents in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4512, 'The following nodeParents don''t exist in the operative network: %node_list%', 'Check nodeParents in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4514, 'All nodeParents in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4514, 'All nodeParents in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4516, 'The following forceClosed/forceOpen don''t exist in the operative network: %node_list%', 'Check forceClosed/forceOpen in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4516, 'The following forceClosed/forceOpen don''t exist in the operative network: %node_list%', 'Check forceClosed/forceOpen in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4518, 'All forceClosed/forceOpen in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4518, 'All forceClosed/forceOpen in graphconfigs exist in the operative network', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4520, 'The following nodeParents are set in multiple mapzones: %node_list%', 'Check nodeParents in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4520, 'The following nodeParents are set in multiple mapzones: %node_list%', 'Check nodeParents in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4522, 'There are no nodeParents set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4522, 'There are no nodeParents set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4524, 'The following forceClosed/forceOpen are set in multiple mapzones: %arc_list%', 'Check forceClosed/forceOpen in graphconfigs', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4524, 'The following forceClosed/forceOpen are set in multiple mapzones: %arc_list%', 'Check forceClosed/forceOpen in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4526, 'There are no forceClosed/forceOpen set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4526, 'There are no forceClosed/forceOpen set on multiple mapzones', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4528, 'Some nodes are not connected in the routing graph (state > 0 filter). Disconnected nodes: %v_disconnected%', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
-VALUES(4430, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+VALUES(4530, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
 
