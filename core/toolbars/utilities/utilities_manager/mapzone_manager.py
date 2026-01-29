@@ -417,8 +417,6 @@ class GwMapzoneManager:
                     mapzone_id = properties.get('mapzone_id')
                     if mapzone_id is not None:
                         valid_mapzone_ids.add(mapzone_id)
-
-
         # Add the flooding data to temporal layer(s)
         vlayer_list = []
         for layer_data in line_layers:
