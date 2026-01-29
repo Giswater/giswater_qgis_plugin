@@ -320,9 +320,9 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4502, 'There are no pump/meter nodeParents with different to_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4504, 'The folowing tank/source/waterwell/wtp nodeParents don''t have the same inlet_arc on their graphconfig and man_table: %node_list%', 'Check for different inlet_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
+VALUES(4504, 'The folowing tank/source/waterwell/wtp nodeParents toArc is inlet_arc in its man_table: %node_list%', 'Check for different inlet_arc in man_table and graphconfig', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4506, 'There are no tank/source/waterwell/wtp nodeParents with different inlet_arc on their graphconfig and man_table', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
+VALUES(4506, 'There are no tank/source/waterwell/wtp nodeParents with its toArc as inlet_arc on its man_table', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4508, 'The following nodeParent/to_arc are null: %feature_list%', 'Check for nulls in graphconfigs', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
@@ -384,4 +384,12 @@ JOIN raingage r
     ON i.timser_id = r.timser_id
 WHERE r.intvl::time > i.interval_time', 'No raingage interval is grater than timseries interval', '[gw_fct_pg2epa_check_data]', true);
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4532, 'The following tank/source/waterwell/wtp nodeParents have arcs connected which aren''t set as toArc or inlet_arc: %node_list%', 'Check arcs connected to the nodeParent', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4534, 'There are no arcs conncted to a tank/source/waterwell/wtp that aren''t set as toArc or inlet_arc', NULL, 0, true, 'utils', 'core', 'AUDIT');
 
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4536, 'The following arcs make a circle: %arc_list%', 'Check your netwrok arcs', 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4538, 'There are no arcs making a circle', NULL, 0, true, 'utils', 'core', 'AUDIT');

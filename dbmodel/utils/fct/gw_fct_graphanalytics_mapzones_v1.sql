@@ -932,13 +932,12 @@ BEGIN
 						AND ga.pgr_arc_id  = a.pgr_arc_id
 				)
 				) sub;
-				/*
+				
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 				ELSE
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
-				*/
 
 			END IF;
 
@@ -1028,20 +1027,20 @@ BEGIN
 			END IF;
 
 			-- Check when 2 arcs make a circle
-			-- SELECT concat('arc_1: ', lg.source, ' - arc_2: ', lg.target) AS message
-			-- INTO message
-			-- FROM pgr_linegraph(
-			-- 	'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1::float8 AS cost, -1::float8 AS reverse_cost
-			-- 	FROM temp_pgr_arc',
-			-- 	directed := TRUE
-			-- ) AS lg
-			-- WHERE reverse_cost =  1;
+			SELECT concat('arc_1: ', lg.source, ' - arc_2: ', lg.target) AS message
+			INTO message
+			FROM pgr_linegraph(
+				'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1::float8 AS cost, -1::float8 AS reverse_cost
+				FROM temp_pgr_arc',
+				directed := TRUE
+			) AS lg
+			WHERE reverse_cost =  1;
 
-			-- IF message IS NOT NULL THEN
-			-- 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"3508","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
-			-- ELSE
-			-- 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
-			-- END IF;
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4536", "function":"3508","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4538", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
 		END IF;
 	END IF; --v_from_zero
 
