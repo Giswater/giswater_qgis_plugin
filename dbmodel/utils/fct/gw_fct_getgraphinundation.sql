@@ -25,6 +25,7 @@ DECLARE
 
     v_mapzone text;
     v_mapzone_field text;
+    v_selected_arc_id integer;
 
     -- response variables
 
@@ -37,8 +38,9 @@ BEGIN
 
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    v_mapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'mapzone');
-    v_mapzone_field = v_mapzone || '_id';
+    v_mapzone := (p_data->'data'->'parameters'->>'mapzone')::text;
+    v_selected_arc_id := (p_data->'data'->'parameters'->>'selected_arc_id')::integer;
+    v_mapzone_field := v_mapzone || '_id';  
 
     EXECUTE format($sql$
 		SELECT jsonb_build_object(
@@ -74,11 +76,12 @@ BEGIN
                 JOIN cat_arc ca ON ca.id = a.arccat_id
                 JOIN value_state_type v ON v.id = a.state_type 
                 JOIN temp_pgr_mapzone m ON m.component = ta.component
+                WHERE a.arc_id = $1 OR $1 IS NULL
 			) r
 		) f
 		$sql$,
 		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field
-		) INTO geojson_result;
+		) INTO geojson_result USING v_selected_arc_id;
 
     RETURN gw_fct_json_create_return((
         '{"status":"Accepted", 
