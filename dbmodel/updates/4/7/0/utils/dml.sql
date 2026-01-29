@@ -360,3 +360,28 @@ info_msg = 'Se han comprobado las columnas obligatorias para el raingage (form_t
 query_text = 'SELECT * FROM t_raingage where (form_type is null) OR (intvl is null) OR (rgage_type is null) OR (scf is null)'
 WHERE fid = 285;
 
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
+VALUES(644, 'Raingage interval grater than timeseries interval', 'ud', NULL, 'core', NULL, 'Check epa-data', NULL, 3, 'raingage intervals grater than its timeseries interval', NULL, NULL, 'WITH intervals AS (
+    SELECT DISTINCT ON (timser_id)
+        timser_id,
+        date_trunc(
+		    ''minute'',
+		    COALESCE(
+		        "time"::time - LAG("time"::time) OVER (
+		            PARTITION BY timser_id
+		            ORDER BY "time"::time
+		        ),
+		        INTERVAL ''0 minute''
+		    )
+		) AS interval_time
+    FROM inp_timeseries_value
+    WHERE "time" IS NOT NULL
+    ORDER BY timser_id, interval_time DESC
+)
+SELECT count(*)
+FROM intervals i
+JOIN raingage r
+    ON i.timser_id = r.timser_id
+WHERE r.intvl::time > i.interval_time', 'No raingage interval is grater than timseries interval', '[gw_fct_pg2epa_check_data]', true);
+
+
