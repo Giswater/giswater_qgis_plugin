@@ -355,8 +355,8 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4530, 'Unable to create a Profile. Check your path continuity before continue!', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
 
 -- 29/01/2026
-UPDATE sys_fprocess SET except_message = 'raingages con valores nulos al menos en las columnas obligatorias para el tipo de lluvia (form_type, intvl, scf, rgage_type).',
-info_message = 'Se han comprobado las columnas obligatorias para el raingage (form_type, intvl, scf, rgage_type) sin que falte ningún valor.',
+UPDATE sys_fprocess SET except_msg = 'raingages con valores nulos al menos en las columnas obligatorias para el tipo de lluvia (form_type, intvl, scf, rgage_type).',
+info_msg = 'Se han comprobado las columnas obligatorias para el raingage (form_type, intvl, scf, rgage_type) sin que falte ningún valor.',
 query_text = 'SELECT * FROM t_raingage where (form_type is null) OR (intvl is null) OR (rgage_type is null) OR (scf is null)'
 WHERE fid = 285;
 
