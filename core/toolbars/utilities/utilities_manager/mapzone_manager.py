@@ -93,7 +93,7 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
-        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis))
+        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._handle_flood_analysis_click))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -289,12 +289,97 @@ class GwMapzoneManager:
         expr = "" if show_inactive else "active is true"
         self._fill_mapzone_table(expr=expr)
 
-    def _open_flood_analysis(self):
+    def _handle_flood_analysis_click(self):
+        """Handle flood button click based on user settings."""
+        if self._use_hinundation_from_arc():
+            self._start_flood_analysis_from_arc()
+        else:
+            self._open_flood_analysis()
+
+    def _use_hinundation_from_arc(self) -> bool:
+        value = tools_gw.get_config_parser("system", "inundation_from_arc", "user", "init", prefix=False)
+        return str(value) == 'True'
+
+    def _start_flood_analysis_from_arc(self):
+        """Enable arc selection before running inundation analysis."""
+        layer = tools_qgis.get_layer_by_tablename('ve_arc', show_warning_=True)
+        if not layer:
+            msg = "Arc layer not found. Cannot start inundation from arc."
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
+            return
+
+        self.layer_arc = layer
+        tools_qgis.set_layer_visible(layer)
+        self.iface.setActiveLayer(layer)
+
+        tools_gw.disconnect_signal('mapzone_manager_snapping')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+
+        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
+                                'mapzone_manager_snapping', 'flood_from_arc_xyCoordinates_mouse_moved')
+        tools_gw.connect_signal(self.emit_point.canvasClicked,
+                                partial(self._identify_arc_and_run_flood_analysis, self.mapzone_mng_dlg),
+                                'mapzone_manager_snapping', 'flood_from_arc_ep_canvasClicked')
+
+        msg = "Select an arc to start inundation analysis."
+        tools_qgis.show_info(msg, dialog=self.mapzone_mng_dlg)
+
+    def _identify_arc_and_run_flood_analysis(self, dialog, point, event):
+        """Identify the arc at the selected point and run flood analysis."""
+        if event == Qt.MouseButton.RightButton:
+            self._cancel_snapping_tool(dialog, None)
+            self.iface.actionPan().trigger()
+            return
+
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result.isValid():
+            msg = "No valid snapping result. Please select a valid arc."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
+        snapped_feature = self.snapper_manager.get_snapped_feature(result)
+        arc_id = snapped_feature.attribute('arc_id')
+        if not arc_id:
+            msg = "No arc ID found at the snapped location."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
+        try:
+            geometry = snapped_feature.geometry()
+            self.rubber_band.setToGeometry(geometry, None)
+            self.rubber_band.setColor(QColor(255, 0, 0, 100))
+            self.rubber_band.setWidth(5)
+            self.rubber_band.show()
+        except AttributeError:
+            msg = "Unable to highlight the snapped arc."
+            tools_qgis.show_warning(msg, dialog=dialog)
+
+        msg = "Flood analysis will start from arc ID"
+        tools_qgis.show_info(msg, dialog=dialog, parameter=arc_id)
+        self.selected_arc_id = arc_id
+
+        self._open_flood_analysis(selected_arc_id=arc_id)
+
+        try:
+            self.layer_arc.removeSelection()
+        except AttributeError:
+            pass
+
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('mapzone_manager_snapping')
+
+    def _open_flood_analysis(self, selected_arc_id=None):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
         mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
 
         # Call gw_fct_getgraphinundation
-        extras = f'"parameters":{{"mapzone": "{mapzone_name}"}}'
+        extras_params = f'"mapzone": "{mapzone_name}"'
+        if selected_arc_id is not None:
+            extras_params += f', "selected_arc_id": "{selected_arc_id}"'
+        extras = f'"parameters":{{{extras_params}}}'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
         if not json_result or json_result.get('status') != 'Accepted':
