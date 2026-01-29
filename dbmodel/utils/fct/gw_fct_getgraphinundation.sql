@@ -69,7 +69,7 @@ BEGIN
                     (a.%I)::text AS %I,
                     m.name AS descript,
                     a.the_geom,
-                    (date_trunc('day', now()) + d.agg_cost * interval '1 second')::timestamp AS timestep
+                    (date_trunc('day', now()) + (d.agg_cost + 1) * interval '1 second')::timestamp AS timestep
                 FROM temp_pgr_arc ta
                 JOIN temp_pgr_drivingdistance d ON ta.pgr_arc_id = d.node
                 JOIN arc a ON a.arc_id = ta.pgr_arc_id
