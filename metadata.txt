@@ -8,6 +8,14 @@ version=4.7.0
 author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Lia Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez, Nico Pérez, Pablo Marques, Arnau Torret, Namrata Karki, Arnau Urgeles, Oscar Pueyo
 
 Changelog=Version 4.7.0
+- fix(mincut): make composer more flexible and message error for user easier to understand issues
+- fix(profile_btn): remove mid-node if error was found
+- fix(mapzone_manager): make timer start and end +1, only enable btn_flood if not macro tab and only remain active in the executed tab
+- feat(mapzone_manager):add new var 'inundation_from_arc' in user config, if true, will let user select arc, false will perform full flood logic
+- feat(cm): remove campaign btns if not admin user role
+- refactor(nonvisual): improve translations handling
+- feat(tools_gw): improve layer temporal layer handling and use geojson
+- refactor(mincut): call gw_fct_setmincut with the same cursor to use temporal tables
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
