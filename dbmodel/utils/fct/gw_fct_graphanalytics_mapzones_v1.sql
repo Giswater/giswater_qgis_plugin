@@ -2075,15 +2075,15 @@ BEGIN
 					FROM (
 						WITH polygon AS (
 						SELECT
-							t.component,
+							t.mapzone_id,
 							ST_Collect(ar.the_geom) AS g
 						FROM temp_pgr_arc t
 						JOIN arc ar ON ar.arc_id = t.pgr_arc_id
 						WHERE t.mapzone_id > 0
-						GROUP BY t.component
+						GROUP BY t.mapzone_id
 						)
 						SELECT
-						component,
+						mapzone_id,
 						CASE
 							WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concave_hull||')) = ''ST_Polygon'' THEN
 							ST_Buffer(ST_ConcaveHull(g, '||v_concave_hull||'), 2)::geometry(Polygon,'||v_srid||')
@@ -2092,7 +2092,7 @@ BEGIN
 						END AS the_geom
 						FROM polygon
 					) a
-					WHERE a.component = m.component
+					WHERE a.mapzone_id = m.mapzone_id
 				';
 				EXECUTE v_query_text;
 
@@ -2103,14 +2103,14 @@ BEGIN
 					UPDATE temp_pgr_mapzone m SET the_geom = a.geom
 					FROM (
 						SELECT
-						t.component,
+						t.mapzone_id,
 						ST_Multi(ST_Buffer(ST_Collect(ar.the_geom), '||v_geom_param_update||')) AS geom
 						FROM temp_pgr_arc t
 						JOIN arc ar ON ar.arc_id = t.pgr_arc_id
 						WHERE t.mapzone_id > 0
-						GROUP BY t.component
+						GROUP BY t.mapzone_id
 					) a
-					WHERE a.component = m.component
+					WHERE a.mapzone_id = m.mapzone_id
 				';
 				EXECUTE v_query_text;
 
@@ -2121,18 +2121,18 @@ BEGIN
 					UPDATE temp_pgr_mapzone m SET the_geom = b.geom
 					FROM (
 						SELECT
-						component,
+						mapzone_id,
 						ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom
 						FROM (
 							SELECT
-								t.component,
+								t.mapzone_id,
 								ST_Buffer(ar.the_geom, '||v_geom_param_update||') AS geom
 							FROM temp_pgr_arc t
 							JOIN arc ar ON ar.arc_id = t.pgr_arc_id
 							WHERE t.mapzone_id > 0
 							UNION ALL
 							SELECT
-								t.component,
+								t.mapzone_id,
 								ep.the_geom AS geom
 							FROM temp_pgr_connec t
 							JOIN connec vc ON t.pgr_connected_id = vc.connec_id
@@ -2142,9 +2142,9 @@ BEGIN
 							WHERE t.mapzone_id > 0
 							AND ep.the_geom IS NOT NULL
 						) a
-						GROUP BY component
+						GROUP BY mapzone_id
 					) b
-					WHERE b.component = m.component
+					WHERE b.mapzone_id = m.mapzone_id
 				';
 				EXECUTE v_query_text;
 
@@ -2156,12 +2156,12 @@ BEGIN
 				v_query_text_aux := '
 					UNION ALL
 					SELECT
-					g.component,
+					g.mapzone_id,
 					ST_Buffer(ST_Collect(l.the_geom), '||v_geom_param_update_divide||', ''endcap=flat join=round'') AS geom
 					FROM temp_pgr_gully g
 					JOIN link l ON l.feature_id = g.pgr_gully_id
 					WHERE g.mapzone_id > 0
-					GROUP BY g.component
+					GROUP BY g.mapzone_id
 				';
 				ELSE
 					v_query_text_aux := '';
@@ -2172,29 +2172,29 @@ BEGIN
 					UPDATE temp_pgr_mapzone m SET the_geom = b.geom
 					FROM (
 					SELECT
-						component,
+						mapzone_id,
 						ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom
 					FROM (
 						SELECT
-						a.component,
+						a.mapzone_id,
 						ST_Buffer(ST_Collect(ar.the_geom), '||v_geom_param_update||') AS geom
 						FROM temp_pgr_arc a
 						JOIN arc ar ON ar.arc_id = a.pgr_arc_id
 						WHERE a.mapzone_id > 0
-						GROUP BY a.component
+						GROUP BY a.mapzone_id
 						UNION ALL
 						SELECT
-						c.component,
+						c.mapzone_id,
 						ST_Buffer(ST_Collect(l.the_geom), '||v_geom_param_update_divide||', ''endcap=flat join=round'') AS geom
 						FROM temp_pgr_connec c
 						JOIN link l ON l.feature_id = c.connec_id
 						WHERE c.mapzone_id > 0
-						GROUP BY c.component
+						GROUP BY c.mapzone_id
 						'||v_query_text_aux||'
 					) u
-					GROUP BY component
+					GROUP BY mapzone_id
 					) b
-					WHERE b.component = m.component
+					WHERE b.mapzone_id = m.mapzone_id
 				';
 				EXECUTE v_query_text;
 			END IF;
