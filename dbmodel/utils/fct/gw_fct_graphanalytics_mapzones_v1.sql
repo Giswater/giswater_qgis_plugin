@@ -726,7 +726,7 @@ BEGIN
 
 		IF v_project_type = 'WS' THEN
 			-- Check if there are any nodes in the graphconfig that are not in the network
-			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -741,13 +741,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any arcs in the graphconfig that are not in the network
-			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -761,13 +761,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4484", "function":"2706","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4484", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 			
 			-- Check if there are any nodes set in more than one mapzone
-			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -781,13 +781,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4488", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4488", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4490", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any arcs set in more than one nodeParent
-			SELECT string_agg(concat('arc_id: ', arc_id, ' - ', pair_block), '; ')
+			SELECT string_agg(concat('arc_id: ', arc_id, ' - ', pair_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -801,16 +801,16 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4492", "function":"2706","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4492", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4494", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any to_arcs not connected to its nodeParent
-			SELECT string_agg(mapzone_arcs, ', ')
+			SELECT string_agg(mapzone_arcs, '')
 			INTO message
 			FROM (
-				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ',g.pgr_node_id,', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ',g.pgr_node_id,', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
 				JOIN temp_pgr_arc a USING (pgr_arc_id)
 				WHERE g.graph_type = 'use' 
@@ -819,16 +819,16 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4496", "function":"2706","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4496", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4498", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if nodeParent or toArc is null
-			SELECT string_agg(mapzone_arcs, ', ')
+			SELECT string_agg(mapzone_arcs, '')
 			INTO message
 			FROM (
-				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
 				WHERE g.graph_type = 'use' 
 				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
@@ -836,14 +836,14 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"2706","parameters":{"feature_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"2706","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			IF v_use_plan_psector = FALSE THEN 
 				-- Check if there are pump/meter nodeParent where its to_arc is not the same as in its man_table
-				SELECT string_agg(mapzone_arcs, ', ')
+				SELECT string_agg(mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH 
@@ -852,7 +852,7 @@ BEGIN
 						UNION ALL 
 						SELECT node_id, to_arc FROM man_pump		
 					)
-					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 					FROM temp_pgr_graphconfig g
 					WHERE g.graph_type = 'use' 
 					AND EXISTS (
@@ -864,13 +864,13 @@ BEGIN
 				) sub;
 
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4500", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4500", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4502", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
 
 				-- Check if there are tank/source/waterwell/wtp nodeParent where its to_arc is inlet in its man_table
-				SELECT string_agg(mapzone_arcs, ', ')
+				SELECT string_agg(mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH
@@ -880,7 +880,7 @@ BEGIN
 						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
 						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
 					)
-					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')') AS mapzone_arcs
+					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 					FROM temp_pgr_graphconfig g
 					WHERE g.graph_type = 'use' 
 					AND EXISTS (
@@ -892,13 +892,13 @@ BEGIN
 				) sub;
 
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
 
 				-- check if there are arcs fore nodeParents that are not toArc, neither inlet_arc 
-				SELECT string_agg(mapzone_arcs, ', ')
+				SELECT string_agg(mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH inlet AS (
@@ -908,7 +908,7 @@ BEGIN
 						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
 						)
 					SELECT
-						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.pgr_arc_id, ')') AS mapzone_arcs
+						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.pgr_arc_id, ')\n') AS mapzone_arcs
 					FROM temp_pgr_arc a
 					JOIN temp_pgr_node n ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 					JOIN temp_pgr_graphconfig g ON g.pgr_node_id = n.pgr_node_id
@@ -934,7 +934,7 @@ BEGIN
 				) sub;
 				
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
@@ -944,7 +944,7 @@ BEGIN
 		ELSIF v_project_type = 'UD' THEN
 
 			-- Check if there are any nodeParents in the graphconfig that are not in the operative network
-			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -960,13 +960,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4512", "function":"3508","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4512", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4514", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any forceClose/forceOpen in the graphconfig that are not in the operative network
-			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -981,13 +981,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4516", "function":"3508","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4516", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4518", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any nodeParents set in more than one mapzone
-			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -1001,13 +1001,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4520", "function":"3508","parameters":{"node_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4520", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4522", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any forceClosed/forceOpen set in more than one mapzone
-			SELECT string_agg(concat('arc_id: ', sub.pgr_arc_id, ' - mapzone_ids: ', mapzone_block), '; ')
+			SELECT string_agg(concat('arc_id: ', sub.pgr_arc_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -1021,13 +1021,13 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4524", "function":"3508","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4524", "function":"3508","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			-- Check when 2 arcs make a circle
-			SELECT concat('arc_1: ', lg.source, ' - arc_2: ', lg.target) AS message
+			SELECT string_agg(concat('arc_1: ', lg.source, ' - arc_2: ', lg.target, '\n'), '') AS message
 			INTO message
 			FROM pgr_linegraph(
 				'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1::float8 AS cost, -1::float8 AS reverse_cost
@@ -1037,7 +1037,7 @@ BEGIN
 			WHERE reverse_cost =  1;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4536", "function":"3508","parameters":{"arc_list":"''' || message || '''"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4536", "function":"3508","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4538", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
@@ -2273,12 +2273,39 @@ BEGIN
 			-- mapzone
 			IF v_from_zero = TRUE THEN
 				-- insert the new mapzones
+				IF v_netscenario IS NOT NULL THEN
+					EXECUTE format($sql$
+					INSERT INTO %I (%I, %I, expl_id, muni_id, the_geom, graphconfig)
+					SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.graphconfig
+					FROM temp_pgr_mapzone t
+					WHERE t.mapzone_id > 0
+					$sql$, v_mapzone_table, v_mapzone_field, CONCAT(LOWER(v_class), '_name'));
+				ELSE
 				EXECUTE format($sql$
 				INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
 				SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
 				FROM temp_pgr_mapzone t
 				WHERE t.mapzone_id > 0
 				$sql$, v_mapzone_table, v_mapzone_field);
+				END IF;
+
+			ELSE
+				IF v_netscenario IS NOT NULL THEN
+					EXECUTE format($sql$
+						UPDATE %I m
+						SET
+							%I = t.name,
+							expl_id = t.expl_id,
+							muni_id = t.muni_id,
+							the_geom = t.the_geom,
+							graphconfig = t.graphconfig,
+							updated_at = t.created_at,
+							updated_by = t.created_by
+						FROM temp_pgr_mapzone t
+						WHERE m.%I = t.mapzone_id
+							AND t.mapzone_id > 0
+						$sql$
+					, v_mapzone_table, CONCAT(LOWER(v_class), '_name'), v_mapzone_field);
 			ELSE
 				EXECUTE format($sql$
 					UPDATE %I m
@@ -2298,6 +2325,7 @@ BEGIN
 						AND t.mapzone_id > 0
 					$sql$
 				, v_mapzone_table, v_mapzone_field);
+				END IF;
 			END IF;
 
 			IF v_class <> 'SECTOR' THEN
