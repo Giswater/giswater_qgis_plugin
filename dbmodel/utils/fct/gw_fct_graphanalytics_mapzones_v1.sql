@@ -2281,12 +2281,12 @@ BEGIN
 					WHERE t.mapzone_id > 0
 					$sql$, v_mapzone_table, v_mapzone_field, CONCAT(LOWER(v_class), '_name'));
 				ELSE
-				EXECUTE format($sql$
-				INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
-				SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
-				FROM temp_pgr_mapzone t
-				WHERE t.mapzone_id > 0
-				$sql$, v_mapzone_table, v_mapzone_field);
+					EXECUTE format($sql$
+					INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
+					SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
+					FROM temp_pgr_mapzone t
+					WHERE t.mapzone_id > 0
+					$sql$, v_mapzone_table, v_mapzone_field);
 				END IF;
 
 			ELSE
@@ -2306,25 +2306,25 @@ BEGIN
 							AND t.mapzone_id > 0
 						$sql$
 					, v_mapzone_table, CONCAT(LOWER(v_class), '_name'), v_mapzone_field);
-			ELSE
-				EXECUTE format($sql$
-					UPDATE %I m
-					SET
-						name = t.name,
-						expl_id = t.expl_id,
-						muni_id = t.muni_id,
-						the_geom = t.the_geom,
-						addparam = t.addparam,
-						graphconfig = t.graphconfig,
-						created_at = t.created_at,
-						created_by = t.created_by,
-						updated_at = t.created_at,
-						updated_by = t.created_by
-					FROM temp_pgr_mapzone t
-					WHERE m.%I = t.mapzone_id
-						AND t.mapzone_id > 0
-					$sql$
-				, v_mapzone_table, v_mapzone_field);
+				ELSE
+					EXECUTE format($sql$
+						UPDATE %I m
+						SET
+							name = t.name,
+							expl_id = t.expl_id,
+							muni_id = t.muni_id,
+							the_geom = t.the_geom,
+							addparam = t.addparam,
+							graphconfig = t.graphconfig,
+							created_at = t.created_at,
+							created_by = t.created_by,
+							updated_at = t.created_at,
+							updated_by = t.created_by
+						FROM temp_pgr_mapzone t
+						WHERE m.%I = t.mapzone_id
+							AND t.mapzone_id > 0
+						$sql$
+					, v_mapzone_table, v_mapzone_field);
 				END IF;
 			END IF;
 
