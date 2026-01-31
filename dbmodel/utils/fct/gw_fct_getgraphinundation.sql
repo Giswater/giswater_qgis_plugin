@@ -76,9 +76,10 @@ BEGIN
                 JOIN cat_arc ca ON ca.id = a.arccat_id
                 JOIN value_state_type v ON v.id = a.state_type 
                 JOIN temp_pgr_mapzone m ON m.component = ta.component
-                WHERE m.component IN (
-                    SELECT ta2.component
+                WHERE m.mapzone_ids IN (
+                    SELECT m2.mapzone_ids
                     FROM temp_pgr_arc ta2
+                    JOIN temp_pgr_mapzone m2 ON m2.component = ta2.component
                     WHERE ta2.pgr_arc_id = $1 OR $1 IS NULL
                 )
 			) r
