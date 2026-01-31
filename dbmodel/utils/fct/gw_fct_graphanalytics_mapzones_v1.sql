@@ -896,7 +896,8 @@ BEGIN
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
-
+				
+				/*
 				-- check if there are arcs fore nodeParents that are not toArc, neither inlet_arc 
 				SELECT string_agg(mapzone_arcs, '')
 				INTO message
@@ -938,6 +939,7 @@ BEGIN
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
+				*/
 
 			END IF;
 
