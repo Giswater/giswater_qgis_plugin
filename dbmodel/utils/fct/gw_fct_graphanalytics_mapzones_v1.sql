@@ -1634,21 +1634,6 @@ BEGIN
 			WHERE m.drainzone_id = 0;
 		END IF;
 
-		-- EXCEPTION
-		-- Mapzone self-disconnected: the mapzone contains multiple nodeParents that are not connected,
-		-- so the graph is split into separate components within the same mapzone
-
-		-- set mapzone_id = 0 for disconected components of the same mapzone
-		UPDATE temp_pgr_mapzone t
-		SET mapzone_id = 0, 
-			name = 'SelfDisconnected'
-		WHERE t.mapzone_id IN (
-		SELECT m.mapzone_id
-		FROM temp_pgr_mapzone m
-		WHERE m.mapzone_id > 0
-		GROUP BY m.mapzone_id
-		HAVING count(m.component) > 1
-		);
 		-- end update temp_pgr_mapzone
 
 		-- update mapzone_id for arcs
