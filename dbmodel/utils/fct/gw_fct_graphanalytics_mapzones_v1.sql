@@ -902,35 +902,35 @@ BEGIN
 				INTO message
 				FROM (
 					WITH inlet AS (
-						SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
-						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
-						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
-						UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
+						SELECT node_id, inlet_arc FROM man_tank
+						UNION ALL SELECT node_id, inlet_arc FROM man_source
+						UNION ALL SELECT node_id, inlet_arc FROM man_waterwell
+						UNION ALL SELECT node_id, inlet_arc FROM man_wtp
 						)
 					SELECT
 						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.pgr_arc_id, ')\n') AS mapzone_arcs
-					FROM temp_pgr_arc a
-					JOIN temp_pgr_node n ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+					FROM temp_pgr_node n 
 					JOIN temp_pgr_graphconfig g ON g.pgr_node_id = n.pgr_node_id
-					WHERE n.graph_delimiter = 'nodeParent'
-				AND g.graph_type = 'use'
-				AND EXISTS (
-					SELECT 1 FROM inlet i
-					WHERE i.node_id = g.pgr_node_id
-				)
-				AND NOT EXISTS (
-					SELECT 1
-					FROM inlet i
-					WHERE i.node_id = g.pgr_node_id
-						AND i.arc_id  = g.pgr_arc_id
-				)
-				AND NOT EXISTS (
-					SELECT 1
-					FROM temp_pgr_graphconfig ga
-					WHERE ga.graph_type = 'use'
-						AND ga.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-						AND ga.pgr_arc_id  = a.pgr_arc_id
-				)
+					JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+					WHERE g.graph_type = 'use' -- nodeParent
+					AND EXISTS (
+						SELECT 1 
+						FROM inlet i
+						WHERE i.node_id = n.pgr_node_id
+					)
+					AND NOT EXISTS (
+						SELECT 1
+						FROM inlet i
+						WHERE i.node_id = n.pgr_node_id
+							AND a.pgr_arc_id = ANY (i.inlet_arc)
+					)
+					AND NOT EXISTS (
+						SELECT 1
+						FROM temp_pgr_graphconfig ga
+						WHERE ga.graph_type = 'use'
+							AND ga.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+							AND ga.pgr_arc_id  = a.pgr_arc_id
+					)
 				) sub;
 				
 				IF message IS NOT NULL THEN
