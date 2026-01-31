@@ -1044,13 +1044,13 @@ BEGIN
 		END IF;
 	END IF; --v_from_zero
 
-	-- check if there are any errors or from_zero is true
+	-- check if there are any errors in grapfconfig, when v_from_zero FALSE
 	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) > 0 THEN
 
 		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, expl_id, name)
 		VALUES (0,0, array[0]::int[], array[0]::int[], 'Disconnected');
 
-	ELSE
+	ELSE -- check errors
 
 		-- GENERATE LINEGRAPH
 		-- ===================
@@ -1484,7 +1484,7 @@ BEGIN
 		FROM temp_pgr_connectedcomponents c
 		WHERE c.node = t.pgr_arc_id;
 
-		-- update mapzone_ids, mapzone_id for temp_pgr_mapzone 
+		-- update mapzone_ids, mapzone_id, name for temp_pgr_mapzone 
 		IF v_from_zero = TRUE THEN
 
 			IF v_project_type = 'WS' THEN
@@ -1634,6 +1634,21 @@ BEGIN
 			WHERE m.drainzone_id = 0;
 		END IF;
 
+		-- EXCEPTION
+		-- Mapzone self-disconnected: the mapzone contains multiple nodeParents that are not connected,
+		-- so the graph is split into separate components within the same mapzone
+
+		-- set mapzone_id = 0 for disconected components of the same mapzone
+		UPDATE temp_pgr_mapzone t
+		SET mapzone_id = 0, 
+			name = 'SelfDisconnected'
+		WHERE t.mapzone_id IN (
+		SELECT m.mapzone_id
+		FROM temp_pgr_mapzone m
+		WHERE m.mapzone_id > 0
+		GROUP BY m.mapzone_id
+		HAVING count(m.component) > 1
+		);
 		-- end update temp_pgr_mapzone
 
 		-- update mapzone_id for arcs
@@ -1642,9 +1657,9 @@ BEGIN
 		FROM temp_pgr_mapzone m 
 		WHERE m.component = t.component;
 
-		-- RESOLVE EXCEPTION
+		-- EXCEPTION
 		-- NodeParent self-conflict: the arcs toArc and the ones that are not have the same mapzone_id
-		-- TODO: check if after solving all the Checking graphconfig errors, this part is still necessarly
+		-- set mapzone_id = -1 
 		
 		WITH 
 			selfconflict AS (
