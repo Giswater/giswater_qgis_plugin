@@ -776,7 +776,7 @@ BEGIN
 				FROM temp_pgr_graphconfig g
 				JOIN temp_pgr_node n USING (pgr_node_id)
 				GROUP BY g.pgr_node_id
-				HAVING  count(*) > 1
+				HAVING  count(DISTINCT (g.mapzone_id, g.graph_type)) > 1
 				ORDER BY g.pgr_node_id
 			) sub;
 
