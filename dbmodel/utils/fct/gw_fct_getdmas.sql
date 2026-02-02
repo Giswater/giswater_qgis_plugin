@@ -36,7 +36,7 @@ BEGIN
 
     -- Build the select statement for DMAs
     v_select = concat('SELECT dma_id as "dmaId", name as "dmaName", expl_id as "explId", macrodma_id as "macrodmaId", ',
-                     'descript as "description", active ',
+                     'descript as "description", active, ST_AsText(the_geom) as "geometry" ',
                      'FROM dma WHERE active IS TRUE ORDER BY dma_id');
 
     -- Execute the query and aggregate DMAs
