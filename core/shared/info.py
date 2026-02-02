@@ -810,9 +810,7 @@ class GwInfo(QObject):
                     tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
                 if field['layoutorder'] is None:
-                    msg = "The field layoutorder is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
 
                 # The data tab is somewhat special (it has 2 columns)
