@@ -861,3 +861,7 @@ UPDATE config_form_fields SET web_layoutorder=16
 WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='ffactor_max' AND tabname='tab_epa';
 UPDATE config_form_fields SET web_layoutorder=17
 WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='ffactor_min' AND tabname='tab_epa';
+
+-- 04/02/2026
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden,web_layoutorder)
+VALUES ('generic','go2epa','tab_data','export_frost','lyt_go2epa_data_2',2,'boolean','check','Export to Frost:','Export inp in Frost',false,true,false,15);

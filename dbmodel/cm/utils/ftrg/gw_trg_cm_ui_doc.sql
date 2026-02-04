@@ -61,6 +61,4 @@ END;
 $function$
 ;
 
-GRANT ALL ON FUNCTION cm.gw_trg_ui_doc() TO role_cm_manager;
-GRANT ALL ON FUNCTION cm.gw_trg_ui_doc() TO role_cm_field;
 

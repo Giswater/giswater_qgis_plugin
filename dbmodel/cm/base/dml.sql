@@ -208,11 +208,13 @@ GRANT ALL ON SCHEMA cm TO role_cm_field;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_field;
 GRANT ALL ON TABLE selector_lot TO role_cm_field;
 GRANT ALL ON TABLE cm_audit.log TO role_cm_field;
+GRANT ALL ON FUNCTION cm.gw_trg_ui_doc() TO role_cm_field;
 
 GRANT ALL ON SCHEMA cm TO role_cm_manager;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_manager;
 GRANT ALL ON SCHEMA cm TO role_cm_manager;
 GRANT ALL ON ALL TABLES IN SCHEMA cm TO role_cm_manager;
+GRANT ALL ON FUNCTION cm.gw_trg_ui_doc() TO role_cm_manager;
 
 GRANT ALL ON SCHEMA cm TO role_cm_admin;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_admin;
