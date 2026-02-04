@@ -146,6 +146,7 @@ BEGIN
                 concat('%s', 's'),
                 json_agg(json_build_object(
                     'id', %I,
+					'code', code,
                     'name', name,
                     'descript', descript,
                     'geometry', ST_AsGeoJSON(the_geom, 4326)::json
