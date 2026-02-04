@@ -16,6 +16,7 @@ DROP VIEW IF EXISTS v_ui_doc_x_workcat;
 DROP VIEW IF EXISTS v_ui_doc_x_node;
 DROP VIEW IF EXISTS v_ui_doc_x_arc;
 DROP VIEW IF EXISTS v_ui_doc_x_connec;
+DROP VIEW IF EXISTS v_ui_doc_x_gully;
 DROP VIEW IF EXISTS v_ui_doc_x_link;
 DROP VIEW IF EXISTS v_ui_doc_x_element;
 DROP VIEW IF EXISTS v_ui_om_visit_x_doc;
@@ -33,6 +34,7 @@ ALTER TABLE doc_x_visit DROP CONSTRAINT doc_x_visit_doc_id_fkey;
 ALTER TABLE doc_x_node DROP CONSTRAINT doc_x_node_doc_id_fkey;
 ALTER TABLE doc_x_arc DROP CONSTRAINT doc_x_arc_doc_id_fkey;
 ALTER TABLE doc_x_connec DROP CONSTRAINT doc_x_connec_doc_id_fkey;
+ALTER TABLE doc_x_gully DROP CONSTRAINT doc_x_gully_doc_id_fkey;
 ALTER TABLE doc_x_element DROP CONSTRAINT doc_x_element_fkey_doc_id;
 
 
@@ -44,5 +46,6 @@ ALTER TABLE doc_x_visit ALTER COLUMN doc_id TYPE int4 USING doc_id::int4;
 ALTER TABLE doc_x_node ALTER COLUMN doc_id TYPE int4 USING doc_id::int4;
 ALTER TABLE doc_x_arc ALTER COLUMN doc_id TYPE int4 USING doc_id::int4;
 ALTER TABLE doc_x_connec ALTER COLUMN doc_id TYPE int4 USING doc_id::int4;
+ALTER TABLE doc_x_gully ALTER COLUMN doc_id TYPE int4 USING doc_id::int4;
 ALTER TABLE doc_x_element ALTER COLUMN doc_id TYPE int4 USING doc_id::int4;
 ALTER TABLE doc ALTER COLUMN id TYPE int4 USING id::int4;

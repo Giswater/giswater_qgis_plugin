@@ -16,6 +16,7 @@ DECLARE
     v_targettext text;
     v_record record;
     v_enabled boolean;
+	v_repeated_paths text;
 
 BEGIN
 
@@ -30,6 +31,12 @@ BEGIN
 			-- future development of variable for some enviroments who they decide to force to put some name for document. Maybe on future create this variable
 			--EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3270", "function":"2686","parameters":null}}$$);';
 		END IF;
+
+		SELECT string_agg(name, ',') INTO v_repeated_paths FROM doc WHERE path = NEW.path AND id != NEW.id;
+		IF v_repeated_paths IS NOT NULL THEN
+			EXECUTE format('SELECT gw_fct_getmessage($${"data":{"message":"4540", "function":"2686","parameters":{"repeated_paths":"%s"}}}$$);', v_repeated_paths);
+		END IF;
+
 	END IF;
 
    	IF TG_OP = 'INSERT' THEN
