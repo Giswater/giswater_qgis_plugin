@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('doc_x_gully', ARRAY['doc_id', 'gully_id'], 'Columns doc_id and gully_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('doc_x_gully', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
+SELECT col_type_is('doc_x_gully', 'doc_id', 'integer', 'Column doc_id should be integer');
 SELECT col_type_is('doc_x_gully', 'gully_id', 'int4', 'Column gully_id should be int4');
 SELECT col_type_is('doc_x_gully', 'gully_uuid', 'uuid', 'Column gully_uuid should be uuid');
 

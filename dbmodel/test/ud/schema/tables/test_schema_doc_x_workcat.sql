@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('doc_x_workcat', ARRAY['doc_id', 'workcat_id'], 'Columns doc_id and workcat_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('doc_x_workcat', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
+SELECT col_type_is('doc_x_workcat', 'doc_id', 'integer', 'Column doc_id should be integer');
 SELECT col_type_is('doc_x_workcat', 'workcat_id', 'varchar(30)', 'Column workcat_id should be varchar(30)');
 
 -- Check foreign keys

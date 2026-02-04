@@ -20,7 +20,7 @@ SELECT has_table('doc'::name, 'Table doc should exist');
 SELECT columns_are(
     'doc',
     ARRAY[
-        'id', 'name', 'doc_type', 'path', 'observ', 'date', 'user_name', 'tstamp', 'the_geom'
+        'id', 'name', 'doc_type', 'path', 'observ', 'date', 'user_name', 'tstamp', 'the_geom', 'code'
     ],
     'Table doc should have the correct columns'
 );
@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('doc', ARRAY['id'], 'Column id should be primary key');
 
 -- Check column types
-SELECT col_type_is('doc', 'id', 'varchar(30)', 'Column id should be varchar(30)');
+SELECT col_type_is('doc', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('doc', 'name', 'varchar(30)', 'Column name should be varchar(30)');
 SELECT col_type_is('doc', 'doc_type', 'varchar(30)', 'Column doc_type should be varchar(30)');
 SELECT col_type_is('doc', 'path', 'varchar(512)', 'Column path should be varchar(512)');
@@ -38,6 +38,7 @@ SELECT col_type_is('doc', 'date', 'timestamp(6)', 'Column date should be timesta
 SELECT col_type_is('doc', 'user_name', 'varchar(50)', 'Column user_name should be varchar(50)');
 SELECT col_type_is('doc', 'tstamp', 'timestamp', 'Column tstamp should be timestamp');
 SELECT col_type_is('doc', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
+SELECT col_type_is('doc', 'code', 'varchar(30)', 'Column code should be varchar(30)');
 
 -- Check foreign keys
 

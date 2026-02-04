@@ -28,7 +28,7 @@ SELECT columns_are(
 
 );
 -- check columns names
-SELECT col_type_is('doc_x_link', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
+SELECT col_type_is('doc_x_link', 'doc_id', 'integer', 'Column doc_id should be integer');
 SELECT col_type_is('doc_x_link', 'link_id', 'int4', 'Column link_id should be int4');
 SELECT col_type_is('doc_x_link', 'link_uuid', 'uuid', 'Column link_uuid should be uuid');
 

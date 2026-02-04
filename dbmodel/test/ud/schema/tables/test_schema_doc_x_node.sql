@@ -28,7 +28,7 @@ SELECT columns_are(
 
 );
 -- check columns names
-SELECT col_type_is('doc_x_node', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
+SELECT col_type_is('doc_x_node', 'doc_id', 'integer', 'Column doc_id should be integer');
 SELECT col_type_is('doc_x_node', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('doc_x_node', 'node_uuid', 'uuid', 'Column node_uuid should be uuid');
 

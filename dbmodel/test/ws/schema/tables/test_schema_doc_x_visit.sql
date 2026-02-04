@@ -29,7 +29,7 @@ SELECT columns_are(
 SELECT col_is_pk('doc_x_visit', ARRAY['doc_id', 'visit_id'], 'Columns doc_id and visit_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('doc_x_visit', 'doc_id', 'varchar(30)', 'Column doc_id should be varchar(30)');
+SELECT col_type_is('doc_x_visit', 'doc_id', 'integer', 'Column doc_id should be integer');
 SELECT col_type_is('doc_x_visit', 'visit_id', 'integer', 'Column visit_id should be integer');
 
 -- Check foreign keys
