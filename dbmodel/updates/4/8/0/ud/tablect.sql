@@ -19,3 +19,4 @@ ALTER TABLE doc_x_connec ADD CONSTRAINT doc_x_connec_doc_id_fkey FOREIGN KEY (do
 ALTER TABLE doc_x_gully ADD CONSTRAINT doc_x_gully_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc(id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE doc_x_element ADD CONSTRAINT doc_x_element_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+ALTER TABLE doc ADD CONSTRAINT doc_path_unique UNIQUE (path);
