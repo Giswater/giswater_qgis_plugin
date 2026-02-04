@@ -205,7 +205,7 @@ BEGIN
 	END IF;
 
 	--check documents related to feature
-	EXECUTE 'SELECT string_agg(doc_id,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
+	EXECUTE 'SELECT string_agg(doc_id::text,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '||v_feature_id||''
 	INTO v_doc;
 
 	IF v_doc IS NOT NULL THEN
