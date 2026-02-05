@@ -505,7 +505,8 @@ BEGIN
         -- Polygons
         EXECUTE 'SELECT jsonb_build_object(
                 ''type'', ''FeatureCollection'',
-                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb),
+                ''layerName'', ''temp_minsector''
             )
         FROM (
             SELECT jsonb_build_object(

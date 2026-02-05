@@ -865,3 +865,196 @@ WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname=
 -- 04/02/2026
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,iseditable,hidden,web_layoutorder)
 VALUES ('generic','go2epa','tab_data','export_frost','lyt_go2epa_data_2',2,'boolean','check','Export to Frost:','Export inp in Frost',false,true,false,15);
+
+-- 05/02/2026
+UPDATE config_function SET "style"='{"style": {"polygon": {"style": "qml", "id": "101"}}}'::json WHERE id=2706;
+
+INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active) VALUES('temp_minsector', 101, 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+<qgis version="3.40.9-Bratislava" styleCategories="Symbology">
+  <renderer-v2 type="singleSymbol" symbollevels="0" enableorderby="0" forceraster="0" referencescale="-1">
+    <symbols>
+      <symbol type="fill" frame_rate="10" name="0" clip_to_extent="1" is_animated="0" force_rhr="0" alpha="0.6">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option type="QString" name="name" value=""/>
+            <Option name="properties"/>
+            <Option type="QString" name="type" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer pass="0" locked="0" enabled="1" id="{27f77253-c08f-4e81-911a-d84d608e2a75}" class="SimpleFill">
+          <Option type="Map">
+            <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="color" value="74,218,98,255,hsv:0.3611111111111111,0.6588235294117647,0.85490196078431369,1"/>
+            <Option type="QString" name="joinstyle" value="bevel"/>
+            <Option type="QString" name="offset" value="0,0"/>
+            <Option type="QString" name="offset_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="offset_unit" value="MM"/>
+            <Option type="QString" name="outline_color" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+            <Option type="QString" name="outline_style" value="solid"/>
+            <Option type="QString" name="outline_width" value="0.26"/>
+            <Option type="QString" name="outline_width_unit" value="MM"/>
+            <Option type="QString" name="style" value="solid"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option type="QString" name="name" value=""/>
+              <Option type="Map" name="properties">
+                <Option type="Map" name="fillColor">
+                  <Option type="bool" name="active" value="true"/>
+                  <Option type="QString" name="expression" value="''#FF'' ||&#xd;&#xa;right(''00'' || format(''%1'', (((&quot;minsector_id&quot; * 123) % 256)), ''X''), 2) ||   -- Red&#xd;&#xa;right(''00'' || format(''%1'', (((&quot;minsector_id&quot; * 45) % 256)), ''X''), 2) ||    -- Green&#xd;&#xa;right(''00'' || format(''%1'', (((&quot;minsector_id&quot; * 67) % 256)), ''X''), 2)       -- Blue"/>
+                  <Option type="int" name="type" value="3"/>
+                </Option>
+              </Option>
+              <Option type="QString" name="type" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+    </symbols>
+    <rotation/>
+    <sizescale/>
+    <data-defined-properties>
+      <Option type="Map">
+        <Option type="QString" name="name" value=""/>
+        <Option name="properties"/>
+        <Option type="QString" name="type" value="collection"/>
+      </Option>
+    </data-defined-properties>
+  </renderer-v2>
+  <selection mode="Default">
+    <selectionColor invalid="1"/>
+    <selectionSymbol>
+      <symbol type="fill" frame_rate="10" name="" clip_to_extent="1" is_animated="0" force_rhr="0" alpha="0">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option type="QString" name="name" value=""/>
+            <Option name="properties"/>
+            <Option type="QString" name="type" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer pass="0" locked="0" enabled="1" id="{d77627be-48c9-4a05-8439-16d058d08f39}" class="SimpleFill">
+          <Option type="Map">
+            <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="color" value="0,0,255,255,rgb:0,0,1,1"/>
+            <Option type="QString" name="joinstyle" value="bevel"/>
+            <Option type="QString" name="offset" value="0,0"/>
+            <Option type="QString" name="offset_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="offset_unit" value="MM"/>
+            <Option type="QString" name="outline_color" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+            <Option type="QString" name="outline_style" value="solid"/>
+            <Option type="QString" name="outline_width" value="0.26"/>
+            <Option type="QString" name="outline_width_unit" value="MM"/>
+            <Option type="QString" name="style" value="solid"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option type="QString" name="name" value=""/>
+              <Option name="properties"/>
+              <Option type="QString" name="type" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+    </selectionSymbol>
+  </selection>
+  <blendMode>0</blendMode>
+  <featureBlendMode>0</featureBlendMode>
+  <layerGeometryType>2</layerGeometryType>
+</qgis>
+', true);
+
+UPDATE sys_style
+	SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+<qgis version="3.40.9-Bratislava" styleCategories="Symbology">
+  <renderer-v2 type="singleSymbol" symbollevels="0" enableorderby="0" forceraster="0" referencescale="-1">
+    <symbols>
+      <symbol type="fill" frame_rate="10" name="0" clip_to_extent="1" is_animated="0" force_rhr="0" alpha="0.75">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option type="QString" name="name" value=""/>
+            <Option name="properties"/>
+            <Option type="QString" name="type" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer pass="0" locked="0" enabled="1" id="{27f77253-c08f-4e81-911a-d84d608e2a75}" class="SimpleFill">
+          <Option type="Map">
+            <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="color" value="74,218,98,255,hsv:0.3611111111111111,0.6588235294117647,0.85490196078431369,1"/>
+            <Option type="QString" name="joinstyle" value="bevel"/>
+            <Option type="QString" name="offset" value="0,0"/>
+            <Option type="QString" name="offset_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="offset_unit" value="MM"/>
+            <Option type="QString" name="outline_color" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+            <Option type="QString" name="outline_style" value="solid"/>
+            <Option type="QString" name="outline_width" value="0.26"/>
+            <Option type="QString" name="outline_width_unit" value="MM"/>
+            <Option type="QString" name="style" value="solid"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option type="QString" name="name" value=""/>
+              <Option type="Map" name="properties">
+                <Option type="Map" name="fillColor">
+                  <Option type="bool" name="active" value="true"/>
+                  <Option type="QString" name="expression" value="''#FF'' ||&#xd;&#xa;right(''00'' || format(''%1'', (((&quot;minsector_id&quot; * 123) % 256)), ''X''), 2) ||   -- Red&#xd;&#xa;right(''00'' || format(''%1'', (((&quot;minsector_id&quot; * 45) % 256)), ''X''), 2) ||    -- Green&#xd;&#xa;right(''00'' || format(''%1'', (((&quot;minsector_id&quot; * 67) % 256)), ''X''), 2)       -- Blue"/>
+                  <Option type="int" name="type" value="3"/>
+                </Option>
+              </Option>
+              <Option type="QString" name="type" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+    </symbols>
+    <rotation/>
+    <sizescale/>
+    <data-defined-properties>
+      <Option type="Map">
+        <Option type="QString" name="name" value=""/>
+        <Option name="properties"/>
+        <Option type="QString" name="type" value="collection"/>
+      </Option>
+    </data-defined-properties>
+  </renderer-v2>
+  <selection mode="Default">
+    <selectionColor invalid="1"/>
+    <selectionSymbol>
+      <symbol type="fill" frame_rate="10" name="" clip_to_extent="1" is_animated="0" force_rhr="0" alpha="1">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option type="QString" name="name" value=""/>
+            <Option name="properties"/>
+            <Option type="QString" name="type" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer pass="0" locked="0" enabled="1" id="{d77627be-48c9-4a05-8439-16d058d08f39}" class="SimpleFill">
+          <Option type="Map">
+            <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="color" value="0,0,255,255,rgb:0,0,1,1"/>
+            <Option type="QString" name="joinstyle" value="bevel"/>
+            <Option type="QString" name="offset" value="0,0"/>
+            <Option type="QString" name="offset_map_unit_scale" value="3x:0,0,0,0,0,0"/>
+            <Option type="QString" name="offset_unit" value="MM"/>
+            <Option type="QString" name="outline_color" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+            <Option type="QString" name="outline_style" value="solid"/>
+            <Option type="QString" name="outline_width" value="0.26"/>
+            <Option type="QString" name="outline_width_unit" value="MM"/>
+            <Option type="QString" name="style" value="solid"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option type="QString" name="name" value=""/>
+              <Option name="properties"/>
+              <Option type="QString" name="type" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+    </selectionSymbol>
+  </selection>
+  <blendMode>0</blendMode>
+  <featureBlendMode>0</featureBlendMode>
+  <layerGeometryType>2</layerGeometryType>
+</qgis>
+'
+WHERE layername='ve_minsector' AND styleconfig_id=101;
