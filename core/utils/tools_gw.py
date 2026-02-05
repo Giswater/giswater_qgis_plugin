@@ -3798,7 +3798,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
 
                 elif return_manager_style['style'] == 'qml':
                     style_id = return_manager_style['id']
-                    extras = f'"style_id":"{style_id}", "layername":"{key}"'
+                    extras = f'"style_id":"{style_id}", "layername":"{layer_name}"'
                     body = create_body(extras=extras)
                     style = execute_procedure('gw_fct_getstyle', body)
                     if style is None or style.get('status') == 'Failed':
