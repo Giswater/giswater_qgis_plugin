@@ -359,92 +359,52 @@ BEGIN
 			WHERE v_class = ANY(n.graph_delimiter)
 			AND t.pgr_node_id = n.node_id;
 
-			-- set node_parent for arcs connected to graph_delimiter METER, PUMP
-			WITH meter_pump AS (
+			-- set node_parent for arcs connected to graph_delimiter METER, PUMP, VALVE (ex. PR_SUSTA_VALVE, PR_REDUC_VALVE)
+			WITH meter_pump_valve AS (
 			SELECT node_id, to_arc FROM man_meter
 			UNION ALL SELECT node_id, to_arc FROM man_pump
+			UNION ALL SELECT node_id, to_arc FROM man_valve
 			)
 			UPDATE temp_pgr_arc t
 			SET node_parent = n.pgr_node_id
 			FROM temp_pgr_node n
-			JOIN meter_pump m ON m.node_id = n.pgr_node_id
+			JOIN meter_pump_valve m ON m.node_id = n.pgr_node_id
 			WHERE n.graph_delimiter = 'nodeParent'
 			AND t.pgr_arc_id = m.to_arc
 			AND m.to_arc IS NOT NULL;	
 
-			-- check if there are graph_delimiter meter or pump without to_arc
-			WITH missing_to_arc AS (
-				SELECT m.node_id
-				FROM man_meter m
-				WHERE m.to_arc IS NULL
-				UNION ALL
-				SELECT p.node_id
-				FROM man_pump p
-				WHERE p.to_arc IS NULL
-			)
+			-- set node_parent for arcs connected to graph_delimiter water_facility	
+			WITH water_facility AS (
+				SELECT node_id, inlet_arc FROM man_tank
+				UNION ALL SELECT node_id, inlet_arc FROM man_source
+				UNION ALL SELECT node_id, inlet_arc FROM man_waterwell
+				UNION ALL SELECT node_id, inlet_arc FROM man_wtp
+				)
+			UPDATE temp_pgr_arc t
+			SET node_parent = n.pgr_node_id
+			FROM temp_pgr_node n
+			WHERE n.graph_delimiter = 'nodeParent'
+			AND n.pgr_node_id IN (t.pgr_node_1, t.pgr_node_2)
+			AND t.node_parent IS NULL
+			AND EXISTS (
+				SELECT 1
+				FROM water_facility w
+				WHERE w.node_id = n.pgr_node_id
+				AND (
+					w.inlet_arc IS NULL
+					OR NOT (t.pgr_arc_id = ANY (w.inlet_arc))
+				)
+			);	
+
+			-- check if there are graph_delimiter nodes without at least one to_arc
 			SELECT count(*)
 			INTO v_missing_to_arc
 			FROM temp_pgr_node n
-			JOIN missing_to_arc ma ON n.pgr_node_id = ma.node_id
-			WHERE n.graph_delimiter = 'nodeParent';		
-
-			IF v_missing_to_arc = 0 THEN 
-
-				-- set node_parent for remaining arcs connected to graph_delimiter nodes, excluding inlet arcs and choosing one parent per arc
-				-- if this node already has an arc with node_parent equal to itself, do not assign node_parent to any additional arcs
-				WITH
-					inlet AS (
-					SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_tank
-					UNION ALL SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_source
-					UNION ALL SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_waterwell
-					UNION ALL SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_wtp
-					),
-					arc_parent AS (
-						SELECT
-							n.pgr_node_id AS node_parent, a.pgr_arc_id
-						FROM temp_pgr_node n
-						JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-						WHERE n.graph_delimiter = 'nodeParent'
-						AND a.node_parent IS NULL
-						AND NOT EXISTS (
-							SELECT 1
-							FROM inlet i
-							WHERE i.node_parent = n.pgr_node_id
-								AND i.pgr_arc_id  = a.pgr_arc_id
-							)
-						AND NOT EXISTS (
-							SELECT 1
-							FROM temp_pgr_arc ax
-							WHERE ax.node_parent = n.pgr_node_id
-						)	
-					),
-					ap AS (
-					SELECT pgr_arc_id, MAX(node_parent) AS node_parent
-					FROM arc_parent
-					GROUP BY pgr_arc_id
-					)
-				UPDATE temp_pgr_arc t
-				SET node_parent = ap.node_parent
-				FROM ap
-				WHERE t.pgr_arc_id = ap.pgr_arc_id
-				AND t.node_parent IS NULL;
-			ELSE 
-				-- water facilities used to calculate to_arc for METER/PUMP
-				WITH water_facility AS (
-					SELECT node_id FROM man_tank
-					UNION ALL SELECT node_id FROM man_source
-					UNION ALL SELECT node_id FROM man_waterwell
-					UNION ALL SELECT node_id FROM man_wtp
-				)
-				UPDATE temp_pgr_node t
-				SET graph_delimiter = 'SECTOR'
-				FROM v_temp_node n
-				JOIN water_facility w ON n.node_id = w.node_id
-				WHERE 'SECTOR' = ANY (n.graph_delimiter)
-				AND t.pgr_node_id = n.node_id
-				AND t.graph_delimiter = 'NONE';
-
-			END IF; -- v_missing_to_arc
+			WHERE n.graph_delimiter = 'nodeParent'
+			AND NOT EXISTS (
+				SELECT 1 FROM temp_pgr_arc a
+				WHERE a.node_parent = n.pgr_node_id
+			);		
 
 		ELSE -- v_from_zero
 
@@ -541,6 +501,21 @@ BEGIN
 
 		END IF; -- v_from_zero
 
+		-- water facilities
+		WITH water_facility AS (
+			SELECT node_id FROM man_tank
+			UNION ALL SELECT node_id FROM man_source
+			UNION ALL SELECT node_id FROM man_waterwell
+			UNION ALL SELECT node_id FROM man_wtp
+		)
+		UPDATE temp_pgr_node t
+		SET graph_delimiter = 'SECTOR'
+		FROM v_temp_node n
+		JOIN water_facility w ON n.node_id = w.node_id
+		WHERE 'SECTOR' = ANY (n.graph_delimiter)
+		AND t.pgr_node_id = n.node_id
+		AND t.graph_delimiter = 'NONE';
+
 		-- init parameters
 		-- forceClosed - cannot be forceClosed a node that is already 'nodeParent'
 		UPDATE temp_pgr_node n SET graph_delimiter = 'forceClosed'
@@ -569,7 +544,7 @@ BEGIN
 			UPDATE temp_pgr_node t
 			SET graph_delimiter = 'nodeParent'
 			FROM v_temp_node n
-			WHERE 'nodeParent' = ANY(n.graph_delimiter)
+			WHERE v_class = ANY(n.graph_delimiter)
 			AND t.pgr_node_id = n.node_id;
 
 			-- set node_parent only for arcs whose pgr_node_2 is a graph_delimiter node
@@ -842,21 +817,23 @@ BEGIN
 			END IF;
 
 			IF v_use_plan_psector = FALSE THEN 
-				-- Check if there are pump/meter nodeParent where its to_arc is not the same as in its man_table
+				-- Check if there are pump/meter/valve nodeParent where its to_arc is not the same as in its man_table
 				SELECT string_agg(mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH 
-					meter_pump AS (
+					meter_pump_valve AS (
 						SELECT node_id, to_arc FROM man_meter
 						UNION ALL 
-						SELECT node_id, to_arc FROM man_pump		
+						SELECT node_id, to_arc FROM man_pump
+						UNION ALL 
+						SELECT node_id, to_arc FROM man_valve		
 					)
 					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 					FROM temp_pgr_graphconfig g
 					WHERE g.graph_type = 'use' 
 					AND EXISTS (
-						SELECT 1 FROM meter_pump m
+						SELECT 1 FROM meter_pump_valve m
 						WHERE m.node_id = g.pgr_node_id
 						AND m.to_arc <> g.pgr_arc_id
 					)
@@ -931,6 +908,7 @@ BEGIN
 							AND ga.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 							AND ga.pgr_arc_id  = a.pgr_arc_id
 					)
+					ORDER BY g.mapzone_id,  g.pgr_node_id
 				) sub;
 				
 				IF message IS NOT NULL THEN
@@ -1116,6 +1094,23 @@ BEGIN
 			WHERE t.graph_delimiter = 'MINSECTOR'
 			AND t.pgr_node_id = m.node_id; 
 
+			-- closed valves
+			UPDATE temp_pgr_arc_linegraph t 
+			SET graph_delimiter = 'closedValve'
+			WHERE t.closed = TRUE;
+
+			-- check valves
+			UPDATE temp_pgr_arc_linegraph t 
+			SET graph_delimiter = 'checkValve'
+			WHERE t.closed = FALSE 
+			AND t.broken = FALSE
+			AND t.to_arc IS NOT NULL;
+
+			-- open valves
+			UPDATE temp_pgr_arc_linegraph t 
+			SET graph_delimiter = 'openValve'
+			WHERE t.graph_delimiter = 'MINSECTOR';
+
 			-- valves from NETSCENARIO
 			-- ======================================
 			IF v_netscenario IS NOT NULL THEN
@@ -1125,8 +1120,7 @@ BEGIN
 					closed = TRUE,
 					broken = FALSE
 				FROM plan_netscenario_valve v
-				WHERE t.graph_delimiter = 'MINSECTOR'
-				AND v.netscenario_id = v_netscenario
+				WHERE v.netscenario_id = v_netscenario
 				AND v.closed IS TRUE
 				AND t.pgr_node_id = v.node_id;
 
@@ -1137,30 +1131,10 @@ BEGIN
 					broken = FALSE,
 					to_arc = NULL
 				FROM plan_netscenario_valve v
-				WHERE t.graph_delimiter = 'MINSECTOR' 
-				AND v.netscenario_id = v_netscenario
+				WHERE v.netscenario_id = v_netscenario
 				AND v.closed IS FALSE
 				AND t.pgr_node_id = v.node_id;
 			END IF;
-
-			-- closed valves
-			UPDATE temp_pgr_arc_linegraph t 
-			SET graph_delimiter = 'closedValve'
-			WHERE t.graph_delimiter = 'MINSECTOR'
-			AND t.closed = TRUE;
-
-			-- check valves
-			UPDATE temp_pgr_arc_linegraph t 
-			SET graph_delimiter = 'checkValve'
-			WHERE t.graph_delimiter = 'MINSECTOR'
-			AND t.closed = FALSE 
-			AND t.broken = FALSE
-			AND t.to_arc IS NOT NULL;
-
-			-- open valves
-			UPDATE temp_pgr_arc_linegraph t 
-			SET graph_delimiter = 'openValve'
-			WHERE t.graph_delimiter = 'MINSECTOR';
 
 			UPDATE temp_pgr_node n
 			SET graph_delimiter = a.graph_delimiter
@@ -1180,7 +1154,23 @@ BEGIN
 			SET 
 				cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
-			WHERE graph_delimiter = 'checkValve';
+			WHERE t.graph_delimiter = 'checkValve';
+
+			-- inlet arcs of water utilities behave as checkvalves
+			WITH 
+				water_facility AS (
+					SELECT node_id, inlet_arc FROM man_tank
+					UNION ALL SELECT node_id, inlet_arc FROM man_source
+					UNION ALL SELECT node_id, inlet_arc FROM man_waterwell
+					UNION ALL SELECT node_id, inlet_arc FROM man_wtp
+				)
+			UPDATE temp_pgr_arc_linegraph t
+			SET 
+				cost = CASE WHEN t.pgr_node_2 = ANY (w.inlet_arc) THEN -1 ELSE 1 END,
+				reverse_cost = CASE WHEN t.pgr_node_1 = ANY (w.inlet_arc) THEN -1 ELSE 1 END
+			FROM water_facility w 
+			WHERE t.graph_delimiter IN ('SECTOR', 'nodeParent')
+			AND t.pgr_node_id = w.node_id;
 
 			-- forceClosed
 			UPDATE temp_pgr_arc_linegraph t
@@ -1255,33 +1245,25 @@ BEGIN
 		IF v_project_type = 'WS' AND v_from_zero AND v_missing_to_arc > 0 THEN
 
 			-- root_vids = toArcs of the water facilities
-			WITH
-				inlet AS (
-					SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_tank
-					UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_source
-					UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_waterwell
-					UNION ALL SELECT node_id, unnest(inlet_arc) AS arc_id FROM man_wtp
+			WITH 
+				water_facility AS (
+					SELECT node_id, inlet_arc FROM man_tank
+					UNION ALL SELECT node_id, inlet_arc FROM man_source
+					UNION ALL SELECT node_id, inlet_arc FROM man_waterwell
+					UNION ALL SELECT node_id, inlet_arc FROM man_wtp
 				)
-			SELECT array_agg(DISTINCT ta.pgr_arc_id)::int[]
+			SELECT array_agg(DISTINCT a.pgr_arc_id)::int[]
 			INTO v_pgr_root_vids
-			FROM v_temp_node vn
-			JOIN temp_pgr_arc ta ON vn.node_id IN (ta.pgr_node_1, ta.pgr_node_2)
-			WHERE 'SECTOR' = ANY(vn.graph_delimiter)
-			AND NOT EXISTS (
+			FROM temp_pgr_arc a 
+			JOIN temp_pgr_node n ON n.pgr_node_id IN  (a.pgr_node_1, a.pgr_node_2)
+			WHERE n.graph_delimiter IN ('SECTOR', 'nodeParent')
+			AND EXISTS (
 				SELECT 1 
-				FROM inlet i 
-				WHERE i.node_id = vn.node_id 
-				AND i.arc_id = ta.pgr_arc_id
+				FROM water_facility w 
+				WHERE w.node_id = a.node_parent
 			);
 
-			-- Remove from temp_pgr_arc_linegraph any connections that cross the water facilities
 			v_query_text := format($sql$
-				WITH water_facility AS (
-					SELECT node_id FROM man_tank
-					UNION ALL SELECT node_id FROM man_source
-					UNION ALL SELECT node_id FROM man_waterwell
-					UNION ALL SELECT node_id FROM man_wtp
-				)
 				SELECT
 					a.pgr_arc_id AS id,
 					a.pgr_node_1 AS source,
@@ -1289,14 +1271,6 @@ BEGIN
 					a.cost,
 					a.reverse_cost
 				FROM temp_pgr_arc_linegraph a
-				WHERE a.pgr_node_id IS NULL
-				OR NOT EXISTS (
-						SELECT 1
-						FROM temp_pgr_node n
-						JOIN water_facility w ON w.node_id = n.pgr_node_id
-						WHERE n.pgr_node_id = a.pgr_node_id
-						AND n.graph_delimiter IN ('SECTOR', 'nodeParent')
-				)
 			$sql$);
 
 			TRUNCATE temp_pgr_drivingdistance;
@@ -1306,88 +1280,27 @@ BEGIN
 				FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 			);
 
-			-- set arc - node_parent for METER, PUMP without node_parent that exists in pgr_drivingdistance		
-			WITH missing_to_arc AS (
-				SELECT node_id FROM man_meter
-				UNION ALL
-				SELECT node_id FROM man_pump
-			),
-			best_dd AS (
-				SELECT DISTINCT ON (edge) edge, node
-				FROM temp_pgr_drivingdistance
-				WHERE cost > 0
-				ORDER BY edge, cost, node
-			)
+			-- set arc - node_parent for arcs without node_parent that exists in pgr_drivingdistance		
+			WITH 
+				best_dd AS (
+					SELECT DISTINCT ON (edge) edge, node
+					FROM temp_pgr_drivingdistance
+					WHERE cost > 0
+					ORDER BY edge, cost, node
+				)
 			UPDATE temp_pgr_arc t
 			SET node_parent = lg.pgr_node_id
 			FROM temp_pgr_arc_linegraph lg
-			JOIN missing_to_arc mta ON mta.node_id = lg.pgr_node_id
 			JOIN best_dd d ON d.edge = lg.pgr_arc_id
-			WHERE t.node_parent IS NULL
-			AND t.pgr_arc_id = d.node;
-
-			-- set node_parent for remaining arcs connected to graph_delimiter nodes, excluding inlet arcs and choosing one parent per arc
-			-- if this node already has an arc with node_parent equal to itself, do not assign node_parent to any additional arcs
-			WITH
-				inlet AS (
-				SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_tank
-				UNION ALL SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_source
-				UNION ALL SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_waterwell
-				UNION ALL SELECT node_id AS node_parent, unnest(inlet_arc) AS pgr_arc_id FROM man_wtp
-				),
-				arc_parent AS (
-					SELECT
-						n.pgr_node_id AS node_parent, a.pgr_arc_id
-					FROM temp_pgr_node n
-					JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-					WHERE n.graph_delimiter = 'nodeParent'
-					AND a.node_parent IS NULL
-					AND NOT EXISTS (
-						SELECT 1
-						FROM inlet i
-						WHERE i.node_parent = n.pgr_node_id
-							AND i.pgr_arc_id  = a.pgr_arc_id
-						)
-					AND NOT EXISTS (
-						SELECT 1
-						FROM temp_pgr_arc ax
-						WHERE ax.node_parent = n.pgr_node_id
-					)	
-				),
-				ap AS (
-				SELECT pgr_arc_id, MAX(node_parent) AS node_parent
-				FROM arc_parent
-				GROUP BY pgr_arc_id
-				)
-			UPDATE temp_pgr_arc t
-			SET node_parent = ap.node_parent
-			FROM ap
-			WHERE t.pgr_arc_id = ap.pgr_arc_id
-			AND t.node_parent IS NULL;
+			WHERE lg.graph_delimiter = 'nodeParent'
+			AND t.node_parent IS NULL
+			AND t.pgr_arc_id = d.node
+			AND NOT EXISTS (
+				SELECT 1 FROM temp_pgr_arc a
+				WHERE a.node_parent = lg.pgr_node_id
+			);
 
 		END IF; -- v_missing_to_arc
-
-		-- after updating to_arcs for all nodeParent in case of from_zero and missing_arcs
-		-- update cost/reverse_cost for nodeParent (inletArcs are like checkvalves)
-		If v_project_type = 'WS' THEN 
-			UPDATE temp_pgr_arc_linegraph l
-			SET COST = CASE 
-					WHEN l.pgr_node_id = a2.node_parent THEN  1 
-					ELSE -1
-			END 
-			FROM  temp_pgr_arc a2 
-			WHERE a2.pgr_arc_id = l.pgr_node_2
-			AND l.graph_delimiter IN ('nodeParent', 'SECTOR');
-
-			UPDATE temp_pgr_arc_linegraph l
-			SET reverse_cost = CASE 
-					WHEN l.pgr_node_id = a1.node_parent THEN  1 
-					ELSE -1
-			END 
-			FROM  temp_pgr_arc a1 
-			WHERE a1.pgr_arc_id = l.pgr_node_1
-			AND l.graph_delimiter IN ('nodeParent', 'SECTOR');
-		END IF; 
 
 		-- FLOOD THE LINEGRAPH 
 		-- ====================
@@ -1449,6 +1362,7 @@ BEGIN
 				JOIN temp_pgr_arc a1 ON a1.pgr_arc_id = lg.pgr_node_1
 				JOIN temp_pgr_arc a2 ON a2.pgr_arc_id = lg.pgr_node_2
 				WHERE lg.pgr_node_id IS NOT NULL
+				AND lg.graph_delimiter = ''nodeParent''
 				AND lg.pgr_node_id = a1.node_parent
 				AND lg.pgr_node_id = a2.node_parent
 			)
@@ -1528,6 +1442,7 @@ BEGIN
 					component,
 					row_number() OVER () AS id
 				FROM temp_pgr_mapzone
+				WHERE component > 0
 			)
 			UPDATE temp_pgr_mapzone m
 			SET mapzone_ids = ARRAY[v_mapzone_id + i.id],
@@ -2264,7 +2179,7 @@ BEGIN
 
 			-- UPDATE mapzone_graph
 			IF v_project_type = 'WS' AND v_netscenario IS NULL THEN 
-
+				-- TODO
 			END IF;
 
 			-- UPDATE TABLES
