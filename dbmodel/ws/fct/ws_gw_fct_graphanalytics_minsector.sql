@@ -506,7 +506,7 @@ BEGIN
         EXECUTE 'SELECT jsonb_build_object(
                 ''type'', ''FeatureCollection'',
                 ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb),
-                ''layerName'', ''temp_minsector''
+                ''layerName'', ''Temp Minsector''
             )
         FROM (
             SELECT jsonb_build_object(

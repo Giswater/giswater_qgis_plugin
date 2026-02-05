@@ -869,7 +869,7 @@ VALUES ('generic','go2epa','tab_data','export_frost','lyt_go2epa_data_2',2,'bool
 -- 05/02/2026
 UPDATE config_function SET "style"='{"style": {"polygon": {"style": "qml", "id": "101"}}}'::json WHERE id=2706;
 
-INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active) VALUES('temp_minsector', 101, 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active) VALUES('Temp Minsector', 101, 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="3.40.9-Bratislava" styleCategories="Symbology">
   <renderer-v2 type="singleSymbol" symbollevels="0" enableorderby="0" forceraster="0" referencescale="-1">
     <symbols>

@@ -374,7 +374,7 @@ BEGIN
 
 		v_result_line := jsonb_build_object(
 			'type', 'FeatureCollection',
-			'layerName', 'Lines',
+			'layerName', 'Treatment Type Lines',
 			'features', COALESCE((
 				SELECT jsonb_agg(features.feature)
 				FROM (
@@ -398,7 +398,7 @@ BEGIN
 
 		v_result_point := jsonb_build_object(
 			'type', 'FeatureCollection',
-			'layerName', 'Points',
+			'layerName', 'Treatment Type Points',
 			'features', COALESCE((
 				SELECT jsonb_agg(features.feature)
 				FROM (
@@ -408,7 +408,7 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, n.has_treatment, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, n.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(n.the_geom, 4326) AS the_geom
+						SELECT t.pgr_node_id AS feature_id, 'NODE' AS feature_type, COALESCE(n.has_treatment, FALSE) AS has_treatment, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, n.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(n.the_geom, 4326) AS the_geom
 						FROM temp_pgr_node t
 						JOIN node n ON n.node_id = t.pgr_node_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
@@ -416,7 +416,7 @@ BEGIN
 						WHERE ot.typevalue = 'treatment_type'
 						AND oto.typevalue = 'treatment_type'
 						UNION
-						SELECT t.pgr_connec_id AS feature_id, 'CONNEC' AS feature_type, c.has_treatment, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, c.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(c.the_geom, 4326) AS the_geom
+						SELECT t.pgr_connec_id AS feature_id, 'CONNEC' AS feature_type, COALESCE(c.has_treatment, FALSE) AS has_treatment, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, c.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(c.the_geom, 4326) AS the_geom
 						FROM temp_pgr_connec t
 						JOIN connec c ON c.connec_id = t.pgr_connec_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
@@ -424,7 +424,7 @@ BEGIN
 						WHERE ot.typevalue = 'treatment_type'
 						AND oto.typevalue = 'treatment_type'
 						UNION
-						SELECT t.pgr_gully_id AS feature_id, 'GULLY' AS feature_type, g.has_treatment, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, g.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(g.the_geom, 4326) AS the_geom
+						SELECT t.pgr_gully_id AS feature_id, 'GULLY' AS feature_type, COALESCE(g.has_treatment, FALSE) AS has_treatment, t.mapzone_id AS treatment_type, ot.idval AS treatment_type_name, g.treatment_type AS old_treatment_type, oto.idval AS old_treatment_type_name, ST_Transform(g.the_geom, 4326) AS the_geom
 						FROM temp_pgr_gully t
 						JOIN gully g ON g.gully_id = t.pgr_gully_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
@@ -543,7 +543,7 @@ BEGIN
 				"polygon":'||v_result_polygon||'
 			}
 		}
-	}')::json, 2710, null, null, null)::json;
+	}')::json, 3522, null, null, null)::json;
 
 END;
 $BODY$
