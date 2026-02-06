@@ -1259,7 +1259,7 @@ BEGIN
 			AND EXISTS (
 				SELECT 1 
 				FROM water_facility w 
-				WHERE w.node_id = a.node_parent
+				WHERE w.node_id = n.pgr_node_id
 			);
 
 			v_query_text := format($sql$
@@ -1609,7 +1609,28 @@ BEGIN
 			GROUP BY n.pgr_node_id
 			HAVING count(DISTINCT a.component) = 1
 		) tn
-		WHERE t.pgr_node_id = tn.pgr_node_id;
+		WHERE t.pgr_node_id = tn.pgr_node_id
+		AND t.graph_delimiter IS DISTINCT FROM 'nodeParent';
+
+		-- update mapzone_id for nodeParents (always) and component only if it's unique
+		UPDATE temp_pgr_node t
+		SET mapzone_id = tn.mapzone_id,
+			component  = CASE
+							WHEN tn.comp_cnt = 1 THEN tn.component
+							ELSE t.component      -- keep existing (typically 0)
+						END
+		FROM (
+			SELECT 
+				a.node_parent,
+				MIN (a.component) AS component,
+				MIN(a.mapzone_id) AS mapzone_id,
+        		COUNT(DISTINCT a.component) AS comp_cnt
+			FROM temp_pgr_arc a
+			WHERE a.node_parent IS NOT NULL
+			GROUP BY a.node_parent
+		) tn
+		WHERE t.pgr_node_id = tn.node_parent
+		AND t.graph_delimiter = 'nodeParent';
 
 		-- update connec
 		UPDATE temp_pgr_connec t
@@ -1638,8 +1659,10 @@ BEGIN
 					FROM temp_pgr_arc_linegraph l 
 					JOIN temp_pgr_arc a1 ON a1.pgr_arc_id = l.pgr_node_1
 					JOIN temp_pgr_arc a2 ON a2.pgr_arc_id = l.pgr_node_2
+					JOIN temp_pgr_node n ON l.pgr_node_id = n.pgr_node_id
 					WHERE l.graph_delimiter = 'nodeParent'
 					AND a1.mapzone_id > 0 AND a2.mapzone_id > 0
+					AND n.mapzone_id > 0
 				),
 				inlet_arc AS (
 					SELECT arc_1 AS end_vid, pgr_node_id AS end_node
