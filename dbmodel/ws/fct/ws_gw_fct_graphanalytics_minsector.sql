@@ -665,9 +665,9 @@ BEGIN
 
         v_visible_layer = '"ve_minsector"';
 
-    END IF;
+    END IF; -- v_commitchanges
 
-    IF v_execute_massive_mincut THEN
+    IF v_execute_massive_mincut AND v_commitchanges THEN
         -- PREPARE tables for Massive Mincut
         -- Initialize process
         -- =======================
@@ -881,15 +881,14 @@ BEGIN
 
         END LOOP;
 
-        IF v_commitchanges THEN
-            INSERT INTO minsector_mincut (minsector_id, mincut_minsector_id)
-            SELECT minsector_id, mincut_minsector_id
-            FROM temp_pgr_minsector_mincut;
+        -- update table minsector_mincut
+        INSERT INTO minsector_mincut (minsector_id, mincut_minsector_id)
+        SELECT minsector_id, mincut_minsector_id
+        FROM temp_pgr_minsector_mincut;
 
-            INSERT INTO minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
-            SELECT minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus
-            FROM temp_pgr_minsector_mincut_valve;
-        END IF;
+        INSERT INTO minsector_mincut_valve (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
+        SELECT minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus
+        FROM temp_pgr_minsector_mincut_valve;
 
     END IF;
 
