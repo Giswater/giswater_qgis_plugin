@@ -1058,3 +1058,12 @@ UPDATE sys_style
 </qgis>
 '
 WHERE layername='ve_minsector' AND styleconfig_id=101;
+
+UPDATE config_param_system
+SET value = jsonb_set(
+    value::jsonb,
+    '{MINSECTOR,mode}',
+    '"Disable"',
+    true
+)::text
+WHERE "parameter" = 'utils_graphanalytics_style';
