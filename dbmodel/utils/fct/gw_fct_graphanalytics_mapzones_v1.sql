@@ -1869,6 +1869,7 @@ BEGIN
 						json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS to_arc
 						FROM temp_pgr_arc
 						WHERE node_parent IS NOT NULL
+						AND mapzone_id > 0
 						GROUP BY mapzone_id, node_parent
 					) x
 					GROUP BY mapzone_id
@@ -1888,6 +1889,7 @@ BEGIN
 						json_agg(pgr_node_id ORDER BY pgr_node_id) AS forceclosed_json
 					FROM temp_pgr_node
 					WHERE graph_delimiter = 'forceClosed'
+					AND mapzone_id > 0
 					GROUP BY mapzone_id
 					) t
 					WHERE mz.mapzone_id = t.mapzone_id;
@@ -1905,6 +1907,7 @@ BEGIN
 						json_agg(pgr_node_id ORDER BY pgr_node_id) AS ignore_json
 					FROM temp_pgr_node
 					WHERE graph_delimiter = 'forceOpen'
+					AND mapzone_id > 0
 					GROUP BY mapzone_id
 					) t
 					WHERE mz.mapzone_id = t.mapzone_id;
@@ -1927,6 +1930,7 @@ BEGIN
 						) AS use_json
 					FROM temp_pgr_arc
 					WHERE node_parent IS NOT NULL
+					AND mapzone_id > 0
 					GROUP BY mapzone_id
 					) s
 					WHERE mz.mapzone_id = s.mapzone_id;
@@ -1944,6 +1948,7 @@ BEGIN
 						json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS forceclosed_json
 					FROM temp_pgr_arc
 					WHERE graph_delimiter = 'forceClosed'
+					AND mapzone_id > 0
 					GROUP BY mapzone_id
 					) t
 					WHERE mz.mapzone_id = t.mapzone_id;
@@ -1961,6 +1966,7 @@ BEGIN
 						json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS ignore_json
 					FROM temp_pgr_arc
 					WHERE graph_delimiter = 'forceOpen'
+					AND mapzone_id > 0
 					GROUP BY mapzone_id
 					) t
 					WHERE mz.mapzone_id = t.mapzone_id;
