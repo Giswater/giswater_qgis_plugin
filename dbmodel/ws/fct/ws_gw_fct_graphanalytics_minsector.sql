@@ -114,6 +114,10 @@ BEGIN
         EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4542", "function":"2706", "parameters":null}}$$);';
 	END IF;
 
+    IF v_execute_massive_mincut AND v_commitchanges = FALSE THEN
+        -- TODO
+	END IF;
+
     -- Get exploitation ID array
     v_expl_id_array := gw_fct_get_expl_id_array(v_expl_id);
 
