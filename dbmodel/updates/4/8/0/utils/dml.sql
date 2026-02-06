@@ -19,3 +19,6 @@ UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, expl_id, the_geo
 INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source",message_type)
 VALUES (4542,'Commit changes is not allowed using psectors','Unselect commit changes or use psectors option',2,true,'utils','core','UI');
 
+INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source",message_type)
+VALUES (4544,'Commit changes must be enabled when Execute massive mincut is enabled','Enable commit changes or disable execute massive mincut',2,true,'utils','core','UI');
+
