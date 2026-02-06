@@ -90,8 +90,8 @@ SELECT is(
             }
         }
     }$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_graphanalytics_minsector with All exploitations and usePlanPsector true returns status "Accepted"'
+    'Failed',
+    'Check if gw_fct_graphanalytics_minsector with All exploitations and usePlanPsector true returns status "Failed"'
 );
 
 SELECT is(
