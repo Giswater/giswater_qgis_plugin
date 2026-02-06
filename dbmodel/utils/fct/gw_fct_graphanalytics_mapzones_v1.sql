@@ -1263,6 +1263,13 @@ BEGIN
 			);
 
 			v_query_text := format($sql$
+				WITH 
+				water_facility AS (
+					SELECT node_id FROM man_tank
+					UNION ALL SELECT node_id FROM man_source
+					UNION ALL SELECT node_id FROM man_waterwell
+					UNION ALL SELECT node_id FROM man_wtp
+				)
 				SELECT
 					a.pgr_arc_id AS id,
 					a.pgr_node_1 AS source,
@@ -1270,6 +1277,12 @@ BEGIN
 					a.cost,
 					a.reverse_cost
 				FROM temp_pgr_arc_linegraph a
+				WHERE a.pgr_node_id IS NULL 
+				OR NOT EXISTS (
+					SELECT 1 FROM water_facility w
+					WHERE a.graph_delimiter IN ('SECTOR', 'nodeParent')
+					AND w.node_id = a.pgr_node_id
+				)
 			$sql$);
 
 			TRUNCATE temp_pgr_drivingdistance;
@@ -1332,9 +1345,9 @@ BEGIN
 			WHERE a.pgr_node_id IS NULL
 			OR NOT EXISTS (
 				SELECT 1
-				FROM temp_pgr_node n
-				WHERE n.graph_delimiter = 'nodeParent'
-				AND n.pgr_node_id = a.pgr_node_id
+				FROM temp_pgr_arc np
+				WHERE np.node_parent IS NOT NULL
+				AND np.node_parent = a.pgr_node_id
 			)
 			$sql$
 		, v_source, v_target);
