@@ -13,9 +13,10 @@ from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QStringListModel
 from qgis.core import QgsExpression
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
-                                  QComboBox, QCompleter, QDateEdit, QDialog,
-                                  QHBoxLayout, QLabel, QLineEdit, QTableView,
-                                  QTextEdit, QToolBar, QWidget)
+                                 QComboBox, QCompleter, QDateEdit, QDialog,
+                                 QDialogButtonBox, QHBoxLayout, QLabel,
+                                 QLineEdit, QTableView, QTextEdit, QToolBar,
+                                 QVBoxLayout, QWidget)
 
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
@@ -1252,7 +1253,9 @@ class AddNewLot:
 
         # Set signals for manage users (only team filtering, no user management buttons in UI)
         self.dlg_resources_man.cmb_team.currentIndexChanged.connect(partial(self.filter_users_table))
-        self.dlg_resources_man.btn_assign_team.clicked.connect(partial(self.assign_team_to_user))
+        if hasattr(self.dlg_resources_man, 'btn_assign_team'):
+            self.dlg_resources_man.btn_assign_team.setVisible(False)
+        self.dlg_resources_man.btn_change_team.clicked.connect(partial(self.change_team_for_user))
         self.dlg_resources_man.btn_remove_team.clicked.connect(partial(self.remove_team_from_user))
         # Toggle active on users
         if hasattr(self.dlg_resources_man, 'btn_user_toggle_active'):
@@ -1363,6 +1366,82 @@ class AddNewLot:
             self.filter_users_table()
         except Exception as e:
             msg = tools_qt.tr("Error assigning team: {0}", context_name="cm")
+            msg_params = (str(e),)
+            tools_qgis.show_warning(msg, msg_params=msg_params)
+
+    def change_team_for_user(self):
+        """ Change team for selected user(s) """
+
+        # Get selected user IDs
+        selected_ids = self.get_selected_ids("cat_user")
+        if not selected_ids:
+            msg = tools_qt.tr("Seleccione al menos un usuario para cambiar de equipo.", context_name="cm")
+            tools_qgis.show_warning(msg)
+            return
+
+        # Build team list from combo (already filtered by role/org)
+        team_combo = self.dlg_resources_man.cmb_team
+        teams = []
+        for i in range(team_combo.count()):
+            record = team_combo.itemData(i)
+            if not record or len(record) < 2:
+                continue
+            team_id, team_name = record[0], record[1]
+            if team_id in ("", None):
+                continue
+            teams.append((team_id, team_name))
+
+        if not teams:
+            msg = tools_qt.tr("No hay equipos disponibles para cambiar.", context_name="cm")
+            tools_qgis.show_warning(msg)
+            return
+
+        title = tools_qt.tr("Cambiar Equipo", context_name="cm")
+        label_text = tools_qt.tr("Seleccione nuevo equipo:", context_name="cm")
+
+        dlg = QDialog(self.dlg_resources_man)
+        dlg.setWindowTitle(title)
+        layout = QVBoxLayout(dlg)
+        layout.addWidget(QLabel(label_text))
+
+        cmb_team = QComboBox(dlg)
+        for team_id, team_name in teams:
+            cmb_team.addItem(str(team_name), team_id)
+        layout.addWidget(cmb_team)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, dlg)
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+        layout.addWidget(buttons)
+
+        if dlg.exec_() != QDialog.DialogCode.Accepted:
+            return
+
+        team_id = cmb_team.currentData()
+        team_name = cmb_team.currentText()
+
+        # Confirm the action
+        user_count = len(selected_ids)
+        msg = tools_qt.tr("¿Está seguro de que desea cambiar al equipo '{0}' para {1} usuario(s) seleccionado(s)?", context_name="cm")
+        msg_params = (team_name, user_count)
+        answer = tools_qt.show_question(msg, msg_params=msg_params, title=title)
+        if not answer:
+            return
+
+        # Update users with the selected team
+        ids_str = ",".join(selected_ids)
+        sql = f"UPDATE cm.cat_user SET team_id = {team_id} WHERE user_id IN ({ids_str})"
+
+        try:
+            tools_db.execute_sql(sql)
+            msg = tools_qt.tr("Se cambió correctamente al equipo '{0}' para {1} usuario(s).", context_name="cm")
+            msg_params = (team_name, user_count)
+            tools_qgis.show_info(msg, msg_params=msg_params)
+
+            # Refresh the users table
+            self.filter_users_table()
+        except Exception as e:
+            msg = tools_qt.tr("Error al cambiar el equipo: {0}", context_name="cm")
             msg_params = (str(e),)
             tools_qgis.show_warning(msg, msg_params=msg_params)
 
