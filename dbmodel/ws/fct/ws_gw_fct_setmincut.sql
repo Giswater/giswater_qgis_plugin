@@ -1760,7 +1760,7 @@ BEGIN
 									AND a.minsector_id = tpa.pgr_node_2
 								)
 							)
-						$fmt$, v_mincut_id);
+						$fmt$, v_mincut_id, v_mincut_id);
 					ELSE
 						v_query_text := format($fmt$
 							SELECT tpa.pgr_arc_id AS id, tpa.pgr_node_1 AS source, tpa.pgr_node_2 AS target, 1 as cost
@@ -1783,7 +1783,7 @@ BEGIN
 									AND a.mapzone_id = tpa.pgr_node_2
 								)
 							)
-						$fmt$, v_mincut_id);
+						$fmt$, v_mincut_id, v_mincut_id);
 					END IF;
 
 					TRUNCATE temp_pgr_connectedcomponents;
