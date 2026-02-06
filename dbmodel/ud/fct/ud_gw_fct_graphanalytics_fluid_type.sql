@@ -368,21 +368,25 @@ BEGIN
 		UPDATE link l
 		SET fluid_type = t.mapzone_id
 		FROM temp_pgr_gully t
-		WHERE t.gully_id = l.feature_id
+		WHERE t.pgr_gully_id = l.feature_id
 		AND t.mapzone_id IS DISTINCT FROM l.fluid_type;
 
 		UPDATE link l
 		SET fluid_type = t.mapzone_id
 		FROM temp_pgr_connec t
-		WHERE t.connec_id = l.feature_id
+		WHERE t.pgr_connec_id = l.feature_id
 		AND t.mapzone_id IS DISTINCT FROM l.fluid_type;
+
+		v_status = 'Accepted';
+		v_level = 3;
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4210", "function":"3424", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
 
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with fluid_type and geometry';
 
 		v_result_line := jsonb_build_object(
 			'type', 'FeatureCollection',
-			'layerName', 'Lines',
+			'layerName', 'Fluid Type Lines',
 			'features', COALESCE((
 				SELECT jsonb_agg(features.feature)
 				FROM (
@@ -392,7 +396,7 @@ BEGIN
 						'properties', to_jsonb(row) - 'the_geom'
 					) AS feature
 					FROM (
-						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, a.initoverflowpath, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, a.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(a.the_geom, 4326) AS the_geom
+						SELECT t.pgr_arc_id AS feature_id, 'ARC' AS feature_type, COALESCE(a.initoverflowpath, FALSE) AS initoverflowpath, t.mapzone_id AS fluid_type, ot.idval AS fluid_type_name, a.fluid_type AS old_fluid_type, oto.idval AS old_fluid_type_name, ST_Transform(a.the_geom, 4326) AS the_geom
 						FROM temp_pgr_arc t
 						JOIN arc a ON a.arc_id = t.pgr_arc_id
 						JOIN om_typevalue ot ON ot.id::int4 = t.mapzone_id
@@ -406,7 +410,7 @@ BEGIN
 
 		v_result_point := jsonb_build_object(
 			'type', 'FeatureCollection',
-			'layerName', 'Points',
+			'layerName', 'Fluid Type Points',
 			'features', COALESCE((
 				SELECT jsonb_agg(features.feature)
 				FROM (
@@ -551,7 +555,7 @@ BEGIN
 				"polygon":'||v_result_polygon||'
 			}
 		}
-	}')::json, 2710, null, null, null)::json;
+	}')::json, 3424, null, null, null)::json;
 
 	EXCEPTION WHEN OTHERS THEN
 		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

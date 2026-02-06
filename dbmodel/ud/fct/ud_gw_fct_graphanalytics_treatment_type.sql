@@ -360,14 +360,18 @@ BEGIN
 		UPDATE link l
 		SET treatment_type = t.mapzone_id
 		FROM temp_pgr_gully t
-		WHERE t.gully_id = l.feature_id
+		WHERE t.pgr_gully_id = l.feature_id
 		AND t.mapzone_id IS DISTINCT FROM l.treatment_type;
 
 		UPDATE link l
 		SET treatment_type = t.mapzone_id
 		FROM temp_pgr_connec t
-		WHERE t.connec_id = l.feature_id
+		WHERE t.pgr_connec_id = l.feature_id
 		AND t.mapzone_id IS DISTINCT FROM l.treatment_type;
+
+		v_status = 'Accepted';
+		v_level = 3;
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4210", "function":"3522", "is_process":true}}$$)::JSON->>''text''' INTO v_message;
 
 	ELSE
 		RAISE NOTICE 'Showing temporal layers with treatment_type and geometry';
