@@ -141,8 +141,8 @@ BEGIN
 
 
 	-- it's not allowed to commit changes when psectors are used
- 	IF v_usepsector THEN
-		v_commitchanges := FALSE;
+ 	IF v_usepsector AND v_commitchanges THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4542", "function":"3424", "parameters":null}}$$);';
 	END IF;
 
     -- Get exploitation ID array

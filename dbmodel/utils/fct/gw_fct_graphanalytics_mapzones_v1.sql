@@ -158,9 +158,8 @@ BEGIN
 	v_parameters := p_data->'data'->'parameters';
 
 	-- it's not allowed to commit changes when psectors are used
- 	IF v_use_plan_psector THEN
-		-- TODO write a message like in the line 192 "IF v_mapzone_count > 0 AND v_commit_changes = TRUE"
-		v_commit_changes := FALSE;
+ 	IF v_use_plan_psector AND v_commit_changes THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4542", "function":"3508", "parameters":null}}$$);';
 	END IF;
 
 	IF v_class = 'PRESSZONE' THEN
