@@ -106,6 +106,7 @@ v_project_type text;
 v_tabnetworksignal integer = 0;
 v_custom_order_by_column text;
 v_isreturnsetselectors boolean;
+v_selector_macro_tabs boolean;
 
 BEGIN
 
@@ -161,6 +162,13 @@ BEGIN
 	ELSE
 		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
 	END IF;
+	
+	-- get if user has a role to show macroexploitation and macrosector tabs or not
+	v_selector_macro_tabs = (select selector_macro_tabs from cat_manager cm
+	where exists (select 1 from pg_roles r
+	where pg_has_role(current_user, r.oid, 'member')
+	and r.rolname = any (cm.rolename)
+	and selector_macro_tabs is not false) limit 1);
 
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
@@ -259,8 +267,12 @@ BEGIN
 
 	-- starting loop for tabs
 	FOR v_tab IN EXECUTE v_query
-
 	LOOP
+
+		IF v_selector_macro_tabs is null AND v_tab.tabname IN ('tab_macroexploitation', 'tab_macrosector') THEN
+   			CONTINUE;
+		END IF;
+		
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
 		v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
