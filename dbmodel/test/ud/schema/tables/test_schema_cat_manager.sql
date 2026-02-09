@@ -20,7 +20,7 @@ SELECT has_table('cat_manager'::name, 'Table cat_manager should exist');
 SELECT columns_are(
     'cat_manager',
     ARRAY[
-        'id', 'idval', 'expl_id', 'rolename', 'active'
+        'id', 'idval', 'expl_id', 'rolename', 'active', 'selector_macro_tabs'
     ],
     'Table cat_manager should have the correct columns'
 );
@@ -34,7 +34,7 @@ SELECT col_type_is('cat_manager', 'idval', 'text', 'Column idval should be text'
 SELECT col_type_is('cat_manager', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
 SELECT col_type_is('cat_manager', 'rolename', 'text[]', 'Column rolename should be text[]');
 SELECT col_type_is('cat_manager', 'active', 'bool', 'Column active should be bool');
-
+SELECT col_type_is('cat_manager', 'selector_macro_tabs', 'bool', 'Column selector_macro_tabs should be bool');
 
 -- Check default values
 SELECT col_has_default('cat_manager', 'active', 'Column active should have default value');
