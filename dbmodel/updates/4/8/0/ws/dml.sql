@@ -1079,3 +1079,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 VALUES ('plan_netscenario_dma','form_feature','tab_none','muni_id','lyt_data_1',10,'text','multiple_option','Muni id:','Muni_id',false,false,false,false,'select muni_id AS id, name AS idval from v_ext_municipality where muni_id > 0','{"setMultiline": false, "valueRelation": {"layer": "v_ext_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json,false);
 
 UPDATE sys_table SET context = 12 WHERE id = 've_minsector';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_om_mincut_valve', 'form_feature', 'tab_none', 'changestatus', NULL, NULL, 'boolean', 'check', 'Change status:', 'Change status', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
