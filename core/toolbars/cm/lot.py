@@ -1414,7 +1414,7 @@ class AddNewLot:
         buttons.rejected.connect(dlg.reject)
         layout.addWidget(buttons)
 
-        if dlg.exec_() != QDialog.DialogCode.Accepted:
+        if dlg.exec() != QDialog.DialogCode.Accepted:
             return
 
         team_id = cmb_team.currentData()
