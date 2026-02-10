@@ -127,7 +127,7 @@ v_result json;
 v_result_info json;
 
 v_response json;
-v_message text;
+v_message json;
 v_error_context text;
 
 v_row_count integer;
@@ -266,8 +266,8 @@ BEGIN
 			FROM om_mincut om
 			WHERE om.id = v_mincut_id
 			AND EXISTS (
-				SELECT 1 
-				FROM v_temp_arc vta 
+				SELECT 1
+				FROM v_temp_arc vta
 				WHERE om.anl_feature_id = vta.arc_id
 			) ;
 
@@ -305,9 +305,9 @@ BEGIN
 	IF NOT EXISTS (
 		SELECT 1
 		FROM v_temp_node n
-		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2 
+		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2
 		WHERE a.arc_id = v_arc_id
-	) THEN 
+	) THEN
 		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not operative, not found."}}')::json;
 	END IF;
 
@@ -329,9 +329,9 @@ BEGIN
 			(
 				SELECT n.node_id
 				FROM v_temp_node n
-				JOIN v_temp_arc a 
-					ON n.node_id = a.node_1 
-					OR n.node_id = a.node_2 
+				JOIN v_temp_arc a
+					ON n.node_id = a.node_1
+					OR n.node_id = a.node_2
 				WHERE a.arc_id = v_arc_id
 				AND 'SECTOR' <> ALL (n.graph_delimiter)
 				LIMIT 1
@@ -824,7 +824,7 @@ BEGIN
 			FROM pgr_drivingdistance(v_query_text, v_minsector_id, v_pgr_distance, directed => false);
 
 			-- NODES graph_delimiter = 'SECTOR'
-			-- MINSECTORS that contain an arc that connects to a node SECTOR-WATER and is not inlet_arc 
+			-- MINSECTORS that contain an arc that connects to a node SECTOR-WATER and is not inlet_arc
 			-- TANK, SOURCE, WATERWELL, WTP
 			WITH
 				water AS (
@@ -874,12 +874,12 @@ BEGIN
 			TRUNCATE temp_pgr_node_minsector;
 			TRUNCATE temp_pgr_arc_linegraph;
 
-			IF v_node = 0 THEN 
+			IF v_node = 0 THEN
 
 				-- arc is in between 2 nodes SECTOR, insert it in temp_pgr_arc
 				INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
 				SELECT a.arc_id, a.node_1, a.node_2
-				FROM v_temp_arc a 
+				FROM v_temp_arc a
 				WHERE a.arc_id = v_arc_id;
 
 			ELSE
@@ -931,7 +931,7 @@ BEGIN
 				FROM v_temp_arc a
 				WHERE EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_1)
 				OR EXISTS (SELECT 1 FROM temp_pgr_node n WHERE n.pgr_node_id = a.node_2);
-			
+
 			END IF;
 
 			-- set the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
@@ -952,7 +952,7 @@ BEGIN
 					JOIN v_temp_node n USING (node_id)
 					WHERE 'SECTOR' = ANY (n.graph_delimiter)
 				)
-			UPDATE temp_pgr_arc a 
+			UPDATE temp_pgr_arc a
 			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
 				SELECT 1
@@ -1016,8 +1016,8 @@ BEGIN
 				-- there is just one arc in temp_pgr_arc (mapzone_id = arc_id)
 				UPDATE temp_pgr_arc
 				SET mapzone_id = pgr_arc_id
-				WHERE mapzone_id = 0;     
-        	ELSE 
+				WHERE mapzone_id = 0;
+        	ELSE
 				v_query_text :=
 				'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost_mincut as cost
 				FROM temp_pgr_arc_linegraph';
@@ -1032,14 +1032,14 @@ BEGIN
 				FROM temp_pgr_connectedcomponents c
 				WHERE a.pgr_arc_id = c.node;
 
-				-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters 
+				-- update mapzone_id for arcs that have node_1 and node_2 graph_delimiters
 				UPDATE temp_pgr_arc
 				SET mapzone_id = pgr_arc_id
 				WHERE mapzone_id = 0;
 
 			END IF;
 
-			-- set v_minsector_id 
+			-- set v_minsector_id
 			v_minsector_id := (SELECT mapzone_id FROM temp_pgr_arc WHERE pgr_arc_id = v_arc_id);
 
 			-- END ALGORITHM GENERATE MINSECTORS
@@ -1075,7 +1075,7 @@ BEGIN
 			WHERE pgr_node_1 = pgr_node_2;
 
 			-- NODES graph_delimiter as 'SECTOR'
-			 -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE 
+			 -- MINSECTORS that contain an arc that connects to a water source and is not inlet_arc WILL BE A WATER SOURCE
 			UPDATE temp_pgr_node_minsector t
 			SET graph_delimiter = 'SECTOR'
 			WHERE EXISTS (
@@ -1088,37 +1088,37 @@ BEGIN
 
 		-- update aditional fields for valves (MINSECTOR)
 		UPDATE temp_pgr_arc_linegraph t
-		SET 
+		SET
 			closed = m.closed,
 			broken = m.broken,
 			to_arc = m.to_arc
 		FROM man_valve m
 		WHERE t.graph_delimiter = 'MINSECTOR'
-		AND t.pgr_node_id = m.node_id; 
+		AND t.pgr_node_id = m.node_id;
 
 		-- closed valves
-		UPDATE temp_pgr_arc_linegraph t 
+		UPDATE temp_pgr_arc_linegraph t
 		SET cost = -1, reverse_cost = -1
 		WHERE t.graph_delimiter = 'MINSECTOR'
 		AND t.closed = TRUE;
 
 		-- check valves (compare minsector of to_arc with pgr_node_2 because pgr_node_2 is a minsector)
-		IF v_mode = 'MINSECTOR' THEN 
-			UPDATE temp_pgr_arc_linegraph t 
+		IF v_mode = 'MINSECTOR' THEN
+			UPDATE temp_pgr_arc_linegraph t
 			SET cost = CASE WHEN a.minsector_id = t.pgr_node_2 THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN a.minsector_id = t.pgr_node_2 THEN -1 ELSE 1 END
-			FROM arc a 
+			FROM arc a
 			WHERE t.graph_delimiter = 'MINSECTOR'
-			AND t.closed = FALSE 
+			AND t.closed = FALSE
 			AND t.to_arc IS NOT NULL
 			AND a.arc_id = t.to_arc;
 		ELSE
-			UPDATE temp_pgr_arc_linegraph t 
+			UPDATE temp_pgr_arc_linegraph t
 			SET cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN a.mapzone_id = t.pgr_node_2 THEN -1 ELSE 1 END
-			FROM temp_pgr_arc a 
+			FROM temp_pgr_arc a
 			WHERE t.graph_delimiter = 'MINSECTOR'
-			AND t.closed = FALSE 
+			AND t.closed = FALSE
 			AND t.to_arc IS NOT NULL
 			AND a.pgr_arc_id = t.to_arc;
 		END IF;
@@ -1146,7 +1146,7 @@ BEGIN
             WHERE cost <> reverse_cost;
         END IF;
 
-		-- Update cost_mincut / reverse_cost_mincut when the valve no longer exists 
+		-- Update cost_mincut / reverse_cost_mincut when the valve no longer exists
 		-- this can occur in v_mode = 'MINSECTOR' if the valve was substituted or became obsolete after the minsectors were calculated
 		UPDATE temp_pgr_arc_linegraph t
 		SET cost_mincut = 1, reverse_cost_mincut = 1
@@ -1455,7 +1455,7 @@ BEGIN
 
 		-- insert hydrometer from node
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT v_mincut_id, rhxn.hydrometer_id 
+		SELECT v_mincut_id, rhxn.hydrometer_id
 		FROM rtc_hydrometer_x_node rhxn
 		JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id
 		JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.hydrometer_id
