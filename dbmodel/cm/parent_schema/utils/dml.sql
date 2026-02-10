@@ -61,3 +61,38 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "layoutorder": 5
   }
 ]'::json, NULL, true, '{4}');
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3540, 'gw_fct_cm_build_topology', 'ws', 'function', 'json', 'json', 'Function to build or update the topology of a Lot. 
+
+
+Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'core', NULL);
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3540, '[CM] Reconnect Lot topology', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "lotId",
+    "label": "Lot ID:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Choose a Lot ASSIGNED, IN PROGRESS or EXECUTED",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "dvQueryText": "select a.lot_id as id, concat(a.name, '' - '', b.idval, '''') as idval from cm.om_campaign_lot a join cm.sys_typevalue b on a.status=b.id::int where b.typevalue = ''lot_status'' and a.status in (3,4,6) order by a.status, a.name asc",
+    "selectedId": null
+  },
+  {
+      "widgetname": "updateType",
+    "widgettype": "combo",
+    "label": "Type of process:",
+    "comboIds": [1,2],
+    "datatype": "text",
+    "comboNames": [
+      "Update topology (for all arcs)",
+      "Build topology (for arcs without topology)"
+    ],
+    "layoutname": "grl_option_parameters",
+    "isMandatory": true,
+    "layoutorder": 5
+  }
+]'::json, NULL, true, '{4}');
