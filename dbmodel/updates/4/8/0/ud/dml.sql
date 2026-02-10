@@ -1527,3 +1527,11 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active)
   <layerGeometryType>1</layerGeometryType>
 </qgis>
 ', true);
+
+-- 10/02/2026
+UPDATE config_param_system
+	SET value='{"sys_display_name":"concat(connec_id, '' : '', conneccat_id)","sys_tablename":"ve_connec","sys_pk":"connec_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}'
+	WHERE "parameter"='basic_search_v2_tab_network_connec';
+UPDATE config_param_system
+	SET value='{"sys_display_name":"concat(gully_id, '' : '', gullycat_id)","sys_tablename":"ve_gully","sys_pk":"gully_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}'
+	WHERE "parameter"='basic_search_v2_tab_network_gully';
