@@ -141,6 +141,8 @@ LEFT JOIN temp_t_node b USING (node_id)
 WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 OR a.sector_id::text != b.sector_id::text) a', 'All Controls has correct node id values.', '[gw_fct_pg2epa_check_result]', true);
+
+-- 10/02/2026
 UPDATE sys_fprocess SET query_text='WITH intervals AS (
     SELECT DISTINCT ON (timser_id)
         timser_id,
@@ -163,3 +165,32 @@ FROM intervals i
 JOIN raingage r
     ON i.timser_id = r.timser_id
 WHERE r.intvl::time > i.interval_time' WHERE fid=644;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4548, 'Default values: %v_defaultval%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4550, 'Default values: No default values used', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4552, 'Advanced settings: %v_advancedval%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4554, 'Advanced settings: No advanced settings used', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4556, 'Debug: %v_defaultval%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4558, 'Enabled set all raingages with ONLY ONE timeseries: %v_setallraingages%', NULL, 0, true, 'utils', 'core', 'AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4560,'Created by: %v_createdby% on %v_date%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4562,'Export mode: %v_exportmodeval%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4564,'Hidrology scenario: %v_hydroscenarioval%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4566,'DWF scenario: %v_dwfscenarioval%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4568,'Dump subcatchments: %v_dumpsubc%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4570,'Active Workspace: %v_workspace%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4572,'Number of dscenarios used: %v_dscenarioused%',0,'utils','core','AUDIT');
+INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
+VALUES (4574,'Number of psectors used: %v_psectorused%',0,'utils','core','AUDIT');

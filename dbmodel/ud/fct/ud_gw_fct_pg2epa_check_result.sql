@@ -166,15 +166,15 @@ BEGIN
 	INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-4, v_fid, v_result_id, 1, 'INFO');
 	INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-3, v_fid, v_result_id, 1, '-------');
 
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Result id: ', v_result_id));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Export mode: ',v_exportmodeval));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Hidrology scenario: ', v_hydroscenarioval));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DWF scenario: ',v_dwfscenarioval));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Dump subcatchments: ',v_dumpsubc::text));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Active Workspace: ', v_workspace));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of dscenarios used: ', v_dscenarioused));
-	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4006", "function":"2858", "parameters":{"v_eparesult":"'||v_result_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4560", "function":"2858", "parameters":{"v_createdby":"'||current_user||'", "v_date":"'||to_char(now(),'YYYY-MM-DD HH-MM-SS')||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4562", "function":"2858", "parameters":{"v_exportmodeval":"'||v_exportmodeval||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4564", "function":"2858", "parameters":{"v_hydroscenarioval":"'||v_hydroscenarioval||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4566", "function":"2858", "parameters":{"v_dwfscenarioval":"'||v_dwfscenarioval||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4568", "function":"2858", "parameters":{"v_dumpsubc":"'||v_dumpsubc::text||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4570", "function":"2858", "parameters":{"v_workspace":"'||COALESCE(v_workspace, '')||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4572", "function":"2858", "parameters":{"v_dscenarioused":"'||v_dscenarioused||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4574", "function":"2858", "parameters":{"v_psectorused":"'||v_psectorused||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 
 	UPDATE rpt_cat_result SET
 	export_options = concat('{"Hydrology scenario": "', v_hydroscenarioval,'", "DWF scenario":"',v_dwfscenarioval,'"}')::json
@@ -183,23 +183,23 @@ BEGIN
 	IF v_checkresult THEN
 
 		IF v_default::boolean THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: ', v_defaultval));
+			EXECUTE 'SELECT gw_fct_getmessage($$' || jsonb_build_object('data', jsonb_build_object('message', '4548','function', '2858','parameters', jsonb_build_object('v_defaultval', v_defaultval),'fid', v_fid,'criticity', '4','tempTable', 't_'))::text ||'$$)';
 		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: No default values used'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4550", "function":"2858", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 		END IF;
 
 		IF v_advanced::boolean THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: ', v_advancedval));
+			EXECUTE 'SELECT gw_fct_getmessage($$' || jsonb_build_object('data', jsonb_build_object('message', '4552','function', '2858','parameters', jsonb_build_object('v_advancedval', v_advancedval),'fid', v_fid,'criticity', '4','tempTable', 't_'))::text ||'$$)';
 		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: No advanced settings used'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4554", "function":"2858", "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 		END IF;
 
 		IF v_debug::boolean THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
+			EXECUTE 'SELECT gw_fct_getmessage($$' || jsonb_build_object('data', jsonb_build_object('message', '4556','function', '2858','parameters', jsonb_build_object('v_defaultval', v_defaultval),'fid', v_fid,'criticity', '4','tempTable', 't_'))::text ||'$$)';
 		END IF;
 
 		IF v_setallraingages IS NOT NULL THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Enabled set all raingages with ONLY ONE timeseries: ', v_setallraingages));
+			EXECUTE 'SELECT gw_fct_getmessage($$' || jsonb_build_object('data', jsonb_build_object('message', '4558','function', '2858','parameters', jsonb_build_object('v_setallraingages', v_setallraingages),'fid', v_fid,'criticity', '4','tempTable', 't_'))::text ||'$$)';
 		END IF;
 
 
