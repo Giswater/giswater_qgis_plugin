@@ -3802,6 +3802,10 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
                     extras = f'"style_id":"{style_id}", "layername":"{layer_name}"'
                     body = create_body(extras=extras)
                     style = execute_procedure('gw_fct_getstyle', body)
+                    if not style.get('body').get('styles'):
+                        extras = f'"style_id":"{style_id}", "layername":"{key}"'
+                        body = create_body(extras=extras)
+                        style = execute_procedure('gw_fct_getstyle', body)
                     if style is None or style.get('status') == 'Failed':
                         return
                     if 'styles' in style['body']:
