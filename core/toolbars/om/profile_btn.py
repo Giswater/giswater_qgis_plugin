@@ -450,9 +450,6 @@ class GwProfileButton(GwAction):
                         self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
                         self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
-                        # Clear old list arcs
-                        self.dlg_draw_profile.tbl_list_arc.clear()
-
                         # Populate list arcs
                         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
                         if links_distance in ("", "None", None):
@@ -465,6 +462,9 @@ class GwProfileButton(GwAction):
                         body = tools_gw.create_body(extras=extras)
                         result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                         if result is None or result['status'] == 'Failed':
+                            # Roll back last mid-node on failed query
+                            if self.add_points and self.add_points_list:
+                                self.add_points_list.pop()
                             return
                         self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
 
@@ -475,12 +475,16 @@ class GwProfileButton(GwAction):
                             level = Qgis.MessageLevel(level)
                             tools_qgis.show_message(msg, level)
                             if result['message']['level'] != 3:
-                                # If error reset profile
-                                self._clear_profile()
+                                # If error while adding mid-nodes, roll back last selection
+                                if self.add_points and self.add_points_list:
+                                    # Drop last added mid-node (the one just selected)
+                                    self.add_points_list.pop()
                                 return
 
                         self._remove_selection()
                         list_arcs = []
+                        # Clear old list arcs only after successful query
+                        self.dlg_draw_profile.tbl_list_arc.clear()
                         for arc in result['body']['data']['arc']:
                             item_arc = QListWidgetItem(str(arc['arc_id']))
                             self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)

@@ -88,7 +88,7 @@ class GwWorkcat:
                 self.dlg_man.tbl_workcat = tools_gw.add_tableview_header(self.dlg_man.tbl_workcat, field)
                 self.dlg_man.tbl_workcat = tools_gw.fill_tableview_rows(self.dlg_man.tbl_workcat, field)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, 'cat_work', Qt.SortOrder.AscendingOrder)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         return True
 
     def _open_selected_workcat(self, dialog, widget):

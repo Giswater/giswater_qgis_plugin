@@ -690,6 +690,8 @@ class GwLoadProject(QObject):
 
         # Check cm role and adjust CM toolbar if necessary
         cm_role = tools_gw.get_cm_user_role()
+        is_cm_admin = tools_db.check_role_user('role_cm_admin')
+        print(f"is_cm_admin: {is_cm_admin}")
         if cm_role:
             cm_role_list = list(cm_role)
             if 'role_cm_edit' in cm_role_list:
@@ -697,11 +699,11 @@ class GwLoadProject(QObject):
                 # Hide buttons not wanted for role_cm_edit
                 self._hide_button('86', True)  # GwAddLotButton
                 self._hide_button('87', True)  # GwLotResourceManagementButton
-            elif 'role_cm_manager' in cm_role_list:
-                # Hide buttons not wanted for role_cm_manager
-                self._hide_button('84', True)  # GwAddCampaignButton
-                # Note: Button 87 (GwManageCampaignLotButton) menu option "Manage Campaign" 
-                # is hidden in the button's __init__ method, not here
+
+        if not is_cm_admin:
+            # Hide buttons not wanted for non-admin CM roles (DB role check)
+            self._hide_button('84', True)  # GwAddCampaignButton
+            # Button 87 (GwManageCampaignLotButton) menu option "Manage Campaign"
 
         # Let the standard project role logic run for everyone
         project_role = lib_vars.project_vars.get('project_role')

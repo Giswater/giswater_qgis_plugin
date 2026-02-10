@@ -810,9 +810,7 @@ class GwInfo(QObject):
                     tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
                 if field['layoutorder'] is None:
-                    msg = "The field layoutorder is not configured for"
                     param = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.dlg_cf)
                     continue
 
                 # The data tab is somewhat special (it has 2 columns)
@@ -2759,7 +2757,7 @@ class GwInfo(QObject):
             return False, False
         widget = tools_gw.add_tableview_header(widget, fields, headers)
         widget = tools_gw.fill_tableview_rows(widget, fields)
-        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
         if 'tab_epa' in widgetname:
             widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))

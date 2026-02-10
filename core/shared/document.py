@@ -263,7 +263,7 @@ class GwDocument(QObject):
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
-        sql = f"INSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{self.doc_id}', '{workcat_id}')"
+        sql = f"INSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ({self.doc_id}, '{workcat_id}')"
         result = tools_db.execute_sql(sql)
 
         if result:
@@ -300,7 +300,7 @@ class GwDocument(QObject):
             return
 
         for workcat_id in workcat_ids:
-            sql = f"DELETE FROM doc_x_workcat WHERE doc_id = '{self.doc_id}' AND workcat_id = '{workcat_id}'"
+            sql = f"DELETE FROM doc_x_workcat WHERE doc_id = {self.doc_id} AND workcat_id = '{workcat_id}'"
             tools_db.execute_sql(sql)
 
         self._fill_table_doc_workcat()
@@ -328,7 +328,7 @@ class GwDocument(QObject):
             return
         psector_id = row[0]
 
-        sql = f"INSERT INTO doc_x_psector (doc_id, psector_id) VALUES ('{self.doc_id}', '{psector_id}')"
+        sql = f"INSERT INTO doc_x_psector (doc_id, psector_id) VALUES ({self.doc_id}, '{psector_id}')"
         result = tools_db.execute_sql(sql)
 
         if result:
@@ -378,7 +378,7 @@ class GwDocument(QObject):
             return
 
         for psector_id in psector_ids:
-            sql = f"DELETE FROM doc_x_psector WHERE doc_id = '{self.doc_id}' AND psector_id = '{psector_id}'"
+            sql = f"DELETE FROM doc_x_psector WHERE doc_id = {self.doc_id} AND psector_id = '{psector_id}'"
             tools_db.execute_sql(sql)
 
         self._fill_table_doc_psector()
@@ -398,7 +398,7 @@ class GwDocument(QObject):
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
-        sql = f"INSERT INTO doc_x_visit (doc_id, visit_id) VALUES ('{self.doc_id}', '{visit_id}')"
+        sql = f"INSERT INTO doc_x_visit (doc_id, visit_id) VALUES ({self.doc_id}, '{visit_id}')"
         result = tools_db.execute_sql(sql)
 
         if result:
@@ -436,7 +436,7 @@ class GwDocument(QObject):
             return
 
         for visit_id in visit_ids:
-            sql = f"DELETE FROM doc_x_visit WHERE doc_id = '{self.doc_id}' AND visit_id = '{visit_id}'"
+            sql = f"DELETE FROM doc_x_visit WHERE doc_id = {self.doc_id} AND visit_id = '{visit_id}'"
             tools_db.execute_sql(sql)
 
         self._fill_table_doc_visit()
@@ -454,7 +454,7 @@ class GwDocument(QObject):
         self.dlg_man = GwDocManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document)
 
         # Adding auto-completion to a QLineEdit
@@ -520,7 +520,7 @@ class GwDocument(QObject):
                 self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
                 self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', Qt.SortOrder.AscendingOrder)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         return True
 
@@ -601,9 +601,11 @@ class GwDocument(QObject):
         # Check if this document already exists
         if item_id is None:
             item_id = self.doc_id
-        sql = f"SELECT DISTINCT(id) FROM {table_object} WHERE id = '{item_id}'"
-        row = tools_db.get_row(sql, log_info=False)
-
+        row = None
+        if item_id is not None:
+            sql = f"SELECT DISTINCT(id) FROM {table_object} WHERE id = '{item_id}'"
+            row = tools_db.get_row(sql, log_info=False)
+        
         # If document not exists perform an INSERT
         if row is None and self.is_new:
             if len(self.files_path) <= 1:
@@ -663,7 +665,7 @@ class GwDocument(QObject):
                f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', name = '{name}'")
         if the_geom:
             sql += f", the_geom = {the_geom}"
-        sql += f" WHERE id = '{doc_id}';"
+        sql += f" WHERE id = {doc_id};"
         return sql
 
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable, doc_name, close_dlg=True):
@@ -720,7 +722,7 @@ class GwDocument(QObject):
         # Update the associated table
         if tablename:
             sql = (f"INSERT INTO doc_x_{tablename} (doc_id, {tablename}_id) "
-                   f" VALUES('{doc_id}', '{item_id}')")
+                   f" VALUES({doc_id}, '{item_id}')")
             tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
             if tablename == 'psector':
@@ -733,7 +735,9 @@ class GwDocument(QObject):
         """Get workcat_ids linked to documento"""
         if doc_id is None:
             doc_id = self.doc_id
-        sql = f"SELECT workcat_id FROM doc_x_workcat WHERE doc_id = '{doc_id}'"
+        if doc_id is None:
+            return []
+        sql = f"SELECT workcat_id FROM doc_x_workcat WHERE doc_id = {doc_id}"
         rows = tools_db.get_rows(sql)
         if not rows:
             return []
@@ -743,7 +747,9 @@ class GwDocument(QObject):
         """Get psector_ids linked to documento"""
         if doc_id is None:
             doc_id = self.doc_id
-        sql = f"SELECT psector_id FROM doc_x_psector WHERE doc_id = '{doc_id}'"
+        if doc_id is None:
+            return []
+        sql = f"SELECT psector_id FROM doc_x_psector WHERE doc_id = {doc_id}"
         rows = tools_db.get_rows(sql)
         if not rows:
             return []
@@ -753,7 +759,9 @@ class GwDocument(QObject):
         """Get visit_ids linked to the document"""
         if doc_id is None:
             doc_id = self.doc_id
-        sql = f"SELECT visit_id FROM doc_x_visit WHERE doc_id = '{doc_id}'"
+        if doc_id is None:
+            return []
+        sql = f"SELECT visit_id FROM doc_x_visit WHERE doc_id = {doc_id}"
         rows = tools_db.get_rows(sql)
         if not rows:
             return []
@@ -851,7 +859,7 @@ class GwDocument(QObject):
         object_name = tools_qt.get_text(dialog, table_object + "_name")
         filter_str = f"name = '{object_name}'"
         if object_name in (None, "", "null"):
-            filter_str = f"id = '{doc_id}'"
+            filter_str = f"id = {doc_id}"
         # Check if we already have data with selected object_id
         sql = (f"SELECT * "
                f" FROM {table_object}"

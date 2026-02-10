@@ -3799,7 +3799,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
 
                 elif return_manager_style['style'] == 'qml':
                     style_id = return_manager_style['id']
-                    extras = f'"style_id":"{style_id}", "layername":"{key}"'
+                    extras = f'"style_id":"{style_id}", "layername":"{layer_name}"'
                     body = create_body(extras=extras)
                     style = execute_procedure('gw_fct_getstyle', body)
                     if style is None or style.get('status') == 'Failed':
@@ -3861,6 +3861,21 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
 
     table_relation = table_object + table_separator + feature_type
     widget_name = "tbl_" + table_relation
+
+    # If feature_id is None or 'null', try to get the value of a specific tableview column
+    if feature_id is None or feature_id == 'null':
+        # Try to get feature_id from the selected row in the relevant tableview
+        widget = tools_qt.get_widget(dialog, widget_name)
+        if widget:
+            selected_rows = widget.selectionModel().selectedRows() if widget.selectionModel() else []
+            if selected_rows:
+                selected_row_index = selected_rows[0]
+                model = widget.model()
+                if model:
+                    # Try to get the column index by the expected id column
+                    col_index = tools_qt.get_col_index_by_col_name(widget, f"{feature_type}_id")
+                    if col_index != -1:
+                        feature_id = model.data(model.index(selected_row_index.row(), col_index))
 
     exists = tools_db.check_table(table_relation)
     if not exists:

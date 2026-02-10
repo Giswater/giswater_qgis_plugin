@@ -397,7 +397,7 @@ class GwToolBoxButton(GwAction):
                 layout.addWidget(widget, 1, order)
 
             # Set scale-to-fit
-            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         # Update tbl in case filters have default value
         self._update_tbl_reports()

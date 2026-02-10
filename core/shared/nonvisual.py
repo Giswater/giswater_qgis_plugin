@@ -267,7 +267,7 @@ class GwNonVisual:
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=QHeaderView.ResizeMode.Stretch, stretchLastSection=False)
+                                      section_resize_mode=QHeaderView.ResizeMode.Stretch, stretch_last_section=False)
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
@@ -739,7 +739,7 @@ class GwNonVisual:
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
         self._manage_curve_plot(self.dialog, tbl_curve_value, self.plot_widget, None, None)
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+        tools_qt.set_tableview_config(tbl_curve_value, section_resize_mode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name='nonvisual_curve')
@@ -2245,7 +2245,7 @@ class GwNonVisual:
             self._load_timeseries_widgets(self.dialog)
 
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+        tools_qt.set_tableview_config(tbl_timeseries_value, section_resize_mode=QHeaderView.ResizeMode.Stretch, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
         is_new = (timser_id is None) or duplicate
 

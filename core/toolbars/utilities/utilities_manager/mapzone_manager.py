@@ -53,6 +53,7 @@ class GwMapzoneManager:
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
         self.user_selected_exploitation = '-901'
+        self._flood_enabled_by_tab = {}
 
     def manage_mapzones(self):
 
@@ -66,7 +67,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         tabs = []
-        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'macroomzone'],
+        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'macroomzone', 'supplyzone'],
                         'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone']}
 
         tabs.extend(project_tabs.get(global_vars.project_type, []))
@@ -93,7 +94,7 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
-        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis))
+        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._handle_flood_analysis_click))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -172,15 +173,19 @@ class GwMapzoneManager:
         if mapzone_type in self.mapzone_status["enabled"]:
             # enabled
             self.mapzone_mng_dlg.btn_execute.setEnabled(True)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(self._flood_enabled_by_tab.get(mapzone_type, False))
         elif mapzone_type in self.mapzone_status["enabledMacromapzone"]:
             # enabledMacromapzone
             self.mapzone_mng_dlg.btn_execute.setEnabled(True)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
         elif mapzone_type in self.mapzone_status["disabled"]:
             # disabled
             self.mapzone_mng_dlg.btn_execute.setEnabled(False)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
         else:
             # fallback
             self.mapzone_mng_dlg.btn_execute.setEnabled(False)
+            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
@@ -220,7 +225,7 @@ class GwMapzoneManager:
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectionBehavior.SelectRows, edit_triggers=set_edit_triggers,
-                                      sectionResizeMode=QHeaderView.ResizeMode.Interactive)
+                                      section_resize_mode=QHeaderView.ResizeMode.Interactive)
         tools_gw.set_tablemodel_config(self.mapzone_mng_dlg, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
@@ -278,8 +283,16 @@ class GwMapzoneManager:
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
-        if run_button and self.mapzone_mng_dlg.btn_flood:
-            run_button.clicked.connect(partial(self.mapzone_mng_dlg.btn_flood.setEnabled, True))
+        enable_flood = mapzone_name in self.mapzone_status["enabled"]
+        if run_button and self.mapzone_mng_dlg.btn_flood and enable_flood:
+            run_button.clicked.connect(partial(self._enable_flood_for_tab, mapzone_name))
+
+    def _enable_flood_for_tab(self, mapzone_name):
+        """Enable flood button only for the current mapzone tab."""
+        if mapzone_name not in self.mapzone_status["enabled"]:
+            return
+        self._flood_enabled_by_tab[mapzone_name] = True
+        self.mapzone_mng_dlg.btn_flood.setEnabled(True)
 
     def _refresh_mapzone_table_on_close(self, result_ignored=None):
         """ Refreshes the table when the dialog is closed, ignoring the result signal. """
@@ -289,64 +302,138 @@ class GwMapzoneManager:
         expr = "" if show_inactive else "active is true"
         self._fill_mapzone_table(expr=expr)
 
-    def _open_flood_analysis(self):
+    def _handle_flood_analysis_click(self):
+        """Handle flood button click based on user settings."""
+        if self._use_hinundation_from_arc():
+            self._start_flood_analysis_from_arc()
+        else:
+            self._open_flood_analysis()
+
+    def _use_hinundation_from_arc(self) -> bool:
+        value = tools_gw.get_config_parser("system", "inundation_from_arc", "user", "init", prefix=False)
+        return str(value) == 'True'
+
+    def _start_flood_analysis_from_arc(self):
+        """Enable arc selection before running inundation analysis."""
+        layer = tools_qgis.get_layer_by_tablename('ve_arc', show_warning_=True)
+        if not layer:
+            msg = "Arc layer not found. Cannot start inundation from arc."
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
+            return
+
+        self.layer_arc = layer
+        tools_qgis.set_layer_visible(layer)
+        self.iface.setActiveLayer(layer)
+
+        tools_gw.disconnect_signal('mapzone_manager_snapping')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+
+        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
+                                'mapzone_manager_snapping', 'flood_from_arc_xyCoordinates_mouse_moved')
+        tools_gw.connect_signal(self.emit_point.canvasClicked,
+                                partial(self._identify_arc_and_run_flood_analysis, self.mapzone_mng_dlg),
+                                'mapzone_manager_snapping', 'flood_from_arc_ep_canvasClicked')
+
+        msg = "Select an arc to start inundation analysis."
+        tools_qgis.show_info(msg, dialog=self.mapzone_mng_dlg)
+
+    def _identify_arc_and_run_flood_analysis(self, dialog, point, event):
+        """Identify the arc at the selected point and run flood analysis."""
+        if event == Qt.MouseButton.RightButton:
+            self._cancel_snapping_tool(dialog, None)
+            self.iface.actionPan().trigger()
+            return
+
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result.isValid():
+            msg = "No valid snapping result. Please select a valid arc."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
+        snapped_feature = self.snapper_manager.get_snapped_feature(result)
+        arc_id = snapped_feature.attribute('arc_id')
+        if not arc_id:
+            msg = "No arc ID found at the snapped location."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
+        try:
+            geometry = snapped_feature.geometry()
+            self.rubber_band.setToGeometry(geometry, None)
+            self.rubber_band.setColor(QColor(255, 0, 0, 100))
+            self.rubber_band.setWidth(5)
+            self.rubber_band.show()
+        except AttributeError:
+            msg = "Unable to highlight the snapped arc."
+            tools_qgis.show_warning(msg, dialog=dialog)
+
+        msg = "Flood analysis will start from arc ID"
+        tools_qgis.show_info(msg, dialog=dialog, parameter=arc_id)
+        self.selected_arc_id = arc_id
+
+        self._open_flood_analysis(selected_arc_id=arc_id)
+
+        try:
+            self.layer_arc.removeSelection()
+        except AttributeError:
+            pass
+
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('mapzone_manager_snapping')
+
+    def _open_flood_analysis(self, selected_arc_id=None):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
         mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
 
         # Call gw_fct_getgraphinundation
-        extras = f'"parameters":{{"mapzone": "{mapzone_name}"}}'
+        extras_params = f'"mapzone": "{mapzone_name}"'
+        if selected_arc_id is not None:
+            extras_params += f', "selected_arc_id": "{selected_arc_id}"'
+        extras = f'"parameters":{{{extras_params}}}'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
         if not json_result or json_result.get('status') != 'Accepted':
             msg = "No valid data received from the SQL function."
             tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
             return
+        line_data = json_result.get('body', {}).get('data', {}).get('line')
+        if not line_data:
+            msg = "No valid line data received from the SQL function."
+            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
+            return
+
+        line_layers = line_data if isinstance(line_data, list) else [line_data]
+
         # Extract mapzone_ids with data from json_result
         valid_mapzone_ids = set()
-        if 'body' in json_result and 'data' in json_result['body'] and 'line' in json_result['body']['data']:
-            # Access the 'features' list in 'line'
-            features = json_result['body']['data']['line'].get('features', [])
+        for layer_data in line_layers:
+            features = (layer_data or {}).get('features', [])
             if features is not None:
                 for feature in features:
                     properties = feature.get('properties', {})
                     mapzone_id = properties.get('mapzone_id')
                     if mapzone_id is not None:
                         valid_mapzone_ids.add(mapzone_id)
-
-        # Get graphconfig for mapzone using gw_fct_getgraphconfig
-        graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        config_extras = f'"context":"OPERATIVE", "mapzone":"{graph_class}"'
-        config_body = tools_gw.create_body(extras=config_extras)
-
-        # Call gw_fct_getgraphconfig
-        config_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', config_body)
-        if not config_result or config_result.get('status') != 'Accepted':
-            msg = "Failed to retrieve graph configuration."
-            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
-            return
-
-        # Get mapzones style by calling gw_fct_getstylemapzones
-        style_extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
-        style_body = tools_gw.create_body(extras=style_extras)
-
-        style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
-        if not style_result or style_result.get('status') != 'Accepted':
-            msg = "Failed to retrieve mapzone styles."
-            tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
-            return
-
-        # Add the flooding data to a temporal layer
-        layer_name = json_result['body']['data']['line'].get('layerName')
-        vlayer = tools_qgis.get_layer_by_layername(layer_name)
-
-        if vlayer and vlayer.isValid():
+        # Add the flooding data to temporal layer(s)
+        vlayer_list = []
+        for layer_data in line_layers:
+            layer_name = (layer_data or {}).get('layerName')
+            if not layer_name:
+                continue
+            vlayer = tools_qgis.get_layer_by_layername(layer_name)
+            if not vlayer or not vlayer.isValid():
+                continue
             # Apply styling only to valid mapzones
-            self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
+            vlayer_list.append(vlayer)
+
+        if vlayer_list:
             msg = "Temporal layer created successfully."
             tools_qgis.show_success(msg, dialog=self.mapzone_mng_dlg)
-            self.iface.mapCanvas().setExtent(vlayer.extent())
-            self.iface.mapCanvas().refresh()
+            tools_qgis.zoom_to_layer(vlayer_list[0])
         else:
             msg = "Failed to retrieve the temporal layer"
             tools_qgis.show_warning(msg, dialog=self.mapzone_mng_dlg)
@@ -377,6 +464,7 @@ class GwMapzoneManager:
         """Applies styles to the layer based on the mapzone styles retrieved, filtering only those with data in valid_mapzone_ids."""
 
         categories = []
+        valid_mapzone_ids_str = {str(mapzone_id) for mapzone_id in valid_mapzone_ids if mapzone_id is not None}
 
         for mapzone in mapzones:
             try:
@@ -387,14 +475,17 @@ class GwMapzoneManager:
             values = mapzone.get('values', [])
 
             # Only include values that match the `mapzone_id`s present in valid_mapzone_ids
-            filtered_values = [value for value in values if value['id'] in valid_mapzone_ids]
+            filtered_values = [
+                value for value in values
+                if str(value.get('id')) in valid_mapzone_ids_str
+            ]
             if not filtered_values:
                 continue
 
             # Process each filtered value to apply styling
             for value in filtered_values:
-                mapzone_id = value['id']
-                color_str = value['stylesheet']['featureColor']
+                mapzone_id = value.get('id')
+                color_str = value.get('stylesheet', {}).get('featureColor', '0,0,0')
                 r, g, b = map(int, color_str.split(','))
 
                 # Create color with full opacity
@@ -421,8 +512,7 @@ class GwMapzoneManager:
             self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
             self.iface.mapCanvas().refreshAllLayers()
         else:
-            msg = "No valid mapzones with values were found to apply styles."
-            tools_qgis.show_warning(msg)
+            return
 
     def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
         """Activates the Temporal Controller with animated temporal navigation."""
@@ -462,8 +552,8 @@ class GwMapzoneManager:
             return
 
         # Set temporal extents in the temporal controller
-        min_time = min(temporal_values)
-        max_time = max(temporal_values)
+        min_time = min(temporal_values).addSecs(-1)
+        max_time = max(temporal_values).addSecs(1)
         temporal_controller.setTemporalExtents(QgsDateTimeRange(min_time, max_time))
 
         # Set frame duration using QgsInterval for 1 second
