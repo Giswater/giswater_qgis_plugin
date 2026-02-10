@@ -273,18 +273,24 @@ def manage_visit_class(**kwargs):
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
 
+    # Get visit class
     current_visit_class = tools_gw.get_values(dialog, widget)
     if current_visit_class[columnname] in (None, -1, '-1'):
         return
+    # Get table name
     sql = (f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}")
     ui_tablename = tools_db.get_row(sql)
+    if ui_tablename in (None, []):
+        return
     table_view = dialog.tab_main.currentWidget().findChildren(QTableView)
     if table_view in (None, []):
         return
     table_view = table_view[0]
-    feature = f'"tableName":"{ui_tablename[0]}"'
+    # Manage parameters
+    extras = f'"tableName":"{ui_tablename[0]}"'
     filter_fields = f'"{field_id}": {{"filterSign":"=", "value":"{feature_id}"}}'
-    body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+    body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
+    # Execute procedure
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
         widget.removeItem(widget.currentIndex())
@@ -414,27 +420,26 @@ def filter_table(**kwargs):
         feature_id = complet_result['body']['feature']['id']
     filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
     filter_fields = get_filter_qtableview(dialog, widget_list, complet_result, filter_fields)
-    try:
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception:
-        tab_name = 'main'
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id, id_name=field_id)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject, feature_id, id_name=field_id)
     if complet_list is False:
         return False
-    for field in complet_list['body']['data']['fields']:
-        qtable = dialog.findChild(QTableView, field['widgetname'])
-        if qtable is None:
-            qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
-        if qtable:
-            if field['value'] is None:
-                model.removeRows(0, model.rowCount())
-                return complet_list
-            model.clear()
-            tools_gw.add_tableview_header(qtable, field)
-            tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, Qt.SortOrder.DescendingOrder)
-            tools_qt.set_tableview_config(qtable)
+    # for field in complet_list['body']['data']['fields']:
+    qtable = dialog.findChild(QTableView, widgetname)
+    if qtable is None:
+        qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
+    if qtable:
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if data.get('hidden'):
+            return False
+        if not fields:
+            model.removeRows(0, model.rowCount())
+            return complet_list
+        model.clear()
+        tools_gw.add_tableview_header(qtable, fields)
+        tools_gw.fill_tableview_rows(qtable, fields)
+        tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, Qt.SortOrder.DescendingOrder)
+        tools_qt.set_tableview_config(qtable)
 
     return complet_list
 
@@ -456,25 +461,23 @@ def filter_table_mincut(**kwargs):
     func_params = kwargs['func_params']
 
     filter_fields = get_filter_qtableview_mincut(dialog, widget_list, func_params)
-    try:
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except Exception:
-        tab_name = 'main'
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject, feature_id)
     if complet_list is False:
         return False
-    for field in complet_list['body']['data']['fields']:
-        qtable = dialog.findChild(QTableView, field['widgetname'])
-        if qtable:
-            if field['value'] is None:
-                model.removeRows(0, model.rowCount())
-                return complet_list
-            model.clear()
-            tools_gw.add_tableview_header(qtable, field)
-            tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], Qt.SortOrder.DescendingOrder)
-            tools_qt.set_tableview_config(qtable)
+    data = complet_list['body']['data']
+    fields = data['fields']
+    if data.get('hidden'):
+        return False
+    qtable = dialog.findChild(QTableView, widgetname)
+    if qtable:
+        if not fields:
+            model.removeRows(0, model.rowCount())
+            return complet_list
+        model.clear()
+        tools_gw.add_tableview_header(qtable, fields)
+        tools_gw.fill_tableview_rows(qtable, fields)
+        tools_gw.set_tablemodel_config(dialog, qtable, widgetname, Qt.SortOrder.DescendingOrder)
+        tools_qt.set_tableview_config(qtable)
 
     return complet_list
 
@@ -830,24 +833,25 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     except Exception:
         tab_name = 'main'
         no_tabs = True
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject)
 
     if complet_list is False:
         return False, False
 
     headers = complet_list['body']['form'].get('headers')
 
-    for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']:
-            continue
+    data = complet_list['body']['data']
+    fields = data['fields']
+    if data.get('hidden'):
+        return False, False
+    widget = dialog.findChild(QTableView, widgetname)
+    if widget is None:
+        return False, False
 
-        widget = dialog.findChild(QTableView, field['widgetname'])
-        if widget is None:
-            continue
-        widget = tools_gw.add_tableview_header(widget, field, headers)
-        widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
-        tools_qt.set_tableview_config(widget)
+    widget = tools_gw.add_tableview_header(widget, fields, headers)
+    widget = tools_gw.fill_tableview_rows(widget, fields)
+    widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
+    tools_qt.set_tableview_config(widget)
 
     widget_list = []
     if no_tabs:
@@ -1119,13 +1123,24 @@ def close_manager(**kwargs):
 # region private functions
 
 
-def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id='', id_name=''):
+def _get_list(complet_result, filter_fields='', linkedobject='', feature_id='', id_name=''):
 
-    form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
-    if complet_result['body'].get('feature') and complet_result['body']['feature'].get('idName'):
-        id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name
-    feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{feature_id}"'
-    body = tools_gw.create_body(form, feature, filter_fields)
+    # Manage id_name
+    if id_name is None:
+        try:
+            id_name = complet_result['body']['feature']['idName']
+        except KeyError:
+            id_name = None
+    # Parameters
+    extras = f'"tableName":"{linkedobject}"'
+    if id_name and feature_id:
+        if filter_fields:
+            filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}, {filter_fields}'
+        else:
+            filter_fields = f'"{id_name}":{{"value":"{feature_id}","filterSign":"="}}'
+    # Create body
+    body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
+    # Execute procedure
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
     if json_result is None or json_result['status'] == 'Failed':
         return False

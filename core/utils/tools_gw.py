@@ -13,9 +13,10 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal, Dict, Optional, Union
 import webbrowser
 import xml.etree.ElementTree as ET
+
+from typing import Literal, Dict, Optional, Union, Any, List
 from qgis.PyQt.sip import isdeleted
 from osgeo import gdal
 
@@ -1087,31 +1088,31 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 continue
             if data[k]['features'] is None or len(data[k]['features']) == 0:
                 continue
-            
+
             aux_layer_name = layer_name
             try:
                 if not layer_name:
                     aux_layer_name = data[k]['layerName']
             except KeyError:
                 aux_layer_name = str(k)
-            
+
             if del_old_layers:
                 tools_qgis.remove_layer_from_toc(aux_layer_name, group)
-            
+
             # Use GeoJSON approach like manage_json_return
             geojson_str = json.dumps(data[k])
             vsipath = f"/vsimem/{aux_layer_name}.geojson"
             gdal.FileFromMemBuffer(vsipath, geojson_str)
             v_layer = QgsVectorLayer(vsipath, aux_layer_name, 'ogr')
-            
+
             # Set CRS if not valid
             if not v_layer.crs().isValid():
                 v_layer.setCrs(QgsCoordinateReferenceSystem(f'EPSG:{srid}'))
             v_layer.updateExtents()
-            
+
             # Get geometry type from layer (like manage_json_return)
             geometry_type = v_layer.geometryType()
-            
+
             # Add layer to project and group
             QgsProject.instance().addMapLayer(v_layer, False)
             root = QgsProject.instance().layerTreeRoot()
@@ -5421,7 +5422,7 @@ def get_icon(icon, folder="dialogs", log_info=True):
         return None
 
 
-def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_headers: Optional[list] = []) -> QWidget:
+def add_tableview_header(widget: QWidget, fields: Optional[List[Dict[str, Any]]] = [], json_headers: Optional[list] = []) -> QWidget:
 
     model = widget.model()
     if model is None:
@@ -5435,8 +5436,8 @@ def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_heade
         # Get headers
         headers = []
 
-        if field and field['value'] is not None:
-            for x in field['value'][0]:
+        if fields:
+            for x in fields[0]:
                 headers.append(x)
 
         # If there are not rows in tableview, set headers from json_headers
@@ -5453,12 +5454,12 @@ def add_tableview_header(widget: QWidget, field: Optional[dict] = {}, json_heade
     return widget
 
 
-def fill_tableview_rows(widget, field):
-    if field is None or field.get('value') is None:
+def fill_tableview_rows(widget, fields: List[Dict[str, Any]]):
+    if not fields:
         return widget
     model = widget.model()
 
-    for item in field['value']:
+    for item in fields:
         row = []
         for value in item.values():
             if value is None:
@@ -7025,21 +7026,24 @@ def _get_extent_parameters(schema_name, table_name="node", geom_name="the_geom")
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
 
-    complet_list = _get_list(complet_result, '', filter_fields, widgetname, 'form_feature', linkedobject)
+    complet_list = _get_list(complet_result, filter_fields, linkedobject)
     tab_name = 'tab_none'
-    if complet_list is False:
+    if complet_list in (False, None):
         return False, False
-    for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']:
-            continue
-        short_name = f'{tab_name}_{field["widgetname"]}'
-        widget = dialog.findChild(QTableView, short_name)
-        if widget is None:
-            continue
-        widget = add_tableview_header(widget, field)
-        widget = fill_tableview_rows(widget, field)
-        widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
-        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)
+    data = complet_list['body']['data']
+    fields = data['fields']
+
+    if data.get('hidden'):
+        return False, False
+    short_name = f'{tab_name}_{widgetname}' if tab_name not in widgetname else widgetname
+    widget = dialog.findChild(QTableView, short_name)
+    if widget is None:
+        return False, False
+
+    widget = add_tableview_header(widget, fields)
+    widget = fill_tableview_rows(widget, fields)
+    widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
+    tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)
 
     widget_list = []
     widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
@@ -7051,14 +7055,14 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     return complet_list, widget_list
 
 
-def _get_list(complet_result, form_name='', filter_fields='', widgetname='', formtype='',
-              linkedobject=''):
+def _get_list(complet_result, filter_fields='', linkedobject=''):
 
-    form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
     if linkedobject is None:
         return
-    feature = f'"tableName":"{linkedobject}"'
-    body = create_body(form, feature, filter_fields)
+    # Create body
+    extras = f'"tableName":"{linkedobject}"'
+    body = create_body(filter_fields=filter_fields, extras=extras)
+    # Execute procedure
     json_result = execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
         return False
@@ -7073,7 +7077,7 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
     if id_field is None:
         id_field = "id_val"
 
-    feature = f'"tableName":"{table_name}"'
+    extras = f'"tableName":"{table_name}"'
     filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
 
     if filter_id is not None:
@@ -7082,7 +7086,7 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
     if filter_active is not None:
         filter_fields += f', "active": {{"filterSign":"=", "value":"{filter_active}"}}'
 
-    body = create_body(feature=feature, filter_fields=filter_fields)
+    body = create_body(filter_fields=filter_fields, extras=extras)
     json_result = execute_procedure('gw_fct_getlist', body)
 
     if json_result is None or json_result['status'] == 'Failed':
@@ -7575,8 +7579,8 @@ def _manage_tableview(**kwargs):
     class_self = kwargs['class']
     module = tools_backend_calls
     widget = add_tableview(complet_result, field, dialog, module, class_self)
-    widget = add_tableview_header(widget, field)
-    widget = fill_tableview_rows(widget, field)
+    widget = add_tableview_header(widget, field.get('value'))
+    widget = fill_tableview_rows(widget, field.get('value'))
     tools_qt.set_tableview_config(widget)
     return widget
 

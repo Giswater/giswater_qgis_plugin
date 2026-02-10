@@ -471,13 +471,13 @@ class GwDscenarioManagerButton(GwAction):
         """ Mount and execute the query for gw_fct_getlist """
 
         id_field = self.dict_ids.get(table_name)
-        feature = f'"tableName":"{table_name}"'
+        extras = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         if filter_id is not None:
             filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
         if not filter_active:
             filter_fields += ', "active": {"filterSign":"=", "value":"true"}'
-        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+        body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
             return False
