@@ -209,6 +209,17 @@ BEGIN
 		RETURN v_response;
 	END IF;
 
+	-- don't allow to delete mincut if it's not planified
+	IF v_action = 'mincutDelete' AND (SELECT mincut_state FROM om_mincut WHERE id = v_mincut_id) <> v_mincut_on_planning_state THEN
+		RETURN jsonb_build_object(
+			'status', 'Failed',
+			'message', jsonb_build_object(
+				'level', 2,
+				'text', 'Mincut not planified.'
+			)
+		);
+	END IF;
+
 	-- get arc_id from click
 	IF v_xcoord IS NOT NULL THEN
 		v_sensibility_f := (SELECT (value::json->>'web')::float FROM config_param_system WHERE parameter = 'basic_info_sensibility_factor');
