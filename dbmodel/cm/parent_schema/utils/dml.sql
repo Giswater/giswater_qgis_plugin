@@ -48,7 +48,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "tooltip": "Choose a Lot which status is ASSIGNED, IN PROGRESS or EXECUTED",
     "layoutname": "grl_option_parameters",
     "layoutorder": 2,
-    "dvQueryText": "select a.lot_id as id, concat(a.name, '' - '', b.idval, '''') as idval from cm.om_campaign_lot a join cm.sys_typevalue b on a.status=b.id::int join cm.selector_campaign c using (campaign_id) where b.typevalue = ''lot_status'' and a.status in (3,4,6) and c.cur_user = current_user order by a.status, a.name asc",
+    "dvQueryText": "SELECT a.lot_id AS id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.om_campaign c USING (campaign_id) JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' AND a.status IN (3,4,6) AND (EXISTS (SELECT 1 FROM cm.cat_user cu JOIN cm.cat_team ct ON ct.team_id = cu.team_id JOIN cm.cat_organization co ON co.organization_id = ct.organization_id WHERE cu.username = current_user) OR c.organization_id IN (SELECT co.organization_id FROM cm.cat_user cu JOIN cm.cat_team ct ON ct.team_id = cu.team_id JOIN cm.cat_organization co ON co.organization_id = ct.organization_id WHERE cu.username = current_user)) ORDER BY a.status, a.name ASC",
     "selectedId": null
   },
   {
@@ -78,7 +78,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "tooltip": "Choose a Lot ASSIGNED, IN PROGRESS or EXECUTED",
     "layoutname": "grl_option_parameters",
     "layoutorder": 2,
-    "dvQueryText": "select a.lot_id as id, concat(a.name, '' - '', b.idval, '''') as idval from cm.om_campaign_lot a join cm.sys_typevalue b on a.status=b.id::int where b.typevalue = ''lot_status'' and a.status in (3,4,6) order by a.status, a.name asc",
+    "dvQueryText": "SELECT a.lot_id AS id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.om_campaign c USING (campaign_id) JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' AND a.status IN (3,4,6) AND (EXISTS (SELECT 1 FROM cm.cat_user cu JOIN cm.cat_team ct ON ct.team_id = cu.team_id JOIN cm.cat_organization co ON co.organization_id = ct.organization_id WHERE cu.username = current_user) OR c.organization_id IN (SELECT co.organization_id FROM cm.cat_user cu JOIN cm.cat_team ct ON ct.team_id = cu.team_id JOIN cm.cat_organization co ON co.organization_id = ct.organization_id WHERE cu.username = current_user)) ORDER BY a.status, a.name ASC",
     "selectedId": null
   },
   {
