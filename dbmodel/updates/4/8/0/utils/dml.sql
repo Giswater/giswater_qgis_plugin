@@ -22,3 +22,8 @@ VALUES (4542,'Commit changes is not allowed using psectors','Unselect commit cha
 INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source",message_type)
 VALUES (4544,'Commit changes must be enabled when Execute massive mincut is enabled','Enable commit changes or disable execute massive mincut',2,true,'utils','core','UI');
 
+-- 10/02/2026
+UPDATE config_param_system
+	SET value='{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"ve_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}',
+    "parameter"='basic_search_v2_tab_psector'
+	WHERE "parameter"='basic_search_v2_tab_psector ';
