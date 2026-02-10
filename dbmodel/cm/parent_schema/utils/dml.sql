@@ -45,7 +45,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "label": "Lot ID:",
     "widgettype": "combo",
     "datatype": "text",
-    "tooltip": "Choose a Lot which status is ASIGN, IN PGROGRESS or EXECUTED",
+    "tooltip": "Choose a Lot which status is ASSIGNED, IN PROGRESS or EXECUTED",
     "layoutname": "grl_option_parameters",
     "layoutorder": 2,
     "dvQueryText": "select a.lot_id as id, concat(a.name, '' - '', b.idval, '''') as idval from cm.om_campaign_lot a join cm.sys_typevalue b on a.status=b.id::int join cm.selector_campaign c using (campaign_id) where b.typevalue = ''lot_status'' and a.status in (3,4,6) and c.cur_user = current_user order by a.status, a.name asc",
