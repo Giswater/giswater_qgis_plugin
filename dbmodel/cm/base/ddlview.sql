@@ -79,3 +79,4 @@ CREATE OR REPLACE VIEW v_filter_campaign AS
 
 -- Permissions for v_selector_lot
 GRANT SELECT ON TABLE cm.v_selector_lot TO role_cm_field;
+GRANT SELECT ON TABLE cm.v_filter_lot TO role_cm_field;
