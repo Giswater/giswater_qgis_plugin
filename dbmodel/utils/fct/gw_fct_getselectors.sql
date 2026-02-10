@@ -235,7 +235,7 @@ BEGIN
 	
 			-- create table for temp_sector
 			CREATE TEMP TABLE temp_sector as
-			SELECT s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active 
+			SELECT distinct s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active 
 			FROM temp_muni_sector_expl t
 			JOIN temp_exploitation e USING (expl_id)
 			JOIN sector s ON s.sector_id = t.sector_id
