@@ -28,3 +28,36 @@ UPDATE cm.sys_version AS dst
      ORDER BY date DESC
      LIMIT 1
   ) AS src;
+
+-- topological trace
+INSERT INTO sys_message
+(id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4444, 'There is no topology from the selected node.', 'The node is isolated or it does not exist in the selected lot_id.', 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3542, 'gw_fct_cm_topological_trace', 'ws', 'function', 'json', 'json', 'Function to visualize the topology of the lot from a SELECTED NODE.
+
+The available lots for the analysis are the ones that take part into de SELECTED CAMPAIGN.', 'role_om', NULL, 'core', NULL);
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3542, '[CM] Visualize Lot topology', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "lotId",
+    "label": "Lot ID:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Choose a Lot which status is ASIGN, IN PGROGRESS or EXECUTED",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "dvQueryText": "select a.lot_id as id, concat(a.name, '' - '', b.idval, '''') as idval from cm.om_campaign_lot a join cm.sys_typevalue b on a.status=b.id::int join cm.selector_campaign c using (campaign_id) where b.typevalue = ''lot_status'' and a.status in (3,4,6) and c.cur_user = current_user order by a.status, a.name asc",
+    "selectedId": null
+  },
+  {
+    "widgetname": "nodeId",
+    "widgettype": "text",
+    "datatype": "integer",
+    "label": "Node id:",
+    "layoutname": "grl_option_parameters",
+    "isMandatory": true,
+    "layoutorder": 5
+  }
+]'::json, NULL, true, '{4}');
